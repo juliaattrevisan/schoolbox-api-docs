@@ -87,7 +87,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate
+     * Impersonate a user via user profile drop when alaress is presented in the drop
      * @param $fullname
      * @throws Exception
      */
@@ -105,7 +105,7 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Impersonate
+     * Impersonate a user via user profile drop
      * @param $fullname
      * @throws Exception
      */
@@ -120,6 +120,38 @@ class AcceptanceTester extends Actor
         $i->click($fullname, '#switch-user');
         $i->deleteSessionSnapshot($fullname);
         $i->deleteSessionSnapshot('login:alaress');
+    }
+
+    /**
+     * Impersonate a user via modify screen
+     * @param $userId
+     * @throws Exception
+     */
+    public function impersonateViaModifyUserPage($fullname)
+    {
+        $i = $this;
+        $i->amOnPage('/user/recoverSession');
+        $i->searchBar($fullname);
+        $i->click('a[title="Modify User"]');
+        $i->click('a.icon-more');
+        $i->click('a[title="Login as user"]');
+        $i->waitForText($fullname, 5);
+        $i->deleteSessionSnapshot($fullname);
+        $i->deleteSessionSnapshot('login:alaress');
+    }
+
+    /**
+     * search for an user using the search bar
+     * @param $fullname
+     * @throws Exception
+     */
+    public function searchBar($fullname)
+    {
+        $i = $this;
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', $fullname);
+        $i->click('ul.results.information-list');
+        $i->waitForText($fullname, 5);
     }
 
     /**

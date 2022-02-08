@@ -5,6 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Quiz;
+
 /**
  * Steps:
  * 1. Provision legacy.tar.gz data
@@ -15,6 +17,8 @@
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Quiz/ReviewCest:<test method name>
  */
 
+use AcceptanceTester;
+use Page\Homepage;
 use Page\Quiz\AssessmentForm;
 use Page\Quiz\StatusPage;
 use Page\Quiz\SectionForm;
@@ -24,6 +28,7 @@ use Page\Quiz\AttemptForm;
 use Page\Quiz\QuestionForm;
 use Page\Common;
 use Codeception\Util\Locator;
+use Exception;
 
 /**
  * Test create, attempt and review of quiz
@@ -49,16 +54,18 @@ class ReviewCest
      */
     public function testQuizBasic(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student1 = Common::USER_RACHEL;
-        $student1Id = Common::USER_ID_RACHEL;
-        $student2 = Common::USER_DAVID;
-        $student2Id = Common::USER_ID_DAVID;
-        $teacher = Common::USER_ZANE;
+
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student1 = Common::USER_LOUISASMITH;
+        $student1Id = Common::USER_ID_LOUISASMITH;
+        $student2 = Common::USER_JAMALALI;
+        $student2Id = Common::USER_ID_JAMALALI;
+        $teacher = Common::USER_JACKCOLES;
+
         $quizTitle = 'Cest One ' . Common::gentext(6);
 
-        // As Zane, create a quiz
+        // As Jack Coles, create a quiz
         $i->impersonate($teacher);
         $this->createQuiz(
             $i,
@@ -70,7 +77,7 @@ class ReviewCest
             AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
         );
 
-        // As Zane, review attempt
+        // As Jack Coles, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
 
         $statusPage = new StatusPage($i);
@@ -80,11 +87,11 @@ class ReviewCest
         // TODO: enter something
         $reviewForm->finalise();
 
-        // As Rachel, check notification
-        $i->impersonate($student1);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the quiz
+        // As Louisa Smith, click into the quiz
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
     }
@@ -96,16 +103,18 @@ class ReviewCest
      */
     public function testQuizReviewHorizontal(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student1 = Common::USER_RACHEL;
-        $student1Id = Common::USER_ID_RACHEL;
-        $student2 = Common::USER_DAVID;
-        $student2Id = Common::USER_ID_DAVID;
-        $teacher = Common::USER_ZANE;
+
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student1 = Common::USER_LOUISASMITH;
+        $student1Id = Common::USER_ID_LOUISASMITH;
+        $student2 = Common::USER_JAMALALI;
+        $student2Id = Common::USER_ID_JAMALALI;
+        $teacher = Common::USER_JACKCOLES;
+
         $quizTitle = 'Cest Two ' . Common::gentext(6);
 
-        // As Zane, create a quiz
+        // As Jack coles, create a quiz
         $i->impersonate($teacher);
         $this->createQuiz(
             $i,
@@ -117,7 +126,7 @@ class ReviewCest
             AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
         );
 
-        // As Zane, review attempt
+        // As Jack Coles, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
 
         // Now go to review horizontal page
@@ -131,20 +140,22 @@ class ReviewCest
         $reviewHorizontalForm = $statusPage->clickReviewHorizontal($quizTitle);
         $reviewHorizontalForm->finalise();
 
-        // As Rachel, check notification
-        $i->impersonate($student1);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
 
         // #attempts > tbody > tr:nth-child(1) > td:nth-child(4)
         // TODO: check only latest one is reviewed
         // TODO: USE ACTUAL REVIEW TIME!!!
-        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $year = date("Y");
+        $i->canSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
-        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
+        $i->cantSee($year, '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
+        $i->canSee('—', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(2) > td:nth-child(5)');
     }
 
@@ -155,16 +166,16 @@ class ReviewCest
      */
     public function testQuizBulkReview(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student1 = Common::USER_RACHEL;
-        $student1Id = Common::USER_ID_RACHEL;
-        $student2 = Common::USER_DAVID;
-        $student2Id = Common::USER_ID_DAVID;
-        $teacher = Common::USER_ZANE;
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student1 = Common::USER_LOUISASMITH;
+        $student1Id = Common::USER_ID_LOUISASMITH;
+        $student2 = Common::USER_JAMALALI;
+        $student2Id = Common::USER_ID_JAMALALI;
+        $teacher = Common::USER_JACKCOLES;
         $quizTitle = 'Cest Three ' . Common::gentext(6);
 
-        // As Zane, create a quiz
+        // As Jack Coles, create a quiz
         $i->impersonate($teacher);
         $this->createQuiz(
             $i,
@@ -176,18 +187,18 @@ class ReviewCest
             AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
         );
 
-        // As Zane, review attempt
+        // As Jack Coles, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
 
         // Bulk Review
         $statusPage = new StatusPage($i);
         $statusPage->bulkReview($quizTitle);
 
-        // As Rachel, check notification
-        $i->impersonate($student1);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
     }
@@ -199,16 +210,22 @@ class ReviewCest
      */
     public function testQuizGradeVisibility(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student1 = Common::USER_RACHEL;
-        $student1Id = Common::USER_ID_RACHEL;
-        $student2 = Common::USER_DAVID;
-        $student2Id = Common::USER_ID_DAVID;
-        $teacher = Common::USER_ZANE;
+
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student1 = Common::USER_LOUISASMITH;
+        $student1Id = Common::USER_ID_LOUISASMITH;
+        $student2 = Common::USER_JAMALALI;
+        $student2Id = Common::USER_ID_JAMALALI;
+        $teacher = Common::USER_JACKCOLES;
         $quizTitle = 'Cest Four ' . Common::gentext(6);
 
-        // As Zane, create a quiz
+        //adding a quiz component into the homepage
+        $i->amOnPage('/homepage/83');
+        $addComponent = new Homepage($i);
+        $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Quizzes');
+
+        // As Jack Coles, create a quiz
         $i->impersonate($teacher);
         $this->createQuiz(
             $i,
@@ -220,7 +237,7 @@ class ReviewCest
             AssessmentForm::VISIBILITY_STAFF_ONLY
         );
 
-        // As Zane, review attempt
+        // As Jack Coles, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
 
         $statusPage = new StatusPage($i);
@@ -229,18 +246,19 @@ class ReviewCest
         // TODO: enter something
         $reviewForm->finalise();
 
-        // As Rachel, check notification
-        $i->impersonate($student1);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student1);
         $i->assertNotifNotExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $year = date("Y");
+        $i->cantSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
-        // Az Zane, change visibility
+        // Az Jack Coles, change visibility
         $i->impersonate($teacher);
         $i->amOnPage('/homepage/' . $classId);
         $i->click($quizTitle, '#content');
@@ -253,17 +271,18 @@ class ReviewCest
         $quizForm->setVisibility(AssessmentForm::VISIBILITY_STAFF_AND_STUDENT)
             ->update();
 
-        // As Rachel, check notification
-        $i->impersonate($student1);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student1);
         sleep(5);
         $i->amOnPage('/messages');
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
-        // shouldn't see any grades
-        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        // should see grade
+        $year = date("Y");
+        $i->canSee($year, '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
     }
 
@@ -319,10 +338,10 @@ class ReviewCest
         // finalize the question
         $sectionForm->finalize();
 
-        // As Rachel, check notification
+        // As Louisa Smith, check notification
         $attemptForm = new AttemptForm($i);
         foreach ($students as $student) {
-            $i->impersonate($student);
+            $i->impersonateViaModifyUserPage($student);
             $i->assertNotifExists('Assessment Task ' . $quizTitle . ' opened in ' . $className);
 
             // create attempt
@@ -333,14 +352,14 @@ class ReviewCest
             $attemptForm->createAttempt($quizTitle, $correctAnswer);
         }
 
-        // As Zane, check notification
+        // As Jack Coles, check notification
         $i->impersonate($teacher);
         // TODO:: the following works only for two students
         // @see schoolbox/library/Schoolbox/Realtime/Notification/Decorator.php
         sort($students);
         $i->assertNotifExists(implode(' and ', $students) . ' attempted ' . $quizTitle . ' in ' . $className);
 
-        // As Zane, click into the quiz -> brings to status page
+        // As Jack Coles, click into the quiz -> brings to status page
         $i->click($quizTitle, '#content');
         $i->waitForText('Status of ' . $quizTitle);
     }

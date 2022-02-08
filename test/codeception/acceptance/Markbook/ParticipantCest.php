@@ -5,6 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Markbook;
+
 /**
  * Steps:
  * 1. Provision legacy.tar.gz data
@@ -15,11 +17,14 @@
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Markbook/ParticipantCest:<test method name>
  */
 
+use AcceptanceTester;
+use Page\Homepage;
 use Page\Markbook\MarkbookPage;
 use Page\Common;
 use Page\Duework\AssessmentForm;
 use Page\Duework\SubmitForm;
 use Page\Duework\StatusPage;
+use Exception;
 
 class ParticipantCest
 {
@@ -32,6 +37,10 @@ class ParticipantCest
     public function _before(AcceptanceTester $i)
     {
         $i->loginAsAdmin();
+        //adding a due work component into the homepage
+        $i->amOnPage('/homepage/106');
+        $addComponent = new Homepage($i);
+        $addComponent->addComponent($addComponent::ELEMENT_ADD_COMPONENT_SECTION_LEARNING, 'Due Work');
         // TODO: Delete something already in markbook
     }
 
@@ -42,13 +51,13 @@ class ParticipantCest
     public function testMarkbookBasic(AcceptanceTester $i)
     {
 
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student = Common::USER_RACHEL;
-        $studentId = Common::USER_ID_RACHEL;
-        $teacher = Common::USER_ZANE;
-        $teacherId = Common::USER_ID_ZANE;
+        $classId = Common::CLASS_ID_DEMO2;
+        $student = Common::USER_LOUISASMITH;
+        $studentId = Common::USER_ID_LOUISASMITH;
+        $teacher = Common::USER_JACKCOLES;
+        $teacherId = Common::USER_ID_JACKCOLES;
 
-        // As Zane, create a due work
+        // As Jack Coles, create a due work
         $i->impersonate($teacher);
         $dueworkTitle1 = 'Cest One ' . Common::gentext(6);
         $filename = __DIR__ . '/../News/upload/test.jpg';
@@ -63,7 +72,7 @@ class ParticipantCest
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->create();
 
-        // As Zane, create submission
+        // As Jack Coles, create submission
         // TODO: need something nicer
         $i->click($dueworkTitle1, '#content');
         $i->click('Create submission', '#content');
@@ -89,7 +98,7 @@ class ParticipantCest
         $i->click(StatusPage::LINK_JELLY_TOT);
         $i->click(StatusPage::LINK_MODIFY);
 
-        // remove Zane from participants
+        // remove Jack Coles from participants
         $dueworkForm->modifyParticipation($teacherId, true, true)
             ->update();
 
@@ -102,6 +111,7 @@ class ParticipantCest
         $markbookPage->cantSeeParticipant($teacher);
         // student should remain
         $markbookPage->canSeeParticipant($student);
+
         // exclude the user from the duework
         $i->click($dueworkTitle1);
         $i->waitForText('Status of ' . $dueworkTitle1);
@@ -110,7 +120,7 @@ class ParticipantCest
         $i->click(StatusPage::LINK_JELLY_TOT);
         $i->click(StatusPage::LINK_MODIFY);
 
-        // remove Rachel from participants
+        // remove Louisa Smith from participants
         $dueworkForm->modifyParticipation($studentId, false, false)
             ->update();
 
