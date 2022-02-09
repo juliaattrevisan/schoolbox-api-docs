@@ -90,20 +90,16 @@ class NotifierHelper
                 if ($pastoralAccess->getRole() instanceof Role) {
                     $targetUsers += $this->buildTargetUsersForRole(
                         $pastoralAccess->getRole(),
-                        $student,
+                        $student->getId(),
                         $parentAccessEnabled,
                         $studentAccessEnabled,
-                        $recordType,
-                        $method
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
                         $pastoralAccess->getRoleType(),
-                        $student,
+                        $student->getId(),
                         $parentAccessEnabled,
                         $studentAccessEnabled,
-                        $recordType,
-                        $method
                     );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     $targetUsers += $this->buildTargetUsersForGroup(
@@ -130,31 +126,22 @@ class NotifierHelper
     /**
      * Build the list of target users for a given role.
      *
-     * @param Role   $role
-     * @param User   $student              Only the student's teachers and
-     *                                     parents will be notified.
-     * @param bool   $parentAccessEnabled
-     * @param bool   $studentAccessEnabled
-     * @param string $recordType
-     * @param string $method
+     * @param Role $role
+     * @param int  $studentId            Only the student's teachers and parents
+     *                                   will be notified.
+     * @param bool $parentAccessEnabled
+     * @param bool $studentAccessEnabled
      * @return array
+     * @throws MapperException if the student doesn't exist
      */
     private function buildTargetUsersForRole(
         Role $role,
-        User $student,
+        int $studentId,
         bool $parentAccessEnabled,
-        bool $studentAccessEnabled,
-        string $recordType,
-        string $method
+        bool $studentAccessEnabled
     ): array {
         // Reload student, as they may not be hydrated
-        try {
-            $student = $this->userMapper->findById($student->getId());
-        } catch (MapperException $e) {
-            // noop
-            $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
-            return [];
-        }
+        $student = $this->userMapper->findById($studentId);
 
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
@@ -190,30 +177,21 @@ class NotifierHelper
      * Build the list of target users for a given role type.
      *
      * @param string $roleType
-     * @param User   $student              Only the student's teachers and
+     * @param int    $studentId            Only the student's teachers and
      *                                     parents will be notified.
      * @param bool   $parentAccessEnabled
      * @param bool   $studentAccessEnabled
-     * @param string $recordType
-     * @param string $method
      * @return array
+     * @throws MapperException if the student doesn't exist
      */
     private function buildTargetUsersForRoleType(
         string $roleType,
-        User $student,
+        int $studentId,
         bool $parentAccessEnabled,
-        bool $studentAccessEnabled,
-        string $recordType,
-        string $method
+        bool $studentAccessEnabled
     ): array {
         // Reload student, as they may not be hydrated
-        try {
-            $student = $this->userMapper->findById($student->getId());
-        } catch (MapperException $e) {
-            // noop
-            $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
-            return [];
-        }
+        $student = $this->userMapper->findById($studentId);
 
         // The system should only notify staff if they are a teacher of the student
         $targetUsers = [];
