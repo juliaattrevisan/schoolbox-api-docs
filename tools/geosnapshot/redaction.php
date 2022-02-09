@@ -95,7 +95,11 @@ HELP;
         $numVisible = 0;
 
         foreach ($redactionList as $redaction) {
-            $lastModified = '' !== (string)$redaction['redact_photo_modified_at'] ? $redaction['redact_photo_modified_at'] : 'null';
+            if ('' !== trim((string)$redaction['redact_photo_modified_at'])) {
+                $lastModified = $redaction['redact_photo_modified_at'];
+            } else {
+                $lastModified = 'unknown; clearing photo paths and timestamps';
+            }
 
             /* The current redaction state of affairs for each guy
              */
