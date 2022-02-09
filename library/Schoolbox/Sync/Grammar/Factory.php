@@ -95,10 +95,6 @@ class Factory
         $ffactory = new FieldFactory();
 
         $map = $ffactory->buildMap($roletype);
-        $map = array_combine(
-            array_keys($map),
-            array_values($map)
-        );
 
         $set = new UserRuleset($this->userMapper, $context, $map, $this->log);
 
