@@ -15,12 +15,16 @@
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest:<test method name>
  */
 
+namespace Duework;
+
+use AcceptanceTester;
 use Page\Common;
 use Page\Duework\AssessmentForm;
 use Page\Duework\AssessmentPage;
 use Page\Duework\SubmitForm;
 use Page\Duework\StatusPage;
 use Codeception\Util\Locator;
+use Exception;
 
 class FeedbackCest
 {
@@ -42,15 +46,15 @@ class FeedbackCest
      */
     public function testDueworkBasic(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student = Common::USER_RACHEL;
-        $teacher = Common::USER_ZANE;
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student = Common::USER_LOUISASMITH;
+        $teacher = Common::USER_JACKCOLES;
         $dueworkTitle1 = 'Cest One ' . Common::gentext(6);
         $filename = __DIR__ . '/../News/upload/test.jpg';
 
 
-        // As Zane, create a due work
+        // As Jack Coles, create a due work
         $i->impersonate($teacher);
         $dueworkForm = new AssessmentForm($i);
         $dueworkForm->openCreate($classId);
@@ -63,8 +67,8 @@ class FeedbackCest
             ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
-        // As Rachel, check notification
-        $i->impersonate($student);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists('Assessment Task ' . $dueworkTitle1 . ' opened in ' . $className);
 
         // Goto submit page
@@ -84,7 +88,7 @@ class FeedbackCest
         $i->impersonate($teacher);
         $i->assertNotifExists($student . ' submitted work to ' . $dueworkTitle1 . ' in ' . $className);
 
-        // As Zane, click into the due work
+        // As Jack Coles, click into the due work
         $i->click($dueworkTitle1, '#content');
         $i->waitForText('SUBMISSION HISTORY');
 
@@ -96,11 +100,11 @@ class FeedbackCest
             ->setComment(Common::gentext(200))
             ->publish();
 
-        // As Rachel, check notification
-        $i->impersonate($student);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists($teacher . ' has marked your work for ' . $dueworkTitle1 . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa Smith, click into the due work
         $i->click($dueworkTitle1, '#content');
         $i->canSee('GRADING');
     }
@@ -111,14 +115,14 @@ class FeedbackCest
      */
     public function testDueworkStatusPage(AcceptanceTester $i)
     {
-        $className = Common::CLASS_CHEMISTRY_1_3;
-        $classId = Common::CLASS_ID_CHEMISTRY_1_3;
-        $student = Common::USER_RACHEL;
-        $studentId = Common::USER_ID_RACHEL;
-        $teacher = Common::USER_ZANE;
+        $className = Common::CLASS_9AENG;
+        $classId = Common::CLASS_ID_9AENG;
+        $student = Common::USER_LOUISASMITH;
+        $studentId = Common::USER_ID_LOUISASMITH;
+        $teacher = Common::USER_JACKCOLES;
         $dueworkTitle2 = 'Cest Two ' . Common::gentext(6);
 
-        // As Zane, create a due work
+        // As Jack Coles, create a due work
         $i->impersonate($teacher);
 
         $dueworkForm = new AssessmentForm($i);
@@ -132,8 +136,8 @@ class FeedbackCest
             ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
-        // As Rachel, check notification
-        $i->impersonate($student);
+        // As Louisa Smith, check notification
+        $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists('Assessment Task ' . $dueworkTitle2 . ' opened in ' . $className);
 
         // Goto submit page
@@ -148,9 +152,9 @@ class FeedbackCest
         $submitForm->setContents(Common::gentext(200))
             ->submit();
 
-        // As Zane, check notification
+        // As Jack Coles, check notification
         $i->impersonate($teacher);
-        $i->assertNotifExists($student . ' submitted work to ' . $dueworkTitle2 . ' in ' . $className);
+        $i->assertNotRachelifExists($student . ' submitted work to ' . $dueworkTitle2 . ' in ' . $className);
 
         // As Zane, click into the due work
         $i->click($dueworkTitle2, '#content');
@@ -161,14 +165,14 @@ class FeedbackCest
         $statusPage = $dueworkPage->openStatusPage();
         $statusPage->gradeSubmission($studentId, rand(50, 100), Common::gentext(200));
 
-        // find Rachel's submission and enter feed back
+        // find Louisa's submission and enter feed back
         $i->canSee('Reviewed', StatusPage::getStatusSelector($studentId, ''));
 
-        // As Rachel, check notification
-        $i->impersonate($student);
+        // As Louisa, check notification
+        $i->impersonateViaModifyUserPage($student);
         $i->assertNotifExists($teacher . ' has marked your work for ' . $dueworkTitle2 . ' in ' . $className);
 
-        // As Rachel, click into the due work
+        // As Louisa, click into the due work
         $i->click($dueworkTitle2, '#content');
         $i->canSee('GRADING');
     }
