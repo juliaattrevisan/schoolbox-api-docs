@@ -172,12 +172,12 @@ class Profile implements IStrategy
     public function import(): void
     {
 
-//        /* Import students' profile data
-//         * Import their specific parents' profile data
-//         */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+        /* Import students' profile data
+         * Import their specific parents' profile data
+         */
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 
         /* Import staff profile data
          */
@@ -1095,9 +1095,6 @@ class Profile implements IStrategy
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
                 $username = (string)$staff['attributes']['timetableCode'];
 
-if (!in_array($lastname, ['Adams', 'Vayenas', 'Lynch'])) {
-    continue;
-}
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
