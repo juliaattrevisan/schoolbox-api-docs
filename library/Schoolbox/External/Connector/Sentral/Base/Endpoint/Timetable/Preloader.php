@@ -253,8 +253,14 @@ if ($data['person']['id'] != 183) {
                 ));
             }
 
+            /* A human-friendly version of the day identifier
+             * Day numbers are 0-indexed in our data structs, but for human consumption, should
+             * be represented by a 1-indexed scheme
+             */
+            $dayName = $timetableLesson['attributes']['dayOrder']+1;
+
             $timetable[$timetableLesson['attributes']['dayOrder']][$timetableLesson['attributes']['periodOrder']] = [
-                'day'      => $timetableLesson['attributes']['dayOrder'],
+                'day'      => $dayName,
                 'name'     => $timetableLesson['attributes']['periodName'],
                 'start'    => $timetableLesson['attributes']['startTime'],
                 'finish'   => $timetableLesson['attributes']['endTime'],
