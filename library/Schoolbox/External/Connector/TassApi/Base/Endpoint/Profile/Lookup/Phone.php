@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
 use RuntimeException;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -177,7 +178,10 @@ class Phone
                  */
                 if ($address['address_description'] === $this->motherAddressDescription) {
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
-                        'firstname' => trim((string)$address['m_preferred_name']),
+                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                            $address['m_preferred_name'],
+                            $address['m_first_name']
+                        ])),
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),
@@ -187,7 +191,10 @@ class Phone
                     ];
                 } elseif ($address['address_description'] === $this->fatherAddressDescription) {
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
-                        'firstname' => trim((string)$address['f_preferred_name']),
+                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                            $address['f_preferred_name'],
+                            $address['f_first_name']
+                        ])),
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),
@@ -199,7 +206,10 @@ class Phone
                     /* Nukular family: fields are distributed among the guys in the fam
                      */
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
-                        'firstname' => trim((string)$address['m_preferred_name']),
+                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                            $address['m_preferred_name'],
+                            $address['m_first_name']
+                        ])),
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1,
                         'home' => trim((string)$address['home_phone']),
@@ -209,7 +219,10 @@ class Phone
                     ];
 
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
-                        'firstname' => trim((string)$address['f_preferred_name']),
+                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                            $address['f_preferred_name'],
+                            $address['f_first_name']
+                        ])),
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),

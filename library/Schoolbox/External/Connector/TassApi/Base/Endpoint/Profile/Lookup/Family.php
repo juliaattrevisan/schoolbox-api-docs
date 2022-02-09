@@ -371,8 +371,15 @@ class Family
      */
     private function processSplitParentNode(string $node, string $externalId, array $family, int $addnum): array
     {
+        /* Prioritise preferred names over official names
+         */
+        $firstname = (new FirstMeaningfulValue())->find([
+            $family[$node]['preferred_name'],
+            $family[$node]['first_name']
+        ]);
+
         $person = $this->phones[$family['user_code']][$node] ?? [
-            'firstname' => $family[$node]['preferred_name'],
+            'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
             'home' => '',
@@ -423,8 +430,15 @@ class Family
      */
     private function processParentNode(string $node, string $externalId, array $family): array
     {
+        /* Prioritise preferred names over official names
+         */
+        $firstname = (new FirstMeaningfulValue())->find([
+            $family[$node]['preferred_name'],
+            $family[$node]['first_name']
+        ]);
+
         $person = $this->phones[$family['user_code']][$node] ?? [
-            'firstname' => $family[$node]['preferred_name'],
+            'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
             'home' => '',
