@@ -26,10 +26,14 @@ class CourseLocationPickerCest
     public function _before(AcceptanceTester $i): void
     {
         // Set the location of the 'Java Programming' course to 'Class 1: Introduction' unit
-        $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
+//        $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
+
+        //parent competing ideologies and course ELC
+        $i->updateInDatabase('folder', ['parent' => 266], ['id' => 65]);
 
         $i->loginAsAdmin();
-        $i->amOnPage(CourseModify::getUrl(6));
+//        $i->amOnPage(CourseModify::getUrl(6));
+        $i->amOnPage(CourseModify::getUrl(4));
         $i->click(CourseModify::SELECTOR_LOCATION);
         $i->waitForElement(CourseModify::SELECTOR_USE_FOLDER); // Need to wait for modal fade-in to finish
     }
@@ -43,7 +47,7 @@ class CourseLocationPickerCest
     public function _after(AcceptanceTester $i): void
     {
         // Set the location of the 'Java Programming' course to 'Class 1: Introduction' unit
-        $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
+        $i->updateInDatabase('folder', ['parent' => 266], ['id' => 4]);
     }
 
 
@@ -57,8 +61,9 @@ class CourseLocationPickerCest
         // 'Use This Folder' button is initially disabled
         $i->seeElement(CourseModify::SELECTOR_USE_FOLDER . '[disabled]');
 
-        // User clicks current location
-        $i->click('[id="508"]');
+        // User clicks current location Class 2
+//        $i->click('[id="508"]');
+        $i->click('[id="266"]');
 
         // 'Use This Folder' button is now enabled
         $i->seeElement(CourseModify::SELECTOR_USE_FOLDER . ':not([disabled])');
@@ -68,13 +73,16 @@ class CourseLocationPickerCest
 
         // The hidden form field retains this value
         $val = $i->executeJS("return $('#parent').val()");
-        $i->assertEquals(508, $val);
+//        $i->assertEquals(508, $val);
+        $i->assertEquals(266, $val);
 
         // User clicks 'Save Course' button
         $i->click(CourseModify::SELECTOR_SAVE_COURSE);
 
-        $i->seeInDatabase('course_specification', ['id' => 6, 'folder_id' => 545]);
-        $i->seeInDatabase('folder', ['id' => 545, 'parent' => 508]);
+//        $i->seeInDatabase('course_specification', ['id' => 6, 'folder_id' => 545]);
+        $i->seeInDatabase('course_specification', ['id' => 4, 'folder_id' => 65]);
+//        $i->seeInDatabase('folder', ['id' => 545, 'parent' => 508]);
+        $i->seeInDatabase('folder', ['id' => 65, 'parent' => 266]);
     }
 
 
