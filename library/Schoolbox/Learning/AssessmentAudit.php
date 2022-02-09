@@ -82,7 +82,8 @@ class AssessmentAudit
         gradeGroupTable.name AS gradeGroup,
         assessment.course_managed AS commonAssessment,
         capabilityMarkTypeTable.hr_name AS capabilityMarkType,
-        capabilityGradeGroupTable.name AS capabilityGradeGroup
+        capabilityGradeGroupTable.name AS capabilityGradeGroup,
+        assessment.weight as weight
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -99,7 +100,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
                         'UnitFolderId', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'SpecificationImplementation'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
@@ -170,6 +171,7 @@ class AssessmentAudit
                 $this->boolToString($row['useRubric']),
                 $row['capabilityMarkType'],
                 $capabilityGradeSchemeScale,
+                $row['weight'],
                 $specImplem
             ]);
         }
