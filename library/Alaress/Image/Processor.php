@@ -112,6 +112,7 @@ class Processor
      *
      * @param int      $maxAttempts
      * @param null|int $retryAfter If non-null, retry any incomplete transformations older than this value (in seconds)
+     * @param bool     $permFail should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
      * @return StreamableFile
      * @throws DomainException
      * @throws Flysystem\FileNotFoundException
@@ -127,7 +128,7 @@ class Processor
      * @throws ConcurrentTransformationException
      * @throws FileExistsException
      */
-    public function load(int $maxAttempts = 1, ?int $retryAfter = null): StreamableFile
+    public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
@@ -210,7 +211,16 @@ class Processor
             LayeredNonGifException |
             CorruptImageException $e
         ) {
-            $transformModel->setState(Storage\Transform\Model::STATE_ERROR);
+            if ($permFail) {
+                /**
+                 * permanently fail images that error out on the cli, there will be a log for this entry to debug
+                 * it might be someone has uploaded a photoshop file as .jpg
+                 */
+                $transformModel->setState(Storage\Transform\Model::STATE_ERROR);
+            } else {
+                //allow the file to be re attempted with the `tools/image/processor.php -vvv --retry-failed`
+                $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
+            }
             $transformMapper->save($transformModel);
             throw $e;
         }
