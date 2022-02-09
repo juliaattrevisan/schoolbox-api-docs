@@ -112,24 +112,24 @@ class AssessmentAudit
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             //set if the assignment is a Specification or Implementation or not
-            $specImplem = null;
+            $specImplem = 'Class Created';
             //grab COURSE specificationId or implementationId
             $courseFolderId = null;
             if (null !== $row['course_specification_id']) {
-                $specImplem = 'Specification';
+                $specImplem = 'Course';
                 $courseFolderId = $row['course_specification_id'];
             } elseif (null !== $row['course_implementation_id']) {
-                $specImplem = 'Implementation';
+                $specImplem = 'Class Imported';
                 $courseFolderId = $row['course_implementation_id'];
             }
 
             //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
             if (null !== $row['course_unit_specification_id']) {
-                $specImplem = 'Specification';
+                $specImplem = 'Course';
                 $unitCourseFolderId = $row['course_unit_specification_id'];
             } elseif (null !== $row['course_unit_implementation_id']) {
-                $specImplem = 'Implementation';
+                $specImplem = 'Class Imported';
                 $unitCourseFolderId = $row['course_unit_implementation_id'];
             }
 
