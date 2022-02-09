@@ -44,9 +44,9 @@ class NotifierHelper
         PastoralGroupMapper $pastoralGroupMapper,
         LoggerInterface $log
     ) {
-        $this->userMapper = $userMapper;
+        $this->userMapper          = $userMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
-        $this->log = $log;
+        $this->log                 = $log;
     }
 
     /**
@@ -85,110 +85,38 @@ class NotifierHelper
                 continue;
             }
 
+            // Build the list of target users
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
-                    // Reload student, if possible
-                    try {
-                        $student = $this->userMapper->findById($student->getId());
-                    } catch (MapperException $e) {
-                        // noop
-                        $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
-                        continue;
-                    }
-
-                    // The system should only notify staff if they are a teacher of the student
-                    if ($pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
-                        $student->loadTeachers();
-                        foreach ($student->getTeacherCollection() as $teacher) {
-                            if ($teacher->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
-                                $targetUsers[$teacher->getId()] = $teacher;
-                            }
-                        }
-                    } elseif ($pastoralAccess->getRole()->isParent() && $parentAccessEnabled) {
-                        // Only send to parents if pastoral parent access is enabled
-                        $student->loadParents();
-                        foreach ($student->getParents() as $parent) {
-                            if ($parent->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
-                                $targetUsers[$parent->getId()] = $parent;
-                            }
-                        }
-                    } elseif (
-                        $pastoralAccess->getRole()->isStudent()
-                        && $studentAccessEnabled
-                        && $student->getRole()->getId() === $pastoralAccess->getRole()->getId()
-                    ) {
-                        // Only send to student if student access is enabled
-                        // (Setting student access by role is not currently
-                        //  supported in frontend: only by role type)
-                        $targetUsers[$student->getId()] = $student;
-                    }
+                    $targetUsers += $this->buildTargetUsersForRole(
+                        $pastoralAccess->getRole(),
+                        $student,
+                        $parentAccessEnabled,
+                        $studentAccessEnabled,
+                        $recordType,
+                        $method
+                    );
                 } elseif ($pastoralAccess->getRoleType()) {
-                    // Reload student, if possible
-                    try {
-                        $student = $this->userMapper->findById($student->getId());
-                    } catch (MapperException $e) {
-                        // noop
-                        $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
-                        continue;
-                    }
-                    switch ($pastoralAccess->getRoleType()) {
-                        case Role::STAFF:
-                            // Only notify student's teachers,
-                            // if their role allows it
-                            $student->loadTeachers();
-                            foreach ($student->getTeacherCollection() as $teacher) {
-                                if ($teacher->getRole()->getAccessPastoral()) {
-                                    $targetUsers[$teacher->getId()] = $teacher;
-                                }
-                            }
-                            break;
-
-                        case Role::STUDENT:
-                            // Only notify student if student access enabled
-                            if ($studentAccessEnabled) {
-                                $targetUsers[$student->getId()] = $student;
-                            }
-                            break;
-
-                        case Role::PARENT:
-                            // Only notify parents if parent access enabled
-                            if ($parentAccessEnabled) {
-                                $student->loadParents();
-                                foreach ($student->getParents() as $parent) {
-                                    $targetUsers[$parent->getId()] = $parent;
-                                }
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
+                    $targetUsers += $this->buildTargetUsersForRoleType(
+                        $pastoralAccess->getRoleType(),
+                        $student,
+                        $parentAccessEnabled,
+                        $studentAccessEnabled,
+                        $recordType,
+                        $method
+                    );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
-                    // Sending to a pastoral group, make sure its hydrated
-                    $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
-
-                    /** @var PastoralGroupMember $member */
-                    foreach ($pastoralGroup->getMembersWithPermission() as $member) {
-                        // Only staff should be in pastoral groups
-                        $user = $this->userMapper->findById($member->getUser()->getId());
-                        if ($user->getRole()->isStaff()) {
-                            $targetUsers[$user->getId()] = $user;
-                        }
-                    }
+                    $targetUsers += $this->buildTargetUsersForGroup(
+                        $pastoralAccess->getGroup()->getId(),
+                        $parentAccessEnabled,
+                        $studentAccessEnabled,
+                    );
                 } elseif ($pastoralAccess->getUser() instanceof User) {
-                    // Sending to an individual user
-                    // user is not hydrated
-                    $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
-
-                    // Only send to parents if parent access is enabled,
-                    // or to students if student access is enabled
-                    if (
-                        ($user->isStaffWithPastoralAccess())
-                        || ($user->getRole()->isParent() && $parentAccessEnabled)
-                        || ($user->getRole()->isStudent() && $studentAccessEnabled)
-                    ) {
-                        $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
-                    }
+                    $targetUsers += $this->buildTargetUsersForUser(
+                        $pastoralAccess->getUser()->getId(),
+                        $parentAccessEnabled,
+                        $studentAccessEnabled,
+                    );
                 }
             } catch (MapperException $e) {
                 // Log an error and move on so we don't break the rest of the notifications
@@ -196,6 +124,197 @@ class NotifierHelper
             }
         }
 
+        return $targetUsers;
+    }
+
+    /**
+     * Build the list of target users for a given role.
+     *
+     * @param Role   $role
+     * @param User   $student              Only the student's teachers and
+     *                                     parents will be notified.
+     * @param bool   $parentAccessEnabled
+     * @param bool   $studentAccessEnabled
+     * @param string $recordType
+     * @param string $method
+     * @return array
+     */
+    private function buildTargetUsersForRole(
+        Role $role,
+        User $student,
+        bool $parentAccessEnabled,
+        bool $studentAccessEnabled,
+        string $recordType,
+        string $method
+    ): array {
+        // Reload student, as they may not be hydrated
+        try {
+            $student = $this->userMapper->findById($student->getId());
+        } catch (MapperException $e) {
+            // noop
+            $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+            return [];
+        }
+
+        $targetUsers = [];
+        if ($role->isStaff() && $role->getAccessPastoral()) {
+            // Only notify staff if they are a teacher of the student
+            $student->loadTeachers();
+            foreach ($student->getTeacherCollection() as $teacher) {
+                if ($teacher->getRole()->getId() === $role->getId()) {
+                    $targetUsers[$teacher->getId()] = $teacher;
+                }
+            }
+        } elseif ($role->isParent() && $parentAccessEnabled) {
+            // Only send to parents if pastoral parent access is enabled
+            $student->loadParents();
+            foreach ($student->getParents() as $parent) {
+                if ($parent->getRole()->getId() === $role->getId()) {
+                    $targetUsers[$parent->getId()] = $parent;
+                }
+            }
+        } elseif (
+            $role->isStudent()
+            && $studentAccessEnabled
+            && $student->getRole()->getId() === $role->getId()
+        ) {
+            // Only send to student if student access is enabled
+            // (Setting student access by role is not currently
+            //  supported in frontend: only by role type)
+            $targetUsers[$student->getId()] = $student;
+        }
+        return $targetUsers;
+    }
+
+    /**
+     * Build the list of target users for a given role type.
+     *
+     * @param string $roleType
+     * @param User   $student              Only the student's teachers and
+     *                                     parents will be notified.
+     * @param bool   $parentAccessEnabled
+     * @param bool   $studentAccessEnabled
+     * @param string $recordType
+     * @param string $method
+     * @return array
+     */
+    private function buildTargetUsersForRoleType(
+        string $roleType,
+        User $student,
+        bool $parentAccessEnabled,
+        bool $studentAccessEnabled,
+        string $recordType,
+        string $method
+    ): array {
+        // Reload student, as they may not be hydrated
+        try {
+            $student = $this->userMapper->findById($student->getId());
+        } catch (MapperException $e) {
+            // noop
+            $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+            return [];
+        }
+
+        // The system should only notify staff if they are a teacher of the student
+        $targetUsers = [];
+        switch ($roleType) {
+            case Role::STAFF:
+                // Only notify student's teachers,
+                // if their role allows it
+                $student->loadTeachers();
+                foreach ($student->getTeacherCollection() as $teacher) {
+                    if ($teacher->getRole()->getAccessPastoral()) {
+                        $targetUsers[$teacher->getId()] = $teacher;
+                    }
+                }
+                break;
+
+            case Role::STUDENT:
+                // Only notify student if student access enabled
+                if ($studentAccessEnabled) {
+                    $targetUsers[$student->getId()] = $student;
+                }
+                break;
+
+            case Role::PARENT:
+                // Only notify parents if parent access enabled
+                if ($parentAccessEnabled) {
+                    $student->loadParents();
+                    foreach ($student->getParents() as $parent) {
+                        $targetUsers[$parent->getId()] = $parent;
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+        return $targetUsers;
+    }
+
+    /**
+     * Build the list of target users for a given pastoral group.
+     *
+     * @param int  $groupId
+     * @param bool $parentAccessEnabled
+     * @param bool $studentAccessEnabled
+     * @return array
+     * @throws MapperException if the pastoral group doesn't exist
+     */
+    private function buildTargetUsersForGroup(
+        int $groupId,
+        bool $parentAccessEnabled,
+        bool $studentAccessEnabled
+    ): array {
+        // Sending to a pastoral group, make sure its hydrated
+        $pastoralGroup = $this->pastoralGroupMapper->findById($groupId);
+        $targetUsers   = [];
+
+        /** @var PastoralGroupMember $member */
+        foreach ($pastoralGroup->getMembersWithPermission() as $member) {
+            // Only staff should be in pastoral groups,
+            // but handle students and parents in case they are there
+            try {
+                $targetUsers += $this->buildTargetUsersForUser(
+                    $member->getUser()->getId(),
+                    $parentAccessEnabled,
+                    $studentAccessEnabled,
+                );
+            } catch (MapperException $e) {
+                // noop: silently refuse to target users which don't exist
+                continue;
+            }
+        }
+        return $targetUsers;
+    }
+
+    /**
+     * Build the list of target users for a given user.
+     *
+     * @param int  $userId
+     * @param bool $parentAccessEnabled
+     * @param bool $studentAccessEnabled
+     * @return array
+     * @throws MapperException if the user doesn't exist
+     */
+    private function buildTargetUsersForUser(
+        int $userId,
+        bool $parentAccessEnabled,
+        bool $studentAccessEnabled
+    ): array {
+        // Sending to a user, make sure its hydrated
+        $user        = $this->userMapper->findById($userId);
+        $targetUsers = [];
+
+        // Only send to parents if parent access is enabled,
+        // or to students if student access is enabled
+        if (
+            ($user->isStaffWithPastoralAccess())
+            || ($user->getRole()->isParent() && $parentAccessEnabled)
+            || ($user->getRole()->isStudent() && $studentAccessEnabled)
+        ) {
+            $targetUsers[$userId] = $user;
+        }
         return $targetUsers;
     }
 }
