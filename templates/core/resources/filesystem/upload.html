@@ -10,7 +10,7 @@ $(function () {
         maxFiles          = {MAX_FILES};
 
         try {
-        
+
             abUploadForm.dropzone({
             paramName: 'upload',
             parallelUploads: {MAX_FILES},
@@ -26,7 +26,7 @@ $(function () {
             addRemoveLinks: false,
             previewTemplate: $('#ab-preview-template').html(),
             acceptedFiles: {ACCEPTED_FILES},
-            timeout: 300000,
+            timeout: 1800000,
 
             /**
              * Initialise this dropzone implementation
