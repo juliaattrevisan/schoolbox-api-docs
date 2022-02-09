@@ -7,22 +7,18 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
+namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetablePeriodMapper;
 
 /**
  * Class Prepare
  *
  * Clears data from a db in preparation for an import
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
+ * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile
  */
 class Prepare implements IStrategy
 {
@@ -30,67 +26,43 @@ class Prepare implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private $classInvolvementMapper;
-
-
-    /**
-     * @var ClassPeriodMapper
-     */
-    private $classPeriodMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private $periodMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
@@ -103,10 +75,6 @@ class Prepare implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetablePeriodMapper           $periodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -115,11 +83,7 @@ class Prepare implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        TimetablePeriodMapper $periodMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -129,11 +93,6 @@ class Prepare implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
-
-        $this->periodMapper = $periodMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
@@ -177,24 +136,6 @@ class Prepare implements IStrategy
             sleep(1);
             $this->relationshipMapper->truncate();
             $this->log->debug('Purged profile relations');
-
-            sleep(1);
-            $this->classInvolvementMapper->truncate();
-            $this->log->debug('Purged classInvolvement relations');
-
-            sleep(1);
-            $this->classPeriodMapper->truncate();
-            $this->log->debug('Purged classPeriod relations');
-
-            sleep(1);
-            $this->classEntryMapper->truncate();
-            $this->log->debug('Purged classEntry');
-
-            sleep(1);
-            $this->periodMapper->truncate();
-            $this->log->debug('Purged classPeriod');
-
-            $this->log->info('Purged existing profile relations, classInvolvement, classPeriod, classEntry data');
         }
     }
 }
