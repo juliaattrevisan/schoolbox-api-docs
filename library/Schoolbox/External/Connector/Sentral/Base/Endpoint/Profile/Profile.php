@@ -1094,9 +1094,8 @@ class Profile implements IStrategy
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
                 $username = (string)$staff['attributes']['timetableCode'];
-/* Only look for trevor adams
- */
-if ($lastname !== 'Adams') {
+
+if (!in_array($lastname, ['Adams', 'Vayenas', 'Lynch'])) {
     continue;
 }
                 /* Disregard inactive staff

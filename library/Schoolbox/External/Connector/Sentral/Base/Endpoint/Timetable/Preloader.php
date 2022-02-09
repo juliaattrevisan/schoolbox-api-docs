@@ -144,12 +144,6 @@ class Preloader
             return null;
         }
 
-/* Look for Trevor Adams only
- */
-if ($data['person']['id'] != 183) {
-    return null;
-}
-
         $this->log->debug(sprintf(
             'Accessing endpoint %s',
             $endpoint
