@@ -144,6 +144,12 @@ class Preloader
             return null;
         }
 
+/* Look for Trevor Adams only
+ */
+if ($data['person']['id'] != 183) {
+    return null;
+}
+
         $this->log->debug(sprintf(
             'Accessing endpoint %s',
             $endpoint
@@ -221,11 +227,12 @@ class Preloader
                     $teacher = $teacherData['person'];
 
                     $this->log->debug(sprintf(
-                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
+                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s) via timetable endpoint %s',
                         $teacher['firstname'],
                         $teacher['lastname'],
                         $teacher['externalId'],
-                        $teacher['id']
+                        $teacher['id'],
+                        $endpoint
                     ));
                 } else {
                     /* Could not find someone in the lookup registry containing this id
@@ -246,8 +253,8 @@ class Preloader
                 ));
             }
 
-            $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
-                'day'      => $timetableLesson['attributes']['dayName'],
+            $timetable[$timetableLesson['attributes']['dayOrder']][$timetableLesson['attributes']['periodOrder']] = [
+                'day'      => $timetableLesson['attributes']['dayOrder'],
                 'name'     => $timetableLesson['attributes']['periodName'],
                 'start'    => $timetableLesson['attributes']['startTime'],
                 'finish'   => $timetableLesson['attributes']['endTime'],

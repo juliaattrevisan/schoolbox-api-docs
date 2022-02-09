@@ -189,6 +189,8 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
+print_r($dayLookup);
+print_r($timetable);
             foreach ($timetable as $day => $dayPeriods) {
                 foreach ($dayPeriods as $periodSequence => $period) {
                     $class = [
