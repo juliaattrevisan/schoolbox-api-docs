@@ -141,8 +141,7 @@ class NotifierHelper
         bool $studentAccessEnabled
     ): array {
         // Reload student, as they may not be hydrated
-        $student = $this->userMapper->findById($studentId);
-
+        $student     = $this->userMapper->findById($studentId);
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
             // Only notify staff if they are a teacher of the student
