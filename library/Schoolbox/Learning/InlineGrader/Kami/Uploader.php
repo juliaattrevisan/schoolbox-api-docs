@@ -193,8 +193,8 @@ class Uploader
                 } catch (Exception\NotFound $e) {
                     //file not found, error out
                     $kamiModel->setStatus(Model::STATUS_ERROR);
+                    $kamiModel->setErrorMessage($e->getMessage());
                     $this->saveKamiModel($kamiModel);
-                    $this->log->error('File Not Found');
                     $this->logUploadFailure($kamiModel, $e);
                     continue;
                 } catch (\Throwable $lastException) {
