@@ -976,11 +976,9 @@ class Profile implements IStrategy
 
             /* This seems to be a set of organisationTitles elements
              */
-            $departments = $this->findDetailsFieldArray($staff['staffDetails'], 'organisationTitles');
+            $departments = $this->findDetailsFieldArray($staff['staffDetails'], 'organisationTitles') ?? [];
 
-            if (null !== $departments) {
-                $department = implode(', ', $departments);
-            }
+            $department = implode(', ', $departments);
 
             /* TODO Email addresses also exist inside staffDetails and are
              *  instance-specific...what's the difference between those
