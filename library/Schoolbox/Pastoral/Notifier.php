@@ -115,6 +115,8 @@ class Notifier extends AbstractModuleNotifier
         try {
             $pastoral = $this->mapper->findById($model->getId());
             $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+            $student->loadParents();
+            $student->loadTeachers();
             $pastoral->setStudent($student);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
