@@ -251,7 +251,7 @@ class Preloader
              * Day numbers are 0-indexed in our data structs, but for human consumption, should
              * be represented by a 1-indexed scheme
              */
-            $dayName = $timetableLesson['attributes']['dayOrder']+1;
+            $dayName = $timetableLesson['attributes']['dayOrder'] + 1;
 
             $timetable[$timetableLesson['attributes']['dayOrder']][$timetableLesson['attributes']['periodOrder']] = [
                 'day'      => $dayName,

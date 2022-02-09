@@ -193,7 +193,7 @@ class Classes implements IStrategy
                      * Day numbers are 0-indexed in our data structs, but for human consumption, should
                      * be represented by a 1-indexed scheme
                      */
-                    $dayName = $day+1;
+                    $dayName = $day + 1;
 
                     $class = [
                         'period' => [
