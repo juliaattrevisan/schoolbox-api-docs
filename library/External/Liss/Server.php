@@ -622,6 +622,11 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
+            /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
+             * It turns out schools have multiple cycles of varying day lengths
+             */
+            $lookup = [];
+
             $this->log()->info('publishBellTimes: processing request');
 
             $allData = $message->params[2]->me['array'];
@@ -630,8 +635,6 @@ class External_Liss_Server
             $timetablePeriodMapper = new TimetablePeriodMapper();
             $timetablePeriodMapper->truncate();
 
-            $collection = new Collection();
-
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
 
@@ -639,43 +642,58 @@ class External_Liss_Server
                  * and load that if it exists, creating a new one if it doesn't
                  */
                 $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
-                $cycle = $this->getCycle($cycleIdentifier);
+                $cycle           = $this->getCycle($cycleIdentifier);
 
                 $dayNumber = (string)$struct['DayNumber']->me['i4'];
 
-                /** @var TimetablePeriod $timetablePeriod */
-                $timetablePeriod = $timetablePeriodMapper->createModel();
-                $timetablePeriod->setCycle($cycle);
-                $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
-                $timetablePeriod->setDay($dayNumber);
-                $timetablePeriod->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'H:i'));
-                $timetablePeriod->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'H:i'));
+                $timetablePeriod = $timetablePeriodMapper->createModel()
+                    ->setCycle($cycle)
+                    ->setTitle((string)$struct['Period']->me['string'])
+                    ->setDay($dayNumber)
+                    ->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'H:i'))
+                    ->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'H:i'));
 
                 /* TODO: Undo these hardcoded values at some point
                   */
                 $timetablePeriod->setUsable(1);
 
-                /* Start a collection for a day, if it's not already a collection
+                /* Build a hash lookup of cycles, days and their periods
                  */
-                if (!($collection->getOffset($dayNumber) instanceof Collection)) {
-                    $collection->setOffset($dayNumber, new Collection());
+                if (!isset($lookup[$cycle->getId()][$dayNumber])) {
+                    $lookup[$cycle->getId()][$dayNumber] = [];
                 }
 
-                $collection->getOffset($dayNumber)->add($timetablePeriod);
+                $lookup[$cycle->getId()][$dayNumber][] = $timetablePeriod;
             }
 
-            $collection->reindex();
+            /* Now traverse $lookup and assign sequence
+             * Take into account non-uniform day lengths by cross-referencing with $counts
+             */
+            foreach ($lookup as $cycleId => $dayData) {
+                $this->log()->info(sprintf(
+                    'publishBellTimes: Cycle %s has %s days',
+                    $cycleId,
+                    \count($dayData)
+                ));
 
-            $this->log()->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure", $collection->count(), $collection->first()->count()));
+                foreach ($dayData as $dayIndex => $periods) {
+                    $this->log()->info(sprintf(
+                        'publishBellTimes: Cycle %s, day %s has %s periods',
+                        $cycleId,
+                        $dayIndex,
+                        \count($periods)
+                    ));
 
-            foreach ($collection as $dayCollection) {
-                $i = 0;
+                    /* Apply sequencing to every period in this day in this cycle
+                     */
+                    $i = 0;
 
-                foreach ($dayCollection as $timetablePeriod) {
-                    $timetablePeriod->setSequence($i);
-                    $timetablePeriodMapper->save($timetablePeriod);
+                    foreach ($periods as $timetablePeriod) {
+                        $timetablePeriod->setSequence($i);
+                        $timetablePeriodMapper->save($timetablePeriod);
 
-                    $i++;
+                        $i++;
+                    }
                 }
             }
 
