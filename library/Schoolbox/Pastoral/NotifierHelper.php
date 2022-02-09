@@ -54,7 +54,9 @@ class NotifierHelper
      *
      * @param iterable<PastoralAccess> $accessRecords
      * @param bool                     $privateChangeOnly
-     * @param User                     $student
+     * @param User                     $student              The student for whom the record was created.
+     *                                                       Expects that `loadParents` and `loadStudents`
+     *                                                       have been called.
      * @param bool                     $parentAccessEnabled
      * @param bool                     $studentAccessEnabled
      * @param string                   $recordType
@@ -90,14 +92,14 @@ class NotifierHelper
                 if ($pastoralAccess->getRole() instanceof Role) {
                     $targetUsers += $this->buildTargetUsersForRole(
                         $pastoralAccess->getRole(),
-                        $student->getId(),
+                        $student,
                         $parentAccessEnabled,
                         $studentAccessEnabled,
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
                         $pastoralAccess->getRoleType(),
-                        $student->getId(),
+                        $student,
                         $parentAccessEnabled,
                         $studentAccessEnabled,
                     );
@@ -127,21 +129,18 @@ class NotifierHelper
      * Build the list of target users for a given role.
      *
      * @param Role $role
-     * @param int  $studentId            Only the student's teachers and parents
+     * @param User $student              Only the student's teachers and parents
      *                                   will be notified.
      * @param bool $parentAccessEnabled
      * @param bool $studentAccessEnabled
      * @return array
-     * @throws MapperException if the student doesn't exist
      */
     private function buildTargetUsersForRole(
         Role $role,
-        int $studentId,
+        User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled
     ): array {
-        // Reload student, as they may not be hydrated
-        $student     = $this->userMapper->findById($studentId);
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
             // Only notify staff if they are a teacher of the student
@@ -176,29 +175,24 @@ class NotifierHelper
      * Build the list of target users for a given role type.
      *
      * @param string $roleType
-     * @param int    $studentId            Only the student's teachers and
+     * @param User   $student              Only the student's teachers and
      *                                     parents will be notified.
      * @param bool   $parentAccessEnabled
      * @param bool   $studentAccessEnabled
      * @return array
-     * @throws MapperException if the student doesn't exist
      */
     private function buildTargetUsersForRoleType(
         string $roleType,
-        int $studentId,
+        User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled
     ): array {
-        // Reload student, as they may not be hydrated
-        $student = $this->userMapper->findById($studentId);
-
         // The system should only notify staff if they are a teacher of the student
         $targetUsers = [];
         switch ($roleType) {
             case Role::STAFF:
                 // Only notify student's teachers,
                 // if their role allows it
-                $student->loadTeachers();
                 foreach ($student->getTeacherCollection() as $teacher) {
                     if ($teacher->getRole()->getAccessPastoral()) {
                         $targetUsers[$teacher->getId()] = $teacher;
@@ -216,7 +210,6 @@ class NotifierHelper
             case Role::PARENT:
                 // Only notify parents if parent access enabled
                 if ($parentAccessEnabled) {
-                    $student->loadParents();
                     foreach ($student->getParents() as $parent) {
                         $targetUsers[$parent->getId()] = $parent;
                     }
