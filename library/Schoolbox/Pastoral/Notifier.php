@@ -270,6 +270,7 @@ class Notifier extends AbstractModuleNotifier
                 $student,
                 $parentAccessEnabled,
                 $studentAccessEnabled,
+                'pastoral',
                 $method,
             );
 

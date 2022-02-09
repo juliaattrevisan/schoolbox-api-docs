@@ -57,6 +57,7 @@ class NotifierHelper
      * @param User                     $student
      * @param bool                     $parentAccessEnabled
      * @param bool                     $studentAccessEnabled
+     * @param string                   $recordType
      * @param string                   $method
      * @return array<int, User>
      */
@@ -66,6 +67,7 @@ class NotifierHelper
         User $student,
         bool $parentAccessEnabled,
         bool $studentAccessEnabled,
+        string $recordType,
         string $method
     ): array {
         $targetUsers = [];
@@ -85,6 +87,15 @@ class NotifierHelper
 
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
+                    // Reload student, if possible
+                    try {
+                        $student = $this->userMapper->findById($student->getId());
+                    } catch (MapperException $e) {
+                        // noop
+                        $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+                        continue;
+                    }
+
                     // The system should only notify staff if they are a teacher of the student
                     if ($pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
                         $student->loadTeachers();
@@ -112,6 +123,14 @@ class NotifierHelper
                         $targetUsers[$student->getId()] = $student;
                     }
                 } elseif ($pastoralAccess->getRoleType()) {
+                    // Reload student, if possible
+                    try {
+                        $student = $this->userMapper->findById($student->getId());
+                    } catch (MapperException $e) {
+                        // noop
+                        $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+                        continue;
+                    }
                     switch ($pastoralAccess->getRoleType()) {
                         case Role::STAFF:
                             // Only notify student's teachers,
@@ -160,19 +179,21 @@ class NotifierHelper
                     // Sending to an individual user
                     // user is not hydrated
                     $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
-                    // Only send to parents if parent access is enabled
+
+                    // Only send to parents if parent access is enabled,
+                    // or to students if student access is enabled
                     if (
                         ($user->isStaffWithPastoralAccess())
                         || ($user->getRole()->isParent() && $parentAccessEnabled)
+                        || ($user->getRole()->isStudent() && $studentAccessEnabled)
                     ) {
                         $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
                     }
                 }
             } catch (MapperException $e) {
                 // Log an error and move on so we don't break the rest of the notifications
-                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+                $this->log->error("Error: Unable to send {$recordType} {$method} notification. {$e->getMessage()}", ['exception' => $e]);
             }
-
         }
 
         return $targetUsers;

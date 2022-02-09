@@ -251,7 +251,6 @@ class Notifier extends AbstractModuleNotifier
 //            }
 //        }
 
-        $student     = $this->userMapper->findById($pastoral->getStudent()->getId());
         $targetUsers = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
             ->buildTargetUsers(
                 $accessRecords,
@@ -259,6 +258,7 @@ class Notifier extends AbstractModuleNotifier
                 $student,
                 $parentAccessEnabled && $pastoral->getParentCommentsAllowed(),
                 $studentAccessEnabled && $pastoral->getStudentCommentsAllowed(),
+                'pastoral comment',
                 $method,
             );
 
