@@ -64,6 +64,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Matchup\Mapper
+     */
+    private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper;
+
+
+    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -72,12 +78,13 @@ class Sessions implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                  $log
-     * @param bool                             $perform
-     * @param IApi                             $api
-     * @param Registry                         $registry
-     * @param Person                           $userLookup
-     * @param \Schoolbox\Fixtures\Venue\Mapper $venueMapper
+     * @param LoggerInterface                    $log
+     * @param bool                               $perform
+     * @param IApi                               $api
+     * @param Registry                           $registry
+     * @param Person                             $userLookup
+     * @param \Schoolbox\Fixtures\Venue\Mapper   $venueMapper
+     * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -85,7 +92,8 @@ class Sessions implements IStrategy
         IApi $api,
         Registry $registry,
         Person $userLookup,
-        \Schoolbox\Fixtures\Venue\Mapper $venueMapper
+        \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
+        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -93,6 +101,7 @@ class Sessions implements IStrategy
         $this->registry = $registry;
         $this->userLookup = $userLookup;
         $this->venueMapper = $venueMapper;
+        $this->matchupMapper = $matchupMapper;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -189,11 +198,9 @@ class Sessions implements IStrategy
 
                 /* Set up a Matchup instance for this team; they aren't vsing anyone
                  */
-                $matchupMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
-
                 $venue = $this->findVenue($session['locationData']['name'] ?? null);
 
-                $matchup = $matchupMapper->createModel()
+                $matchup = $this->matchupMapper->createModel()
                     ->setSeason($season)
                     ->setDivision($division)
                     ->setVenue($venue)
@@ -201,7 +208,7 @@ class Sessions implements IStrategy
                     ->setStartAt(\Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime'])));
 
                 if ($this->perform) {
-                    $matchupMapper->save($matchup);
+                    $this->matchupMapper->save($matchup);
                 }
 
                 $this->log->debug(sprintf(

@@ -171,6 +171,7 @@ class Factory
          */
         if ($sessions) {
             $venueMapper = \Schoolbox\Fixtures\Venue\Mapper::getInstance();
+            $matchupMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
 
             $bus->add(new Sessions\Prepare(
                 $this->log,
@@ -182,7 +183,8 @@ class Factory
                 $api,
                 $registry,
                 $userLookup,
-                $venueMapper
+                $venueMapper,
+                $matchupMapper
             ));
         }
 
