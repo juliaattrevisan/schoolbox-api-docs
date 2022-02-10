@@ -194,6 +194,13 @@ class Factory
             ));
         }
 
+        /* The usual stats
+         */
+        $bus->add(new ApiStatistics(
+            $this->log,
+            $api
+        ));
+
         return $bus;
     }
 }
