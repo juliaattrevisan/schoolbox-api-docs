@@ -70,6 +70,18 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Team\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper;
+
+
+    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -78,13 +90,15 @@ class Sessions implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                    $log
-     * @param bool                               $perform
-     * @param IApi                               $api
-     * @param Registry                           $registry
-     * @param Person                             $userLookup
-     * @param \Schoolbox\Fixtures\Venue\Mapper   $venueMapper
-     * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param IApi                                  $api
+     * @param Registry                              $registry
+     * @param Person                                $userLookup
+     * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
+     * @param \Schoolbox\Fixtures\Matchup\Mapper    $matchupMapper
+     * @param \Schoolbox\Fixtures\Coach\Mapper      $coachMapper
+     * @param \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -93,7 +107,9 @@ class Sessions implements IStrategy
         Registry $registry,
         Person $userLookup,
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
-        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
+        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
+        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -102,6 +118,8 @@ class Sessions implements IStrategy
         $this->userLookup = $userLookup;
         $this->venueMapper = $venueMapper;
         $this->matchupMapper = $matchupMapper;
+        $this->coachMapper = $coachMapper;
+        $this->teamCoachMapper = $teamCoachMapper;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -200,11 +218,11 @@ class Sessions implements IStrategy
                  */
                 $venue = $this->findVenue($session['locationData']['name'] ?? null);
 
-                /* See if this matchup exists by taking the bestest guess
-                 */
                 $matchupName = trim($session['title']);
                 $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
 
+                /* See if this matchup exists by taking the bestest guess
+                 */
                 try {
                     $matchup = $this->matchupMapper->findOneByColumnList([
                         'name' => $matchupName,
@@ -237,6 +255,12 @@ class Sessions implements IStrategy
                     ));
                 }
 
+                /* Slap in a team coach
+                 */
+                foreach ($session['assignedStaff'] as $assignedStaff) {
+                    $this->assignCoach($this->findCoach($assignedStaff), $team);
+                }
+
                 /* We saw this, so we keep this
                  */
                 if ($this->perform) {
@@ -244,6 +268,66 @@ class Sessions implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * Assign a coach to a team, if they aren't already assigned
+     *
+     * @param \Schoolbox\Fixtures\Coach\Model $coach
+     * @param \Schoolbox\Fixtures\Team\Model  $team
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function assignCoach(\Schoolbox\Fixtures\Coach\Model $coach, \Schoolbox\Fixtures\Team\Model $team): void
+    {
+        try {
+            $teamCoach = $this->teamCoachMapper->findOneByColumnList([
+                'team_id' => $team->getId(),
+                'coach_id' => $coach->getId()
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $teamCoach = $this->teamCoachMapper->createModel()
+                ->setTeam($team)
+                ->setCoach($coach);
+
+            if ($this->perform) {
+                $this->teamCoachMapper->save($teamCoach);
+            }
+        }
+    }
+
+
+    /**
+     * Find a coach for the given Clipboard data $coach
+     * Creates a coach record if they couldn't be found
+     *
+     * @param array $coach
+     * @return \Schoolbox\Fixtures\Coach\Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function findCoach(array $coach): \Schoolbox\Fixtures\Coach\Model
+    {
+        $coachName = "{$coach['firstName']} {$coach['lastName']}";
+
+        try {
+            $coach = $this->coachMapper->findOneByColumnList([
+                'name' => $coachName
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $coach = $this->coachMapper->createModel()
+                ->setName($coachName);
+
+            if ($this->perform) {
+                $this->coachMapper->save($coach);
+            }
+        }
+
+        return $coach;
     }
 
 

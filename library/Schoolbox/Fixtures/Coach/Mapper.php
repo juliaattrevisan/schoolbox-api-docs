@@ -66,7 +66,9 @@ class Mapper extends BaseMapper
                 $model = $this->createModel();
             }
 
-            if ($row['u.id']) {
+            /* Only hydrate users if they existed
+             */
+            if ($row['u.id'] ?? false) {
                 $user = $this->hydrateJoin($row, 'user', 'u');
                 if ($user instanceof User) {
                     $model->setUser($user);

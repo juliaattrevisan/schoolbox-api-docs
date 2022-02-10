@@ -172,6 +172,8 @@ class Factory
         if ($sessions) {
             $venueMapper = \Schoolbox\Fixtures\Venue\Mapper::getInstance();
             $matchupMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
+            $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
+            $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
 
             $bus->add(new Sessions\Prepare(
                 $this->log,
@@ -185,7 +187,9 @@ class Factory
                 $registry,
                 $userLookup,
                 $venueMapper,
-                $matchupMapper
+                $matchupMapper,
+                $coachMapper,
+                $teamCoachMapper
             ))
             ->add(new Sessions\Cleanup(
                 $this->log,
