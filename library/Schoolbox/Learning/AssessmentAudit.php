@@ -22,7 +22,7 @@ class AssessmentAudit
     /**
      * @var FolderMapper
      */
-    private $folderMapper;
+    private FolderMapper $folderMapper;
     /**
      * for building the assessment query
      * @var IConnector $database
@@ -72,6 +72,7 @@ class AssessmentAudit
         lu_work_type.name AS assessmentWorkType,
 
         course_implementation.folder_id as course_implementation_id,
+        course_unit_implementation_out.folder_id as course_unit_implementation_id,
         course_specification.folder_id AS course_specification_id,
         course_unit_specification.folder_id as course_unit_specification_id,
 
@@ -99,6 +100,8 @@ class AssessmentAudit
         LEFT JOIN course_specification on v_assessment_relation.course_specification_id = course_specification.id
         LEFT JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
         LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
+        LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+        LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
 
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
@@ -136,14 +139,9 @@ class AssessmentAudit
             if (null !== $row['course_unit_specification_id']) {
                 $specImplem = 'Course';
                 $unitCourseFolderId = $row['course_unit_specification_id'];
-            } elseif (null !== $row['course_implementation_id']) {
-                /**
-                 * unable to work out what the course unit implementation folder is,
-                 * so lets just use the course implementation folder,
-                 * as these might be the same thing?
-                 */
+            } elseif (null !== $row['course_unit_implementation_id']) {
                 $specImplem = 'Class Imported';
-                $unitCourseFolderId = $row['course_implementation_id'];
+                $unitCourseFolderId = $row['course_unit_implementation_id'];
             }
 
             //work out number of online submissions
