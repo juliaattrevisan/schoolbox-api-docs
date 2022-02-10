@@ -797,9 +797,16 @@ class Controller extends Assessment\Controller
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
         }
 
+        // Show the feedback for the student, if:
+        // * a self-assessment
+        // * the most recent feedback is a draft
+        //   (if it has been published, they need to re-create the self-assess)
         $feedback = null;
-        if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+        if ($reviewRoute !== ReturnedWork::REVIEW_ROUTE_INSTRUCTOR && $participant) {
             $feedback = $participant->findMostRecentSelfAssessedFeedback();
+            if ($feedback && $feedback->isPublished()) {
+                $feedback = null;
+            }
         }
 
         if ($feedback instanceof Feedback\Model) {
@@ -829,8 +836,8 @@ class Controller extends Assessment\Controller
         /* Assume the most recent record is the latest submission
          */
         if ($allResponses->count()) {
-            /** @var Submission $latestResponse */
-            $latestResponse = $participant->findMostRecentResponse();
+            /** @var Submission|null $latestResponse */
+            $latestResponse = $participant ? $participant->findMostRecentResponse() : null;
 
             /* If the latest response is a draft, collect all its contents for editing
              */
@@ -1092,10 +1099,6 @@ class Controller extends Assessment\Controller
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
         }
 
-        /* Feedback vars */
-        $participant = null;
-        $comment = null;
-        $mark = null;
         // Students can't mark themselves as requiring resubmission
         $resubmissionRequired = false;
         // Self-reflecters can't attach files to feedback, so this will always be null
@@ -1103,12 +1106,14 @@ class Controller extends Assessment\Controller
         // And we only need to know if the feedback was submitted from the inline grader in order to determine if
         // we need to process attachments, so this is a nope too
         $fromInlineGrader = false;
-        $publish = null;
-        $mostRecentFeedback = null;
-        $hasRubric = null;
 
         // Only try to create a feedback if this due work uses self reflect
         if ($reviewRoute != ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+            // Reload assessment's participation.
+            // There's a rare case where if a teacher submits feedback without
+            // being a participant: their participation is added but not
+            // recognised yet.
+            $assessment  = $this->participantMapper->loadParticipationIntoAssessment($assessment);
             $participant = $assessment->getParticipant($student);
             $comment     = $rq->post['comment'];
             // There might not be a mark: due works may have mark type none, in which case no mark will be posted
@@ -1165,11 +1170,12 @@ class Controller extends Assessment\Controller
                 // Process the rubric
                 $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
-                // Did we just give some rubric marks? Save them
-                if (\is_array($rq->post['rubric'])) {
+                // Does this assessment use rubrics?
+                // Save the rubric if so, even if nothing is there.
+                if ($hasRubric) {
                     $markedGrid = $factory->buildFromPostData(
                         $this->rubricMapper->retrieveMarkedGrid($feedback),
-                        $rq->post['rubric']
+                        $rq->post['rubric'] ?? [],
                     );
                     $this->rubricMapper->persistMarkedGrid($markedGrid);
 
@@ -1199,6 +1205,7 @@ class Controller extends Assessment\Controller
          */
         $detachedFunction = null;
 
+        /** @var Model $assessment */
         if ($isFinal && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
