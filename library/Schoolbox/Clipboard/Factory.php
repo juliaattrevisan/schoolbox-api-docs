@@ -105,6 +105,7 @@ class Factory
         $divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
         $teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
         $teamPlayerMapper = \Schoolbox\Fixtures\Team\Player\Mapper::getInstance();
+        $divisionUserMapper = \Schoolbox\Fixtures\Division\User\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
         /* Set up a local cache for (sport, division, team) tuples
@@ -135,7 +136,9 @@ class Factory
                 $sportMapper,
                 $positionMapper,
                 $divisionMapper,
-                $teamMapper
+                $teamMapper,
+                $teamPlayerMapper,
+                $divisionUserMapper
             ))
             ->add(new Hierarchy\Team(
                 $this->log,
@@ -144,6 +147,7 @@ class Factory
                 $membership,
                 $registry,
                 $userLookup,
+                $divisionUserMapper,
                 $teamPlayerMapper,
                 $userMapper
             ))

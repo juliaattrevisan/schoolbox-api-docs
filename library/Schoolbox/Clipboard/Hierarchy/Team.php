@@ -60,9 +60,9 @@ class Team implements IStrategy
 
 
     /**
-     * @var Codec\Division
+     * @var \Schoolbox\Fixtures\Division\User\Mapper
      */
-    private Codec\Division $divisionCodec;
+    private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
 
 
     /**
@@ -78,14 +78,21 @@ class Team implements IStrategy
 
 
     /**
-     * @param LoggerInterface                        $log
-     * @param bool                                   $perform
-     * @param IApi                                   $api
-     * @param bool                                   $membership
-     * @param Registry                               $registry
-     * @param Person                                 $userLookup
-     * @param \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper
-     * @param \Schoolbox\UserMapper                  $userMapper
+     * @var Codec\Division
+     */
+    private Codec\Division $divisionCodec;
+
+
+    /**
+     * @param LoggerInterface                          $log
+     * @param bool                                     $perform
+     * @param IApi                                     $api
+     * @param bool                                     $membership
+     * @param Registry                                 $registry
+     * @param Person                                   $userLookup
+     * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
+     * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
+     * @param \Schoolbox\UserMapper                    $userMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -94,6 +101,7 @@ class Team implements IStrategy
         bool $membership,
         Registry $registry,
         Lookup\Person $userLookup,
+        \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
@@ -103,9 +111,10 @@ class Team implements IStrategy
         $this->membership = $membership;
         $this->registry = $registry;
         $this->userLookup = $userLookup;
-        $this->divisionCodec = new Codec\Division();
+        $this->divisionUserMapper = $divisionUserMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->userMapper = $userMapper;
+        $this->divisionCodec = new Codec\Division();
     }
 
 
@@ -218,7 +227,7 @@ class Team implements IStrategy
             /* If the --membership flag was set, ram in students and staff relationships too
              */
             if ($this->membership) {
-                $this->importMemberships($userLookup, $team, $teamData);
+                $this->importMemberships($userLookup, $division, $team, $teamData);
             }
         }
     }
@@ -228,25 +237,25 @@ class Team implements IStrategy
      * Import the students listed in $teamData into schoolbox Fixtures,
      * associating them with $team
      *
-     * @param array                          $userLookup
-     * @param \Schoolbox\Fixtures\Team\Model $team
-     * @param array                          $teamData
+     * @param array                              $userLookup
+     * @param \Schoolbox\Fixtures\Division\Model $division
+     * @param \Schoolbox\Fixtures\Team\Model     $team
+     * @param array                              $teamData
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importMemberships(array $userLookup, \Schoolbox\Fixtures\Team\Model $team, array $teamData): void
-    {
+    private function importMemberships(
+        array $userLookup,
+        \Schoolbox\Fixtures\Division\Model $division,
+        \Schoolbox\Fixtures\Team\Model $team,
+        array $teamData
+    ): void {
         $this->log->debug(sprintf(
             'Processing memberships for team %s',
             $team->getName()
         ));
-
-        /* If anyone was here,
-         * they won't be anymore
-         */
-        $this->teamPlayerMapper->deleteByColumn('team_id', $team->getId());
 
         /* Find out who this external_id is
          */
@@ -276,12 +285,16 @@ class Team implements IStrategy
              * so I can save this relation. Instead of having a full hydration
              * stored in ram, I'll just ram in a stub with the identifier
              */
+            $user = $this->userMapper->createModel()->setId($userId);
+
             $teamPlayer = $this->teamPlayerMapper->createModel()
-                ->setUser($this->userMapper->createModel()->setId($userId))
+                ->setUser($user)
                 ->setTeam($team)
                 ->setSequence($sequence);
 
-            $this->teamPlayerMapper->save($teamPlayer);
+            if ($this->perform) {
+                $this->teamPlayerMapper->save($teamPlayer);
+            }
 
             $this->log->info(sprintf(
                 'Assigned Clipboard human %s %s (%s) to team %s, using schoolbox user %s',
@@ -289,6 +302,26 @@ class Team implements IStrategy
                 $student['lastName'],
                 $student['smsId'],
                 $team->getName(),
+                $userId
+            ));
+
+            /* Put them in the Division pool too
+             */
+            $divisionUser = $this->divisionUserMapper->createModel()
+                ->setUser($user)
+                ->setDivision($division)
+                ->setSequence($sequence);
+
+            if ($this->perform) {
+                $this->divisionUserMapper->save($divisionUser);
+            }
+
+            $this->log->info(sprintf(
+                'Assigned Clipboard human %s %s (%s) to player pool for division %s, using schoolbox user %s',
+                $student['firstName'],
+                $student['lastName'],
+                $student['smsId'],
+                $division->getName(),
                 $userId
             ));
         }

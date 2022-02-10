@@ -63,13 +63,27 @@ class Prepare implements IStrategy
 
 
     /**
-     * @param LoggerInterface                     $log
-     * @param bool                                $perform
-     * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
-     * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
-     * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
-     * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
-     * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
+     * @var \Schoolbox\Fixtures\Team\Player\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Division\User\Mapper
+     */
+    private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
+
+
+    /**
+     * @param LoggerInterface                          $log
+     * @param bool                                     $perform
+     * @param \Schoolbox\Fixtures\Season\Mapper        $seasonMapper
+     * @param \Schoolbox\Fixtures\Sport\Mapper         $sportMapper
+     * @param \Schoolbox\Fixtures\Position\Mapper      $positionMapper
+     * @param \Schoolbox\Fixtures\Division\Mapper      $divisionMapper
+     * @param \Schoolbox\Fixtures\Team\Mapper          $teamMapper
+     * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
+     * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -78,7 +92,9 @@ class Prepare implements IStrategy
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
-        \Schoolbox\Fixtures\Team\Mapper $teamMapper
+        \Schoolbox\Fixtures\Team\Mapper $teamMapper,
+        \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -87,6 +103,8 @@ class Prepare implements IStrategy
         $this->positionMapper = $positionMapper;
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
+        $this->divisionUserMapper = $divisionUserMapper;
     }
 
 
@@ -103,6 +121,11 @@ class Prepare implements IStrategy
             $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+
+            /* Hard deletions for relationships
+             */
+            $this->teamPlayerMapper->getDatabase()->query("DELETE FROM {$this->teamPlayerMapper->getTable()}");
+            $this->divisionUserMapper->getDatabase()->query("DELETE FROM {$this->divisionUserMapper->getTable()}");
         }
 
         $this->log->info('Preparing existing seasons, sports, positions, divisions and teams for create/update');
