@@ -35,12 +35,13 @@
         "highcharts-vue": "^1.3.5",
         "intro.js": "2.8.0-alpha.1",
         "jquery": "^3.6.0",
-        "jquery-ui": "1.13.0",
+        "jquery-ui": "^1.13.0",
         "jquery-validation": "^1.19.3",
         "locutus": "^2.0.15",
         "lodash": "4.17.21",
         "magnific-popup": "1.0.0",
         "mediaelement": "4.2.16",
+        "qrcode.vue": "^1.7.0",
         "qs": "^6.9.6",
         "spectrum-colorpicker": "1.6.0",
         "strtotime": "^1.0.0",
@@ -20239,6 +20240,14 @@
       "dev": true,
       "engines": {
         "node": ">=6"
+      }
+    },
+    "node_modules/qrcode.vue": {
+      "version": "1.7.0",
+      "resolved": "https://registry.npmjs.org/qrcode.vue/-/qrcode.vue-1.7.0.tgz",
+      "integrity": "sha512-R7t6Y3fDDtcU7L4rtqwGUDP9xD64gJhIwpfjhRCTKmBoYF6SS49PIJHRJ048cse6OI7iwTwgyy2C46N9Ygoc6g==",
+      "peerDependencies": {
+        "vue": "^2.0.0"
       }
     },
     "node_modules/qs": {
@@ -41654,6 +41663,12 @@
       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz",
       "integrity": "sha1-tYsBCsQMIsVldhbI0sLALHv0eew=",
       "dev": true
+    },
+    "qrcode.vue": {
+      "version": "1.7.0",
+      "resolved": "https://registry.npmjs.org/qrcode.vue/-/qrcode.vue-1.7.0.tgz",
+      "integrity": "sha512-R7t6Y3fDDtcU7L4rtqwGUDP9xD64gJhIwpfjhRCTKmBoYF6SS49PIJHRJ048cse6OI7iwTwgyy2C46N9Ygoc6g==",
+      "requires": {}
     },
     "qs": {
       "version": "6.10.1",

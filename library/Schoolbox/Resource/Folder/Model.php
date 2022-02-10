@@ -673,16 +673,35 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Returns whether QR code is enabled for this folder
+     * @return bool
+     */
+    public function isQrcodeEnabled(): bool
+    {
+        return $this->getYearLevelPermission('qrcodeEnabled', false);
+    }
+
+    /**
      * Returns whether grade page is enabled for this folder from associated year levels
      * @return bool
      */
     public function isGradePageEnabled(): bool
     {
+        return $this->getYearLevelPermission('displayGradePage', true);
+    }
+
+    /**
+     * @param string $propertyName
+     * @param bool   $default When no year level is associated to this folder
+     * @return bool
+     */
+    private function getYearLevelPermission(string $propertyName, bool $default): bool
+    {
         if ($this->getYearLevels()->count() === 0) {
-            return true;
+            return $default;
         }
-        $displayGradePages = array_unique($this->getYearLevels()->getPropertyValues('displayGradePage'));
-        return count($displayGradePages) > 1 ? true : $displayGradePages[0];
+        $propertyPermissions = array_unique($this->getYearLevels()->getPropertyValues($propertyName));
+        return count($propertyPermissions) > 1 ? true : $propertyPermissions[0];
     }
 
     /**

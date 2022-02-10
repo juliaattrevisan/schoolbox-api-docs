@@ -221,6 +221,7 @@ class RecursiveUndeleter
         UserMapper::class                   => [
             Pastoral\Access\Mapper::class,
             Pastoral\Audience\Mapper::class,
+            \Schoolbox\User\Token\Mapper::class => 'user_id',
         ],
         RoleMapper::class                   => [
             Pastoral\Access\Mapper::class => 'role_id',
@@ -301,6 +302,7 @@ class RecursiveUndeleter
         ],
         Forum\PostMapper::class                         => [],
         News\Mapper::class                              => [],
+        \Schoolbox\User\Token\Mapper::class => [],
     ];
 
 

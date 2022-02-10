@@ -85,7 +85,7 @@ class Jwt
             MessagePayloadInterface::CLAIM_SUB => $user->getUsername(),
         ];
         if ($expiry !== null && !$expiry->isNull()) {
-            $claims[MessagePayloadInterface::CLAIM_EXP] = $expiry;
+            $claims[MessagePayloadInterface::CLAIM_EXP] = $expiry->getUnixTimeStamp();
         }
         if ($jwtId !== null) {
             $claims[MessagePayloadInterface::CLAIM_JTI] = $jwtId;

@@ -65,14 +65,7 @@ class Controller extends Base
         $showExisting = false;
         switch ($jwtIdToUse) {
             case 'new':
-                // delete existing
-                $existing = $this->tokenMapper->findByColumn('user_id', $user->getId());
-                $this->tokenMapper->softDelete($existing);
-                // create new
-                $userJwtId = $this->tokenMapper->createModel()->setUser($user);
-                $this->tokenMapper->save($userJwtId);
-                // get the new one
-                $userJwtId    = $this->tokenMapper->findOneByColumn('user_id', $user->getId());
+                $userJwtId = $this->tokenMapper->generateForUser($user);
                 $showExisting = true;
                 break;
             case 'existing':

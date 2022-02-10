@@ -178,6 +178,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteNotificationQueue']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteToken']);
 
         $this->registerCallback(
             self::CALLBACK_POSTSOFTDELETE,
@@ -842,6 +843,16 @@ class UserMapper extends Mapper
         return true;
     }
 
+    /**
+     * Deletes token
+     * @param User $user
+     * @return bool
+     */
+    protected function deleteToken(User $user): bool
+    {
+        Schoolbox\User\Token\Mapper::getInstance()->deleteByColumn('user_id', $user->getId());
+        return true;
+    }
 
     /**
      * Pre-save callback for verifying whether a user's name is not null or zero-length
