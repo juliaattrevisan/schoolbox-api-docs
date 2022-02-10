@@ -92,8 +92,8 @@ class Team implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->membership = $membership;
-        $this->divisionCodec = new Codec\Division();
         $this->registry = $registry;
+        $this->divisionCodec = new Codec\Division();
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->userMapper = $userMapper;
     }
