@@ -40,17 +40,17 @@
         <tbody>
         {% for capability in longitudinalRubric %}
             <tr>
-            <th class="rb-group-name" rowspan="{{ capability.indicators|length }}"><b>{{ capability.name | nl2br }}</b></th>
+            <th class="rb-group-name markdown" rowspan="{{ capability.indicators|length }}">{{ capability.name | markdown }}</th>
             {% for indicator in capability.indicators %}
                 {% if not loop.first %}
                     <tr>
                 {% endif %}
-                <th class="rb-criterion-name">{{ (indicator.name  ?? '') | nl2br }}</th>
+                <th class="rb-criterion-name markdown">{{ (indicator.name  ?? '') | markdown }}</th>
                 {% for activity_id, activity in rubricAssessmentList %}
                     {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                    <td><div><span class="rb-description">
+                    <td><div><span class="rb-description markdown">
                             {% if activity %}<b>{{ activity.level ?? '' }}</b><br />{% endif %}
-                            {{ (activity.descriptor ?? '') | nl2br }} {% if activity and activity.value is defined and activity.max_value > 0 and showRubricPoints %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
+                            {{ (activity.descriptor ?? '') | markdown }} {% if activity and activity.value is defined and activity.max_value > 0 and showRubricPoints %}({{ activity.value|round }}/{{ activity.max_value|round }}){% endif %}
                         </span></div>
                     </td>
                 {% endfor %}

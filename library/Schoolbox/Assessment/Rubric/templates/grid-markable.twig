@@ -35,7 +35,7 @@
             <tr>
                 <th colspan="2">&nbsp;</th>
                 {% for level in rubricGrid.levels %}
-                <th>{{ level.name | markdown }}</th>
+                <th class="markdown">{{ level.name | markdown }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -54,11 +54,11 @@
                 <tr data-group="{{ rubricId }}-{{ groupUsage.capability.id }}">
                     {# yay html tables... -_-; #}
                     {% if rowspan %}
-                        <th class="rb-group-name" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
+                        <th class="rb-group-name markdown" rowspan="{{ rowspan }}"><span>{{ groupUsage.capability.name | markdown }}</span></th>
                         {% set rowspan = 0 %}
                     {% endif %}
 
-                    <th class="rb-criterion-name">{{ critUsage.indicator.name | markdown }}</th>
+                    <th class="rb-criterion-name markdown">{{ critUsage.indicator.name | markdown }}</th>
 
                     {% set indicatorId   = critUsage.indicator.id %}
                     {% set indicatorMark = rubricMarkedGrid

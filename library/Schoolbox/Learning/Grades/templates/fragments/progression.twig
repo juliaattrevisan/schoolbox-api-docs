@@ -77,14 +77,14 @@
         }
     });
 </script>
-<table>
+<table class="rb">
     {% for capability in longitudinalRubric %}
-        <tr><th class="rubric-progression-capability">{{ (capability.name ?? '') | nl2br }}</th>
+        <tr><th class="rubric-progression-capability markdown">{{ (capability.name ?? '') | markdown }}</th>
         {% for indicatorId,indicator in capability.indicators %}
             {% if not loop.first %}
                 <tr><th class="rubric-progression-capability">&nbsp;</th>
             {% endif %}
-            <th class="rubric-progression-indicator">{{ (indicator.name ?? '') | nl2br}}</th>
+            <th class="rubric-progression-indicator markdown">{{ (indicator.name ?? '') | markdown }}</th>
             <td class="rubric-progression-graph">
                 <div id="rubricGraph{{ indicatorId }}"></div>
                 <script type="application/javascript">
@@ -101,7 +101,7 @@
                             {% if activity.max_value ?? 0 > 0  %}
                             {
                                 y: {{ activity.value is defined ? ((activity.value / activity.max_value) * 100) : 'null' }},
-                                desc: "{{ (activity.descriptor ?? '') |nl2br | escape('js') }}",
+                                desc: "{{ (activity.descriptor ?? '') | markdown | escape('js') }}",
                                 title: "{{ activity_name }}",
                                 level: "{{ activity.level ?? '' }}"
                             },
