@@ -1170,11 +1170,12 @@ class Controller extends Assessment\Controller
                 // Process the rubric
                 $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
-                // Did we just give some rubric marks? Save them
-                if (\is_array($rq->post['rubric'])) {
+                // Does this assessment use rubrics?
+                // Save the rubric if so, even if nothing is there.
+                if ($hasRubric) {
                     $markedGrid = $factory->buildFromPostData(
                         $this->rubricMapper->retrieveMarkedGrid($feedback),
-                        $rq->post['rubric']
+                        $rq->post['rubric'] ?? [],
                     );
                     $this->rubricMapper->persistMarkedGrid($markedGrid);
 
