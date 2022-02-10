@@ -7,11 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Clipboard\Hierarchy;
+namespace Schoolbox\Clipboard;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Clipboard\Api;
-use Schoolbox\Clipboard\IStrategy;
 use Schoolbox\GenericCollection;
 
 /**
@@ -73,12 +71,13 @@ class Factory
      * of the clipboard Hierarchy
      *
      * @param bool $membership
+     * @param bool $sessions
      * @return GenericCollection
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(bool $membership): GenericCollection
+    public function produce(bool $membership, bool $sessions): GenericCollection
     {
         /* Check the required pieces existed
          */
@@ -108,11 +107,24 @@ class Factory
         $teamPlayerMapper = \Schoolbox\Fixtures\Team\Player\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
+        /* Set up a local cache for (sport, division, team) tuples
+         */
+        $registry = new Hierarchy\Registry(
+            $this->log,
+            $this->perform,
+            $seasonMapper,
+            $sportMapper,
+            $positionMapper,
+            $divisionMapper,
+            $teamMapper
+        );
+
         /* Set up composite bus - everybody's data gets on board and shuttled off
          * into schoolbox town
          */
-        return (new GenericCollection(IStrategy::class))
-            ->add(new Prepare(
+        $bus = new GenericCollection(IStrategy::class);
+
+        $bus->add(new Hierarchy\Prepare(
                 $this->log,
                 $this->perform,
                 $seasonMapper,
@@ -121,20 +133,16 @@ class Factory
                 $divisionMapper,
                 $teamMapper
             ))
-            ->add(new Team(
+            ->add(new Hierarchy\Team(
                 $this->log,
                 $this->perform,
                 $api,
                 $membership,
-                $seasonMapper,
-                $sportMapper,
-                $positionMapper,
-                $divisionMapper,
-                $teamMapper,
+                $registry,
                 $teamPlayerMapper,
                 $userMapper
             ))
-            ->add(new Cleanup(
+            ->add(new Hierarchy\Cleanup(
                 $this->log,
                 $this->perform,
                 $seasonMapper,
@@ -143,5 +151,24 @@ class Factory
                 $divisionMapper,
                 $teamMapper
             ));
+
+        /* Optionally load Sessions (the equivalent of schoolbox Matchups)
+         * This is where we assign people to positions, add coaches, etc.
+         * since that comes out of a separate payload in Clipboard and
+         * also gets inserted into schoolbox Fixtures' participations
+         *
+         * Reuse whatever we might have encountered previously during the
+         * Team import - Registry will already know about it
+         */
+        if ($sessions) {
+            $bus->add(new Sessions\Sessions(
+                $this->log,
+                $this->perform,
+                $api,
+                $registry
+            ));
+        }
+
+        return $bus;
     }
 }

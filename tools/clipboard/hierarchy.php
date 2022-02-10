@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new \Schoolbox\Clipboard\Hierarchy\Cli\HierarchyTool();
+$app = new \Schoolbox\Clipboard\Cli\HierarchyTool();
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *

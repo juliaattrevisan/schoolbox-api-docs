@@ -47,39 +47,15 @@ class Team implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private Registry $registry;
+
+
+    /**
      * @var Codec\Division
      */
     private Codec\Division $divisionCodec;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Season\Mapper
-     */
-    private \Schoolbox\Fixtures\Season\Mapper $seasonMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Sport\Mapper
-     */
-    private \Schoolbox\Fixtures\Sport\Mapper $sportMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Position\Mapper
-     */
-    private \Schoolbox\Fixtures\Position\Mapper $positionMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Division\Mapper
-     */
-    private \Schoolbox\Fixtures\Division\Mapper $divisionMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Mapper $teamMapper;
 
 
     /**
@@ -99,11 +75,7 @@ class Team implements IStrategy
      * @param bool                                   $perform
      * @param IApi                                   $api
      * @param bool                                   $membership
-     * @param \Schoolbox\Fixtures\Season\Mapper      $seasonMapper
-     * @param \Schoolbox\Fixtures\Sport\Mapper       $sportMapper
-     * @param \Schoolbox\Fixtures\Position\Mapper    $positionMapper
-     * @param \Schoolbox\Fixtures\Division\Mapper    $divisionMapper
-     * @param \Schoolbox\Fixtures\Team\Mapper        $teamMapper
+     * @param Registry                               $registry
      * @param \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper
      * @param \Schoolbox\UserMapper                  $userMapper
      */
@@ -112,11 +84,7 @@ class Team implements IStrategy
         bool $perform,
         IApi $api,
         bool $membership,
-        \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
-        \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
-        \Schoolbox\Fixtures\Position\Mapper $positionMapper,
-        \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
-        \Schoolbox\Fixtures\Team\Mapper $teamMapper,
+        Registry $registry,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
@@ -125,17 +93,16 @@ class Team implements IStrategy
         $this->api = $api;
         $this->membership = $membership;
         $this->divisionCodec = new Codec\Division();
-        $this->seasonMapper = $seasonMapper;
-        $this->sportMapper = $sportMapper;
-        $this->positionMapper = $positionMapper;
-        $this->divisionMapper = $divisionMapper;
-        $this->teamMapper = $teamMapper;
+        $this->registry = $registry;
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->userMapper = $userMapper;
     }
 
 
     /**
+     * Import Sports, Divisions, Teams, Team Members from clipboard,
+     * creating them if they don't already exist
+     *
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -144,23 +111,10 @@ class Team implements IStrategy
      */
     public function import(): void
     {
-
-        /* Set up a local cache for (sport, division, team) tuples
-         */
-        $registry = new Registry(
-            $this->log,
-            $this->perform,
-            $this->seasonMapper,
-            $this->sportMapper,
-            $this->positionMapper,
-            $this->divisionMapper,
-            $this->teamMapper
-        );
-
         /* I guess have an ultralong season to basically remove it from typical usage
          * This season basically encompasses everything so we only need to spawn it once
          */
-        $season = $registry->recallSeason();
+        $season = $this->registry->recallSeason();
 
         /* Consume data from Clipboard endpoint - each team comes with info about
          * its own hierarchy so map them to schoolbox concepts as best we can
@@ -221,17 +175,17 @@ class Team implements IStrategy
 
             /* Try to spawn a corresponding Sport instance
              */
-            $sport = $registry->recallSport($teamActivityId, $teamActivity);
+            $sport = $this->registry->recallSport($teamActivityId, $teamActivity);
 
             /* Try to spawn a corresponding Division instance
              */
-            $division = $registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+            $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
 
             /* Try to spawn a corresponding Team instance
              * $teamId is used later to figure out who vs who, when importing Matchups
              * Teams are indexed by ids for this particular usage, unlike others
              */
-            $team = $registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
+            $team = $this->registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
 
             $this->log->info(sprintf(
                 'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
@@ -248,7 +202,7 @@ class Team implements IStrategy
              * Positions, accumulate them into the corresponding Sport
              */
             foreach ($teamData['positions'] as $positionData) {
-                $position = $registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
+                $position = $this->registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
             }
 
             /* If the --membership flag was set, ram in students and staff relationships too

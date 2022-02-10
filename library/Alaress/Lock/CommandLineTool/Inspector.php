@@ -15,7 +15,7 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Clipboard\Hierarchy\Cli\HierarchyTool;
+use Schoolbox\Clipboard\Cli\HierarchyTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
