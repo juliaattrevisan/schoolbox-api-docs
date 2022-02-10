@@ -170,6 +170,8 @@ class Factory
          * Team import - Registry will already know about it
          */
         if ($sessions) {
+            $venueMapper = \Schoolbox\Fixtures\Venue\Mapper::getInstance();
+
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
@@ -179,7 +181,8 @@ class Factory
                 $this->perform,
                 $api,
                 $registry,
-                $userLookup
+                $userLookup,
+                $venueMapper
             ));
         }
 
