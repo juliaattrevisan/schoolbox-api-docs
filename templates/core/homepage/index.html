@@ -56,6 +56,7 @@
 <!-- BEGIN modify_layout -->
 <link rel="stylesheet" type="text/css" href="{CDN_PREFIX}/css/core/spectrum/spectrum.css" />
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/spectrum.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/form/jquery.ajax-form.js"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/updateHomepage.js?v={SITE_VERSION}"></script>
 
@@ -436,7 +437,6 @@
 <script type="text/javascript">
     // all forms should submit without prevention
     $(".homepage form").submit(function() {
-        debugger;
         window.check = false;
     });
 </script>
