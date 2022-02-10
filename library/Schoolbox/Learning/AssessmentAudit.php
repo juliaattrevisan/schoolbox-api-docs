@@ -71,10 +71,10 @@ class AssessmentAudit
         v_assessment_relation.folder_id AS folderID,
         lu_work_type.name AS assessmentWorkType,
 
-        course_implementation.folder_id as course_implementation_id,
-        course_unit_implementation_out.folder_id as course_unit_implementation_id,
-        course_specification.folder_id AS course_specification_id,
-        course_unit_specification.folder_id as course_unit_specification_id,
+        course_implementation.folder_id as course_implementation_folder_id,
+        course_unit_implementation_out.folder_id as course_unit_implementation_folder_id,
+        course_specification.folder_id AS course_specification_folder_id,
+        course_unit_specification.folder_id as course_unit_specification_folder_id,
 
         submission_box.accept_submission AS acceptSubmission,
         submission_box.multi_submission AS multiSubmission,
@@ -126,22 +126,22 @@ class AssessmentAudit
             $specImplem = 'Class Created';
             //grab COURSE specificationId or implementationId
             $courseFolderId = null;
-            if (null !== $row['course_specification_id']) {
+            if (null !== $row['course_specification_folder_id']) {
                 $specImplem = 'Course';
-                $courseFolderId = $row['course_specification_id'];
-            } elseif (null !== $row['course_implementation_id']) {
+                $courseFolderId = $row['course_specification_folder_id'];
+            } elseif (null !== $row['course_implementation_folder_id']) {
                 $specImplem = 'Class Imported';
-                $courseFolderId = $row['course_implementation_id'];
+                $courseFolderId = $row['course_implementation_folder_id'];
             }
 
             //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
-            if (null !== $row['course_unit_specification_id']) {
+            if (null !== $row['course_unit_specification_folder_id']) {
                 $specImplem = 'Course';
-                $unitCourseFolderId = $row['course_unit_specification_id'];
-            } elseif (null !== $row['course_unit_implementation_id']) {
+                $unitCourseFolderId = $row['course_unit_specification_folder_id'];
+            } elseif (null !== $row['course_unit_implementation_folder_id']) {
                 $specImplem = 'Class Imported';
-                $unitCourseFolderId = $row['course_unit_implementation_id'];
+                $unitCourseFolderId = $row['course_unit_implementation_folder_id'];
             }
 
             //work out number of online submissions
