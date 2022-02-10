@@ -2346,11 +2346,6 @@ parameters:
 			path: library/External/Edumate/Timetable.php
 
 		-
-			message: "#^Return type \\(bool\\|string\\) of method External_Edumate_Timetable\\:\\:getDayNumber\\(\\) should be compatible with return type \\(int\\) of method External_TimetableInterface\\:\\:getDayNumber\\(\\)$#"
-			count: 1
-			path: library/External/Edumate/Timetable.php
-
-		-
 			message: "#^Method External_Isams_Batch_Reader_Timetable\\:\\:getAccountInfo\\(\\) should return Iterator but returns array\\.$#"
 			count: 1
 			path: library/External/Isams/Batch/Reader/Timetable.php
