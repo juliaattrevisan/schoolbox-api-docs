@@ -70,10 +70,11 @@ class AssessmentAudit
         assessment.title AS assessmentTitle,
         v_assessment_relation.folder_id AS folderID,
         lu_work_type.name AS assessmentWorkType,
-        v_assessment_relation.course_implementation_id AS course_implementation_id,
-        v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
-        v_assessment_relation.course_specification_id AS course_specification_id,
-        v_assessment_relation.course_unit_specification_id AS course_unit_specification_id,
+
+        course_implementation.folder_id as course_implementation_id,
+        course_specification.folder_id AS course_specification_id,
+        course_unit_specification.folder_id as course_unit_specification_id,
+
         submission_box.accept_submission AS acceptSubmission,
         submission_box.multi_submission AS multiSubmission,
         submission_box.use_rubric AS useRubric,
@@ -93,6 +94,12 @@ class AssessmentAudit
         LEFT JOIN submission_mark_type as capabilityMarkTypeTable ON submission_box.rubric_capability_mark_type_id = capabilityMarkTypeTable.mark_type_id
         LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
         LEFT JOIN submission_grade_group as capabilityGradeGroupTable ON submission_box.rubric_capability_grade_group_id = capabilityGradeGroupTable.id
+
+        LEFT JOIN assessment_course_unit_implementation on v_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
+        LEFT JOIN course_specification on v_assessment_relation.course_specification_id = course_specification.id
+        LEFT JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
+        LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
+
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
 
@@ -129,9 +136,14 @@ class AssessmentAudit
             if (null !== $row['course_unit_specification_id']) {
                 $specImplem = 'Course';
                 $unitCourseFolderId = $row['course_unit_specification_id'];
-            } elseif (null !== $row['course_unit_implementation_id']) {
+            } elseif (null !== $row['course_implementation_id']) {
+                /**
+                 * unable to work out what the course unit implementation folder is,
+                 * so lets just use the course implementation folder,
+                 * as these might be the same thing?
+                 */
                 $specImplem = 'Class Imported';
-                $unitCourseFolderId = $row['course_unit_implementation_id'];
+                $unitCourseFolderId = $row['course_implementation_id'];
             }
 
             //work out number of online submissions
