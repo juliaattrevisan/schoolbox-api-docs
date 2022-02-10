@@ -1,32 +1,43 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Rules\Lang;
 
+/**
+ * A language construct for mapping SIS output (possibly modified with tokens)
+ * to one or more final values.
+ */
 class Map implements Construct
 {
-    /** @var string */
-    protected $field;
+    /**
+     * The field within the object which is to be modified by this mapping.
+     */
+    private string $field;
 
     /**
-     * Each element may be a scalar or itself an array
+     * The mapping itself.
      *
-     * @var array
+     * key:   the value which will be compared to each `$inputValue` passed to
+     *        `apply()`.
+     *        This pattern may contain wildcards: "*" matches any character
+     *        sequence, "?" matches any single character.
+     *        (@see https://www.php.net/fnmatch)
+     * value: the value(s) which will be set in the object. This may be a
+     *        multidimensional array: it will be converted into a flat array.
+     *
+     * @var array<string, string|array>
      */
-    protected $map;
-
+    private array $map;
 
     /**
      * @param string $field
      * @param array  $map
      */
-    public function __construct($field, array $map)
+    public function __construct(string $field, array $map)
     {
         $this->field = $field;
         $this->map   = $map;
@@ -72,16 +83,20 @@ class Map implements Construct
     {
         $output = [];
         foreach ($inputValue as $input) {
-            if (array_key_exists($input, $this->map)) {
-                $mapVal = $this->map[$input];
-                if (is_array($mapVal)) {
-                    $output = array_merge($output, $this->flattenArray($mapVal));
-                } else {
-                    $output[] = $mapVal;
+            foreach ($this->map as $mapKey => $mapVal) {
+                // TODO figure out what FNM_PERIOD and FNM_PATHNAME do
+                // TODO consider whether to just split `$mapKey` on space/comma
+                //      and then compare
+                if ($mapKey === $input || fnmatch($mapKey, $input, FNM_CASEFOLD | FNM_NOESCAPE)) {
+                    if (is_array($mapVal)) {
+                        $output = array_merge($output, $this->flattenArray($mapVal));
+                    } else {
+                        $output[] = $mapVal;
+                    }
                 }
             }
         }
-        return array_unique($output);
+        return array_values(array_unique($output));
     }
 
     /**
