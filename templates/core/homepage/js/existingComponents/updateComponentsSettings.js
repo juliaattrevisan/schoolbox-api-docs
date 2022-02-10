@@ -173,7 +173,7 @@ function getSaveComponentSettingsParams (form) {
  * @param { Element } 
  * @param { String } 
  */
- async function updateComponent (component, responseData) {
+async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
     const tempElement = document.createElement('div'); //just use to insert the updated component html
     setInnerHTML(tempElement, updatedComponent.outerHTML); //now insert it

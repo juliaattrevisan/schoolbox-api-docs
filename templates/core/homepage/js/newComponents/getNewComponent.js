@@ -33,9 +33,9 @@ export async function getNewComponent (component) {
  * 
  * @returns { Element }  
  */
-function replaceExistingComponent (component, newComponentHTML) {
+async function replaceExistingComponent (component, newComponentHTML) {
     const tempElement = document.createElement('div'); //just use to insert the updated component html
-    setInnerHTML(tempElement, newComponentHTML); //now insert it
+    await setInnerHTML(tempElement, newComponentHTML); //now insert it
     const newComponent = tempElement.firstElementChild; //and then extract the element
     component.replaceWith(newComponent); //switch over to the newly created component
     updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page

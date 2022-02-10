@@ -194,6 +194,7 @@ export function setAndGetAttribute (element, attribute, value) {
 /**
  * Set innerHTML while also ensuring <script> tags within get run
  * https://stackoverflow.com/questions/2592092/executing-script-elements-inserted-with-innerhtml
+ * Modified so can also ensure all <script> tags are loaded prior to insertion if required
  * 
  * @param { Element }  
  * @param { String }
@@ -201,11 +202,21 @@ export function setAndGetAttribute (element, attribute, value) {
  */
 export function setInnerHTML (element, html) {
     element.innerHTML = html;
-    Array.from(element.querySelectorAll("script")).forEach( oldScript => {
-      const newScript = document.createElement("script");
-      Array.from(oldScript.attributes)
-        .forEach( attr => newScript.setAttribute(attr.name, attr.value) );
+    const allScriptsWithSrc = element.querySelectorAll('script[src]'); //get each to ensure we can run it
+    const totalScriptCount = allScriptsWithSrc.length;
+    let loadedScriptCount = 0;
+    Array.from(allScriptsWithSrc).forEach((oldScript) => { //replace each script with a new replacement
+        const newScript = document.createElement('script');
+        newScript.addEventListener('load', () => {
+            loadedScriptCount++;
+            if (loadedScriptCount === totalScriptCount) {
+                new Promise((resolve, reject) => {
+                    resolve();
+                });
+            }
+        });
+        Array.from(oldScript.attributes).forEach((attribute) => newScript.setAttribute(attribute.name, attribute.value)); //grab each of the attributes of the old script
         newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-        oldScript.parentNode.replaceChild(newScript, oldScript);
+        oldScript.parentNode.replaceChild(newScript, oldScript); 
     });
-  }
+}
