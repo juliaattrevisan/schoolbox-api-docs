@@ -20,13 +20,13 @@ use Symfony\Component\Lock\Store\RedisStore;
 /**
  * Encapsulated cli tool
  */
-class HierarchyTool extends CliTool\App
+class ImporterTool extends CliTool\App
 {
 
     /**
      * Lock name
      */
-    public const CLIPBOARD_HIERARCHY_LOCK_NAME = 'clipboard_hierarchy';
+    public const CLIPBOARD_IMPORTER_LOCK_NAME = 'clipboard_importer';
 
 
     /**
@@ -102,7 +102,7 @@ Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equiv
 This will not import students or their relationships or anything like that; it's the
 barest bones that can be added.
 
-Usage: php hierarchy.php [--perform]
+Usage: php importer.php [--perform]
 
 ----
 
@@ -111,7 +111,7 @@ you will end up obtaining anyway, so you have to augment with students' data by 
 additional flag. This would be your main day-to-day usage as it periodically synchronises
 most of the Clipbard hierarchy to schoolbox.
 
-Usage: php hierarchy.php --membership [--perform]
+Usage: php importer.php --membership [--perform]
 
 ---
 
@@ -120,7 +120,7 @@ Import Clipboard Sessions into schoolbox Matchups. This also depends on the exis
  adds coaches, etc. Anyone who can't be found will be skipped. This usage assigns team members
  to positions and matchups, so last-minute variations or alterations take place here.
  
-Usage: php hierarchy.php --sessions [--perform]
+Usage: php importer.php --sessions [--perform]
 
 
 HELP;
@@ -135,7 +135,7 @@ HELP;
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::CLIPBOARD_HIERARCHY_LOCK_NAME, self::LOCK_TTL);
+        $lock        = $lockFactory->createLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
 
         try {
             $acquired = $lock->acquire();
