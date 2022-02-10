@@ -105,6 +105,8 @@ class Factory
         $positionMapper = \Schoolbox\Fixtures\Position\Mapper::getInstance();
         $divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
         $teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamPlayerMapper = \Schoolbox\Fixtures\Team\Player\Mapper::getInstance();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
 
         /* Set up composite bus - everybody's data gets on board and shuttled off
          * into schoolbox town
@@ -128,7 +130,9 @@ class Factory
                 $sportMapper,
                 $positionMapper,
                 $divisionMapper,
-                $teamMapper
+                $teamMapper,
+                $teamPlayerMapper,
+                $userMapper
             ))
             ->add(new Cleanup(
                 $this->log,

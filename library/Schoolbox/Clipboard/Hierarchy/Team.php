@@ -83,15 +83,29 @@ class Team implements IStrategy
 
 
     /**
-     * @param LoggerInterface                     $log
-     * @param bool                                $perform
-     * @param IApi                                $api
-     * @param bool                                $membership
-     * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
-     * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
-     * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
-     * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
-     * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
+     * @var \Schoolbox\Fixtures\Team\Player\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper;
+
+
+    /**
+     * @var \Schoolbox\UserMapper
+     */
+    private \Schoolbox\UserMapper $userMapper;
+
+
+    /**
+     * @param LoggerInterface                        $log
+     * @param bool                                   $perform
+     * @param IApi                                   $api
+     * @param bool                                   $membership
+     * @param \Schoolbox\Fixtures\Season\Mapper      $seasonMapper
+     * @param \Schoolbox\Fixtures\Sport\Mapper       $sportMapper
+     * @param \Schoolbox\Fixtures\Position\Mapper    $positionMapper
+     * @param \Schoolbox\Fixtures\Division\Mapper    $divisionMapper
+     * @param \Schoolbox\Fixtures\Team\Mapper        $teamMapper
+     * @param \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper
+     * @param \Schoolbox\UserMapper                  $userMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -102,7 +116,9 @@ class Team implements IStrategy
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
-        \Schoolbox\Fixtures\Team\Mapper $teamMapper
+        \Schoolbox\Fixtures\Team\Mapper $teamMapper,
+        \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        \Schoolbox\UserMapper $userMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -114,6 +130,8 @@ class Team implements IStrategy
         $this->positionMapper = $positionMapper;
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
+        $this->userMapper = $userMapper;
     }
 
 
@@ -159,9 +177,18 @@ class Team implements IStrategy
          *
          * Disgusting
          */
+        $includeStudents = 'false';
+        $lookup = [];
+
+        if ($this->membership) {
+            $includeStudents = 'true';
+
+            $lookup = (new Lookup\Person($this->userMapper))->generate();
+        }
+
         $teams = $this->api->retrieve('GET', $endpoint, [
             'includePositions' => 'true',
-            'includeStudents' => $this->membership ? 'true' : 'false'
+            'includeStudents' => $includeStudents
         ]);
 
         foreach ($teams['data'] as $teamData) {
@@ -227,10 +254,79 @@ class Team implements IStrategy
             /* If the --membership flag was set, ram in students and staff relationships too
              */
             if ($this->membership) {
-                $this->log->info(sprintf(
-                    'Processing memberships'
-                ));
+                $this->importMemberships($lookup, $team, $teamData);
             }
+        }
+    }
+
+
+    /**
+     * Import the students listed in $teamData into schoolbox Fixtures,
+     * associating them with $team
+     *
+     * @param array                          $lookup
+     * @param \Schoolbox\Fixtures\Team\Model $team
+     * @param array                          $teamData
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importMemberships(array $lookup, \Schoolbox\Fixtures\Team\Model $team, array $teamData): void
+    {
+        $this->log->debug(sprintf(
+            'Processing memberships for team %s',
+            $team->getName()
+        ));
+
+        /* If anyone was here,
+         * they won't be anymore
+         */
+        $this->teamPlayerMapper->deleteByColumn('team_id', $team->getId());
+
+        /* Find out who this external_id is
+         */
+        $sequence = 0;
+
+        foreach ($teamData['students'] as $student) {
+            $externalId = $student['smsId'];
+            $userId = $lookup[$externalId] ?? null;
+            $sequence++;
+
+            /* If there is no user id, we didn't find this person in
+             * our local user table - we can't put them into Fixtures
+             */
+            if (null === $userId) {
+                $this->log->debug(sprintf(
+                    'Clipboard human %s %s (externalId %s) does not have a corresponding schoolbox user record; skipping',
+                    $student['firstName'],
+                    $student['lastName'],
+                    $student['smsId']
+                ));
+
+                continue;
+            }
+
+            /* I don't need to have the full hydration of a user;
+             * I just need to fulfil the teamPlayerMapper model interface
+             * so I can save this relation. Instead of having a full hydration
+             * stored in ram, I'll just ram in a stub with the identifier
+             */
+            $teamPlayer = $this->teamPlayerMapper->createModel()
+                ->setUser($this->userMapper->createModel()->setId($userId))
+                ->setTeam($team)
+                ->setSequence($sequence);
+
+            $this->teamPlayerMapper->save($teamPlayer);
+
+            $this->log->info(sprintf(
+                'Assigned Clipboard human %s %s (%s) to team %s, using schoolbox user %s',
+                $student['firstName'],
+                $student['lastName'],
+                $student['smsId'],
+                $team->getName(),
+                $userId
+            ));
         }
     }
 }
