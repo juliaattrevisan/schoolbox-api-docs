@@ -160,7 +160,7 @@ class JwtFactory
     public function buildForAdminView(User $currentUser): string
     {
         $claims = $this->buildBaseClaims($currentUser);
-        $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = 'https://analytics.intellischool.cloud/console/schoolbox';
+        $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = 'https://analytics.intellischool.cloud/admin';
         return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
     }
 
