@@ -133,7 +133,7 @@ class Controller extends AbstractController
              */
             if (!$currentMatch->getHomeTeam() instanceof Team) {
                 if (!$currentMatch->getHomeSchool() instanceof School) {
-                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName('Unknown');
+                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName(null);
                     $currentMatch->setHomeSchool($facelessSchool);
                 }
             }
@@ -143,7 +143,7 @@ class Controller extends AbstractController
              */
             if (!$currentMatch->getAwayTeam() instanceof Team) {
                 if (!$currentMatch->getAwaySchool() instanceof School) {
-                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName('Unknown');
+                    $facelessSchool = $this->getSchoolMapper()->createModel()->setName(null);
                     $currentMatch->setAwaySchool($facelessSchool);
                 }
             }
