@@ -45,6 +45,15 @@ class HierarchyTool extends CliTool\App
 
 
     /**
+     * --hierarchy
+     *
+     * Setting this flag imports Students and their relations in addition
+     * to processing the Hierarchy
+     */
+    private const OPT_LONG_MEMBERSHIP = 'membership';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -59,7 +68,8 @@ class HierarchyTool extends CliTool\App
     public function getLongOpts(): array
     {
         return [
-            self::OPT_LONG_HELP
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_MEMBERSHIP,
         ];
     }
 
@@ -69,12 +79,27 @@ class HierarchyTool extends CliTool\App
      */
     public function run(): void
     {
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
+
+Import Clipboard Fixtures into schoolbox Fixtures, assuming command of our Fixtures
+module in its entirety to do so. Schools will be sacrificing their Fixtures module
+to support Clipboard imported data.
+
+----
 
 Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equivalent.
 
 Usage: php hierarchy.php
+
+----
+
+Also import Clipboard Students into schoolbox Teams. This depends on the hierarchy which 
+you will end up obtaining anyway, so you have to augment with students' data by using this 
+additional flag. 
+
+Usage: php hierarchy.php --membership
 
 
 HELP;
@@ -106,7 +131,9 @@ HELP;
                     $this->perform(),
                     (string)$this->getConfig()->get('clipboard_endpoint_host'),
                     (string)$this->getConfig()->get('clipboard_endpoint_token'),
-                ))->produce();
+                ))->produce(
+                    $this->getOpt(self::OPT_LONG_MEMBERSHIP)
+                );
             } catch (\DomainException $e) {
                 $this->getLogger()->warning($e->getMessage());
 

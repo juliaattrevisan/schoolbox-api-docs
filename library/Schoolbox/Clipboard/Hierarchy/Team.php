@@ -41,6 +41,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $membership;
+
+
+    /**
      * @var Codec\Division
      */
     private Codec\Division $divisionCodec;
@@ -80,6 +86,7 @@ class Team implements IStrategy
      * @param LoggerInterface                     $log
      * @param bool                                $perform
      * @param IApi                                $api
+     * @param bool                                $membership
      * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
      * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
@@ -90,6 +97,7 @@ class Team implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
+        bool $membership,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
@@ -99,6 +107,7 @@ class Team implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->membership = $membership;
         $this->divisionCodec = new Codec\Division();
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
@@ -145,8 +154,14 @@ class Team implements IStrategy
             $endpoint
         ));
 
+        /* If --membership was supplied, also get the students
+         * And (offensively) pass that setting as a bucket boolean
+         *
+         * Disgusting
+         */
         $teams = $this->api->retrieve('GET', $endpoint, [
-            'includePositions' => 'true'
+            'includePositions' => 'true',
+            'includeStudents' => $this->membership ? 'true' : 'false'
         ]);
 
         foreach ($teams['data'] as $teamData) {
@@ -207,6 +222,14 @@ class Team implements IStrategy
              */
             foreach ($teamData['positions'] as $positionData) {
                 $position = $registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
+            }
+
+            /* If the --membership flag was set, ram in students and staff relationships too
+             */
+            if ($this->membership) {
+                $this->log->info(sprintf(
+                    'Processing memberships'
+                ));
             }
         }
     }

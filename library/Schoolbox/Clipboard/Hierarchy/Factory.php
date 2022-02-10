@@ -72,12 +72,13 @@ class Factory
      * Produce the individual parts that together, import the fullness
      * of the clipboard Hierarchy
      *
+     * @param bool $membership
      * @return GenericCollection
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(): GenericCollection
+    public function produce(bool $membership): GenericCollection
     {
         /* Check the required pieces existed
          */
@@ -122,6 +123,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $membership,
                 $seasonMapper,
                 $sportMapper,
                 $positionMapper,
