@@ -1,5 +1,9 @@
 {# Google Map vars #}
 
 {% macro generate(venue, key) %}
-    https://www.google.com/maps/embed/v1/place?q={{ venue.latitude }}%2C{{ venue.longitude }}&zoom=16&key={{ key }}
+    {% if venue.latitude and venue.longitude %}
+        https://www.google.com/maps/embed/v1/place?q={{ venue.latitude }}%2C{{ venue.longitude }}&zoom=16&key={{ key }}
+    {% elseif venue.address %}
+        https://www.google.com/maps/embed/v1/place?q={{ venue.address }}&zoom=16&key={{ key }}
+    {% endif %}
 {% endmacro %}
