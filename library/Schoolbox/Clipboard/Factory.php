@@ -178,7 +178,8 @@ class Factory
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
-                $matchupMapper
+                $matchupMapper,
+                $coachMapper
             ))
             ->add(new Sessions\Sessions(
                 $this->log,
@@ -194,7 +195,8 @@ class Factory
             ->add(new Sessions\Cleanup(
                 $this->log,
                 $this->perform,
-                $matchupMapper
+                $matchupMapper,
+                $coachMapper
             ));
         }
 

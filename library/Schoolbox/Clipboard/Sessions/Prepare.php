@@ -39,18 +39,27 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
+
+
+    /**
      * @param LoggerInterface                    $log
      * @param bool                               $perform
      * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+     * @param \Schoolbox\Fixtures\Coach\Mapper   $coachMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
+        \Schoolbox\Fixtures\Coach\Mapper $coachMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->matchupMapper = $matchupMapper;
+        $this->coachMapper = $coachMapper;
     }
 
 
@@ -63,6 +72,7 @@ class Prepare implements IStrategy
     {
         if ($this->perform) {
             $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->coachMapper->getDatabase()->query("UPDATE {$this->coachMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Preparing previously-imported Matchups');

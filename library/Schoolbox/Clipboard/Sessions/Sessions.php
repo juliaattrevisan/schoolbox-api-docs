@@ -322,10 +322,10 @@ class Sessions implements IStrategy
         } catch (\Schoolbox\Mapper\Exception $e) {
             $coach = $this->coachMapper->createModel()
                 ->setName($coachName);
+        }
 
-            if ($this->perform) {
-                $this->coachMapper->save($coach);
-            }
+        if ($this->perform) {
+            $this->coachMapper->save($coach);
         }
 
         return $coach;
