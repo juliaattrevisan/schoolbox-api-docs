@@ -228,6 +228,7 @@ class Sessions implements IStrategy
                         'name' => $matchupName,
                         'division_id' => $division->getId(),
                         'season_id' => $season->getId(),
+                        'home_team_id' => $team->getId(),
                         'start_at' => $startAt->getDatabase(),
                         'venue_id' => $venue->getId()
                     ]);
