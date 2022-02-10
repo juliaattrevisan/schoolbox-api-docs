@@ -1199,6 +1199,7 @@ class Controller extends Assessment\Controller
          */
         $detachedFunction = null;
 
+        /** @var Model $assessment */
         if ($isFinal && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
              * Specifically enable turnitin if its api key was set
