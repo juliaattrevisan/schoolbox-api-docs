@@ -200,26 +200,49 @@ class Sessions implements IStrategy
                  */
                 $venue = $this->findVenue($session['locationData']['name'] ?? null);
 
-                $matchup = $this->matchupMapper->createModel()
-                    ->setSeason($season)
-                    ->setDivision($division)
-                    ->setVenue($venue)
-                    ->setHomeTeam($team)
-                    ->setStartAt(\Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime'])));
+                /* See if this matchup exists by taking the bestest guess
+                 */
+                $matchupName = trim($session['title']);
+                $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
 
+                try {
+                    $matchup = $this->matchupMapper->findOneByColumnList([
+                        'name' => $matchupName,
+                        'division_id' => $division->getId(),
+                        'season_id' => $season->getId(),
+                        'start_at' => $startAt->getDatabase(),
+                        'venue_id' => $venue->getId()
+                    ]);
+
+                    $this->log->debug(sprintf(
+                        'Reusing matchup %s on %s, at venue %s',
+                        $matchup->getDisplayName(),
+                        $matchup->getStartAt()->getDatabase(),
+                        $matchup->getVenue()->getName()
+                    ));
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $matchup = $this->matchupMapper->createModel()
+                        ->setName($matchupName)
+                        ->setSeason($season)
+                        ->setDivision($division)
+                        ->setVenue($venue)
+                        ->setHomeTeam($team)
+                        ->setStartAt($startAt);
+
+                    $this->log->debug(sprintf(
+                        'Creating matchup %s on %s, at venue %s',
+                        $matchup->getDisplayName(),
+                        $matchup->getStartAt()->getDatabase(),
+                        $matchup->getVenue()->getName()
+                    ));
+                }
+
+                /* We saw this, so we keep this
+                 */
                 if ($this->perform) {
                     $this->matchupMapper->save($matchup);
                 }
-
-                $this->log->debug(sprintf(
-                    'Creating matchup %s on %s, at venue %s',
-                    $matchup->getDisplayName(),
-                    $matchup->getStartAt()->getDatabase(),
-                    $matchup->getVenue()->getName()
-                ));
             }
-
-            print_r($session);
         }
     }
 

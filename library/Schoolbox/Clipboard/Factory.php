@@ -176,6 +176,7 @@ class Factory
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
+                $matchupMapper
             ))
             ->add(new Sessions\Sessions(
                 $this->log,
@@ -184,6 +185,11 @@ class Factory
                 $registry,
                 $userLookup,
                 $venueMapper,
+                $matchupMapper
+            ))
+            ->add(new Sessions\Cleanup(
+                $this->log,
+                $this->perform,
                 $matchupMapper
             ));
         }
