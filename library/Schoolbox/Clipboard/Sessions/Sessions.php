@@ -69,6 +69,27 @@ class Sessions implements IStrategy
      */
     public function import(): void
     {
-        // TODO: Implement import() method.
+
+        /* Consume data from Clipboard endpoint - each Session comes with info about
+         * its own hierarchy so map them to schoolbox concepts as best we can
+         */
+        $endpoint = 'sessions';
+
+        $this->log->info(sprintf(
+            'Downloading data from endpoint: %s (this might take a while)',
+            $endpoint
+        ));
+
+        $sessions = $this->api->retrieve('GET', $endpoint, [
+            'includeTeams' => 'true',
+            'includeStaff' => 'true',
+            'includeRoundName' => 'true',
+            'includeStatuses' => ['confirmed'],
+            /* Apparently this should give you "only not cancelled" sessions
+             */
+            'cancelled' => 'false'
+        ]);
+
+        print_r($sessions);
     }
 }
