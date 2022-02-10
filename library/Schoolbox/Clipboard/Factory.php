@@ -170,7 +170,11 @@ class Factory
          * Team import - Registry will already know about it
          */
         if ($sessions) {
-            $bus->add(new Sessions\Sessions(
+            $bus->add(new Sessions\Prepare(
+                $this->log,
+                $this->perform,
+            ))
+            ->add(new Sessions\Sessions(
                 $this->log,
                 $this->perform,
                 $api,
