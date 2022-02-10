@@ -179,9 +179,7 @@ class Classes implements IStrategy
                 [D4] => 4
             )
              */
-            $dayLookup = array_map(static function ($elem) {
-                return $elem + 1;
-            }, array_flip(array_keys($timetable)));
+
 
             /* Find all the classes and their details as best we can
              *
@@ -191,9 +189,15 @@ class Classes implements IStrategy
              */
             foreach ($timetable as $day => $dayPeriods) {
                 foreach ($dayPeriods as $periodSequence => $period) {
+                    /* A human-friendly version of the day identifier
+                     * Day numbers are 0-indexed in our data structs, but for human consumption, should
+                     * be represented by a 1-indexed scheme
+                     */
+                    $dayName = $day + 1;
+
                     $class = [
                         'period' => [
-                            'day' => (string)$dayLookup[$day],
+                            'day' => $dayName,
                             'name' => $period['name'],
                             'sequence' => $period['sequence'],
                             'start' => $period['start'],
@@ -225,7 +229,7 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+                    $timetablePeriod = $this->findPeriod($ext, $periods, (string)$class['period']['day'], $class['period']['name']);
 
                     $this->log->info(sprintf(
                         'Looking for ext_timetable_code %s, day %s, period %s',

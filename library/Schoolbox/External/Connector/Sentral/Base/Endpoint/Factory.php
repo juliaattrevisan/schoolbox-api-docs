@@ -233,18 +233,14 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Prepare(
+            ->add(new Profile\Prepare(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
+                $this->relationshipMapper
             ))
             ->add(new Profile\Profile(
                 $this->log,
@@ -265,6 +261,14 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new Timetable\Prepare(
+                $this->log,
+                $this->perform,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Timetable\Definition(
                 $this->log,

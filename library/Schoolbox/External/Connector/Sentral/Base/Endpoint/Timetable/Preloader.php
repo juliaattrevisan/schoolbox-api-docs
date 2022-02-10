@@ -221,11 +221,12 @@ class Preloader
                     $teacher = $teacherData['person'];
 
                     $this->log->debug(sprintf(
-                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s)',
+                        'Reusing teacher endpoint payload for %s %s (externalId: %s, sentralId: %s) via timetable endpoint %s',
                         $teacher['firstname'],
                         $teacher['lastname'],
                         $teacher['externalId'],
-                        $teacher['id']
+                        $teacher['id'],
+                        $endpoint
                     ));
                 } else {
                     /* Could not find someone in the lookup registry containing this id
@@ -246,8 +247,14 @@ class Preloader
                 ));
             }
 
-            $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
-                'day'      => $timetableLesson['attributes']['dayName'],
+            /* A human-friendly version of the day identifier
+             * Day numbers are 0-indexed in our data structs, but for human consumption, should
+             * be represented by a 1-indexed scheme
+             */
+            $dayName = $timetableLesson['attributes']['dayOrder'] + 1;
+
+            $timetable[$timetableLesson['attributes']['dayOrder']][$timetableLesson['attributes']['periodOrder']] = [
+                'day'      => $dayName,
                 'name'     => $timetableLesson['attributes']['periodName'],
                 'start'    => $timetableLesson['attributes']['startTime'],
                 'finish'   => $timetableLesson['attributes']['endTime'],
