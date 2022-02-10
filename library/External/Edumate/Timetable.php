@@ -37,40 +37,46 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-        $definition = array();
         $periodCount = 0;
 
-        $stmt = $this->getConnection()->prepareQuery('
+        $definition = [
+            'desc'     => [],
+            'start'    => [],
+            'end'      => [],
+            'number'   => [],
+            'sequence' => [],
+        ];
+
+        $stmt = $this->getConnection()->prepareQuery(
+            '
             SELECT PERIOD "desc", START_TIME "start", END_TIME "end", PERIOD_NUMBER "number", 1 "sequence"
             FROM SCHOOLBOX_TIMETABLE_DEFINITION TD
             WHERE TD.DAY_NUMBER = :day
             AND TD.CAMPUS = :campus
             ORDER BY TD.START_TIME ASC
-        ');
+        '
+        );
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
 
-        $stmt->execute(array(
-            'day' => $day ?: 1, // there is no day 0 in this definition
-            'campus' => $campusCode[0]
-        ));
+        $stmt->execute(
+            [
+                'day'    => $day ?: 1, // there is no day 0 in this definition
+                'campus' => $campusCode[0],
+            ]
+        );
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $definition['desc'][] = $r['desc'];
-            $definition['start'][] = $this->parseTime($r['start']);
-            $definition['end'][] = $this->parseTime($r['end']);
-            $definition['number'][] = $r['number'];
+            $definition['desc'][]     = $r['desc'];
+            $definition['start'][]    = $this->parseTime($r['start']);
+            $definition['end'][]      = $this->parseTime($r['end']);
+            $definition['number'][]   = $r['number'];
             $definition['sequence'][] = $r['sequence'];
             ++$periodCount;
         }
 
-        if ($periodCount == 0) {
-            return [];
-        }
-
         $definition['periodCount'] = $periodCount;
-
-        $definition['dayCount'] = $this->getCycleLength($campus);
+        $definition['dayCount']    = $this->getCycleLength($campus);
 
         return $definition;
     }
@@ -120,7 +126,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * @param Campus $campus
      * @param int               $date
-     * @return bool|string
+     * @return bool|int
      * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
