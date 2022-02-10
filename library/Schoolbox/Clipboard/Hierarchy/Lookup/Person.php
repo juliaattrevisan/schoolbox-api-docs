@@ -25,6 +25,12 @@ class Person
 
 
     /**
+     * @var array|null
+     */
+    private ?array $lookup = null;
+
+
+    /**
      * @param \Schoolbox\UserMapper $userMapper
      */
     public function __construct(\Schoolbox\UserMapper $userMapper)
@@ -41,6 +47,12 @@ class Person
      */
     public function generate(): array
     {
+        /* Only do this once
+         */
+        if (null !== $this->lookup) {
+            return $this->lookup;
+        }
+
         $lookup = [];
 
         $statement = $this->userMapper->getDatabase()->query("
@@ -55,6 +67,10 @@ class Person
         while ($row = $statement->fetch()) {
             $lookup[(string)$row['synergy_id']] = $row['id'];
         }
+
+        /* Remember this for later
+         */
+        $this->lookup = $lookup;
 
         return $lookup;
     }

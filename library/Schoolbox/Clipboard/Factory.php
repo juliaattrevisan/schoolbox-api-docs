@@ -119,6 +119,10 @@ class Factory
             $teamMapper
         );
 
+        /* Set up alocal cache of (external_id, user_id) tuples
+         */
+        $userLookup = new \Schoolbox\Clipboard\Hierarchy\Lookup\Person($userMapper);
+
         /* Set up composite bus - everybody's data gets on board and shuttled off
          * into schoolbox town
          */
@@ -139,6 +143,7 @@ class Factory
                 $api,
                 $membership,
                 $registry,
+                $userLookup,
                 $teamPlayerMapper,
                 $userMapper
             ))
@@ -165,7 +170,8 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
-                $registry
+                $registry,
+                $userLookup
             ));
         }
 

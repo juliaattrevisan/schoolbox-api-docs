@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Clipboard\Hierarchy;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
 
@@ -53,6 +54,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var Person
+     */
+    private Lookup\Person $userLookup;
+
+
+    /**
      * @var Codec\Division
      */
     private Codec\Division $divisionCodec;
@@ -76,6 +83,7 @@ class Team implements IStrategy
      * @param IApi                                   $api
      * @param bool                                   $membership
      * @param Registry                               $registry
+     * @param Person                                 $userLookup
      * @param \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper
      * @param \Schoolbox\UserMapper                  $userMapper
      */
@@ -85,6 +93,7 @@ class Team implements IStrategy
         IApi $api,
         bool $membership,
         Registry $registry,
+        Lookup\Person $userLookup,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
@@ -93,6 +102,7 @@ class Team implements IStrategy
         $this->api = $api;
         $this->membership = $membership;
         $this->registry = $registry;
+        $this->userLookup = $userLookup;
         $this->divisionCodec = new Codec\Division();
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->userMapper = $userMapper;
@@ -111,11 +121,6 @@ class Team implements IStrategy
      */
     public function import(): void
     {
-        /* I guess have an ultralong season to basically remove it from typical usage
-         * This season basically encompasses everything so we only need to spawn it once
-         */
-        $season = $this->registry->recallSeason();
-
         /* Consume data from Clipboard endpoint - each team comes with info about
          * its own hierarchy so map them to schoolbox concepts as best we can
          */
@@ -126,18 +131,23 @@ class Team implements IStrategy
             $endpoint
         ));
 
+        /* I guess have an ultralong season to basically remove it from typical usage
+         * This season basically encompasses everything so we only need to spawn it once
+         */
+        $season = $this->registry->recallSeason();
+
         /* If --membership was supplied, also get the students
          * And (offensively) pass that setting as a bucket boolean
          *
          * Disgusting
          */
         $includeStudents = 'false';
-        $lookup = [];
+        $userLookup = [];
 
         if ($this->membership) {
             $includeStudents = 'true';
 
-            $lookup = (new Lookup\Person($this->userMapper))->generate();
+            $userLookup = $this->userLookup->generate();
         }
 
         $teams = $this->api->retrieve('GET', $endpoint, [
@@ -208,7 +218,7 @@ class Team implements IStrategy
             /* If the --membership flag was set, ram in students and staff relationships too
              */
             if ($this->membership) {
-                $this->importMemberships($lookup, $team, $teamData);
+                $this->importMemberships($userLookup, $team, $teamData);
             }
         }
     }
@@ -218,7 +228,7 @@ class Team implements IStrategy
      * Import the students listed in $teamData into schoolbox Fixtures,
      * associating them with $team
      *
-     * @param array                          $lookup
+     * @param array                          $userLookup
      * @param \Schoolbox\Fixtures\Team\Model $team
      * @param array                          $teamData
      * @return void
@@ -226,7 +236,7 @@ class Team implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importMemberships(array $lookup, \Schoolbox\Fixtures\Team\Model $team, array $teamData): void
+    private function importMemberships(array $userLookup, \Schoolbox\Fixtures\Team\Model $team, array $teamData): void
     {
         $this->log->debug(sprintf(
             'Processing memberships for team %s',
@@ -244,7 +254,7 @@ class Team implements IStrategy
 
         foreach ($teamData['students'] as $student) {
             $externalId = $student['smsId'];
-            $userId = $lookup[$externalId] ?? null;
+            $userId = $userLookup[$externalId] ?? null;
             $sequence++;
 
             /* If there is no user id, we didn't find this person in

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Clipboard\Sessions;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
@@ -44,6 +45,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var Person
+     */
+    private \Schoolbox\Clipboard\Hierarchy\Lookup\Person $userLookup;
+
+
+    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -56,17 +63,20 @@ class Sessions implements IStrategy
      * @param bool            $perform
      * @param IApi            $api
      * @param Registry        $registry
+     * @param Person          $userLookup
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
-        Registry $registry
+        Registry $registry,
+        Person $userLookup
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
         $this->registry = $registry;
+        $this->userLookup = $userLookup;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -79,20 +89,24 @@ class Sessions implements IStrategy
      */
     public function import(): void
     {
-        /* I guess have an ultralong season to basically remove it from typical usage
-         * This season basically encompasses everything so we only need to spawn it once
-         */
-        $season = $this->registry->recallSeason();
+        $userLookup = $this->userLookup->generate();
 
         /* Consume data from Clipboard endpoint - each Session comes with info about
          * its own hierarchy so map them to schoolbox concepts as best we can
          */
         $endpoint = 'sessions';
 
+        $this->log->info('');
+
         $this->log->info(sprintf(
             'Downloading data from endpoint: %s (this might take a while)',
             $endpoint
         ));
+
+        /* I guess have an ultralong season to basically remove it from typical usage
+         * This season basically encompasses everything so we only need to spawn it once
+         */
+        $season = $this->registry->recallSeason();
 
         $sessions = $this->api->retrieve('GET', $endpoint, [
             'includeTeams' => 'true',
