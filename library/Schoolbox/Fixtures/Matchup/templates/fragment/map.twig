@@ -1,5 +1,14 @@
+{##
+ # Render a map depicting the match's venue
+ #
+ # @param Matchup $match
+ #}
+
+{# Only try to render the map if there's a possibility that it can work #}
+{% if match.venue.address or (match.venue.latitude and match.venue.longitude) %}
 {% import '@sportsfixturesMatch/macro/map.twig' as matchMap %}
 
 {% if googleApiKey %}
 <iframe src="{{ matchMap.generate(match.venue, googleApiKey) }}" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>
+{% endif %}
 {% endif %}
