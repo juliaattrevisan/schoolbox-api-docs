@@ -4,6 +4,7 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Redis;
 use Alaress\Web\Output;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Auth\Remember;
@@ -23,9 +24,9 @@ class SitePage extends Page
 
     /**
      * The dependency injection container, injected into SitePage!
-     * @var Aura\Di\ContainerInterface
+     * @var ContainerInterface
      */
-    protected $di;
+    protected ContainerInterface $di;
 
     /**
      * List of arguments passed in URL
@@ -51,9 +52,9 @@ class SitePage extends Page
     /**
      * Constructor
      *
-     * @param Aura\Di\ContainerInterface $di
+     * @param ContainerInterface $di
      */
-    public function __construct(Aura\Di\ContainerInterface $di)
+    public function __construct(ContainerInterface $di)
     {
         parent::__construct();
 
@@ -68,7 +69,7 @@ class SitePage extends Page
     }
 
     /**
-     * @return Aura\Di\ContainerInterface
+     * @return ContainerInterface
      */
     public function getDi()
     {
