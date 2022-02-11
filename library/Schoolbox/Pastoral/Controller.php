@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
@@ -25,6 +24,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -578,31 +578,59 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        $allowParents = $this->config->get('pastoral_parent_access');
+        $allowParents  = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $allowStudents = $this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
-        // Only want staff/parent roles
+        // Tally counts for staff roles:
+        // for parent and student roles, only count if there is a user
+        $roles          = new Collection();
+        $roleUserCounts = [];
+        $rolesWithUsers = [];
 
-        $roles     = new Collection();
-        $roleUsers = [];
+        $allowedRoles   = $this->determineAllowedRoles();
 
-        $rolesAll = $this->roleMapper->findAll();
+        // When student ids are provided to copy this record to:
+        // add all those students and their parents to the role user counts.
+        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        /** @var User[] $duplicates */
+        $duplicates = $this->userMapper->findByColumnList([
+            'id'           => $duplicateIds,
+            'g.group_type' => Role::STUDENT,
+        ]);
 
         /** @var Role $roleCurrent */
-        foreach ($rolesAll as $roleCurrent) {
-            // Staff role? Show all users
+        foreach ($allowedRoles as $roleCurrent) {
+            $rolesWithUsers[$roleCurrent->getId()] = false;
+            $roleUserCounts[$roleCurrent->getId()] = 0;
+
+            // Staff role? Show user count
             if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+                $roleUserCounts[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+                $rolesWithUsers[$roleCurrent->getId()] = true;
             }
 
-            // Parent role? Show only the # of this student's parents in this role
+            // Parent role?
+            // Only track if there are users in the role who are a parent of a
+            // student, not the number
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
-                $roleUsers[$roleCurrent->getId()] = 0;
                 if ($record->getStudent()) {
                     foreach ($record->getStudent()->getParents() as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                            $roleUsers[$roleCurrent->getId()]++;
+                            $rolesWithUsers[$roleCurrent->getId()] = true;
+                            break;
+                        }
+                    }
+                }
+                foreach ($duplicates as $duplicateStudent) {
+                    if ($rolesWithUsers[$roleCurrent->getId()]) {
+                        break;
+                    }
+                    $duplicateStudent->loadParents();
+                    foreach ($duplicateStudent->getParents() as $parent) {
+                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                            $rolesWithUsers[$roleCurrent->getId()] = true;
                         }
                     }
                 }
@@ -620,15 +648,9 @@ class Controller extends Base
             }
         }
 
-        // When student ids are provided to copy this record to, prefill Create duplicate record field.
-        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
-        $duplicates   = $this->userMapper->findByColumn('id', $duplicateIds);
-        $students     = [];
-        /** @var User $student */
+        // Prefill create duplicate record field with duplicate students
+        $students = [];
         foreach ($duplicates as $student) {
-            if (!$student->getRole()->isStudent()) {
-                continue;
-            }
             $students[] = [
                 'id'   => $student->getId(),
                 'name' => $student->getFullName(),
@@ -684,6 +706,7 @@ class Controller extends Base
                     'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
+                    'allowStudents'     => $allowStudents,
                     'types'             => $types,
                     'typesIndexPrivate' => $typesIndexPrivate,
                     'typesIndex'        => $typesIndex,
@@ -692,7 +715,9 @@ class Controller extends Base
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
-                    'roleUsers'         => $roleUsers,
+                    'roleTypes'         => $this->determineAllowedRoleTypes(),
+                    'roleUserCounts'    => $roleUserCounts,
+                    'rolesWithUsers'    => $rolesWithUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                     'moderator'         => $moderator,
                     'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
@@ -832,23 +857,34 @@ class Controller extends Base
         $accesses = $this->pastoralAccessMapper->createCollection();
 
         if (is_array($post["role"])) {
-            $foundRoles = [];
-            foreach ($post["role"] as $role_id => $accessLevel) {
-                if (in_array($role_id, $foundRoles)) {
+            $foundRoles       = [];
+            $allowedRoles     = $this->determineAllowedRoles();
+            $allowedRoleTypes = $this->determineAllowedRoleTypes();
+            foreach ($post["role"] as $roleId => $accessLevel) {
+                if (in_array($roleId, $foundRoles)) {
                     // should not happen
                     continue;
                 }
-                $foundRoles[] = $role_id;
+                $foundRoles[] = $roleId;
 
-                try {
-                    $role   = $this->roleMapper->findById($role_id);
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setAccess($accessLevel);
-                    $access->setRole($role);
-                    $accesses->add($access);
-                } catch (MapperException $e) {
-                    // Noop
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setAccess($accessLevel);
+
+                // Is this a role or a role type?
+                if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
+                    if (!in_array($matches['roleType'], $allowedRoleTypes)) {
+                        continue;
+                    }
+                    $access->setRoleType($matches['roleType']);
+                } else {
+                    $role = $allowedRoles[$roleId] ?? null;
+                    if ($role) {
+                        $access->setRole($role);
+                    } else {
+                        continue;
+                    }
                 }
+                $accesses->add($access);
             }
         }
 
@@ -1134,6 +1170,7 @@ class Controller extends Base
             );
 
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
+            $record->setStudentCommentsAllowed((bool)$post->get('student_comments_allowed'));
 
             // Only set owner if this is a new record
             if (!$record->getId()) {
@@ -1457,6 +1494,31 @@ class Controller extends Base
             $this->getResponse()->status->setCode(400);
         }
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * @return GenericCollection<Role>
+     */
+    private function determineAllowedRoles(): GenericCollection
+    {
+        $allowedRoleTypes = [Role::STAFF];
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::PARENT;
+        }
+        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function determineAllowedRoleTypes(): array
+    {
+        $allowedRoleTypes = [];
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::STUDENT;
+        }
+        return $allowedRoleTypes;
     }
 }
 

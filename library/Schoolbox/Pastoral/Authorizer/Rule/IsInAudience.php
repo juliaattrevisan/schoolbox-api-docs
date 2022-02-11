@@ -1,11 +1,8 @@
 <?php
 
 /**
- * Determine if a pastoral record should be viewable by the logged in user based on audienced roles/users/groups
- *
- * @author      Damian Sloane <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Pastoral\Authorizer\Rule;
@@ -19,6 +16,10 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 
+/**
+ * Determine if a pastoral record should be viewable by the logged-in user
+ * based on the roles/users/groups the record is audienced to.
+ */
 class IsInAudience implements IAuthorizationRule
 {
     /**

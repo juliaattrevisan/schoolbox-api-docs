@@ -1,5 +1,5 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# Pastoral Roles Access #}
+{# Pastoral Role / Role Type Access #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 {% if roles | length > 0 %}
@@ -7,46 +7,57 @@
     <tbody id="permission-roles">
 
         {% if record.id != '' %}
-            {% for userAccess in record.accessWithPermission|filter(userAccess=>userAccess.role) %}
-                {# Work out which radio should be checked for each row #}
-                {% set checkedDeny = '' %}
-                {% set checkedPublic = '' %}
-                {% set checkedPrivate = '' %}
-
-                {% if userAccess.access == 0 %}
-                    {% set checkedDeny = 'checked' %}
-                {% elseif userAccess.access == 1 %}
-                    {% set checkedPublic = 'checked' %}
-                {% elseif userAccess.access == 2 %}
-                    {% set checkedPrivate = 'checked' %}
+            {% for userAccess in record.accessWithPermission|filter(userAccess => userAccess.role or userAccess.roleType) %}
+                {% set roleId = null %}
+                {% if userAccess.role %}
+                    {% set roleId = userAccess.role.id %}
+                    {% set roleName = userAccess.role.name %}
+                {% elseif userAccess.roleType %}
+                    {% set roleId = 'role-type-' ~ userAccess.roleType %}
+                    {% set roleName = userAccess.roleType | capitalize %}
                 {% endif %}
 
-                <tr data-role-id="{{ userAccess.role.id }}">
-                    <td class="small-2">
-                        Role
-                    </td>
-                    <td class="small-3">
-                        {{ userAccess.role.name }}
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="roleDeny{{ userAccess.role.id }}"
-                               value="0" {{ checkedDeny }}>
-                        <label class="radio-label" for="roleDeny{{ userAccess.role.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePublic{{ userAccess.role.id }}"
-                               value="1" {{ checkedPublic }}>
-                        <label class="radio-label" for="rolePublic{{ userAccess.role.id }}"></label>
-                    </td>
-                    <td class="small-2">
-                        <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePrivate{{ userAccess.role.id }}"
-                               value="2" {{ checkedPrivate }}>
-                        <label class="radio-label" for="rolePrivate{{ userAccess.role.id }}"></label>
-                    </td>
-                    <td class="text-right small-1">
-                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
-                    </td>
-                </tr>
+                {% if roleId %}
+                    {# Work out which radio should be checked for each row #}
+                    {% set checkedDeny = '' %}
+                    {% set checkedPublic = '' %}
+                    {% set checkedPrivate = '' %}
+
+                    {% if userAccess.access == 0 %}
+                        {% set checkedDeny = 'checked' %}
+                    {% elseif userAccess.access == 1 %}
+                        {% set checkedPublic = 'checked' %}
+                    {% elseif userAccess.access == 2 %}
+                        {% set checkedPrivate = 'checked' %}
+                    {% endif %}
+
+                    <tr data-role-id="{{ roleId }}">
+                        <td class="small-2">
+                            Role
+                        </td>
+                        <td class="small-3">
+                            {{ roleName }}
+                        </td>
+                        <td class="small-2">
+                            <input type="radio" name="role[{{ roleId }}]" id="roleDeny{{ roleId }}"
+                                   value="0" {{ checkedDeny }}>
+                            <label class="radio-label" for="roleDeny{{ roleId }}"></label>
+                        </td>
+                        <td class="small-2">
+                            <input type="radio" name="role[{{ roleId }}]" id="rolePublic{{ roleId }}"
+                                   value="1" {{ checkedPublic }}>
+                            <label class="radio-label" for="rolePublic{{ roleId }}"></label>
+                        </td>
+                        <td class="small-2">
+                            <input type="radio" name="role[{{ roleId }}]" id="rolePrivate{{ roleId }}"
+                                   value="2" {{ checkedPrivate }}>
+                            <label class="radio-label" for="rolePrivate{{ roleId }}"></label>
+                        </td>
+                        <td class="text-right small-1">
+                            <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         {% endif %}
 
@@ -60,7 +71,8 @@
         <h2>Add Pastoral Role</h2>
         <section>
             <ul class="information-list">
-                {% for role in roles %}
+                {# Only show roles which actually have users #}
+                {% for role in roles|filter(r => rolesWithUsers[r.id]) %}
                     <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
                         <a class="list-item link-row">
                             <div class="card small-12">
@@ -68,14 +80,46 @@
                                 <p>{{ role.name }}</p>
                                 <p class="meta">
                                     System Role
-                                    {% if not role.isParent or not bulkCreate %}
-                                        ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+
+                                    {# Don't show the user count for student or parent roles #}
+                                    {% if role.isStaff %}
+                                        ({{ roleUserCounts[role.id] }} {% if roleUserCounts[role.id] == 1 %}User{% else %}Users{% endif %})
                                     {% endif %}
+
+                                    {% if role.isStudent %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+                                    {% endif %}
+
                                     {% if role.isParent %}
                                         <br />
-                                        (Only
-                                        {{ (record is defined and record.student is defined and record.student) ? record.student.firstName : 'the student' }}'s
-                                        parents will be able to view this record.)
+                                        (Only {{ record.student.firstName ?? 'the student' }}'s parents will be able to view this record.)
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+
+                {# Students: a role type, rather than a role #}
+                {# TODO consider exposing parents as a role type instead #}
+                {% for roleType in roleTypes %}
+                    <li data-role-add="role-type-{{ roleType }}" data-role-name="{{ roleType | capitalize }}">
+                        <a class="list-item link-row">
+                            <div class="card small-12">
+                                <i class="icon-group alert size-32"></i>
+                                <p>{{ roleType | capitalize }}</p>
+                                <p class="meta">
+                                    System Role
+
+                                    {% if roleType == 'student' %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }} will be able to view this record.)
+                                    {% endif %}
+
+                                    {% if roleType == 'parent' %}
+                                        <br />
+                                        (Only {{ record.student.firstName ?? 'the student' }}'s parents will be able to view this record.)
                                     {% endif %}
                                 </p>
                             </div>
@@ -147,7 +191,7 @@
                         var roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
-                            if (window.rolesAdded.indexOf(parseInt(roleId)) !== -1) {
+                            if (window.rolesAdded.indexOf(roleId) !== -1) {
                                 $("[data-role-add=" + roleId + "]").addClass('hide');
                             } else {
                                 $("[data-role-add=" + roleId + "]").removeClass('hide');
@@ -181,7 +225,7 @@
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
-                    window.rolesAdded.push(parseInt(roleId));
+                    window.rolesAdded.push(roleId);
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
@@ -226,8 +270,12 @@
 
             window.rolesAdded = [];
 
-            {% for userAccess in record.accessWithPermission|filter(userAccess=>userAccess.role) %}
-                window.rolesAdded.push({{ userAccess.role.id }});
+            {% for userAccess in record.accessWithPermission %}
+                {% if userAccess.role %}
+                    window.rolesAdded.push('{{ userAccess.role.id }}');
+                {% elseif userAccess.roleType %}
+                    window.rolesAdded.push('role-type-{{ userAccess.roleType }}');
+                {% endif %}
             {% endfor %}
 
             updateRolePermissionsClick();

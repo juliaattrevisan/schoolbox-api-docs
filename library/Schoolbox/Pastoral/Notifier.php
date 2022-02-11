@@ -13,6 +13,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -114,6 +115,8 @@ class Notifier extends AbstractModuleNotifier
         try {
             $pastoral = $this->mapper->findById($model->getId());
             $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+            $student->loadParents();
+            $student->loadTeachers();
             $pastoral->setStudent($student);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
@@ -142,13 +145,8 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $parentAccessEnabled = $this->conf->get('pastoral_parent_access') == '1';
-
-        /** @var Collection|PastoralAccess[] $accessRecords */
-        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
-
-        // Users to send notifications to. Starting with author of the record.
-        $targetUsers = [];
+        $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
         $privateChangeOnly = false;
         if ($diff) {
@@ -156,71 +154,19 @@ class Notifier extends AbstractModuleNotifier
             $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
         }
 
-        /** @var PastoralAccess $pastoralAccess */
-        foreach ($accessRecords as $pastoralAccess) {
-            // If the access is denied, fail
-            if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
-                // do not send any notification
-                continue;
-            }
+        /** @var Collection|PastoralAccess[] $accessRecords */
+        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
+        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
+            ->buildTargetUsers(
+                $accessRecords,
+                $privateChangeOnly,
+                $student,
+                $parentAccessEnabled,
+                $studentAccessEnabled,
+                'pastoral',
+                $method,
+            );
 
-            // if the access is public only and the changes are private only, fail
-            if (($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_PUBLIC) && $privateChangeOnly) {
-                // do not send any notification
-                continue;
-            }
-
-            try {
-                if ($pastoralAccess->getRole() instanceof Role) {
-                    // The system should only notify staff if they are a teacher of the student
-                    if ($pastoralAccess->getRole()->isStaff() && $pastoralAccess->getRole()->getAccessPastoral()) {
-                        $student->loadTeachers();
-                        $teachers = $student->getTeacherCollection();
-                        /** @var User $teacher */
-                        foreach ($teachers as $teacher) {
-                            if ($teacher->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
-                                $targetUsers[$teacher->getId()] = $teacher;
-                            }
-                        }
-                    } elseif ($pastoralAccess->getRole()->isParent() && $parentAccessEnabled) {
-                        // Only send to parents if pastoral parent access is enabled
-                        $student->loadParents();
-                        $parents = $student->getParents();
-                        foreach ($parents as $parent) {
-                            if ($parent->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
-                                $targetUsers[$parent->getId()] = $parent;
-                            }
-                        }
-                    }
-                } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
-                    // Sending to a pastoral group, make sure its hydrated
-                    $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
-
-                    /** @var PastoralGroupMember $member */
-                    foreach ($pastoralGroup->getMembersWithPermission() as $member) {
-                        // Only staff should be in pastoral groups
-                        $user = $this->userMapper->findById($member->getUser()->getId());
-                        if ($user->getRole()->isStaff()) {
-                            $targetUsers[$user->getId()] = $user;
-                        }
-                    }
-                } elseif ($pastoralAccess->getUser() instanceof User) {
-                    // Sending to an individual user
-                    // user is not hydrated
-                    $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
-                    // Only send to parents if parent access is enabled
-                    if (
-                        ($user->isStaffWithPastoralAccess())
-                        || ($user->getRole()->isParent() && $parentAccessEnabled)
-                    ) {
-                        $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
-                    }
-                }
-            } catch (MapperException $e) {
-                // Log an error and move on so we don't break the rest of the notifications
-                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception' => $e]);
-            }
-        }
 
         $accessLevelCensor = new AccessLevelCensor();
         foreach ($targetUsers as $userId => $user) {

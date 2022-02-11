@@ -6856,11 +6856,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/CommandLineTool/AttachmentUploader.php
 
 		-
-			message: "#^Variable \\$pastoral in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Comment/Notifier.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
@@ -8052,7 +8047,7 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/User.php
 
 		-

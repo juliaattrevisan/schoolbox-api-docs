@@ -176,6 +176,9 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_ACTION_ENABLED = 'pastoral_action_enable';
     public const NAME_SHOW_ATTENDANCE_FLAGS = 'show_attendance_flags';
 
+    public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
+    public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
+
     /**
      * @throws \InvalidArgumentException
      */

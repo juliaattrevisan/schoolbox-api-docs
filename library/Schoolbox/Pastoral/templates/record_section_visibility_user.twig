@@ -1,0 +1,29 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+
+<li>
+    <div class="small-12 card wrap-down">
+        {% if access.user.deleted %}
+            {{ profile.imageSquare64(access.user) }}
+            {{ accessLevelLabel | raw }}
+            <p>{{ access.user.fullName }}</p>
+            <p class="meta">
+                {{ access.user.role.name }}
+            </p>
+        {% else %}
+            <a href="{{ profile.link(access.user) }}">
+                {{ profile.imageSquare64(access.user) }}
+                {{ accessLevelLabel | raw }}
+                {% if access.user.role.isParent and record.parentCommentsAllowed %}
+                    <span class="neutral label right">Comments</span>
+                {% endif %}
+                {% if access.user.role.isStudent and record.studentCommentsAllowed %}
+                    <span class="neutral label right">Comments</span>
+                {% endif %}
+                <p>{{ access.user.fullName }}</p>
+                <p class="meta">
+                    {{ access.user.role.name }}
+                </p>
+            </a>
+        {% endif %}
+    </div>
+</li>

@@ -19,6 +19,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -28,6 +29,8 @@ use Schoolbox\UserMapper;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  *
  * @package Schoolbox\Pastoral\Access
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
@@ -49,6 +52,13 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('role_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->uses(
+            'role_type',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'roleType',
+            [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF, null],
+        );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -66,11 +76,11 @@ class Mapper extends BaseMapper
         // (e.g. An access is for a User, and user is soft-deleted)
 
         return "
-			SELECT      {$this->getColumnString()},
+            SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('group', 'g')}
-			FROM        {$this->getTable()}
+            FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
@@ -88,9 +98,9 @@ class Mapper extends BaseMapper
         $results = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            // The record must have a user, role or group specified
+            // The record must have a user, role, role type or group specified
 
-            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id'])) {
+            if (empty($row['u.id']) && empty($row['r.id']) && empty($row['g.id']) && empty($row['role_type'])) {
                 continue;
             }
 

@@ -459,7 +459,8 @@ class DataSource
             $paInnerPb1 = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a1"))
                 ->setParamPrefix("{$alias}a1")
                 ->equals('user_id', $viewer->getId())
-                ->equals('role_id', $viewer->getRole()->getId());
+                ->equals('role_id', $viewer->getRole()->getId())
+                ->equals('role_type', $viewer->getRole()->getType());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb1->in('group_id', $pastoralGroupIds);
             }
@@ -475,7 +476,8 @@ class DataSource
             $paInnerPb2 = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a2"))
                 ->setParamPrefix("{$alias}a2")
                 ->equals('user_id', $viewer->getId())
-                ->equals('role_id', $viewer->getRole()->getId());
+                ->equals('role_id', $viewer->getRole()->getId())
+                ->equals('role_type', $viewer->getRole()->getType());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb2->in('group_id', $pastoralGroupIds);
             }

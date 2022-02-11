@@ -20,7 +20,8 @@ use Schoolbox\User;
 /**
  * Pastoral care access control
  *
- * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
+ * This allows the user to audience a pastoral care record to individual users,
+ * roles, role types and user defined pastoral groups.
  *
  * @package Schoolbox\Pastoral\Access
  */
@@ -35,6 +36,11 @@ class Model implements ISoftDeletable
 
     /** @var null|Role $role */
     protected $role;
+
+    /**
+     * The role type for this pastoral care access, if any.
+     */
+    private ?string $roleType = null;
 
     /** @var null|User $user */
     protected $user;
@@ -61,7 +67,7 @@ class Model implements ISoftDeletable
         if ($this->getUser() instanceof User) {
             return $this->getUserAccessLevel($user);
         }
-        if ($this->getRole() instanceof Role) {
+        if ($this->getRoleType() || $this->getRole() instanceof Role) {
             return $this->getRoleAccessLevel($user);
         }
         if ($this->getGroup() instanceof Group) {
@@ -101,12 +107,34 @@ class Model implements ISoftDeletable
      */
     private function getRoleAccessLevel(User $user): ?int
     {
-        $thisRole = $this->getRole();
+        $isApplicable = false;
+        if ($this->getRole() && $user->getRole()->getId() === $this->getRole()->getId()) {
+            $isApplicable = true;
+        }
+        if ($this->getRoleType() && $user->getRole()->getType() === $this->getRoleType()) {
+            $isApplicable = true;
+        }
 
         // Not a role-based rule, or for a different role?
-        if (!$thisRole || $user->getRole()->getId() !== $thisRole->getId()) {
+        if (!$isApplicable) {
             // Does not apply
             return null;
+        }
+
+        // Test in order of expected expensiveness:
+        // staff, then student, then parent
+
+        // Roles match, and roleType is staff
+        if ($user->getRole()->isStaff()) {
+            return $this->access;
+        }
+
+        // Is this a student rule?
+        // (Only applies if the student is viewing their own record)
+        if ($user->getRole()->isStudent()) {
+            return $user->getId() === $this->getPastoral()->getStudent()->getId()
+                ? $this->access
+                : null;
         }
 
         // Is this a parent rule?
@@ -118,10 +146,6 @@ class Model implements ISoftDeletable
             return null;
         }
 
-        // Roles match, and roleType is staff
-        if ($user->getRole()->isStaff()) {
-            return $this->access;
-        }
         return null;
     }
 
@@ -188,6 +212,24 @@ class Model implements ISoftDeletable
     public function getRole(): ?Role
     {
         return $this->role;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRoleType(): ?string
+    {
+        return $this->roleType;
+    }
+
+    /**
+     * @param string|null $roleType
+     * @return $this
+     */
+    public function setRoleType(?string $roleType): self
+    {
+        $this->roleType = $roleType;
+        return $this;
     }
 
     /**

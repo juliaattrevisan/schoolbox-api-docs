@@ -76,6 +76,13 @@ class Model implements ISoftDeletable, IModel
     protected bool $parentCommentsAllowed;
 
     /**
+     * May students comment on this pastoral record?
+     *
+     * (Only relevant if the student has been allowed to view the record.)
+     */
+    private bool $studentCommentsAllowed = false;
+
+    /**
      * The user who created the record.
      *
      * @var User
@@ -307,6 +314,24 @@ class Model implements ISoftDeletable, IModel
     public function getParentCommentsAllowed(): bool
     {
         return $this->parentCommentsAllowed;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getStudentCommentsAllowed(): bool
+    {
+        return $this->studentCommentsAllowed;
+    }
+
+    /**
+     * @param bool $studentCommentsAllowed
+     * @return $this
+     */
+    public function setStudentCommentsAllowed(bool $studentCommentsAllowed): self
+    {
+        $this->studentCommentsAllowed = $studentCommentsAllowed;
+        return $this;
     }
 
     /**

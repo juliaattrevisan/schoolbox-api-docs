@@ -1,10 +1,8 @@
 <?php
 
 /**
- * Determine if parent comment is allowed for the record
- *
- * @copyright   Copyright 2021, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
@@ -18,7 +16,17 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
 
-class IsParentCommentAllowed implements IAuthorizationRule
+/**
+ * Authorization rule for determining if a user may comment on a pastoral
+ * record.
+ *
+ * Staff may always comment: students or parents may only comment if the
+ * record allows comment from that role type.
+ *
+ * This rule presumes that the user has permission to view the record:
+ * @see \Schoolbox\Pastoral\Authorizer\Rule\IsInAudience
+ */
+class IsCommentAllowed implements IAuthorizationRule
 {
     /**
      * {@inheritdoc}
@@ -44,9 +52,15 @@ class IsParentCommentAllowed implements IAuthorizationRule
         /** @var Pastoral $record */
         $record = $params['record'];
 
-        if (!$record->getParentCommentsAllowed()) {
-            throw new Unauthorized();
+        if ($user->getRole()->isStaff()) {
+            return true;
         }
-        return true;
+        if ($user->getRole()->isStudent() && $record->getStudentCommentsAllowed()) {
+            return true;
+        }
+        if ($user->getRole()->isParent() && $record->getParentCommentsAllowed()) {
+            return true;
+        }
+        throw new Unauthorized();
     }
 }

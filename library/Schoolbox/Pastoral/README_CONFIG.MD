@@ -4,7 +4,7 @@
 
 ## TLDR
 
-Most of these settings should be accessible from the 'Pastoral Care' setings tab in the admin system 
+Most of these settings should be accessible from the 'Pastoral Care' setings tab in the admin system
 [http://192.168.36.10/adminv2/setting/Pastoral+Care](http://192.168.36.10/adminv2/setting/Pastoral+Care)
 
 ## Module Settings
@@ -26,8 +26,8 @@ If enabled pastoral care records will be uploaded to the schools external SIS (S
 
 ##### external_pastoral_upload
 
-If enabled pastoral care records documents will be uploaded to the schools external SIS (Synergetic Docman only at 
-present). 
+If enabled pastoral care records documents will be uploaded to the schools external SIS (Synergetic Docman only at
+present).
 
 ##### pastoral_external_delete
 
@@ -47,6 +47,11 @@ so this value should not be set too low)
 If enabled parents will be able to access their students pastoral care page. If disabled parents should see no part
 of the pastoral care mdule.
 
+##### pastoral_student_access
+
+If enabled students will be able to access their own pastoral care page.
+If disabled student should see no part of the pastoral care mdule.
+
 ##### pastoral_individual_access
 
 If enabled staff should be able to audience pastoral care items to individual users. If disabled only groups and roles
@@ -56,7 +61,7 @@ should be the only allowed audience selections.
 
 ##### pastoral_page_size
 
-This is the number of records to display per page on a students pastoral care page 
+This is the number of records to display per page on a students pastoral care page
 
 ##### pastoral_page_visible
 

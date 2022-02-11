@@ -89,9 +89,9 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             ]);
 
             if (
-                $this->getConfigLoader()->get('pastoral_enabled') &&
+                $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
                 $this->getUser()->isParentOf($userChild) &&
-                $this->getConfigLoader()->get('pastoral_parent_access')
+                $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)
             ) {
                 $this->parse('pastoral_block', 'pastoral');
             } else {
