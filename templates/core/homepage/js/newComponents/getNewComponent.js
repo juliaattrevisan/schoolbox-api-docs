@@ -4,8 +4,7 @@
  */
 
 import { UPDATE_URL } from '../updateHomepage';
-import { updateComponentDisplay, isToggleUnlocked } from '../existingComponents/toggleLockComponents';
-import { setInnerHTML } from '@js/util/domUtils';
+import { loadNewHTML } from '@js/util/domUtils';
 
 
 /**
@@ -17,7 +16,10 @@ export async function getNewComponent (component) {
             method: 'POST',
             body: getFormData(component),
         });
-        const newComponentHTML = await response.text();
+        const newComponentText = await response.text(); //it's currently a String
+        const parser = new DOMParser(); //so we need to create an Element from it
+        const document = parser.parseFromString(newComponentText, 'text/html'); //by parsing it into HTML
+        const newComponentHTML = document.querySelector('div'); //and then we can get the first div, which will be the entire component
         const newComponent = replaceExistingComponent(component, newComponentHTML);
         return newComponent;
     } catch (error) {
@@ -27,18 +29,15 @@ export async function getNewComponent (component) {
 
 /**
  * Update the just added component to the actual component that's been loaded in
- * @todo can this be handled better?
  * 
- * @params { String } the component that's been moved
+ * @params { Element } the component that's been updated
+ * @params { Element } the component's new markup
  * 
  * @returns { Element }  
  */
 async function replaceExistingComponent (component, newComponentHTML) {
-    const tempElement = document.createElement('div'); //just use to insert the updated component html
-    await setInnerHTML(tempElement, newComponentHTML); //now insert it
-    const newComponent = tempElement.firstElementChild; //and then extract the element
+    const newComponent = await loadNewHTML(newComponentHTML); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly created component
-    updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
     return newComponent;
 }
 

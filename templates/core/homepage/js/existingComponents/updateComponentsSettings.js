@@ -5,12 +5,10 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-// import { timeout } from '@js/util/jsUtils';
-import { setInnerHTML } from '@js/util/domUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from '../updateHomepage';
+import { loadNewHTML } from '@js/util/domUtils';
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateRemovedComponent } from './removeComponents';
-// import { isOpen as isComponentOpen, close as collapseComponent, open as uncollapseComponent, isCollapseComponentSelected } from './collapseComponents';
 import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents';
 
 const ANIMATE_SPEED = 0.3;
@@ -175,16 +173,15 @@ function getSaveComponentSettingsParams (form) {
  */
 async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const tempElement = document.createElement('div'); //just use to insert the updated component html
-    setInnerHTML(tempElement, updatedComponent.outerHTML); //now insert it
-    const newComponent = tempElement.firstElementChild; //and then extract the element
-    component.replaceWith(newComponent); //switch over to the newly created component
+    const newComponent = await loadNewHTML(updatedComponent); //enure the new html is properly loaded
+    component.replaceWith(newComponent); //switch over to the newly updated component
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
     updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
 }
 
 /**
- * To get the updated component once returned
+ * To get the updated component as an Element once returned as it's 
+ * currently in the form of a String
  * 
  * @param { Element } 
  * @param { String } 

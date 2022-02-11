@@ -192,31 +192,31 @@ export function setAndGetAttribute (element, attribute, value) {
 }
 
 /**
- * Set innerHTML while also ensuring <script> tags within get run
- * https://stackoverflow.com/questions/2592092/executing-script-elements-inserted-with-innerhtml
- * Modified so can also ensure all <script> tags are loaded prior to insertion if required
+ * When new HTML is added dynamically to page, we need to ensure any <script> tags
+ * have been loaded prior to adding to new HTML to the page
  * 
- * @param { Element }  
+ * @param { Element }  note: the element shouldn't exist in the DOM yet, so we can load properly
+ * 
+ * @return { Element }
+ */
+export async function loadNewHTML (element) {
+    const documentFragment = document.createRange().createContextualFragment(element.outerHTML); //createContextualFragment ensures any </script> tags within the element are run
+    const scriptTags = documentFragment.querySelectorAll('script[src]'); //get each <script src></script>
+    const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page
+    for (const scriptTag of newScriptTags) { //add each into the document head
+        await injectScript(scriptTag.getAttribute('src'));
+        scriptTag.remove(); //remove each from the element as the <script> is now in the document head instead
+    } 
+    return documentFragment.firstElementChild;
+}
+
+/** 
+ * Returns true if the script exists on the page
+ * 
  * @param { String }
  * 
+ * @returns { Boolean }
  */
-export function setInnerHTML (element, html) {
-    element.innerHTML = html;
-    const allScriptsWithSrc = element.querySelectorAll('script[src]'); //get each to ensure we can run it
-    const totalScriptCount = allScriptsWithSrc.length;
-    let loadedScriptCount = 0;
-    Array.from(allScriptsWithSrc).forEach((oldScript) => { //replace each script with a new replacement
-        const newScript = document.createElement('script');
-        newScript.addEventListener('load', () => {
-            loadedScriptCount++;
-            if (loadedScriptCount === totalScriptCount) {
-                new Promise((resolve, reject) => {
-                    resolve();
-                });
-            }
-        });
-        Array.from(oldScript.attributes).forEach((attribute) => newScript.setAttribute(attribute.name, attribute.value)); //grab each of the attributes of the old script
-        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-        oldScript.parentNode.replaceChild(newScript, oldScript); 
-    });
+export function isScriptAdded (src) {
+    return Boolean(document.querySelector(`script[src="${src}"]`));
 }

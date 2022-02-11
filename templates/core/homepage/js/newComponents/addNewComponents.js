@@ -2,6 +2,7 @@ import { gsap, Draggable, Flip } from 'gsap/all';
 import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
          isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 import { getNewComponent } from './getNewComponent';
+import { updateComponentDisplay, isToggleUnlocked } from '../existingComponents/toggleLockComponents';
 import { saveComponentOrder } from '../existingComponents/saveComponentOrder';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 
@@ -457,6 +458,7 @@ async function addNewComponent () {
     reinsertNewComponentButton();
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
+    updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
     await saveComponentOrder(newComponent);
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
