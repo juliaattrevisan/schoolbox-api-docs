@@ -107,6 +107,8 @@ class Module
      * TODO don't set $injector here, pass as a param to init() instead.
      * (This would mean that custom constructors could be used, and $injector
      *  shouldn't be used outside of init() anyway)
+     * (As of Aura.di 4 actually need to not pass the container: need to pass
+     *  the router)
      *
      * @param ContainerInterface $injector
      * @param string             $basename
@@ -289,25 +291,25 @@ class Module
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
         $key = 'module:' . $this->basename;
-        if (!$override && $injector->has($key)) {
-            $other = $injector->get($key);
-            if (get_class($other) != get_class($this)) {
-                throw new LogicException(
-                    sprintf(
-                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
-                        $this->basename,
-                        get_class($other),
-                        get_class($this)
-                    )
-                );
-            } else {
-                user_error(
-                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
-                    E_USER_WARNING
-                );
-                return false;
-            }
-        }
+//        if (!$override && $injector->has($key)) {
+//            $other = $injector->get($key);
+//            if (get_class($other) != get_class($this)) {
+//                throw new LogicException(
+//                    sprintf(
+//                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
+//                        $this->basename,
+//                        get_class($other),
+//                        get_class($this)
+//                    )
+//                );
+//            } else {
+//                user_error(
+//                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
+//                    E_USER_WARNING
+//                );
+//                return false;
+//            }
+//        }
         $injector->set($key, $this);
         return true;
     }

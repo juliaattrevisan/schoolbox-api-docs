@@ -38,9 +38,15 @@ class MapperFactory
      */
     public function get($mapperName)
     {
+        if (!class_exists($mapperName)) {
+            throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
+        }
         // No longer injectable, because the container is locked as soon as
         // sonething is extracted from it
-        return $mapperName::getInstance();
+        if (!is_callable([ $mapperName, 'getInstance' ])) {
+            throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
+        }
+        return new $mapperName();
     }
 
     /**

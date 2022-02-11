@@ -253,8 +253,7 @@ abstract class Kernel
      */
     protected function postInstallDependencies(): void
     {
-        /** @var IConfigLoader $config */
-        $config = $this->get('config');
+        $config = new ConfigLoader();
         session_save_path(PipeManager::getSessionSavePath($config->get('redis_url')));
     }
 
@@ -1750,7 +1749,11 @@ abstract class Kernel
                         $rememberer,
                         $_SERVER['REQUEST_TIME'],
                     );
-                    return $factory->build();
+                    $session = $factory->build();
+                    if (!$session->isStarted()) {
+                        $session->start();
+                    }
+                    return $session;
                 }
             )
         );
@@ -1792,7 +1795,7 @@ abstract class Kernel
 
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            ucfirst(strtolower($this->getDependencyInjector()->get('config')->get('site_school_code')))
+            ucfirst(strtolower((new ConfigLoader())->get('site_school_code')))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),

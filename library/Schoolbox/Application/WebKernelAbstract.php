@@ -243,25 +243,25 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     }
 
 
-    /**
-     * Initialise the session, in addition to running the parent class'
-     * post-install dependencies.
-     *
-     * @noinspection PhpDocMissingThrowsInspection the session management object
-     *                                             will always be in DI
-     */
-    protected function postInstallDependencies(): void
-    {
-        parent::postInstallDependencies();
-
-        // initialise session
-        /** @var Session $session */
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $session = $this->getDependencyInjector()->get('session');
-        if (!$session->isStarted()) {
-            $session->start();
-        }
-    }
+//    /**
+//     * Initialise the session, in addition to running the parent class'
+//     * post-install dependencies.
+//     *
+//     * @noinspection PhpDocMissingThrowsInspection the session management object
+//     *                                             will always be in DI
+//     */
+//    protected function postInstallDependencies(): void
+//    {
+//        parent::postInstallDependencies();
+//
+//        // initialise session
+//        /** @var Session $session */
+//        /** @noinspection PhpUnhandledExceptionInspection */
+//        $session = $this->getDependencyInjector()->get('session');
+//        if (!$session->isStarted()) {
+//            $session->start();
+//        }
+//    }
 
     /** @inheritDoc */
     protected function getKnownUserClassesFromSession(Di\Container $di): array
