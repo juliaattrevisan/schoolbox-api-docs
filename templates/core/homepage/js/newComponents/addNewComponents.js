@@ -405,20 +405,20 @@ function onDragEnd () {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
     updateDraggablesStatus(false); //prevent quick reclicks on elements
-    snapBackNewComponent();
+    alignNewComponent();
 }
 
 /**
  * Move the component back to its original spot or its new position on the page
  */
-function snapBackNewComponent () {
+function alignNewComponent () {
     gsap.to(__newComponent, {
         x: 0 + parseInt(__newComponent.dataset.leftDifference), //to accommodate for potential position changes that have occured
         y: 0 + parseInt(__newComponent.dataset.topDifference),
         width: __referenceElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
         duration: ANIMATE_SPEED,
         overwrite: true,
-        onComplete: () => onSnapBackNewComponentComplete()
+        onComplete: () => onAlignNewComponentComplete()
     });
 }
 
@@ -428,7 +428,7 @@ function snapBackNewComponent () {
  * 
  * @param { Element }  
  */
-function onSnapBackNewComponentComplete () {
+function onAlignNewComponentComplete () {
     gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __newComponent.style.position = 'static'; //was absolute, now sitting as it should
     __newComponent.setAttribute('data-component', ''); //so it can be dragged again
@@ -461,6 +461,11 @@ function onSnapBackNewComponentComplete () {
 async function addNewComponent () {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
+    await gsap.to(newComponent, { //fade in the updated component
+        duration: ANIMATE_SPEED,
+        opacity: 1, 
+        startAt: { opacity: 0 },
+    } );
     await saveComponentOrder(newComponent);
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
