@@ -121,7 +121,7 @@ class Factory
             $teamMapper
         );
 
-        /* Set up alocal cache of (external_id, user_id) tuples
+        /* Set up a local cache of (external_id, user_id) tuples
          */
         $userLookup = new \Schoolbox\Clipboard\Hierarchy\Lookup\Person($userMapper);
 

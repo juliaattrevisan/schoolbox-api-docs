@@ -26,4 +26,10 @@ interface IApi
      * @return array
      */
     public function retrieve(string $method, string $endpoint, array $params = []): array;
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage;
 }
