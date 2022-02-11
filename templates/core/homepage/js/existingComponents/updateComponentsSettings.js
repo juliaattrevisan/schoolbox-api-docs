@@ -9,7 +9,6 @@ import { loadNewHTML } from '@js/util/domUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateRemovedComponent } from './removeComponents';
-import { updateComponentDisplay, isToggleUnlocked } from './toggleLockComponents';
 
 const ANIMATE_SPEED = 0.3;
 const BUTTON_SELECTOR = '[data-target="settings"]';
@@ -176,7 +175,6 @@ async function updateComponent (component, responseData) {
     const newComponent = await loadNewHTML(updatedComponent); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
-    updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
 }
 
 /**
