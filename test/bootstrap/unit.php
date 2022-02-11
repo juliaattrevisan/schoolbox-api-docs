@@ -11,4 +11,4 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 
 // sorry.
-Schoolbox\Mapper::di(new Aura\Di\Container(new Aura\Di\Factory()));
+Schoolbox\Mapper::di((new Aura\Di\ContainerBuilder())->newInstance());

@@ -198,7 +198,15 @@ abstract class Kernel
      */
     public function __construct()
     {
-        $this->di              = new Di\Container(new Di\Factory());
+        // Various things about the new DI container:
+        // TODO remove references to \Aura\Di\ContainerInterface,
+        //      replace w/ either \Aura\Di\Container or \Psr\Container\ContainerInterface
+        // Should always be the latter, unless the container is actually being
+        // filled (or used to fill something).
+        class_alias(Di\Container::class, '\Aura\Di\ContainerInterface');
+        // TODO ensure all contents are lazy-loaded,
+        //      as container is locked after something is retrieved
+        $this->di              = (new Di\ContainerBuilder())->newInstance();
         $this->shutdownHandler = new ShutdownHandler();
 
         // run the launch sequence
