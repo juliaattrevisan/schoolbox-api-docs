@@ -65,7 +65,7 @@
         "tijsverkoyen/css-to-inline-styles": "~2.2",
         "html2text/html2text": "~4.3.1",
         "wolfcast/browser-detection": "~2.9.0",
-        "aura/di": "~2.2.3",
+        "aura/di": "^4.2.1",
         "aura/router": "~2.3.0",
         "aura/web": "~2.1.0",
         "aura/session": "~2.1.0",
