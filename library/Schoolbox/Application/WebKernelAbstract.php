@@ -402,6 +402,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         if ($args['outputStackTrace']) {
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}") . "</li>";
+            if ($args['stackTrace'] instanceof \Throwable) {
+                foreach ($args['stackTrace']->getTrace() as $i => $frame) {
+                    $output .= <<<LINE
+                    <li>
+                        <pre>#$i:{$frame['class']}{$frame['type']}{$frame['function']}, called from {$frame['file']}:{$frame['line']}</pre>
+                    </li>
+                    LINE;
+                }
+            }
         } else {
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']}. (Further details have been logged.)") . "</li>";
         }

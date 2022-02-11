@@ -370,22 +370,29 @@ abstract class Kernel
     protected function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
-        $di->set('config', $di->lazyNew(ConfigLoader::class));
+        $config = new ConfigLoader();
+        $di->set('config', $config);
 
         // Redis cache (memory-only, not persistent)
-        Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
-        $di->set('redis.cache', Redis::getCacheClientInstance());
+        Redis::getCacheInstance()->connect($config->get('redis_ephemeral_url'), null, INSTANCE_ID);
+        $di->set('redis.cache', function () {
+            return Redis::getCacheClientInstance();
+        });
 
         // Redis storage (persisted to disk)
-        Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis.storage', Redis::getStorageClientInstance());
+        Redis::getStorageInstance()->connect($config->get('redis_url'), null, INSTANCE_ID);
+        $di->set('redis.storage', function () {
+            return Redis::getStorageClientInstance();
+        });
 
         // Redis queue publish (not persistent)
         // (The subscription to this queue doesn't exist in the standard kernel,
         //  only in the daemon kernel: this is because it requires the event
         //  loop)
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
-        $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
+        $di->set('redis.signalQueue.pub', function () {
+            return Redis::getSignalQueueClientInstance();
+        });
 
         // Default Redis connection:
         // uses cache, and raises a warning telling you to choose a connector
@@ -426,7 +433,7 @@ abstract class Kernel
             'notif',
             $di->lazy(
                 function () {
-                    // replace this with $di->lazyGetCall() once we upgrade Aura.Di
+                    // TODO replace this with $di->lazyGetCall() once we upgrade Aura.Di
                     return Notifactory::create();
                 }
             )
