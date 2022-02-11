@@ -68,7 +68,9 @@ function addNewDraggable (component) {
 }
 
 /**
- * Add in the component to the top of the page
+ * Add in the new component to the top of the page
+ * It animates from the new components tabs to the top of the 'top' container
+ * Once it's in place we then move onto loading the new component
  * 
  * @param { MouseEvent }  
  */
@@ -76,18 +78,19 @@ function onNewComponentClicked (event) {
     
     event.preventDefault();
     
-    if (!__hasNewComponent) {
-
-        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-        updateDraggablesStatus(false); //prevent any others being dragged while a component is alread being added
+    if (!__hasNewComponent) { //ensure there's no rapid fire going on
 
         __hasNewComponent = true;
         __isFlipping = true;
-        
+
+        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+        updateDraggablesStatus(false); //prevent any others being dragged while a component is alread being added
+        reinsertNewComponentButton();
+
         const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
         
         const topContainer = document.querySelector('[data-position="top"]');
-        insertElementBefore(topContainer.firstChild, __newComponent);
+        insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
         __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
         __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
 
@@ -245,14 +248,14 @@ function updateSortableElements () {
  ****************************************************************/
 
 /**
- * Constantly check for the nearest other sortable and update position 
- * based on whether a move is valid
+ * Constantly check the new components position while dragging
+ * Moving it onto the page or back into the tabs based on the drag position
  */
 function onDrag () {
     if (canCheckForChange() && isNewComponentOverPage()) { //add the component to the page
-        showNewComponentOnPage();
+        checkNewDraggedComponentOnPage();
     } else if (canCheckForChange() && __hasNewComponent) { //if the new component has been added to page already, but it back into the tabs
-        putComponentBackIntoTabs();
+        putDraggedComponentBackIntoTabs();
     }
 }
 
@@ -284,25 +287,24 @@ function isNewComponentOverPage () {
 }
 
 /**
- * The component has been dragged over the page, so show where it will be current placed 
- * relative to where it has been dragged
+ *  The component is being dragged over the page, so show where it will be currently placed 
+ *  relative to where it has been dragged. And if it's been moved closer to a new element 
+ *  animate the position change.
  */
-function showNewComponentOnPage () {
+function checkNewDraggedComponentOnPage () {
     const sortablesToCheckList = Array.from(document.querySelectorAll(SORTABLE_SELECTOR)); //grab all sortable elements 
     const closestElement = getClosestElement(__newComponent, sortablesToCheckList); //the element nearest to the dragged element
-    if (closestElement.id !== __newComponent.id) { //no need to FLIP if the closest element is still the __newComponent
-        if (isElementAboveOtherElement(__newComponent, closestElement)) { //otherwise determine movement direction, up or down into the container
-            addNewComponentToPage(closestElement, true);
-        } else if (isElementBelowOtherElement(__newComponent, closestElement)) {
-            addNewComponentToPage(closestElement, false);
-        }
+    if (closestElement.id !== __newComponent.id && isElementAboveOtherElement(__newComponent, closestElement)) { //no need to FLIP if the closest element is still the __newComponent
+        updateDraggedComponentOnPage(closestElement, true);
+    } else if (closestElement.id !== __newComponent.id && isElementBelowOtherElement(__newComponent, closestElement)) {
+        updateDraggedComponentOnPage(closestElement, false);
     }
 }
 
 /**
  * Was on the page, but has been dragged back into the tabs area, so put it back in
  */
-function putComponentBackIntoTabs () {
+function putDraggedComponentBackIntoTabs () {
 
     __hasNewComponent = false;
     __isFlipping = true;
@@ -327,12 +329,11 @@ function putComponentBackIntoTabs () {
 
 /**
  * Use Flip to add the new compoenent to the page or move it to a different spot
- * Refer to https://greensock.com/docs/v3/Plugins/Flip for more info on Flip
  * 
  * @param { Element }  
  * @param { Boolean }  
  */
-function addNewComponentToPage (closestElement, isShiftingDown) {
+function updateDraggedComponentOnPage (closestElement, isShiftingDown) {
     
     __hasNewComponent = true;
     __isFlipping = true;
@@ -400,6 +401,9 @@ function animateFlip (state) {
  * Just snap back to where it now belongs
  */
 function onDragEnd () {
+    if (__hasNewComponent) {
+        reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
+    }
     updateDraggablesStatus(false); //prevent quick reclicks on elements
     snapBackNewComponent();
 }
@@ -455,7 +459,6 @@ function onSnapBackNewComponentComplete () {
  * To set up for another possible drag of elements
  */
 async function addNewComponent () {
-    reinsertNewComponentButton();
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
     updateComponentDisplay(newComponent, isToggleUnlocked()) //ensure the new component respects the lock status of the page
@@ -470,9 +473,6 @@ async function addNewComponent () {
  */
 function reinsertNewComponentButton () {
     __newComponentTabsContainer.appendChild(__newComponentClone); 
-    // __newComponentClone.style.opacity = 0;
-    // __newComponentClone.style.opacity = 1;
-    // gsap.to(__newComponentClone, { duration: ANIMATE_SPEED, opacity: 1 } );
 }
 
 /**
