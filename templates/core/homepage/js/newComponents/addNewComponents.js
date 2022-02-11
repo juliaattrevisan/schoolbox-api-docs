@@ -429,11 +429,7 @@ function alignNewComponent () {
  * @param { Element }  
  */
 function onAlignNewComponentComplete () {
-    gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-    __newComponent.setAttribute('data-component', ''); //so it can be dragged again
-    insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
-    __referenceElement.remove(); //and now the placeholder can be pulled out
+    resetNewComponent();
     updateDocumentOnDragEnd();
     updateSortableElements();
     if (__hasNewComponent) {
@@ -441,6 +437,17 @@ function onAlignNewComponentComplete () {
     } else {
         updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
     }
+}
+
+/**
+ * Return the new component element back to its pre dragging state
+ */
+function resetNewComponent () {
+    gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
+    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
+    __newComponent.setAttribute('data-component', ''); //so it can be dragged again
+    insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
+    __referenceElement.remove(); //and now the placeholder can be pulled out
 }
 
 /**
@@ -453,7 +460,6 @@ function onAlignNewComponentComplete () {
     document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
 }
-
 
 /**
  * To set up for another possible drag of elements
