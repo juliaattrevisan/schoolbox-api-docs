@@ -426,7 +426,7 @@ abstract class Kernel
         Mapper::di($di);
 
         // Set correct timezone
-        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+        date_default_timezone_set($config->get('date_timezone'));
 
         // Notification factory
         $di->set(
@@ -551,7 +551,7 @@ abstract class Kernel
             'setRouter'     => $di->lazyGet('router'),
             'setAuthorizer' => $di->lazyGet('authorizer'),
             'setDi'         => $di,
-            'setExceptionGenerator' => $di->get('mapperFactory')->getLazy(Error\Mapper::class),
+            'setExceptionGenerator' => $mapperFactory->getLazy(Error\Mapper::class),
             'setSentry'     => $di->lazy(
             // Use lazy function to insulate from service registration sequencing
                 function () use ($di) {
@@ -1097,7 +1097,7 @@ abstract class Kernel
                     'logMapper'        => $di->lazyNew(SyncLogMapper::class),
                     'userAccessMapper' => $di->lazyNew(UserAccessMapper::class),
                     'folderMapper'     => $di->lazyNew(Folder\Mapper::class),
-                    'config'           => $di->get('config')
+                    'config'           => $config,
                 ]
             )
         );
@@ -1350,7 +1350,7 @@ abstract class Kernel
         );
 
         $di->params[LearningAssessmentTransactor::class] = [
-            'folderMapper'                  => $di->get('mapperFactory')->getLazy(Folder\Mapper::class),
+            'folderMapper'                  => $mapperFactory->getLazy(Folder\Mapper::class),
             'unitImplementationMapperProxy' => $di->lazyGet('unitImplementationDataSource'),
             'unitSpecificationMapperProxy'  => $di->lazyGet('unitSpecificationDataSource'),
             'assessmentMapperProxy'         => $di->lazyGet('assessmentDataSource'),
@@ -1391,9 +1391,9 @@ abstract class Kernel
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'         => $di->lazyGet('httpClient'),
-            'enabled'        => $di->get('config')->get('kami_enabled'),
-            'apiKey'         => $di->get('config')->get('kami_api_key'),
-            'siteSchoolCode' => $di->get('config')->get('site_school_code'),
+            'enabled'        => $config->get('kami_enabled'),
+            'apiKey'         => $config->get('kami_api_key'),
+            'siteSchoolCode' => $config->get('site_school_code'),
         ]));
 
         // PDF generator
@@ -1607,7 +1607,7 @@ abstract class Kernel
             'user.tokenBuilder',
             $di->lazyNew(
                 Jwt::class,
-                ['configLoader' => $di->get('config')]
+                ['configLoader' => $config]
             )
         );
 

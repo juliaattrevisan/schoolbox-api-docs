@@ -9,7 +9,7 @@
 namespace Schoolbox;
 
 use Aura\Di\Container;
-use Aura\Di\Lazy;
+use Aura\Di\Injection\Lazy;
 use InvalidArgumentException;
 use Schoolbox\Mapper as BaseMapper;
 
@@ -38,16 +38,9 @@ class MapperFactory
      */
     public function get($mapperName)
     {
-        $di = $this->injector;
-
-        if (!$di->has($mapperName)) {
-            // register the lazy into the DI
-            $di->set($mapperName, $this->getLazy($mapperName));
-        }
-
-        // yank it straight back out (but now it's registered!)
-        // @phpstan-ignore-next-line: can't enforce this constraint here
-        return $di->get($mapperName);
+        // No longer injectable, because the container is locked as soon as
+        // sonething is extracted from it
+        return $mapperName::getInstance();
     }
 
     /**
