@@ -84,7 +84,7 @@
     {% if match.awayTeam %}
         {{ match.awayTeam.name }}
     {% else %}
-        {{ match.awaySchool.name }}
+        {{ match.awaySchool.name ?? '' }}
     {% endif %}
 
 {% endapply %}
