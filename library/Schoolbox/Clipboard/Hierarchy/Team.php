@@ -72,6 +72,12 @@ class Team implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Team\Position\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper;
+
+
+    /**
      * @var \Schoolbox\UserMapper
      */
     private \Schoolbox\UserMapper $userMapper;
@@ -92,6 +98,7 @@ class Team implements IStrategy
      * @param Person                                   $userLookup
      * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
      * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
+     * @param \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper
      * @param \Schoolbox\UserMapper                    $userMapper
      */
     public function __construct(
@@ -103,6 +110,7 @@ class Team implements IStrategy
         Lookup\Person $userLookup,
         \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
         $this->log = $log;
@@ -113,6 +121,7 @@ class Team implements IStrategy
         $this->userLookup = $userLookup;
         $this->divisionUserMapper = $divisionUserMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
+        $this->teamPositionMapper = $teamPositionMapper;
         $this->userMapper = $userMapper;
         $this->divisionCodec = new Codec\Division();
     }
@@ -165,6 +174,10 @@ class Team implements IStrategy
         ]);
 
         foreach ($teams['data'] as $teamData) {
+            /* Build a lookup here, because we're about to take advantage of it
+             */
+            $positionLookup = [];
+
             /* Sport identifiers
              */
             $teamActivityId = (int)$teamData['activity']['id'];
@@ -222,12 +235,21 @@ class Team implements IStrategy
              */
             foreach ($teamData['positions'] as $positionData) {
                 $position = $this->registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
+
+                $positionLookup[$positionData['id']] = $position;
+
+                $this->log->debug(sprintf(
+                    'Manufactured position %s (%s) in team %s',
+                    $position->getName(),
+                    $positionData['name'],
+                    $team->getName()
+                ));
             }
 
             /* If the --membership flag was set, ram in students and staff relationships too
              */
             if ($this->membership) {
-                $this->importMemberships($userLookup, $division, $team, $teamData);
+                $this->importMemberships($userLookup, $positionLookup, $division, $team, $teamData);
             }
         }
     }
@@ -238,6 +260,7 @@ class Team implements IStrategy
      * associating them with $team
      *
      * @param array                              $userLookup
+     * @param array                              $positionLookup
      * @param \Schoolbox\Fixtures\Division\Model $division
      * @param \Schoolbox\Fixtures\Team\Model     $team
      * @param array                              $teamData
@@ -248,6 +271,7 @@ class Team implements IStrategy
      */
     private function importMemberships(
         array $userLookup,
+        array $positionLookup,
         \Schoolbox\Fixtures\Division\Model $division,
         \Schoolbox\Fixtures\Team\Model $team,
         array $teamData
@@ -287,6 +311,8 @@ class Team implements IStrategy
              */
             $user = $this->userMapper->createModel()->setId($userId);
 
+            /* Put them in a team
+             */
             $teamPlayer = $this->teamPlayerMapper->createModel()
                 ->setUser($user)
                 ->setTeam($team)
@@ -316,7 +342,7 @@ class Team implements IStrategy
                 $this->divisionUserMapper->save($divisionUser);
             }
 
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Assigned Clipboard human %s %s (%s) to player pool for division %s, using schoolbox user %s',
                 $student['firstName'],
                 $student['lastName'],
@@ -324,6 +350,31 @@ class Team implements IStrategy
                 $division->getName(),
                 $userId
             ));
+
+            /* Figure out their assigned position (if any)
+             */
+            if ('' !== trim((string)$student['positionId'])) {
+                $position = $positionLookup[$student['positionId']];
+
+                $teamPosition = $this->teamPositionMapper->createModel()
+                    ->setTeam($team)
+                    ->setPosition($position)
+                    ->setUser($user);
+
+                if ($this->perform) {
+                    $this->teamPositionMapper->save($teamPosition);
+                }
+
+                $this->log->debug(sprintf(
+                    'Assigning Clipboard student %s %s (%s) to position %s (clipboard %s) in team %s',
+                    $student['firstName'],
+                    $student['lastName'],
+                    $student['smsId'],
+                    $position->getName(),
+                    $student['positionId'],
+                    $team->getName()
+                ));
+            }
         }
     }
 }

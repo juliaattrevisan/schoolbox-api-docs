@@ -69,6 +69,12 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Team\Position\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Division\User\Mapper
      */
     private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
@@ -83,6 +89,7 @@ class Prepare implements IStrategy
      * @param \Schoolbox\Fixtures\Division\Mapper      $divisionMapper
      * @param \Schoolbox\Fixtures\Team\Mapper          $teamMapper
      * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
+     * @param \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper
      * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
      */
     public function __construct(
@@ -94,6 +101,7 @@ class Prepare implements IStrategy
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
         \Schoolbox\Fixtures\Team\Mapper $teamMapper,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
         \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
     ) {
         $this->log = $log;
@@ -104,6 +112,7 @@ class Prepare implements IStrategy
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
+        $this->teamPositionMapper = $teamPositionMapper;
         $this->divisionUserMapper = $divisionUserMapper;
     }
 
@@ -125,6 +134,7 @@ class Prepare implements IStrategy
             /* Hard deletions for relationships
              */
             $this->teamPlayerMapper->getDatabase()->query("DELETE FROM {$this->teamPlayerMapper->getTable()}");
+            $this->teamPositionMapper->getDatabase()->query("DELETE FROM {$this->teamPositionMapper->getTable()}");
             $this->divisionUserMapper->getDatabase()->query("DELETE FROM {$this->divisionUserMapper->getTable()}");
         }
 

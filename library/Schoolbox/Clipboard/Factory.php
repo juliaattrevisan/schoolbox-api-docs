@@ -105,6 +105,7 @@ class Factory
         $divisionMapper = \Schoolbox\Fixtures\Division\Mapper::getInstance();
         $teamMapper = \Schoolbox\Fixtures\Team\Mapper::getInstance();
         $teamPlayerMapper = \Schoolbox\Fixtures\Team\Player\Mapper::getInstance();
+        $teamPositionMapper = \Schoolbox\Fixtures\Team\Position\Mapper::getInstance();
         $divisionUserMapper = \Schoolbox\Fixtures\Division\User\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
@@ -138,6 +139,7 @@ class Factory
             $divisionMapper,
             $teamMapper,
             $teamPlayerMapper,
+            $teamPositionMapper,
             $divisionUserMapper
         ))
         ->add(new Hierarchy\Team(
@@ -149,6 +151,7 @@ class Factory
             $userLookup,
             $divisionUserMapper,
             $teamPlayerMapper,
+            $teamPositionMapper,
             $userMapper
         ))
         ->add(new Hierarchy\Cleanup(
