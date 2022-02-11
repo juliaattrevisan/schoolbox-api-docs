@@ -142,12 +142,7 @@ async function saveComponentSettings (component, form) {
         console.warn(error);
         updateRemovedComponent(component); //currently the assumed error, that the component no longer exists
         slideUp(component.querySelector(PANEL_SELECTOR), ANIMATE_SPEED);
-    } finally { //now the update is complete notify with the button and close the settings, enabling once the settings are closed 
-        submitFormButton.value = 'Updated';
-        await close(component);
-        submitFormButton.disabled = false;
-        submitFormButton.value = 'Update';
-    }
+    } 
 }
 
 /**
@@ -174,6 +169,11 @@ async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
     const newComponent = await loadNewHTML(updatedComponent); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
+    gsap.to(newComponent, { //fade in the updated component
+        duration: ANIMATE_SPEED,
+        opacity: 1, 
+        startAt: { opacity: 0 },
+    } );
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
 }
 
