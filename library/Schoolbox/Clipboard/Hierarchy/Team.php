@@ -24,6 +24,18 @@ class Team implements IStrategy
 {
 
     /**
+     * Short-circuit to prevent infinite loops
+     */
+    private const MAX_CALLS = 100;
+
+
+    /**
+     * Number of results per page
+     */
+    private const NUM_PER_PAGE = 10;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -168,89 +180,115 @@ class Team implements IStrategy
             $userLookup = $this->userLookup->generate();
         }
 
-        $teams = $this->api->retrieve('GET', $endpoint, [
-            'includePositions' => 'true',
-            'includeStudents' => $includeStudents
-        ]);
+        /* Bash through paginated data
+         */
+        $currentPage = 1;
+        $lastPage = null;
 
-        foreach ($teams['data'] as $teamData) {
-            /* Build a lookup here, because we're about to take advantage of it
-             */
-            $positionLookup = [];
+        /* This will be set to something truthy, until the end of
+         * the paginated data, at which point it becomes falsy
+         */
+        $nextUrl = $endpoint;
 
-            /* Sport identifiers
-             */
-            $teamActivityId = (int)$teamData['activity']['id'];
-            $teamActivity = $teamData['activity']['name'] ?? '';
+        while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
+            $teams = $this->api->retrieve('GET', $endpoint, [
+                'includePositions' => 'true',
+                'includeStudents' => $includeStudents,
+                /* Bash through paginated data
+                 */
+                'page' => $currentPage,
+                'pageLength' => self::NUM_PER_PAGE
+            ]);
 
-            /* Division identifiers
-             */
-            $teamCategory = $teamData['category']['name'] ?? '';
-            $teamSubcategory = $teamData['subcategory']['name'] ?? '';
+            foreach ($teams['data'] as $teamData) {
+                /* Build a lookup here, because we're about to take advantage of it
+                 */
+                $positionLookup = [];
 
-            /* Team identifiers
-             */
-            $teamId = (int)$teamData['id'];
-            $teamName = $teamData['name'];
+                /* Sport identifiers
+                 */
+                $teamActivityId = (int)$teamData['activity']['id'];
+                $teamActivity = $teamData['activity']['name'] ?? '';
 
-            /* Try to manufacture a division title
-             */
-            $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory, $teamActivity);
+                /* Division identifiers
+                 */
+                $teamCategory = $teamData['category']['name'] ?? '';
+                $teamSubcategory = $teamData['subcategory']['name'] ?? '';
 
-            $this->log->debug(sprintf(
-                'Encoded category/subcategory/activity (%s, %s, %s) into schoolbox division name: %s',
-                $teamCategory,
-                $teamSubcategory,
-                $teamActivity,
-                $divisionName
-            ));
+                /* Team identifiers
+                 */
+                $teamId = (int)$teamData['id'];
+                $teamName = $teamData['name'];
 
-            /* Try to spawn a corresponding Sport instance
-             */
-            $sport = $this->registry->recallSport($teamActivityId, $teamActivity);
-
-            /* Try to spawn a corresponding Division instance
-             */
-            $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
-
-            /* Try to spawn a corresponding Team instance
-             * $teamId is used later to figure out who vs who, when importing Matchups
-             * Teams are indexed by ids for this particular usage, unlike others
-             */
-            $team = $this->registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
-
-            $this->log->info(sprintf(
-                'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
-                $sport->getName(),
-                $sport->getId(),
-                $division->getName(),
-                $division->getId(),
-                $team->getName(),
-                $team->getId()
-            ));
-
-            /* Each team has a set of positions, but we attribute Positions to
-             * the sport in schoolbox. Inspect each team and from its list of
-             * Positions, accumulate them into the corresponding Sport
-             */
-            foreach ($teamData['positions'] as $positionData) {
-                $position = $this->registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
-
-                $positionLookup[$positionData['id']] = $position;
+                /* Try to manufacture a division title
+                 */
+                $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory, $teamActivity);
 
                 $this->log->debug(sprintf(
-                    'Manufactured position %s (%s) in team %s',
-                    $position->getName(),
-                    $positionData['name'],
-                    $team->getName()
+                    'Encoded category/subcategory/activity (%s, %s, %s) into schoolbox division name: %s',
+                    $teamCategory,
+                    $teamSubcategory,
+                    $teamActivity,
+                    $divisionName
                 ));
+
+                /* Try to spawn a corresponding Sport instance
+                 */
+                $sport = $this->registry->recallSport($teamActivityId, $teamActivity);
+
+                /* Try to spawn a corresponding Division instance
+                 */
+                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+
+                /* Try to spawn a corresponding Team instance
+                 * $teamId is used later to figure out who vs who, when importing Matchups
+                 * Teams are indexed by ids for this particular usage, unlike others
+                 */
+                $team = $this->registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
+
+                $this->log->info(sprintf(
+                    'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
+                    $sport->getName(),
+                    $sport->getId(),
+                    $division->getName(),
+                    $division->getId(),
+                    $team->getName(),
+                    $team->getId()
+                ));
+
+                /* Each team has a set of positions, but we attribute Positions to
+                 * the sport in schoolbox. Inspect each team and from its list of
+                 * Positions, accumulate them into the corresponding Sport
+                 */
+                foreach ($teamData['positions'] as $positionData) {
+                    $position = $this->registry->recallPosition($teamActivityId, $sport, (int)$positionData['id'], $positionData['name']);
+
+                    $positionLookup[$positionData['id']] = $position;
+
+                    $this->log->debug(sprintf(
+                        'Manufactured position %s (%s) in team %s',
+                        $position->getName(),
+                        $positionData['name'],
+                        $team->getName()
+                    ));
+                }
+
+                /* If the --membership flag was set, ram in students and staff relationships too
+                 */
+                if ($this->membership) {
+                    $this->importMemberships($userLookup, $positionLookup, $division, $team, $teamData);
+                }
             }
 
-            /* If the --membership flag was set, ram in students and staff relationships too
+            /* Bash through paginated data
              */
-            if ($this->membership) {
-                $this->importMemberships($userLookup, $positionLookup, $division, $team, $teamData);
+            $lastPage = $teams['pagination']['lastPage'];
+
+            if ($currentPage >= $lastPage) {
+                $nextUrl = null;
             }
+
+            $currentPage++;
         }
     }
 

@@ -22,6 +22,18 @@ class Sessions implements IStrategy
 {
 
     /**
+     * Short-circuit to prevent infinite loops
+     */
+    private const MAX_CALLS = 100;
+
+
+    /**
+     * Number of results per page
+     */
+    private const NUM_PER_PAGE = 10;
+
+
+    /**
      * A placeholder venue if one wasn't specified by Clipboard
      */
     private const UNSPECIFIED_LOCATION = 'Unspecified location';
@@ -132,6 +144,9 @@ class Sessions implements IStrategy
      */
     public function import(): void
     {
+        /* TODO: Clipboard is going to provide external ids for us to find
+         *  They would appear here, but for now this will be unused
+         */
         $userLookup = $this->userLookup->generate();
 
         /* Consume data from Clipboard endpoint - each Session comes with info about
@@ -151,123 +166,149 @@ class Sessions implements IStrategy
          */
         $season = $this->registry->recallSeason();
 
-        $sessions = $this->api->retrieve('GET', $endpoint, [
-            'includeTeams' => 'true',
-            'includeStaff' => 'true',
-            'includeRoundName' => 'true',
-            'includeStatuses' => ['confirmed'],
-            /* Apparently this should give you "only not cancelled" sessions
-             */
-            'cancelled' => 'false'
-        ]);
+        /* Bash through paginated data
+         */
+        $currentPage = 1;
+        $lastPage = null;
 
-        foreach ($sessions['data'] as $session) {
-            /* Sport identifiers
-             */
-            $teamActivityId = (int)$session['activity']['id'];
-            $teamActivity = $session['activity']['name'] ?? '';
+        /* This will be set to something truthy, until the end of
+         * the paginated data, at which point it becomes falsy
+         */
+        $nextUrl = $endpoint;
 
-            foreach ($session['teams'] as $teamData) {
-                /* Division identifiers
+        while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
+            $sessions = $this->api->retrieve('GET', $endpoint, [
+                'includeTeams' => 'true',
+                'includeStaff' => 'true',
+                'includeRoundName' => 'true',
+                'includeStatuses' => ['confirmed'],
+                /* Apparently this should give you "only not cancelled" sessions
                  */
-                $teamCategory = $teamData['category']['name'] ?? '';
-                $teamSubcategory = $teamData['subcategory']['name'] ?? '';
-
-                /* Team identifiers
+                'cancelled' => 'false',
+                /* Bash through paginated data
                  */
-                $teamId = (int)$teamData['id'];
-                $teamName = $teamData['name'];
+                'page' => $currentPage,
+                'pageLength' => self::NUM_PER_PAGE
+            ]);
 
-                /* Try to manufacture a division title
+            foreach ($sessions['data'] as $session) {
+                /* Sport identifiers
                  */
-                $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory, $teamActivity);
+                $teamActivityId = (int)$session['activity']['id'];
+                $teamActivity = $session['activity']['name'] ?? '';
 
-                $this->log->debug(sprintf(
-                    'Encoded category/subcategory/activity (%s, %s, %s) into schoolbox division name: %s',
-                    $teamCategory,
-                    $teamSubcategory,
-                    $teamActivity,
-                    $divisionName
-                ));
+                foreach ($session['teams'] as $teamData) {
+                    /* Division identifiers
+                     */
+                    $teamCategory = $teamData['category']['name'] ?? '';
+                    $teamSubcategory = $teamData['subcategory']['name'] ?? '';
 
-                /* Try to spawn a corresponding Sport instance
-                 */
-                $sport = $this->registry->recallSport($teamActivityId, $teamActivity);
+                    /* Team identifiers
+                     */
+                    $teamId = (int)$teamData['id'];
+                    $teamName = $teamData['name'];
 
-                /* Try to spawn a corresponding Division instance
-                 */
-                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
-
-                /* Try to spawn a corresponding Team instance
-                 * $teamId is used later to figure out who vs who, when importing Matchups
-                 * Teams are indexed by ids for this particular usage, unlike others
-                 */
-                $team = $this->registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
-
-                $this->log->info(sprintf(
-                    'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
-                    $sport->getName(),
-                    $sport->getId(),
-                    $division->getName(),
-                    $division->getId(),
-                    $team->getName(),
-                    $team->getId()
-                ));
-
-                /* Set up a Matchup instance for this team; they aren't vsing anyone
-                 */
-                $venue = $this->findVenue($session['locationData']['name'] ?? null);
-
-                $matchupName = trim($session['title']);
-                $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
-
-                /* See if this matchup exists by taking the bestest guess
-                 */
-                try {
-                    $matchup = $this->matchupMapper->findOneByColumnList([
-                        'name' => $matchupName,
-                        'division_id' => $division->getId(),
-                        'season_id' => $season->getId(),
-                        'home_team_id' => $team->getId(),
-                        'start_at' => $startAt->getDatabase(),
-                        'venue_id' => $venue->getId()
-                    ]);
+                    /* Try to manufacture a division title
+                     */
+                    $divisionName = $this->divisionCodec->encode($teamCategory, $teamSubcategory, $teamActivity);
 
                     $this->log->debug(sprintf(
-                        'Reusing matchup %s on %s, at venue %s',
-                        $matchup->getDisplayName(),
-                        $matchup->getStartAt()->getDatabase(),
-                        $matchup->getVenue()->getName()
+                        'Encoded category/subcategory/activity (%s, %s, %s) into schoolbox division name: %s',
+                        $teamCategory,
+                        $teamSubcategory,
+                        $teamActivity,
+                        $divisionName
                     ));
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $matchup = $this->matchupMapper->createModel()
-                        ->setName($matchupName)
-                        ->setSeason($season)
-                        ->setDivision($division)
-                        ->setVenue($venue)
-                        ->setHomeTeam($team)
-                        ->setStartAt($startAt);
 
-                    $this->log->debug(sprintf(
-                        'Creating matchup %s on %s, at venue %s',
-                        $matchup->getDisplayName(),
-                        $matchup->getStartAt()->getDatabase(),
-                        $matchup->getVenue()->getName()
+                    /* Try to spawn a corresponding Sport instance
+                     */
+                    $sport = $this->registry->recallSport($teamActivityId, $teamActivity);
+
+                    /* Try to spawn a corresponding Division instance
+                     */
+                    $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+
+                    /* Try to spawn a corresponding Team instance
+                     * $teamId is used later to figure out who vs who, when importing Matchups
+                     * Teams are indexed by ids for this particular usage, unlike others
+                     */
+                    $team = $this->registry->recallTeam($teamActivityId, $division, $teamId, $teamName);
+
+                    $this->log->info(sprintf(
+                        'Sport: %s (id %s), Division: %s (id %s), Team: %s (id %s)',
+                        $sport->getName(),
+                        $sport->getId(),
+                        $division->getName(),
+                        $division->getId(),
+                        $team->getName(),
+                        $team->getId()
                     ));
-                }
 
-                /* Slap in a team coach
-                 */
-                foreach ($session['assignedStaff'] as $assignedStaff) {
-                    $this->assignCoach($this->findCoach($assignedStaff), $team);
-                }
+                    /* Set up a Matchup instance for this team; they aren't vsing anyone
+                     */
+                    $venue = $this->findVenue($session['locationData']['name'] ?? null);
 
-                /* We saw this, so we keep this
-                 */
-                if ($this->perform) {
-                    $this->matchupMapper->save($matchup);
+                    $matchupName = trim($session['title']);
+                    $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
+
+                    /* See if this matchup exists by taking the bestest guess
+                     */
+                    try {
+                        $matchup = $this->matchupMapper->findOneByColumnList([
+                            'name' => $matchupName,
+                            'division_id' => $division->getId(),
+                            'season_id' => $season->getId(),
+                            'home_team_id' => $team->getId(),
+                            'start_at' => $startAt->getDatabase(),
+                            'venue_id' => $venue->getId()
+                        ]);
+
+                        $this->log->debug(sprintf(
+                            'Reusing matchup %s on %s, at venue %s',
+                            $matchup->getDisplayName(),
+                            $matchup->getStartAt()->getDatabase(),
+                            $matchup->getVenue()->getName()
+                        ));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $matchup = $this->matchupMapper->createModel()
+                            ->setName($matchupName)
+                            ->setSeason($season)
+                            ->setDivision($division)
+                            ->setVenue($venue)
+                            ->setHomeTeam($team)
+                            ->setStartAt($startAt);
+
+                        $this->log->debug(sprintf(
+                            'Creating matchup %s on %s, at venue %s',
+                            $matchup->getDisplayName(),
+                            $matchup->getStartAt()->getDatabase(),
+                            $matchup->getVenue()->getName()
+                        ));
+                    }
+
+                    /* Slap in a team coach
+                     */
+                    foreach ($session['assignedStaff'] as $assignedStaff) {
+                        $this->assignCoach($this->findCoach($assignedStaff), $team);
+                    }
+
+                    /* We saw this, so we keep this
+                     */
+                    if ($this->perform) {
+                        $this->matchupMapper->save($matchup);
+                    }
                 }
             }
+
+            /* Bash through paginated data
+             */
+            $lastPage = $sessions['pagination']['lastPage'];
+
+            if ($currentPage >= $lastPage) {
+                $nextUrl = null;
+            }
+
+            $currentPage++;
         }
     }
 
