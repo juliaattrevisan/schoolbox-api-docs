@@ -93,8 +93,11 @@ function checkButtonStatus (component, componentCount) {
     const newComponentButton = getNewComponentButton(component);
     if (componentCount === 0) {
         newComponentButton.classList.remove('disabled');
+        newComponentButton.style.opacity = 1;
     } else if (newComponentButton.getAttribute('data-multi') === 'one-only') {
         newComponentButton.classList.add('disabled');
+    } else {
+        newComponentButton.style.opacity = 1;
     }
 }
 

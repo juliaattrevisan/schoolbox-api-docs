@@ -119,6 +119,7 @@ function onNewComponentClicked (event) {
  function updateNewComponentVars (newComponent) {
     __newComponent = newComponent; //use the parent container regardless of selection to ensure correct dimensions etc
     __newComponentClone = __newComponent.cloneNode(true); //to replace the new component in the tabs when/if the __newComponent has been added in
+    __newComponentClone.style.opacity = 0.5; //so the __newComponent stands out when animating from the component tabs
     __newComponentTabsContainer = __newComponent.parentElement; //so can put a copy of the __newComponent back into the palette once the addition is complete
 }
 
