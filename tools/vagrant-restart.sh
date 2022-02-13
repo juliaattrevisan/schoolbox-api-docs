@@ -1,4 +1,11 @@
 #!/bin/bash
+
+primary_php_majver=$1
+if [[ -z $primary_php_majver ]]; then
+  echo "You must declare primary/active PHP major version" >&2
+  exit 1
+fi
+
 # Override vagrant's network configuration with this host's network config
 /etc/init.d/procps restart
 
@@ -27,7 +34,7 @@ fi
 rabbitmq_management_port=$(rabbitmqctl status | grep -Eo "http,[0-9]+" | awk -F',' '{ print $2 }')
 
 # This will fail to start when VM booted because /vagrant may not yet be mounted
-service php8.0-fpm restart
+eval "service php${primary_php_majver}-fpm restart"
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
