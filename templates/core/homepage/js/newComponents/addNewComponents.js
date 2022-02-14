@@ -468,13 +468,13 @@ function resetNewComponent () {
 async function addNewComponent () {
     updateDraggablesWithNewComponentButton();
     const newComponent = await getNewComponent(__newComponent);
+    document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
     await gsap.to(newComponent, { //fade in the updated component
         duration: ANIMATE_SPEED,
         opacity: 1, 
         startAt: { opacity: 0 },
     } );
     await saveComponentOrder(newComponent);
-    document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_ADDED, { detail: { component: newComponent } } ) );
     updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
     __hasNewComponent = false;
 }
