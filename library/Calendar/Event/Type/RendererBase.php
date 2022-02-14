@@ -9,7 +9,6 @@
 namespace Calendar\Event\Type;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\User;
 
