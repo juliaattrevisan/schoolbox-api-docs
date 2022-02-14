@@ -50,8 +50,6 @@ class Module
     /**
      * The base name for this module.
      *
-     * This module will be injected into the dependency injector at "module:$basename".
-     *
      * @var string
      */
     protected $basename;

@@ -10,6 +10,7 @@
 
 namespace Alaress\Web\Controller;
 
+use Alaress\Module\Module;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Aura\Di;
@@ -362,25 +363,18 @@ abstract class Base
      */
     protected function getController($name)
     {
-        try {
-            /** @var self $controller */
-            $controller = $this->getDi()->get("controller:$name");
-        } catch (ServiceNotFound $e) {
-            // the controller isn't registered... hawkward. Let's remedy that
+        $module = Module::retrieveInstalledModule($name);
 
-            /** @var \Alaress\Module\Module $module */
-            $module = $this->getDi()->get("module:$name");
+        // initialise the controller into the DI
+        $module->initControllerDependencies();
+        $module->initControllers($this->getDi());
 
-            // initialise the controller into the DI
-            $module->initControllerDependencies();
-            $module->initControllers($this->getDi());
+        // remove this reference, we don't need it anymore
+        unset($module);
 
-            // remove this reference, we don't need it anymore
-            unset($module);
-
-            // obtain and return the controller from DI now that it's been registered
-            $controller = $this->getDi()->get("controller:$name");
-        }
+        // obtain and return the controller from DI now that it's been registered
+        /** @var self $controller */
+        $controller = $this->getDi()->get("controller:$name");
 
         $controller->setUser($this->user);
         return $controller;
