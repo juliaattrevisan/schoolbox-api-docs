@@ -142,6 +142,9 @@ NULLTYPE;
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
         $randomMapper = UserMapper::getInstance();
+
+        /* TODO: Pass the script name to scheduler, for logging lastRun
+         */
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),
             $frequency,

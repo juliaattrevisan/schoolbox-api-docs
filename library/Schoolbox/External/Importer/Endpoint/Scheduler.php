@@ -127,6 +127,17 @@ class Scheduler
                 exit;
             }
 
+            /* TODO: Always log the start of the run
+             */
+
+            /* TODO: Augment the Factory's recipe with the finisher
+             *  This way you don't have to remember doing it in every factory;
+             *  you literally cannot forget to do it. It'll only log the finish
+             *  if you didn't crash somewhere in the process
+             *
+             * $composites->add(LastRun_Finisher)
+             */
+
             try {
                 $this->logger->debug(sprintf(
                     'Beginning transaction'

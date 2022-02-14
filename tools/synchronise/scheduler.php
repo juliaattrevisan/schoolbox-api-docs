@@ -127,13 +127,21 @@ HELP;
         /* Execute scheduler: sis stuff
          */
         $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $sisFactory, $type, $file, $this->getLogger()))->run(time());
+
+        /* TODO: Pass the script name to scheduler, for logging lastRun
+         */
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $sisFactory, $type, $file, $this->getLogger()))
+            ->run(time());
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
          */
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))->run(time());
+
+        /* TODO: Pass the script name to scheduler, for logging lastRun
+         */
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))
+            ->run(time());
 
         /* Announce lock release
          */
