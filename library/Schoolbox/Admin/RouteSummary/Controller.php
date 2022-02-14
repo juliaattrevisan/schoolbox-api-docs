@@ -34,8 +34,9 @@ class Controller extends Base
 //                /** @var BaseModule $module */
 //                $module = $di->get('module:' . $parsedName['controller']);
                 $module->initControllerDependencies();
-                $module->initControllers($di);
-                $controller = $di->get('controller:' . $parsedName['controller']);
+//                $module->initControllers($di);
+//                $controller = $di->get('controller:' . $parsedName['controller']);
+                $controller = $module->buildController($di);
             } catch (\Throwable $e) {
                 // Something went wrong when parsing this controller
                 $routeSummaries[$parsedName['controller']][] = [
