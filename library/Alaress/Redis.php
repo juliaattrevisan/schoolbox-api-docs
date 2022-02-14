@@ -143,6 +143,30 @@ class Redis
     }
 
     /**
+     * Gets client within the cache instance of this wrapper.
+     *
+     * @see INSTANCE_CACHE
+     *
+     * @return null|Predis\ClientInterface
+     */
+    public static function getCacheClientInstance(): ?Predis\ClientInterface
+    {
+        return self::getClientInstance(self::INSTANCE_CACHE);
+    }
+
+    /**
+     * Gets client within the storage instance of this wrapper.
+     *
+     * @see INSTANCE_STORAGE
+     *
+     * @return null|Predis\ClientInterface
+     */
+    public static function getStorageClientInstance(): ?Predis\ClientInterface
+    {
+        return self::getClientInstance(self::INSTANCE_STORAGE);
+    }
+
+    /**
      * Connects this wrapper to Redis.
      *
      * @see Predis\Client::__construct() for parameter documentation.

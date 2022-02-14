@@ -59,7 +59,7 @@ try {
 
             try {
                 // get the cache handler
-                $jit = new RedisCache(Redis::getClientInstance(Redis::INSTANCE_STORAGE), $log, INSTANCE_ID);
+                $jit = new RedisCache(Redis::getStorageClientInstance(), $log, INSTANCE_ID);
                 $tff = new TriggerFactoryFactory(true);
 
                 $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);

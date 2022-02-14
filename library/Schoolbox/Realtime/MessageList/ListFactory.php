@@ -128,6 +128,6 @@ class ListFactory implements IListFactory, Serializable
         $this->instanceId = $serialized;
 
         // Messages are stored in the persistent Redis instance
-        $this->redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE); // TODO IoC
+        $this->redis = Redis::getStorageClientInstance(); // TODO IoC
     }
 }

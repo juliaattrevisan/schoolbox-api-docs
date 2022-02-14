@@ -26,7 +26,7 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
-        $redis = Redis::getClientInstance(Redis::INSTANCE_CACHE);
+        $redis = Redis::getStorageClientInstance();
 
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");

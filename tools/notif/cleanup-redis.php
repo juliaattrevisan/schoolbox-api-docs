@@ -38,7 +38,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
     }
 
     // TODO clean up storage instance too?
-    $redis = Redis::getClientInstance(Redis::INSTANCE_STORAGE);
+    $redis = Redis::getStorageClientInstance();
 
     /** @var Mapper[] $offendingMappers */
     $offendingMappers = [

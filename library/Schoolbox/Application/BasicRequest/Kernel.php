@@ -72,11 +72,11 @@ class Kernel extends WebKernelAbstract
 
         // Redis cache (memory-only, not persistent)
         Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
-        $di->set('redis.cache', Redis::getClientInstance(Redis::INSTANCE_CACHE));
+        $di->set('redis.cache', Redis::getCacheClientInstance());
 
         // Redis storage (persisted to disk)
         Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis.storage', Redis::getClientInstance(Redis::INSTANCE_STORAGE));
+        $di->set('redis.storage', Redis::getStorageClientInstance());
 
         // Redis queue publish (not persistent)
         // (The subscription to this queue doesn't exist in the standard kernel,

@@ -63,7 +63,7 @@ class TimetableNotifier extends WorkNotifier
         // lazyload
         if ($this->publisher === null) {
             $this->publisher = new RedisPublisher(
-                Redis::getClientInstance(Redis::INSTANCE_STORAGE),
+                Redis::getStorageClientInstance(),
                 INSTANCE_ID,
             );
         }

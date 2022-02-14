@@ -197,7 +197,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             )
         ) {
             // Hit up the cache
-            $cache     = new Vcal(Redis::getClientInstance(Redis::INSTANCE_CACHE));
+            $cache = new Vcal(Redis::getCacheClientInstance());
 
             $decodedConfig->tokenReplaceUrl($this->getUser());
             // In general, calendar config is cached when saved from the admin page.
