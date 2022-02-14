@@ -32,7 +32,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
         parent::__construct(
             (new External_DatabaseFactory())->buildTimetableConnector(Loader::getInstance()),
             new External_Offline_Timetable(),
-            Redis::getInstance(),
+            Redis::getCacheInstance(),
             Config::get('external_cache_timeout')
         );
     }

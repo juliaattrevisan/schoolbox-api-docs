@@ -31,7 +31,7 @@ EOL;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Redis pubsub signal test',
     [
         Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::DEBUG,
@@ -43,9 +43,10 @@ $kernel = Daemon\Kernel(
 if (!isset($opts['d'])) {
     // client (publish) mode
     $signal = isset($opts['signal'])  ? $opts['signal']  : strtoupper(readline('Signal (name) to send [SIGPOLL]: ') ?: 'sigpoll');
+    $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
     /** @var \Redis $redis */
-    $redis = Redis::getClientInstance();
+    $redis = Redis::getSignalQueueClientInstance();
 
     $loop = isset($opts['loop']) ? (int)($opts['loop']) : 1;
 
@@ -91,6 +92,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
     /** @var Redis\Async\Client $client */
-    $client = $di->get('redis.async');
+    $client = $di->get('redis.signalQueue.sub');
     $client->subscribe($daemon, new TestListener($log));
 });

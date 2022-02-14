@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Redis;
 use Psr\Log\NullLogger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -155,6 +156,14 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
 
     /**
+     * Rebuild the subscription cache if required.
+     *
+     * The subscription cache needs to be rebuilt if:
+     * * the component has an alt source
+     * * the component's definition includes a notification namespace
+     *
+     * TODO migrate to taskd when that exists
+     *
      * @param string             $query
      * @param Component_Instance $instance
      * @param int                $altSourceId
@@ -174,12 +183,15 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             }
         }
 
+        // The routing subscription loader is stored in Redis, not jst cached
         // TODO desingleton these
-        $redis = Alaress\Redis::getClientInstance();
-        $log = new NullLogger();
+        $redis      = Redis::getCacheClientInstance();
+        $log        = new NullLogger();
+        $redisQueue = Redis::getSignalQueueClientInstance();
 
         // update the cache
-        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+        // TODO replace with $di('subscriptionCache')
+        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log), $redisQueue);
 
         $cache->cacheRedirects(INSTANCE_ID);
     }

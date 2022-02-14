@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Redis;
 use Schoolbox\Realtime\Pipe\PipeManager;
 
 class Unread extends AbstractList
@@ -37,6 +38,8 @@ class Unread extends AbstractList
         // that this message has been published, so it can be pushed to them
         $topic = "{$this->getNamespace()}:{$this->getUserId()}:" . PipeManager::PIPE_METHOD_PUSH;
 
-        $this->redis->publish($topic, "$instance");
+        // TODO this should be injected: however I'd have to update everywhere
+        //      which uses `ListFactory` to make it so
+        Redis::getStorageClientInstance()->publish($topic, "$instance");
     }
 }

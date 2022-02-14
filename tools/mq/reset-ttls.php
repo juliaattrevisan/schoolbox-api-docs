@@ -27,7 +27,7 @@ $app = new class extends CliTool\App{
         $this->getLogger()->info('Starting reset-ttls');
 
         /** @var ClientInterface $redis */
-        $redis = $this->getDi()->get('redis');
+        $redis = $this->getDi()->get('redis.storage');
 
         // non-blocking search of the keyspace for all messages
         $search = new Keyspace($redis, 'msg:' . INSTANCE_ID . ':m:*');

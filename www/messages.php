@@ -31,7 +31,7 @@ $this->setBlock('event', 'abstract', 'abstract_block');
 
 $this->setTitle('All Messages');
 
-$factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
+$factory = new ListFactory(INSTANCE_ID, Redis::getStorageClientInstance());
 
 // load the data into your hat, and pull out a rabbit
 $decorator = new Decorator();

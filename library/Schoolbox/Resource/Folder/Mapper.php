@@ -13,6 +13,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use Alaress\Redis;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -362,6 +363,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
+     * Post-save callback: refresh the notification redirect cache if either:
+     * * the folder inherits permissions
+     * * the folder previously inherited permissions, but no longer does
+     *
+     * TODO migrate to notifier, and then to taskd when that exists
+     *
      * @param Model $folder
      * @param Model $previous
      */
@@ -371,11 +378,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // folder inheritance is enabled OR inheritance has changed
 
             // TODO desingleton these
-            $redis = Alaress\Redis::getClientInstance();
-            $log = new NullLogger();
+            $redis      = Redis::getStorageClientInstance();
+            $log        = new NullLogger();
+            $redisQueue = Redis::getSignalQueueClientInstance();
 
             // update the cache
-            $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log));
+            // TODO replace with $di('subscriptionCache')
+            $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log), $redisQueue);
 
             $cache->cacheRedirects(INSTANCE_ID);
         }

@@ -321,7 +321,8 @@ class Controller extends Base
      */
     private function authenticateViaPostData(string $username, string $password): User
     {
-        return $this->auth->authenticate($username, $password, true);
+        // TODO this used to remember the authenticated user: should it?
+        return $this->auth->authenticate($username, $password);
     }
 
 
@@ -361,7 +362,9 @@ class Controller extends Base
         }
 
         if ($user) {
-            $this->auth->createSession($user->getUsername(), true);
+
+            // TODO this used to remember the authenticated user: should it?
+            $this->auth->createSession($user->getUsername());
             return $user;
         }
 
@@ -387,7 +390,8 @@ class Controller extends Base
         );
 
         $user = $tokenParser->findUserFromToken($jwt);
-        $this->auth->createSession($user->getUsername(), true);
+        // TODO this used to remember the authenticated user: should it?
+        $this->auth->createSession($user->getUsername());
         return $user;
     }
 

@@ -40,6 +40,7 @@ class Report extends CliTool\App
 
     private const COLUMN_KEY_PATTERN = 'keyPattern';
     private const COLUMN_PAYLOAD = 'payload';
+    private const COLUMN_STATUS = 'status';
     private const COLUMN_TOTAL_COUNT = 'totalCount';
     private const COLUMN_NO_TTL_COUNT = 'noTtlCount';
     private const COLUMN_WITH_TTL_COUNT = 'withTtlCount';
@@ -54,6 +55,7 @@ class Report extends CliTool\App
     private const ALIGNMENTS = [
         self::COLUMN_KEY_PATTERN    => STR_PAD_RIGHT,
         self::COLUMN_PAYLOAD        => STR_PAD_RIGHT,
+        self::COLUMN_STATUS         => STR_PAD_RIGHT,
         self::COLUMN_TOTAL_COUNT    => STR_PAD_LEFT,
         self::COLUMN_NO_TTL_COUNT   => STR_PAD_LEFT,
         self::COLUMN_WITH_TTL_COUNT => STR_PAD_LEFT,
@@ -69,6 +71,7 @@ class Report extends CliTool\App
     private const LABELS = [
         self::COLUMN_KEY_PATTERN    => 'Key Pattern',
         self::COLUMN_PAYLOAD        => 'Payload',
+        self::COLUMN_STATUS         => 'Status',
         self::COLUMN_TOTAL_COUNT    => 'Total Count',
         self::COLUMN_NO_TTL_COUNT   => 'No TTL Count',
         self::COLUMN_WITH_TTL_COUNT => 'With TTL Count',
@@ -79,49 +82,124 @@ class Report extends CliTool\App
     ];
 
     /**
+     * Which Redis instances exist?
+     *
+     * (Note that INSTANCE_CACHE and INSTANCE_QUEUE_PUBLISH are currently the
+     *  same)
+     */
+    private const REDIS_INSTANCES = [
+        Redis::INSTANCE_CACHE,
+        Redis::INSTANCE_STORAGE,
+//        Redis::INSTANCE_SIGNAL_QUEUE,
+    ];
+
+    /**
+     * Redis instances which are aliases of one another.
+     *
+     * Keys which are found in an instance but aren't in `self::KEY_PATTERNS`
+     * for that instance are ignored if they are in one of the aliases key
+     * patterns.
+     */
+    private const REDIS_INSTANCE_ALIASES = [
+//        [
+//            Redis::INSTANCE_CACHE,
+//            Redis::INSTANCE_SIGNAL_QUEUE,
+//        ]
+    ];
+
+    /**
      * Recognised key patterns
      */
     private const KEY_PATTERNS = [
-        '^msg:' . INSTANCE_ID . ':m:.+',
-        '^pad:g\.',
-        '^msg:' . INSTANCE_ID . ':q:\D.+',
-        // Old remember me format
-        "^[0-9a-f]{40}$",
-        // New remember me format
-        "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
-        '^msg:' . INSTANCE_ID . ':s:.+',
-        '^token2author:',
-        '^author2sessions:',
-        '^mapper2author:',
-        '^group2sessions:g\.',
-        // Old and new scrub
-        '^scrub.html:',
-        '^scrub.htmlAbsoluteUri:',
-        '^fc:' . INSTANCE_ID . ':scrub.html:',
-        '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
-        // Old and new Verso API
-        '^verso_api',
-        '^fc:' . INSTANCE_ID . ':verso_api:',
-        '^sessionstorage:',
-        '^globalAuthor:',
-        '^ueberDB:keys:',
-        '^PHPREDIS_SESSION:',
-        '^pad2readonly:g\.',
-        '^readonly2pad:r\.',
-        '^group:g\.',
-        '^session:s\.',
-        '^msg:' . INSTANCE_ID . ':q:\d+:unread',
-        '^msg:' . INSTANCE_ID . ':q:\d+:listed',
-        '^msg:' . INSTANCE_ID . ':q:\d+:digest',
-        "^m:" . INSTANCE_ID . ":routes",
-        "^schedule:" . INSTANCE_ID . ":index",
-        "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
-        "^groups$",
-        // Old and new external
-        "^External_.+",
-        '^fc:' . INSTANCE_ID . ':External_',
-        "^vcal.[0-9a-f]{64}",
-        '^accessToken:' . INSTANCE_ID . ':.+',
+        // Cache-only patterns go here
+        Redis::INSTANCE_CACHE => [
+            // Old and new scrub
+            '^scrub.html:',
+            '^scrub.htmlAbsoluteUri:',
+            '^fc:' . INSTANCE_ID . ':scrub.html:',
+            '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
+
+            // Old and new Verso API
+            '^verso_api',
+            '^fc:' . INSTANCE_ID . ':verso_api:',
+
+            // Old and new external
+            "^External_.+",
+            '^fc:' . INSTANCE_ID . ':External_',
+
+            // vCal cache: not partitioned by instance ID
+            // (it may need to be one day)
+            "^vcal.[0-9a-f]{64}",
+
+            // Locks
+            '^lock:' . INSTANCE_ID . ':',
+
+            // Atlas API?
+            '^atlasApi:' . INSTANCE_ID . '.',
+        ],
+        // Storage-only patterns go here
+        Redis::INSTANCE_STORAGE => [
+            // Sessions
+            '^PHPREDIS_SESSION:',
+
+            // Old and new remember me
+            "^[0-9a-f]{40}$",
+            "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
+
+            // Message instance, detailing the content of a message
+            // (an `\Alaress\Async\Notification\Instance\Instance` instance)
+            '^msg:' . INSTANCE_ID . ':m:.+',
+
+            // Message trigger, detailing when, how and why of a message
+            // (a `\Schoolbox\Realtime\Schedule\Trigger\TriggerInterface`
+            //  instance)
+            '^msg:' . INSTANCE_ID . ':s:.+',
+
+            // Set of message keys relating to a particular object
+            '^msg:' . INSTANCE_ID . ':q:\D.+',
+
+            // Set of message keys relating to a particular user
+            '^msg:' . INSTANCE_ID . ':q:\d+:unread',
+            '^msg:' . INSTANCE_ID . ':q:\d+:listed',
+            '^msg:' . INSTANCE_ID . ':q:\d+:digest',
+            // Not sure if the below are used
+//            '^msg:' . INSTANCE_ID . ':q:\d+:push',
+//            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
+
+            // Route cache
+            "^m:" . INSTANCE_ID . ":routes",
+
+            // Scheduled triggers?
+            // (Don't know if this is even used, or where it should be if it is)
+            "^schedule:" . INSTANCE_ID . ":index",
+            "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
+
+            // Access tokens for LTI assessments
+            '^accessToken:' . INSTANCE_ID . ':.+',
+
+            // Etherpad patterns
+            '^pad:g\.',
+            '^token2author:',
+            '^author2sessions:',
+            '^mapper2author:',
+            '^group2sessions:g\.',
+            '^sessionstorage:',
+            '^globalAuthor:',
+            '^ueberDB:keys:',
+            '^pad2readonly:g\.',
+            '^readonly2pad:r\.',
+            '^group:g\.',
+            '^session:s\.',
+            "^groups$",
+        ],
+        // Queue patterns go here
+        // (Note that queue is the same instance as cache, so it's not an issue
+        //  if queue patterns are found in cache and v.v.)
+//        Redis::INSTANCE_SIGNAL_QUEUE => [
+//            // Signal queues
+//            'scheduled.' . INSTANCE_ID . '.*',
+//            'routed.' . INSTANCE_ID . '.*',
+//        ],
     ];
 
     /**
@@ -163,15 +241,21 @@ class Report extends CliTool\App
             exit;
         }
 
-        $redis = Redis::getClientInstance();
-        if (!$redis) {
-            $this->getLogger()->error("Unable to fetch redis connection");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
+        $aggregated = [];
+        foreach (self::REDIS_INSTANCES as $instanceName) {
+            $redis = Redis::getClientInstance($instanceName);
+            if (!$redis) {
+                $this->getLogger()->error("Unable to fetch redis connection: $instanceName");
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
 
-        $rawData    = $this->scanKeys($redis);
-        $aggregated = $this->aggregateData($rawData);
-        $this->renderResults($aggregated);
+            $this->getLogger()->notice("Scanning redis connection: $instanceName");
+            $rawData                   = $this->scanKeys($redis, $instanceName);
+            $aggregated[$instanceName] = $this->aggregateData($rawData);
+        }
+        foreach (self::REDIS_INSTANCES as $instanceName) {
+            $this->renderResults($aggregated[$instanceName], $instanceName);
+        }
     }
 
 
@@ -179,25 +263,32 @@ class Report extends CliTool\App
      * Scans all keys in redis, groups by key pattern, and gets each key's TTL and data size
      *
      * @param Predis\ClientInterface $redis
+     * @param string                 $instanceName The name of the instance to
+     *                                             scan: used to filter the list
+     *                                             of keys to process
      * @return array
      */
-    private function scanKeys(Predis\ClientInterface $redis): array
+    private function scanKeys(Predis\ClientInterface $redis, string $instanceName): array
     {
         $rawData = [];
         $cursor  = null;
         $count   = 1;
         while ($cursor !== '0') {
             [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => '*', 'COUNT' => 10000]);
-            foreach ($elements as $str_key) {
+            foreach ($elements as $key) {
                 // Log every 1000 at a higher level to show progression at less verbosity
                 $level = $count % 1000 === 0 ? Logger::NOTICE : Logger::DEBUG;
-                $this->getLogger()->log($level, "$count) $str_key");
-                [$keyPattern, $payload, $ttl, $length] = $this->processKey($redis, $str_key);
-                $rawData[$keyPattern][$payload][] = [
-                    'ttl'    => $ttl,
-                    'length' => $length,
-                ];
-                $count++;
+                $this->getLogger()->log($level, "$count) $key");
+                $processed = $this->processKey($redis, $key, $instanceName);
+                if (isset($processed)) {
+                    [$keyPattern, $payload, $ttl, $length, $status] = $processed;
+                    $rawData[$keyPattern][$payload][] = [
+                        'ttl'    => $ttl,
+                        'length' => $length,
+                        'status' => $status,
+                    ];
+                    $count++;
+                }
             }
         }
         return $rawData;
@@ -209,9 +300,16 @@ class Report extends CliTool\App
      *
      * @param Predis\ClientInterface $redis
      * @param string                 $key
-     * @return array
+     * @param string                 $instanceName The name of the instance to
+     *                                             scan: used to filter the list
+     *                                             of keys to process
+     * @return array{string, string, int, int, string}|null
+     *         [key pattern, payload type, ttl, length, status], or null if this
+     *         key is to be ignored completely in the report.
+     *         (This happens if this key is not in `$instanceName`'s keys, but
+     *          is in an alias' keys.)
      */
-    private function processKey(Predis\ClientInterface $redis, string $key): array
+    private function processKey(Predis\ClientInterface $redis, string $key, string $instanceName): ?array
     {
         /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
@@ -225,6 +323,9 @@ class Report extends CliTool\App
             case 'none':
                 $length = 0;
                 break;
+            case 'zset':
+                $length = array_sum(array_map('strlen', $redis->zrange($key, 0, -1)));
+                break;
             default:
                 $this->getLogger()->warning("Unrecognised payload: '{$type->getPayload()}'");
                 $length = 0;
@@ -232,18 +333,68 @@ class Report extends CliTool\App
         $ttl = $redis->ttl($key);
         $this->getLogger()->info("payload: {$type->getPayload()}, ttl: $ttl, length: $length");
 
-
-        $keyPattern = 'unrecognised';
-        foreach (self::KEY_PATTERNS as $pattern) {
+        // Search this instance's key patterns
+        $keyPattern = null;
+        $status     = false;
+        foreach (self::KEY_PATTERNS[$instanceName] as $pattern) {
             if (preg_match("/$pattern/", $key)) {
                 $keyPattern = $pattern;
+                $status     = 'ok';
                 break;
             }
         }
-        if ($keyPattern === 'unrecognised') {
+
+        // Not found?
+        // Check the other instance's key patterns: if it's found in another
+        // instance, report on it
+        if (!isset($keyPattern)) {
+            foreach (self::KEY_PATTERNS as $keyPatternInstanceName => $patterns) {
+                if ($keyPatternInstanceName === $instanceName) {
+                    continue;
+                }
+                foreach ($patterns as $pattern) {
+                    if (preg_match("/$pattern/", $key)) {
+                        // Check each alias
+                        // @phpstan-ignore-next-line: this is currently empty, but may not always be
+                        foreach (self::REDIS_INSTANCE_ALIASES as $alias) {
+                            if (in_array($instanceName, $alias) && in_array($keyPatternInstanceName, $alias)) {
+                                // This key pattern is referred to in an alias:
+                                // ignore it completely
+                                $this->getLogger()->debug(
+                                    sprintf(
+                                        'Aliased key: %s found in %s (expected in alias %s)',
+                                        $key,
+                                        $instanceName,
+                                        $keyPatternInstanceName,
+                                    )
+                                );
+                                return null;
+                            }
+                        }
+
+                        $this->getLogger()->warning(
+                            sprintf(
+                                'Misplaced key: %s found in %s (expected in %s)',
+                                $key,
+                                $instanceName,
+                                $keyPatternInstanceName,
+                            )
+                        );
+                        $keyPattern = $pattern;
+                        $status     = 'misp';
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Still not found? Report this key as unrecognised
+        if (!isset($keyPattern)) {
+            $keyPattern = 'unrecognised';
+            $status     = 'unrec';
             $this->getLogger()->warning("Unrecognised key: $key");
         }
-        return [$keyPattern, $type->getPayload(), $ttl, $length];
+        return [$keyPattern, $type->getPayload(), $ttl, $length, $status];
     }
 
 
@@ -260,9 +411,11 @@ class Report extends CliTool\App
             foreach ($patternData as $payload => $matches) {
                 $countNoTtl = $countHasTtl = $sumTtl = $sumLength = 0;
                 $minTtl     = $maxTtl = null;
+                $status     = null;
                 foreach ($matches as $row) {
                     $sumLength += $row['length'];
                     $ttl       = $row['ttl'];
+                    $status    = $row['status'];
                     switch ($ttl) {
                         case -2:
                             break;
@@ -280,6 +433,7 @@ class Report extends CliTool\App
                 $aggregated[] = [
                     self::COLUMN_KEY_PATTERN    => $pattern,
                     self::COLUMN_PAYLOAD        => $payload,
+                    self::COLUMN_STATUS         => $status,
                     self::COLUMN_TOTAL_COUNT    => count($matches),
                     self::COLUMN_NO_TTL_COUNT   => $countNoTtl,
                     self::COLUMN_WITH_TTL_COUNT => $countHasTtl,
@@ -302,7 +456,7 @@ class Report extends CliTool\App
 
         // Column totals
         $countRows = count($aggregated);
-        foreach (array_keys($aggregated[0]) as $idx => $columnTitle) {
+        foreach (array_keys($aggregated[0] ?? []) as $idx => $columnTitle) {
             if ($idx === 0) {
                 $columnValue = "Totals";
             } elseif (stripos($columnTitle, 'count') !== false || stripos($columnTitle, 'size')) {
@@ -329,9 +483,10 @@ class Report extends CliTool\App
     /**
      * Renders aggregated raw data into a suitable display format
      *
-     * @param array $aggregated
+     * @param array  $aggregated
+     * @param string $instanceName
      */
-    private function renderResults(array $aggregated): void
+    private function renderResults(array $aggregated, string $instanceName): void
     {
         // Calculate column widths from widest column header or value
         $columnWidths = [];
@@ -350,7 +505,7 @@ class Report extends CliTool\App
         $table = [];
 
         // Column headers
-        foreach (array_keys($aggregated[0]) as $columnKey) {
+        foreach (array_keys($aggregated[0] ?? []) as $columnKey) {
             $columnTitle = self::LABELS[$columnKey];
             $width       = $columnWidths[$columnKey];
             $table[0][]  = str_pad('', $width, '*');
@@ -372,7 +527,7 @@ class Report extends CliTool\App
 
         // Column Footer
         $nextRow = count($table);
-        foreach (array_keys($aggregated[0]) as $columnKey) {
+        foreach (array_keys($aggregated[0] ?? []) as $columnKey) {
             $width       = $columnWidths[$columnKey];
             $columnValue = $aggregated[count($aggregated) - 1][$columnKey];
 
@@ -385,6 +540,15 @@ class Report extends CliTool\App
             $table[$idx] = "|" . implode('|', $row) . '|';
         }
 
+        fwrite(
+            $this->getOutStream(),
+            sprintf(
+                (empty($table)
+                    ? "\nNo usage for instance \"%s\" found."
+                    : "\nUsage for instance \"%s\":"),
+                $instanceName,
+            )
+        );
         fwrite($this->getOutStream(), "\n" . implode("\n", $table) . "\n");
     }
 }

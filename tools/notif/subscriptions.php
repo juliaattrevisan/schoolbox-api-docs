@@ -13,7 +13,6 @@ use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\IRouter;
 use Alaress\Routing\Router;
 use Aura\Di;
-use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
@@ -34,13 +33,13 @@ $kernel = new Daemon\Kernel(
 const HALP = <<<EOF
 Schoolbox Subscription Reader
 
-Usage: 
+Usage:
   ./subscriptions.php [-v[v[v]]][--instance=INSTANCE_ID][--user=USER_ID][--pattern=PATTERN]
 
 Options:
   -h, --help                    Display this help message
   -v[v[v]]]                     Various levels of verbosity
-  --user=USER_ID                The ID of a user: that user's subscriptions will be returned 
+  --user=USER_ID                The ID of a user: that user's subscriptions will be returned
   --pattern=PATTERN             A subscription pattern to search: all users subscribed will be returned
 
 Example patterns to search by (quotes are not required, btw):
@@ -61,8 +60,11 @@ try {
         /** @var LoggerInterface */
         private $log;
 
-        /** @var ClientInterface */
-        private $redis;
+        /**
+         * A read-only subscription cache: required so that user route
+         * subscriptions may be read into the router.
+         */
+        private ReadCache $subscriptionCache;
 
         /**
          * @inheritdoc
@@ -70,7 +72,11 @@ try {
         public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
         {
             $this->log   = $log;
-            $this->redis = $di->get('redis');
+
+            /** @var ReadCache $subscriptionCache */
+            $subscriptionCache = $di->get('subscriptionCache.readonly');
+            $subscriptionCache->setLog($log);
+            $this->subscriptionCache = $subscriptionCache;
 
             if ($opts['user'] && $opts['pattern']) {
                 $log->alert('Specify ONLY one of --user=:id or --pattern=:string');
@@ -155,8 +161,7 @@ try {
          */
         private function loadRouter(IRouter $router)
         {
-            (new ReadCache($this->redis, $this->log))->readIntoRouter(INSTANCE_ID, $router);
-
+            $this->subscriptionCache->readIntoRouter(INSTANCE_ID, $router);
             return $router;
         }
     });

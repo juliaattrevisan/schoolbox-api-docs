@@ -34,6 +34,12 @@ use Symfony\Component\Lock\LockInterface;
 class InstanceLockFactory
 {
     /**
+     * Prefix added to the lock's key name, identifying it as a lock in whatever
+     * store it uses.
+     */
+    private const PREFIX = 'lock';
+
+    /**
      * A Symfony lock factory instance.
      *
      * @var LockFactory
@@ -86,6 +92,6 @@ class InstanceLockFactory
      */
     public function calculateKeyName(string $resource): string
     {
-        return $this->instanceId . '.' . $resource;
+        return self::PREFIX . ':' . $this->instanceId . ':' . $resource;
     }
 }

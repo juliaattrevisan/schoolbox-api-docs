@@ -10,6 +10,7 @@ namespace Schoolbox\Application\Login;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
+use Schoolbox\Auth\Remember\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\User;
 use Session;
@@ -26,13 +27,20 @@ class Controller extends Base
     private PrefixGenerator $prefixGenerator;
 
     /**
+     * Login rememberer, used to remember a user's login.
+     */
+    private Remember $rememberer;
+
+    /**
      * Constructor
      *
      * @param PrefixGenerator $prefixGenerator
+     * @param Remember        $rememberer
      */
-    public function __construct(PrefixGenerator $prefixGenerator)
+    public function __construct(PrefixGenerator $prefixGenerator, Remember $rememberer)
     {
         $this->prefixGenerator = $prefixGenerator;
+        $this->rememberer      = $rememberer;
     }
 
     /**
@@ -154,7 +162,10 @@ class Controller extends Base
                 try {
                     $user = $sessionHandler->authenticate($username, $password);
                     if ($user instanceof User) {
-                        $authenticated = $sessionHandler->create($user->getUsername(), $remember);
+                        $authenticated = $sessionHandler->create($user->getUsername());
+                        if ($remember) {
+                            $this->rememberer->rememberUsername($user->getUsername(), Remember::DEFAULT_EXPIRY);
+                        }
                     } else {
                         $message = 'The username or password you typed is incorrect, please try again.';
                     }

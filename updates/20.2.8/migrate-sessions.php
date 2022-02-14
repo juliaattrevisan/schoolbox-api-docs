@@ -64,7 +64,7 @@ $app = new class extends CliTool\App {
     private function renameSessionKeys(): void
     {
         /** @var Predis\ClientInterface $redis */
-        $redis = $this->getDi()->get('redis');
+        $redis = $this->getDi()->get('redis.storage');
 
         $oldKeys = new Keyspace($redis, "PHPREDIS_SESSION:*");
         foreach ($oldKeys as $oldKey) {

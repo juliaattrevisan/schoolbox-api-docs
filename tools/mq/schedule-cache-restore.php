@@ -11,6 +11,7 @@
  */
 
 use Alaress\Async\Stomp\IClient;
+use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
 use Schoolbox\Di\Configurator;
@@ -58,7 +59,7 @@ try {
 
             try {
                 // get the cache handler
-                $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
+                $jit = new RedisCache(Redis::getStorageClientInstance(), $log, INSTANCE_ID);
                 $tff = new TriggerFactoryFactory(true);
 
                 $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);
@@ -67,14 +68,14 @@ try {
                 $amqp = $di->get('amqp');
 
                 /** @var ClientInterface $redis */
-                $redis = $di->get('redis');
+                $redis = $di->get('redis.storage');
 
                 /** @var IClient $stomp */
                 $stomp = $di->get('stomp');
 
                 $broker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);
 
-                $propagator = new Propagator($splitter, $redis, $broker, INSTANCE_ID);
+                $propagator = new Propagator($splitter, $broker, INSTANCE_ID);
 
                 // restore data if possible
                 $restored = $jit->restoreSchedule(new Connector(), $propagator, $q);

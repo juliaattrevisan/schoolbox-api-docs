@@ -5,7 +5,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Auth\Remember;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
@@ -87,12 +86,16 @@ class Session
     }
 
     /**
+     * Create a session.
+     *
+     * Note the `$remember` param is gone: remembering a login is now handled
+     * outside of this class, in `Schoolbox\Auth\Remember`.
+     *
      * @param string $username New user's user.username
-     * @param bool $remember Whether to store a 'remember' me cookie
      * @return bool Whether new Session started for proposed user
      * @throws MapperException
      */
-    public function create($username, $remember = false)
+    public function create($username)
     {
         $userHandler  = new \User();
         $userMapper   = UserMapper::getInstance();
@@ -109,19 +112,6 @@ class Session
         if ($user instanceof User && $user->getEnabled() && session_start()) {
             /* Start by creating a fresh ID to ensure ID has not been injected */
             session_regenerate_id();
-
-            /* Store remember me cookie so user can return in the future */
-            if ($remember) {
-                $rememberer = new Remember\Remember(
-                    new Remember\Cookie(
-                        Remember\Cookie::DEFAULT_COOKIE_NAME,
-                        $_COOKIE,
-                        session_get_cookie_params()
-                    ),
-                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
-                );
-                $rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
-            }
 
             //register users id
             $_SESSION['title']              = $user->getTitle();

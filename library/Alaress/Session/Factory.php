@@ -14,44 +14,44 @@
 namespace Alaress\Session;
 
 use Aura\Session as SessionLibrary;
-use Predis;
+use Schoolbox\Auth\Remember\Remember;
+use Schoolbox\IConfigLoader;
 
 class Factory
 {
-
     /**
      * @var array
      */
-    protected $cookies;
+    protected array $cookies;
+
     /**
-     * @var \Schoolbox\IConfigLoader
+     * @var IConfigLoader
      */
-    protected $config;
+    protected IConfigLoader $config;
 
     /**
      * @var int
      */
-    protected $requestTime;
+    protected int $requestTime;
 
     /**
-     * Sessions are stored in redis so this is the connection
-     * @var Predis\ClientInterface
+     * Session rememberer
      */
-    protected $redis;
+    protected Remember $rememberer;
 
     /**
-     * Creates factory.
+     * Constructor
      *
-     * @param array $cookies Cookies, often from $_COOKIE but not always.
-     * @param \Schoolbox\IConfigLoader $config
-     * @param Predis\ClientInterface $redis
-     * @param int $requestTime Unix timestamp, usually from $_SERVER['REQUEST_TIME'].
+     * @param array         $cookies
+     * @param IConfigLoader $config
+     * @param Remember      $rememberer
+     * @param int           $requestTime
      */
-    public function __construct($cookies, \Schoolbox\IConfigLoader $config, $redis, $requestTime)
+    public function __construct(array $cookies, IConfigLoader $config, Remember $rememberer, int $requestTime)
     {
-        $this->cookies = $cookies;
-        $this->redis = $redis;
-        $this->config = $config;
+        $this->cookies     = $cookies;
+        $this->rememberer  = $rememberer;
+        $this->config      = $config;
         $this->requestTime = $requestTime;
     }
 
@@ -62,7 +62,7 @@ class Factory
      */
     public function build()
     {
-        $func             = new Phpfunc($this->config, $this->redis, $this->cookies);
+        $func             = new Phpfunc($this->config, $this->rememberer);
         $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(
             new SessionLibrary\Randval($func)

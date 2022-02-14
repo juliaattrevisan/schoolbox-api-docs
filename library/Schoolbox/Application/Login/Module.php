@@ -50,7 +50,10 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['prefixGenerator' => $injector->lazyGet('cdnPrefixGenerator')],
+                [
+                    'prefixGenerator' => $injector->lazyGet('cdnPrefixGenerator'),
+                    'rememberer'      => $injector->lazyGet('session.rememberer'),
+                ],
             ),
         );
     }

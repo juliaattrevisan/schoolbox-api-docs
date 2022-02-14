@@ -33,7 +33,7 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         /** @var ClientInterface $redis */
-        $redis = $this->getDi()->get('redis');
+        $redis = $this->getDi()->get('redis.storage');
 
         $search = new Keyspace($redis, PipeManager::REDIS_SESSION_PREFIX . '*');
         $count = 0;

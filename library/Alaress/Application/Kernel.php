@@ -55,6 +55,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
+use Schoolbox\Auth\Remember;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -131,6 +132,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
@@ -362,8 +364,30 @@ abstract class Kernel
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
-        Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis', Redis::getClientInstance());
+        // Redis cache (memory-only, not persistent)
+        Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
+        $di->set('redis.cache', Redis::getCacheClientInstance());
+
+        // Redis storage (persisted to disk)
+        Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        $di->set('redis.storage', Redis::getStorageClientInstance());
+
+        // Redis queue publish (not persistent)
+        // (The subscription to this queue doesn't exist in the standard kernel,
+        //  only in the daemon kernel: this is because it requires the event
+        //  loop)
+        Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
+        $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
+
+        // Default Redis connection:
+        // uses cache, and raises a warning telling you to choose a connector
+        $di->set('redis', $di->lazy(function () use ($di) {
+            trigger_error(
+                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
+                E_USER_WARNING,
+            );
+            return $di->get('redis.storage');
+        }));
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();
@@ -694,10 +718,7 @@ abstract class Kernel
             /** @var StepMapper $tourStepMapper */
             $tourStepMapper = $mapperFactory->get(StepMapper::class);
             $tourList = new \Schoolbox\Tour\Lists($tourMapper, $tourStepMapper);
-
-            /** @var Predis\ClientInterface $redis */
-            $redis   = $di->get('redis');
-            $output  = new Output\ThemedHtml();
+            $output   = new Output\ThemedHtml();
 
             /** @var Environment $templateEngine */
             $templateEngine = $di->get('templateEngine');
@@ -714,6 +735,8 @@ abstract class Kernel
             /** @var BookmarkMapper $bookMarkMapper */
             $bookMarkMapper = $mapperFactory->get(BookmarkMapper::class);
 
+            /** @var Predis\ClientInterface $redisStorage */
+            $redisStorage = $di->get('redis.storage');
             $output
                 ->setTemplateEngine($templateEngine)
                 ->addDataGenerator(
@@ -721,7 +744,7 @@ abstract class Kernel
                     new Output\DataGenerator\Websocket(
                         $config,
                         $session->getAuthUser(),
-                        new UnreadRetriever($redis),
+                        new UnreadRetriever($redisStorage),
                         INSTANCE_ID
                     )
                 )
@@ -1463,7 +1486,7 @@ abstract class Kernel
         ];
 
         $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-            'redis' => $di->lazyGet('redis'),
+            'redis' => $di->lazyGet('redis.storage'),
             'log'   => $di->lazyValue('logger')
         ];
 
@@ -1472,12 +1495,29 @@ abstract class Kernel
             'setGenerator'  => $di->lazyNew(\Schoolbox\Notif\Queue\Bindings\Generator::class)
         ];
 
-        $di->set('subscriptionCache', $di->lazyNew(WriteCache::class, [
-            'redis' => $di->lazyGet('redis'),
-            'log'   => $di->lazyValue('logger'),
-            'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class)
-        ]));
+        $di->set(
+            'subscriptionCache',
+            $di->lazyNew(
+                WriteCache::class,
+                [
+                    'redis'         => $di->lazyGet('redis.storage'),
+                    'log'           => $di->lazyValue('logger'),
+                    'loaderFactory' => $di->lazyNew(\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class),
+                    'redisQueue'    => $di->lazyGet('redis.signalQueue.pub'),
+                ]
+            )
+        );
 
+        $di->set(
+            'subscriptionCache.readonly',
+            $di->lazyNew(
+                ReadCache::class,
+                [
+                    'redis' => $di->lazyGet('redis.storage'),
+                    'log'   => $di->lazyValue('logger'),
+                ]
+            )
+        );
 
 
         // install sentry
@@ -1549,11 +1589,12 @@ abstract class Kernel
 
 
         // Lock factory
+        // TODO inject this everywhere a lock is used
         $di->set(
             'lockFactory',
             $di->lazy(function () use ($di) {
                 return new \Alaress\Lock\InstanceLockFactory(
-                    new LockFactory(new RedisStore($di->get('redis'))),
+                    new LockFactory(new RedisStore($di->get('redis.cache'))),
                     INSTANCE_ID
                 );
             })
@@ -1636,7 +1677,7 @@ abstract class Kernel
             'lti.accessTokenCache',
             $di->lazy(function () use ($di) {
                 /** @var Predis\ClientInterface $redis */
-                $redis = $di->get('redis');
+                $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
                 return new ItemPool(
@@ -1662,7 +1703,7 @@ abstract class Kernel
 
 
     /**
-     * Consistently register the 'session' DI service
+     * Consistently register the 'session' and 'session.rememberer' DI services.
      *
      * @param Di\Container $di
      * @return Di\Container
@@ -1677,18 +1718,37 @@ abstract class Kernel
                 function () use ($di) {
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    /** @var Predis\ClientInterface $redis */
-                    $redis = $di->get('redis');
+                    /** @var Remember\Remember $rememberer */
+                    $rememberer = $di->get('session.rememberer');
                     $factory = new Factory(
                         $_COOKIE,
                         $config,
-                        $redis,
-                        $_SERVER['REQUEST_TIME']
+                        $rememberer,
+                        $_SERVER['REQUEST_TIME'],
                     );
                     return $factory->build();
                 }
             )
         );
+
+        $di->set(
+            'session.rememberer',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Predis\ClientInterface $redisStorage */
+                    $redisStorage = $di->get('redis.storage');
+                    return new Remember\Remember(
+                        new Remember\Cookie(
+                            Remember\Cookie::DEFAULT_COOKIE_NAME,
+                            $_COOKIE,
+                            session_get_cookie_params()
+                        ),
+                        new Remember\Redis(INSTANCE_ID, $redisStorage),
+                    );
+                }
+            )
+        );
+
         return $di;
     }
 

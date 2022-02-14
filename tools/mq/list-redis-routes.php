@@ -50,7 +50,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->instanceId = INSTANCE_ID;
         }
 
-        $this->redis = $this->getDi()->get('redis');
+        $this->redis = $this->getDi()->get('redis.storage');
 
         $redisKey = sprintf(ReadCache::CACHE_PATTERN, $this->instanceId);
 

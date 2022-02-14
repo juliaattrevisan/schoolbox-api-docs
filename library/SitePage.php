@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Redis;
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -320,15 +321,9 @@ class SitePage extends Page
         ) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {
-                $rememberer = new Remember\Remember(
-                    new Remember\Cookie(
-                        Remember\Cookie::DEFAULT_COOKIE_NAME,
-                        $_COOKIE,
-                        session_get_cookie_params()
-                    ),
-                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
-                );
-                $username = $rememberer->retrieveUsername();
+                /** @var Remember\Remember $rememberer */
+                $rememberer = $this->di->get('session.rememberer');
+                $username   = $rememberer->retrieveUsername();
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();

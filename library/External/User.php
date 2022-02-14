@@ -28,7 +28,7 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         parent::__construct(
             (new External_DatabaseFactory())->buildUserConnector($databaseName, Loader::getInstance()),
             new External_Offline_User(),
-            Redis::getInstance(),
+            Redis::getCacheInstance(),
             ConfigLoader::getInstance()->get('external_cache_timeout')
         );
     }

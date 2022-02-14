@@ -16,14 +16,50 @@ use Predis;
 class Redis
 {
     /**
+     * Identifier for the cache-only Redis instance.
+     *
+     * This instance is memory-only and thus suitable only as a cache: it does
+     * not write to permanent storage. This means it's much faster than the
+     * storage instance, though.
+     */
+    public const INSTANCE_CACHE = 'cache';
+
+    /**
+     * Identifier for the storage Redis instance.
+     *
+     * This instance writes to permanent storage: this means it is suitable for
+     * storing persistent data. The process of writing to permanent storage
+     * makes this instance slower and less efficient than the cache-only
+     * instance, so this should only be used when persistence is required.
+     *
+     * TODO consider splitting into message and session storage
+     */
+    public const INSTANCE_STORAGE = 'storage';
+
+    /**
+     * Identifier for the signal queue Redis instance.
+     *
+     * Currently, this instance is the same as the cache-only instance: it has a
+     * separate identifier in case it is moved.
+     */
+    public const INSTANCE_SIGNAL_QUEUE = 'signalQueue';
+
+    /**
      * Prefix all function call Redis keys with this value.
      */
     private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
-     * @var static
+     * @var self
      */
     protected static $instance;
+
+    /**
+     * A list of instances.
+     *
+     * @var array<string, self>
+     */
+    protected static $instances = [];
 
     /**
      * Will be null prior to connect() being called
@@ -43,28 +79,116 @@ class Redis
     protected $instanceId = '';
 
     /**
-     * Gets singleton instance of this wrapper.
+     * Gets an instance of this wrapper.
      *
-     * @return static
+     * TODO consider replacing with a separate CacheFunctionCall class
+     * (The only use of this class is for constructing and holding instances,
+     *  and for `cacheFunctionCall`.)
+     *
+     * @param string $name The name of the instance to retrieve.
+     * @return self
      */
-    public static function getInstance()
+    public static function getInstance(string $name): self
     {
-        if (!(static::$instance instanceof static)) {
-            static::$instance = new static();
-        }
-        return static::$instance;
+        return (self::$instances[$name] ??= new self());
     }
 
     /**
-     * Gets client within singleton instance.
+     * Get the cache instance of this wrapper.
      *
-     * Will return null if connect() has not yet been called
+     * @see INSTANCE_CACHE
+     *
+     * @return self
+     */
+    public static function getCacheInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_CACHE);
+    }
+
+    /**
+     * Get the storage instance of this wrapper.
+     *
+     * @see INSTANCE_STORAGE
+     *
+     * @return self
+     */
+    public static function getStorageInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_STORAGE);
+    }
+
+    /**
+     * Get the signal queue instance of this wrapper. (Unused, but provided for
+     * completeness.)
+     *
+     * @see INSTANCE_SIGNAL_QUEUE
+     *
+     * @return self
+     */
+    public static function getSignalQueueInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_SIGNAL_QUEUE);
+    }
+
+    /**
+     * Aliases the connection `$connectionName` to `$aliasName`.
+     *
+     * @param string $connectionName
+     * @param string $aliasName
+     * @return void
+     */
+    public static function aliasInstance(string $connectionName, string $aliasName)
+    {
+        self::$instances[$aliasName] = self::$instances[$connectionName];
+    }
+
+    /**
+     * Gets client within a stored instance of this wrapper.
+     *
+     * Will return null if connect() has not yet been called on that instance.
+     *
+     * @param string $name The name of the instance to retrieve.
+     * @return null|Predis\ClientInterface
+     */
+    public static function getClientInstance(string $name): ?Predis\ClientInterface
+    {
+        return static::getInstance($name)->getClient();
+    }
+
+    /**
+     * Gets client within the cache instance of this wrapper.
+     *
+     * @see INSTANCE_CACHE
      *
      * @return null|Predis\ClientInterface
      */
-    public static function getClientInstance(): ?Predis\ClientInterface
+    public static function getCacheClientInstance(): ?Predis\ClientInterface
     {
-        return static::getInstance()->getClient();
+        return self::getClientInstance(self::INSTANCE_CACHE);
+    }
+
+    /**
+     * Gets client within the storage instance of this wrapper.
+     *
+     * @see INSTANCE_STORAGE
+     *
+     * @return null|Predis\ClientInterface
+     */
+    public static function getStorageClientInstance(): ?Predis\ClientInterface
+    {
+        return self::getClientInstance(self::INSTANCE_STORAGE);
+    }
+
+    /**
+     * Gets client within the signal queue instance of this wrapper.
+     *
+     * @see INSTANCE_SIGNAL_QUEUE
+     *
+     * @return null|Predis\ClientInterface
+     */
+    public static function getSignalQueueClientInstance(): ?Predis\ClientInterface
+    {
+        return self::getClientInstance(self::INSTANCE_SIGNAL_QUEUE);
     }
 
     /**

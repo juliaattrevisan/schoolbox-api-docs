@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Redis;
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
@@ -36,7 +37,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array
         $log->notice('Running a dry-run; your data is safe');
     }
 
-    $redis = \Alaress\Redis::getClientInstance();
+    // TODO clean up storage instance too?
+    $redis = Redis::getStorageClientInstance();
 
     /** @var Mapper[] $offendingMappers */
     $offendingMappers = [

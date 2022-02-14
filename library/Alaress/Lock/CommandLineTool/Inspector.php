@@ -188,7 +188,7 @@ DESCRIPTION
         // You really want to bypass symfony-lock to get at the juicy Redis
         // goodness within? Okay then
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
         $this->getLogger()->notice(sprintf('Running for instance "%s"', $instanceId));
 

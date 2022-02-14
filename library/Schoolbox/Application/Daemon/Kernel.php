@@ -391,10 +391,11 @@ EOL;
             return new Stomp\Client($conn);
         }));
 
-        $di->set('redis.async', $di->lazy(function () use ($di) {
+        // Redis queue subscription (not persistent)
+        $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient($conf->get('redis_url'), $this->loop);
+            return new AsyncRedisClient($conf->get('redis_ephemeral_url'), $this->loop);
         }));
         return $di;
     }

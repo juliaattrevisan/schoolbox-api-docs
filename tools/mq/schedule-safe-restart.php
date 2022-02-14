@@ -232,7 +232,7 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
     $exit = 0;
 
     try {
-        $trigger = frame2trigger(Redis::getClientInstance(), $input);
+        $trigger = frame2trigger(Redis::getStorageClientInstance(), $input);
         $log->info(sprintf("Trigger '%s' will fire at %s; testing callbacks", $trigger->getIdString(), (new Alaress_Date_Format($trigger->getTimestamp(), 'U'))->getDatabase()));
 
         foreach ($trigger->getCallbacks() as $callback) {
@@ -322,7 +322,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $event = extractEvent($input);
 
         /** @var Redis|ClientInterface $redis */
-        $redis = $di->get('redis');
+        $redis = $di->get('redis.storage');
 
         $amqp  = Connector::getInstance();
 
@@ -333,7 +333,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $broker = new Broker($instanceId, $amqp, $redis);
 
         // handle this message by splitting this event and propagating its triggers
-        (new Propagator($splitter, $redis, $broker, $instanceId))->propagateEvent($event);
+        (new Propagator($splitter, $broker, $instanceId))->propagateEvent($event);
     } catch (CompressionException $e) {
         $log->debug($e->getMessage());
 

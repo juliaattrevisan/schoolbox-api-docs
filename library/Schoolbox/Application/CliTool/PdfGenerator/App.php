@@ -367,7 +367,7 @@ BASE;
 
         // Find the redis client
         try {
-            $redis = $this->getDi()->get('redis');
+            $redis = $this->getDi()->get('redis.storage');
         } catch (ServiceNotFound $e) {
             $redis = null;
         }

@@ -58,13 +58,23 @@ try {
     $d->notice('MySQL is online', array('char' => '+'));
 
     try {
-        // test redis is online
-        $r = $kernel->get('redis');
+        // test redis cache is online
+        $r = $kernel->get('redis.cache');
         $r->executeCommand($r->createCommand('get', array('test')));
-        $d->notice('Redis is online', array('char' => '+'));
+        $d->notice('Redis cache is online', array('char' => '+'));
     } catch (\Predis\PredisException $e) {
-        $d->alert('Redis is offline');
-        $errors[] = 'Redis';
+        $d->alert('Redis cache is offline');
+        $errors[] = 'Redis cache';
+    }
+
+    try {
+        // test redis storage is online
+        $r = $kernel->get('redis.storage');
+        $r->executeCommand($r->createCommand('get', array('test')));
+        $d->notice('Redis storage is online', array('char' => '+'));
+    } catch (\Predis\PredisException $e) {
+        $d->alert('Redis storage is offline');
+        $errors[] = 'Redis storage';
     }
 
     try {

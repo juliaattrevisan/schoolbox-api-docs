@@ -27,15 +27,14 @@ class Authenticator
     /* Authentication Functions */
 
     /**
-     * Encapsulating authentication method. Takes password by reference because it will unset it at the end of its use
+     * Encapsulating authentication method.
      *
      * @param string $username
      * @param string $password
-     * @param bool   $remember
      * @return User
      * @throws SchoolboxAccessDeniedException
      */
-    public function authenticate(string $username, string $password, bool $remember = false): User
+    public function authenticate(string $username, string $password): User
     {
         $s    = new Session();
         $user = $s->authenticate($username, $password);
@@ -45,7 +44,7 @@ class Authenticator
 
         // if successful, go ahead and create a session
         if ($this->isAuthenticated()) {
-            $this->createSession($user->getUsername(), $remember);
+            $this->createSession($user->getUsername());
             return $user;
         }
         throw new SchoolboxAccessDeniedException('Username or password is incorrect');
@@ -62,18 +61,17 @@ class Authenticator
      * somehow.
      *
      * @param string $username
-     * @param bool   $remember
      * @return bool
      * @throws SchoolboxNotAuthenticatedException
      */
-    public function createSession(string $username, bool $remember = false): bool
+    public function createSession(string $username): bool
     {
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
         if (session_start()) {
             $session = new Session();
-            if (!$session->create($username, $remember)) {
+            if (!$session->create($username)) {
                 throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
             }
 

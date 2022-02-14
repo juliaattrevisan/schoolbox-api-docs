@@ -705,13 +705,12 @@ abstract class Mapper implements IMapper, Serializable
                                     'factory'   => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
                                 ]
                             ),
-                            'redis'      => $this->getDi()->lazyGet('redis'),
                             'broker'     => $this->getDi()->lazyNew(
                                 Broker::class,
                                 [
                                     'instanceId' => INSTANCE_ID,
                                     'amqp'       => $this->getDi()->lazyGet('amqp'),
-                                    'redis'      => $this->getDi()->lazyGet('redis'),
+                                    'redis'      => $this->getDi()->lazyGet('redis.storage'),
                                     // no 'stomp'
                                 ]
                             ),

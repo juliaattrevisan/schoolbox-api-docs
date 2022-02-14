@@ -82,8 +82,18 @@ class PipeManagerFactory
      * @param DispatchStrategyInterface $strat
      * @param int                       $fdLimit
      */
-    public function __construct($loop, $handler, $log, $redis, $asyncRedis, $sessionLength, $db, $instanceId, $strat, $fdLimit)
-    {
+    public function __construct(
+        LoopInterface $loop,
+        HandlerInterface $handler,
+        LoggerInterface $log,
+        ClientInterface $redis,
+        Async\Client $asyncRedis,
+        int $sessionLength,
+        IConnector $db,
+        string $instanceId,
+        DispatchStrategyInterface $strat,
+        int $fdLimit
+    ) {
         $this->loop          = $loop;
         $this->handler       = $handler;
         $this->log           = $log;

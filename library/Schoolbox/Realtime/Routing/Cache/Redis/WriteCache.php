@@ -1,10 +1,8 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Routing\Cache\Redis;
@@ -18,6 +16,9 @@ use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use UnderflowException;
 
+/**
+ * Writable cache of routes, backed by a Redis instance.
+ */
 class WriteCache extends ReadCache implements WritableCache
 {
     const SIGNAL_PATTERN = 'routed.%s.reload';
@@ -25,16 +26,30 @@ class WriteCache extends ReadCache implements WritableCache
     /** @var Subscription\Loader\Factory */
     private $loaderFactory;
 
+    /**
+     * A Redis connection to the publish/subscribe queue.
+     *
+     * This may be a different Redis instance to where the route cache lives.
+     */
+    private ClientInterface $redisQueue;
 
     /**
+     * Constructor
+     *
      * @param ClientInterface             $redis
      * @param LoggerInterface             $log
      * @param Subscription\Loader\Factory $loaderFactory
+     * @param ClientInterface             $redisQueue
      */
-    public function __construct(ClientInterface $redis, LoggerInterface $log, Subscription\Loader\Factory $loaderFactory)
-    {
+    public function __construct(
+        ClientInterface $redis,
+        LoggerInterface $log,
+        Subscription\Loader\Factory $loaderFactory,
+        ClientInterface $redisQueue
+    ) {
         parent::__construct($redis, $log);
         $this->loaderFactory = $loaderFactory;
+        $this->redisQueue    = $redisQueue;
     }
 
 
@@ -177,7 +192,7 @@ class WriteCache extends ReadCache implements WritableCache
 
         $this->log->info("Broadcasting `$reloadChannel`", [ 'char' => '>' ]);
 
-        $this->redis->publish($reloadChannel, '');
+        $this->redisQueue->publish($reloadChannel, '');
     }
 
 

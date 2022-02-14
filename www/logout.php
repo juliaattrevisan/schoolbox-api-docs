@@ -2,6 +2,7 @@
 
 //small script to logout users
 
+use Alaress\Redis;
 use Schoolbox\Auth\Remember;
 
 require_once '../conf/core/require.php';
@@ -17,14 +18,8 @@ session_regenerate_id(true);
 session_destroy();
 
 // Destroy remember me cookie
-$rememberer = new Remember\Remember(
-    new Remember\Cookie(
-        Remember\Cookie::DEFAULT_COOKIE_NAME,
-        $_COOKIE,
-        session_get_cookie_params()
-    ),
-    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
-);
+/** @var Remember\Remember $rememberer */
+$rememberer = $kernel->get('session.rememberer');
 $rememberer->forgetUsername();
 
 $samlLogoutUrl = trim(Config::get('saml_logout_url'));

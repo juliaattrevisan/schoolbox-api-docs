@@ -9,40 +9,31 @@
 
 namespace Alaress\Session;
 
-use Alaress\Redis;
-use Predis\ClientInterface;
 use Schoolbox\Auth\Remember;
 use Schoolbox\IConfigLoader;
 
 class Phpfunc extends \Aura\Session\Phpfunc
 {
-
     /**
      * @var IConfigLoader
      */
     private $config;
-    /**
-     * @var ClientInterface
-     */
-    private $redis;
-    /**
-     * @var array
-     */
-    private $cookies;
-
 
     /**
-     * Phpfunc constructor.
+     * Session rememberer
+     */
+    private Remember\Remember $rememberer;
+
+    /**
+     * Constructor
      *
-     * @param IConfigLoader   $config
-     * @param ClientInterface $redis
-     * @param array           $cookies
+     * @param IConfigLoader     $config
+     * @param Remember\Remember $rememberer
      */
-    public function __construct(IConfigLoader $config, ClientInterface $redis, array $cookies)
+    public function __construct(IConfigLoader $config, Remember\Remember $rememberer)
     {
-        $this->config  = $config;
-        $this->redis   = $redis;
-        $this->cookies = $cookies;
+        $this->config     = $config;
+        $this->rememberer = $rememberer;
     }
 
 
@@ -65,15 +56,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
         }
 
         // challenge 'remember me' auth
-        $rememberer = new Remember\Remember(
-            new Remember\Cookie(
-                Remember\Cookie::DEFAULT_COOKIE_NAME,
-                $this->cookies,
-                session_get_cookie_params()
-            ),
-            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance())
-        );
-        $username = $rememberer->retrieveUsername();
+        $username = $this->rememberer->retrieveUsername();
 
         if (strlen($username)) {
             // found a redis match; attempt to rebuild that session
@@ -85,7 +68,12 @@ class Phpfunc extends \Aura\Session\Phpfunc
             // TODO replace cantankerous old handler
             $session = new \Session();
             $session->disableLoginLog();
-            return $session->create($username, true);
+
+            $created = $session->create($username);
+            if ($created) {
+                $this->rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
+            }
+            return $created;
         }
 
         return false;

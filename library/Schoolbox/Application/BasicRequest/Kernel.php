@@ -70,8 +70,30 @@ class Kernel extends WebKernelAbstract
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
-        Redis::getInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis', Redis::getClientInstance());
+        // Redis cache (memory-only, not persistent)
+        Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
+        $di->set('redis.cache', Redis::getCacheClientInstance());
+
+        // Redis storage (persisted to disk)
+        Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        $di->set('redis.storage', Redis::getStorageClientInstance());
+
+        // Redis queue publish (not persistent)
+        // (The subscription to this queue doesn't exist in the standard kernel,
+        //  only in the daemon kernel: this is because it requires the event
+        //  loop)
+        Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
+        $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
+
+        // Default Redis connection:
+        // uses cache, and raises a warning telling you to choose a connector
+        $di->set('redis', $di->lazy(function () use ($di) {
+            trigger_error(
+                'The default "redis" connection is deprecated; falling back to using "redis.storage". (Use "redis.cache" for memory-only or "redis.storage" for persistent storage)',
+                E_USER_WARNING,
+            );
+            return $di->get('redis.storage');
+        }));
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();

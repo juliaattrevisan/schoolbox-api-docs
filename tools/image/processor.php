@@ -9,8 +9,13 @@
 declare(strict_types=1);
 
 use Alaress\Image;
+use Predis\ClientInterface;
+use Schoolbox\Application\Daemon\Kernel;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+// TODO move this to a CLI tool instead of using the daemon kernel
+$kernel = new Kernel(__FILE__);
 
 const DEFAULT_TIME_INTERVAL_MINUTES  = 60;                   // default time period in minutes to look up images for processing
 const DEFAULT_IMAGE_COUNT_LIMIT      = 300;                  // default maximum amount of images to be processed
@@ -58,6 +63,10 @@ $limits           = [
     2 => Monolog\Logger::INFO,     // mod verbosity: most things
     3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
 ];
+
+// TODO inject lock inspector instaed of cache
+/** @var ClientInterface $redis */
+$redis  = $kernel->get('redis.cache');
 $parent = new Image\Processor\Manager(
     $timeInterval,
     $imageCountLimit,
@@ -65,7 +74,8 @@ $parent = new Image\Processor\Manager(
     new Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$verboseFlagCount]),
     $retryFailed,
     $attemptsPerTransform,
-    $limits[$verboseFlagCount]
+    $limits[$verboseFlagCount],
+    $redis
 );
 $isInterrupted = $parent->run();
 exit($isInterrupted ? 1 : 0);

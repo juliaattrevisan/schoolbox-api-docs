@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Pipe;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Redis;
 use Predis\ClientInterface;
 use Predis\CommunicationException;
 use Ratchet\Session\Serialize\HandlerInterface;

@@ -1,10 +1,8 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Routing\Cache\Redis;
@@ -15,6 +13,9 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\ReadableCache;
 
+/**
+ * Read-only cache of routes, backed by a Redis instance.
+ */
 class ReadCache implements ReadableCache
 {
     const CACHE_PATTERN  = 'm:%s:routes';
@@ -36,6 +37,15 @@ class ReadCache implements ReadableCache
         $this->log = $log;
     }
 
+    /**
+     * @param LoggerInterface $log
+     * @return $this
+     */
+    public function setLog(LoggerInterface $log): self
+    {
+        $this->log = $log;
+        return $this;
+    }
 
     /**
      * @param string  $instanceId
