@@ -168,7 +168,7 @@ function getSaveComponentSettingsParams (form) {
  */
 async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const newComponent = await loadNewHTML(updatedComponent); //enure the new html is properly loaded
+    const newComponent = await loadNewHTML(updatedComponent.outerHTML); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
     gsap.to(newComponent, { //fade in the updated component
         duration: ANIMATE_SPEED,

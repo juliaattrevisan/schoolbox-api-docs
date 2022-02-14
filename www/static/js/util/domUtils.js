@@ -195,19 +195,25 @@ export function setAndGetAttribute (element, attribute, value) {
  * When new HTML is added dynamically to page, we need to ensure any <script> tags
  * have been loaded prior to adding the new HTML to the page
  * 
- * @param { Element }  note: the element shouldn't exist in the DOM yet, so we can load properly
+ * @param { HTMLString }  note: the HTML shouldn't exist in the DOM yet, so we can load properly
  * 
- * @return { Element }
+ * @return { Element } 
  */
-export async function loadNewHTML (element) {
-    const documentFragment = document.createRange().createContextualFragment(element.outerHTML); //createContextualFragment ensures any </script> tags within the element are run
+export async function loadNewHTML (htmlString) {
+    const documentFragment = document.createRange().createContextualFragment(htmlString); //createContextualFragment ensures any </script> tags within the element are run
     const scriptTags = documentFragment.querySelectorAll('script[src]'); //get each <script src></script>
     const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page
     for (const scriptTag of newScriptTags) { //add each into the document head
         await injectScript(scriptTag.getAttribute('src'));
         scriptTag.remove(); //remove each from the element as the <script> is now in the document head instead
     } 
-    return documentFragment.firstElementChild;
+    if (documentFragment.childElementCount === 1) { //should be returning a single div
+        return documentFragment.firstElementChild;
+    } else { //and if there's not, wrap everything around one
+        const wrappedElement = document.createElement('div');
+        wrappedElement.append(documentFragment);
+        return wrappedElement;
+    }
 }
 
 /** 

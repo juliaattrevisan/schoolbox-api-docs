@@ -36,7 +36,7 @@ export async function getNewComponent (component) {
  * @returns { Element }  
  */
 async function replaceExistingComponent (component, newComponentHTML) {
-    const newComponent = await loadNewHTML(newComponentHTML); //enure the new html is properly loaded
+    const newComponent = await loadNewHTML(newComponentHTML.outerHTML); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly created component
     return newComponent;
 }
