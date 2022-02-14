@@ -95,10 +95,15 @@ class Historical
          * Once you have those, reduce the set to ones which don't already have a turnitin_report
          * row in the db. Once it gets into turnitin_report, the async tools will take over the
          * transmission responsibilities etc.
+         *
+         * Ignore softdeleted items (the bidness logic postdelete hooks ec. should have cascaded
+         * that down the line but in case it didn't...exclude them explicitly)
+         *
+         * Ignore submission_boxes that did not enable similarity check
          */
         $query = '
             SELECT 
-                sb.name AS submission_box_name, 
+                sb.id AS submission_box_id, sb.name AS submission_box_name, 
                 ssf.*
             FROM submission_box sb
             INNER JOIN (
@@ -109,11 +114,14 @@ class Historical
             ) maxdates ON sb.id = maxdates.box_id
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+            INNER JOIN assessment a ON sb.assessment_id = a.id
             LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
             WHERE ss.submitted_at >= :startDate
             AND ss.submitted_at <= :endDate
             AND tr.id IS NULL
             AND ssf.deleted_at IS NULL
+            AND a.deleted_at IS NULL
+            AND sb.similarity_check_enabled = 1
             ORDER BY ssf.id
         ';
 
@@ -134,10 +142,11 @@ class Historical
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logInfo(sprintf(
-                'Id %s (%s): %s, in "%s"',
+                'Id %s (%s): %s, in box %s called "%s"',
                 $row['id'],
                 $row['created_at'],
                 $row['realname'],
+                $row['submission_box_id'],
                 $row['submission_box_name']
             ));
 
@@ -171,6 +180,8 @@ class Historical
 
             return;
         }
+
+        $this->logInfo('');
 
         $this->logInfo(sprintf(
             '%s file(s) prepared for historical addition',
