@@ -304,7 +304,8 @@
                                 {% for script, stats in suds_import_logs %}
                                     <li>
                                         <div class="small-5 columns content">
-                                            School Data: {{ script }}
+                                            {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
+                                            <a href="{{ route }}">School Data: {{ script }}</a>
                                         </div>
                                         <div class="small-7 columns content">
                                             {% if stats %}
