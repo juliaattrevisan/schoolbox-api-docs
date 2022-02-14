@@ -10,5 +10,5 @@ create table assessment_view
         foreign key (participant_id) references user (id),
     constraint assessment_view_user_id_fk
         foreign key (user_id) references user (id)
-);
+) DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
