@@ -1,18 +1,28 @@
 <script>
+
+/**
+ * Generate a list of QR login codes for the current class / group. 
+ * Using the QR code, the student can login and be redirected to the specified URL. 
+ * The codes are set to a specific expiry. 
+ * By default all users have the QR login code generated, however select students can also be chosen. 
+ */
+
 import qrcodeVue from 'qrcode.vue';
 
 export default {
-    props: {
-        endpointGenerate: {
-            type: String,
-            required: true,
-        },
-    },
+   
     components: {
         qrcodeVue
     },
 
-    data() {
+    props: {
+        endpointGenerate: { //the url to request that generates the QR codes
+            type: String,
+            required: true,
+        },
+    },
+
+    data () {
         return {
             students: [],
             selectedStudents: [],
@@ -23,39 +33,15 @@ export default {
         }
     },
 
-    mounted: function () {
+    mounted  () {
         this.loadStudents();
     },
 
     methods: {
-        isInSelectedStudents(studentId) {
-            return this.selectedStudents.some((student) => student.id === studentId);
-        },
 
-        onStudentSelected(student, isChecked) {
-            if (isChecked) {
-                this.selectedStudents = [student, ...this.selectedStudents];
-            } else {
-                this.selectedStudents = this.selectedStudents.filter((selectedStudent) => selectedStudent.id !== student.id); //or remove
-            }
-        },
-
-        async generateCodes() {
-            try {
-                const response = await fetch(this.endpointGenerate, {
-                    method: 'POST',
-                    body: this.getFormData(),
-                });
-
-                let data = await response.json();
-                this.students = data.students;
-                this.loginUrl = data.loginUrl;
-                this.expiry = data.expiry;
-            } catch (error) {
-                console.warn(error);
-            }
-        },
-
+        /**
+         * Load the current list of students
+         */
         async loadStudents() {
             try {
                 const response = await fetch(this.endpointGenerate, {
@@ -72,7 +58,48 @@ export default {
             }
         },
 
+        /**
+         * To determine the display of the checkbox on the student
+         */
+        isInSelectedStudents(studentId) {
+            return this.selectedStudents.some((student) => student.id === studentId);
+        },
 
+        /**
+         * Update the selectedStudents list
+         */
+        onStudentSelected(student, isChecked) {
+            if (isChecked) {
+                this.selectedStudents = [student, ...this.selectedStudents];
+            } else {
+                this.selectedStudents = this.selectedStudents.filter((selectedStudent) => selectedStudent.id !== student.id); //or remove
+            }
+        },
+
+        /**
+         * Generate the QR codes for the selected students
+         */
+        async generateCodes() {
+            try {
+                const response = await fetch(this.endpointGenerate, {
+                    method: 'POST',
+                    body: this.getFormData(),
+                });
+
+                let data = await response.json();
+                this.students = data.students;
+                this.loginUrl = data.loginUrl;
+                this.expiry = data.expiry;
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+
+        /**
+         * Get the FormData to submit to the QR generation endpoint
+         * 
+         * @returns { FormData } 
+         */
         getFormData() {
             const formData = new FormData();
             this.selectedStudents.forEach((student) => {
