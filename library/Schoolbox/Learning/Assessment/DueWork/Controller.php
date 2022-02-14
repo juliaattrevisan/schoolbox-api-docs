@@ -359,12 +359,18 @@ class Controller extends Assessment\Controller
                 }
             }
         }
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView();
+        $lastView->addNewView($assessment, $student, $this->getUser());
 
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
+            'last_views'    => $lastView->getAllViews($assessment, $student),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),

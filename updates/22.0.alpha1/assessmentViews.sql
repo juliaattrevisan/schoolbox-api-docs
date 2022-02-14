@@ -1,5 +1,6 @@
 create table assessment_view
 (
+    id int not null PRIMARY KEY AUTO_INCREMENT,
     assessment_id  int unsigned      null,
     participant_id int(4) unsigned      null,
     user_id        int(4) unsigned      null,

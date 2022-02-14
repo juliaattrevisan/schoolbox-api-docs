@@ -10,26 +10,28 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Views;
 
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\DataModel as LearningAssessment;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
+    use Id;
 
     /**
-     * Assessment Id
+     * Assessment
      */
-    private LearningAssessment\Model $assessment;
+    private int $assessmentId;
 
     /**
      * Participant
      */
-    private User $participant;
+    private int $participantId;
 
     /**
      * User
      */
-    private User $user;
+    private int $userId;
 
     /**
      * last Visit
@@ -37,31 +39,41 @@ class Model
     private \Alaress_Date_Format $last_visit;
 
     /**
-     * @return LearningAssessment\Model
+     * @return int
      */
-    public function getAssessment(): LearningAssessment\Model
+    public function getAssessmentId(): int
     {
-        return $this->assessment;
+        return $this->assessmentId;
     }
 
 
     /**
-     * @param LearningAssessment\Model $assessment
+     * @param IAssessable $assessment
      * @return $this
      *
      */
-    public function setAssessment(LearningAssessment\Model $assessment): self
+    public function setAssessment(IAssessable $assessment): self
     {
-        $this->assessment = $assessment;
+        $this->assessmentId = $assessment->getId();
         return $this;
     }
 
     /**
-     * @return User
+     * @param int $assessmentId
+     * @return $this
      */
-    public function getParticipant(): User
+    public function setAssessmentId(int $assessmentId): self
     {
-        return $this->participant;
+        $this->assessmentId = $assessmentId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getParticipantId(): int
+    {
+        return $this->participantId;
     }
 
 
@@ -72,16 +84,27 @@ class Model
      */
     public function setParticipant(User $participant): self
     {
-        $this->participant = $participant;
+        $this->participantId = $participant->getId();
         return $this;
     }
 
     /**
-     * @return User
+     * @param int $participantId
+     * @return $this
+     *
      */
-    public function getUser(): User
+    public function setParticipantId(int $participantId): self
     {
-        return $this->user;
+        $this->participantId = $participantId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUserId(): int
+    {
+        return $this->userId;
     }
 
 
@@ -92,7 +115,18 @@ class Model
      */
     public function setUser(User $user): self
     {
-        $this->user = $user;
+        $this->userId = $user->getId();
+        return $this;
+    }
+
+    /**
+     * @param int $userId
+     * @return $this
+     *
+     */
+    public function setUserId(int $userId): self
+    {
+        $this->userId = $userId;
         return $this;
     }
 

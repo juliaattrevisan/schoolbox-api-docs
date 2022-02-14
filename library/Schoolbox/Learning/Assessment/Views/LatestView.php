@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Views;
 
-use Schoolbox\Learning\Assessment\DataModel as LearningAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
@@ -38,11 +38,11 @@ class LatestView
      * add record?
      * is new? or existing?
      * update value
-     * @param LearningAssessment\Model $assessment
+     * @param IAssessable $assessment
      * @param User $participant
      * @param User $user
      */
-    public function addNewView(LearningAssessment\Model $assessment, User $participant, User $user): void
+    public function addNewView(IAssessable $assessment, User $participant, User $user): void
     {
         /**
          * find if record exists
@@ -55,15 +55,15 @@ class LatestView
                                                             ]);
         } catch (NotFound $e) {
             $last_view = $this->mapper->createModel()
-                ->setAssessment($assessment->getId())
-                ->setParticipant($participant->getId())
-                ->setUser($user->getId());
+                ->setAssessment($assessment)
+                ->setParticipant($participant)
+                ->setUser($user);
         }
 
         /**
          * update time to now
          */
-        $last_view->setLastView(\Alaress_Date_Format::now());
+        $last_view->setLastVisit(\Alaress_Date_Format::now());
 
         /**
          * save record
@@ -73,10 +73,10 @@ class LatestView
 
     /**
      * get views all
-     * @param LearningAssessment\Model $assessment
+     * @param IAssessable $assessment
      * @param User $participant
      */
-    public function getAllViews(LearningAssessment\Model $assessment, User $participant): array
+    public function getAllViews(IAssessable $assessment, User $participant): array
     {
         /**
          * find latest views for assessment and participant
@@ -103,7 +103,7 @@ class LatestView
          * ]
          */
         foreach ($views as $view) {
-            if ($participant === $view->getParticipant) {
+            if ($participant->getId() === $view->getParticipantId()) {
                 $last_views['student'] = $view;
                 continue;
             }
@@ -114,12 +114,12 @@ class LatestView
 
     /**
      * get single user view
-     * @param LearningAssessment\Model $assessment
-     * @param User                     $participant
-     * @param User                     $user
+     * @param IAssessable $assessment
+     * @param User        $participant
+     * @param User        $user
      * @return \Alaress_Date_Format|null
      */
-    public function getView(LearningAssessment\Model $assessment, User $participant, User $user): ?\Alaress_Date_Format
+    public function getView(IAssessable $assessment, User $participant, User $user): ?\Alaress_Date_Format
     {
         /**
          * find latest view of assessmen/participation for the user specified.
@@ -130,7 +130,7 @@ class LatestView
                                                    'participant_id' => $participant->getId(),
                                                    'user_id'        => $user->getId(),
                                                ]);
-            return $last_view->getLastView();
+            return $last_view->getLastVisit();
         } catch (NotFound $e) {
             return null;
         }
