@@ -256,9 +256,9 @@ class Module
             return;
         }
         $this->isControllerDependenciesInstalled = true;
-        $injector                                = $this->getInjector();
-        $this->preInitControllerDependencies($injector);
-        $this->initDependingModules();
+//        $injector                                = $this->getInjector();
+//        $this->preInitControllerDependencies($injector);
+//        $this->initDependingModules();
 
         // configure pre-registered preloaders
         foreach ($this->preloadIndex as [$preload, $methods]) {
@@ -476,6 +476,9 @@ class Module
      * You should use this method to initialize any mappers or other objects
      * which the controller needs, but are too heavy to initialize at module
      * init time.
+     *
+     * @deprecated Must be removed as DI container doesn't allow pre-init:
+     *             create controllers using buildController
      *
      * @param ContainerInterface $injector The dependency injection container.
      */
