@@ -1749,11 +1749,7 @@ abstract class Kernel
                         $rememberer,
                         $_SERVER['REQUEST_TIME'],
                     );
-                    $session = $factory->build();
-                    if (!$session->isStarted()) {
-                        $session->start();
-                    }
-                    return $session;
+                    return $factory->build();
                 }
             )
         );
