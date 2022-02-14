@@ -10,6 +10,7 @@ namespace Schoolbox\Application\Login;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Aura\Di\ContainerInterface;
 use Twig\Error\LoaderError;
 
@@ -56,5 +57,17 @@ class Module extends BaseModule
                 ],
             ),
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(ContainerInterface $container): Controller
+    {
+        $controller = new Controller(
+            $container->get('cdnPrefixGenerator'),
+            $container->get('session.rememberer'),
+        );
+        return $this->installControllerDependencies($controller, $container);
     }
 }
