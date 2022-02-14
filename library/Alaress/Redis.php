@@ -88,9 +88,33 @@ class Redis
      * @param string $name The name of the instance to retrieve.
      * @return self
      */
-    public static function getInstance(string $name)
+    public static function getInstance(string $name): self
     {
         return (self::$instances[$name] ??= new self());
+    }
+
+    /**
+     * Get the cache instance of this wrapper.
+     *
+     * @see INSTANCE_CACHE
+     *
+     * @return self
+     */
+    public static function getCacheInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_CACHE);
+    }
+
+    /**
+     * Get the storage instance of this wrapper.
+     *
+     * @see INSTANCE_STORAGE
+     *
+     * @return self
+     */
+    public static function getStorageInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_STORAGE);
     }
 
     /**

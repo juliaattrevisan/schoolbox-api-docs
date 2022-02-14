@@ -111,7 +111,7 @@ class Renderer
             $travelLogs = (new TravelLog(
                 $this->clientId,
                 $this->clientSecret,
-                Redis::getInstance(Redis::INSTANCE_CACHE)
+                Redis::getCacheInstance()
             ))->getForStudentCached(
                 $externalId,
                 $this->cachingTimeout

@@ -27,7 +27,7 @@ class External_UserDetention extends CachingConnectorAbstract implements Externa
         parent::__construct(
             (new External_DatabaseFactory())->buildUserDetentionConnector(Loader::getInstance()),
             new External_Offline_UserDetention(),
-            Redis::getInstance(Redis::INSTANCE_CACHE),
+            Redis::getCacheInstance(),
             Config::get('external_cache_timeout')
         );
     }

@@ -404,7 +404,7 @@ class Scrub
      */
     public static function html($html)
     {
-        return Alaress\Redis::getInstance(Alaress\Redis::INSTANCE_CACHE)->cacheFunctionCall(
+        return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.html',
             function ($param) {
                 return self::getHtmlPurifierInstance()->purify($param);
@@ -424,7 +424,7 @@ class Scrub
      */
     public static function htmlAbsoluteUri(string $html, string $domain): string
     {
-        return Alaress\Redis::getInstance(Alaress\Redis::INSTANCE_CACHE)->cacheFunctionCall(
+        return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.htmlAbsoluteUri',
             function ($params) {
                 $purifier = self::getHtmlPurifierInstance($params[1]);

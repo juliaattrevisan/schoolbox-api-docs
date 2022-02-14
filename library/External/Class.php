@@ -26,7 +26,7 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
         parent::__construct(
             (new External_DatabaseFactory())->buildClassConnector(Loader::getInstance()),
             new External_Offline_Class(),
-            Redis::getInstance(Redis::INSTANCE_CACHE),
+            Redis::getCacheInstance(),
             Config::get('external_cache_timeout')
         );
     }
