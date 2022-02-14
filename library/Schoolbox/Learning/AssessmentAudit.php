@@ -22,7 +22,7 @@ class AssessmentAudit
     /**
      * @var FolderMapper
      */
-    private $folderMapper;
+    private FolderMapper $folderMapper;
     /**
      * for building the assessment query
      * @var IConnector $database
@@ -70,10 +70,12 @@ class AssessmentAudit
         assessment.title AS assessmentTitle,
         v_assessment_relation.folder_id AS folderID,
         lu_work_type.name AS assessmentWorkType,
-        v_assessment_relation.course_implementation_id AS course_implementation_id,
-        v_assessment_relation.course_unit_implementation_id AS course_unit_implementation_id,
-        v_assessment_relation.course_specification_id AS course_specification_id,
-        v_assessment_relation.course_unit_specification_id AS course_unit_specification_id,
+
+        course_implementation.folder_id as course_implementation_folder_id,
+        course_unit_implementation_out.folder_id as course_unit_implementation_folder_id,
+        course_specification.folder_id AS course_specification_folder_id,
+        course_unit_specification.folder_id as course_unit_specification_folder_id,
+
         submission_box.accept_submission AS acceptSubmission,
         submission_box.multi_submission AS multiSubmission,
         submission_box.use_rubric AS useRubric,
@@ -82,7 +84,8 @@ class AssessmentAudit
         gradeGroupTable.name AS gradeGroup,
         assessment.course_managed AS commonAssessment,
         capabilityMarkTypeTable.hr_name AS capabilityMarkType,
-        capabilityGradeGroupTable.name AS capabilityGradeGroup
+        capabilityGradeGroupTable.name AS capabilityGradeGroup,
+        assessment.weight as weight
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -92,6 +95,14 @@ class AssessmentAudit
         LEFT JOIN submission_mark_type as capabilityMarkTypeTable ON submission_box.rubric_capability_mark_type_id = capabilityMarkTypeTable.mark_type_id
         LEFT JOIN submission_grade_group as gradeGroupTable ON submission_box.submission_grade_group_id = gradeGroupTable.id
         LEFT JOIN submission_grade_group as capabilityGradeGroupTable ON submission_box.rubric_capability_grade_group_id = capabilityGradeGroupTable.id
+
+        LEFT JOIN assessment_course_unit_implementation on v_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
+        LEFT JOIN course_specification on v_assessment_relation.course_specification_id = course_specification.id
+        LEFT JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
+        LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
+        LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
+        LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
+
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
 
@@ -99,7 +110,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
                         'UnitFolderId', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'SpecificationImplementation'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
@@ -112,25 +123,25 @@ class AssessmentAudit
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             //set if the assignment is a Specification or Implementation or not
-            $specImplem = null;
+            $specImplem = 'Class Created';
             //grab COURSE specificationId or implementationId
             $courseFolderId = null;
-            if (null !== $row['course_specification_id']) {
-                $specImplem = 'Specification';
-                $courseFolderId = $row['course_specification_id'];
-            } elseif (null !== $row['course_implementation_id']) {
-                $specImplem = 'Implementation';
-                $courseFolderId = $row['course_implementation_id'];
+            if (null !== $row['course_specification_folder_id']) {
+                $specImplem = 'Course';
+                $courseFolderId = $row['course_specification_folder_id'];
+            } elseif (null !== $row['course_implementation_folder_id']) {
+                $specImplem = 'Class Imported';
+                $courseFolderId = $row['course_implementation_folder_id'];
             }
 
             //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
-            if (null !== $row['course_unit_specification_id']) {
-                $specImplem = 'Specification';
-                $unitCourseFolderId = $row['course_unit_specification_id'];
-            } elseif (null !== $row['course_unit_implementation_id']) {
-                $specImplem = 'Implementation';
-                $unitCourseFolderId = $row['course_unit_implementation_id'];
+            if (null !== $row['course_unit_specification_folder_id']) {
+                $specImplem = 'Course';
+                $unitCourseFolderId = $row['course_unit_specification_folder_id'];
+            } elseif (null !== $row['course_unit_implementation_folder_id']) {
+                $specImplem = 'Class Imported';
+                $unitCourseFolderId = $row['course_unit_implementation_folder_id'];
             }
 
             //work out number of online submissions
@@ -170,6 +181,7 @@ class AssessmentAudit
                 $this->boolToString($row['useRubric']),
                 $row['capabilityMarkType'],
                 $capabilityGradeSchemeScale,
+                $row['weight'],
                 $specImplem
             ]);
         }
