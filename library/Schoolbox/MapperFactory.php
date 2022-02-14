@@ -43,8 +43,8 @@ class MapperFactory
         }
         // No longer injectable, because the container is locked as soon as
         // sonething is extracted from it
-        if (!is_callable([ $mapperName, 'getInstance' ])) {
-            throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
+        if (is_callable([ $mapperName, 'getInstance' ])) {
+            return $mapperName::getInstance();
         }
         return new $mapperName();
     }
