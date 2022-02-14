@@ -115,8 +115,9 @@ NULLTYPE;
             $factory,
             $type,
             $file,
-            $this->getLogger()
-        ))->run(time());
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+        ))->run(time(), Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
 
         /* Announce conclusion
          */
