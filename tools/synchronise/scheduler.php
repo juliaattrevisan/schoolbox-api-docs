@@ -38,7 +38,13 @@ $app = new class extends CliTool\App
     /**
      * This script name appears in the import log
      */
-    private const SCRIPT_NAME = 'scheduler';
+    private const SCHEDULER_SCRIPT_NAME = 'scheduler (sis)';
+
+
+    /**
+     * This is when you use the optional calendar importer
+     */
+    private const CALENDAR_SCRIPT_NAME = 'scheduler (calendar)';
 
 
     // --help: print help
@@ -143,7 +149,7 @@ HELP;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), self::SCRIPT_NAME);
+        ))->run(time(), self::SCHEDULER_SCRIPT_NAME);
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
@@ -159,7 +165,7 @@ HELP;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), self::SCRIPT_NAME);
+        ))->run(time(), self::CALENDAR_SCRIPT_NAME);
 
         /* Announce lock release
          */
