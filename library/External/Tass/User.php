@@ -541,8 +541,12 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = :companyCode
-                    AND par_code = {$this->database->legacyQuote($parentCode)}
+                    JOIN student as s
+                       ON scr.stud_code = s.stud_code
+                       AND scr.cmpy_code = s.cmpy_code
+                       AND (s.dol IS NULL OR s.dol >= CAST(GETDATE() AS DATE))
+                    WHERE scr.cmpy_code = :companyCode
+                    AND scr.par_code = {$this->database->legacyQuote($parentCode)}
                     AND add_num IN({$addnum})
                 ";
                 $params['companyCode'] = $this->companyCode;
@@ -583,8 +587,12 @@ class External_Tass_User implements External_UserInterface
                     SELECT DISTINCT
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
-                    WHERE cmpy_code = :companyCode
-                    AND par_code = {$this->database->legacyQuote($id)}
+                    JOIN student as s
+                       ON scr.stud_code = s.stud_code
+                       AND scr.cmpy_code = s.cmpy_code
+                       AND (s.dol IS NULL OR s.dol >= CAST(GETDATE() AS DATE))
+                    WHERE scr.cmpy_code = :companyCode
+                    AND scr.par_code = {$this->database->legacyQuote($id)}
                     AND add_num IN ({$addnum})
                 ";
                 $params['companyCode'] = $this->companyCode;
