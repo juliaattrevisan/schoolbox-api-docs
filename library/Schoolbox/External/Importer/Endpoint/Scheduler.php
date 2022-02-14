@@ -80,16 +80,24 @@ class Scheduler
      */
     private $logger;
 
+
+    /**
+     * @var \Schoolbox\External\Connector\Log\Mapper
+     */
+    private \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
     /**
      * Scheduler constructor.
      *
-     * @param IDatabase       $db
-     * @param string          $frequency
-     * @param string[]        $customHours
-     * @param IFactory        $factory
-     * @param string          $type
-     * @param string|null     $file
-     * @param LoggerInterface $logger
+     * @param IDatabase                                $db
+     * @param string                                   $frequency
+     * @param string[]                                 $customHours
+     * @param IFactory                                 $factory
+     * @param string                                   $type
+     * @param string|null                              $file
+     * @param LoggerInterface                          $logger
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      */
     public function __construct(
         IDatabase $db,
@@ -98,7 +106,8 @@ class Scheduler
         IFactory $factory,
         string $type,
         ?string $file,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
     ) {
         $this->db = $db;
         $this->frequency = $frequency;
@@ -107,13 +116,18 @@ class Scheduler
         $this->type = $type;
         $this->file = $file;
         $this->logger = $logger;
+        $this->importLogMapper = $importLogMapper;
     }
 
 
     /**
      * Execute the importer at $now
      *
-     * @param int $now
+     * @param int    $now
+     * @param string $scriptName
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function run(int $now, string $scriptName): void
     {
@@ -127,11 +141,9 @@ class Scheduler
                 exit;
             }
 
-            /* TODO: Always log the start of the run
+            /* Always log the start of the run
              */
-            $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
-
-            $importLog = $importLogMapper->start($scriptName);
+            $importLog = $this->importLogMapper->start($scriptName);
 
             try {
                 $this->logger->debug(sprintf(
@@ -150,7 +162,7 @@ class Scheduler
                  * you literally cannot forget to do it. It'll only log the finish
                  * if you didn't crash somewhere in the process
                  */
-                $importLogMapper->finish($importLog);
+                $this->importLogMapper->finish($importLog);
 
                 $this->logger->debug(sprintf(
                     'Committing transaction'

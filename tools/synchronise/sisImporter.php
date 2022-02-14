@@ -157,7 +157,8 @@ NULLTYPE;
             $factory,
             $type,
             $file,
-            $this->getLogger()
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
         ))->run(time(), self::SCRIPT_NAME);
 
         /* Announce conclusion

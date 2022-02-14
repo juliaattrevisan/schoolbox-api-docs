@@ -134,16 +134,32 @@ HELP;
          */
         $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $sisFactory, $type, $file, $this->getLogger()))
-            ->run(time(), self::SCRIPT_NAME);
+        (new Endpoint\Scheduler(
+            $randomMapper->getDatabase(),
+            $frequency,
+            $customHours,
+            $sisFactory,
+            $type,
+            $file,
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+        ))->run(time(), self::SCRIPT_NAME);
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
          */
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
 
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))
-            ->run(time(), self::SCRIPT_NAME);
+        (new Endpoint\Scheduler(
+            $randomMapper->getDatabase(),
+            $frequency,
+            $customHours,
+            $calendarFactory,
+            $type,
+            $file,
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+        ))->run(time(), self::SCRIPT_NAME);
 
         /* Announce lock release
          */
