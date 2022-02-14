@@ -10,17 +10,8 @@
 
 namespace Alaress\Module;
 
-use Aura\Di\ContainerInterface;
-
 class Loader implements LoaderInterface
 {
-    /**
-     * The dependency injection container.
-     *
-     * @var ContainerInterface
-     */
-    protected $injector;
-
     /**
      * Modules that have already been loaded. Don't try to load them again.
      *
@@ -41,12 +32,10 @@ class Loader implements LoaderInterface
     /**
      * Constructor
      *
-     * @param ContainerInterface $injector
-     * @param string             $moduleRegex
+     * @param string $moduleRegex
      */
-    public function __construct(ContainerInterface $injector, $moduleRegex)
+    public function __construct($moduleRegex)
     {
-        $this->injector    = $injector;
         $this->moduleRegex = $moduleRegex;
     }
 
