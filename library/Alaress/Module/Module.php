@@ -102,6 +102,14 @@ class Module
 
 
     /**
+     * A list of initialised modules.
+     *
+     * @var array<string, self>
+     */
+    private static array $installedModules = [];
+
+
+    /**
      * Constructor
      *
      * TODO don't set $injector here, pass as a param to init() instead.
@@ -214,7 +222,7 @@ class Module
     protected function internalInit($basePath, $override)
     {
         $injector = $this->getInjector();
-        if ($this->installModule($injector, $override)) {
+        if ($this->installModule()) {
             $this->initSubmodules($injector, $basePath);
 
             // perform any route registration available
@@ -280,39 +288,30 @@ class Module
     /**
      * Installs this module into the dependency injection system.
      *
-     * @param  ContainerInterface $injector
-     * @param  bool               $override If true, override a previous definition with this basename
      * @return bool Was the module installed?
      * @throws LogicException if this module has no basename, or it is already defined as a different class
      */
-    protected function installModule(ContainerInterface $injector, $override = false)
+    protected function installModule(): bool
     {
         if (!$this->basename) {
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
-        $key = 'module:' . $this->basename;
-//        if (!$override && $injector->has($key)) {
-//            $other = $injector->get($key);
-//            if (get_class($other) != get_class($this)) {
-//                throw new LogicException(
-//                    sprintf(
-//                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
-//                        $this->basename,
-//                        get_class($other),
-//                        get_class($this)
-//                    )
-//                );
-//            } else {
-//                user_error(
-//                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
-//                    E_USER_WARNING
-//                );
-//                return false;
-//            }
-//        }
-        $injector->set($key, $this);
+        self::$installedModules[$this->basename] = $this;
         return true;
     }
+
+
+    /**
+     * Retrieves a module previously installed via `$this->init`.
+     *
+     * @param string $baseName
+     * @return self
+     */
+    public static function retrieveInstalledModule(string $baseName): self
+    {
+        return self::$installedModules[$baseName];
+    }
+
 
     /**
      * Initializes any submodules of this module.
