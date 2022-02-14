@@ -370,7 +370,7 @@ abstract class Kernel
 
         // Redis storage (persisted to disk)
         Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
-        $di->set('redis.storage', Redis::getStorageInstance());
+        $di->set('redis.storage', Redis::getStorageClientInstance());
 
         // Redis queue publish (not persistent)
         // (The subscription to this queue doesn't exist in the standard kernel,
