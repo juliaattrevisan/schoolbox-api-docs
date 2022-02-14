@@ -254,9 +254,9 @@
                 $("#visibility_empty_state_locked").hide();
             }
 
+            clearVisibility();
             {% for typeAudiences in audiences %}
             if ('{{ typeAudiences.typeId }}' === typeId && '{{ typeAudiences.subtypeId }}' === subtypeId) {
-                clearVisibility();
                 {% for audience in typeAudiences.audiences %}
                 {% if audience.group %}
                 window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}", visibilityLocked);
