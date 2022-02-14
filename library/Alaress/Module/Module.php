@@ -703,11 +703,17 @@ class Module
 
 
     /**
-     * Actually builds the controller, possibly pulling from but not writing to
-     * the DI container.
+     * Actually builds the controller, if this module has one.
+     * (AFAIK it always should, but let's leave open for now.)
+     *
+     * This may pull dependencies from the DI container, but will not write to
+     * it.
+     *
+     * TODO Is $injector even required? An injector is a constructor param
      *
      * @param ContainerInterface $container
      * @return Base|null
+     *
      */
     public function buildController(ContainerInterface $container): ?Base
     {

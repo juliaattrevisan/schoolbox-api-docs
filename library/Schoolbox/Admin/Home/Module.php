@@ -12,13 +12,11 @@ namespace Schoolbox\Admin\Home;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Database;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
@@ -53,29 +51,6 @@ class Module extends BaseModule
                      new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
                  )
              );
-    }
-
-    /**
-     * {@inheritdoc}
-     * @param Container|ContainerInterface $injector
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'configMapper'     => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'kamiConnector'    => $this->injector->lazyGet('kamiConnector'),
-            'databaseFactory'  => $this->injector->lazyGet('databaseFactory'),
-            'databaseExternal' => $injector->lazyGet('databaseExternal'),
-//            'databaseExternal' => $injector->lazy(
-//                static function () use ($injector) {
-//                    try {
-//                        return $injector->get('databaseExternal');
-//                    } catch (Database\Exception $e) {
-//                        return null;
-//                    }
-//                }
-//            ),
-        ]));
     }
 
     /**

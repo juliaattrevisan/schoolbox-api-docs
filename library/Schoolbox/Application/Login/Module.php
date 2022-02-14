@@ -10,8 +10,7 @@ namespace Schoolbox\Application\Login;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Alaress\Web\Controller\Base;
-use Aura\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -38,25 +37,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'prefixGenerator' => $injector->lazyGet('cdnPrefixGenerator'),
-                    'rememberer'      => $injector->lazyGet('session.rememberer'),
-                ],
-            ),
-        );
     }
 
     /**
