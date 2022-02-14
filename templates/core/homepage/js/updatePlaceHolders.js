@@ -1,6 +1,6 @@
 /** 
  * Show/hide the place holders depending when new components tab is open or when sorting 
- * and a component container is empty
+ * and a component column container is empty
  *
  */
 
@@ -48,7 +48,7 @@ function initPlaceHolderComponents () {
 /**
  * Remove and re-add as a component has been added / removed
  */
- function onComponentUpdate () {
+function onComponentUpdate () {
     removePlaceHolderComponents();
     if (isNewComponentTabsOpen()) { //only show them again when the tabs are open
         addPlaceHolderComponents();

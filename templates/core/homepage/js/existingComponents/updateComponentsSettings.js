@@ -1,5 +1,5 @@
 /** 
- * Control the coponent settings panel and ensure it gets updated via ajax
+ * Control the component settings panel and ensure it gets updated via ajax
  *
  */
 
@@ -14,12 +14,13 @@ const ANIMATE_SPEED = 0.3;
 const BUTTON_SELECTOR = '[data-target="settings"]';
 const PANEL_SELECTOR = '[data-component-panel="settings"]';
 const STATE_ATTRIBUTE = 'data-state'; //can be 'opened' or 'closed'
-const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //can be 'opened' or 'closed'
+const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //to store the current settings to be sent to the DB on update
 
 
 
 /**
- * initiate the setings toggle and form
+ * Initiate the setings toggle and form for each component and when a 
+ * new component is added or udpated
  */
 export function initUpdateComponentsSettings () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component));
@@ -28,7 +29,7 @@ export function initUpdateComponentsSettings () {
 }
 
 /**
- * Fire it up
+ * Set up the settings buttons and what happens on form submission
  * 
  * @param { Element } 
  */
@@ -38,8 +39,8 @@ function init (component) {
 }   
 
 /**
- * To show/hide the settings panel with the toggle button
- * There's also sometimes a settings toggle button in the empty state as well,
+ * To show/hide the settings panel with the toggle button.
+ * There's also sometimes a settings toggle button in the empty component state as well,
  * so check for that
  * 
  * @param { Element } 
@@ -78,15 +79,15 @@ export function isOpen (component) {
  * @param { Element } 
  */
 function open (component) {
-    const panel = component.querySelector(PANEL_SELECTOR);
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
     toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
+    const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
 }
 
 /**
- * To be able to compare the form query string on form submit, as don't want to submit if nothing has changed
+ * To be able to compare the form query string on form submit, as we don't want to submit if nothing has changed
  * 
  * @param { Element } 
  * 
@@ -104,9 +105,9 @@ function getQueryString (component) {
  * @param { Element } 
  */
 async function close (component) {
-    const panel = component.querySelector(PANEL_SELECTOR);
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
 
@@ -146,7 +147,7 @@ async function saveComponentSettings (component, form) {
 }
 
 /**
- * To pass through the required FormData to delete the component in the DB
+ * To pass through the required FormData to update the component in the DB
  * 
  * @param { Element } 
  * 
@@ -160,7 +161,7 @@ function getSaveComponentSettingsParams (form) {
 }
 
 /**
- * Now we have the returned response from the settings save, replace the old content with the new content
+ * Now we have the returned response from the settings save, replace the old component with the new component
  * 
  * @param { Element } 
  * @param { String } 

@@ -54,7 +54,7 @@ function updateComponentCount (component, isIncrement) {
 }
 
 /**
- * Get the counter element in the palette to 
+ * Get the counter element in the palette to increment/decrement
  * 
  * @param { Element }
  * 
@@ -102,7 +102,8 @@ function checkButtonStatus (component, componentCount) {
 }
 
 /**
- * 
+ * Get the relevant button in the new component tabs linked to the 
+ * component current being updated
  * 
  * @param { Element }
  * 

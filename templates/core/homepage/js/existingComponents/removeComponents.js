@@ -1,5 +1,5 @@
 /** 
- * To delete a component 
+ * To remove a component 
  *
  */
 
@@ -15,7 +15,7 @@ const STATE_ATTRIBUTE = 'data-state'; //can be 'opened' or 'closed'
 const PANEL_SELECTOR = '[data-component-panel="delete"]';
 
 /**
- * Toggle the delete palette and manage the confirm/deny actions
+ * Toggle the remove palette and manage the confirm/deny actions
  */
 export function initRemoveComponents () {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
@@ -24,7 +24,7 @@ export function initRemoveComponents () {
 }
 
 /**
- * To show/hide the confirm/cancel delete component panel
+ * To show/hide the confirm/cancel remove component panel
  * 
  * @param { Element } 
  */
@@ -67,9 +67,9 @@ export function isOpen (component) {
  * @param { Element } 
  */
 function open (component) {
-    const panel = component.querySelector(PANEL_SELECTOR);
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
+    const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
 }
 
@@ -79,17 +79,15 @@ function open (component) {
  * @param { Element } 
  */
 async function close (component) {
-    const panel = component.querySelector(PANEL_SELECTOR);
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
 
 /**
  * Cancel the component deletion
  * 
- * @param { Element } 
- * @param { Element } 
  * @param { Element } 
  */
 function initCancelButton (component) {
@@ -111,16 +109,16 @@ function initConfirmButton (component) {
     const comfirmDeleteButton = component.querySelector('[data-remove="1"]');
     comfirmDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
-        deleteComponent(component);
+        removeComponent(component);
     });
 }
  
 /**
- * Save the deleted component to the
+ * Save the removed component to the DB
  * 
  * @param { Element } 
  */
-async function deleteComponent (component) {
+async function removeComponent (component) {
     try {
         await fetch(UPDATE_URL, {
             method: 'POST',
@@ -140,7 +138,7 @@ async function deleteComponent (component) {
 }
 
 /**
- * To pass through the required FormData to delete the component in the DB
+ * To pass through the required FormData to remove the component in the DB
  * 
  * @param { Element } 
  * 
@@ -155,7 +153,7 @@ function getFormData (component) {
 }
 
 /**
- * The component has been deleted elsewhere, so notify the user
+ * The component has been removed elsewhere, so notify the user
  * and suggest a page refresh for the latest data
  * 
  * @param { Element } 
@@ -167,7 +165,7 @@ export function updateRemovedComponent (component) {
 
     const errorElement = document.createElement('div');
     errorElement.classList.add('alert', 'alert-box');
-    errorElement.innerHTML = `<b>Warning:</b> This component has been deleted from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
+    errorElement.innerHTML = `<b>Warning:</b> This component has been removed from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
 
     const insideComponentElement = component.querySelector('[data-collapsable] > div > section');
     insideComponentElement.replaceChildren(errorElement);

@@ -1,5 +1,5 @@
 /** 
- * To dispatch the relevant events for each
+ * To dispatch the relevant events when editing the columns
  *
  */
 

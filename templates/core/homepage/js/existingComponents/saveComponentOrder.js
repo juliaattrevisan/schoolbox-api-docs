@@ -1,5 +1,6 @@
 /** 
- * Save the new sorting order, as a component has been moved to a new spot
+ * Save the new sorting order, as a component has been moved to a new spot or 
+ * a new component has been added to the page
  *
  */
 
@@ -9,6 +10,8 @@ import { updateRemovedComponent } from './removeComponents';
 
 /**
  * Submit the new component order to the DB
+ * 
+ * @param { Element }
  */
 export async function saveComponentOrder (component) {
     try {

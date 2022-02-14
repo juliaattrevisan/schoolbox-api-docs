@@ -1,5 +1,5 @@
 /** 
- * Initiates new component tabs, adding components by dragging/selected and new component buttons
+ * Initiates new component tabs, adding components by dragging/selecting and new component buttons
  *
  */
 

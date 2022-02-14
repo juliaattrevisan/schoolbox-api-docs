@@ -484,6 +484,7 @@ async function addNewComponent () {
  */
 function reinsertNewComponentButton () {
     __newComponentTabsContainer.appendChild(__newComponentClone); 
+    __newComponentClone.style.zIndex = null; //ensure there's no z-index issues, as it was boosted when dragging took place
 }
 
 /**

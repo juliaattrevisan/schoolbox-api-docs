@@ -306,7 +306,7 @@
                             
                             // send deletion request to server
                             $.post(opt.component.url, removeBtn.closest('form').serialize());
-                            
+                               
                             // animate a disappearance (P.S. this is revolting)
                             removeBtn.closest(opt.component.selector).animate({ opacity: 0 }, 300, function () {
                                 $(this).slideUp(200, function () {
@@ -584,7 +584,7 @@
             // callback not called
             return;
         }
-        
+
         return $.ajax({
             type: 'POST',
             url: url,

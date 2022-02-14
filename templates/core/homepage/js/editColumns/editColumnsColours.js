@@ -1,10 +1,10 @@
 /** 
  * Update the colours of the home page components
- * There are currently four colour pickers
+ * There are currently four colour pickers.
  * The Text and Background colour of the Heading, 
  * as well as the Text and Background colour of the Content
  * When changing these colour pickers, all the components within the 
- * currently selected Columns (top/left/right) will change 
+ * currently selected Columns will change 
  * 
  */
 
@@ -114,7 +114,7 @@ function updateColour (colourId, colourAsRGB) {
 
 /**
  * Display the initial colour picker colours,
- * if there's different colour values for top & left for example,
+ * if there's different colour values for the top & left columns for example,
  * no colour will be set. So the colour will only be set if all
  * the columns have the same colour.
  */
@@ -130,7 +130,7 @@ function displayDefaultColourPickerColours () {
 }
 
 /**
- * To loop through when settings initial colours or resetting / undoing changes
+ * To loop through when setting initial colours or resetting / undoing changes
  * 
  * @returns { Array }
  */
@@ -150,7 +150,7 @@ export function appendColours (formData) {
 }
 
 /**
- * Reset all the colours back to the default selections
+ * Reset all the colours back to the default selections.
  * This represents the admin set colours used as the default
  */
 export function resetColours () {
@@ -158,7 +158,7 @@ export function resetColours () {
 }
 
 /**
- * Reset all the colours back to the original selections
+ * Undo all the colour changes back to the original selections.
  * This represents the colours at page load, prior to any further Saves
  */
 export function undoColourChanges () {

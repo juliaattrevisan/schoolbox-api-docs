@@ -193,7 +193,7 @@ export function setAndGetAttribute (element, attribute, value) {
 
 /**
  * When new HTML is added dynamically to page, we need to ensure any <script> tags
- * have been loaded prior to adding to new HTML to the page
+ * have been loaded prior to adding the new HTML to the page
  * 
  * @param { Element }  note: the element shouldn't exist in the DOM yet, so we can load properly
  * 
