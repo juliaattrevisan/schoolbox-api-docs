@@ -69,7 +69,7 @@ class LatestView
          * check if use is either that student or the parents, then save
          */
         if (
-            (null !== $participant->getParents() & $participant->getParents()->getBy('id', $user->getId())) ||
+            (null !== $user->getChildren() & $user->getChildren()->getBy('id', $participant->getId())) ||
              $participant->getId() === $user->getId()
         ) {
             /**
@@ -112,12 +112,13 @@ class LatestView
          * ]
          */
         foreach ($views as $view) {
-            if ($participant->getId() === $view->getUserId()) {
+            if ($participant === $view->getUser()) {
                 $last_views['student'] = $view;
                 continue;
             }
             //parent full name
-            $last_views['parents'][$participant->getParents()->getBy('id', $view->getUserId())] = $view;
+            $participant->loadParents();
+            $last_views['parents'][$participant->getParents()->getBy('id', $view->getUser())] = $view;
         }
         return $last_views;
     }

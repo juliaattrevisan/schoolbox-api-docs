@@ -31,7 +31,9 @@ class Model
     /**
      * User
      */
-    private int $userId;
+    private User $userId;
+    private User $user;
+//    private int $userId;
 
     /**
      * last Visit
@@ -100,13 +102,17 @@ class Model
     }
 
     /**
-     * @return int
+     * @return User
      */
-    public function getUserId(): int
+    public function getUserId(): User
     {
         return $this->userId;
     }
 
+    public function getUser(): User
+    {
+        return $this->user;
+    }
 
     /**
      * @param User $user
@@ -115,16 +121,16 @@ class Model
      */
     public function setUser(User $user): self
     {
-        $this->userId = $user->getId();
+        $this->user = $user;
         return $this;
     }
 
     /**
-     * @param int $userId
+     * @param User $userId
      * @return $this
      *
      */
-    public function setUserId(int $userId): self
+    public function setUserId($userId): self
     {
         $this->userId = $userId;
         return $this;

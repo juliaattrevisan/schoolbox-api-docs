@@ -209,7 +209,6 @@ class Controller extends Assessment\Controller
          * record view
          */
         $lastView = new Assessment\Views\LatestView();
-        $student->loadParents();
         $lastView->addNewView($assessment, $student, $this->getUser());
         $status = 'preSubmit';
 

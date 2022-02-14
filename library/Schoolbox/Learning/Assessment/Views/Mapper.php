@@ -33,10 +33,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('assessment_id', self::TYPE_INTEGER);
         $this->uses('participant_id', self::TYPE_INTEGER);
-        $this->uses('user_id', self::TYPE_INTEGER);
+//        $this->uses('user_id', self::TYPE_INTEGER);
 //        $this->joins('assessment_id', Assessment\IAssessable::class, 'id', null, null, 'assessment', 'assessment');
 //        $this->joins('participant_id', UserMapper::class, 'id', null, null, 'participant', 'participant');
-//        $this->joins('user_id', UserMapper::class, 'id', null, null, 'userId', 'userId');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('last_visit', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
 }

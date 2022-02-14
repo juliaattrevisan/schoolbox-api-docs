@@ -33,21 +33,22 @@
     {% if lastViews is defined %}
         {# set visit status #}
     {% set preSubmission = ('preSubmit' == status)  %}
-    {% set preFeedback = ('submitted' == status) %}
+    {% set postSubmission = ('submitted' == status) %}
     {% set postFeedback = ('postFeedback' == status) %}
         {# build frontend displays #}
     {% if lastViews.student is empty %}
         <li class="icon-staff-students">{{ student.fullname }} is yet to view this assessment</li>
     {% endif %}
     {% if lastViews.student is not empty %}
+        {% if postSubmission %}
         <li class="icon-staff-students" title="{{ lastViews.student.getLastVisit.getLocal() }}">{{ student.fullname }} has viewed this assessment</li>
-        {% if postFeedback %}
+        {% elseif postFeedback %}
         <li class="icon-staff-students" title="{{ lastViews.student.getLastVisit.getLocal() }}">{{ student.fullname }} has viewed the feedback</li>
         {% endif %}
     {% endif %}
     {% if lastViews.parents is not empty %}
 
-        {% if preFeedback %}
+        {% if postSubmission %}
         <li class="icon-staff" title="{{ lastViews.parents.getLastVisit.getLocal() }}">
         {% for parent in lastViews.parents %}
             {{ parent.fullname }}
@@ -55,9 +56,9 @@
         has viewed this assessment
         </li>
         {% elseif postFeedback %}
-        <li class="icon-staff" title="{{ lastViews.parents.getLastVisit.getLocal() }}">
+        <li class="icon-staff">
         {% for parent in lastViews.parents %}
-            {{ parent.fullname }}
+            <span title="{{ parent.getLastVisit.getLocal() }}">{{ parent.user.fullname }}</span>
         {% endfor %}
         has viewed the feedback
         </li>
