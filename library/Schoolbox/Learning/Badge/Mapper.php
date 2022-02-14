@@ -293,7 +293,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_badge', 'cn')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
+            INNER JOIN curriculum_badge cb ON badge.id = cb.badge_id
+            INNER JOIN curriculum_node cn ON cb.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
             WHERE {$pb->getWhereIntersect()}
         ";
 
