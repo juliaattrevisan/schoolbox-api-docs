@@ -113,11 +113,11 @@ class LatestView
          */
         foreach ($views as $view) {
             if ($participant->getId() === $view->getUserId()) {
-                $last_views['student'] = $participant;
+                $last_views['student'] = $view;
                 continue;
             }
             //parent full name
-            $last_views['parents'][] = $participant->getParents()->getBy('id', $view->getUserId());
+            $last_views['parents'][$participant->getParents()->getBy('id', $view->getUserId())] = $view;
         }
         return $last_views;
     }

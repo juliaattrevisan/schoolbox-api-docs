@@ -76,7 +76,8 @@
             canShowcase: canShowcase,
             isShowcased: isShowcased,
             participant: participant,
-            lastViews: lastViews
+            lastViews: lastViews,
+            status: status
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}

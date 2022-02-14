@@ -211,8 +211,10 @@ class Controller extends Assessment\Controller
         $lastView = new Assessment\Views\LatestView();
         $student->loadParents();
         $lastView->addNewView($assessment, $student, $this->getUser());
+        $status = 'preSubmit';
 
         $twigData = [
+            'status'       => $status,
             'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,

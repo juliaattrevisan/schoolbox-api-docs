@@ -366,12 +366,20 @@ class Controller extends Assessment\Controller
         $student->loadParents();
         $lastView->addNewView($assessment, $student, $this->getUser());
 
+        $status = 'preSubmit';
+        if ($participant->hasSubmittedResponse()) {
+            $status = 'submitted';
+        }
+        if ($participant->hasPublishedFeedback()) {
+            $status = 'postFeedback';
+        }
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
             'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
+            'status'        => $status,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),
