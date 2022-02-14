@@ -454,6 +454,14 @@ class Kernel extends WebKernelAbstract
             $this->authenticateUserForThisRequestOnly($user);
         }
 
+        // Time to start the session
+        // TODO is this necessary?
+        /** @var \Alaress\Session\Session $session */
+        $session = $this->di->get('session');
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
         /** @var \SitePage $sitePage */
         $sitePage = $this->di->get('sitePage');
 
@@ -699,6 +707,7 @@ class Kernel extends WebKernelAbstract
         $sessionHandler->create($user->getUsername());
 
         // Also: override the DI user with this user?
+        // TODO this is going to die when container is locked
         $this->di->set('user', $user);
 
         // Restore or destroy the session when all is done
