@@ -363,6 +363,7 @@ class Controller extends Assessment\Controller
          * record view
          */
         $lastView = new Assessment\Views\LatestView();
+        $student->loadParents();
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         /* Find all the records spawned by $participant

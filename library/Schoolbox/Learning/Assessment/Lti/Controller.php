@@ -210,10 +210,18 @@ class Controller extends Assessment\Controller
             $timeline = (new Assessment\Timeline\Generic($participant))->getForUser($this->getUser());
         }
 
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView();
+        $student->loadParents();
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
                 [
+                    'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
                     'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                                                   ->add([ $assessment->getTitle(), '' ]),
                     'assessment'  => $assessment,

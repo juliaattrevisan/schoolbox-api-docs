@@ -242,7 +242,15 @@ class Controller extends Assessment\Controller
         $canAttempt = $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId()
             && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
 
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView();
+        $student->loadParents();
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
         $twigData = [
+            'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'        => $assessment,
             'student'           => $student,

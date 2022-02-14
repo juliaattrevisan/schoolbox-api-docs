@@ -180,9 +180,17 @@ class Controller extends Assessment\Controller
             'teacherAssessed' => 'incomplete',
         ];
 
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView();
+        $student->loadParents();
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
+            'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '' ]),
             'student'     => $student,
             'assessment'  => $assessment,

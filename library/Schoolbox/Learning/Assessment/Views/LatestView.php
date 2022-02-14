@@ -68,10 +68,9 @@ class LatestView
         /**
          * check if use is either that student or the parents, then save
          */
-        $participant->loadParents();
         if (
             (null !== $participant->getParents() & $participant->getParents()->getBy('id', $user->getId())) ||
-             $participant === $user
+             $participant->getId() === $user->getId()
         ) {
             /**
              * save record
@@ -93,7 +92,7 @@ class LatestView
          */
         $last_views = [
             'student' => [],
-            'parent' => [],
+            'parents' => [],
         ];
         try {
             $views = $this->mapper->findByColumnList([
@@ -113,11 +112,12 @@ class LatestView
          * ]
          */
         foreach ($views as $view) {
-            if ($user->getId() === $view->getParticipantId()) {
-                $last_views['student'] = $view;
+            if ($participant->getId() === $view->getUserId()) {
+                $last_views['student'] = $participant;
                 continue;
             }
-            $last_views['parent'][] = $view;
+            //parent full name
+            $last_views['parents'][] = $participant->getParents()->getBy('id', $view->getUserId());
         }
         return $last_views;
     }

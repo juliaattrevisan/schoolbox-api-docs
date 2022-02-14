@@ -31,7 +31,39 @@
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
     {% if lastViews is defined %}
-    {# has student viewed? #}
-    {# has parent viewed? #}
+        {# set visit status #}
+    {% set preSubmission = false %}
+    {% set preFeedback = false %}
+    {% set postFeedback = false %}
+        {# build frontend displays #}
+    {% if lastViews.student is not empty %}
+        {% if preSubmission %}
+        <li class="icon-staff-students">{{ student.fullname }} is yet to view this assessment</li>
+        {% elseif preFeedback %}
+        <li class="icon-staff-students">{{ student.fullname }} has viewed this assessment</li>
+        {% elseif postFeedback %}
+        <li class="icon-staff-students">{{ student.fullname }} has viewed the feedback</li>
+        {% endif %}
     {% endif %}
+    {% if lastViews.parents is not empty %}
+
+        {% if preFeedback %}
+        <li class="icon-staff">
+        {% for parent in lastViews.parents %}
+            {{ parent.fullname }}
+        {% endfor %}
+        has viewed this assessment
+        </li>
+        {% elseif postFeedback %}
+        <li class="icon-staff">
+        {% for parent in lastViews.parents %}
+            {{ parent.fullname }}
+        {% endfor %}
+        has viewed the feedback
+        </li>
+        {% endif %}
+
+        {% endif %}
+    {% endif %}
+
 </ul>
