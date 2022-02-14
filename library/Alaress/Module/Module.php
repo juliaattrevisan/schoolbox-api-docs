@@ -306,9 +306,13 @@ class Module
      *
      * @param string $baseName
      * @return self
+     * @throws LogicException if module isn't installed
      */
     public static function retrieveInstalledModule(string $baseName): self
     {
+        if (!(self::$installedModules[$baseName] ?? null) instanceof Module) {
+            throw new LogicException(sprintf('Module "%s" does not exist', $baseName));
+        }
         return self::$installedModules[$baseName];
     }
 
@@ -488,11 +492,7 @@ class Module
     protected function initDependingModules()
     {
         foreach ($this->moduleDependencies as $dependency) {
-            $dependingModule = $this->getInjector()->get('module:' . $dependency);
-            if (!$dependingModule instanceof Module) {
-                throw new LogicException(sprintf('Module "%s" does not exist', $dependency));
-            }
-            $dependingModule->initControllerDependencies();
+            self::$installedModules[$dependency]->initControllerDependencies();
         }
     }
 

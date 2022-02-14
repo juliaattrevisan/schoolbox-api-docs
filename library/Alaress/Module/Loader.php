@@ -57,16 +57,18 @@ class Loader implements LoaderInterface
     {
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
-            if (empty($this->loadedModules[$moduleName])) {
-                if ($this->injector->has('module:' . $moduleName)) {
-                    $module = $this->injector->get('module:' . $moduleName);
-                    if ($module instanceof Module) {
-                        $module->initControllerDependencies();
-                    }
-                }
-                // Don't try to init again, even if it wasn't found
-                $this->loadedModules[$moduleName] = true;
-            }
+            $module     = Module::retrieveInstalledModule($moduleName);
+            $module->initControllerDependencies();
+//            if (empty($this->loadedModules[$moduleName])) {
+//                if ($this->injector->has('module:' . $moduleName)) {
+//                    $module = $this->injector->get('module:' . $moduleName);
+//                    if ($module instanceof Module) {
+//                        $module->initControllerDependencies();
+//                    }
+//                }
+//                // Don't try to init again, even if it wasn't found
+//                $this->loadedModules[$moduleName] = true;
+//            }
         }
     }
 }

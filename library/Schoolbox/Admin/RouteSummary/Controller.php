@@ -30,8 +30,9 @@ class Controller extends Base
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
-                /** @var BaseModule $module */
-                $module = $di->get('module:' . $parsedName['controller']);
+                $module = Module::retrieveInstalledModule($parsedName['controller']);
+//                /** @var BaseModule $module */
+//                $module = $di->get('module:' . $parsedName['controller']);
                 $module->initControllerDependencies();
                 $module->initControllers($di);
                 $controller = $di->get('controller:' . $parsedName['controller']);
