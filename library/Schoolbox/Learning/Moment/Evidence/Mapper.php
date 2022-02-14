@@ -229,7 +229,8 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_evidence', 'cn')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('curriculum_evidence', '', 'cn')}
+            INNER JOIN curriculum_evidence ce ON evidence.id = ce.evidence_id
+            INNER JOIN curriculum_node cn ON ce.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
             WHERE {$pb->getWhereIntersect()}
         ";
 
