@@ -15,6 +15,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -75,6 +76,22 @@ class Module extends BaseModule
 //                }
 //            ),
         ]));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(ContainerInterface $container): ?Base
+    {
+        return $this->installControllerDependencies(
+            new Controller(
+                $this->injector->get('kamiConnector'),
+                $this->injector->get('databaseFactory'),
+                $this->injector->get('databaseExternal'),
+                $this->getMapperFactory()->get(ConfigMapper::class)
+            ),
+            $container,
+        );
     }
 
 
