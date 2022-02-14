@@ -697,6 +697,8 @@ class Module
     /**
      * Initializes controller classes into the dependency injector.
      *
+     * @deprecated Must be removed and replaced with buildController due to DI
+     *
      * @param ContainerInterface $injector The dependency injection container.
      */
     public function initControllers(ContainerInterface $injector)
