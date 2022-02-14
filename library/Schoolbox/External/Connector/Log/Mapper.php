@@ -23,6 +23,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     private const EXPIRY_THRESHOLD = 1;
 
+
     /**
      * @inheritDoc
      */
@@ -36,6 +37,36 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('finish_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+    }
+
+
+    /**
+     * Find the most recent log stats
+     *
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function status(): array
+    {
+        $query = "
+            SELECT *
+            FROM sis_import_log
+            WHERE id IN (
+                SELECT MAX(id) from sis_import_log
+                GROUP BY script
+            )
+            ORDER BY script
+        ";
+
+        $statement = $this->getDatabase()->query($query);
+
+        $stack = array_fill_keys(Model::KNOWN_SCRIPTS, null);
+
+        while ($row = $statement->fetch()) {
+            $stack[$row['script']] = $this->hydrate($row);
+        }
+
+        return $stack;
     }
 
 

@@ -33,12 +33,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
 
-    /**
-     * This script name appears in the import log
-     */
-    private const SCRIPT_NAME = 'sisImporter';
-
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -159,7 +153,7 @@ NULLTYPE;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), self::SCRIPT_NAME);
+        ))->run(time(), Endpoint\Scheduler::SISIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
          */

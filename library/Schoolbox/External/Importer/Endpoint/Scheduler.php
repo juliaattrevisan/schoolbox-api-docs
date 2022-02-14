@@ -28,6 +28,21 @@ class Scheduler
     public const TWICE_DAILY = 'twiceDaily';
     public const DAILY       = 'daily';
 
+
+    /**
+     * This script name appears in the import log
+     *
+     * sisImporter is when you run an on-demand suds import via sisImporter.php
+     *
+     * schedular.php is a two-part system, the first imports regular sis data
+     * such as profiles and timetables - this manifests as "scheduler (sis)"
+     *
+     * The other part is TASS Calendar, which manifests as "scheduler (calendar)"
+     */
+    public const SISIMPORTER_SCRIPT_NAME = 'sisImporter';
+    public const SCHEDULER_SIS_SCRIPT_NAME = 'scheduler (sis)';
+    public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'scheduler (calendar)';
+
     /**
      * max execution time before we consider the import process timed out.
      */

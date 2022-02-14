@@ -298,6 +298,28 @@
                                 </div>
                             </li>
                             {% endif %}
+
+
+                            {% if suds_import_data_enabled %}
+                                {% for script, stats in suds_import_logs %}
+                                    <li>
+                                        <div class="small-5 columns content">
+                                            School Data: {{ script }}
+                                        </div>
+                                        <div class="small-7 columns content">
+                                            {% if stats %}
+                                                {% if stats.finishAt.isNull %}
+                                                    <span class="full-width alert label" title="Started at {{ stats.startAt.local }}">Not Finished</span>
+                                                {% else %}
+                                                    <span class="full-width success label" title="{{ stats.finishAt.local }}">Success</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="full-width neutral label">Never ran</span>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
                         {% endif %}
                     </ul>
                 </section>

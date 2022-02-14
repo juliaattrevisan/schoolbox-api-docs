@@ -23,6 +23,19 @@ class Model
 
 
     /**
+     * A list of known scripts that can occur for suds
+     *
+     * TODO This probably should be an enum, but I'll do that when
+     *  people have had a chance to rename my suggestions
+     */
+    public const KNOWN_SCRIPTS = [
+        \Schoolbox\External\Importer\Endpoint\Scheduler::SISIMPORTER_SCRIPT_NAME,
+        \Schoolbox\External\Importer\Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME,
+        \Schoolbox\External\Importer\Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME,
+    ];
+
+
+    /**
      * @var string
      */
     private string $script;
