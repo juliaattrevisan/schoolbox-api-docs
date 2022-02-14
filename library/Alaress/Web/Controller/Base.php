@@ -613,19 +613,23 @@ abstract class Base
 
     /**
      * @param IExceptionGenerator $eg
+     * @return $this
      */
-    public function setExceptionGenerator(IExceptionGenerator $eg)
+    public function setExceptionGenerator(IExceptionGenerator $eg): self
     {
         $this->eg = $eg;
+        return $this;
     }
 
 
     /**
      * @param null|HubInterface $sentry
+     * @return $this
      */
-    public function setSentry(?HubInterface $sentry)
+    public function setSentry(?HubInterface $sentry): self
     {
         $this->sentry = $sentry;
+        return $this;
     }
 
 
