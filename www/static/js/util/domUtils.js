@@ -1,14 +1,18 @@
+/*
+ * Basic DOM manipulation utilities
+ *
+ */
 
 /**
  * returns an integer indicating the position of the 
  * passed element relative to the original collection
  * replacement for $(el).index
  *
- * @param { DOMElement } the DOM element to find the index of
+ * @param { Element } the DOM element to find the index of
  * 
  * @return { Number } position of the DOM element
  */
-export function getIndex (element) {
+ export function getIndex (element) {
     if (!element) {
         return -1;
     }
@@ -19,12 +23,11 @@ export function getIndex (element) {
     return i;
 }
 
-
 /**
  * empty the element of children
  * replacement for $(el).empty
  *
- * @param { DOMElement } the DOM element to empty
+ * @param { Element } the DOM element to empty
  * 
  */
 export function empty (element) {
@@ -36,8 +39,8 @@ export function empty (element) {
 /**
  * switch elements, changing stacking order
  *
- * @param { DOMElement } the first DOM element
- * @param { DOMElement } the second DOM element
+ * @param { Element } the first DOM element
+ * @param { Element } the second DOM element
  * 
  */
 export function swapElements (firstElement, secondElement) {
@@ -47,8 +50,8 @@ export function swapElements (firstElement, secondElement) {
 /**
  * Insert the target node before the reference
  * 
- * @param { DOMElement } element to use as basis
- * @param { DOMElement } element that will be added
+ * @param { Element } element to use as basis
+ * @param { Element } element that will be added
  */
 export function insertElementBefore (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement);
@@ -57,8 +60,8 @@ export function insertElementBefore (referenceElement, targetElement) {
 /**
  * Insert the target node after the reference
  * 
- * @param { DOMElement } element to use as basis 
- * @param { DOMElement } element that will be added
+ * @param { Element } element to use as basis 
+ * @param { Element } element that will be added
  */
 export function insertElementAfter (referenceElement, targetElement) {
     referenceElement.parentNode.insertBefore(targetElement, referenceElement.nextSibling);
@@ -67,7 +70,7 @@ export function insertElementAfter (referenceElement, targetElement) {
 /**
  * put at the very top of the stack
  *
- * @param { DOMElement } the DOM element
+ * @param { Element } the DOM element
  * 
  */
  export function insertBeforeFirstChild (element) {
@@ -81,7 +84,7 @@ export function insertElementAfter (referenceElement, targetElement) {
  * @param { Element }  
  * @param { NodeList }  
  * 
- * @returns { DOMElement }   
+ * @returns { Element }   
  */
 export function getClosestElement (targetElement, elements) {
     const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
@@ -101,7 +104,7 @@ export function getClosestElement (targetElement, elements) {
 /**
  * To get an elements left and mid height point relative to the document
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * 
  * @returns { x, y }   
  */
@@ -115,7 +118,7 @@ export function getClosestElement (targetElement, elements) {
 /**
  * To get an elements mid point relative to the document
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * 
  * @returns { x, y }   
  */
@@ -129,8 +132,8 @@ export function getElementsMidPoint (element) {
 /**
  * Is the midpoint of an element above the midpoint of another element
  * 
- * @param { DOMElement }  
- * @param { DOMElement }  
+ * @param { Element }  
+ * @param { Element }  
  * 
  * @returns { Boolean }  
  */
@@ -141,8 +144,8 @@ export function isElementAboveOtherElement (firstElement, secondElement) {
 /**
  * Is the midpoint of an element below the midpoint of another element
  * 
- * @param { DOMElement }  
- * @param { DOMElement }  
+ * @param { Element }  
+ * @param { Element }  
  * 
  * @returns { Boolean }  
  */
@@ -151,9 +154,9 @@ export function isElementBelowOtherElement (firstElement, secondElement) {
 }
 
 /**
- * Is the midpoint of an element below the midpoint of another element
+ * Add styles to an element
  * 
- * @param { DOMElement }  
+ * @param { Element }  
  * @param { Styles } for example { position: 'absolute', top: '20px' } 
  */
 export function setStylesOnElement (element,styles) {
@@ -186,4 +189,40 @@ export function injectScript (src) {
 export function setAndGetAttribute (element, attribute, value) {
     element.setAttribute(attribute, value)
     return element.getAttribute(attribute);
+}
+
+/**
+ * When new HTML is added dynamically to page, we need to ensure any <script> tags
+ * have been loaded prior to adding the new HTML to the page
+ * 
+ * @param { HTMLString }  note: the HTML shouldn't exist in the DOM yet, so we can load properly
+ * 
+ * @return { Element } 
+ */
+export async function loadNewHTML (htmlString) {
+    const documentFragment = document.createRange().createContextualFragment(htmlString); //createContextualFragment ensures any </script> tags within the element are run
+    const scriptTags = documentFragment.querySelectorAll('script[src]'); //get each <script src></script>
+    const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page
+    for (const scriptTag of newScriptTags) { //add each into the document head
+        await injectScript(scriptTag.getAttribute('src'));
+        scriptTag.remove(); //remove each from the element as the <script> is now in the document head instead
+    } 
+    if (documentFragment.childElementCount === 1) { //should be returning a single div
+        return documentFragment.firstElementChild;
+    } else { //and if there's not, wrap everything around one
+        const wrappedElement = document.createElement('div');
+        wrappedElement.append(documentFragment);
+        return wrappedElement;
+    }
+}
+
+/** 
+ * Returns true if the script exists on the page
+ * 
+ * @param { String }
+ * 
+ * @returns { Boolean }
+ */
+export function isScriptAdded (src) {
+    return Boolean(document.querySelector(`script[src="${src}"]`));
 }

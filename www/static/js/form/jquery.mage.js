@@ -5,6 +5,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+import { loadNewHTML } from '@js/util/domUtils';
+
+
 ;(function ($, window, document, undefined) {
 
     var slideSlow = 600;
@@ -573,7 +577,9 @@
      * @param {jQuery} target
      * @param {*} data
      */
-    function xhrDone(onXhrDone, target, data) {
+    async function xhrDone(onXhrDone, target, data) {
+
+        const loadedHTMLData = await loadNewHTML(data);
 
         // ensure the error is slidden away (although onBefore should have handled it)
         target.find('[data-mage-error]').slideUp(slideSlow);
@@ -593,7 +599,7 @@
         $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
 
         // call the callback (this would include any specific manipulation for the section being targeted)
-        onXhrDone.call(this.element, data);
+        onXhrDone.call(this.element, loadedHTMLData.innerHTML);
 
         // if this is not the final section, the submit for the next section should be available, albeit hidden
         var nextMage = $('[name="' + this.nextPart +  '"]');
