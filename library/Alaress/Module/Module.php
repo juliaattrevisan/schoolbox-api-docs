@@ -11,6 +11,9 @@
 namespace Alaress\Module;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Route;
 use Aura\Router\Router;
@@ -18,6 +21,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
@@ -698,6 +702,47 @@ class Module
     public function initControllers(ContainerInterface $injector)
     {
     }
+
+
+    /**
+     * Actually builds the controller, possibly pulling from but not writing to
+     * the DI container.
+     *
+     * @param ContainerInterface $container
+     * @return Base|null
+     */
+    public function buildController(ContainerInterface $container): ?Base
+    {
+        return null;
+    }
+
+
+    /**
+     * Installs dependencies into the controller.
+     *
+     * Ported from DI configuration of controller
+     *
+     * @template T of Base
+     * @param T               $controller
+     * @param ContainerInterface $container
+     * @return T
+     */
+    protected function installControllerDependencies(Base $controller, ContainerInterface $container): Base
+    {
+        $controller
+            ->setRequest($container->get('webFactory')->newRequest())
+            ->setResponse($container->get('webFactory')->newResponse())
+            ->setSession($container->get('session'))
+            ->setRouter($container->get('router'))
+            ->setAuthorizer($container->get('authorizer'))
+            ->setDi($container)
+            ->setExceptionGenerator($container->get('mapperFactory')->get(ErrorMapper::class))
+            ->setSentry($container->has('sentry') ? $container->get('sentry') : null)
+            ->setIsJsonSpec(new IsJson())
+            ->setIsXhrSpec(new IsXhr());
+        return $controller;
+    }
+
 
     /**
      * @param  ContainerInterface $injector
