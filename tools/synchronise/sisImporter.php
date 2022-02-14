@@ -30,7 +30,14 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *   sis_timetable_cycle
  *   sis_timetable_period
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\App
+{
+
+    /**
+     * This script name appears in the import log
+     */
+    private const SCRIPT_NAME = 'sisImporter';
+
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -143,8 +150,6 @@ NULLTYPE;
 
         $randomMapper = UserMapper::getInstance();
 
-        /* TODO: Pass the script name to scheduler, for logging lastRun
-         */
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),
             $frequency,
@@ -153,7 +158,7 @@ NULLTYPE;
             $type,
             $file,
             $this->getLogger()
-        ))->run(time());
+        ))->run(time(), self::SCRIPT_NAME);
 
         /* Announce conclusion
          */

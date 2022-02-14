@@ -31,4 +31,44 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
+
+
+    /**
+     * A macro to set up and save a new record
+     *
+     * @param string $scriptName
+     * @return Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function start(string $scriptName): Model
+    {
+        $importLog = $this->createModel()
+            ->setScript($scriptName)
+            ->setStartAt(\Alaress_Date_Format::now());
+
+        $this->save($importLog);
+
+        return $importLog;
+    }
+
+
+    /**
+     * A macro to set up and save a new record
+     *
+     * @param Model $importLog
+     * @return Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function finish(Model $importLog): Model
+    {
+        $importLog->setFinishAt(\Alaress_Date_Format::now());
+
+        $this->save($importLog);
+
+        return $importLog;
+    }
 }

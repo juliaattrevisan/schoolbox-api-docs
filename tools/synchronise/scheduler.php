@@ -35,6 +35,12 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
 
+    /**
+     * This script name appears in the import log
+     */
+    private const SCRIPT_NAME = 'scheduler';
+
+
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -128,20 +134,16 @@ HELP;
          */
         $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        /* TODO: Pass the script name to scheduler, for logging lastRun
-         */
         (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $sisFactory, $type, $file, $this->getLogger()))
-            ->run(time());
+            ->run(time(), self::SCRIPT_NAME);
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
          */
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
 
-        /* TODO: Pass the script name to scheduler, for logging lastRun
-         */
         (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))
-            ->run(time());
+            ->run(time(), self::SCRIPT_NAME);
 
         /* Announce lock release
          */

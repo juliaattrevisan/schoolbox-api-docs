@@ -115,7 +115,7 @@ class Scheduler
      *
      * @param int $now
      */
-    public function run(int $now): void
+    public function run(int $now, string $scriptName): void
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             $composites = $this->factory->produce($this->file, $this->type);
@@ -129,14 +129,9 @@ class Scheduler
 
             /* TODO: Always log the start of the run
              */
+            $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
-            /* TODO: Augment the Factory's recipe with the finisher
-             *  This way you don't have to remember doing it in every factory;
-             *  you literally cannot forget to do it. It'll only log the finish
-             *  if you didn't crash somewhere in the process
-             *
-             * $composites->add(LastRun_Finisher)
-             */
+            $importLog = $importLogMapper->start($scriptName);
 
             try {
                 $this->logger->debug(sprintf(
@@ -148,6 +143,14 @@ class Scheduler
                 foreach ($composites as $composite) {
                     $composite->import();
                 }
+
+                /* Augment the Factory's recipe with the finisher
+                 *
+                 * This way you don't have to remember doing it in every factory;
+                 * you literally cannot forget to do it. It'll only log the finish
+                 * if you didn't crash somewhere in the process
+                 */
+                $importLogMapper->finish($importLog);
 
                 $this->logger->debug(sprintf(
                     'Committing transaction'
