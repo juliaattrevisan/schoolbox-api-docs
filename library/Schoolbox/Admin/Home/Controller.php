@@ -61,17 +61,31 @@ class Controller extends Base
     /** @var ConfigMapper  */
     private ConfigMapper $configMapper;
 
+
+    /**
+     * @var \Schoolbox\External\Connector\Log\Mapper
+     */
+    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
     /**
      * @param Kami\IConnector  $kamiConnector
      * @param Database\Factory $databaseFactory
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      */
-    public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal, ConfigMapper $configMapper)
-    {
+    public function __construct(
+        Kami\IConnector $kamiConnector,
+        Database\Factory $databaseFactory,
+        ?IConnector $databaseExternal,
+        ConfigMapper $configMapper,
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+    ) {
         $this->kamiConnector    = $kamiConnector;
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = $databaseExternal;
         $this->configMapper     = $configMapper;
+        $this->importLogMapper  = $importLogMapper;
     }
 
     /**
@@ -344,7 +358,7 @@ class Controller extends Base
         $importLogs = null;
 
         if ($sudsEnabled) {
-            $importLogs = \Schoolbox\External\Connector\Log\Mapper::getInstance()->status();
+            $importLogs = $this->importLogMapper->status();
         }
 
         $this->response->content->set(
