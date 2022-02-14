@@ -17,6 +17,12 @@ namespace Schoolbox\External\Connector\Log;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
+    /**
+     * Anything older than now minus EXPIRY_THRESHOLD days gets deleted
+     */
+    private const EXPIRY_THRESHOLD = 1;
+
     /**
      * @inheritDoc
      */
@@ -70,5 +76,28 @@ class Mapper extends \Schoolbox\Mapper
         $this->save($importLog);
 
         return $importLog;
+    }
+
+
+    /**
+     * Anything older than EXPIRY_THRESHOLD days gets...pruned away
+     *
+     * @return void
+     * @throws \PDOException
+     */
+    public function prune(): void
+    {
+        $threshold = \Alaress_Date_Format::now()->addDays(-1 * self::EXPIRY_THRESHOLD)->getDatabase();
+
+        $query = "
+            DELETE FROM {$this->getTable()} 
+            WHERE created_at < :threshold
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+
+        $statement->execute([
+            'threshold' => $threshold
+        ]);
     }
 }

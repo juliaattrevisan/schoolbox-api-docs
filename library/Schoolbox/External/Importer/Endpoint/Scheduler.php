@@ -164,6 +164,10 @@ class Scheduler
                  */
                 $this->importLogMapper->finish($importLog);
 
+                /* Trim away ancient logs
+                 */
+                $this->importLogMapper->prune();
+
                 $this->logger->debug(sprintf(
                     'Committing transaction'
                 ));
