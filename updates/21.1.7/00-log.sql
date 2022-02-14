@@ -1,0 +1,8 @@
+CREATE TABLE `sis_import_log` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `script` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `start_at` DATETIME NOT NULL,
+  `finish_at` DATETIME DEFAULT NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`));
