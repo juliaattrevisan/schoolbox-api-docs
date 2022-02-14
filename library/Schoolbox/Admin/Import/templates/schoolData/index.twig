@@ -199,6 +199,41 @@
             </div>
         </div>
 
+        {% if importLogs|length %}
+        <div class="small-12 island">
+            <h3 class="subheader">Previous Imports</h3>
+
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Script</th>
+                            <th>Start</th>
+                            <th>Finish</th>
+                            <th>Duration (sec)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for importLog in importLogs %}
+                        <tr>
+                            <td>{{ importLog.script }}</td>
+                            <td><time title="{{ importLog.startAt.database }}">{{ importLog.startAt.local }}</time></td>
+                            <td><time title="{{ importLog.finishAt.database }}">{{ importLog.finishAt.local }}</time></td>
+                            <td>
+                                {% if not importLog.finishAt.isNull %}
+                                <time title="{{ importLog.startAt.diffInSeconds(importLog.finishAt) }}">
+                                    {{ importLog.startAt.diffInSeconds(importLog.finishAt) }}
+                                </time>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="small-12 island">
             <h3 class="subheader">Your Data</h3>
 

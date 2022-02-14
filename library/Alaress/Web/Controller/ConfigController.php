@@ -30,13 +30,21 @@ abstract class ConfigController extends Base
 
 
     /**
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @var \Schoolbox\External\Connector\Log\Mapper
      */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory)
+    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
+    /**
+     * @param ConfigMapper                             $configMapper
+     * @param FieldStrategyFactory                     $fieldStrategyFactory
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     */
+    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory, \Schoolbox\External\Connector\Log\Mapper $importLogMapper)
     {
         $this->configMapper         = $configMapper;
         $this->fieldStrategyFactory = $fieldStrategyFactory;
+        $this->importLogMapper      = $importLogMapper;
     }
 
     /**

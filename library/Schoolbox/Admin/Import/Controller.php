@@ -70,6 +70,7 @@ class Controller extends ConfigController
             'configContext' => $configContext,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
+            'importLogs' => $this->importLogMapper->findAll()
         ])->setTitle('School Data Import'));
     }
 
