@@ -131,7 +131,7 @@ class Module extends RestfulModule
     {
         $matcher->add('#getQuizSummary#', function ($params) {
             /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
-            $dataSource = $this->getInjector()->get('assessmentDataSource');
+            $dataSource = $this->injector->get('assessmentDataSource');
 
             return [
                 "assessmentId"   => $params["assessmentId"],

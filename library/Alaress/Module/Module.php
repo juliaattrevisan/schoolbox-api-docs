@@ -49,7 +49,7 @@ class Module
      *
      * @var ContainerInterface
      */
-    protected $injector;
+    protected ContainerInterface $injector;
 
     /**
      * The base name for this module.
@@ -114,18 +114,12 @@ class Module
     /**
      * Constructor
      *
-     * TODO don't set $injector here, pass as a param to init() instead.
-     * (This would mean that custom constructors could be used, and $injector
-     *  shouldn't be used outside of init() anyway)
-     * (As of Aura.di 4 actually need to not pass the container: need to pass
-     *  the router)
-     *
      * @param ContainerInterface $injector
      * @param string             $basename
      */
     public function __construct(ContainerInterface $injector, $basename = '')
     {
-        $this->setInjector($injector);
+        $this->injector = $injector;
         if ($basename) {
             $this->setBasename($basename);
         }
@@ -223,9 +217,8 @@ class Module
      */
     protected function internalInit($basePath, $override)
     {
-        $injector = $this->getInjector();
         if ($this->installModule()) {
-            $this->initSubmodules($injector, $basePath);
+            $this->initSubmodules($this->injector, $basePath);
 
             // perform any route registration available
             $this->registerRoutes();
@@ -256,7 +249,7 @@ class Module
             return;
         }
         $this->isControllerDependenciesInstalled = true;
-//        $injector                                = $this->getInjector();
+//        $injector                                = $this->injector;
 //        $this->preInitControllerDependencies($injector);
 //        $this->initDependingModules();
 
@@ -615,7 +608,7 @@ class Module
     protected function getMapperFactory(): MapperFactory
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        return $this->getInjector()->get('mapperFactory');
+        return $this->injector->get('mapperFactory');
     }
 
     /**
@@ -623,7 +616,7 @@ class Module
      */
     protected function getExternalUser()
     {
-        return $this->getInjector()->get('externalUser');
+        return $this->injector->get('externalUser');
     }
 
     /**
@@ -631,7 +624,7 @@ class Module
      */
     protected function getExternalTimetable()
     {
-        return $this->getInjector()->get('externalTimetable');
+        return $this->injector->get('externalTimetable');
     }
 
     /**
@@ -679,7 +672,7 @@ class Module
      */
     protected function getConfig(): IConfigLoader
     {
-        return $this->getInjector()->get('config');
+        return $this->injector->get('config');
     }
 
     /**
@@ -749,23 +742,23 @@ class Module
     }
 
 
-    /**
-     * @param  ContainerInterface $injector
-     * @return $this
-     */
-    public function setInjector(ContainerInterface $injector)
-    {
-        $this->injector = $injector;
-        return $this;
-    }
-
-    /**
-     * @return ContainerInterface
-     */
-    public function getInjector()
-    {
-        return $this->injector;
-    }
+//    /**
+//     * @param  ContainerInterface $injector
+//     * @return $this
+//     */
+//    public function setInjector(ContainerInterface $injector)
+//    {
+//        $this->injector = $injector;
+//        return $this;
+//    }
+//
+//    /**
+//     * @return ContainerInterface
+//     */
+//    public function getInjector()
+//    {
+//        return $this->injector;
+//    }
 
     /**
      * @return string

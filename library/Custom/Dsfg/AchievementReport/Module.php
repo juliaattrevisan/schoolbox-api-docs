@@ -103,7 +103,7 @@ class Module extends BaseModule
          */
         return [
             'id' => $user->getId(),
-            'db' => $this->getInjector()->get('databaseExternal'),
+            'db' => $this->injector->get('databaseExternal'),
             'externalUser' => $externalUser,
             'user' => $user
         ];

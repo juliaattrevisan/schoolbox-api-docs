@@ -146,7 +146,7 @@ class Module extends BaseModule
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
                 return [
-                    'filterFactoryFactory' => $this->getInjector()->get('filters.factoryFactory'),
+                    'filterFactoryFactory' => $this->injector->get('filters.factoryFactory'),
                 ];
             }
         );
@@ -209,22 +209,22 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
+            'assessmentMapperProxy' => $this->injector->lazyGet('assessmentDataSource'),
             'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
             'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
             'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'externalClass'         => $this->getInjector()->get('externalClass'),
+            'externalClass'         => $this->injector->get('externalClass'),
             'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
             'logMapper'             => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
             'rosettaStone'          => $injector->lazyGet('l10n'),
             'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
             'classListFactory'      => $injector->lazy(function () {
                 /** @var IConnector $database */
-                $database = $this->getInjector()->get('databaseInternal');
+                $database = $this->injector->get('databaseInternal');
                 return new Folder\ClassListFactory($database);
             }),
-            'database'              => $this->getInjector()->get('databaseInternal'),
+            'database'              => $this->injector->get('databaseInternal'),
         ];
     }
 

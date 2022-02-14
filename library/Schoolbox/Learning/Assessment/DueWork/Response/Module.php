@@ -143,7 +143,7 @@ class Module extends BaseModule
      */
     private function getKamiConnector()
     {
-        return $this->getInjector()->get('kamiConnector');
+        return $this->injector->get('kamiConnector');
     }
 
 

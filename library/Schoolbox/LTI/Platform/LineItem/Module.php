@@ -36,7 +36,7 @@ class Module extends BaseModule
     {
         $preloadAssessment = function (array $params) {
             /** @var AssessmentDataSource $assessmentDataSource */
-            $assessmentDataSource = $this->getInjector()->get('assessmentDataSource');
+            $assessmentDataSource = $this->injector->get('assessmentDataSource');
             try {
                 $assessment = $assessmentDataSource->findByIdForReview($params['assessmentId']);
             } catch (MapperException $e) {

@@ -65,7 +65,7 @@ class Module extends BaseModule
                                 }
 
                                 /** @var IConnector $externalDb */
-                                $externalDb = $this->getInjector()->get('databaseExternal');
+                                $externalDb = $this->injector->get('databaseExternal');
 
                                 /* Permission to NCEA Report and its button, controlled by STK
                                  */

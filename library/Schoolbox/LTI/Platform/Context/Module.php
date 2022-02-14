@@ -64,7 +64,7 @@ class Module extends BaseModule
                     $componentInstanceMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
 
                     /** @var SitePage $page */
-                    $page = $this->getInjector()->get('sitePage');
+                    $page = $this->injector->get('sitePage');
 
                     $factory           = new Component_Homepage_Factory(new User(), $page);
                     $componentInstance = $componentInstanceMapper->findByInstanceId($params['componentId']);

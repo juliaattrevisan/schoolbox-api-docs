@@ -356,10 +356,10 @@ class Module extends BaseModule
                 try {
                     // TODO make current user easily available in path matcher
                     /** @var DataSource $pastoralDataSource */
-                    $pastoralDataSource = $this->getInjector()->get('pastoralDataSource');
+                    $pastoralDataSource = $this->injector->get('pastoralDataSource');
 
                     /** @var User $user */
-                    $user = $this->getInjector()->get('user');
+                    $user = $this->injector->get('user');
 
                     $record                      = $pastoralDataSource->findById($user, $params['recordId']);
                     $injectedValues['record']    = $record;

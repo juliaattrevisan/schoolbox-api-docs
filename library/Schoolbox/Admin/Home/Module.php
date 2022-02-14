@@ -63,8 +63,8 @@ class Module extends BaseModule
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
             'configMapper'     => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'kamiConnector'    => $this->getInjector()->lazyGet('kamiConnector'),
-            'databaseFactory'  => $this->getInjector()->lazyGet('databaseFactory'),
+            'kamiConnector'    => $this->injector->lazyGet('kamiConnector'),
+            'databaseFactory'  => $this->injector->lazyGet('databaseFactory'),
             'databaseExternal' => $injector->lazyGet('databaseExternal'),
 //            'databaseExternal' => $injector->lazy(
 //                static function () use ($injector) {

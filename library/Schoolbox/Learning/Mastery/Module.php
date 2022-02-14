@@ -100,7 +100,7 @@ class Module extends BaseModule
             $injector->lazyNew(Controller::class, [
                 'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
+                'defaultGradeGroup'          => $this->injector->get('defaultGradeGroup'),
                 'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
             ])
         );

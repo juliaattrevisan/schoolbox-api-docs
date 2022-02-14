@@ -55,13 +55,13 @@ class Module extends BaseModule
             function () {
 
                 /** @var Di\Container $di */
-                $di = $this->getInjector();
+                $di = $this->injector;
 
                 // prep the key Redis will use for this dry run
                 $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
 
                 return array(
-                    'provisioner' => $this->getInjector()->get('ups.provisioner'),
+                    'provisioner' => $this->injector->get('ups.provisioner'),
                 );
             }
         );

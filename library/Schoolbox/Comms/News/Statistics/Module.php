@@ -104,7 +104,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'databaseInternal' => $injector->lazy(function () {
-                return $this->getInjector()->get('databaseInternal');
+                return $this->injector->get('databaseInternal');
             }),
             'statisticsMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Cumulative\Mapper::class),

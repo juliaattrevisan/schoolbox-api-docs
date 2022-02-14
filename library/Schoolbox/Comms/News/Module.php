@@ -57,7 +57,7 @@ class Module extends BaseModule
 
         $canCreate = new Rule\LazyCallback(function () {
             /** @var IConnector $db */
-            $db = $this->getInjector()->get('databaseInternal');
+            $db = $this->injector->get('databaseInternal');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -76,8 +76,8 @@ class Module extends BaseModule
              * @var UserResolver $userResolver
              * @var StrategyFactory $strategyFactory
              */
-            $userResolver    = $this->getInjector()->get('commsNewsUserResolver');
-            $strategyFactory = $this->getInjector()->get('commsNewsAudienceStrategyFactory');
+            $userResolver    = $this->injector->get('commsNewsUserResolver');
+            $strategyFactory = $this->injector->get('commsNewsAudienceStrategyFactory');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -140,7 +140,7 @@ class Module extends BaseModule
         // Associating a discussion thread with a comms article:
         // Use the authorizer the discussion thread uses.
         $canAssociate = new Rule\Callback(function ($params, ?User $user) {
-            $authorizer = $this->getInjector()->get('authorizer');
+            $authorizer = $this->injector->get('authorizer');
             $rule       = new CanModerateThread(
                 $authorizer,
                 new ThreadLocator(

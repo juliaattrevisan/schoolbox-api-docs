@@ -319,7 +319,7 @@ class Module extends BaseModule
      */
     protected function getAssessmentDataSource()
     {
-        return $this->getInjector()->get('assessmentDataSource');
+        return $this->injector->get('assessmentDataSource');
     }
 
 
@@ -379,6 +379,6 @@ class Module extends BaseModule
      */
     protected function getParticipantDataSource()
     {
-        return $this->getInjector()->get('participantDataSource');
+        return $this->injector->get('participantDataSource');
     }
 }

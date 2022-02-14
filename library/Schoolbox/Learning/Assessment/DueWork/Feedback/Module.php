@@ -352,7 +352,7 @@ class Module extends BaseModule
      */
     public function getAssessmentDataSource()
     {
-        return $this->getInjector()->get('assessmentDataSource');
+        return $this->injector->get('assessmentDataSource');
     }
 
     /**
@@ -361,7 +361,7 @@ class Module extends BaseModule
      */
     public function getParticipantDataSource()
     {
-        return $this->getInjector()->get('participantDataSource');
+        return $this->injector->get('participantDataSource');
     }
 
     /**
@@ -370,7 +370,7 @@ class Module extends BaseModule
      */
     public function getResponseDataSource()
     {
-        return $this->getInjector()->get('responseDataSource');
+        return $this->injector->get('responseDataSource');
     }
 
     /**
@@ -379,6 +379,6 @@ class Module extends BaseModule
      */
     public function getFeedbackDataSource()
     {
-        return $this->getInjector()->get('feedbackDataSource');
+        return $this->injector->get('feedbackDataSource');
     }
 }

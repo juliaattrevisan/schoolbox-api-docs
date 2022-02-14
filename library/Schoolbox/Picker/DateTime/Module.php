@@ -120,10 +120,10 @@ class Module extends BaseModule
                 'termMapper'          => $this->getMapperFactory()->getLazy(TermMapper::class),
                 'folderMapper'        => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'timetableHandler'    => $this->getInjector()->lazyGet('externalTimetable'),
-                'participationFinder' => $this->getInjector()->lazyNew(
+                'timetableHandler'    => $this->injector->lazyGet('externalTimetable'),
+                'participationFinder' => $this->injector->lazyNew(
                     Finder::class,
-                    ['database' => $this->getInjector()->lazyGet('databaseInternal')]
+                    ['database' => $this->injector->lazyGet('databaseInternal')]
                 )
             ])
         );

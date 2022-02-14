@@ -170,7 +170,7 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
         $injector->params[Controller::class] = [
-            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
+            'assessmentMapperProxy' => $this->injector->lazyGet('assessmentDataSource'),
             'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             'folderMapper'          => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
