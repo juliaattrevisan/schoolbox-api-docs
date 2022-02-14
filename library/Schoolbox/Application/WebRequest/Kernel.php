@@ -308,12 +308,16 @@ class Kernel extends WebKernelAbstract
         }
 
         // now the preloading is done initialise the controller
-        $module->initControllers($this->di);
+        $controller = $module->buildController($this->di);
         unset($module);
 
-        // TODO replace with a create controller method
-        /** @var \Alaress\Web\Controller\Base $controller */
-        $controller = $this->di->get('controller:' . $controllerName);
+//        // now the preloading is done initialise the controller
+//        $module->initControllers($this->di);
+//        unset($module);
+//
+//        // TODO replace with a create controller method
+//        /** @var \Alaress\Web\Controller\Base $controller */
+//        $controller = $this->di->get('controller:' . $controllerName);
 
         // The user is now injected directly into the controller, instead of the
         // user being loaded from the session within the controller.
