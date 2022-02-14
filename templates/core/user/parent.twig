@@ -2,7 +2,7 @@
  # Parent Profile
  #
  # showEmails   bool    Spec pattern to decide whether email address is visible
- # showDetails  bool    Spec patternt to decide whether details are visible
+ # showDetails  bool    Spec pattern to decide whether details are visible
  #}
 
 {# Permissions #}
@@ -88,7 +88,7 @@
                                 {% endblock home_address %}
                                 <dt class="small-12 medium-3">Role:</dt>
                                 <dd class="small-12 medium-9">{{ user.role.name }}</dd>
-                                {% if externalUser and externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
+                                {% if externalUser and externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (spouse is null or not spouse.getHideContacts) %}
                                     <dt class="small-12">Partner:</dt>
                                     <dd class="small-12">
                                         <div class="card small-12">
