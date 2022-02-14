@@ -13,14 +13,13 @@ namespace Alaress\Web\Controller;
 use Alaress\Module\Module;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
-use Aura\Di;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -41,9 +40,9 @@ abstract class Base
     protected $response;
 
     /**
-     * @var Di\Container
+     * @deprecated you should be injecting your dependencies from the constructor!
      */
-    protected $di;
+    protected ContainerInterface $di;
 
     /**
      * @var Router
@@ -143,10 +142,12 @@ abstract class Base
     }
 
     /**
-     * @param  Di\Container $di
+     * @deprecated you should be injecting your dependencies from the constructor!
+     *
+     * @param  ContainerInterface $di
      * @return $this
      */
-    public function setDi($di)
+    public function setDi(ContainerInterface $di)
     {
         $this->di = $di;
         return $this;
@@ -155,9 +156,9 @@ abstract class Base
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
      *
-     * @return Di\Container
+     * @return ContainerInterface
      */
-    public function getDi()
+    public function getDi(): ContainerInterface
     {
         return $this->di;
     }
@@ -359,7 +360,6 @@ abstract class Base
      * @param  string $name The name of the controller, as defined in the
      *                      controller's module's basename.
      * @return self
-     * @throws ServiceNotFound
      */
     protected function getController($name)
     {
@@ -376,7 +376,7 @@ abstract class Base
 //        /** @var self $controller */
 //        $controller = $this->getDi()->get("controller:$name");
 
-        $controller = $module->buildController($this->getDi());
+        $controller = $module->buildController($this->di);
         $controller->setUser($this->user);
         return $controller;
     }
