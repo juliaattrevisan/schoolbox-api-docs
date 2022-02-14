@@ -118,6 +118,19 @@ class Redis
     }
 
     /**
+     * Get the signal queue instance of this wrapper. (Unused, but provided for
+     * completeness.)
+     *
+     * @see INSTANCE_SIGNAL_QUEUE
+     *
+     * @return self
+     */
+    public static function getSignalQueueInstance(): self
+    {
+        return self::getInstance(self::INSTANCE_SIGNAL_QUEUE);
+    }
+
+    /**
      * Aliases the connection `$connectionName` to `$aliasName`.
      *
      * @param string $connectionName
@@ -164,6 +177,18 @@ class Redis
     public static function getStorageClientInstance(): ?Predis\ClientInterface
     {
         return self::getClientInstance(self::INSTANCE_STORAGE);
+    }
+
+    /**
+     * Gets client within the signal queue instance of this wrapper.
+     *
+     * @see INSTANCE_SIGNAL_QUEUE
+     *
+     * @return null|Predis\ClientInterface
+     */
+    public static function getSignalQueueClientInstance(): ?Predis\ClientInterface
+    {
+        return self::getClientInstance(self::INSTANCE_SIGNAL_QUEUE);
     }
 
     /**

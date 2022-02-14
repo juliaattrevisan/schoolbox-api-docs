@@ -377,7 +377,7 @@ abstract class Kernel
         //  only in the daemon kernel: this is because it requires the event
         //  loop)
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
-        $di->set('redis.signalQueue.pub', Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE));
+        $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
         // Default Redis connection:
         // uses cache, and raises a warning telling you to choose a connector

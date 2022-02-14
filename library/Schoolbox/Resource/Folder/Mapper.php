@@ -380,7 +380,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // TODO desingleton these
             $redis      = Redis::getStorageClientInstance();
             $log        = new NullLogger();
-            $redisQueue = Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE);
+            $redisQueue = Redis::getSignalQueueClientInstance();
 
             // update the cache
             // TODO replace with $di('subscriptionCache')

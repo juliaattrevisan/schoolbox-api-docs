@@ -46,7 +46,7 @@ if (!isset($opts['d'])) {
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
     /** @var \Redis $redis */
-    $redis = Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE);
+    $redis = Redis::getSignalQueueClientInstance();
 
     $loop = isset($opts['loop']) ? (int)($opts['loop']) : 1;
 

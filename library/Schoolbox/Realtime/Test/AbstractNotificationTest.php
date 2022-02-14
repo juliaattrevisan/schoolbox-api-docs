@@ -105,7 +105,7 @@ abstract class AbstractNotificationTest extends AbstractTest
 
         // TODO should this be the cache or storage?
         $this->redis = Redis::getStorageClientInstance();
-        $this->redisQueue = Redis::getClientInstance(Redis::INSTANCE_SIGNAL_QUEUE);
+        $this->redisQueue = Redis::getSignalQueueClientInstance();
         $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
