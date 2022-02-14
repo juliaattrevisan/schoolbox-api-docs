@@ -370,7 +370,7 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'last_views'    => $lastView->getAllViews($assessment, $student),
+            'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),

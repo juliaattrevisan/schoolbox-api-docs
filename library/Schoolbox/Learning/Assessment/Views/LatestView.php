@@ -39,8 +39,8 @@ class LatestView
      * is new? or existing?
      * update value
      * @param IAssessable $assessment
-     * @param User $participant
-     * @param User $user
+     * @param User $participant (student)
+     * @param User $user (student, parent's)
      */
     public function addNewView(IAssessable $assessment, User $participant, User $user): void
     {
@@ -66,17 +66,27 @@ class LatestView
         $last_view->setLastVisit(\Alaress_Date_Format::now());
 
         /**
-         * save record
+         * check if use is either that student or the parents, then save
          */
-        $this->mapper->save($last_view);
+        $participant->loadParents();
+        if (
+            (null !== $participant->getParents() & $participant->getParents()->getBy('id', $user->getId())) ||
+             $participant === $user
+        ) {
+            /**
+             * save record
+             */
+            $this->mapper->save($last_view);
+        }
     }
 
     /**
      * get views all
      * @param IAssessable $assessment
-     * @param User $participant
+     * @param User $participant (student)
+     * @param User $user (student, parent's)
      */
-    public function getAllViews(IAssessable $assessment, User $participant): array
+    public function getAllViews(IAssessable $assessment, User $participant, User $user): array
     {
         /**
          * find latest views for assessment and participant
@@ -103,7 +113,7 @@ class LatestView
          * ]
          */
         foreach ($views as $view) {
-            if ($participant->getId() === $view->getParticipantId()) {
+            if ($user->getId() === $view->getParticipantId()) {
                 $last_views['student'] = $view;
                 continue;
             }
@@ -115,8 +125,8 @@ class LatestView
     /**
      * get single user view
      * @param IAssessable $assessment
-     * @param User        $participant
-     * @param User        $user
+     * @param User        $participant (student)
+     * @param User        $user (student, parent's)
      * @return \Alaress_Date_Format|null
      */
     public function getView(IAssessable $assessment, User $participant, User $user): ?\Alaress_Date_Format
