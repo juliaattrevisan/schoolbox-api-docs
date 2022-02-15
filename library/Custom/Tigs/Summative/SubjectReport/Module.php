@@ -64,7 +64,7 @@ class Module extends Alaress\Module\Module
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): ?Base
+    public function buildController(ContainerInterface $container): Base
     {
         return new Controller(
             $container->get('externalUser'),

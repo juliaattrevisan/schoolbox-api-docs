@@ -43,9 +43,9 @@ class Module extends Alaress\Module\Module
 
     /**
      * @param ContainerInterface $container
-     * @return Base|null
+     * @return Base
      */
-    public function buildController(ContainerInterface $container): ?Base
+    public function buildController(ContainerInterface $container): Base
     {
         return new Controller();
     }

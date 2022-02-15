@@ -58,7 +58,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): ?Base
+    public function buildController(ContainerInterface $container): Base
     {
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $container->get('assessmentDataSource');
