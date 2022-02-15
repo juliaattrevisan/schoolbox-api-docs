@@ -157,7 +157,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * A macro to set up and save a new record
+     * Update with Complete status with the time it ended
      *
      * @param Model $importLog
      * @return Model
@@ -170,6 +170,28 @@ class Mapper extends \Schoolbox\Mapper
         $importLog
             ->setStatus(Model::STATUS_COMPLETE)
             ->setFinishAt(\Alaress_Date_Format::now());
+
+        $this->save($importLog);
+
+        return $importLog;
+    }
+
+
+    /**
+     * Update with Error status and error message, for diagnostics
+     *
+     * @param Model  $importLog
+     * @param string $errorMessage
+     * @return Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function error(Model $importLog, string $errorMessage): Model
+    {
+        $importLog
+            ->setStatus(Model::STATUS_ERROR)
+            ->setErrorMessage($errorMessage);
 
         $this->save($importLog);
 

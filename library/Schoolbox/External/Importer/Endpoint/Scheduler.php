@@ -197,6 +197,16 @@ class Scheduler
                 ));
 
                 $this->db->rollBack();
+
+                /* Something happened with the api; log it
+                 */
+                $this->importLogMapper->error($importLog, $e->getMessage());
+            } catch (\Throwable | \Exception $e) {
+                $this->db->rollBack();
+
+                /* Some kind of unexpected fatal; log it
+                 */
+                $this->importLogMapper->error($importLog, $e->getMessage());
             }
         }
     }
