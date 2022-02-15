@@ -214,14 +214,13 @@ class Controller extends Assessment\Controller
          * record view
          */
         $lastView = new Assessment\Views\LatestView();
-        $student->loadParents();
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
                 [
-                    'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
+                    'lastViews'    => $lastView->getTwigViews($assessment, $participant),
                     'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                                                   ->add([ $assessment->getTitle(), '' ]),
                     'assessment'  => $assessment,

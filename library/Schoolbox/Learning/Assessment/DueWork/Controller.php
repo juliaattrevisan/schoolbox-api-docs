@@ -365,22 +365,12 @@ class Controller extends Assessment\Controller
         $lastView = new Assessment\Views\LatestView();
         $lastView->addNewView($assessment, $student, $this->getUser());
 
-        $status = ['preSubmit' => false];
-        if ($participant) {
-            if ($participant->hasSubmittedResponse()) {
-                $status = ['submitted' => $participant->getSubmittedResponses()->last()->getUpdatedAt()];
-            }
-            if (null !== $participant & $participant->hasPublishedFeedback()) {
-                $status = ['feedback' => $participant->getPublishedFeedbacks()->last()->getUpdatedAt()];
-            }
-        }
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'lastViews'    => $lastView->getAllViews($assessment, $student, $this->getUser()),
-            'status'        => $status,
+            'lastViews'    => $lastView->getTwigViews($assessment, $participant),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),
