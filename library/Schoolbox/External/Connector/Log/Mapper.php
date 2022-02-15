@@ -32,9 +32,12 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('sis_import_log');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('run_id', self::TYPE_STRING);
         $this->uses('script', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->uses('finish_at', self::TYPE_DATETIME);
+        $this->uses('status', self::TYPE_STRING);
+        $this->uses('error_message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }

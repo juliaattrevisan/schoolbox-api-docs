@@ -35,9 +35,36 @@ class Model
 
 
     /**
+     * These constts explicitly indicate the status of an import
+     * without having to infer meaning from a null finish_at
+     */
+    private const STATUS_RUNNING = 'running';
+    private const STATUS_COMPLETE = 'complete';
+    private const STATUS_ERROR = 'error';
+
+
+    /**
+     * @var string
+     */
+    private string $runId;
+
+
+    /**
      * @var string
      */
     private string $script;
+
+
+    /**
+     * @var string
+     */
+    private string $status;
+
+
+    /**
+     * @var string
+     */
+    private string $errorMessage;
 
 
     /**
@@ -61,7 +88,6 @@ class Model
 
     /* Getters/Setters
      */
-
 
     /**
      * @return string
@@ -119,6 +145,66 @@ class Model
     public function setFinishAt(?\Alaress_Date_Format $finishAt): self
     {
         $this->finishAt = $finishAt;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getRunId(): string
+    {
+        return $this->runId;
+    }
+
+
+    /**
+     * @param string $runId
+     * @return Model
+     */
+    public function setRunId(string $runId): self
+    {
+        $this->runId = $runId;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @param string $status
+     * @return Model
+     */
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
+    }
+
+
+    /**
+     * @param string $errorMessage
+     * @return Model
+     */
+    public function setErrorMessage(string $errorMessage): self
+    {
+        $this->errorMessage = $errorMessage;
         return $this;
     }
 }
