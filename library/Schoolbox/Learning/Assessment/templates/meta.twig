@@ -30,16 +30,15 @@
         #}
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
-    {% if lastViews is defined and USER.role.isStaff() %}
-    <li class="icon-staff-students" title="{{ student.date }}">
-        {{ student.fullname }} {{ student.status }}
-        {% if 'assessment' is same as(student.object) %} {{ locale.assessment }}{% else %} feedback {% endif %}
+    {% if lastViews is not empty and USER.role.isStaff() %}
+    <li class="icon-staff-students" title="{{ lastViews.student.date }}">
+        {{ lastViews.student.name }} {{ lastViews.student.status }}
+        {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
     </li>
-
     {% for parent in lastViews.parents %}
     <li class="icon-staff">
             <span title="{{ parent.date }}">{{ parent.name }}</span>
-        {{ parent.status }} {% if 'assessment' is same as(parent.object) %} {{ locale.assessment }}{% else %} feedback {% endif %}
+        {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
     </li>
     {% endfor %}
     {% endif %}

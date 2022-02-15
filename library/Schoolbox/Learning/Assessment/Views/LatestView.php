@@ -160,11 +160,16 @@ class LatestView
      * [status: (has viewed), object: 'assessment / feedback', 'date': date last view or (null) ]
      * ]
      * @param IAssessable $assessment
-     * @param Participant $participant (student)
+     * @param Participant|null $participant (student)
      * @return array
      */
-    public function getTwigViews(IAssessable $assessment, Participant $participant): array
+    public function getTwigViews(IAssessable $assessment, ?Participant $participant): array
     {
+        //if no participant, must be submitting the assessment, so exit
+        if (null === $participant) {
+            return [];
+        }
+
         $views = [
             'student' => [
                 'name'      => $participant->getUser()->getFullName(),
@@ -195,11 +200,17 @@ class LatestView
              */
             return [];
         }
+        if (empty($last_views)) {
+            /**
+             * no data, error out, the student has submitted, but previously, so there is no data to use, so lets hide the fields.
+             */
+            return [];
+        }
         /**
          * set the student values
          */
         /** @var Model $studentView */
-        $studentView = $last_views->getBy('user_id', $participant->getUser()->getId());
+        $studentView = $last_views->getBy('user', $participant->getUser());
         $views['student']['status'] = 'has viewed';
         $views['student']['date']   = $studentView->getLastVisit()->getLocal();
         $views['student']['object'] = 'assessment';
@@ -226,7 +237,7 @@ class LatestView
              * check if viewed?
              */
             /** @var Model|null $parentView */
-            $parentView = $last_views->getBy('user_id', $parent->getId());
+            $parentView = $last_views->getBy('user', $parent);
             if (null !== $parentView) {
                 $date = $parentView->getLastVisit();
                 $view['date'] = $date->getLocal();
