@@ -376,7 +376,10 @@ abstract class Base
 //        /** @var self $controller */
 //        $controller = $this->getDi()->get("controller:$name");
 
-        $controller = $module->buildController($this->di);
+        $controller = $module->installControllerDependencies(
+            $module->buildController($this->di),
+            $this->di,
+        );
         $controller->setUser($this->user);
         return $controller;
     }

@@ -731,7 +731,7 @@ class Module
      * @param ContainerInterface $container
      * @return T
      */
-    protected function installControllerDependencies(Base $controller, ContainerInterface $container): Base
+    public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
         $controller
             ->setRequest($container->get('webFactory')->newRequest())
