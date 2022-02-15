@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * An interface for module loaders.
  *
@@ -17,5 +19,5 @@ interface LoaderInterface
      *
      * @param string $moduleString A string to extract a module name from somehow.
      */
-    public function loadModule($moduleString);
+    public function loadModule(string $moduleString);
 }

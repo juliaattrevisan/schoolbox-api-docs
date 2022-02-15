@@ -810,7 +810,7 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di) {
                     $config      = $di->get('config');
-                    $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
+                    $chainLoader = new ChainLoader(new ModuleLoader('[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
                     $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_school_code} over templates/core
                     $basePath     = SITE_root . '/templates/';

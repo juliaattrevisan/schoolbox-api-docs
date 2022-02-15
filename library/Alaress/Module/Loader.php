@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * A loader class for loading module's controller dependencies dynamically.
  *
@@ -42,7 +44,7 @@ class Loader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadModule($moduleString)
+    public function loadModule(string $moduleString)
     {
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
