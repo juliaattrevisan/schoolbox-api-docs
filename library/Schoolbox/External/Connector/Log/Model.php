@@ -38,9 +38,9 @@ class Model
      * These constts explicitly indicate the status of an import
      * without having to infer meaning from a null finish_at
      */
-    private const STATUS_RUNNING = 'running';
-    private const STATUS_COMPLETE = 'complete';
-    private const STATUS_ERROR = 'error';
+    public const STATUS_RUNNING = 'running';
+    public const STATUS_COMPLETE = 'complete';
+    public const STATUS_ERROR = 'error';
 
 
     /**
@@ -62,9 +62,9 @@ class Model
 
 
     /**
-     * @var string
+     * @var ?string
      */
-    private string $errorMessage;
+    private ?string $errorMessage = null;
 
 
     /**
@@ -190,19 +190,19 @@ class Model
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getErrorMessage(): string
+    public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
     }
 
 
     /**
-     * @param string $errorMessage
+     * @param null|string $errorMessage
      * @return Model
      */
-    public function setErrorMessage(string $errorMessage): self
+    public function setErrorMessage(?string $errorMessage): self
     {
         $this->errorMessage = $errorMessage;
         return $this;

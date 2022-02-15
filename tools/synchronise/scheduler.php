@@ -124,6 +124,11 @@ HELP;
          */
         $randomMapper = UserMapper::getInstance();
 
+        /* This identifier indicates that the two schedulers were part of this
+         * script execution together
+         */
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
         /* Execute scheduler: sis stuff
          */
         $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
@@ -137,7 +142,7 @@ HELP;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+        ))->run(time(), $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
@@ -153,7 +158,7 @@ HELP;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
+        ))->run(time(), $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
 
         /* Announce lock release
          */

@@ -135,16 +135,19 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * A macro to set up and save a new record
      *
+     * @param string $runId
      * @param string $scriptName
      * @return Model
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function start(string $scriptName): Model
+    public function start(string $runId, string $scriptName): Model
     {
         $importLog = $this->createModel()
+            ->setRunId($runId)
             ->setScript($scriptName)
+            ->setStatus(Model::STATUS_RUNNING)
             ->setStartAt(\Alaress_Date_Format::now());
 
         $this->save($importLog);
@@ -164,7 +167,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function finish(Model $importLog): Model
     {
-        $importLog->setFinishAt(\Alaress_Date_Format::now());
+        $importLog
+            ->setStatus(Model::STATUS_COMPLETE)
+            ->setFinishAt(\Alaress_Date_Format::now());
 
         $this->save($importLog);
 

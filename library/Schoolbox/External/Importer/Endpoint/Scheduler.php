@@ -139,12 +139,13 @@ class Scheduler
      * Execute the importer at $now
      *
      * @param int    $now
+     * @param string $runId
      * @param string $scriptName
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function run(int $now, string $scriptName): void
+    public function run(int $now, string $runId, string $scriptName): void
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             $composites = $this->factory->produce($this->file, $this->type);
@@ -158,7 +159,7 @@ class Scheduler
 
             /* Always log the start of the run
              */
-            $importLog = $this->importLogMapper->start($scriptName);
+            $importLog = $this->importLogMapper->start($runId, $scriptName);
 
             try {
                 $this->logger->debug(sprintf(

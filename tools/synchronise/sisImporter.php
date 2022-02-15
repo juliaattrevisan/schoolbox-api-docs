@@ -144,6 +144,8 @@ NULLTYPE;
 
         $randomMapper = UserMapper::getInstance();
 
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),
             $frequency,
@@ -153,7 +155,7 @@ NULLTYPE;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), Endpoint\Scheduler::SISIMPORTER_SCRIPT_NAME);
+        ))->run(time(), $runId, Endpoint\Scheduler::SISIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
          */
