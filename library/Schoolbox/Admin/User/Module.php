@@ -12,11 +12,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use HouseMapper;
 use HouseResidentialMapper;
+use Psr\Container\ContainerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -110,36 +111,22 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                    'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
-                    'houseMapper' => $this->getMapperFactory()->getLazy(HouseMapper::class),
-                    'houseResidentialMapper' => $this->getMapperFactory()->getLazy(HouseResidentialMapper::class),
-                    'userTitleMapper' => $this->getMapperFactory()->getLazy(UserTitleMapper::class),
-                    'userLogMapper' => $this->getMapperFactory()->getLazy(UserLogMapper::class),
-                    'cmsLogMapper' => $this->getMapperFactory()->getLazy(CMSLogMapper::class),
-                    'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
-                    'tokenMapper' => $this->getMapperFactory()->getLazy(TokenMapper::class),
-                    'yearLevelMapper' => $this->getMapperFactory()->getLazy(YearLevel\Mapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(CMSLogMapper::class),
+            $this->getMapperFactory()->get(UserLogMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(UserTitleMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(HouseResidentialMapper::class),
+            $this->getMapperFactory()->get(HouseMapper::class),
+            $this->getMapperFactory()->get(TokenMapper::class),
+            $this->getMapperFactory()->get(YearLevel\Mapper::class),
         );
     }
 

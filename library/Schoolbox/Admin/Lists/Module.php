@@ -13,10 +13,10 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Psr\Container\ContainerInterface;
 
 class Module extends BaseModule
 {
@@ -47,19 +47,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param ContainerInterface|Container $injector
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller($this->getMapperFactory());
     }
 
     /**

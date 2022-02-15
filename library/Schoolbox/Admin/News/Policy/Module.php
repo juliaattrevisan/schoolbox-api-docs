@@ -11,9 +11,9 @@ namespace Schoolbox\Admin\News\Policy;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Comms\News\Topic;
@@ -61,38 +61,17 @@ class Module extends BaseModule
         $this->register('POST', '', 'postPolicies', $postPerms);
     }
 
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'topicMapper'          => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
-            'fieldStrategyFactory' => $injector->lazy(function () {
-                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
-            }),
-        ];
-    }
-
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(Topic\Mapper::class),
+        );
     }
 
     /**

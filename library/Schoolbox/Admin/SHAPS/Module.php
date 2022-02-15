@@ -12,9 +12,9 @@ namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Admin\SHAPS\Auth\Parameters;
 use Schoolbox\UserMapper;
@@ -68,17 +68,16 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            new Parameters(
+                $this->getConfig()->get('schoolbox_help_url'),
+                $this->getConfig()->get('site_school_code'),
+                $this->getConfig()->get('schoolbox_help_access_token'),
+            ),
+        );
     }
 
     /**
@@ -87,32 +86,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'authParams' => $injector->lazyNew(
-                Parameters::class,
-                [
-                    'url'         => $this->getConfig()->get('schoolbox_help_url'),
-                    'schoolCode'  => $this->getConfig()->get('site_school_code'),
-                    'accessToken' => $this->getConfig()->get('schoolbox_help_access_token'),
-                ]
-            ),
-        ];
     }
 
     /**

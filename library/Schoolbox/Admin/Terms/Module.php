@@ -11,11 +11,13 @@ namespace Schoolbox\Admin\Terms;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 /**
  * The module for managing school terms through the admin section.
@@ -69,24 +71,11 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(YearLevelMapper::class),
         );
     }
 

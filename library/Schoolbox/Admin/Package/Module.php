@@ -10,7 +10,8 @@ namespace Schoolbox\Admin\Package;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 
 class Module extends BaseModule
 {
@@ -49,25 +50,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'packageMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                ]
-            )
-        );
+        return new Controller($this->getMapperFactory()->get(Mapper::class));
     }
 }

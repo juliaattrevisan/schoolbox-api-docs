@@ -11,9 +11,10 @@ namespace Schoolbox\Admin\Menu\Side;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Psr\Container\ContainerInterface;
 
 /**
  * The module for managing school terms through the admin section.
@@ -67,17 +68,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
         return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

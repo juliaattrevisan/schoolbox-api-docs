@@ -12,11 +12,10 @@ namespace Schoolbox\Admin\Intellischool;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Intellischool\JwtFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Url\Factory;
@@ -61,34 +60,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'jwtFactory' => $injector->lazy(function () {
-                        return new JwtFactory(
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
-                            (new Factory($this->getConfig()))->buildFullyQualified()->toString(),
-                        );
-                    }),
-                ]
+        return new Controller(
+            new JwtFactory(
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
+                (new Factory($this->getConfig()))->buildFullyQualified()->toString(),
             )
         );
     }
@@ -100,26 +82,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
-        ];
     }
 
 

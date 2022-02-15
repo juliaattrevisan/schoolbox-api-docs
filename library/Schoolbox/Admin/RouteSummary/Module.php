@@ -10,8 +10,9 @@ namespace Schoolbox\Admin\RouteSummary;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 
 /**
  * A module for viewing a list of routes defined within Schoolbox.
@@ -31,20 +32,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    public function buildController(ContainerInterface $container): Base
     {
         return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
     }
 
     /**
