@@ -14,11 +14,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -117,36 +118,20 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        // Inject the custom Meriden pastoral database connection too
-        // a MSSQL connection should be a service?
-        $injector->params[Controller::class]['studentInvolvementFactory']
-            = $injector->lazyNew(StudentInvolvement\Report\Factory::class);
-
-        $injector->params[StudentInvolvement\Report\Factory::class]['gateway']
-            = $injector->lazyNew(StudentInvolvement\Gateway::class);
-        $injector->params[StudentInvolvement\Report\Factory::class]['folderMapper']
-            = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
-        $injector->params[StudentInvolvement\Report\Factory::class]['userMapper']
-            = $this->getMapperFactory()->getLazy(UserMapper::class);
-        $injector->params[StudentInvolvement\Report\Factory::class]['assessmentDataSource']
-            = $injector->lazyGet('assessmentDataSource');
-        $injector->params[StudentInvolvement\Report\Factory::class]['rubricMapper']
-            = $this->getMapperFactory()->getLazy(RubricDataSource::class);
-        $injector->params[StudentInvolvement\Report\Factory::class]['currentUser']
-            = $injector->lazyGet('user');
-        $injector->params[StudentInvolvement\Report\Factory::class]['userAccessMapper']
-            = $this->getMapperFactory()->getLazy(UserAccessMapper::class);
-
-        $injector->params[StudentInvolvement\Gateway::class]['database']
-            = $injector->lazyGet('databaseExternal');
-
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
+        return new Controller(
+            new StudentInvolvement\Report\Factory(
+                new StudentInvolvement\Gateway($container->get('databaseExternal')),
+                $this->getMapperFactory()->get(UserMapper::class),
+                $this->getMapperFactory()->get(Folder\Mapper::class),
+                $container->get('assessmentDataSource'),
+                $this->getMapperFactory()->get(RubricDataSource::class),
+                $container->get('user'),
+                $this->getMapperFactory()->get(UserAccessMapper::class)
+            )
         );
     }
 
