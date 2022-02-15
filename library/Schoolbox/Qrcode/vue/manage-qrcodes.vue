@@ -26,10 +26,10 @@ export default {
 
     data () {
         return {
-            students: [],
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
-            selectedStudents: [],
+            students: [], //the entire list of students
+            selectedStudents: [], //those students currently selected
             destination: 'homepage',
             expiry: '',
             expiryMonth: '1',
@@ -40,12 +40,21 @@ export default {
     computed: {
 
         /**
-         * No qr cods to show if there's no students, so show a 'no students' display
+         * No qr codes to show if there's no students, so show a 'no students' display
          * 
          * @returns { Boolean }
          */
         hasStudents () {
             return this.students.length > 0; 
+        },
+
+        /**
+         * To toggle the bottom-drawer, only show when there's students to submit
+         * 
+         * @returns { Boolean }
+         */
+        hasSelectedStudents () {
+            return this.selectedStudents.length > 0; 
         },
 
     },
@@ -67,9 +76,8 @@ export default {
                 });
                 const data = await response.json();
                 this.students = data.students;
-                this.selectedStudents = this.students;
+                this.selectedStudents = this.students; //all students are selected by default
                 this.loginUrl = data.loginUrl;
-                this.expiry = data.expiry;
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -100,11 +108,6 @@ export default {
             } else {
                 this.selectedStudents = [student, ...this.selectedStudents]; //otherwise add them in
             }
-            // if (isChecked) {
-            //     this.selectedStudents = [student, ...this.selectedStudents];
-            // } else {
-            //     this.selectedStudents = this.selectedStudents.filter((selectedStudent) => selectedStudent.id !== student.id); //or remove
-            // }
         },
 
         /**
@@ -117,8 +120,11 @@ export default {
                     body: this.getFormData(),
                 });
                 const data = await response.json();
+                //only update selected students
+                //watch for token changes
+                //if it's null, check if we have a token yet, if we don't set the token
+                //otherwise if the token is null and we already have a token, keep the current token
                 this.students = data.students;
-                this.loginUrl = data.loginUrl;
                 this.expiry = data.expiry;
             } catch (error) {
                 console.warn(error);
@@ -149,25 +155,6 @@ export default {
             
         <div v-if="isDataLoaded && hasStudents">
             <section class="content">
-                <div class="header">
-                    <div class="header__column">
-                        <label class="required-with-tip">Login destination <span data-tooltip class="hint has-tip tip-top"
-                            title="The page the student will be sent to after logging in with the QR code">?</span></label>
-                        <select v-model="destination">
-                            <option value="homepage">Homepage</option>
-                            <option value="dashboard">Dashboard</option>
-                        </select>
-                    </div>
-                    <div class="header__column">
-                        <label>Login expiry <span data-tooltip class="hint has-tip tip-top"
-                            title="How long the login codes will last for. After this time they will need to be regenerated">?</span></label>
-                        <select v-model="expiryMonth">
-                            <option value="1">1 month</option>
-                            <option value="3">3 months</option>
-                            <option value="6">6 months</option>
-                        </select>
-                    </div>
-                </div>
                 <div class="students">
                     <div class="student" v-for="student in students" :key="student.id" @click.prevent="onStudentSelected(student)">
                         <input type="checkbox"
@@ -180,10 +167,12 @@ export default {
                             <div v-if="student.token">
                                 <qrcode-vue :value="`${loginUrl}${student.token}`" :size="300" />
                             </div>
+                            <div v-else class="student_code-placeholder">&nbsp;</div>
                         </div>
                         <div class="student__details">
-                            <h3>{{ student.fullname }}</h3>
-                            <h4><span v-if="student.token">Expires {{ expiry }}</span></h4>
+                            <h2>{{ student.fullname }}</h2>
+                            <h5 v-if="student.token">Expires {{ expiry }}</h5>
+                            <h5 v-else>&nbsp;</h5>
                         </div>
                     </div>
                 </div>
@@ -201,7 +190,26 @@ export default {
 
         <div v-else class="loader"></div>
 
-        <bottom-drawer :showDrawer="true">
+        <bottom-drawer :showDrawer="hasSelectedStudents">
+            <div class="options-list">
+                <div class="option-list__option">
+                    <label class="required-with-tip">Login destination <span data-tooltip class="hint has-tip tip-top"
+                        title="The page the student will be sent to after logging in with the QR code">?</span></label>
+                    <select v-model="destination">
+                        <option value="homepage">Homepage</option>
+                        <option value="dashboard">Dashboard</option>
+                    </select>
+                </div>
+                <div class="option-list__option">
+                    <label>Login expiry <span data-tooltip class="hint has-tip tip-top"
+                        title="How long the login codes will last for. After this time they will need to be regenerated">?</span></label>
+                    <select v-model="expiryMonth">
+                        <option value="1">1 month</option>
+                        <option value="3">3 months</option>
+                        <option value="6">6 months</option>
+                    </select>
+                </div>
+            </div>
             <button @click.prevent="generateCodes()" class="button submit" title="Generate codes">Generate codes</button>
         </bottom-drawer>
 
@@ -215,27 +223,24 @@ export default {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
 
-.header {
+.options-list {
     display: flex;
-    padding: 1rem 0;
-    // @media (max-width: $tableToSingleColumn) {
-    //     flex-direction: column;
-    // }
+    gap: 1rem; //@todo consider safari 14
 }
 
-    .header__column { 
+    .option-list__option { 
         flex: 1 1 0; //keep both sides equal
-        margin: 0 0.5rem;
     }
 
 .students {
     display: flex;
-    padding-bottom: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 0;
 }
 
 .student {
     border: 1px solid var(--form-border-color);
-    margin: 0 0.5rem;
+    margin: 0 0.5rem 1rem 0.5rem;
     padding: 1rem;
     transition: background-color 0.3s;
     &:hover {
@@ -244,14 +249,24 @@ export default {
 }
 
     .student__code {
-        background: #DDDDDD;
         height: 300px;
         width: 300px;
+    }
+
+    .student_code-placeholder {
+        background: #DDDDDD;
+        height: 100%;
     }
 
     .student__details {
         padding: 1rem 0;
         text-align: center;
+        h2 {
+            margin-bottom: 0.5rem;
+        }
+        h5 {
+            margin-bottom: 0; //remove the 1rem default
+        }
     }
     
 
