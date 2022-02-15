@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Views;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -166,9 +167,12 @@ class LatestView
     {
         $views = [
             'student' => [
-                'status' => 'is yet to view',
-                'object' => 'i18n',
+                'name'      => $participant->getUser()->getFullName(),
+                'status'    => 'is yet to view',
+                'object'    => 'assessment',
+                'date'      => null,
             ],
+            'parents'   => [],
 
         ];
         /**
@@ -176,26 +180,67 @@ class LatestView
          * and return just the student
          */
         if (!$participant->hasSubmittedResponse()) {
+            return $views;
+        }
+
+        try {
+            /** @var Model[]|GenericCollection $last_views */
+            $last_views = $this->mapper->findByColumnList([
+                                                         'assessment_id'  => $assessment->getId(),
+                                                         'participant_id' => $participant->getUser()->getId(),
+                                                     ]);
+        } catch (NotFound $e) {
+            /**
+             * no data, error out, the student has submitted, but previously, so there is no data to use, so lets hide the fields.
+             */
             return [];
         }
-
         /**
-         * must have been submitted, check if feedback has been given.
+         * set the student values
          */
-
-        /**
-         * if feedback has not been given, set status, and time of views
-         */
-
-        $last_views = [];
-        try {
-            $views = $this->mapper->findByColumnList([
-                'assessment_id'  => $assessment->getId(),
-                'participant_id' => $participant->getId(),
-            ]);
-        } catch (NotFound $e) {
-            return $last_views;
+        /** @var Model $studentView */
+        $studentView = $last_views->getBy('user_id', $participant->getUser()->getId());
+        $views['student']['status'] = 'has viewed';
+        $views['student']['date']   = $studentView->getLastVisit()->getLocal();
+        $views['student']['object'] = 'assessment';
+        $feedback = $participant->getAuthoritativeFeedback(true);
+        if (null !== $feedback) {
+            $views['student']['object'] = 'feedback';
         }
-        return [];
+
+        /**
+         * parent's now
+         * check status of parent's lasts views, and set the status'
+         */
+        $parentList = $participant->getUser()->loadParents()->getParents();
+        foreach ($parentList as $parent) {
+            /**
+             * set basic data
+             */
+            $view = [
+                'name'      => $parent->getFullName(),
+                'status'    => 'has not viewed',
+                'object'    => 'assessment',
+            ];
+            /**
+             * check if viewed?
+             */
+            /** @var Model|null $parentView */
+            $parentView = $last_views->getBy('user_id', $parent->getId());
+            if (null !== $parentView) {
+                $date = $parentView->getLastVisit();
+                $view['date'] = $date->getLocal();
+                $view['status'] = 'has viewed';
+                /**
+                 * check if view after feedback?
+                 */
+                if (null !== $feedback & $feedback->getPublishedAt() < $date) {
+                    //parent viewed after feedback was published
+                    $view['object'] = 'feedback';
+                }
+            }
+            $views['parents'][] = $view;
+        }
+        return $views;
     }
 }
