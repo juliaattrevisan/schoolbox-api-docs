@@ -992,7 +992,7 @@ abstract class Mapper implements IMapper, Serializable
         return 'get' . ucfirst($property);
     }
 
-    /**getParticipant
+    /**
      * Gets name of set method for given property.
      *
      * @param string $property
