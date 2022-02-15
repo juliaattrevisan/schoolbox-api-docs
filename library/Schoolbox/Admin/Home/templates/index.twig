@@ -305,7 +305,7 @@
                                     <li>
                                         <div class="small-5 columns content">
                                             {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
-                                            <a href="{{ route }}#previous">School Data: {{ script }}</a>
+                                            <a href="{{ route }}#previous">{{ script }}</a>
                                         </div>
                                         <div class="small-7 columns content">
                                             {% if stats %}
@@ -314,8 +314,6 @@
                                                 {% else %}
                                                     <span class="full-width success label" title="{{ stats.finishAt.local }}">Success</span>
                                                 {% endif %}
-                                            {% else %}
-                                                <span class="full-width neutral label">Never ran</span>
                                             {% endif %}
                                         </div>
                                     </li>

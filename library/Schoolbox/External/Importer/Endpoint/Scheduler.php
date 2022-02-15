@@ -34,14 +34,14 @@ class Scheduler
      *
      * sisImporter is when you run an on-demand suds import via sisImporter.php
      *
-     * schedular.php is a two-part system, the first imports regular sis data
-     * such as profiles and timetables - this manifests as "scheduler (sis)"
+     * scheduler.php is a two-part system, the first imports regular sis data
+     * such as profiles and timetables - this manifests as "School Data Import (SIS)"
      *
-     * The other part is TASS Calendar, which manifests as "scheduler (calendar)"
+     * The other part is TASS Calendar, which manifests as "School Data Import (Calendar)"
      */
     public const SISIMPORTER_SCRIPT_NAME = 'sisImporter';
-    public const SCHEDULER_SIS_SCRIPT_NAME = 'scheduler (sis)';
-    public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'scheduler (calendar)';
+    public const SCHEDULER_SIS_SCRIPT_NAME = 'School Data Import (SIS)';
+    public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'School Data Import (Calendar)';
 
     /**
      * max execution time before we consider the import process timed out.
