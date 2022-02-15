@@ -10,9 +10,8 @@ namespace Custom\Help\Hero;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use InvalidArgumentException;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
@@ -44,9 +43,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return $this->installControllerDependencies(
+            new Controller(
+                $this->getMapperFactory()->get(ErrorMapper::class),
+                $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+                $this->getMapperFactory()->get(Folder\Mapper::class),
+                $this->getMapperFactory()->get(UserAccessMapper::class)
+            ),
+            $container
+        );
     }
 
     /**
@@ -55,27 +62,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'folderMapper' => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'userAccessrMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
-        ];
     }
 
     /**

@@ -9,8 +9,12 @@
 namespace Custom\Help\Marketo\Component\Dashboard;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
+use Component_Instance;
+use Psr\Container\ContainerInterface;
+use Schoolbox\User;
+use SitePage;
 
 class Module extends BaseModule
 {
@@ -20,11 +24,25 @@ class Module extends BaseModule
     protected $basename = 'marketoDashboard';
 
     /**
-     * {@inheritdoc}
+     * TODO is this even a real controller, or is it just a component?
+     *
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        /** @var SitePage $sitePage */
+        $sitePage = $container->get('sitePage');
+
+        /** @var User $user */
+        $user = $container->get('user');
+        return $this->installControllerDependencies(
+            new Controller(
+                new Component_Instance(),
+                $user,
+                $sitePage
+            ),
+            $container
+        );
     }
 
     /**

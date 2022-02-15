@@ -11,8 +11,8 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Authorizer\Rule\IsSchoolboxAdmin;
 use Alaress;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
@@ -54,54 +54,29 @@ class Module extends Alaress\Module\Module
 
 
     /**
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws \InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
         /** @var MapperFactory $mapperFactory */
-        $mapperFactory = $injector->get('mapperFactory');
-
-        $injector->params[CoreContext::class] = [
-            'conf' => $injector->lazyGet('config')
-        ];
-
-        $injector->params[TwigEmailFactory::class] = [
-            'context' => $injector->lazyNew(CoreContext::class),
-            'log'     => $injector->lazyNew(NullLogger::class)
-        ];
-
-        $injector->params[MailService::class] = [
-            'config'      => $injector->lazyGet('config'),
-            'resetMapper' => $mapperFactory->getLazy(Reset\Mapper::class),
-            'userMapper'  => $mapperFactory->getLazy(UserMapper::class),
-            'mailFactory' => $injector->lazyNew(TwigEmailFactory::class)
-        ];
-
-        $injector->params[Controller::class] = [
-            'userAccessMapper' => $mapperFactory->getLazy(UserAccessMapper::class),
-            'tokenMapper'      => $mapperFactory->getLazy(SiteAccess\Mapper::class),
-            'folderMapper'     => $mapperFactory->getLazy(Folder\Mapper::class),
-            'mailService'      => $injector->lazyNew(MailService::class),
-        ];
+        $mapperFactory = $container->get('mapperFactory');
+        return $this->installControllerDependencies(
+            new Controller(
+                $mapperFactory->get(UserAccessMapper::class),
+                $mapperFactory->get(SiteAccess\Mapper::class),
+                $mapperFactory->get(Folder\Mapper::class),
+                new MailService(
+                    $this->getConfig(),
+                    $mapperFactory->get(Reset\Mapper::class),
+                    $mapperFactory->get(UserMapper::class),
+                    new TwigEmailFactory(
+                        new CoreContext($this->getConfig()),
+                        new NullLogger()
+                    )
+                )
+            ),
+            $container
+        );
     }
 
 

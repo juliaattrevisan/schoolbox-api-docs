@@ -11,8 +11,9 @@ namespace Custom\Lc\Survey;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
@@ -68,17 +69,18 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $mappers = [
-            'userMapper'    => $this->getMapperFactory()->get(UserMapper::class),
-            'surveyMapper'  => $this->getMapperFactory()->get(SurveyMapper::class),
-            'externalClass' => $injector->lazyGet('externalClass')
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return $this->installControllerDependencies(
+            new Controller(
+                $this->getMapperFactory()->get(UserMapper::class),
+                $this->getMapperFactory()->get(SurveyMapper::class),
+                $container->get('externalClass')
+            ),
+            $container
+        );
     }
 
     /**
