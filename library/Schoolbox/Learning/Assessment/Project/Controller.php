@@ -185,7 +185,14 @@ class Controller extends Assessment\Controller
          */
         $lastView = new Assessment\Views\LatestView();
         $lastView->addNewView($assessment, $student, $this->getUser());
-        $status = 'preSubmit';
+        $status = ['preSubmit' => false];
+        $participant = $assessment->getParticipantUsers()[$student->getId()];
+        if ($assessment->hasSubmittedResponse($participant)) {
+            $status = ['submitted' => $subActivities->first()->getSubmittedResponses()->last()->getUpdatedAt()];
+        }
+        if ($assessment->hasPublishedFeedback($participant)) {
+            $status = ['feedback' => $subActivities->first()->getPublishedFeedbacks()->last()->getUpdatedAt()];
+        }
 
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
