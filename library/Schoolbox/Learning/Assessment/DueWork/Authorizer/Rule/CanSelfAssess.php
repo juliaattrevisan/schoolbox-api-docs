@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
 use Schoolbox\Error;
@@ -36,14 +37,17 @@ class CanSelfAssess extends AbstractParticipationRule
     /**
      * Performs an authorization check.
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
-     *                       that no user is logged in.
+     * @param array     $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any.
+     *                          Null value assumes that no user is logged in.
      *
-     * @throws InvalidArgumentException If unable to locate a Participant instance in $params,
-     *                                  or if the assessment isn't a due work
-     * @throws Unauthorized If assessment is not self-assessable, there's no response, or user is not the participant
      * @return bool
+     * @throws InvalidPath              If the assessment isn't a due work
+     * @throws Unauthorized             If assessment is not self-assessable,
+     *                                  there's no response, or user is not the
+     *                                  participant
+     * @throws InvalidArgumentException If unable to locate a Participant
+     *                                  instance in $params
      * @throws UnexpectedValueException
      */
     public function authorize(array $params = [], User $user = null)
@@ -60,7 +64,7 @@ class CanSelfAssess extends AbstractParticipationRule
         // It allows participants to mark themselves as having completed a
         // task, which is outside the scope of this authorizer.
         if (!$assessment instanceof DueWork\Model) {
-            throw new InvalidArgumentException("Only due work may be self-assessed");
+            throw new InvalidPath();
         }
 
         $student     = $this->findStudent($params);
