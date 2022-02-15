@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Views;
 
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
@@ -145,5 +146,56 @@ class LatestView
         } catch (NotFound $e) {
             return null;
         }
+    }
+
+    /**
+     * get twig view data
+     * returns a helper array for the student and parent containing the status and time of last view
+     *
+     * return array [
+     * student: [status: (is yet to view / has viewed), object: 'assessment / feedback', 'date': date last view or (null) ]
+     * parents: [
+     * [status: (has viewed), object: 'assessment / feedback', 'date': date last view or (null) ]
+     * [status: (has viewed), object: 'assessment / feedback', 'date': date last view or (null) ]
+     * ]
+     * @param IAssessable $assessment
+     * @param Participant $participant (student)
+     * @return array
+     */
+    public function getTwigViews(IAssessable $assessment, Participant $participant): array
+    {
+        $views = [
+            'student' => [
+                'status' => 'is yet to view',
+                'object' => 'i18n',
+            ],
+
+        ];
+        /**
+         * if not been submitted, check for student views.
+         * and return just the student
+         */
+        if (!$participant->hasSubmittedResponse()) {
+            return [];
+        }
+
+        /**
+         * must have been submitted, check if feedback has been given.
+         */
+
+        /**
+         * if feedback has not been given, set status, and time of views
+         */
+
+        $last_views = [];
+        try {
+            $views = $this->mapper->findByColumnList([
+                'assessment_id'  => $assessment->getId(),
+                'participant_id' => $participant->getId(),
+            ]);
+        } catch (NotFound $e) {
+            return $last_views;
+        }
+        return [];
     }
 }
