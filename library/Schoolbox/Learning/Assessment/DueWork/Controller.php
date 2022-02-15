@@ -366,11 +366,13 @@ class Controller extends Assessment\Controller
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         $status = ['preSubmit' => false];
-        if ($participant->hasSubmittedResponse()) {
-            $status = ['submitted' => $participant->getSubmittedResponses()->last()->getUpdatedAt()];
-        }
-        if ($participant->hasPublishedFeedback()) {
-            $status = ['feedback' => $participant->getPublishedFeedbacks()->last()->getUpdatedAt()];
+        if ($participant) {
+            if ($participant->hasSubmittedResponse()) {
+                $status = ['submitted' => $participant->getSubmittedResponses()->last()->getUpdatedAt()];
+            }
+            if (null !== $participant & $participant->hasPublishedFeedback()) {
+                $status = ['feedback' => $participant->getPublishedFeedbacks()->last()->getUpdatedAt()];
+            }
         }
         /* Find all the records spawned by $participant
          *
