@@ -64,7 +64,7 @@ class Mapper extends \Schoolbox\Mapper
                 GROUP BY script
             )
             AND {$where} 
-            ORDER BY start_at
+            ORDER BY start_at DESC
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -99,7 +99,11 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findLogsWithDuration(): array
     {
-        $logs = $this->findAll();
+        $logs = $this->findAll([
+            'order' => [
+                'start_at' => 'desc'
+            ]
+        ]);
 
         $stack = [];
 
