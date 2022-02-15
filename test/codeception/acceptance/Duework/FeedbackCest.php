@@ -154,7 +154,7 @@ class FeedbackCest
 
         // As Jack Coles, check notification
         $i->impersonate($teacher);
-        $i->assertNotRachelifExists($student . ' submitted work to ' . $dueworkTitle2 . ' in ' . $className);
+        $i->assertNotifExists($student . ' submitted work to ' . $dueworkTitle2 . ' in ' . $className);
 
         // As Zane, click into the due work
         $i->click($dueworkTitle2, '#content');

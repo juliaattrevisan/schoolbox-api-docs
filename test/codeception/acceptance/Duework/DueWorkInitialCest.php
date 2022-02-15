@@ -2,6 +2,7 @@
 
 namespace Duework;
 
+use AcceptanceTester;
 use Codeception\Util\Locator;
 use Facebook\WebDriver\WebDriverKeys;
 
