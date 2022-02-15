@@ -68,14 +68,15 @@ class Kernel extends WebKernelAbstract
     protected function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
-        $di->set('config', $di->lazyNew(ConfigLoader::class));
+        $config = new ConfigLoader();
+        $di->set('config', $config);
 
         // Redis cache (memory-only, not persistent)
-        Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
+        Redis::getCacheInstance()->connect($config->get('redis_ephemeral_url'), null, INSTANCE_ID);
         $di->set('redis.cache', Redis::getCacheClientInstance());
 
         // Redis storage (persisted to disk)
-        Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        Redis::getStorageInstance()->connect($config->get('redis_url'), null, INSTANCE_ID);
         $di->set('redis.storage', Redis::getStorageClientInstance());
 
         // Redis queue publish (not persistent)
@@ -117,7 +118,7 @@ class Kernel extends WebKernelAbstract
         Mapper::di($di);
 
         // Set correct timezone
-        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+        date_default_timezone_set($config->get('date_timezone'));
 
         // Notification factory
         $di->set(
