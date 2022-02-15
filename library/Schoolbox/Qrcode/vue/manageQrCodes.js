@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import ManageQrcodes from './manage-qrcodes';
+import ManageQrCodes from './manage-qr-codes';
 
 new Vue({
-    el: '#manage-qrcodes-container',
+    el: '#manage-qr-codes-container',
     components: {
-        ManageQrcodes
+        ManageQrCodes
     }
 });
