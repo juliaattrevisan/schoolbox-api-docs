@@ -200,17 +200,18 @@ class LatestView
              */
             return [];
         }
-        if (empty($last_views)) {
+
+        /**
+         * set the student values
+         */
+        /** @var Model|null $studentView */
+        $studentView = $last_views->getBy('user', $participant->getUser());
+        if (null === $studentView) {
             /**
              * no data, error out, the student has submitted, but previously, so there is no data to use, so lets hide the fields.
              */
             return [];
         }
-        /**
-         * set the student values
-         */
-        /** @var Model $studentView */
-        $studentView = $last_views->getBy('user', $participant->getUser());
         $views['student']['status'] = 'has viewed';
         $views['student']['date']   = $studentView->getLastVisit()->getLocal();
         $views['student']['object'] = 'assessment';
