@@ -93,6 +93,39 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find all the logs with Duration metadata pre-calculated
+     *
+     * @return array
+     */
+    public function findLogsWithDuration(): array
+    {
+        $logs = $this->findAll();
+
+        $stack = [];
+
+        foreach ($logs as $log) {
+            $duration = null;
+            $durationHms = null;
+
+            if (!$log->getFinishAt()->isNull()) {
+                $duration = $log->getFinishAt()->diffInSeconds($log->getStartAt());
+                $durationHms = (new \Alaress\Date\Interval($duration))->hms();
+            }
+
+            $stack[] = [
+                'instance' => $log,
+                'duration' => [
+                    'sec' => $duration,
+                    'hms' => $durationHms
+                ]
+            ];
+        }
+
+        return $stack;
+    }
+
+
+    /**
      * A macro to set up and save a new record
      *
      * @param string $scriptName

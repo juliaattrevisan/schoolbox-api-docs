@@ -210,19 +210,19 @@
                             <th>Script</th>
                             <th>Start</th>
                             <th>Finish</th>
-                            <th>Duration (sec)</th>
+                            <th>Duration</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for importLog in importLogs %}
                         <tr>
-                            <td>{{ importLog.script }}</td>
-                            <td><time title="{{ importLog.startAt.database }}">{{ importLog.startAt.local }}</time></td>
-                            <td><time title="{{ importLog.finishAt.database }}">{{ importLog.finishAt.local }}</time></td>
+                            <td>{{ importLog.instance.script }}</td>
+                            <td><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
+                            <td><time title="{{ importLog.instance.finishAt.database }}">{{ importLog.instance.finishAt.local }}</time></td>
                             <td>
-                                {% if not importLog.finishAt.isNull %}
-                                <time title="{{ importLog.startAt.diffInSeconds(importLog.finishAt) }}">
-                                    {{ importLog.startAt.diffInSeconds(importLog.finishAt) }}
+                                {% if not importLog.instance.finishAt.isNull %}
+                                <time title="">
+                                    {{ importLog.duration.hms }} ({{ importLog.duration.sec }} sec)
                                 </time>
                                 {% endif %}
                             </td>
