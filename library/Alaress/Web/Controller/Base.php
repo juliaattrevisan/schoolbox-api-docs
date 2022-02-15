@@ -19,6 +19,7 @@ use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\IConfigLoader;
@@ -360,6 +361,7 @@ abstract class Base
      * @param  string $name The name of the controller, as defined in the
      *                      controller's module's basename.
      * @return self
+     * @throws LogicException if module `$name` doesn't have a controller
      */
     protected function getController($name)
     {

@@ -36,10 +36,7 @@ class Controller extends Base
                 $module->initControllerDependencies();
 //                $module->initControllers($di);
 //                $controller = $di->get('controller:' . $parsedName['controller']);
-                $controller = $module->installControllerDependencies(
-                    $module->buildController($di),
-                    $di,
-                );
+                $controller = $module->buildController($di);
             } catch (\Throwable $e) {
                 // Something went wrong when parsing this controller
                 $routeSummaries[$parsedName['controller']][] = [
@@ -61,7 +58,7 @@ class Controller extends Base
                     'method'     => $method,
                     'path'       => $route->path,
                     'basename'   => $parsedName['controller'],
-                    'controller' => get_class($controller),
+                    'controller' => $controller ? get_class($controller) : null,
                     'action'     => $parsedName['action'],
                     'error'      => null,
                 ];

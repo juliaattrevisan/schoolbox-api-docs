@@ -704,7 +704,11 @@ class Module
 
     /**
      * Actually builds the controller, if this module has one.
-     * (AFAIK it always should, but let's leave open for now.)
+     *
+     * Modules which instantiate only a homepage/dashboard/ePortfolio component
+     * will not have a controller: they will not have any routes either, as
+     * they have no controller to reference those routes to. This method will
+     * throw a `LogicException` in this case.
      *
      * This may pull dependencies from the DI container, but will not write to
      * it.
@@ -713,11 +717,11 @@ class Module
      *
      * @param ContainerInterface $container
      * @return Base|null
-     *
+     * @throws LogicException if this module has no controller
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        return null;
+        throw new LogicException(sprintf('Controller does not exist for module "%s"', $this->basename));
     }
 
 
