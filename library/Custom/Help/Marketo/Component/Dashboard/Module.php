@@ -24,25 +24,22 @@ class Module extends BaseModule
     protected $basename = 'marketoDashboard';
 
     /**
-     * TODO is this even a real controller, or is it just a component?
-     *
      * @inheritdoc
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        /** @var SitePage $sitePage */
-        $sitePage = $container->get('sitePage');
-
-        /** @var User $user */
-        $user = $container->get('user');
-        return $this->installControllerDependencies(
-            new Controller(
-                new Component_Instance(),
-                $user,
-                $sitePage
-            ),
-            $container
-        );
+        // TODO is this even a real controller, or is it just a component?
+        return null;
+//        /** @var SitePage $sitePage */
+//        $sitePage = $container->get('sitePage');
+//
+//        /** @var User $user */
+//        $user = $container->get('user');
+//        return new Controller(
+//            new Component_Instance(),
+//            $user,
+//            $sitePage
+//        );
     }
 
     /**

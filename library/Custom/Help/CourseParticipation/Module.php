@@ -60,22 +60,19 @@ class Module extends Alaress\Module\Module
     {
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $container->get('mapperFactory');
-        return $this->installControllerDependencies(
-            new Controller(
-                $mapperFactory->get(UserAccessMapper::class),
-                $mapperFactory->get(SiteAccess\Mapper::class),
-                $mapperFactory->get(Folder\Mapper::class),
-                new MailService(
-                    $this->getConfig(),
-                    $mapperFactory->get(Reset\Mapper::class),
-                    $mapperFactory->get(UserMapper::class),
-                    new TwigEmailFactory(
-                        new CoreContext($this->getConfig()),
-                        new NullLogger()
-                    )
+        return new Controller(
+            $mapperFactory->get(UserAccessMapper::class),
+            $mapperFactory->get(SiteAccess\Mapper::class),
+            $mapperFactory->get(Folder\Mapper::class),
+            new MailService(
+                $this->getConfig(),
+                $mapperFactory->get(Reset\Mapper::class),
+                $mapperFactory->get(UserMapper::class),
+                new TwigEmailFactory(
+                    new CoreContext($this->getConfig()),
+                    new NullLogger()
                 )
-            ),
-            $container
+            )
         );
     }
 

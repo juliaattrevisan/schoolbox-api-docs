@@ -73,13 +73,10 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        return $this->installControllerDependencies(
-            new Controller(
-                $this->getMapperFactory()->get(UserMapper::class),
-                $this->getMapperFactory()->get(SurveyMapper::class),
-                $container->get('externalClass')
-            ),
-            $container
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(SurveyMapper::class),
+            $container->get('externalClass')
         );
     }
 

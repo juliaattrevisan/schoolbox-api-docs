@@ -115,7 +115,7 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        return $this->installControllerDependencies(new Controller(), $container);
+        return new Controller();
     }
 
 

@@ -45,14 +45,11 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        return $this->installControllerDependencies(
-            new Controller(
-                $this->getMapperFactory()->get(ErrorMapper::class),
-                $this->getMapperFactory()->get(CourseSpecificationMapper::class),
-                $this->getMapperFactory()->get(Folder\Mapper::class),
-                $this->getMapperFactory()->get(UserAccessMapper::class)
-            ),
-            $container
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+            $this->getMapperFactory()->get(Folder\Mapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class)
         );
     }
 

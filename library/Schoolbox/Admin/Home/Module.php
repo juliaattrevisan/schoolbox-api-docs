@@ -58,14 +58,11 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): ?Base
     {
-        return $this->installControllerDependencies(
-            new Controller(
-                $this->injector->get('kamiConnector'),
-                $this->injector->get('databaseFactory'),
-                $this->injector->get('databaseExternal'),
-                $this->getMapperFactory()->get(ConfigMapper::class)
-            ),
-            $container,
+        return new Controller(
+            $this->injector->get('kamiConnector'),
+            $this->injector->get('databaseFactory'),
+            $this->injector->get('databaseExternal'),
+            $this->getMapperFactory()->get(ConfigMapper::class)
         );
     }
 

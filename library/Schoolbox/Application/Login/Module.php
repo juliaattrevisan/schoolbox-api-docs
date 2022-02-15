@@ -44,10 +44,9 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): Controller
     {
-        $controller = new Controller(
+        return new Controller(
             $container->get('cdnPrefixGenerator'),
             $container->get('session.rememberer'),
         );
-        return $this->installControllerDependencies($controller, $container);
     }
 }
