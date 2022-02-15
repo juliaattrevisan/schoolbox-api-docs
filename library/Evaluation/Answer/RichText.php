@@ -99,7 +99,7 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short
          * if ($existing['response'] != null) { ... } else { ... }
          */
         $page->setVar(array(
-            'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+            'RESPONSE_USER_ID' => $currentQuestion['user_id'],
             'USER_FIRSTNAME' => $currentQuestion['firstname'],
             'USER_LASTNAME' => $currentQuestion['lastname'],
             'ANSWER_ID' => $currentAnswer['answer_id'],

@@ -301,7 +301,7 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
      *
      * @param SitePage $page
      * @param int $attemptId
-     * @param int $currentQuestion
+     * @param array $currentQuestion
      * @return void
      */
     public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
@@ -316,7 +316,7 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
          */
         $page->setVar(
             array(
-                'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+                'RESPONSE_USER_ID' => $currentQuestion['user_id'],
                 'USER_FIRSTNAME' => $currentQuestion['firstname'],
                 'USER_LASTNAME' => $currentQuestion['lastname'],
                 'ANSWER' => Scrub::text($existing['response']),

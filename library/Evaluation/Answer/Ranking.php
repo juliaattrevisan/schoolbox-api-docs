@@ -483,7 +483,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         if ($answerGroup) {
             $page->setVar(
                 array(
-                    'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+                    'RESPONSE_USER_ID' => $currentQuestion['user_id'],
                     'USER_FIRSTNAME'   => $currentQuestion['firstname'],
                     'USER_LASTNAME'    => $currentQuestion['lastname'],
                     'ANSWER_ID'        => $answerGroup['answer_id'],
