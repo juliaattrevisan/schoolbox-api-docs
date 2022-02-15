@@ -85,7 +85,7 @@ HELP;
          */
 
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);

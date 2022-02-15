@@ -108,7 +108,7 @@ other turnitin document, except the historical flag will be 1 instead of the
 default 0. This allows us to treat them a bit specially in their processing.
 
 
-Usage: historical.php [--start=2022-02-02] [--end=2022-03-03] [--instance=INSTANCE_ID] 
+Usage: historical.php [--start=2022-02-02] [--end=2022-03-03] [--instance=INSTANCE_ID]
 
 
 HELP;
@@ -119,7 +119,7 @@ HELP;
          */
 
         /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis');
+        $redis      = $this->getDi()->get('redis.cache');
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
