@@ -59,6 +59,14 @@ class Module extends \Alaress\Module\Module
     /**
      * @inheritdoc
      */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set("controller:{$this->basename}", $injector->lazyNew(Controller::class));

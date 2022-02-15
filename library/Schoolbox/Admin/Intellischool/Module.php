@@ -17,7 +17,6 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Admin\Intellischool\Controller;
 use Schoolbox\Intellischool\JwtFactory;
 use Schoolbox\Mapper;
 use Schoolbox\Url\Factory;
@@ -57,6 +56,14 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/console', 'getConsole', $getPerms, null);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
     }
 
     /**
