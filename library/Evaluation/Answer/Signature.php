@@ -332,7 +332,7 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
      * top under the question itself, and not repeated for each attempt
      *
      * @param SitePage $page
-     * @param int $currentQuestion
+     * @param array $currentQuestion
      * @return void
      */
     public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
