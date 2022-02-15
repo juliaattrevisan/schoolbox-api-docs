@@ -315,10 +315,10 @@ class Module
     /**
      * Initializes any submodules of this module.
      *
-     * @param ContainerInterface $injector
-     * @param string             $basePath The base route for this module
+     * @param \Aura\Di\ContainerInterface $injector
+     * @param string                      $basePath The base route for this module
      */
-    public function initSubmodules(ContainerInterface $injector, $basePath)
+    public function initSubmodules(\Aura\Di\ContainerInterface $injector, $basePath)
     {
     }
 
@@ -473,9 +473,9 @@ class Module
      * @deprecated Must be removed as DI container doesn't allow pre-init:
      *             create controllers using buildController
      *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @param \Aura\Di\ContainerInterface  $injector The dependency injection container.
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function preInitControllerDependencies(\Aura\Di\ContainerInterface  $injector)
     {
     }
 
@@ -695,9 +695,9 @@ class Module
      *
      * @deprecated Must be removed and replaced with buildController due to DI
      *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @param \Aura\Di\ContainerInterface $injector The dependency injection container.
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(\Aura\Di\ContainerInterface $injector)
     {
     }
 
