@@ -31,40 +31,19 @@
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
     {% if lastViews is defined and USER.role.isStaff() %}
-        {# set visit status #}
-    {% set preSubmission = (if status is defined )  %}
-    {% set postSubmission = ('submitted' == status) %}
-    {% set postFeedback = ('postFeedback' == status) %}
-        {# build frontend displays #}
-    {% if lastViews.student is empty %}
-        <li class="icon-staff-students">{{ student.fullname }} is yet to view this assessment</li>
-    {% endif %}
-    {% if lastViews.student is not empty %}
-        {% if postSubmission or preSubmission%}
-        <li class="icon-staff-students" title="{{ lastViews.student.getLastVisit.getLocal() }}">{{ student.fullname }} has viewed this assessment</li>
-        {% elseif postFeedback %}
-        <li class="icon-staff-students" title="{{ lastViews.student.getLastVisit.getLocal() }}">{{ student.fullname }} has viewed the feedback</li>
-        {% endif %}
-    {% endif %}
-    {% if lastViews.parents is not empty %}
+    <li class="icon-staff-students" title="{{ student.date }}">
+        {{ student.fullname }} {{ student.status }}
+        {% if 'assessment' is same as(student.object) %} {{ locale.assessment }}{% else %} feedback {% endif %}
+    </li>
 
-        {% if postSubmission %}
-            <li class="icon-staff">
-        {% for parent in lastViews.parents %}
-            <span title="{{ parent.getLastVisit.getLocal() }}">{{ parent.user.fullname }}</span>
-        {% endfor %}
-        has viewed this assessment
-
-        {% elseif postFeedback %}
-        <li class="icon-staff">
-        {% for parent in lastViews.parents %}
-            <span title="{{ parent.getLastVisit.getLocal() }}">{{ parent.user.fullname }}</span>
-        {% endfor %}
-        has viewed the feedback
-        </li>
-        {% endif %}
-
-        {% endif %}
+    {% for parent in lastViews.parents %}
+    <li class="icon-staff">
+            <span title="{{ parent.date }}">{{ parent.name }}</span>
+        {{ parent.status }} {% if 'assessment' is same as(parent.object) %} {{ locale.assessment }}{% else %} feedback {% endif %}
+    </li>
+    {% endfor %}
     {% endif %}
+
+
 
 </ul>

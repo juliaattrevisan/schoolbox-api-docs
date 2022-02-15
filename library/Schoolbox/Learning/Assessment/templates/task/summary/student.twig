@@ -36,8 +36,7 @@ Data:
             icon: 'icon-task',
             canShowcase: false,
             isShowcased: false,
-            lastViews: lastViews,
-            status: status
+            lastViews: lastViews
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
