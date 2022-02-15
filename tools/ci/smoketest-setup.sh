@@ -31,9 +31,6 @@ mysql schoolbox -e "UPDATE config SET value = REPLACE(value, '/var/lib/schoolbox
 mysql schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
 mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
 
-# Sandbox has no ephemeral Redis instance; use the persistent instance
-mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
-
 
 ## Make directories that will be used by our schoolbox instance
 mkdir vagrant
@@ -92,6 +89,10 @@ cd /vagrant/tools
 
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
+
+# Sandbox has no ephemeral Redis instance; use the persistent instance
+# (ensure this happens after all updates happen)
+mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 
 ## Finish where we started.
 cd $initialdir
