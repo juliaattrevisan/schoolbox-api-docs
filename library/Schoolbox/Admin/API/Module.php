@@ -9,10 +9,11 @@
 namespace Schoolbox\Admin\API;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Class Module
@@ -36,37 +37,19 @@ class Module extends BaseModule
         $this->register('POST', '/process', 'postProcess');
     }
 
-
     /**
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $injector->params[Controller::class] = [
-            'storageMapper'   => $injector->get('mapperFactory')->getLazy(\Schoolbox\Resource\Storage\Mapper::class),
-            'importerFactory' => $injector->lazyNew(ImporterFactory::class),
-            'baseMapper' => $this->getMapperFactory()->getLazy(External\Profile\Mapper::class),
-            'parentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Parent\Mapper::class),
-            'studentMapper' => $this->getMapperFactory()->getLazy(External\Profile\Student\Mapper::class),
-            'staffMapper' => $this->getMapperFactory()->getLazy(External\Profile\Staff\Mapper::class),
-            'relationshipMapper' => $this->getMapperFactory()->getLazy(External\Profile\Relationship\Mapper::class),
-        ];
+        return new Controller(
+            $this->getMapperFactory()->get(StorageMapper::class),
+            new ImporterFactory(),
+            $this->getMapperFactory()->get(External\Profile\Mapper::class),
+            $this->getMapperFactory()->get(External\Profile\Parent\Mapper::class),
+            $this->getMapperFactory()->get(External\Profile\Student\Mapper::class),
+            $this->getMapperFactory()->get(External\Profile\Staff\Mapper::class),
+            $this->getMapperFactory()->get(External\Profile\Relationship\Mapper::class),
+        );
     }
 }

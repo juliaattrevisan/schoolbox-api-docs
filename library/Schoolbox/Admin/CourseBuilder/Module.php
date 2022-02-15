@@ -12,11 +12,11 @@ namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -47,22 +47,16 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'configMapper'           => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-                    'courseConfigMapper'     => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
-                    'homepageTemplateMapper' => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
-                    'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
-                    'folderMapper'           => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(CourseConfigMapper::class),
+            $this->getMapperFactory()->get(HomepageTemplateMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
         );
     }
 

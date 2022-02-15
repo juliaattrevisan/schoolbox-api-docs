@@ -14,13 +14,17 @@ namespace Schoolbox\Admin\BulkCourseImport;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Component_ConfigDefinitionMapper;
+use Component_ConfigMapper;
+use Component_InstanceMapper;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
@@ -52,11 +56,33 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $container->get('assessmentDataSource');
+        return new Controller(
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(CourseImplementationMapper::class),
+            $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            new ImportFactory(
+                $assessmentDataSource,
+                new Replicator(
+                    $assessmentDataSource,
+                    $this->getMapperFactory()->get(QuizMapper::class),
+                    $this->getMapperFactory()->get(RubricDataSource::class),
+                ),
+                $this->getMapperFactory()->get(CourseImplementationMapper::class),
+                $this->getMapperFactory()->get(UnitImplementationMapper::class),
+                $this->getMapperFactory()->get(Component_InstanceMapper::class),
+                $this->getMapperFactory()->get(Component_ConfigDefinitionMapper::class),
+                $this->getMapperFactory()->get(Component_ConfigMapper::class),
+            ),
+            $assessmentDataSource,
+            $this->getMapperFactory()->get(ErrorMapper::class)
+        );
     }
 
     /**
@@ -65,42 +91,5 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'courseImplementationMapper' => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-            'unitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-            'importFactory'              => $injector->lazyNew(
-                ImportFactory::class,
-                [
-                    'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
-                    'replicator'                      => $injector->lazyNew(
-                        Replicator::class,
-                        [
-                            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                            'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-                        ]
-                    ),
-                    'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                    'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                    'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(\Component_InstanceMapper::class),
-                    'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(\Component_ConfigDefinitionMapper::class),
-                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(\Component_ConfigMapper::class),
-                ]
-            ),
-            'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-        ];
     }
 }
