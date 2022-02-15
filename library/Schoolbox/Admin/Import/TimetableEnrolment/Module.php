@@ -13,9 +13,9 @@ namespace Schoolbox\Admin\Import\TimetableEnrolment;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\Import\ImporterFactory;
@@ -58,9 +58,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            new ImporterFactory(),
+            $this->getConfig(),
+            $this->getMapperFactory()->get(ClassEntryMapper::class),
+            $this->getMapperFactory()->get(ClassInvolvementMapper::class),
+        );
     }
 
 
@@ -70,26 +75,5 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'importerFactory' => $injector->lazyNew(ImporterFactory::class),
-            'configLoader' => $injector->lazyGet('config'),
-            'classEntryMapper' => $this->getMapperFactory()->getLazy(ClassEntryMapper::class),
-            'classInvolvementMapper' => $this->getMapperFactory()->getLazy(ClassInvolvementMapper::class),
-        ];
     }
 }

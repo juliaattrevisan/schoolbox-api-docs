@@ -10,9 +10,10 @@ namespace Schoolbox\Admin\Grades;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Closure;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\Mapper\Exception;
@@ -71,19 +72,13 @@ class Module extends BaseModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(ContainerInterface $container): ?Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'gradeLevelMapper'      => $this->getMapperFactory()->getLazy(GradeLevelMapper::class),
-                    'gradeLevelGroupMapper' => $this->getMapperFactory()->getLazy(GradeLevelGroupMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(GradeLevelMapper::class),
+            $this->getMapperFactory()->get(GradeLevelGroupMapper::class)
         );
     }
 
