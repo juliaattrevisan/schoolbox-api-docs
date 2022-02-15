@@ -7,13 +7,13 @@
  * By default all users have the QR login code generated, however select students can also be chosen. 
  */
 
-import qrcodeVue from 'qrcode.vue';
+import ManageQrCodesStudent from './manage-qr-codes-student';
 import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
 
 export default {
    
     components: {
-        qrcodeVue, //to generate and display QR codes
+        ManageQrCodesStudent, //to generate and display QR codes
         BottomDrawer, //to provide submit actions
     },
 
@@ -77,7 +77,6 @@ export default {
                 const data = await response.json();
                 this.students = data.students;
                 this.selectedStudents = this.students; //all students are selected by default
-                this.loginUrl = data.loginUrl;
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -89,7 +88,7 @@ export default {
         /**
          * To determine the display of the checkbox on the student
          * 
-         * @params { Number } 
+         * @param { Number }
          * 
          * @returns { Boolean }
          */
@@ -124,8 +123,10 @@ export default {
                 //watch for token changes
                 //if it's null, check if we have a token yet, if we don't set the token
                 //otherwise if the token is null and we already have a token, keep the current token
-                this.students = data.students;
                 this.expiry = data.expiry;
+                this.loginUrl = data.loginUrl;
+                this.students = data.students;
+                this.selectedStudents = []; //clear the selected students once generated once
             } catch (error) {
                 console.warn(error);
             }
@@ -149,6 +150,7 @@ export default {
     }
 }
 </script>
+
 <template>
 
     <div class="small-12 island manage-qrcodes">
@@ -156,25 +158,15 @@ export default {
         <div v-if="isDataLoaded && hasStudents">
             <section class="content">
                 <div class="students">
-                    <div class="student" v-for="student in students" :key="student.id" @click.prevent="onStudentSelected(student)">
-                        <input type="checkbox"
-                            :id="`selectStudent-${student.id}`"
-                            :checked="isInSelectedStudents(student.id)"
-                            @change="onStudentSelected(student)"
-                        >
-                        <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
-                        <div class="student__code">
-                            <div v-if="student.token">
-                                <qrcode-vue :value="`${loginUrl}${student.token}`" :size="300" />
-                            </div>
-                            <div v-else class="student_code-placeholder">&nbsp;</div>
-                        </div>
-                        <div class="student__details">
-                            <h2>{{ student.fullname }}</h2>
-                            <h5 v-if="student.token">Expires {{ expiry }}</h5>
-                            <h5 v-else>&nbsp;</h5>
-                        </div>
-                    </div>
+                    <manage-qr-codes-student 
+                        v-for="student in students"
+                        :key="student.id"
+                        :student="student"
+                        :selectedStudents="selectedStudents"
+                        :loginUrl="loginUrl"
+                        :expiry="expiry"
+                        @student-selected="onStudentSelected"
+                    />
                 </div>
             </section>
         </div>
@@ -237,37 +229,5 @@ export default {
     flex-wrap: wrap;
     padding: 1rem 0;
 }
-
-.student {
-    border: 1px solid var(--form-border-color);
-    margin: 0 0.5rem 1rem 0.5rem;
-    padding: 1rem;
-    transition: background-color 0.3s;
-    &:hover {
-        background-color: var(--form-bg-hover-color);
-    }
-}
-
-    .student__code {
-        height: 300px;
-        width: 300px;
-    }
-
-    .student_code-placeholder {
-        background: #DDDDDD;
-        height: 100%;
-    }
-
-    .student__details {
-        padding: 1rem 0;
-        text-align: center;
-        h2 {
-            margin-bottom: 0.5rem;
-        }
-        h5 {
-            margin-bottom: 0; //remove the 1rem default
-        }
-    }
-    
 
 </style>
