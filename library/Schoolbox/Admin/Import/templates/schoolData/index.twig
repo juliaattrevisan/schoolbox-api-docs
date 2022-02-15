@@ -200,36 +200,38 @@
         </div>
 
         {% if importLogs|length %}
-        <div class="small-12 island" id="previous">
-            <h3 class="subheader">Previous Imports</h3>
+        <div>
+            <div class="small-12 island" id="previous">
+                <h3 class="subheader">Previous Imports</h3>
 
-            <div class="scrollable">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Script</th>
-                            <th>Start</th>
-                            <th>Finish</th>
-                            <th>Duration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for importLog in importLogs %}
-                        <tr>
-                            <td>{{ importLog.instance.script }}</td>
-                            <td><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
-                            <td><time title="{{ importLog.instance.finishAt.database }}">{{ importLog.instance.finishAt.local }}</time></td>
-                            <td>
-                                {% if not importLog.instance.finishAt.isNull %}
-                                <time title="">
-                                    {{ importLog.duration.hms }} ({{ importLog.duration.sec }} sec)
-                                </time>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="scrollable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Script</th>
+                                <th>Start</th>
+                                <th>Finish</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for importLog in importLogs %}
+                            <tr>
+                                <td>{{ importLog.instance.script }}</td>
+                                <td><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
+                                <td><time title="{{ importLog.instance.finishAt.database }}">{{ importLog.instance.finishAt.local }}</time></td>
+                                <td>
+                                    {% if not importLog.instance.finishAt.isNull %}
+                                    <time title="">
+                                        {{ importLog.duration.hms }} ({{ importLog.duration.sec }} sec)
+                                    </time>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         {% endif %}
