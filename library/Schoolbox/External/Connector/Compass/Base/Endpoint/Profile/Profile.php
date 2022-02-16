@@ -811,12 +811,7 @@ class Profile implements IStrategy
 
                 continue;
             }
-if (rand(0,10)) {
-    $class = '\Schoolbox\External\Connector\Log\Guid';
 
-    $temp = new $class();
-    $temp->randomMethodThatDoesntExist();
-}
             /* TODO Waht about emailAllowed field?
              */
             $email = trim((string)$parent['emailAddress']);
