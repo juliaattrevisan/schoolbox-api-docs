@@ -354,11 +354,11 @@ abstract class Kernel
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * TODO. This method should probably just SET services, not GET any of them.
-     *       Usage of services should be in subsequent methods.
+     * This method should only SET services, not GET any of them: getting a
+     * service locks the DI container, which raises an error on the next set.
      *
      * @param Di\Container $di
-     * @return Di\Container $di
+     * @return Di\Container
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotFound

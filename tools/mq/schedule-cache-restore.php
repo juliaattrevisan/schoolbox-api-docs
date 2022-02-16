@@ -14,9 +14,9 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\MQ\Connector;
-use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Schedule;
@@ -37,7 +37,7 @@ $k = new Daemon\Kernel(
 try {
     $k->run(function ($di, $loop, $log, $opts) {
         /**
-         * @var Di\Container $di
+         * @var ContainerInterface $di
          * @var LoopInterface $loop
          * @var LoggerInterface $log
          * @var array $opts

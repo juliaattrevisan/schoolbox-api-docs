@@ -9,10 +9,10 @@
 
 namespace Alaress\Async\Test;
 
-use Aura\Di;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use ReflectionClass;
@@ -26,7 +26,7 @@ class Framework
     protected $log;
     /** @var LoopInterface  */
     protected $loop;
-    /** @var Di\Container  */
+    /** @var ContainerInterface  */
     protected $di;
     /** @var string  */
     protected $service;
@@ -43,12 +43,12 @@ class Framework
 
 
     /**
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param string|null     $env
-     * @param string|null     $logDir
-     * @param string          $rootDir
+     * @param ContainerInterface $di
+     * @param LoopInterface      $loop
+     * @param LoggerInterface    $log
+     * @param string|null        $env
+     * @param string|null        $logDir
+     * @param string             $rootDir
      */
     public function __construct($di, $loop, $log, string $env = null, string $logDir = null, $rootDir = SITE_root)
     {
