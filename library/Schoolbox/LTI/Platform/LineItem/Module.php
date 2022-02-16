@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\LineItem;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
@@ -69,28 +69,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'ltiAssessmentMapper'      => $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class),
-                    'ltiAssessmentScoreMapper' => $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class),
-                    'registrations'            => $injector->lazyGet('lti.registrations'),
-                    'userCodec'                => $injector->lazyGet('lti.userCodec'),
-                    'accessTokenCache'         => $injector->lazyGet('lti.accessTokenCache'),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(LtiAssessmentMapper::class),
+            $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+            $this->injector->get('lti.registrations'),
+            $this->injector->get('lti.userCodec'),
+            $this->injector->get('lti.accessTokenCache'),
         );
     }
 }

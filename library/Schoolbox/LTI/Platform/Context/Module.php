@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\Context;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Component_Homepage_Factory;
 use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
@@ -102,30 +102,16 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'registrations'        => $injector->lazyGet('lti.registrations'),
-                    'userCodec'            => $injector->lazyGet('lti.userCodec'),
-                    'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-                    'instance'             => $injector->lazyGet('instance'),
-                    'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'access'               => $this->getMapperFactory()->getLazy(Access::class),
-                    'accessTokenCache'     => $injector->lazyGet('lti.accessTokenCache'),
-                ]
-            )
+        return new Controller(
+            $this->injector->get('lti.registrations'),
+            $this->injector->get('lti.userCodec'),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('instance'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('lti.accessTokenCache'),
         );
     }
 }

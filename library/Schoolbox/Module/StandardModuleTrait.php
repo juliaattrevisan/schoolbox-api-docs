@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Module;
 
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -69,21 +69,10 @@ trait StandardModuleTrait
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->getBasename(),
-            $injector->lazyNew($this->getControllerClassName())
-        );
+        // I hope this is consistent
+        $className = $this->getControllerClassName();
+        return new $className();
     }
 }
