@@ -195,7 +195,7 @@ class Transactor
                      * Otherwise do the original behaviour (retrofit to plag)
                      */
                     if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
-                        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance()))->retrofit($this->assessment->getId());
+                        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper))->retrofit($this->assessment->getId());
                     } else {
                         (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
                     }

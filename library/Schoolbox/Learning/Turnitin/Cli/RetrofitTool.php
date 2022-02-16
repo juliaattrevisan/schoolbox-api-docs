@@ -118,7 +118,7 @@ HELP;
                 $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
             ));
 
-            (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->getLogger()))
+            (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->getLogger()))
                 ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
 
             $this->getLogger()->info('Done.');
