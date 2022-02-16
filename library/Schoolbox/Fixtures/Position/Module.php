@@ -10,7 +10,7 @@ namespace Schoolbox\Fixtures\Position;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
