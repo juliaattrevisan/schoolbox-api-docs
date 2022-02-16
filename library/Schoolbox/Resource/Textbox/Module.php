@@ -12,7 +12,7 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_InstanceMapper;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -112,29 +112,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'componentConfigMapper' => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Component_ConfigMapper::class),
         );
     }
-
 
     /**
      * @inheritdoc

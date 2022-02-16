@@ -17,7 +17,7 @@ use Alaress\Authorizer\Rule\IsConfigOn;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -97,28 +97,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'googleFileMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
         );
     }
 

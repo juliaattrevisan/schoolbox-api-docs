@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Admin;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
@@ -84,20 +85,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
         return new Controller();
-    }
-
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
     }
 }

@@ -13,7 +13,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
@@ -131,38 +131,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->setters[Controller::class]['setEventMapper']
-            = $this->getMapperFactory()->getLazy(Calendar\EventMapper::class);
-        $injector->setters[Controller::class]['setEventRecurrenceMapper']
-            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class, [
-            'eventMapper' => $this->getMapperFactory()->getLazy(Calendar\EventMapper::class)
-        ]);
-        $injector->setters[Controller::class]['setBookingMapper']
-            = $this->getMapperFactory()->getLazy(Mapper::class);
-        $injector->setters[Controller::class]['setResourceMapper']
-            = $this->getMapperFactory()->getLazy(ItemMapper::class);
-        $injector->setters[Controller::class]['setExternalTimetableHandler']
-            = $injector->get('externalTimetable');
-        $injector->setters[Controller::class]['setCampusMapper']
-            = $this->getMapperFactory()->getLazy(CampusMapper::class);
-        $injector->setters[Controller::class]['setStatusMapper']
-            = $this->getMapperFactory()->getLazy(StatusMapper::class);
-        $injector->setters[Controller::class]['setTermMapper']
-            = $this->getMapperFactory()->getLazy(TermMapper::class);
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        return (new Controller())
+            ->setEventMapper($this->getMapperFactory()->get(Calendar\EventMapper::class))
+            ->setEventRecurrenceMapper($this->getMapperFactory()->get(Calendar\EventMapper::class))
+            ->setBookingMapper($this->getMapperFactory()->get(Mapper::class))
+            ->setResourceMapper($this->getMapperFactory()->get(ItemMapper::class))
+            ->setExternalTimetableHandler($this->injector->get('externalTimetable'))
+            ->setCampusMapper($this->getMapperFactory()->get(CampusMapper::class))
+            ->setStatusMapper($this->getMapperFactory()->get(StatusMapper::class))
+            ->setTermMapper($this->getMapperFactory()->get(TermMapper::class));
     }
 
     /* Getters / Setters

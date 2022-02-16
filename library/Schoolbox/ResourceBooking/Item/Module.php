@@ -14,7 +14,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Paginator\UrlPaginator;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\RoleMapper;
@@ -85,38 +85,19 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->setters[Controller::class]['setMapper']
-            = $this->getMapperFactory()->getLazy(Mapper::class);
-        $injector->setters[Controller::class]['setUserMapper']
-            = $this->getMapperFactory()->getLazy(UserMapper::class);
-        $injector->setters[Controller::class]['setRoleMapper']
-            = $this->getMapperFactory()->getLazy(RoleMapper::class);
-        $injector->setters[Controller::class]['setTermMapper']
-            = $this->getMapperFactory()->getLazy(TermMapper::class);
-        // Paginator needs the count per page and amount set.
-        $injector->setters[Controller::class]['setPaginator']
-            = $injector->lazyNew(
-                UrlPaginator::class,
-                array(),
-                array(
-                    'setPageSize' => 10,
-                    'setParam'    => 'page',
-                )
+        return (new Controller())
+            ->setMapper($this->getMapperFactory()->get(Mapper::class))
+            ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
+            ->setRoleMapper($this->getMapperFactory()->get(RoleMapper::class))
+            ->setTermMapper($this->getMapperFactory()->get(TermMapper::class))
+            ->setPaginator(
+                (new UrlPaginator())
+                    ->setPaginator(new \Alaress\Paginator\Paginator())
+                    ->setPageSize(10)
+                    ->setParam('page')
             );
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
     }
 
     /* Getters / Setters
