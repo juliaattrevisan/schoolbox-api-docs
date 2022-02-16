@@ -92,19 +92,20 @@ class LatestView
      * [status: (has viewed), object: 'assessment / feedback', 'date': date last view or (null) ]
      * ]
      * @param IAssessable $assessment
-     * @param Participant|null $participant (student)
+     * @param User $student (student)
      * @return array
      */
-    public function getTwigViews(IAssessable $assessment, ?Participant $participant): array
+    public function getTwigViews(IAssessable $assessment, User $student): array
     {
         //if no participant, must be submitting the assessment, so exit
+        $participant = $assessment->getParticipantIfExtant($student);
         if (null === $participant) {
             return [];
         }
 
         $views = [
             'student' => [
-                'name'      => $participant->getUser()->getFullName(),
+                'name'      => $student->getFullName(),
                 'status'    => 'is yet to view',
                 'object'    => 'assessment',
                 'date'      => null,
@@ -116,21 +117,23 @@ class LatestView
         /** @var Model[]|GenericCollection $last_views */
         $last_views = $this->mapper->findByColumnList([
                                                      'assessment_id'  => $assessment->getId(),
-                                                     'participant_id' => $participant->getUser()->getId(),
+                                                     'participant_id' => $student->getId(),
                                                  ]);
 
         /**
          * set the student values
          */
         /** @var Model|null $studentView */
-        $studentView = $last_views->getBy('user', $participant->getUser());
+        $studentView = $last_views->getBy('user', $student);
 
         /**
          * check if there has been a submission? as the student has viewed the assignment when they were submitting it
          * this will also be true if the teacher submitted on behalf of the student
          */
-        if ($participant->hasSubmittedResponse()) {
+        $feedback = null;
+        if (null !== $participant && $participant->hasSubmittedResponse()) {
             $views['student']['status'] = 'has viewed';
+            $feedback = $participant->getAuthoritativeFeedback(true);
         }
 
         /**
@@ -146,8 +149,7 @@ class LatestView
         $studentDate = $studentView->getLastVisit();
         $views['student']['date']   = $studentDate->getLocal();
 
-        $feedback = $participant->getAuthoritativeFeedback(true);
-        if (null !== $feedback & $feedback->getPublishedAt() < $studentDate) {
+        if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
             /**
              * was the last student view after feedback?
              */
@@ -158,7 +160,7 @@ class LatestView
          * if not been submitted, don't check parent views.
          * and return just the student
          */
-        if (!$participant->hasSubmittedResponse()) {
+        if (null === $participant || !$participant->hasSubmittedResponse()) {
             return $views;
         }
         /**
@@ -188,7 +190,7 @@ class LatestView
                 /**
                  * check if view after feedback?
                  */
-                if (null !== $feedback & $feedback->getPublishedAt() < $parentDate) {
+                if (null !== $feedback && $feedback->getPublishedAt() < $parentDate) {
                     //parent viewed after feedback was published
                     $view['object'] = 'feedback';
                 }

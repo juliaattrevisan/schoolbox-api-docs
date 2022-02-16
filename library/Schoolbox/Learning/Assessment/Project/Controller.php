@@ -189,7 +189,7 @@ class Controller extends Assessment\Controller
         // Ideally make this an instance var instead of instantiating all the time
         // Except you can't, $this->getRouter() returns null in __construct()?
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $assessment->getParticipant($student)),
+            'lastViews'    => $lastView->getTwigViews($assessment, $student),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '' ]),
             'student'     => $student,
             'assessment'  => $assessment,
