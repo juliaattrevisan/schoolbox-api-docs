@@ -144,7 +144,7 @@ class Factory
             }
         } catch (\DomainException $e) {
             /* schoolcalendarandnotices might not be enabled for a school who chooses to eschew
-             * this feature; instead of catastrophically dying with a fatal, just exist quietly
+             * this feature; instead of catastrophically dying with a fatal, just accumulate quietly
              */
             $dsnErrors[] = $e->getMessage();
         }
@@ -156,7 +156,10 @@ class Factory
                 $this->log->warning($dsnError);
             }
 
-            exit();
+            throw new \DomainException(sprintf(
+                'DSN Errors: %s',
+                implode(', ', $dsnErrors)
+            ));
         }
 
         /* A list of all the campuses from which we can chooze
@@ -180,14 +183,10 @@ class Factory
         /* Without event types we can't import anything - they're mandatory
          */
         if (!$eventTypes->count()) {
-            $this->log->critical(sprintf(
-                'There needs to be at least one Event Type to import events.'
-            ));
-
-            exit();
+            throw new \DomainException('There needs to be at least one Event Type to import events.');
         }
 
-        /* Elected event Owner and Author is arbitrarily this person for now...
+        /* TODO Elected event Owner and Author is arbitrarily this person for now...
          */
         $owner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
