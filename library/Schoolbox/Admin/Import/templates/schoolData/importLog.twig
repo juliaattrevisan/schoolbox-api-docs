@@ -20,7 +20,6 @@
         <tr>
             <th>Data Source</th>
             <th>Start</th>
-            <th>Finish</th>
             <th>Status</th>
             <th>Duration</th>
         </tr>
@@ -48,7 +47,6 @@
             <tr>
                 <td {{ borderStyle|raw }}>{{ importLog.instance.script }}</td>
                 <td {{ borderStyle|raw }}><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
-                <td {{ borderStyle|raw }}><time title="{{ importLog.instance.finishAt.database }}">{{ importLog.instance.finishAt.local }}</time></td>
                 <td {{ borderStyle|raw }}>
                     {% set statusCss = '' %}
 
@@ -73,7 +71,7 @@
             </tr>
             {% if hasErrorMessage %}
                 <tr>
-                    <td colspan="6">
+                    <td colspan="5">
                         <span class="meta">{{ importLog.instance.errorMessage }}</span>
                     </td>
                 </tr>
