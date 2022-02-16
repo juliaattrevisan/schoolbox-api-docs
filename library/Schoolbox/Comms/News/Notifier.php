@@ -12,9 +12,9 @@ namespace Schoolbox\Comms\News;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Lookup\ReadMore;
@@ -76,8 +76,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {

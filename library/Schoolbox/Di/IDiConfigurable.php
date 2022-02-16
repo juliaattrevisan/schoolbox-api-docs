@@ -9,11 +9,16 @@
 
 namespace Schoolbox\Di;
 
+use Psr\Container\ContainerInterface;
+
 /**
- * Interface for allowing classes to statically declare their DI dependencies.
- * Designed to reduce the coupling of everything being declared in a central location like Bootstrap, and allowing
- * classes to have more control over how they're constructed. These methods are designed to be used by the
- * Configurator class.
+ * Interface for allowing classes to statically declare their dependencies.
+ *
+ * Designed to reduce the coupling of everything being declared in a central
+ * location like Bootstrap, and allowing classes to have more control over how
+ * they're constructed.
+ *
+ * These methods are designed to be used by `\Schoolbox\Di\Configurator`.
  *
  * Interface IDiConfigurable
  * @package Schoolbox\Di
@@ -21,18 +26,18 @@ namespace Schoolbox\Di;
 interface IDiConfigurable
 {
     /**
-     * Returns the $di->params[static:class] for this class
+     * Returns the constructor parameters for this class.
      *
-     * @param \Aura\Di\ContainerInterface $di
+     * @param ContainerInterface $di
      * @return array
      */
-    public static function getParams(\Aura\Di\ContainerInterface $di): ?array;
+    public static function getParams(ContainerInterface $di): ?array;
 
     /**
-     * Returns the $di->setters[static:class] for this class
+     * Returns the required setters for this class.
      *
-     * @param \Aura\Di\ContainerInterface $di
+     * @param ContainerInterface $di
      * @return array
      */
-    public static function getSetters(\Aura\Di\ContainerInterface $di): ?array;
+    public static function getSetters(ContainerInterface $di): ?array;
 }

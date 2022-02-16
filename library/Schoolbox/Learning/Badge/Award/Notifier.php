@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress\Async\Notification\Parameter\Param;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Award\Model as Award;
 use Alaress\Async\Notification\Instance\Builder;
-use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception as MapperException;

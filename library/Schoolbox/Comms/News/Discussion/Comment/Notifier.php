@@ -12,10 +12,10 @@ namespace Schoolbox\Comms\News\Discussion\Comment;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Database\Predicate;
-use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Monolog\Logger;
 use PDO;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\IUserResolver;
@@ -79,8 +79,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
