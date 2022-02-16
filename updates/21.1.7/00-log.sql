@@ -4,8 +4,8 @@ CREATE TABLE `sis_import_log` (
   `script` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `start_at` DATETIME NOT NULL,
   `finish_at` DATETIME DEFAULT NULL,
-  `status` ENUM('running', 'complete', 'error') NOT NULL,
-  `error_message` TEXT NULL,
+  `status` ENUM('running', 'complete', 'error') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
+  `error_message` TEXT CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   PRIMARY KEY (`id`));
