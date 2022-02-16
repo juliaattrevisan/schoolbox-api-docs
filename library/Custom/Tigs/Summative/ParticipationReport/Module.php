@@ -66,18 +66,18 @@ class Module extends Alaress\Module\Module
     public function buildController(ContainerInterface $container): Base
     {
         return new Controller(
-            $container->get('databaseInternal'),
-            $container->get('externalUser'),
-            $container->get('externalClass'),
+            $this->injector->get('databaseInternal'),
+            $this->injector->get('externalUser'),
+            $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(PastoralMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(Textbox\Mapper::class),
             $this->getMapperFactory()->get(Access::class),
-            $container->get('databaseExternal'),
+            $this->injector->get('databaseExternal'),
             $this->getMapperFactory()->get(Assessment\Mapper::class),
-            $container->get('assessmentDataSource'),
+            $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
         );
     }

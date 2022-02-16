@@ -76,7 +76,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(SurveyMapper::class),
-            $container->get('externalClass')
+            $this->injector->get('externalClass')
         );
     }
 

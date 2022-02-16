@@ -385,13 +385,13 @@ class Module extends BaseModule
         $termMapper       = $this->getMapperFactory()->get(Term\Mapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
-        $assessmentDataSource = $container->get('assessmentDataSource');
+        $assessmentDataSource = $this->injector->get('assessmentDataSource');
 
         /** @var Transactor $transactor */
-        $transactor = $container->get('transactor');
+        $transactor = $this->injector->get('transactor');
 
         /** @var ParticipantDataSource $participantDataSource */
-        $participantDataSource = $container->get('participantDataSource');
+        $participantDataSource = $this->injector->get('participantDataSource');
 
         $bakery = new Breadcrumb\Factory(
             $this->getRouter(),
@@ -428,19 +428,19 @@ class Module extends BaseModule
                     $bakery,
                     $this->getMapperFactory()->get(RubricDataSource::class),
                     $this->getMapperFactory()->get(RubricResultSetMapper::class),
-                    $container->get('submissionDataSource'),
+                    $this->injector->get('submissionDataSource'),
                     $participantDataSource,
                     $termMapper,
                     $this->getMapperFactory()->get(SingleFile\Mapper::class),
-                    $container->get('kamiConnector'),
+                    $this->injector->get('kamiConnector'),
                     $this->getMapperFactory()->get(Kami\Mapper::class),
                     $participantDataSource,
                     $courseSpecMapper,
                     $unitSpecMapper,
                     $replicator,
-                    $container->get('pdfGenerator'),
+                    $this->injector->get('pdfGenerator'),
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
-                    $container->get('feedbackDataSource'),
+                    $this->injector->get('feedbackDataSource'),
                     $folderMapper,
                 );
 
@@ -514,9 +514,9 @@ class Module extends BaseModule
                     $this->getMapperFactory()->get(LtiToolMapper::class),
                     $this->getMapperFactory()->get(LtiAssessmentMapper::class),
                     $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
-                    $container->get('lti.registrations'),
-                    $container->get('instance'),
-                    $container->get('lti.userCodec'),
+                    $this->injector->get('lti.registrations'),
+                    $this->injector->get('instance'),
+                    $this->injector->get('lti.userCodec'),
                 );
 
             default:

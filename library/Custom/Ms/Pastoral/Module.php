@@ -124,12 +124,12 @@ class Module extends BaseModule
     {
         return new Controller(
             new StudentInvolvement\Report\Factory(
-                new StudentInvolvement\Gateway($container->get('databaseExternal')),
+                new StudentInvolvement\Gateway($this->injector->get('databaseExternal')),
                 $this->getMapperFactory()->get(UserMapper::class),
                 $this->getMapperFactory()->get(Folder\Mapper::class),
-                $container->get('assessmentDataSource'),
+                $this->injector->get('assessmentDataSource'),
                 $this->getMapperFactory()->get(RubricDataSource::class),
-                $container->get('user'),
+                $this->injector->get('user'),
                 $this->getMapperFactory()->get(UserAccessMapper::class)
             )
         );

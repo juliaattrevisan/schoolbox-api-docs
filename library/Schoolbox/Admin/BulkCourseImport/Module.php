@@ -61,7 +61,7 @@ class Module extends BaseModule
     public function buildController(ContainerInterface $container): Base
     {
         /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $container->get('assessmentDataSource');
+        $assessmentDataSource = $this->injector->get('assessmentDataSource');
         return new Controller(
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),

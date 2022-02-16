@@ -59,7 +59,7 @@ class Module extends Alaress\Module\Module
     public function buildController(ContainerInterface $container): Base
     {
         /** @var MapperFactory $mapperFactory */
-        $mapperFactory = $container->get('mapperFactory');
+        $mapperFactory = $this->injector->get('mapperFactory');
         return new Controller(
             $mapperFactory->get(UserAccessMapper::class),
             $mapperFactory->get(SiteAccess\Mapper::class),

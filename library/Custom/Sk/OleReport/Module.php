@@ -88,7 +88,7 @@ class Module extends BaseModule
      */
     public function buildController(ContainerInterface $container): Base
     {
-        return new Controller($container->get('databaseExternal'));
+        return new Controller($this->injector->get('databaseExternal'));
     }
 
     /**
