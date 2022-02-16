@@ -211,10 +211,14 @@ class LatestView
             return $views;
         }
 
-        $views['student']['date']   = $studentView->getLastVisit()->getLocal();
+        $studentDate = $studentView->getLastVisit();
+        $views['student']['date']   = $studentDate->getLocal();
 
         $feedback = $participant->getAuthoritativeFeedback(true);
-        if (null !== $feedback) {
+        if (null !== $feedback & $feedback->getPublishedAt() < $studentDate) {
+            /**
+             * was the last student view after feedback?
+             */
             $views['student']['object'] = 'feedback';
         }
 
@@ -246,13 +250,13 @@ class LatestView
             /** @var Model|null $parentView */
             $parentView = $last_views->getBy('user', $parent);
             if (null !== $parentView) {
-                $date = $parentView->getLastVisit();
-                $view['date'] = $date->getLocal();
+                $parentDate = $parentView->getLastVisit();
+                $view['date'] = $parentDate->getLocal();
                 $view['status'] = 'has viewed';
                 /**
                  * check if view after feedback?
                  */
-                if (null !== $feedback & $feedback->getPublishedAt() < $date) {
+                if (null !== $feedback & $feedback->getPublishedAt() < $parentDate) {
                     //parent viewed after feedback was published
                     $view['object'] = 'feedback';
                 }
