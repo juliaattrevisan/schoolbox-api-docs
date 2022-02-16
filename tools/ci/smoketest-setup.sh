@@ -90,5 +90,9 @@ cd /vagrant/tools
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
 
+# Sandbox has no ephemeral Redis instance; use the persistent instance
+# (ensure this happens after all updates happen)
+mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
+
 ## Finish where we started.
 cd $initialdir
