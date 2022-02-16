@@ -10,7 +10,11 @@
  # @param array $importLog  An array of Log\Model instances along with precalculated duration metadata
  #}
 {%- apply spaceless -%}
-<div class="scrollable">
+{# Enforce a max-height here so you don't get a super Shaquille list of log entries
+ # Ideally this would be a jiggles vue table so users have filter powers, pagination
+ # and all that fad witchery
+ #}
+<div class="scrollable" style="max-height:20rem;">
     <table>
         <thead>
         <tr>
