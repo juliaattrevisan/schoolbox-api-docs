@@ -262,6 +262,9 @@ class Uploader
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
                 return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
+            } catch (Exception\NotFound $e) {
+                // file not found
+                throw $e;
             } catch (Exception\IKamiException $e) {
                 // If we recognise the exception, just print the info we need.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
@@ -269,9 +272,6 @@ class Uploader
             } catch (ConnectException $e) {
                 // Network is unreachable.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
-                throw $e;
-            } catch (Exception\NotFound $e) {
-                // file not found
                 throw $e;
             } catch (\Throwable $e) {
                 // But if unknown, also print the trace to help debugging
