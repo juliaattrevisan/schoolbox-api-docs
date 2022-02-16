@@ -192,20 +192,27 @@ class LatestView
          */
         /** @var Model|null $studentView */
         $studentView = $last_views->getBy('user', $participant->getUser());
+
+        /**
+         * check if there has been a submission? as the student has viewed the assignment when they were submitting it
+         * this will also be true if the teacher submitted on behalf of the student
+         */
+        if ($participant->hasSubmittedResponse()) {
+            $views['student']['status'] = 'has viewed';
+        }
+
+        /**
+         * check if there was a view recorded? in our special table
+         */
         if (null === $studentView) {
             /**
              * no student entry, error out
-             * has the student submitted the assessment, if so show a basic message
              */
-            if ($participant->hasSubmittedResponse()) {
-                $views['student']['status'] = 'has viewed';
-            }
             return $views;
         }
 
-        $views['student']['status'] = 'has viewed';
         $views['student']['date']   = $studentView->getLastVisit()->getLocal();
-        $views['student']['object'] = 'assessment';
+
         $feedback = $participant->getAuthoritativeFeedback(true);
         if (null !== $feedback) {
             $views['student']['object'] = 'feedback';
