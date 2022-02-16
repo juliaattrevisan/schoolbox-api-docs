@@ -13,7 +13,7 @@ namespace Schoolbox\Canvas;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 
 class Module extends BaseModule
@@ -45,25 +45,11 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'canvasUrl' => $this->getConfig()->get('canvas_url'),
-                    'bearerToken' => $this->getConfig()->get('canvas_bearer_token'),
-                ]
-            )
+        return new Controller(
+            $this->getConfig()->get('canvas_url'),
+            $this->getConfig()->get('canvas_bearer_token'),
         );
     }
 
