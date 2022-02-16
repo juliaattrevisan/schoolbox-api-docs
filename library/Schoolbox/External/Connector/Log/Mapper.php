@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Log;
 
 use Schoolbox\GenericCollection;
 
-
 /**
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
@@ -54,6 +53,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function status(): GenericCollection
     {
