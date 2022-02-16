@@ -464,37 +464,6 @@ class Module
     }
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @deprecated Must be removed as DI container doesn't allow pre-init:
-     *             create controllers using buildController
-     *
-     * @param \Aura\Di\ContainerInterface  $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(\Aura\Di\ContainerInterface  $injector)
-    {
-    }
-
-    /**
-     * Calls the secondary init on each module that this one depends on.
-     *
-     * @deprecated Module dependencies should now be automatically installed when required
-     *             (@see `Alaress\Module\Loader` and classes which use it)
-     *
-     * @throws LogicException if a dependency doesn't exist
-     */
-    protected function initDependingModules()
-    {
-        foreach ($this->moduleDependencies as $dependency) {
-            self::$installedModules[$dependency]->initControllerDependencies();
-        }
-    }
-
-    /**
      * Initializes any preloads on routes for this module.
      *
      * Preloads adjust route params before they are passed to the controller.
@@ -691,18 +660,6 @@ class Module
 
 
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @deprecated Must be removed and replaced with buildController due to DI
-     *
-     * @param \Aura\Di\ContainerInterface $injector The dependency injection container.
-     */
-    public function initControllers(\Aura\Di\ContainerInterface $injector)
-    {
-    }
-
-
-    /**
      * Actually builds the controller, if this module has one.
      *
      * Modules which instantiate only a homepage/dashboard/ePortfolio component
@@ -748,24 +705,6 @@ class Module
         return $controller;
     }
 
-
-//    /**
-//     * @param  ContainerInterface $injector
-//     * @return $this
-//     */
-//    public function setInjector(ContainerInterface $injector)
-//    {
-//        $this->injector = $injector;
-//        return $this;
-//    }
-//
-//    /**
-//     * @return ContainerInterface
-//     */
-//    public function getInjector()
-//    {
-//        return $this->injector;
-//    }
 
     /**
      * @return string
