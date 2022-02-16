@@ -199,9 +199,11 @@ class Factory
 
     /**
      * @return GenericCollection
+     * @throws Exception
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws Exception
+     * @throws \DomainException
+     * @throws \PDOException
      */
     public function produce(): GenericCollection
     {
@@ -226,9 +228,7 @@ class Factory
         /* If there aren't any files to process, do nothing
          */
         if (empty($xml)) {
-            $this->log->info('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
-
-            return $bus;
+            throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
         /* Purge previously-imported profile relationships and classes
@@ -296,13 +296,11 @@ class Factory
          * to name their Periods specifically and kamar has no period data
          */
         if (null === $currentWeekOffset) {
-            $this->log->error('Could not determine week offset; check your Timetable Structure CSV import.');
-            exit;
+            throw new \DomainException('Could not determine week offset; check your Timetable Structure CSV import.');
         }
 
         if (null === $termSettings) {
-            $this->log->error('Could not determine term settings; check your Timetable Structure CSV import.');
-            exit;
+            throw new \DomainException('Could not determine term settings; check your Timetable Structure CSV import.');
         }
 
         /* Figure out which term number we're in, to navigate xml files' nodes
@@ -314,13 +312,11 @@ class Factory
         /* You need both of these to work stuff out
          */
         if (null === $currentTerm) {
-            $this->log->error('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
-            exit;
+            throw new \DomainException('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
         }
 
         if (null === $currentCycleId) {
-            $this->log->error('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
-            exit;
+            throw new \DomainException('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
         }
 
         /* Otherwise continue onwards
