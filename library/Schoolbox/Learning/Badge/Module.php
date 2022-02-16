@@ -150,7 +150,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
-            $this->injector->lazyGet('filters.factoryFactory'),
+            $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
             $this->getMapperFactory()->get(StorageMapper::class),

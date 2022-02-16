@@ -9,11 +9,18 @@
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
+use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapper;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Alaress\Authorizer\Rule;
@@ -138,5 +145,21 @@ class Module extends RestfulModule
                 "assessment"     => $dataSource->findById($params["assessmentId"])
             ];
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(): Base
+    {
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(QuizSectionMapper::class),
+            $this->getMapperFactory()->get(QuizQuestionMapper::class),
+            $this->getMapperFactory()->get(QuizSolutionMapper::class),
+            $this->getMapperFactory()->get(QuizAttemptMapper::class),
+            $this->getMapperFactory()->get(QuizAnswerMapper::class)
+        );
     }
 }
