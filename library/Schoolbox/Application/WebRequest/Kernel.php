@@ -309,7 +309,7 @@ class Kernel extends WebKernelAbstract
 
         // now the preloading is done initialise the controller
         $controller = $module->installControllerDependencies(
-            $module->buildController($this->di),
+            $module->buildController(),
             $this->di,
         );
         unset($module);

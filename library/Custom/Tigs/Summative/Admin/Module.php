@@ -46,10 +46,9 @@ class Module extends Alaress\Module\Module
     }
 
     /**
-     * @param ContainerInterface $container
      * @return Base
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),

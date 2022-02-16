@@ -373,7 +373,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         // Common dependencies across the controllers this module _may_ create.
         $userMapper       = $this->getMapperFactory()->get(UserMapper::class);
@@ -520,7 +520,7 @@ class Module extends BaseModule
                 );
 
             default:
-                return parent::buildController($container);
+                return parent::buildController();
         }
     }
 

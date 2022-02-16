@@ -65,7 +65,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         return new Controller();
     }

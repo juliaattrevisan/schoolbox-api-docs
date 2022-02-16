@@ -713,13 +713,10 @@ class Module
      * This may pull dependencies from the DI container, but will not write to
      * it.
      *
-     * TODO Is $injector even required? An injector is a constructor param
-     *
-     * @param ContainerInterface $container
      * @return Base
      * @throws LogicException if this module has no controller
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         throw new LogicException(sprintf('Controller does not exist for module "%s"', $this->basename));
     }

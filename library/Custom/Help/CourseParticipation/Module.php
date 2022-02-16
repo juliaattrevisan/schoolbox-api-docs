@@ -56,7 +56,7 @@ class Module extends Alaress\Module\Module
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->injector->get('mapperFactory');

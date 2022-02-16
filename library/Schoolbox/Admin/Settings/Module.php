@@ -43,7 +43,7 @@ class Module extends \Alaress\Module\Module
     /**
      * @inheritdoc
      */
-    public function buildController(ContainerInterface $container): Base
+    public function buildController(): Base
     {
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
