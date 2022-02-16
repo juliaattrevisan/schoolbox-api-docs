@@ -202,7 +202,7 @@ class WorkerProcess extends AbstractProcess
 
             try {
                 // return a new, shiny instance of this class, correctly configured
-                $this->configurator->configureClass($notifierClassName);
+//                $this->configurator->configureClass($notifierClassName);
                 return $this->configurator->newInstance($notifierClassName);
             } catch (ReflectionFailure $e) {
                 // kennet configure? ok, just return as-is

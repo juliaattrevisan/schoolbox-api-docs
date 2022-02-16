@@ -65,18 +65,6 @@ class NotifierInflector
 
 
     /**
-     * Passthru to the configurator beneath
-     *
-     * @param string $classname
-     * @throws ReflectionFailure
-     */
-    public function configureClass(string $classname): void
-    {
-        $this->configurator->configureClass($classname);
-    }
-
-
-    /**
      * Instantiate ModuleNotifier via DI
      *
      * @param string $classname
@@ -85,12 +73,6 @@ class NotifierInflector
      */
     private function newInstance(string $classname): ModuleNotifierInterface
     {
-        try {
-            $this->configurator->configureClass($classname);
-        } catch (ReflectionFailure $e) {
-            // noop (for now, this is ok)
-        }
-
         try {
             /** @var ModuleNotifierInterface $notifier */
             $notifier = $this->configurator->newInstance($classname);

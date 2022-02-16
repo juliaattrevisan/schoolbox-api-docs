@@ -47,7 +47,7 @@ class Splitter
         $this->inflector = $inflector;
 
         // pre-set these configurations
-        $this->inflector->configureClass(AbstractModuleNotifier::class);
+//        $this->inflector->configureClass(AbstractModuleNotifier::class);
     }
 
 
