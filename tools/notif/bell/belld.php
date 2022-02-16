@@ -2,9 +2,9 @@
 <?php
 
 use Alaress\Date\Clock;
-use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\CampusMapper;
@@ -28,7 +28,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     try {
         /** @var IConfigLoader $conf */

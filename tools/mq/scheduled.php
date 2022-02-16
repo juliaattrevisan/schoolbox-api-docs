@@ -17,8 +17,8 @@ use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
-use Aura\Di;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
@@ -35,7 +35,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // CREATE SCHEDULER APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {
 
     /** @var Notif $notif */
     $notif = $di->get('notif');

@@ -11,7 +11,7 @@
 
 use Alaress\Redis;
 use Alaress\Test\Redis\Async\TestListener;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
@@ -87,7 +87,7 @@ if (!isset($opts['d'])) {
 
 
 // daemon (subscribe / consume) mode
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 

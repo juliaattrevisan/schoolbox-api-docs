@@ -16,8 +16,8 @@ use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Transaction\DispatchTransaction;
-use Aura\Di;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\MessageList\ListFactory;
@@ -33,7 +33,7 @@ require __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // ROUTING APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     $di->get('stomp')->connect()->then(function (IClient $client) use ($di, $loop, $log, $opts, $flags) {
         try {

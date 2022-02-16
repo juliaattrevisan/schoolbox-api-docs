@@ -9,7 +9,7 @@
  */
 
 use Alaress\Redis;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
@@ -28,7 +28,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) {
     $perform = \array_key_exists('perform', $opts);
 
     if ($perform) {

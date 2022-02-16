@@ -7,8 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
@@ -18,7 +18,7 @@ use Schoolbox\Application\Daemon;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel("Worker", [Daemon\Kernel::OPTION_ERRORS => E_ALL]);
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     // use the default strat
     $strat = new \Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy();

@@ -8,8 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\IConfigLoader;
@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker');
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log) {
 
     // extract things from DI and build the worker
 

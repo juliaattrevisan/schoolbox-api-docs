@@ -8,7 +8,7 @@
  */
 
 use Alaress\Async\Test\Framework;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
@@ -32,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $framework = new Framework($di, $loop, $log, $opts['env'] ?? null, $opts['logdir'] ?? null);
 
