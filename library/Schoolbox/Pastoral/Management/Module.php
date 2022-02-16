@@ -10,14 +10,13 @@ namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
-use InvalidArgumentException;
 
 class Module extends BaseModule
 {
@@ -50,26 +49,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * {@inheritdoc}
-     * @throws InvalidArgumentException If invalid mapper class specified
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $mappers = [
-            'userMapper'                => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'roleMapper'                => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'pastoralGroupMapper'       => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
-            'pastoralGroupMemberMapper' => $this->getMapperFactory()->getLazy(Pastoral\Group\Member\Mapper::class),
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Group\Member\Mapper::class),
+        );
     }
 
     /**
