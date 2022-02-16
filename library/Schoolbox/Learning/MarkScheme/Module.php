@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class Module extends BaseModule
 {

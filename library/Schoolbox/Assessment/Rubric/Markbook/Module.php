@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
@@ -20,9 +19,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\Access;
-use Aura\Di\Container;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Filter;
 

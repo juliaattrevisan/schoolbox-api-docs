@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;

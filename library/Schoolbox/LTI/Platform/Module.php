@@ -12,8 +12,6 @@ namespace Schoolbox\LTI\Platform;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 
 /**
