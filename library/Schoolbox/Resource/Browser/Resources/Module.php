@@ -10,9 +10,7 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Container;
 use Aura\Router\Router;
-use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\UserMapper;
@@ -33,78 +31,6 @@ class Module extends AbstractModule
         $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens([ 'linkId' => '\d+' ]);
         $this->addGetRoute($router, 'showFiles', $basePath, '/folder/{componentID}/files/{sourceFolderID}')->addTokens([ 'componentID' => '\d+', 'sourceFolderID' => '\d+' ]);
     }
-
-    /**
-     * @return string
-     */
-    protected function getControllerClass()
-    {
-        return Controller::class;
-    }
-
-    /**
-     * @param Container $ci
-     * @return array
-     */
-    protected function getSetterList(Container $ci)
-    {
-        // add/override the parent list
-        return array_merge(parent::getSetterList($ci), [
-            'setTreeBuilder'      => $ci->lazyNew(Resource\Browser\Resources\TreeBuilder::class),
-            'setFolderMapper'     => $this->getMapperFactory()->getLazy(Resource\Folder\Mapper::class),
-            'setFileMapper'       => $this->getMapperFactory()->getLazy(Resource\File\Mapper::class),
-            'setLinkMapper'       => $this->getMapperFactory()->getLazy(Resource\LinkMapper::class),
-            'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
-        ]);
-    }
-
-    /**
-     * @param Container $injector
-     * @return void
-     */
-    protected function initSetters(Container $injector)
-    {
-        $setters = $this->getSetterList($injector);
-
-        $injector->params[TreeBuilder::class]['taskMapper']       = $this->getMapperFactory()->getLazy(TaskMapper::class);
-        $injector->params[TreeBuilder::class]['locator']          = $setters['setFolderMapper'];
-        $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazy(
-            function () use ($injector) {
-                return new Resource\File\CompositeLocator(
-                    $this->getMapperFactory()->get(Resource\File\Mapper::class),
-                    $this->getMapperFactory()->get(Resource\LinkMapper::class)
-                );
-            }
-        );
-
-        $injector->params[TreeBuilder::class]['user'] = $injector->lazy(
-            function () use ($injector) {
-                return $injector->get('session')->getAuthUser();
-            }
-        );
-
-        $injector->params[TreeBuilder::class]['rootLabel'] = $injector->lazy(
-            function () use ($injector) {
-                return $injector->get('l10n')->translate('resource', true, true);
-            }
-        );
-
-        $injector->setters[$this->getControllerClass()]['setTab'] = 'resources';
-
-        //send the DB to the controller for showAllFiles to use.
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'fileMapper'        => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\File\Mapper::class),
-                    'componentInstance' => $this->getMapperFactory()->getLazy(\Component_InstanceMapper::class),
-                ],
-                $this->getSetterList($injector)
-            )
-        );
-    }
-
 
     /**
      * @inheritdoc

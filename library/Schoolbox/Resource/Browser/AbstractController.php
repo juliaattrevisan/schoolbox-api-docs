@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Config;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -42,7 +43,7 @@ abstract class AbstractController extends BaseController
     protected $fileMapper;
 
     /**
-     * @var Config\Loader
+     * @var IConfigLoader
      */
     protected $conf;
 
@@ -555,7 +556,7 @@ abstract class AbstractController extends BaseController
 
 
     /**
-     * @param Config\Loader $conf
+     * @param IConfigLoader $conf
      * @return self
      */
     public function setConfig($conf)
