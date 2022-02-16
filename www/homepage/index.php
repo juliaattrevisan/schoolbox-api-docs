@@ -322,28 +322,6 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
         }
     }
 
-    // Colors (original)
-    $this->setVar('COLOUR_ARRAY', 'original');
-    $this->setVar($listColor);
-    $this->parse('colour_list_block', 'colour_list', true);
-
-    // Colors (picker)
-    $this->setVar('COLOUR_ARRAY', 'pickers');
-    $this->setVar($listColor);
-    $this->parse('colour_list_block', 'colour_list', true);
-
-    // Defaults
-    $columns = array('top', 'left', 'right');
-    $this->setVar('COLOUR_ARRAY', 'defaults');
-
-    foreach ($columns as $col) {
-        foreach ($defaultColour as $field => $colour) {
-            $this->setVar($col . '_' . $field, $colour);
-        }
-    }
-
-    $this->parse('colour_list_block', 'colour_list', true);
-
     // Template control
     $template = $homepageHandler->getTemplate();
     for ($x = 1; $x <= 4; $x++) {

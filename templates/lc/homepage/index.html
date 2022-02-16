@@ -20,7 +20,7 @@
     }
 </style>
 <script type="text/javascript">
-    var colours = {};
+    var colours = {}; //the PhpLib below adds original, pickers, and default objects to colours, each with the colour variables below 
     // <!-- BEGIN colour_list -->
     // Colourset for {COLOUR_ARRAY} colours
     colours['{COLOUR_ARRAY}'] = {
@@ -43,139 +43,22 @@
 </script>
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
 
-<script type="text/javascript" src="{CDN_PREFIX}/js/form/jquery.ajax-form.js"></script>
 <script type="text/javascript">
     $(function() {
-        /* Collapse content on components
-         */
-        $('[data-component]').find('[data-collapser=true]').collapsable();
-
-        // Adds page to my links
-        $('#postToMyLinks').click( function (event) {
-            event.preventDefault();
-            $(this).ajaxForm({
-                url: "/cms/myLinksForm.php",
-                data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
-                type: 'post'
-            }).on('done.ajaxForm', function() {
-                location.reload();
-            });
-        });
-
-        // Lock all components on page load
-        // This is done with JS, otherwise components that are added after page load will be locked,
-        // and who can be bothered wrangling with phplib
-        $('a[data-component-settings], [data-component-handle]').hide();
-
-
-        // Toggle for homepage lock
-        $('#component-lock-toggle').click(function (event) {
-            var locked = this.checked;
-
-            $('a[data-component-settings], [data-component-handle]').toggle(locked);
-
-        });
-
         // Send out a custom trigger for the homepage feature tour
         // This won't trigger if #component-lock-switch doesn't exist on the page (which is what we want)
-        $('#component-lock-switch').trigger('editTourStart');
-
+         $('#component-lock-switch').trigger('editTourStart');
     });
 </script>
 
 <!-- BEGIN modify_layout -->
 <link rel="stylesheet" type="text/css" href="{CDN_PREFIX}/css/core/spectrum/spectrum.css" />
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/spectrum.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/sortableComponents.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/updateHomepage.js?v={SITE_VERSION}"></script>
 
 <script type="text/javascript">
     $(function() {
-        var url = '/homepage/configForm.php';
-
-        var homepage = $('#component-layout');
-        homepage.masonry({
-            context: {
-                cid: '{ID}'
-            },
-            component: {
-                url: url,
-                handleSelector: '[using-sortableComponents]', //to use sortableComponents.js to sort existing components instead - the whole of jquery.masonry.js will soon be replaced
-                calcSequenceData: function (columns) {
-                    var masonry = this,
-                            data  = { type: 'components' },
-                            order = ['left','right','top','bottom'];
-
-                    $.each(columns, function (position, column) {
-                        var key = 'column' + (order.indexOf(position) + 1);
-
-                        data[key] = column.children(masonry.options.component.selector).map(function () {
-                            /*
-                             * Two components in ePorfolio have no id's (My Profile, Teacher Notes)
-                             * and always appear in the same positions. So we do a check to see if
-                             * an id is set. If it isn't, and we don't do the check, the script breaks
-                             * and components cannot be relocated successfully
-                             */
-                            if (this.id) {
-                                return this.id.substr(9);
-                            }
-                        }).toArray().join(',');
-                    });
-
-                    return data;
-                }
-            },
-            column: {
-                leftColumnWidth: '{TEMPLATE_LEFT_COLUMN_WIDTH}',
-                placeholderTpl: '<div class="masonry-placeholder" />'
-            },
-            palette: {
-                url: url,
-                selector: '#tabs-1',
-                containerSelector: '.tabs-content',
-                handleSelector: '[data-component-palette]',
-                refreshItem: function () {
-                    this.find('[data-relation="count"]').text(this.data('count'));
-                }
-            },
-            spectrum: {
-                selector: '#tabs-2',
-                colours: colours,
-                restoreBtnSelector: '[data-role="reset-to-default"]',
-                cancelBtnSelector: '[data-role="undo"]',
-                saveBtnSelector: '[data-role="save"]',
-                saveLabelSelector: '[data-relation="saveLayout"]',
-                url: url
-            },
-            slider: {
-                selector: '[data-interaction="column-width"]',
-                url: url
-            }
-        });
-
-        // Fix slider on tab
-        $('[data-tab]').on('toggled', function (event, tab) {
-            tab.foundation('reflow');
-
-            // What tab is this?
-            var tabData = tab.data();
-            if ('hideEmpty' in tabData) {
-                homepage.removeClass('show-empty');
-            } else if ('showEmpty' in tabData) {
-                homepage.addClass('show-empty');
-            }
-        });
-
-
-
-        /* Tab toggler
-         * Deal with special components placeholder
-         */
-        $.fn.tabActivator({
-            onTabClose: function(tabActivator) {
-                homepage.removeClass('show-empty');
-            }
-        });
 
         /* Attach Course Selector Modal listeners
          */
@@ -191,7 +74,6 @@
                 }
             }
         });
-
 
     });
 </script>
@@ -539,6 +421,8 @@
     -->
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
+<input type="hidden" id="homepageURL" value="{HOMEPAGE_URL}" />
+<input type="hidden" id="heading" value="{HEADING}" />
 
 <div id="resource-browser" class="hide"></div>
 

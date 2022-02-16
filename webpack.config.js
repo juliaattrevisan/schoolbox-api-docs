@@ -118,6 +118,12 @@ module.exports = {
 
             './www/static/js/calendar/jquery.getExportCalendarLink.js'
         ],
+        spectrum: {
+            import: [
+                './node_modules/spectrum-colorpicker/spectrum.js', // Colour handling
+            ],
+            dependOn: 'main' //ensures jQuery is loaded prior
+        },
         masonry: {
             import: [
                 // Colour handling
@@ -125,7 +131,7 @@ module.exports = {
 
                 // homepage editing
                 './www/static/js/masonry/jquery.masonry.js',
-                './www/static/js/masonry/jquery.masonry.spectrum.js'
+                './www/static/js/masonry/jquery.masonry.spectrum.js',
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
@@ -217,8 +223,8 @@ module.exports = {
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
         viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
-        //Sortable components for homepages
-        sortableComponents: './templates/core/homepage/js/sortableComponents.js',
+        //Most functionality for a home page
+        updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 

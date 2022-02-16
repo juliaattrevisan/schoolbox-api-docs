@@ -247,8 +247,7 @@
                         configForm
                             .find('input[name="componentname"]')
                             .val(response.heading);
-                        configForm.submit();
-
+                        configForm[0].dispatchEvent(new Event('submit')); //is dispatched to updateComponentSettings.js
                     }).fail(function () {
                         toast.toastTimeout({text: 'Could not create text box', css: 'alert'});
                     }).always(function () {
