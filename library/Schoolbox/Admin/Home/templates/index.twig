@@ -301,19 +301,19 @@
 
 
                             {% if suds_import_data_enabled %}
-                                {% for script, stats in suds_import_logs %}
+                                {% for importLog in suds_import_logs %}
                                     <li>
                                         <div class="small-5 columns content">
                                             {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
-                                            <a href="{{ route }}#previous">{{ script }}</a>
+                                            <a href="{{ route }}#previous">{{ importLog.script }}</a>
                                         </div>
                                         <div class="small-7 columns content">
-                                            {% if stats %}
-                                                {% if stats.finishAt.isNull %}
-                                                    <span class="full-width alert label" title="Started at {{ stats.startAt.local }}">Not Finished</span>
-                                                {% else %}
-                                                    <span class="full-width success label" title="{{ stats.finishAt.local }}">Success</span>
-                                                {% endif %}
+                                            {% if importLog.status == 'error' %}
+                                                <span class="full-width alert label">Error</span>
+                                            {% elseif importLog.status == 'running' %}
+                                                <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
+                                            {% elseif importLog.status == 'complete' %}
+                                                <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
                                             {% endif %}
                                         </div>
                                     </li>

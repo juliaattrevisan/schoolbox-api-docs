@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Log;
 
+use Schoolbox\GenericCollection;
+
+
 /**
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
@@ -46,49 +49,41 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find the most recent log stats
      *
-     * @return array
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
      */
-    public function status(): array
+    public function status(): GenericCollection
     {
         /* Only look for the KNOWN_SCRIPTS that ran today and not any other day
          */
         $pb = $this->getPredicateBuilder()
-            ->in('script', Model::KNOWN_SCRIPTS)
-            ->like('start_at', date('Y-m-d') . '%');
+            ->in('script', Model::KNOWN_SCRIPTS);
 
         $where = implode(' AND ', $pb->getWhere());
 
         $query = "
             SELECT *
-            FROM sis_import_log
-            WHERE id IN (
-                SELECT MAX(id) from sis_import_log
-                GROUP BY script
+            FROM {$this->getTable()}
+            WHERE run_id = (
+                SELECT run_id
+                FROM {$this->getTable()}                
+                ORDER BY id DESC 
+                LIMIT 1
             )
-            AND {$where} 
-            ORDER BY start_at DESC
+            AND {$where}
+            ORDER BY start_at
         ";
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
 
-        $stack = [];
+        $stack = $this->createCollection();
 
-        /* These rows might have zero, one, or two scripts in it
-         *
-         * If there are two rows in this configuration: [sis, calendar]
-         * then you're looking at a complete suds import
-         *
-         * If there are two rows in this configuration: [calendar, sis]
-         * You're looking at the second half of a previous run alongside
-         * the first half of the current run. In this case, you could
-         * ignore the first row and say the current run is incomplete...
-         * except you don't know if the calendar was previously in use,
-         * but is -no longer- in use, at which point things get wierd
-         */
         while ($row = $statement->fetch()) {
-           $stack[$row['script']] = $this->hydrate($row);
+            $stack->add($this->hydrate($row));
         }
 
         return $stack;

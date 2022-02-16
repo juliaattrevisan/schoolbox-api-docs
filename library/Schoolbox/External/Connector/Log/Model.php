@@ -70,9 +70,9 @@ class Model
     /**
      * Script started running at this time
      *
-     * @var \Alaress_Date_Format
+     * @var \Alaress_Date_Format|null
      */
-    private \Alaress_Date_Format $startAt;
+    private ?\Alaress_Date_Format $startAt = null;
 
 
     /**
@@ -110,9 +110,9 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
-    public function getStartAt(): \Alaress_Date_Format
+    public function getStartAt(): ?\Alaress_Date_Format
     {
         return $this->startAt;
     }
