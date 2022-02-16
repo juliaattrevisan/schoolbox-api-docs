@@ -148,7 +148,18 @@ class Scheduler
     public function run(int $now, string $runId, string $scriptName): void
     {
         if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
-            $composites = $this->factory->produce($this->file, $this->type);
+            try {
+                $composites = $this->factory->produce($this->file, $this->type);
+            } catch (\Exception $e) {
+                /* Specifically log when you couldn't produce the recipe, then leave
+                 * Anything could have caused that, so you might as well log it
+                 * then throw it back out
+                 */
+                $importLog = $this->importLogMapper->start($runId, $scriptName);
+                $this->importLogMapper->error($importLog, $e->getMessage());
+
+                throw $e;
+            }
 
             /* No composites produced; exit
              * Either you chose an invalid $type or you don't need a $type at all (csv imports)

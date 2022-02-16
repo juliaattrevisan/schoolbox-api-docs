@@ -242,12 +242,10 @@ class Factory
         try {
             $defaultOwner = $this->userMapper->findById($credentials['timetableowner']);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->log->info(sprintf(
-                'Timetable owner user account %s not found, but we needed that. Exiting',
+            throw new \DomainException(sprintf(
+                'Timetable owner user account %s not found, but we needed that. Exiting.',
                 $credentials['timetableowner']
             ));
-
-            return new GenericCollection(IStrategy::class);
         }
 
         /* Default event type, I guess
