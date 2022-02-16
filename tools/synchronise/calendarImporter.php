@@ -122,7 +122,7 @@ NULLTYPE;
             $file,
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
+        ))->run(time(), $runId, Endpoint\Scheduler::CALENDARIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
          */

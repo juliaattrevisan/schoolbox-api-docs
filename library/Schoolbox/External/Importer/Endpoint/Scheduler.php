@@ -40,6 +40,7 @@ class Scheduler
      * The other part is TASS Calendar, which manifests as "School Data Import (Calendar)"
      */
     public const SISIMPORTER_SCRIPT_NAME = 'sisImporter';
+    public const CALENDARIMPORTER_SCRIPT_NAME = 'calendarImporter';
     public const SCHEDULER_SIS_SCRIPT_NAME = 'School Data Import (SIS)';
     public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'School Data Import (Calendar)';
 
