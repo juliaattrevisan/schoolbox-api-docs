@@ -213,6 +213,10 @@ class Scheduler
                 /* Some kind of unexpected fatal; log it
                  */
                 $this->importLogMapper->error($importLog, $e->getMessage());
+
+                /* Also rethrow it, so you get an error in the face
+                 */
+                throw $e;
             }
         }
     }
