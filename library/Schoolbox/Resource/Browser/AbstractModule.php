@@ -57,14 +57,6 @@ abstract class AbstractModule extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildController(): \Alaress\Web\Controller\Base
-    {
-        return new Controller();
-    }
-
 
     /**
      * @param ContainerInterface $injector

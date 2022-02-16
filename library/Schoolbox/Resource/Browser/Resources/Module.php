@@ -9,14 +9,13 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Web\Controller\Base;
 use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
+use Schoolbox\UserMapper;
 
 class Module extends AbstractModule
 {
@@ -104,5 +103,34 @@ class Module extends AbstractModule
                 $this->getSetterList($injector)
             )
         );
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(): Base
+    {
+        return (
+            new Controller(
+                $this->getMapperFactory()->get(Resource\File\Mapper::class),
+                $this->getMapperFactory()->get(\Component_InstanceMapper::class),
+            ))
+            ->setLinkMapper($this->getMapperFactory()->get(Resource\LinkMapper::class))
+            ->setFileMapper($this->getMapperFactory()->get(Resource\File\Mapper::class))
+            ->setConfig($this->getConfig())
+            ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
+            ->setNodeFactory(new Resource\Browser\NodeFactory())
+            ->setTreeBuilder(
+                new TreeBuilder(
+                    $this->getMapperFactory()->get(Resource\Folder\Mapper::class),
+                    $this->injector->get('user'),
+                    $this->injector->get('l10n')->translate('resource', true, true),
+                )
+            )
+            ->setFolderMapper($this->getMapperFactory()->get(Resource\Folder\Mapper::class))
+            ->setNamespace($this->basename)
+            ->setNodeType(Resource\Browser\NodeFactory::SBFS)
+            ->setTab('resources');
     }
 }
