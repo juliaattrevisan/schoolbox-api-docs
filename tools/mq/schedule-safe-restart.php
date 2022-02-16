@@ -14,8 +14,8 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
 use Alaress\Redis;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use Aura\Di\ContainerInterface;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
@@ -189,7 +189,7 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
 
         foreach ($trigger->getCallbacks() as $callback) {
             if (is_array($callback) && count($callback) == 2) {
-                list ($object, $method) = array_values($callback);
+                [$object, $method] = array_values($callback);
 
                 $methodName = get_class($object) . "::$method";
 
