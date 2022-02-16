@@ -14,13 +14,13 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\AbstractProcess;
 use Alaress\WorkerCrew\Worker\PipeWriter;
-use Aura\Di\Exception\ReflectionFailure;
 use ErrorException;
 use InvalidArgumentException;
 use PDOException;
 use Predis\PredisException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use ReflectionException;
 use RuntimeException;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
@@ -73,7 +73,7 @@ class WorkerProcess extends AbstractProcess
             switch ($command) {
                 // retrieve messages
                 case DefaultDispatchStrategy::TASK_FETCH:
-                    list($userId, $count) = $args;
+                    [$userId, $count] = $args;
                     return $this->fetch($userId, $count);
 
                 // publish messages
@@ -82,7 +82,7 @@ class WorkerProcess extends AbstractProcess
                     if (!(is_array($data) && count($data) === 4)) {
                         throw new RuntimeException('Data should be array(4); is ' . gettype($data) . '(' . count($data) . ')');
                     }
-                    list($callback, $model, $user, $diff) = $data;
+                    [$callback, $model, $user, $diff] = $data;
                     return $this->publish($callback, $model, $user, $diff);
 
                 // digest or alert messages
@@ -202,9 +202,8 @@ class WorkerProcess extends AbstractProcess
 
             try {
                 // return a new, shiny instance of this class, correctly configured
-//                $this->configurator->configureClass($notifierClassName);
                 return $this->configurator->newInstance($notifierClassName);
-            } catch (ReflectionFailure $e) {
+            } catch (ReflectionException $e) {
                 // kennet configure? ok, just return as-is
                 return $callback[0];
             }
