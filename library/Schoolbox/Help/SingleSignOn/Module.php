@@ -11,7 +11,7 @@ namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\UserMapper;
@@ -36,27 +36,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'tokenBuilder'           => $injector->lazyGet('user.tokenBuilder'),
-                    'auth'                   => $injector->lazyNew(Authenticator::class),
-                    'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'instanceRegistryMapper' => $this->getMapperFactory()->getLazy(InstanceRegistryMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->injector->get('user.tokenBuilder'),
+            new Authenticator(),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(InstanceRegistryMapper::class),
         );
     }
 }

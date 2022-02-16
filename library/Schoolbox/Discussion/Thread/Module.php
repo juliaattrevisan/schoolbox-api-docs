@@ -13,9 +13,8 @@ use Alaress\Authorizer as Auth;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread\Context\IThreadLocator;
@@ -131,17 +130,15 @@ abstract class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(Comment\Mapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->buildContext(),
+            $this->buildModelDecoratorFactory(),
+            $this->buildCommentModelDecoratorFactory(),
+        );
     }
 
 
@@ -151,22 +148,6 @@ abstract class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'commentMapper'           => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'threadMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
-            'context'                 => $this->buildContext(),
-            'decoratorFactory'        => $this->buildModelDecoratorFactory(),
-            'commentDecoratorFactory' => $this->buildCommentModelDecoratorFactory(),
-        ];
     }
 
 

@@ -13,7 +13,7 @@ namespace Schoolbox\Curriculum\Import;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
@@ -67,27 +67,12 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
-        $injector->setters[Controller::class]['setSourceMapper']
-            = $this->getMapperFactory()->getLazy(Curriculum\Source\Mapper::class);
-        $injector->setters[Controller::class]['setAreaMapper']
-            = $this->getMapperFactory()->getLazy(Curriculum\LearningArea\Mapper::class);
-        $injector->setters[Controller::class]['setLevelMapper']
-            = $this->getMapperFactory()->getLazy(Curriculum\LearningLevel\Mapper::class);
-        $injector->setters[Controller::class]['setNodeMapper']
-            = $this->getMapperFactory()->getLazy(Curriculum\Node\Mapper::class);
+        return (new Controller())
+            ->setSourceMapper($this->getMapperFactory()->get(Curriculum\Source\Mapper::class))
+            ->setAreaMapper($this->getMapperFactory()->get(Curriculum\LearningArea\Mapper::class))
+            ->setLevelMapper($this->getMapperFactory()->get(Curriculum\LearningLevel\Mapper::class))
+            ->setNodeMapper($this->getMapperFactory()->get(Curriculum\Node\Mapper::class));
     }
 }
