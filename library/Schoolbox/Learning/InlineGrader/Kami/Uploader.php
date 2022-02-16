@@ -190,6 +190,13 @@ class Uploader
                         $kamiDoc->getId(),
                         $kamiDoc->getFileStatus()
                     ));
+                } catch (Exception\NotFound $e) {
+                    //file not found, error out
+                    $kamiModel->setStatus(Model::STATUS_ERROR);
+                    $kamiModel->setErrorMessage($e->getMessage());
+                    $this->saveKamiModel($kamiModel);
+                    $this->logUploadFailure($kamiModel, $e);
+                    continue;
                 } catch (\Throwable $lastException) {
                     $successiveFailures++;
                     $kamiModel->setStatus(Model::STATUS_FAILED);
@@ -255,6 +262,9 @@ class Uploader
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
                 return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
+            } catch (Exception\NotFound $e) {
+                // file not found
+                throw $e;
             } catch (Exception\IKamiException $e) {
                 // If we recognise the exception, just print the info we need.
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);

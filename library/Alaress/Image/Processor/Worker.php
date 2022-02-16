@@ -275,7 +275,8 @@ class Worker extends CliTool\App
 
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
-            $transformFile = $processor->load($this->attemptsPerTransform, $this->timeOutThreshold);
+            //we are in the cli, so perm fail any images that fail here.
+            $transformFile = $processor->load($this->attemptsPerTransform, $this->timeOutThreshold, true);
             if (!$transformFile->isCacheHit()) {
                 $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'success')));
             } else {

@@ -27,6 +27,7 @@ class Model
 
     public const STATE_PROCESSING = 'processing'; // initial state
     public const STATE_DONE       = 'done';       // successfully transformed, transform file saved to disk
+    public const STATE_ERROR      = 'error';      // fatal error, do not try again
     public const STATE_FAILED     = 'failed';     // transform failed, transform file not on disk
                                                   // Reasons include: - original hash missing on disk
                                                   //                  - corrupt image
@@ -34,6 +35,7 @@ class Model
     public const STATES = [
         self::STATE_PROCESSING,
         self::STATE_DONE,
+        self::STATE_ERROR,
         self::STATE_FAILED,
     ];
 
