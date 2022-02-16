@@ -180,26 +180,12 @@ class LatestView
             'parents'   => [],
 
         ];
-        /**
-         * if not been submitted, check for student views.
-         * and return just the student
-         */
-        if (!$participant->hasSubmittedResponse()) {
-            return $views;
-        }
 
-        try {
-            /** @var Model[]|GenericCollection $last_views */
-            $last_views = $this->mapper->findByColumnList([
-                                                         'assessment_id'  => $assessment->getId(),
-                                                         'participant_id' => $participant->getUser()->getId(),
-                                                     ]);
-        } catch (NotFound $e) {
-            /**
-             * no data, error out, the student has submitted, but previously, so there is no data to use, so lets hide the fields.
-             */
-            return [];
-        }
+        /** @var Model[]|GenericCollection $last_views */
+        $last_views = $this->mapper->findByColumnList([
+                                                     'assessment_id'  => $assessment->getId(),
+                                                     'participant_id' => $participant->getUser()->getId(),
+                                                 ]);
 
         /**
          * set the student values
@@ -208,10 +194,15 @@ class LatestView
         $studentView = $last_views->getBy('user', $participant->getUser());
         if (null === $studentView) {
             /**
-             * no data, error out, the student has submitted, but previously, so there is no data to use, so lets hide the fields.
+             * no student entry, error out
+             * has the student submitted the assessment, if so show a basic message
              */
-            return [];
+            if ($participant->hasSubmittedResponse()) {
+                $views['student']['status'] = 'has viewed';
+            }
+            return $views;
         }
+
         $views['student']['status'] = 'has viewed';
         $views['student']['date']   = $studentView->getLastVisit()->getLocal();
         $views['student']['object'] = 'assessment';
@@ -220,6 +211,13 @@ class LatestView
             $views['student']['object'] = 'feedback';
         }
 
+        /**
+         * if not been submitted, don't check parent views.
+         * and return just the student
+         */
+        if (!$participant->hasSubmittedResponse()) {
+            return $views;
+        }
         /**
          * parent's now
          * check status of parent's lasts views, and set the status'
