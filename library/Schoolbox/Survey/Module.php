@@ -11,7 +11,7 @@ namespace Schoolbox\Survey;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 
 class Module extends BaseModule
 {
@@ -51,21 +51,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $mappers = [
-            'surveyMapper' => Mapper::getInstance(),
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return new Controller($this->getMapperFactory()->get(Mapper::class));
     }
 }

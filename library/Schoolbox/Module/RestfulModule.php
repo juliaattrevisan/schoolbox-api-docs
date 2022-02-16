@@ -10,8 +10,8 @@
 namespace Schoolbox\Module;
 
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Alaress\Module\Module as AlaressModule;

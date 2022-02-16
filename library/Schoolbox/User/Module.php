@@ -13,8 +13,8 @@ namespace Schoolbox\User;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -26,7 +26,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 use User\Logger;
-use External_User;
 
 class Module extends BaseModule
 {
@@ -127,21 +126,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'externalHandler'     => $injector->lazyGet('externalUser'),
-            'assumeUserLogMapper' => $this->getMapperFactory()->getLazy(Logger\Mapper::class),
-        ]));
+        return new Controller(
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->injector->get('externalUser'),
+            $this->getMapperFactory()->get(Logger\Mapper::class),
+        );
     }
 
     /* Getters / Setters

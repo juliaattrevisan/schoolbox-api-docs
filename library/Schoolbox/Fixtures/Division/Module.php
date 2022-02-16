@@ -11,9 +11,8 @@ namespace Schoolbox\Fixtures\Division;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
@@ -107,20 +106,5 @@ class Module extends RestfulModule
          * Note that if the perms change you need to log out/log in to refresh
          */
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $injector->params[Controller::class]['mapper'] = $this->getMapperFactory()->getLazy(Mapper::class);
     }
 }

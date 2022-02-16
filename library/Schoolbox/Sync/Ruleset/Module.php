@@ -13,8 +13,8 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Controller\Base;
 use Aura\Di;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\File\MimetypeMapper;
@@ -54,6 +54,7 @@ class Module extends BaseModule
             '(?:dryRun|performUpdate)',
             function () {
 
+                // TODO this will die as container is locked
                 /** @var Di\Container $di */
                 $di = $this->injector;
 
@@ -91,24 +92,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * Set up controllers
-     *
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                ['mimetypeMapper' => $this->getMapperFactory()->getLazy(MimetypeMapper::class),]
-            )
-        );
+        return new Controller($this->getMapperFactory()->get(MimetypeMapper::class));
     }
 }

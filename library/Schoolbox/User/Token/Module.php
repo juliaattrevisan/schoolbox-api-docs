@@ -11,7 +11,7 @@ namespace Schoolbox\User\Token;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
@@ -71,26 +71,11 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'tokenBuilder'     => $injector->lazyGet('user.tokenBuilder'),
-                    'tokenMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                ]
-            )
+        return new Controller(
+            $this->injector->get('user.tokenBuilder'),
+            $this->getMapperFactory()->get(Mapper::class),
         );
     }
 }

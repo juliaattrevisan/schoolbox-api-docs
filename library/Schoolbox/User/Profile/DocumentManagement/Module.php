@@ -8,18 +8,14 @@
 
 namespace Schoolbox\User\Profile\DocumentManagement;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
+use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Alaress\Twig\Loader\IChainLoader;
-// These mappers are injected into controllers where required
-
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -91,19 +87,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'externalDocument' => $injector->lazyGet('externalDocumentManager'),
-        ]));
+        return new Controller($this->injector->get('externalDocumentManager'));
     }
 
     /**

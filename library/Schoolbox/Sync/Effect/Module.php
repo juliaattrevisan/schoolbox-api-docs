@@ -13,6 +13,7 @@ namespace Schoolbox\Sync\Effect;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Controller\Base;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
@@ -85,21 +86,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
         return new Controller();
-    }
-
-    /**
-     * Set up controllers
-     *
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
     }
 }
