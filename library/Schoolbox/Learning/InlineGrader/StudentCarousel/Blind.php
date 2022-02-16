@@ -131,7 +131,7 @@ class Blind
              * This sorts by user id reversed, to make the marking user
              * do more mental gymnastics if they want to guess identities
              */
-            return $p1->getUser()->getId() >= $p2->getUser()->getId();
+            return $p1->getUser()->getId() <=> $p2->getUser()->getId();
         });
 
         return $allParticipants;

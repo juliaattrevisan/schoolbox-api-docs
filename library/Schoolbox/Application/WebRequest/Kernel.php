@@ -380,10 +380,10 @@ class Kernel extends WebKernelAbstract
                 // * set in the response content
                 // * set in route
                 // * default to 'html'
-                $format = $output['format'];
+                $format = $output['format'] ?? null;
                 if (empty($format)) {
                     // Strip leading . from format
-                    $format = preg_replace('/^\\./', '', $params['format']);
+                    $format = preg_replace('/^\\./', '', $params['format'] ?? '');
                     if (empty($format)) {
                         $format = 'html';
                     }
