@@ -308,12 +308,12 @@
                                             <a href="{{ route }}#previous">{{ importLog.script }}</a>
                                         </div>
                                         <div class="small-7 columns content">
-                                            {% if importLog.status == 'error' %}
-                                                <span class="full-width alert label">Error</span>
-                                            {% elseif importLog.status == 'running' %}
-                                                <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
-                                            {% elseif importLog.status == 'complete' %}
+                                            {% if importLog.isComplete %}
                                                 <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
+                                            {% elseif importLog.isRunning %}
+                                                <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
+                                            {% elseif importLog.isError %}
+                                                <span class="full-width alert label">Error</span>
                                             {% endif %}
                                         </div>
                                     </li>

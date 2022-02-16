@@ -86,6 +86,39 @@ class Model
     private ?\Alaress_Date_Format $finishAt = null;
 
 
+    /**
+     * Decide if this import completed successfully
+     *
+     * @return bool
+     */
+    public function isComplete(): bool
+    {
+        return $this->getStatus() === self::STATUS_COMPLETE;
+    }
+
+
+    /**
+     * Decide if this import is still running
+     *
+     * @return bool
+     */
+    public function isRunning(): bool
+    {
+        return $this->getStatus() === self::STATUS_RUNNING;
+    }
+
+
+    /**
+     * Decide if this import is irrevocably dead
+     *
+     * @return bool
+     */
+    public function isError(): bool
+    {
+        return $this->getStatus() === self::STATUS_ERROR;
+    }
+
+
     /* Getters/Setters
      */
 

@@ -53,11 +53,11 @@
                     {% set statusCss = '' %}
 
                     {# Paint the log status #}
-                    {% if importLog.instance.status == 'running' %}
-                        {% set statusCss = 'warning' %}
-                    {% elseif importLog.instance.status == 'complete' %}
+                    {% if importLog.instance.isComplete %}
                         {% set statusCss = 'success' %}
-                    {% elseif importLog.instance.status == 'error' %}
+                    {% elseif importLog.instance.isRunning %}
+                        {% set statusCss = 'warning' %}
+                    {% elseif importLog.instance.isError %}
                         {% set statusCss = 'alert' %}
                     {% endif %}
 
