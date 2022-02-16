@@ -154,6 +154,10 @@ Admin,"Configure terms",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/te
 Admin,"Configure terms",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
+Admin,"Bulk Course Import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,200
+Admin,"Bulk Course Import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,401
+Admin,"Bulk Course Import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,401
+Admin,"Bulk Course Import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,401
 Admin,"Configure course builder",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,200
 Admin,"Configure course builder",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401
 Admin,"Configure course builder",Student,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder,401

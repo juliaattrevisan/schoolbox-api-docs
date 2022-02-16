@@ -29,7 +29,7 @@ Admin,Configure skin,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Skin+Co
 Admin,Configure Terminology,https://vagrant.dev.schoolbox.cloud/adminv2/terminology
 Admin,Import a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar
 Admin,Import a calendar calendar/import,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import
-Admin,Subscibe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
+Admin,Subscribe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe
 Admin,Cleanup calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup
 Admin,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder
 Admin,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
@@ -37,6 +37,7 @@ Admin,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
 Admin,LMS LMS Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy
 Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
 Admin,Configure terms,https://vagrant.dev.schoolbox.cloud/adminv2/terms
+Admin,Bulk Course Import, https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport
 Admin,Configure course builder,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder
 Admin,Setup notifications,https://vagrant.dev.schoolbox.cloud/adminv2/messages
 Admin,Configure notification delivery,https://vagrant.dev.schoolbox.cloud/adminv2/messages/configure
