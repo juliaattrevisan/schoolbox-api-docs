@@ -57,6 +57,45 @@ export default {
             return this.selectedStudents.length > 0; 
         },
 
+        /**
+         * To display how many students are selected
+         * 
+         * @returns { Number }
+         */
+        selectedStudentsCount () {
+            return this.selectedStudents.length;
+        },
+
+        /**
+         * To display how many students are selected
+         * 
+         * @returns { String }
+         */
+        selectedStudentsStatus () {
+            if (this.students.length === this.selectedStudentsCount) {
+                return 'All students selected';
+            } else if (this.selectedStudentsCount === 0) {
+                return 'No students selected';
+            } else if (this.selectedStudentsCount === 1) {
+                return '1 student selected';
+            } else {
+                return `${this.selectedStudentsCount} students selected`;
+            }
+        },
+
+        /**
+         * To update the toggle selection status based on the current selection 
+         * 
+         * @returns { String }
+         */
+        toggleStudentSelectionStatus () {
+            if (this.selectedStudentsCount > 0) {
+                return 'Clear selection';
+            } else {
+                return 'Select all';
+            } 
+        },
+
     },
 
     mounted  () {
@@ -119,10 +158,6 @@ export default {
                     body: this.getFormData(),
                 });
                 const data = await response.json();
-                //only update selected students
-                //watch for token changes
-                //if it's null, check if we have a token yet, if we don't set the token
-                //otherwise if the token is null and we already have a token, keep the current token
                 this.expiry = data.expiry;
                 this.loginUrl = data.loginUrl;
                 this.students = data.students;
@@ -145,6 +180,18 @@ export default {
             formData.append('destination', this.destination);
             formData.append('expiry', this.expiryMonth);
             return formData;
+        },
+
+        /**
+         * Clear the currently selected students or select all based on 
+         * whether there's any students currently selected
+         */
+        onToggleStudentSelection () {
+            if (this.selectedStudentsCount > 0) {
+                this.selectedStudents = [];
+            } else {
+                this.selectedStudents = this.students;
+            }
         },
 
     }
@@ -182,7 +229,9 @@ export default {
 
         <div v-else class="loader"></div>
 
-        <bottom-drawer :showDrawer="hasSelectedStudents">
+        <bottom-drawer :showDrawer="true">
+            <h3 class="selected-count"><em>{{ selectedStudentsStatus }}</em></h3>
+            <button @click.prevent="onToggleStudentSelection" @keyup.enter="onToggleStudentSelection" class="button-toggle-selection">{{ toggleStudentSelectionStatus }}</button>
             <div class="options-list">
                 <div class="option-list__option">
                     <label class="required-with-tip">Login destination <span data-tooltip class="hint has-tip tip-top"
@@ -213,6 +262,20 @@ export default {
 
 .manage-qrcodes {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+}
+
+.selected-count {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+
+.button-toggle-selection {
+    display: inline-block;
+    padding: 0px;
+    background: none;
+    vertical-align: baseline;
+    font-size: 0.8rem;
 }
 
 .options-list {
