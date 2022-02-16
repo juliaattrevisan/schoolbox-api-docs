@@ -202,6 +202,12 @@ class Scheduler
                  */
                 $this->importLogMapper->error($importLog, $e->getMessage());
             } catch (\Throwable | \Exception $e) {
+                $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
+
+                $this->logger->debug(sprintf(
+                    'Rollback transaction'
+                ));
+
                 $this->db->rollBack();
 
                 /* Some kind of unexpected fatal; log it
