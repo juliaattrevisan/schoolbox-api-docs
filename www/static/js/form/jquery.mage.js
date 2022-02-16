@@ -578,9 +578,7 @@ import { loadNewHTML } from '@js/util/domUtils';
      * @param {*} data
      */
     async function xhrDone(onXhrDone, target, data) {
-
-        const loadedHTMLData = await loadNewHTML(data);
-
+                
         // ensure the error is slidden away (although onBefore should have handled it)
         target.find('[data-mage-error]').slideUp(slideSlow);
 
@@ -598,8 +596,13 @@ import { loadNewHTML } from '@js/util/domUtils';
          */
         $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
 
-        // call the callback (this would include any specific manipulation for the section being targeted)
-        onXhrDone.call(this.element, loadedHTMLData.innerHTML);
+        if (typeof data === 'string' && /<\/?[a-z][\s\S]*>/i.test(data)) { //if it's a string and if it contains any HTML markup
+            const loadedHTMLData = await loadNewHTML(data); //we need to ensure any <script> tags are preloaded prior to adding to the page
+            // call the callback (this would include any specific manipulation for the section being targeted)
+            onXhrDone.call(this.element, loadedHTMLData.innerHTML);
+        } else { //oterwise proceed as normal
+            onXhrDone.call(this.element, data);
+        }
 
         // if this is not the final section, the submit for the next section should be available, albeit hidden
         var nextMage = $('[name="' + this.nextPart +  '"]');
