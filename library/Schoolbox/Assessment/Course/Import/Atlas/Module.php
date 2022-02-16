@@ -59,6 +59,15 @@ class Module extends \Alaress\Module\Module
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
+
 
     /**
      * Initializes controller classes into the dependency injector.

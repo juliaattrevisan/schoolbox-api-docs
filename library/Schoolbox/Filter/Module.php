@@ -67,6 +67,15 @@ class Module extends AlaressModule
 
     /**
      * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
+
+    /**
+     * @inheritdoc
      * @throws \InvalidArgumentException If mapper class not found
      */
     public function initControllers(ContainerInterface $injector)

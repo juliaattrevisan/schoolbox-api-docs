@@ -80,6 +80,15 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
     /**
      * @inheritdoc
      * @param Container $injector

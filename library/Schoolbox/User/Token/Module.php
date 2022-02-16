@@ -68,6 +68,14 @@ class Module extends BaseModule
         throw new \InvalidArgumentException('A user ID must be provided in path param "userId"');
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
 
     /**
      * @inheritdoc

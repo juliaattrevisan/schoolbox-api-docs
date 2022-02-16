@@ -48,6 +48,14 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
 
     /**
      * {@inheritdoc}

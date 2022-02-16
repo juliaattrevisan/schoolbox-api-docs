@@ -43,6 +43,14 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/{userId:\d+}', 'getProfile', new IsLoggedIn(), $preloadUser);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
 
     /**
      * @inheritdoc

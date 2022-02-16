@@ -109,6 +109,14 @@ class Module extends BaseModule
         $this->register('GET', '/{id:\d+}', 'getTextbox', $folderAuthView, $textboxPreload);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
 
     /**
      * @inheritdoc

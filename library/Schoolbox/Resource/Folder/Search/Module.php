@@ -31,6 +31,14 @@ class Module extends BaseModule
         $this->register('GET', '', 'getFolderSearch', new Rule\IsLoggedIn());
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
 
     /**
      * Initializes controller classes into the dependency injector.

@@ -228,6 +228,15 @@ class Module extends BaseModule
         ];
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
     /**
      * @inheritdoc
      */

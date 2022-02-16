@@ -34,6 +34,15 @@ class Module extends BaseModule
         $this->register('GET', '/getAuth', 'getTokenAndSubdomain', $isLoggedIn, null);
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
     /**
      * Initializes controller classes into the dependency injector.
      *

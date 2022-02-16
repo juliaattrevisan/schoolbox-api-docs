@@ -18,6 +18,15 @@ class Module extends BaseModule
      */
     protected $basename = 'geosnapshotHomepage';
 
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(\Psr\Container\ContainerInterface $container): \Alaress\Web\Controller\Base
+    {
+        return new Controller();
+    }
+
     /**
      * {@inheritdoc}
      */
