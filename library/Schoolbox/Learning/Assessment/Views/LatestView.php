@@ -127,16 +127,6 @@ class LatestView
         $studentView = $last_views->getBy('user', $student);
 
         /**
-         * check if there has been a submission? as the student has viewed the assignment when they were submitting it
-         * this will also be true if the teacher submitted on behalf of the student
-         */
-        $feedback = null;
-        if (null !== $participant && $participant->hasSubmittedResponse()) {
-            $views['student']['status'] = 'has viewed';
-            $feedback = $participant->getAuthoritativeFeedback(true);
-        }
-
-        /**
          * check if there was a view recorded? in our special table
          */
         if (null === $studentView) {
@@ -144,6 +134,16 @@ class LatestView
              * no student entry, error out
              */
             return $views;
+        }
+
+        /**
+         * check if there has been a submission? as the student has viewed the assignment when they were submitting it
+         * this will also be true if the teacher submitted on behalf of the student
+         */
+        $feedback = null;
+        if ($participant->hasSubmittedResponse()) {
+            $views['student']['status'] = 'has viewed';
+            $feedback = $participant->getAuthoritativeFeedback(true);
         }
 
         $studentDate = $studentView->getLastVisit();
@@ -160,7 +160,7 @@ class LatestView
          * if not been submitted, don't check parent views.
          * and return just the student
          */
-        if (null === $participant || !$participant->hasSubmittedResponse()) {
+        if (!$participant->hasSubmittedResponse()) {
             return $views;
         }
         /**
