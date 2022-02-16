@@ -137,18 +137,14 @@ class LatestView
         }
 
         /**
-         * check if there has been a submission? as the student has viewed the assignment when they were submitting it
-         * this will also be true if the teacher submitted on behalf of the student
+         * student has viewed the assessment
          */
-        $feedback = null;
-        if ($participant->hasSubmittedResponse()) {
-            $views['student']['status'] = 'has viewed';
-            $feedback = $participant->getAuthoritativeFeedback(true);
-        }
+        $views['student']['status'] = 'has viewed';
 
         $studentDate = $studentView->getLastVisit();
         $views['student']['date']   = $studentDate->getLocal();
 
+        $feedback = $participant->getAuthoritativeFeedback(true);
         if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
             /**
              * was the last student view after feedback?
@@ -156,13 +152,6 @@ class LatestView
             $views['student']['object'] = 'feedback';
         }
 
-        /**
-         * if not been submitted, don't check parent views.
-         * and return just the student
-         */
-        if (!$participant->hasSubmittedResponse()) {
-            return $views;
-        }
         /**
          * parent's now
          * check status of parent's lasts views, and set the status'
