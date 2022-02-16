@@ -220,7 +220,7 @@ class Controller extends Assessment\Controller
             $this->buildHtmlOutput(
                 '@learningAssessment/lti/summary.twig',
                 [
-                    'lastViews'    => $lastView->getTwigViews($assessment, $student),
+                    'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
                     'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                                                   ->add([ $assessment->getTitle(), '' ]),
                     'assessment'  => $assessment,

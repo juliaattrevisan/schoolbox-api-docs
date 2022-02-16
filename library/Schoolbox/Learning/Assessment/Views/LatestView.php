@@ -93,13 +93,14 @@ class LatestView
      * ]
      * @param IAssessable $assessment
      * @param User $student (student)
+     * @param bool $isInstructor (only instructors should view this data)
      * @return array
      */
-    public function getTwigViews(IAssessable $assessment, User $student): array
+    public function getTwigViews(IAssessable $assessment, User $student, bool $isInstructor): array
     {
         //if no participant, must be submitting the assessment, so exit
         $participant = $assessment->getParticipantIfExtant($student);
-        if (null === $participant) {
+        if (null === $participant || false == $isInstructor) {
             return [];
         }
 

@@ -212,7 +212,7 @@ class Controller extends Assessment\Controller
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         $twigData = [
-            'lastViews'    => $lastView->getTwigViews($assessment, $student),
+            'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
             'student'      => $student,
