@@ -315,10 +315,10 @@ class Module
     /**
      * Initializes any submodules of this module.
      *
-     * @param \Aura\Di\ContainerInterface $injector
-     * @param string                      $basePath The base route for this module
+     * @param ContainerInterface $injector
+     * @param string             $basePath The base route for this module
      */
-    public function initSubmodules(\Aura\Di\ContainerInterface $injector, $basePath)
+    public function initSubmodules(ContainerInterface $injector, $basePath)
     {
     }
 
