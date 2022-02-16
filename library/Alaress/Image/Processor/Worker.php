@@ -15,9 +15,9 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
-use Aura\Di;
 use League\Flysystem\FileNotFoundException;
 use LogicException;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -124,7 +124,7 @@ class Worker extends CliTool\App
 
 
     /** @inheritDoc */
-    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
+    public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
         pcntl_signal(SIGINT, [$this, 'signalHandler']);   // eg Ctrl+C

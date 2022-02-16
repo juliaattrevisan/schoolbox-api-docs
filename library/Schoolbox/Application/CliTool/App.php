@@ -12,7 +12,9 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Exception\UnreachableException;
 use Alaress\Lock\InstanceLockFactory;
-use Aura\Di;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Sentry\EventId;
 use Sentry\State\HubInterface;
 use Throwable;
@@ -55,7 +57,7 @@ abstract class App
     /** @var array */
     private $appOptions;
 
-    /** @var Di\Container */
+    /** @var ContainerInterface */
     private $di;
 
     /** @var resource */
@@ -133,15 +135,16 @@ abstract class App
     /**
      * Common app setup implementation
      *
-     * @param array           $appOptions
-     * @param Di\Container    $di
-     * @param resource        $outStream
-     * @param LoggerInterface $logger
-     * @param bool            $perform
+     * @param array              $appOptions
+     * @param ContainerInterface $di
+     * @param resource           $outStream
+     * @param LoggerInterface    $logger
+     * @param bool               $perform
      * @return $this
-     * @throws Di\Exception\ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): self
+    public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): self
     {
         $this->appOptions       = $appOptions;
         $this->di               = $di;
@@ -349,9 +352,9 @@ abstract class App
 
 
     /**
-     * @return Di\Container
+     * @return ContainerInterface
      */
-    protected function getDi(): Di\Container
+    protected function getDi(): ContainerInterface
     {
         return $this->di;
     }
@@ -471,7 +474,7 @@ abstract class App
         try {
             /** @var HubInterface $sentry */
             $sentry = $this->di->get('sentry');
-        } catch (Di\Exception\ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             // It should not be possible to generate this exception because we checked DI has Sentry a few lines above
             throw new UnreachableException($e);
         }
