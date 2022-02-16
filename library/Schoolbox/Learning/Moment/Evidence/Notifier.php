@@ -45,8 +45,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -57,14 +55,6 @@ class Notifier extends AbstractModuleNotifier
             'setMapper'     => $mf->get(Mapper::class),
             'setUserMapper' => $mf->get(UserMapper::class),
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($configLoader)
-    {
-        parent::__construct($configLoader);
     }
 
     /**

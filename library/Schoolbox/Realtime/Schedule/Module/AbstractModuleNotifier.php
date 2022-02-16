@@ -87,7 +87,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param ContainerInterface $di
      * @return array
      */
-    public static function getSetters(ContainerInterface $di): ?array
+    public static function getSetters(ContainerInterface $di): array
     {
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
@@ -103,7 +103,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param IConfigLoader $configLoader
      * @param Mapper[]      $dependencies
      */
-    public function __construct($configLoader, $dependencies = array())
+    public function __construct(IConfigLoader $configLoader, $dependencies = array())
     {
         $this->conf = $configLoader;
         $this->loadDependencies($dependencies);

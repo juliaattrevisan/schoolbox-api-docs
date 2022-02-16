@@ -69,7 +69,7 @@ class Configurator
         }
 
         // Build the object and call whatever its setters are.
-        $instance = $reflection->newInstance($constructorArgs);
+        $instance = $reflection->newInstance(...$constructorArgs);
         foreach ($classname::getSetters($this->di) as $setter => $value) {
             if ($reflection->hasMethod($setter)) {
                 $instance->$setter($value);

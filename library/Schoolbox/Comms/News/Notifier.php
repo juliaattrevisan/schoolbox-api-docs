@@ -104,15 +104,6 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
-    {
-        parent::__construct($configLoader);
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     protected function getSlug(): string
     {
         return NSMapper::NS_NEWS;

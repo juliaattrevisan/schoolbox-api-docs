@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Schedule\Module;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Serializable;
@@ -27,7 +26,7 @@ interface ModuleNotifierInterface extends Serializable
     /**
      * @param IConfigLoader $configLoader
      */
-    public function __construct($configLoader);
+    public function __construct(IConfigLoader $configLoader);
 
     /**
      * Switch logging on

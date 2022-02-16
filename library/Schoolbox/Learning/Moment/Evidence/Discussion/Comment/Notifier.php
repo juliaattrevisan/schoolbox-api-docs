@@ -17,6 +17,7 @@ use Psr\Container\ContainerInterface;
 use Schoolbox\Discussion\Comment\Model as Comment;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Moment\Evidence\Discussion\ThreadLocator;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Evidence\Model as Evidence;
@@ -46,8 +47,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -66,7 +65,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
     }

@@ -47,7 +47,6 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {

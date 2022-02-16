@@ -29,6 +29,7 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Discussion\Comment\Model as Comment;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccess;
@@ -107,7 +108,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
     }
