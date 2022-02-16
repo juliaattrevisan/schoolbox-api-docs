@@ -17,13 +17,14 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use Alaress_Date_Format;
-use Aura\Di;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
 use PhpAmqpLib\Exception\AMQPIOException;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Column;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
@@ -287,15 +288,15 @@ abstract class Mapper implements IMapper, Serializable
      * Reference to global DI container; lord forgive me for what I have done
      *
      * @deprecated
-     * @var Di\ContainerInterface
+     * @var ContainerInterface
      */
     private static $di;
 
     /**
-     * @param Di\ContainerInterface $di
-     * @throws Di\Exception
+     * @param ContainerInterface $di
+     * @return void
      */
-    public static function di(Di\ContainerInterface $di)
+    public static function di(ContainerInterface $di)
     {
         self::$di = $di;
         self::$columnFactory = new ColumnFactory();
@@ -325,7 +326,7 @@ abstract class Mapper implements IMapper, Serializable
 
     /**
      * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
-     * @return Di\ContainerInterface
+     * @return ContainerInterface
      */
     public static function getDi()
     {
@@ -691,33 +692,48 @@ abstract class Mapper implements IMapper, Serializable
             if (!self::$prop) {
                 // We don't have a propagator setup, lets connect to the rabbit
                 try {
-                    self::$prop = $this->getDi()->newInstance(
-                        Propagator::class,
-                        [
-                            'splitter'   => $this->getDi()->lazyNew(
-                                Splitter::class,
-                                [
-                                    'inflector' => $this->getDi()->lazyNew(NotifierInflector::class, [
-                                        'configurator' => $this->getDi()->lazyNew(Configurator::class, [
-                                            'di' => $this->getDi()
-                                        ])
-                                    ]),
-                                    'factory'   => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
-                                ]
+                    self::$prop = new Propagator(
+                        new Splitter(
+                            new NotifierInflector(
+                                new Configurator($this->getDi()),
                             ),
-                            'broker'     => $this->getDi()->lazyNew(
-                                Broker::class,
-                                [
-                                    'instanceId' => INSTANCE_ID,
-                                    'amqp'       => $this->getDi()->lazyGet('amqp'),
-                                    'redis'      => $this->getDi()->lazyGet('redis.storage'),
-                                    // no 'stomp'
-                                ]
-                            ),
-                            'instanceId' => INSTANCE_ID,
-                        ]
+                            new TriggerFactoryFactory(true),
+                        ),
+                        new Broker(
+                            INSTANCE_ID,
+                            $this->getDi()->get('amqp'),
+                            $this->getDi()->get('redis.storage'),
+                        ),
+                        INSTANCE_ID,
                     );
-                } catch (Di\Exception\ServiceNotFound $e) {
+
+//                    self::$prop = $this->getDi()->newInstance(
+//                        Propagator::class,
+//                        [
+//                            'splitter'   => $this->getDi()->lazyNew(
+//                                Splitter::class,
+//                                [
+//                                    'inflector' => $this->getDi()->lazyNew(NotifierInflector::class, [
+//                                        'configurator' => $this->getDi()->lazyNew(Configurator::class, [
+//                                            'di' => $this->getDi()
+//                                        ])
+//                                    ]),
+//                                    'factory'   => $this->getDi()->lazyNew(TriggerFactoryFactory::class, [true]),
+//                                ]
+//                            ),
+//                            'broker'     => $this->getDi()->lazyNew(
+//                                Broker::class,
+//                                [
+//                                    'instanceId' => INSTANCE_ID,
+//                                    'amqp'       => $this->getDi()->lazyGet('amqp'),
+//                                    'redis'      => $this->getDi()->lazyGet('redis.storage'),
+//                                    // no 'stomp'
+//                                ]
+//                            ),
+//                            'instanceId' => INSTANCE_ID,
+//                        ]
+//                    );
+                } catch (NotFoundExceptionInterface $e) {
                     // in PHPUnit land, we do not have external services.
                     // this catch is merely to accommodate that case, it should
                     // not be relied upon in development

@@ -9,19 +9,24 @@
 
 namespace Schoolbox\Di;
 
+use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionException;
 
 class Configurator
 {
-    /** @var \Aura\Di\Container */
+    /**
+     * @var ContainerInterface
+     */
     private $di;
 
 
     /**
-     * @param \Aura\Di\Container $di
+     * Constructor
+     *
+     * @param ContainerInterface $di
      */
-    public function __construct(\Aura\Di\Container $di)
+    public function __construct(ContainerInterface $di)
     {
         $this->di = $di;
     }
