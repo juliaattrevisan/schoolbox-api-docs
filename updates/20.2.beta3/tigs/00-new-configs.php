@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Admin\Settings\FieldType\SelectLookup;
@@ -46,9 +46,8 @@ $app = new class extends App
     /**
      * @inheritdoc
      * @throws PDOException
-     * @throws Di\Exception\ServiceNotFound
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
+    public function run(ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log      = $log;
         $this->database = $di->get('databaseInternal');

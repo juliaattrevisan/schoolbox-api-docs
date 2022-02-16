@@ -10,6 +10,7 @@
 namespace Schoolbox\Application\Daemon;
 
 use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
@@ -17,14 +18,14 @@ abstract class App
 {
 
     /**
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
-     * @param string        $flags Space-separated list of command line options that were passed to the php script that invoked this app
+     * @param ContainerInterface $di
+     * @param LoopInterface      $loop
+     * @param Logger             $log
+     * @param array              $opts
+     * @param string             $flags Space-separated list of command line options that were passed to the php script that invoked this app
      * @return void
      */
-    abstract public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void;
+    abstract public function run(ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void;
 
 
     /**
