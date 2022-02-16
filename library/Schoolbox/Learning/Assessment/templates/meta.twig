@@ -31,7 +31,7 @@
         <li class="icon-close">Excluded from {{ locale.assessment }}</li>
     {% endif %}
     {% if lastViews is not empty and USER.role.isStaff() %}
-    <li class="icon-staff-students" title="{{ lastViews.student.date }}">
+    <li class="icon-staff-students" title="{% if lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
         {{ lastViews.student.name }} {{ lastViews.student.status }}
         {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
     </li>
@@ -42,7 +42,5 @@
     </li>
     {% endfor %}
     {% endif %}
-
-
 
 </ul>

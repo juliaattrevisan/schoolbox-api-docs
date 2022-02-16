@@ -11,7 +11,8 @@
         {% include '@learningAssessment/quiz/meta.twig' with {
             assessment: assessment,
             student: student,
-            icon: 'icon-quiz'
+            icon: 'icon-quiz',
+            lastViews: lastViews
         } only %}
     </div>
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}

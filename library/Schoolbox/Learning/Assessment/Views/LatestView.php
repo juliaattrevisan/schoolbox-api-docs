@@ -231,6 +231,7 @@ class LatestView
                 'name'      => $parent->getFullName(),
                 'status'    => 'has not viewed',
                 'object'    => 'assessment',
+                'date'      => null,
             ];
             /**
              * check if viewed?
