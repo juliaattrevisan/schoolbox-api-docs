@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
 use Component_DefinitionMapper;
@@ -82,46 +82,33 @@ class Module extends \Alaress\Module\Module
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-
-    /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws \InvalidArgumentException
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'unitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-                'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                'folderMapper'                    => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'courseSpecificationMapper'       => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-                'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                'access'                          => $this->getMapperFactory()->getLazy(Access::class), // not a mapper, but has getInstance, so does work
-                'importFactory'                   => $injector->lazyNew(ImportFactory::class, [
-                    'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                    'replicator'                      => $injector->lazyNew(Replicator::class, [
-                        'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                        'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                        'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-                    ]),
-                    'courseImplementationMapper'      => $this->getMapperFactory()->getLazy(CourseImplementationMapper::class),
-                    'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                    'componentInstanceMapper'         => $this->getMapperFactory()->getLazy(Component_InstanceMapper::class),
-                    'componentConfigDefinitionMapper' => $this->getMapperFactory()->getLazy(Component_ConfigDefinitionMapper::class),
-                    'componentConfigInstanceMapper'   => $this->getMapperFactory()->getLazy(Component_ConfigMapper::class),
-                ]),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-            ])
+        $replicator = new Replicator(
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(QuizMapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+        );
+        $importFactory = new ImportFactory(
+            $this->injector->get('assessmentDataSource'),
+            $replicator,
+            $this->getMapperFactory()->get(CourseImplementationMapper::class),
+            $this->getMapperFactory()->get(UnitImplementationMapper::class),
+            $this->getMapperFactory()->get(Component_InstanceMapper::class),
+            $this->getMapperFactory()->get(Component_ConfigDefinitionMapper::class),
+            $this->getMapperFactory()->get(Component_ConfigMapper::class),
+        );
+        return new Controller(
+            $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            $this->getMapperFactory()->get(UnitImplementationMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+            $this->getMapperFactory()->get(CourseImplementationMapper::class),
+            $this->getMapperFactory()->get(Component_InstanceMapper::class),
+            // not a mapper, but has getInstance, so does work
+            $this->getMapperFactory()->get(Access::class),
+            $importFactory,
+            $this->injector->get('assessmentDataSource')
         );
     }
 

@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Rubric\Manager;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
@@ -62,22 +62,15 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'nodeMapper'   => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                    'rubricMapper' => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-                    'rosettaStone' => $injector->lazyGet('l10n'),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(NodeMapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->injector->get('l10n'),
         );
     }
 }

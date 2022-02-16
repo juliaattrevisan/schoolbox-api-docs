@@ -9,7 +9,7 @@
 namespace Schoolbox\API;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
@@ -34,29 +34,15 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'auth'           => $injector->lazyNew(Authenticator::class),
-                    'userMapper'     => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'registryMapper' => $this->getMapperFactory()->getLazy(RegistryMapper::class),
-                    'serviceMapper'  => $this->getMapperFactory()->getLazy(ServiceMapper::class),
-                    'tokenMapper'    => $this->getMapperFactory()->getLazy(TokenMapper::class),
-                    'tokenValidator' => $injector->lazyGet('user.tokenBuilder'),
-                ]
-            )
+        return new Controller(
+            new Authenticator(),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RegistryMapper::class),
+            $this->getMapperFactory()->get(ServiceMapper::class),
+            $this->getMapperFactory()->get(TokenMapper::class),
+            $this->injector->get('user.tokenBuilder'),
         );
     }
 }

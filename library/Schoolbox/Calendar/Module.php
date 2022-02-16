@@ -21,9 +21,8 @@ use Alaress\Authorizer\Rule\IsUserOrParentOfUser;
 use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
@@ -140,21 +139,20 @@ class Module extends BaseModule
         );
     }
 
-
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(EventTypeMapper::class),
+            $this->getMapperFactory()->get(\Calendar_Api_Config_Mapper::class),
+            new ModuleChecker($this->getConfig()),
+            $this->getMapperFactory()->get(EventMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+        );
     }
 
     /**
@@ -163,25 +161,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'folderMapper'       => $this->getMapperFactory()->getLazy(Mapper::class),
-            'campusMapper'       => $this->getMapperFactory()->getLazy(CampusMapper::class),
-            'eventTypeMapper'    => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
-            'calApiConfigMapper' => $this->getMapperFactory()->getLazy(\Calendar_Api_Config_Mapper::class),
-            'moduleChecker'      => $injector->lazyNew(ModuleChecker::class, [
-                'config' => $injector->lazyGet('config'),
-            ]),
-            'eventMapper'        => $this->getMapperFactory()->getLazy(EventMapper::class),
-            'userMapper'         => $this->getMapperFactory()->getLazy(UserMapper::class),
-        ];
     }
 
     /**

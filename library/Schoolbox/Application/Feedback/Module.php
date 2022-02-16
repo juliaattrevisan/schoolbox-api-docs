@@ -10,10 +10,8 @@ namespace Schoolbox\Application\Feedback;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Twig\Error\LoaderError;
-use Aura\Di\Container;
-use InvalidArgumentException;
 use ReCaptcha;
 
 class Module extends BaseModule
@@ -33,20 +31,6 @@ class Module extends BaseModule
         $this->register('GET', '/thank-you', 'getFeedbackReceipt', null, null);
     }
 
-
-    /**
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'reCaptcha' => new ReCaptcha($this->getConfig()->get('recaptcha_public_api_key'), $this->getConfig()->get('recaptcha_private_api_key')),
-        ];
-    }
-
     /**
      * @param IChainLoader $templateLoader
      * @throws LoaderError
@@ -59,18 +43,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            new ReCaptcha(
+                $this->getConfig()->get('recaptcha_public_api_key'),
+                $this->getConfig()->get('recaptcha_private_api_key'),
+            ),
+        );
     }
 }

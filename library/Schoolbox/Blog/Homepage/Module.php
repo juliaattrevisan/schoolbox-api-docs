@@ -14,8 +14,8 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
@@ -178,18 +178,11 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
+        return new BlogController();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(BlogController::class));
-    }
 
     /**
      * {@inheritdoc}
