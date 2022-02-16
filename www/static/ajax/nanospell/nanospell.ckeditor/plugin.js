@@ -490,7 +490,7 @@
 			var element = editor.getDoc().createElement("link");
 			element.setAttribute("rel", "stylesheet");
 			element.setAttribute("type", "text/css");
-			element.setAttribute("href", path + "/theme/nanospell.css");
+			element.setAttribute("href", path + "theme/nanospell.css");
 			element.setAttribute("id", 'nanospell_theme');
 			head.insertBefore(element, head.firstChild);
 		}

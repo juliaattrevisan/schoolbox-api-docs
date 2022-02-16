@@ -135,6 +135,12 @@ module.exports = {
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
+        mage: {
+            import: [
+                './www/static/js/form/jquery.mage.js',
+            ],
+            dependOn: 'main' //ensures jQuery is loaded prior
+        },
         dataTables: {
             import: [
                 './node_modules/datatables.net/js/jquery.dataTables.js',

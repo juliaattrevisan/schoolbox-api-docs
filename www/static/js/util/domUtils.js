@@ -12,7 +12,7 @@
  * 
  * @return { Number } position of the DOM element
  */
-export function getIndex (element) {
+ export function getIndex (element) {
     if (!element) {
         return -1;
     }
