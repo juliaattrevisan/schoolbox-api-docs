@@ -84,21 +84,21 @@ class Notifier extends AbstractModuleNotifier
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
 
-        $userResolver = $di->lazyGet('commsNewsUserResolver');
+        $userResolver = $di->get('commsNewsUserResolver');
 
-        $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
-            'audienceMapper'   => $mf->getLazy(Audience\Mapper::class),
-            'userAccessMapper' => $mf->getLazy(UserAccessMapper::class),
-            'db'               => $di->lazyGet('databaseInternal'),
-        ]);
+        $moderatorResolver = new ModeratorResolver(
+            $mf->get(Audience\Mapper::class),
+            $mf->get(UserAccessMapper::class),
+            $di->get('databaseInternal'),
+        );
 
         return [
-            'setMapper'            => $mf->getLazy(Mapper::class),
-            'setUserMapper'        => $mf->getLazy(UserMapper::class),
+            'setMapper'            => $mf->get(Mapper::class),
+            'setUserMapper'        => $mf->get(UserMapper::class),
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
-            'setPrefixGenerator'   => $di->lazyGet('cdnPrefixGenerator'),
-            'setFileMapper'        => $mf->getLazy(\Schoolbox\Comms\News\File\Mapper::class)
+            'setPrefixGenerator'   => $di->get('cdnPrefixGenerator'),
+            'setFileMapper'        => $mf->get(\Schoolbox\Comms\News\File\Mapper::class)
         ];
     }
 

@@ -11,7 +11,6 @@ namespace Schoolbox;
 use Aura\Di\Container;
 use Aura\Di\Injection\Lazy;
 use InvalidArgumentException;
-use Schoolbox\Mapper as BaseMapper;
 
 class MapperFactory
 {

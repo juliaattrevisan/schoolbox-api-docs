@@ -75,7 +75,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     public static function getParams(\Aura\Di\ContainerInterface $di): array
     {
         return [
-            'configLoader' => $di->lazyGet('config'),
+            'configLoader' => $di->get('config'),
         ];
     }
 
@@ -92,8 +92,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
         $mf = $di->get('mapperFactory');
 
         return [
-            'setNsMapper'  => $mf->getLazy(NSMapper::class),
-            'setSrcMapper' => $mf->getLazy(SourceMapper::class),
+            'setNsMapper'  => $mf->get(NSMapper::class),
+            'setSrcMapper' => $mf->get(SourceMapper::class),
         ];
     }
 

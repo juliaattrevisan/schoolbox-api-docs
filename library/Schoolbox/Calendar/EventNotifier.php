@@ -55,8 +55,8 @@ class EventNotifier extends AbstractModuleNotifier
         $mf = $di->get('mapperFactory');
 
         return [
-            'setMapper'           => $mf->getLazy(EventMapper::class),
-            'setAttendanceMapper' => $mf->getLazy(AttendanceMapper::class),
+            'setMapper'           => $mf->get(EventMapper::class),
+            'setAttendanceMapper' => $mf->get(AttendanceMapper::class),
         ];
     }
 

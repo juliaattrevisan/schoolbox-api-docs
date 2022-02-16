@@ -68,8 +68,8 @@ class Notifier extends AbstractModuleNotifier
         $mf = $di->get('mapperFactory');
 
         return [
-            'setMapper'     => $mf->getLazy(Mapper::class),
-            'setUserMapper' => $mf->getLazy(UserMapper::class),
+            'setMapper'     => $mf->get(Mapper::class),
+            'setUserMapper' => $mf->get(UserMapper::class),
         ];
     }
 
