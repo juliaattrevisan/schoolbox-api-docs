@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
-use Aura\Di;
 use Aura\Di\Container;
 use Database;
 use Alaress\Exception\IO\IOException;
@@ -404,7 +403,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     }
 
     /** @inheritDoc */
-    protected function getKnownUserClassesFromSession(Di\Container $di): array
+    protected function getKnownUserClassesFromSession(Container $di): array
     {
         // No session in CLI context.
         return [];
