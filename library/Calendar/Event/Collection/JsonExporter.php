@@ -28,7 +28,7 @@ class JsonExporter implements IExporter
         $events = $renderer->getAllEvents();
         echo '[';
         foreach ($events as $i => $event) {
-            echo ($i > 0 ? ',' : '') . $renderer->renderEvent($event, EventBase::RENDER_FORMAT_JSON);
+            echo ($i > 0 ? ',' : '') . $renderer->renderEvent($event, EventBase::RENDER_FORMAT_JSON, null, null, false);
         }
         echo ']';
     }

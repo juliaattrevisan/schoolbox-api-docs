@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -425,8 +426,16 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $this->response->content->set($this->buildJsonOutput(
-            array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
-        ));
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                array_map(
+                    'json_decode',
+                    $calendar->renderAll(
+                        EventBase::RENDER_FORMAT_JSON,
+                        $this->getConfigLoader()->get(ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
+                    )
+                )
+            )
+        );
     }
 }

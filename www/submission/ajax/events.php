@@ -10,8 +10,7 @@
 
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\Submission\Event as SubmissionEvent;
-use Schoolbox\IConfigLoader;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -54,5 +53,14 @@ $renderer             = new Renderer(
     $viewer
 );
 
-printf('[%s]', \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)));
+printf(
+    '[%s]',
+    \implode(
+        ',',
+        $renderer->renderAll(
+            EventBase::RENDER_FORMAT_JSON,
+            $this->getDi()->get('config')->get(ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
+        )
+    )
+);
 exit;

@@ -21,6 +21,7 @@ use External_Timetable;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -638,7 +639,10 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $output = $calendar->renderAll(EventBase::RENDER_FORMAT_JSON);
+        $output = $calendar->renderAll(
+            EventBase::RENDER_FORMAT_JSON,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
+        );
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();

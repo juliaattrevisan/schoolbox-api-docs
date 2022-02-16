@@ -179,6 +179,8 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
 
+    public const NAME_CALENDAR_VIEW_TIMEZONE = 'calendar_view_timezone';
+
     /**
      * @throws \InvalidArgumentException
      */

@@ -27,13 +27,12 @@ class Javascript extends Base
 
         /* Congeal all that stuff
          */
-        $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
-        $end     = $this->getEvent()->getEndTime()->getDatabaseDate();
         $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
-            $start .= ' ' . $this->getEvent()->getStartTime()->getDatabaseTime();
-            $end   .= ' ' . $this->getEvent()->getEndTime()->getDatabaseTime();
+            $start = $this->getEvent()->getStartTimeForCalendar($this->w3c);
+            $end   = $this->getEvent()->getEndTimeForCalendar($this->w3c);
         } else {
+            $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
             // FullCalendar (and vCal) 2.0 treats event ends as exclusive.
             // Doesn't really matter for timed events, but all day events
             // get truncated by one day.

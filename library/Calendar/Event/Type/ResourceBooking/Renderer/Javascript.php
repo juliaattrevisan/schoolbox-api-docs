@@ -27,8 +27,8 @@ class Javascript extends Base
     public function render(): string
     {
         // Resource bookings are never all day events.
-        $start = $this->getEvent()->getStartTime()->getDatabase();
-        $end   = $this->getEvent()->getEndTime()->getDatabase();
+        $start = $this->getEvent()->getStartTimeForCalendar($this->w3c);
+        $end   = $this->getEvent()->getEndTimeForCalendar($this->w3c);
 
         // Putting any class other than "personal", "group" or "type{whatever}"
         // prevents this object from rendering, so add classes later.

@@ -52,8 +52,8 @@ class Javascript extends Base
             $end    = $this->getEvent()->getEndTime()->addDays(1)->getDatabaseDate();
         } else {
             $allDay = false;
-            $start  = $this->getEvent()->getStartTime()->getDatabase();
-            $end    = $this->getEvent()->getEndTime()->getDatabase();
+            $start  = $this->getEvent()->getStartTimeForCalendar($this->w3c);
+            $end    = $this->getEvent()->getEndTimeForCalendar($this->w3c);
         }
 
         //

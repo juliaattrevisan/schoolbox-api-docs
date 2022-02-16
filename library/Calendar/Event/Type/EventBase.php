@@ -514,6 +514,30 @@ abstract class EventBase implements EventInterface
     }
 
     /**
+     * @param bool $w3c
+     * @return string
+     */
+    public function getStartTimeForCalendar(bool $w3c): string
+    {
+        if ($w3c) {
+            return $this->startTime->toW3cString();
+        }
+        return $this->startTime->getDatabase();
+    }
+
+    /**
+     * @param bool $w3c
+     * @return string
+     */
+    public function getEndTimeForCalendar(bool $w3c): string
+    {
+        if ($w3c) {
+            return $this->endTime->toW3cString();
+        }
+        return $this->endTime->getDatabase();
+    }
+
+    /**
      * Set start date and time
      *
      * @param Alaress_Date_Format $startTime

@@ -43,6 +43,9 @@ abstract class RendererBase implements RendererInterface
     private $router;
 
 
+    public bool $w3c;
+
+
     /**
      * Constructor
      *
@@ -74,5 +77,14 @@ abstract class RendererBase implements RendererInterface
             return $this->router->generate($name, $params);
         }
         return false;
+    }
+
+    /**
+     * Sets whether to use w3c format
+     * @param bool $w3c
+     */
+    public function setW3C(bool $w3c): void
+    {
+        $this->w3c = $w3c;
     }
 }

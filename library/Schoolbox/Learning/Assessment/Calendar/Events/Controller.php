@@ -20,6 +20,7 @@ use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use Calendar_Api_EventType_Interface;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -233,7 +234,10 @@ class Controller extends Base
             static function ($v) {
                 return json_decode($v, true);
             },
-            $events->renderAll(EventBase::RENDER_FORMAT_JSON)
+            $events->renderAll(
+                EventBase::RENDER_FORMAT_JSON,
+                $this->getConfigLoader()->get(ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
+            )
         );
     }
 

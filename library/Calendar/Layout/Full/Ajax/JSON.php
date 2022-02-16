@@ -43,7 +43,15 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 
         /* Render all registered events
          */
-        echo '[' . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']';
+        echo '[' .
+            \implode(
+                ',',
+                $renderer->renderAll(
+                    EventBase::RENDER_FORMAT_JSON,
+                    Config::get(\Schoolbox\Config\ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
+                )
+            )
+            . ']';
 
         exit();
     }
