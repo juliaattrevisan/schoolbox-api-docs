@@ -22,7 +22,6 @@ use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
-use Schoolbox\WebDav\LegacyConfiguration\Factory as LegacyConfigFactory;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\WebDav\Model as WebDav;
 
@@ -128,7 +127,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $settings = null;
 
         $siteSchoolCode = Config::get('site_school_code');
-        $fallbackEnabled = Config::get('webdav_fallback_enabled');
 
         /** @var Collection $davs */
         $davs = WebDavMapper::getInstance()->findByColumn('enabled', 1);
@@ -186,17 +184,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
                 $paths[] = $path;
             }
-        }
-
-        // If no paths were found matching the current logged in user, and fallback was enabled in the Admin - Settings - Policy screen, revert to the old
-        // WebDAV setting from prior to V17.0
-
-        if (count($paths) == 0 && $fallbackEnabled) {
-            // There was no WebDAV configuration applied, fallback to historical method (aka. that big long if-else statement)
-            // Now extracted for your convenience
-            $config   = LegacyConfigFactory::build($siteSchoolCode, $user, $_SESSION);
-            $settings = $config['settings'];
-            $paths    = $config['paths'];
         }
 
         if (empty($settings) || empty($paths)) {
