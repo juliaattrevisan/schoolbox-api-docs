@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * TODO remove this entire thing
+ *
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -13,7 +15,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -95,24 +96,13 @@ class Module extends BaseModule
      */
     public function buildController(): \Alaress\Web\Controller\Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'defaultGradeGroup'          => $this->injector->get('defaultGradeGroup'),
-                'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(TermMapper::class),
         );
     }
+
 
     public function initRoutePermissions(Authorizer $authorizer)
     {

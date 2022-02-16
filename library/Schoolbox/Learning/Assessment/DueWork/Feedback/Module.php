@@ -12,6 +12,7 @@ use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
@@ -187,45 +188,21 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-    /**
-     * Override with any steps required for a controller and its routes
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $injector->params[Controller::class] = [
-            'feedbackDataSource'    => $injector->lazyGet('feedbackDataSource'),
-            'participantDataSource' => $injector->lazyGet('participantDataSource'),
-            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
-            'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
-            'responseDataSource'    => $injector->lazyGet('responseDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->get(RubricDataSource::class),
-            'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
-        ];
-    }
-
 
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @param ContainerInterface $injector
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('feedbackDataSource'),
+            $this->injector->get('participantDataSource'),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('responseDataSource'),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->getMapperFactory()->get(ReturnedWorkMapper::class),
+        );
     }
 
     /**

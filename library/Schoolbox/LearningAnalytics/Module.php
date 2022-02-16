@@ -13,7 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
@@ -276,25 +276,12 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-    /**
-     * Set up controllers
-     *
-     * {@inheritdoc}
-     * @throws \InvalidArgumentException
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'workTypeMapper' => $this->getMapperFactory()->getLazy(WorkTypeMapper::class),
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(WorkTypeMapper::class),
         );
     }
 

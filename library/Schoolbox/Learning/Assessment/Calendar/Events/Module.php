@@ -12,8 +12,7 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Calendar_Api_Config_Mapper;
 use Calendar_Api_EventType_Event_Schoolbox_Campus;
 use InvalidArgumentException;
@@ -53,40 +52,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
-            'visibility'            => $injector->lazy(static function () {
-                return new Visibility(Access::getInstance());
-            }),
-            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-            'campusMapper'          => $this->getMapperFactory()->getLazy(CampusMapper::class),
-            'calendarConfig'        => $injector->lazy(function () {
-                return $this->getMapperFactory()->get(Calendar_Api_Config_Mapper::class)
-                                                ->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Campus::class);
-            }),
-        ];
+        return new Controller(
+            $this->injector->get('assessmentDataSource'),
+            new Visibility($this->getMapperFactory()->get(Access::class)),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(Calendar_Api_Config_Mapper::class)
+                ->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Campus::class),
+        );
     }
 }

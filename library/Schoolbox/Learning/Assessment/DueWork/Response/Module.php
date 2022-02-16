@@ -12,7 +12,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -378,31 +378,21 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getMapperFactory()->getLazy(Error\Mapper::class),
-                'responseDataSource' => $injector->lazyGet('responseDataSource'),
-                'bakery' => $injector->lazyNew(BreadcrumbFactory::class, [
-                    'router'     => $injector->lazyGet('router'),
-                    'authorizer' => $injector->lazyGet('authorizer'),
-                    'access'     => Access::getInstance(),
-                ]),
-                'termMapper' => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                'kamiMapper' => $this->getMapperFactory()->getLazy(Kami\Mapper::class),
-                'kamiConnector' => $injector->lazyGet('kamiConnector'),
-                'access' => $this->getMapperFactory()->getLazy(Access::class),
-            ])
+        $bakery = new BreadcrumbFactory(
+            $this->getRouter(),
+            $this->getAuthorizer(),
+            $this->getMapperFactory()->get(Access::class),
+        );
+        return new Controller(
+            $this->getMapperFactory()->get(Error\Mapper::class),
+            $this->injector->get('responseDataSource'),
+            $bakery,
+            $this->getMapperFactory()->get(Term\Mapper::class),
+            $this->getMapperFactory()->get(Kami\Mapper::class),
+            $this->injector->get('kamiConnector'),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 

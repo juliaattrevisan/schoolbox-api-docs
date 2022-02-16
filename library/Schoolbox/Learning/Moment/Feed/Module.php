@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Moment\Feed;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
@@ -64,27 +64,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'evidenceMapper'   => $this->getMapperFactory()->getLazy(EvidenceMapper::class),
-                    'badgeAwardMapper' => $this->getMapperFactory()->getLazy(BadgeAwardMapper::class),
-                    'commentMapper'    => $this->getMapperFactory()->getLazy(CommentMapper::class),
-                    'database'         => $injector->lazyGet('databaseInternal'),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(EvidenceMapper::class),
+            $this->getMapperFactory()->get(BadgeAwardMapper::class),
+            $this->getMapperFactory()->get(CommentMapper::class),
+            $this->injector->get('databaseInternal'),
         );
     }
 

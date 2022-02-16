@@ -9,13 +9,12 @@
 namespace Schoolbox\Learning\Upcoming;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -115,47 +114,22 @@ class Module extends BaseModule
 
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws \InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $injector->params[Controller::class] = [
-            'userMapper'            => $this->getUserMapper(),
-            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'externalClass'         => $this->injector->lazyGet('externalClass'),
-            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
-            'participantDataSource' => $injector->lazyGet('participantDataSource'),
-            'defaultGradeGroup'     => $this->injector->lazyGet('defaultGradeGroup'),
-            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-            'access'                => $this->getMapperFactory()->getLazy(Access::class),
-        ];
-    }
-
-
-    /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getUserMapper(),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('participantDataSource'),
+            $this->injector->get('filters.factoryFactory'),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+        );
     }
 
     /* Getters / Setters

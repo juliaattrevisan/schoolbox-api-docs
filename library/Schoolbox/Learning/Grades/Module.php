@@ -12,7 +12,8 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
@@ -167,35 +168,18 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->params[Controller::class] = [
-            'assessmentMapperProxy' => $this->injector->lazyGet('assessmentDataSource'),
-            'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-            'folderMapper'          => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-            'access'                => $this->getMapperFactory()->getLazy(Access::class),
-            'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-        ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function buildController(): \Alaress\Web\Controller\Base
-    {
-        return new Controller();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(Folder\Mapper::class),
+            $this->getMapperFactory()->get(Term\Mapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->getMapperFactory()->get(FilterSelection\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->injector->get('filters.factoryFactory'),
+        );
     }
 
     /* Getters / Setters

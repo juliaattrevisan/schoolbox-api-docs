@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Badge;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
@@ -146,32 +146,17 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function buildController(): \Alaress\Web\Controller\Base
+    public function buildController(): Base
     {
-        return new Controller();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-                    'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
-                    'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-                    'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
-                    'categoryMapper'        => $this->getMapperFactory()->getLazy(Category\Mapper::class),
-                    'yearLevelMapper'       => $this->getMapperFactory()->getLazy(YearLevelMapper::class),
-                    'curriculumNodeMapper'  => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->injector->lazyGet('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(StorageMapper::class),
+            $this->getMapperFactory()->get(Category\Mapper::class),
+            $this->getMapperFactory()->get(YearLevelMapper::class),
+            $this->getMapperFactory()->get(CurriculumNodeMapper::class),
         );
     }
 }
