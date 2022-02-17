@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Conflict;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
@@ -254,6 +255,7 @@ class Transmit
 
                     /* Continue with file upload itself
                      */
+                    $submission['id'] = '378357fa-bf02-460e-8dff-cd98f793f501';
                     $upload = $this->uploadFile($model, $ssf, $submission);
 
                     /* Once we uploaded, we wait for turnitin
@@ -279,7 +281,7 @@ class Transmit
                      */
                 }
             }
-        } catch (BadEndpoint | Credentials | \DomainException $e) {
+        } catch (BadEndpoint | Credentials | Conflict | \DomainException $e) {
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model
@@ -330,6 +332,7 @@ class Transmit
      * @param SingleFile\Model    $ssf
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -421,10 +424,12 @@ class Transmit
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
      * @param Turnitin\File\Model $model
+     * @param SubmissionBox       $box
      * @param SingleFile\Model    $ssf
      * @param array               $group
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -552,6 +557,7 @@ class Transmit
      * @param array               $submission
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
