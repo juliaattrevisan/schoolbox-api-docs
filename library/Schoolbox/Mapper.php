@@ -3868,7 +3868,8 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function raiseNotification($object, $verb, $previous = null)
     {
-        if (!isset($this->sessionData['user'])) {
+        $sessionUser = $this->getSessionUser();
+        if (!$sessionUser) {
             return false;
         }
 
@@ -3876,8 +3877,8 @@ abstract class Mapper implements IMapper, Serializable
 
         // create a new event, and send it to the scheduler
         try {
-            $this->database->onPersist(function () use ($verb, $object, $diff) {
-                $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
+            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff) {
+                $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
             });
         } catch (\ErrorException $e) {
             //Unable to connect to notification system

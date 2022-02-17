@@ -377,8 +377,8 @@ class EventRecurrenceMapper
      */
     public function raiseNotification(Event $object, string $verb, ?Event $previous = null): bool
     {
-        $sessionData = $this->eventMapper->getSessionData();
-        if (empty($sessionData['user'])) {
+        $sessionUser = $this->eventMapper->getSessionUser();
+        if (!$sessionUser) {
             return false;
         }
 
@@ -388,7 +388,7 @@ class EventRecurrenceMapper
         } catch (MapperException $e) {
             return false;
         }
-        $this->eventMapper->getEventPropagator()->propagate($sessionData['user'], $verb, $object, $this->eventMapper, $diff);
+        $this->eventMapper->getEventPropagator()->propagate($sessionUser, $verb, $object, $this->eventMapper, $diff);
         return true;
     }
 
