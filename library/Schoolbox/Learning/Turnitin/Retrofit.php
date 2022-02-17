@@ -36,14 +36,25 @@ class Retrofit
 
 
     /**
+     * @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper
+     */
+    private \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+
+
+    /**
      * Retrofit constructor.
      *
-     * @param File\Mapper          $turnitinFileMapper
-     * @param LoggerInterface|null $log
+     * @param File\Mapper                                                                $turnitinFileMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
+     * @param LoggerInterface|null                                                       $log
      */
-    public function __construct(File\Mapper $turnitinFileMapper, ?LoggerInterface $log = null)
-    {
+    public function __construct(
+        File\Mapper $turnitinFileMapper,
+        \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        ?LoggerInterface $log = null
+    ) {
         $this->turnitinFileMapper = $turnitinFileMapper;
+        $this->singleFileMapper = $singleFileMapper;
         $this->log = $log;
     }
 
@@ -78,6 +89,7 @@ class Retrofit
             ) maxdates ON sb.id = maxdates.box_id
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+            INNER JOIN storage s ON ssf.hash = s.hash
             LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
             WHERE a.id = :assessmentId
             AND tr.id IS NULL
@@ -86,22 +98,43 @@ class Retrofit
 
         $statement = $this->turnitinFileMapper->getDatabase()->prepare($query);
         $statement->execute([
-            'assessmentId' => $assessmentId
+            'assessmentId' => $assessmentId,
         ]);
 
-        $models = [];
+        /* Find the ids so we can hydrate instances easier
+         */
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
+        $singleFiles = $this->singleFileMapper->findByColumn('id', $ids);
 
         /* Build a collection of models
          */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        $models = [];
+
+        foreach ($singleFiles as $singleFile) {
+            /* All files discovered for retrofit must adhere to the usual criteria
+             */
+            if (!(new ValidFile())->isSatisfiedBy($singleFile)) {
+                $this->logDebug(sprintf(
+                    'Student Submission File Id %s: not suitable for retrofit (invalid file)',
+                    $singleFile->getId(),
+                ));
+
+                continue;
+            }
+
             $models[] = $this->turnitinFileMapper->createModel()
-                ->setStudentSubmissionFileId((int)$row['id'])
+                ->setStudentSubmissionFileId($singleFile->getId())
                 ->setHistorical(false)
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logDebug(sprintf(
                 'Student Submission File Id %s: preparing for retrofit',
-                $row['id'],
+                $singleFile->getId(),
             ));
         }
 

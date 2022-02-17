@@ -81,6 +81,13 @@ class ValidFile
 
 
     /**
+     * We can't accurately represent min_text_length for files that might contain
+     * html or other stuff like that, so we rely on evaluating by filesize instead
+     */
+    private const MIN_TURNITIN_TEXT_FILESIZE = 500;
+
+
+    /**
      * Each $file must pass the stringent whitelist checks here
      *
      * @param IFile $file
@@ -91,6 +98,12 @@ class ValidFile
         /* Must be one of the allowed filetypes; reject immediately if not allowed
          */
         if (!\in_array($file->getExtension(), self::VALID_EXTENSIONS)) {
+            return false;
+        }
+
+        /* Ignore all ultra small files
+         */
+        if ($file->getSize() < self::MIN_TURNITIN_TEXT_FILESIZE) {
             return false;
         }
 
