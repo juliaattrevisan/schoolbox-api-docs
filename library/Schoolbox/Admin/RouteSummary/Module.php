@@ -12,7 +12,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 
 /**
  * A module for viewing a list of routes defined within Schoolbox.

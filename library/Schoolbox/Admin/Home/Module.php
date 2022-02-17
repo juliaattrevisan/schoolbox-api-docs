@@ -16,7 +16,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 

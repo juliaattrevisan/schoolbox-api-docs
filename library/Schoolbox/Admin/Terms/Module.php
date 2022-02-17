@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;

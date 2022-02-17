@@ -12,7 +12,6 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Authorizer\Rule\IsSchoolboxAdmin;
 use Alaress;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Psr\Log\NullLogger;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;

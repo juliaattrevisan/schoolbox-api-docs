@@ -1,7 +1,6 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
-use Alaress\Redis;
 use Alaress\Web\Output;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;

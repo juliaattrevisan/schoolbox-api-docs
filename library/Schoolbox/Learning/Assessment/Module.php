@@ -17,7 +17,6 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;

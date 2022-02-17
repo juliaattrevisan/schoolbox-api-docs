@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Admin\SHAPS\Auth\Parameters;
 use Schoolbox\UserMapper;

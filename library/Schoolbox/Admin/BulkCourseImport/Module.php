@@ -20,7 +20,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
 use Component_InstanceMapper;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Course\Import\ImportFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;

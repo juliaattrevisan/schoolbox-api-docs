@@ -12,7 +12,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 

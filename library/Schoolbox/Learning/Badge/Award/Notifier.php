@@ -15,7 +15,6 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Badge\Award\Model as Award;
 use Alaress\Async\Notification\Instance\Builder;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;

@@ -13,7 +13,6 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Event\Attendance\Model as EventAttendance;

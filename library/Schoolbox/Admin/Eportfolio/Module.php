@@ -15,7 +15,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Eportfolio\PageMapper as EportfolioPageMapper;
 use Alaress\Twig\Loader\IChainLoader;
-use Psr\Container\ContainerInterface;
 
 /**
  * The module for managing school terms through the admin section.

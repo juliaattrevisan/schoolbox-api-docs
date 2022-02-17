@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Admin\RouteSummary;
 
-use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
 

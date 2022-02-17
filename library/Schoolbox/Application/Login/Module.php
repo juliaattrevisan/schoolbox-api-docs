@@ -11,7 +11,6 @@ namespace Schoolbox\Application\Login;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule

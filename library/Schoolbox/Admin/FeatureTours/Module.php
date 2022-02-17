@@ -6,7 +6,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Twig\Error\LoaderError;
 

@@ -10,7 +10,6 @@ namespace Schoolbox\Admin\API;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\External;
 use Schoolbox\Import\ImporterFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;

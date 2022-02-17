@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Moment\Evidence\Discussion\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Discussion\Comment\Model as Comment;

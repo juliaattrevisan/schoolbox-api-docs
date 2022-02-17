@@ -19,7 +19,6 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;

@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\Settings;
 
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Authorizer\Rule;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;

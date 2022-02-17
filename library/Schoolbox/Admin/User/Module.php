@@ -17,7 +17,6 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use HouseMapper;
 use HouseResidentialMapper;
-use Psr\Container\ContainerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;

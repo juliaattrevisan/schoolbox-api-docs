@@ -14,10 +14,8 @@
 namespace Alaress\Twig\Method;
 
 use Alaress\Module\Module;
-use Alaress\Module\Module as BaseModule;
 use LogicException;
 use Psr\Container\ContainerInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Twig\Error\RuntimeError;
 
 class RequireModule
@@ -52,15 +50,6 @@ class RequireModule
         } catch (LogicException $e) {
             throw new RuntimeError(sprintf('Module "%s" does not exist', $moduleName));
         }
-//        if (!$module instanceof BaseModule) {
-//            throw new RuntimeError(
-//                sprintf(
-//                    'Module "%s" is not an instance of "%s"',
-//                    $moduleName,
-//                    BaseModule::class
-//                )
-//            );
-//        }
         $module->initControllerDependencies();
     }
 }
