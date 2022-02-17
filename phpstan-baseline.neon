@@ -8166,11 +8166,6 @@ parameters:
 			path: tools/notif/syscheck.php
 
 		-
-			message: "#^Variable \\$cache in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: tools/parentClassAccess.php
-
-		-
 			message: "#^Variable \\$usersAdded in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: tools/parentClassAccess.php
