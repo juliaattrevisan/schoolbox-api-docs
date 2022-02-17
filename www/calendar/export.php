@@ -396,15 +396,6 @@ try {
             );
 
             break;
-        case 'all_timetable':
-            //include timetabled classes
-            $timeApi = buildApiClass(
-                Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
-                true,
-                $sentry
-            );
-            //fallthrough and append to the end of the standard 'all schoolbox events' option
         case 'all':
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
@@ -447,9 +438,15 @@ try {
                 $api->add($subApi);
             }
 
-            //if including timetable classes, append them now, as we fellthrough from that...
-            if (isset($timeApi)) {
-                $api->add($timeApi);
+            //if including timetable classes, do that now
+            if ('all_timetable' === $export_type) {
+                $subApi = buildApiClass(
+                    Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
+                    [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                    true,
+                    $sentry
+                );
+                $api->add($subApi);
             }
             break;
 
