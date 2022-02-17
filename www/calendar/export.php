@@ -396,7 +396,15 @@ try {
             );
 
             break;
-
+        case 'all_timetable':
+            //include timetabled classes
+            $timeApi = buildApiClass(
+                Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
+                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                true,
+                $sentry
+            );
+            //fallthrough and append to the end of the standard 'all schoolbox events' option
         case 'all':
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
@@ -439,14 +447,9 @@ try {
                 $api->add($subApi);
             }
 
-            //include timetabled classes
-            $subApi = buildApiClass(
-                Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
-                true,
-                $sentry
-            );
-            $api->add($subApi);
+            if (isset($timeApi)) {
+                $api->add($timeApi);
+            }
             break;
 
         case '':

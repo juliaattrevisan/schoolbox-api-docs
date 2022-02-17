@@ -61,7 +61,7 @@ export default {
                 + qs.stringify(values);
         },
     },
-    
+
     methods: {
         /**
          * Open this modal.
@@ -80,10 +80,14 @@ export default {
         <form class="top" :action="eventExportUrl" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
-                    <ul class="option-list">     
+                    <ul class="option-list">
                         <li>
                             <input type="radio" v-model="form.export" name="export" value="all" id="export-all" />
                             <label for="export-all">All events</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="all_timetable" id="export-all_timetable" />
+                            <label for="export-all_timetable">All events (Including Timetable classes)</label>
                         </li>
                         <li>
                             <input type="radio" v-model="form.export" name="export" value="personal" id="export-personal" />
