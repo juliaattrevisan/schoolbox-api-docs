@@ -366,8 +366,8 @@ class Kernel extends WebKernelAbstract
             )
         );
 
-        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
-        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
+//        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class, ['di' => $di]));
 
         // Unfortunately basic request needs a SitePage for now
         $di->set(
