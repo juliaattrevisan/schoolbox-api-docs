@@ -17,7 +17,7 @@
 {% endif %}
 
 <label for="{{ inputId }}">
-    <span class="rb-description">
+    <span class="rb-description markdown">
         {# Self assessment student icon #}
         {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
             {% if blindMode %}
@@ -32,7 +32,7 @@
             {% endif %}
         {% endif %}
 
-        {{- descriptor.description|nl2br -}}
+        {{- descriptor.description | markdown -}}
     </span>
 
     {% set descriptorHasMarkRange = rubricGrid.assessment.useMarkRange and descriptor.hasRange %}

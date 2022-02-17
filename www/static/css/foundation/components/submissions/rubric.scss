@@ -8,6 +8,16 @@ table.rb {
     color-adjust: exact;
     -webkit-print-color-adjust: exact;
 
+    .markdown {
+        li {
+            white-space: pre-wrap;
+        }
+        p {
+            white-space: pre-wrap;
+            font-weight: inherit;
+        }
+    }
+
     [colspan] {
         border-right-width: 0 !important;
     }

@@ -15,22 +15,18 @@
 
             <!-- BEGIN rubric -->
             <section>
-                <ul class="information-list">
+                <table class="rb">
                     <!-- BEGIN rubric_criterion -->
-                    <li>
-                        <div class="small-12 columns content">
-                            <h3>{CRITERION_GROUP}</h3>
-                            <ul>
-                                <!-- BEGIN rubric_descriptor -->
-                                <li>
-                                    <p>{CRITERION_NAME}</p>
-                                </li>
-                                <!-- END rubric_descriptor -->
-                            </ul>
-                        </div>
-                    </li>
+                    <tr>
+                        <th class="markdown border-none">{CRITERION_GROUP}</th>
+                    </tr>
+                    <!-- BEGIN rubric_descriptor -->
+                    <tr>
+                        <td class="markdown border-none">{CRITERION_NAME}</td>
+                    </tr>
+                    <!-- END rubric_descriptor -->
                     <!-- END rubric_criterion -->
-                </ul>
+                </table>
 
                 <!-- BEGIN modify_rubric -->
                 <div class="component-action">

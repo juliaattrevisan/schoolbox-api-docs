@@ -888,6 +888,15 @@ abstract class Kernel
                         )
                     );
 
+                    // Markdown filter
+                    $twig->addFilter(
+                        new TwigFilter(
+                            'markdown',
+                            [Scrub::class, 'markdown'],
+                            ['is_safe' => ['html']]
+                        )
+                    );
+
                     // Cut sentence filter
                     $twig->addFilter(
                         new TwigFilter(

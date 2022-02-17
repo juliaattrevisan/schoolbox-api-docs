@@ -8,7 +8,7 @@
         assessments           IAssessable[]
         returnUrlSuffix       string
 #}
-<table>
+<table class="rb">
     <tr><td>&nbsp;</td>
         {% for activity_id, activity in rubricAssessmentList  %}
             {% if activity.rubric_capability_mark_type_id %}
@@ -38,7 +38,7 @@
     </tr>
     {% for capability in longitudinalRubric %}
         <tr>
-            <td><b>{{ capability.name | nl2br }}</b></td>
+            <th class="rb-group-name markdown">{{ capability.name | markdown }}</th>
             {% for activity_id, activity in rubricAssessmentList %}
                 {% if activity.rubric_capability_mark_type_id %}
                 {% set activity = indicator is defined and indicator.activities[activity_id] %}
