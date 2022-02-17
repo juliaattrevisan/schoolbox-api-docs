@@ -637,7 +637,7 @@ class Controller extends Base
         try {
             $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
         } catch (\Carbon\Exceptions\InvalidFormatException $e) {
-            $untilDate = $endDate->endOfDay();
+            $untilDate = (clone $endDate)->endOfDay();
         }
         /**
          * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
