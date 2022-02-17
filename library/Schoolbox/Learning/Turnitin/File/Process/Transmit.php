@@ -221,7 +221,6 @@ class Transmit
              * if you repeatedly a group, it just updates it)
              */
 
-
             /* The box has to exist (i.e. not deleted)
              */
             try {
@@ -255,7 +254,7 @@ class Transmit
                     /* Continue with file upload itself
                      */
                     $submission['id'] = '378357fa-bf02-460e-8dff-cd98f793f501';
-                    $upload = $this->uploadFile($model, $ssf, $submission);
+                    $upload           = $this->uploadFile($model, $ssf, $submission);
 
                     /* Once we uploaded, we wait for turnitin
                      */
@@ -280,7 +279,26 @@ class Transmit
                      */
                 }
             }
+        } catch (Turnitin\Exception\Conflict $e) {
+            /* A non-recoverable situation - you're trying to upload data
+             * into a place which is already associated with data
+             */
+            $errorMessage = sprintf(
+                '%s - last status was [%s]',
+                $e->getMessage(),
+                $model->getStatus()
+            );
+
+            $this->logWarning($errorMessage);
+
+            $this->turnitinMapper->save($model
+                ->setErrorCode((string)$e->getCode())
+                ->setErrorMessage($errorMessage)
+                ->setStatus(Turnitin\File\Model::STATUS_ERROR));
         } catch (Turnitin\Exception\Exception $e) {
+            /* Potentially recoverable by running transmit forcibly
+             * which is what the crontab does anyway
+             */
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model

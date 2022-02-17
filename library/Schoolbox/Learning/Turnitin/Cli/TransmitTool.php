@@ -174,8 +174,8 @@ HELP;
              */
             if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
                 /* Optionally:
-                 * Forcibly retransmit everything in Pending, Group, Submission
-                 * regardless of whether they're in those states normally; used
+                 * Forcibly retransmit everything in Pending, Group, Submission, Uploading
+                 * statuses - regardless of whether they're in those states normally; used
                  * to recommence a stalled or broken process, but you might also
                  * reprocess something that's in this state naturally
                  */
@@ -186,6 +186,7 @@ HELP;
                             Turnitin\File\Model::STATUS_TRANSMIT_PENDING,
                             Turnitin\File\Model::STATUS_TRANSMIT_GROUP,
                             Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION,
+                            Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING,
                         ]
                     ]);
                 } else {
@@ -206,6 +207,7 @@ HELP;
                         Turnitin\File\Model::STATUS_TRANSMIT_PENDING,
                         Turnitin\File\Model::STATUS_TRANSMIT_GROUP,
                         Turnitin\File\Model::STATUS_TRANSMIT_SUBMISSION,
+                        Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING,
                     ]);
                 } else {
                     $models = Turnitin\File\Mapper::getInstance()->findByColumn('status', Turnitin\File\Model::STATUS_TRANSMIT_PENDING);
