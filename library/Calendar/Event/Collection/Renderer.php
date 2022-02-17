@@ -111,7 +111,6 @@ class Renderer
      * Render all events
      *
      * @param string $format
-     * @param bool   $w3c
      * @return string[]
      * @throws \Exception If unable to find a rendering class for the specified type
      */
