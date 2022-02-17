@@ -68,31 +68,24 @@
 
 {# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
 {# establish small as the default rendering method #}
-{% if render not in ['tiny', 'small', 'medium', 'large', 'menuMobile'] %}
-    {% set render = 'small' %}
-{% endif %}
-
-{# how does the semantic render affect the tag #}
 {% if render == "tiny" %}
     {% set sizeParameter = sizeParameter ~ "square32" %}
-{% endif %}
-{% if render == "small" %}
+{% elseif render == "small" %}
     {% set sizeParameter = sizeParameter ~ "square64" %}
-{% endif %}
-{% if render == "medium" %}
+{% elseif render == "medium" %}
     {% set sizeParameter = sizeParameter ~ "constrain200" %}
     {% set limitHeight = 200 %}
     {% set limitWidth = 200 %}
     {% set class = "full-width" %}
-{% endif %}
-{% if render == "menuMobile" %}
+{% elseif render == "menuMobile" %}
     {% set sizeParameter = sizeParameter ~ "square72" %}
     {% set limitHeight = 72 %}
     {% set limitWidth = 72 %}
-{% endif %}
-{% if render == "large" %}
+{% elseif render == "large" %}
     {% set sizeParameter = sizeParameter ~ "profile" %}
     {% set class = "full-width" %}
+{% else %}
+    {% set sizeParameter = sizeParameter ~ "square64" %}
 {% endif %}
 
 <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"

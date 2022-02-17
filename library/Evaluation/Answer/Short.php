@@ -315,7 +315,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
          * if ($existing['response'] != null) { ... } else { ... }
          */
         $page->setVar(array(
-            'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+            'RESPONSE_USER_ID' => $currentQuestion['user_id'],
             'USER_FIRSTNAME' => $currentQuestion['firstname'],
             'USER_LASTNAME' => $currentQuestion['lastname'],
             'ANSWER' => Scrub::text($existing['response']),

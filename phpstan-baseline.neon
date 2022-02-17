@@ -1991,26 +1991,6 @@ parameters:
 			path: library/Evaluation/Answer/Short.php
 
 		-
-			message: "#^Cannot access offset 'firstname' on int\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/Signature.php
-
-		-
-			message: "#^Cannot access offset 'lastname' on int\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/Signature.php
-
-		-
-			message: "#^Cannot access offset 'question_id' on int\\.$#"
-			count: 2
-			path: library/Evaluation/Answer/Signature.php
-
-		-
-			message: "#^Cannot access offset 'synergy_id' on int\\.$#"
-			count: 1
-			path: library/Evaluation/Answer/Signature.php
-
-		-
 			message: "#^Return type \\(void\\) of method Evaluation_Answer_Signature\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
 			count: 1
 			path: library/Evaluation/Answer/Signature.php
