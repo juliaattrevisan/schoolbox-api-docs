@@ -205,17 +205,6 @@ class Kernel extends WebKernelAbstract
         // register an empty logger to maintain interfaces as required
         $di->values['logger'] = new NullLogger();
 
-        // Mapper notifications:
-        // They rely upon the session being injected into them, so do that.
-        // TODO decouple the dependency between mappers and session
-        $di->setters[Mapper::class]['setSessionData'] = $di->lazy(function () use ($di) {
-            $session = $di->get('session');
-            if (!$session->isStarted()) {
-                $session->start();
-            }
-            return $_SESSION ?? [];
-        });
-
         // install sentry
         $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';

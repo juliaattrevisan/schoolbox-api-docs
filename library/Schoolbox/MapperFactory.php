@@ -48,16 +48,6 @@ class MapperFactory
             $mapper = new $mapperName();
         }
 
-        // Is this a genuine mapper? Set its session if so.
-        // TODO decouple the dependency between mappers and session
-        if ($mapper instanceof Mapper) {
-            $session = $this->injector->get('session');
-            if (!$session->isStarted()) {
-                $session->start();
-            }
-            $mapper->setSessionData($_SESSION ?? []);
-        }
-
         return $mapper;
     }
 
