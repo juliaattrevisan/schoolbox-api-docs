@@ -54,8 +54,8 @@ class Module extends BaseModule
             '(?:dryRun|performUpdate)',
             function () {
                 // AFAICT ups.redisKey is unused
-//                // prep the key Redis will use for this dry run
-//                $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
+                // // prep the key Redis will use for this dry run
+                // $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
                 return [
                     'provisioner' => $this->injector->get('ups.provisioner'),
                 ];

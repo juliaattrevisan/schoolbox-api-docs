@@ -1,17 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * A loader class for loading module's controller dependencies dynamically.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Module;
 
+/**
+ * A loader class for loading module's controller dependencies dynamically.
+ */
 class Loader implements LoaderInterface
 {
     /**

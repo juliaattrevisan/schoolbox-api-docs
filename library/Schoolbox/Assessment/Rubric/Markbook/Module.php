@@ -73,13 +73,13 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-             $this->injector->get('databaseInternal'),
-             $this->getMapperFactory()->get(UserAccessMapper::class),
-             $this->injector->get('filters.factoryFactory'),
-             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
-             $this->injector->get('filters.assessmentIdFinder'),
-             $this->getMapperFactory()->get(Filter\Mapper::class),
-             $this->injector->get('l10n'),
+            $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
+            $this->injector->get('l10n'),
         );
     }
 

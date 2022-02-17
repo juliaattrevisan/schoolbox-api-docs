@@ -1,17 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * An interface for module loaders.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Module;
 
+/**
+ * An interface for module loaders.
+ */
 interface LoaderInterface
 {
     /**

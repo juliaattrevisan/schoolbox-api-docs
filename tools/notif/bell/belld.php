@@ -1,6 +1,13 @@
 #!/usr/bin/php
 <?php
 
+/**
+ * The Bell Daemon.
+ *
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Alaress\Date\Clock;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
@@ -13,14 +20,6 @@ use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
 use Schoolbox\Realtime\Timetable\TimetableScheduler;
-
-/**
- * The Bell Daemon.
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
- */
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
