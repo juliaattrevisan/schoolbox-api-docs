@@ -58,8 +58,8 @@ $kernel->run(
         $instanceId = $opts["instance"] ?? INSTANCE_ID;
 
 
-        // define the redis key we'll use for this run
-        $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
+        // AFAICT this is unused
+        // $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
 
         /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');
