@@ -15,7 +15,6 @@ use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
-use Alaress\Redis;
 use Alaress\Scheduler\Cache\RedisCache;
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Aura\Di;
@@ -27,9 +26,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Schedule;
-use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
-use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -67,7 +65,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
         $postman        = new Postman($routeBroker, $log);
 
-        $strat          = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $flags);
+        $strat          = new DefaultDispatchStrategy($flags);
         $scheduler      = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
 
         $scheduler->setJitCache(new RedisCache($redis, $log, INSTANCE_ID));

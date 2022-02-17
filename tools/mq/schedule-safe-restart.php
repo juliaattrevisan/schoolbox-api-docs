@@ -81,54 +81,6 @@ set_error_handler(
     E_RECOVERABLE_ERROR
 );
 
-// we have to fetch all because the DB conn is about to be reset :/
-$sqlq = Database::getInstance()->query("SELECT * FROM scheduleq")->fetchAll(PDO::FETCH_ASSOC);
-
-// init this
-DeprecatedDatabase::getInstance();
-
-foreach ($sqlq as $qi) {
-    // do this for every message that comes in
-    $d->info('Processing message from SQL', [ 'char' => '>' ]);
-
-    Database::reinitialise();
-    DeprecatedDatabase::reinitialise();
-
-    try {
-        $event = unserialize($qi['identifier']);
-
-        // if the interrogation says to dismiss the message, we do
-        if (interrogate($event, $d, $kernel->getDependencyInjector())) {
-            $d->error('Message broken');
-
-            if ($perform) {
-                // split this message off onto a special queue
-                Database::reinitialise();
-                Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
-            }
-        } else {
-            $d->notice('Message retained', [ 'char' => '+' ]);
-        }
-    } catch (RuntimeException $e) {
-        // this message is can't be parsed, so we ACK it to make it go away
-        $d->error('RuntimeException: ' . $e->getMessage());
-        $d->notice('Message unparseable', [ 'char' => '-' ]);
-    } catch (ScheduleException $e) {
-        // we're happy to ignore this, it just means no scheduling strategy exists for this Model
-        $d->warning('Schedule Exception: ' . $e->getMessage());
-        $d->notice('Message ignorable', [ 'char' => '-' ]);
-    } catch (CompressionException $e) {
-        // this message is unparseable, so we'll eventually ACK it to make it go away
-        $d->error('Compression Exception: ' . $e->getMessage());
-        $d->notice('Message unparseable', [ 'char' => '-' ]);
-    }
-
-    if ($perform) {
-        Database::reinitialise();
-        Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
-    }
-}
-
 // now move onto stuff in rabbit
 /** @var LoopInterface $loop */
 $loop  = $kernel->getDependencyInjector()->values['react.loop'];
