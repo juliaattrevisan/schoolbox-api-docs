@@ -221,6 +221,12 @@
                     endDate: {
                         required: true,
                         datepickerDate: true
+                    },
+                    repeat_until: {
+                        datepickerDate: true
+                    },
+                    publishDate: {
+                        datepickerDate: true
                     }
                 },
 
