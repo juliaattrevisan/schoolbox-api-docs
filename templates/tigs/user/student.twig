@@ -6,13 +6,7 @@
         <a href="/synergetic/absences?id={{user.getExternalId()}}" class="icon-user">Absences</a>
     </li>
     <li>
-        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">My Details</a>
-    </li>
-    <li>
         <a href="/synergetic/fin?id={{user.getExternalId()}}" class="icon-itineraryitem">Finance</a>
-    </li>
-    <li>
-        <a href="/homepage/2814" class="icon-forms">Permission Notes</a>
     </li>
     {% set routeParticipationReport = routeLookupIfAuthorized('tigsParticipationReport.getReport', { userId: user.id, user: user }) %}
     {% if routeParticipationReport %}
