@@ -287,9 +287,6 @@ class Kernel extends WebKernelAbstract
             }
         }
 
-        /** @var \Aura\Web\Response $response */
-        $response = null;
-
         // Has session expired? Assume no user here then, but that should probably
         // be handled in authenticator.
         $params = [];
@@ -708,8 +705,10 @@ class Kernel extends WebKernelAbstract
         $sessionHandler->create($user->getUsername());
 
         // Also: override the DI user with this user?
-        // TODO this is going to die when container is locked
-        $this->di->set('user', $user);
+        // Should not be required because the DI user is fetched from the
+        // session, anyway.
+        // (This would die when the container was locked, anyway)
+//        $this->di->set('user', $user);
 
         // Restore or destroy the session when all is done
         $this->getShutdownHandler()->registerFunction(
