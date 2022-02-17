@@ -34,6 +34,7 @@ use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 
 /**
  * Class Controller
@@ -63,6 +64,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
     /** @var Replicator */
     private $replicator;
+
+    /**
+     * @var LatestViewMapper
+     */
+    protected LatestViewMapper $latestViewMapper;
+
     /**
      * Controller constructor.
      *
@@ -78,6 +85,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param Replicator    $replicator
+     * @param LatestViewMapper       $latestViewMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -91,7 +99,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
-        Replicator $replicator
+        Replicator $replicator,
+        LatestViewMapper $latestViewMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper);
 
@@ -100,6 +109,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->termMapper                = $termMapper;
         $this->replicator                = $replicator;
         $this->courseSpecificationMapper = $courseSpecificationMapper;
+        $this->latestViewMapper          = $latestViewMapper;
     }
 
 

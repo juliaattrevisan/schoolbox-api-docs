@@ -26,13 +26,10 @@ class LatestView
 
     /**
      * Constructor
-     * @param Mapper|null $mapper
+     * @param Mapper $mapper
      */
-    public function __construct(Mapper $mapper = null)
+    public function __construct(Mapper $mapper)
     {
-        if (null === $mapper) {
-            $mapper = Mapper::getInstance();
-        }
         $this->mapper = $mapper;
     }
 

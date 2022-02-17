@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\LTI\Assessment as LtiAssessment;
@@ -74,6 +75,11 @@ class Controller extends Assessment\Controller
     private UserCodec $userCodec;
 
     /**
+     * @var LatestViewMapper
+     */
+    private LatestViewMapper $latestViewMapper;
+
+    /**
      * Constructor
      *
      * @param UserMapper                      $userMapper
@@ -94,6 +100,7 @@ class Controller extends Assessment\Controller
      * @param RegistrationRepositoryInterface $registrations
      * @param Instance                        $instance
      * @param UserCodec                       $userCodec
+     * @param LatestViewMapper                $latestViewMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -113,7 +120,8 @@ class Controller extends Assessment\Controller
         LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         RegistrationRepositoryInterface $registrations,
         Instance $instance,
-        UserCodec $userCodec
+        UserCodec $userCodec,
+        LatestViewMapper $latestViewMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -127,7 +135,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator
+            $replicator,
+            $latestViewMapper
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
@@ -213,7 +222,7 @@ class Controller extends Assessment\Controller
         /**
          * record view
          */
-        $lastView = new Assessment\Views\LatestView();
+        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         $this->response->content->set(

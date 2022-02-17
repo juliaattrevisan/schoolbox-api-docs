@@ -183,7 +183,7 @@ class Controller extends Assessment\Controller
         /**
          * record view
          */
-        $lastView = new Assessment\Views\LatestView();
+        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         // Ideally make this an instance var instead of instantiating all the time
