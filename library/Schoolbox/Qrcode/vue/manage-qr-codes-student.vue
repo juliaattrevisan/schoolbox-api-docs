@@ -91,7 +91,7 @@ export default {
          */
         animateQrCodeChange () {
             gsap.to(this.$refs.code, { 
-                duration: 0.5, 
+                duration: 0.7, 
                 ease: 'power2.out',
                 opacity: 1, 
                 scale: 1,

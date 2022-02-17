@@ -28,6 +28,7 @@ export default {
         return {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
+            isProcessing: true, //to disable various actions while active
             students: [], //the entire list of students
             selectedStudents: [], //those students currently selected
             destination: 'homepage',
@@ -96,6 +97,20 @@ export default {
             } 
         },
 
+        /**
+         * To disable the submit button while already processing or
+         * when there's no students currently selected
+         * 
+         * @returns { Boolean }
+         */
+        isGenerateCodesDisabled () {
+            if (this.isProcessing || !this.hasSelectedStudents) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
     },
 
     mounted  () {
@@ -121,6 +136,7 @@ export default {
                 this.hasDataLoadError = true; //show load error
             } finally {
                 this.isDataLoaded = true; //update the display to show the list or error
+                this.isProcessing = false;
             }
         },
 
@@ -153,6 +169,7 @@ export default {
          */
         async generateCodes () {
             try {
+                this.isProcessing = true;
                 const response = await fetch(this.endpointGenerate, {
                     method: 'POST',
                     body: this.getFormData(),
@@ -164,6 +181,8 @@ export default {
                 this.selectedStudents = []; //clear the selected students once generated once
             } catch (error) {
                 console.warn(error);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
@@ -251,7 +270,7 @@ export default {
                     </select>
                 </div>
             </div>
-            <button @click.prevent="generateCodes()" class="button submit" title="Generate codes">Generate codes</button>
+            <button @click.prevent="generateCodes()" class="button submit" title="Generate codes" :disabled="isGenerateCodesDisabled">Generate codes</button>
         </bottom-drawer>
 
     </div>
