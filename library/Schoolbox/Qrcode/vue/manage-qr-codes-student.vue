@@ -80,10 +80,6 @@ export default {
 
     },
 
-    mounted () {
-        gsap.set(this.$refs.container, { perspective: 1000 } ); //so the qr code change animation has depth
-    },
-
     methods: {
 
         /**
@@ -107,6 +103,7 @@ export default {
                     opacity: 0, 
                     rotationY: 180,
                 },
+                transformPerspective: 1000,
             })
         },
 
@@ -133,7 +130,7 @@ export default {
         </div>
         <div class="student__details">
             <a :href="`/search/user/${student.id}`" title="View profile">{{ student.fullname }}</a>
-            <h4 class="folder-name">{{ folderNameWithCode }}</h4>
+            <h4>{{ folderNameWithCode }}</h4>
             <h5 v-if="hasQrCode">Expires {{ studentExpiry }}</h5>
             <h5 v-else>&nbsp;</h5>
         </div>
