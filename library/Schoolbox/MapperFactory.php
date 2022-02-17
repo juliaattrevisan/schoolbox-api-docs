@@ -40,37 +40,47 @@ class MapperFactory
         if (!class_exists($mapperName)) {
             throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
         }
-        // No longer injectable, because the container is locked as soon as
-        // sonething is extracted from it
+
+        // Does this have a getInstance? Use it if so
         if (is_callable([ $mapperName, 'getInstance' ])) {
-            return $mapperName::getInstance();
+            $mapper = $mapperName::getInstance();
+        } else {
+            $mapper = new $mapperName();
         }
-        return new $mapperName();
+
+        // Is this a genuine mapper? Set its session if so.
+        // TODO decouple the dependency between mappers and session
+        if ($mapper instanceof Mapper) {
+            $session = $this->injector->get('session');
+            if (!$session->isStarted()) {
+                $session->start();
+            }
+            $mapper->setSessionData($_SESSION ?? []);
+        }
+
+        return $mapper;
     }
 
     /**
      * Gets Lazy reference to the specified mapper
      *
-     * Use this when registering a service on the DI.
-     * Only the DI knows how to transform a lazy ref to a Mapper into a Mapper instance.
+     * Use this when registering a service on the DI: only the DI container
+     * knows how to transform a lazy ref to a Mapper into a Mapper instance.
      *
      * @template T
      * @param class-string<T> $mapperName
-     * @throws InvalidArgumentException If mapper class not found
      * @return Lazy
+     * @throws InvalidArgumentException If mapper class not found
      */
     public function getLazy($mapperName)
     {
         if (!class_exists($mapperName)) {
             throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
         }
-        return $this->injector->lazy(function () use ($mapperName) {
-            // utilise getInstance if possible
-            if (is_callable([ $mapperName, 'getInstance' ])) {
-                return $mapperName::getInstance();
+        return $this->injector->lazy(
+            function () use ($mapperName) {
+                return $this->get($mapperName);
             }
-
-            return new $mapperName();
-        });
+        );
     }
 }

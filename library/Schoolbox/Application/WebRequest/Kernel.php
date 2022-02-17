@@ -34,6 +34,7 @@ use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
@@ -533,7 +534,8 @@ class Kernel extends WebKernelAbstract
 
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
-        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(
+        // TODO decouple the dependency between mappers and session
+        $di->setters[Mapper::class]['setSessionData'] = $di->lazy(
             function () use ($di) {
                 $session = $di->get('session');
                 if (!$session->isStarted()) {

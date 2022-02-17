@@ -244,7 +244,13 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected $config_loader;
 
-    /** @var array */
+    /**
+     * Session data.
+     *
+     * TODO decouple the dependency between mappers and session
+     *
+     * @var array
+     */
     protected $sessionData = [];
 
     /** @var Cache|GenericCollection[] */
@@ -389,7 +395,8 @@ abstract class Mapper implements IMapper, Serializable
         $this->setColumnFactory(self::$columnFactory ?: new ColumnFactory());
         $this->setMonitor(self::$perfmon ?: new LiveMonitor());
 
-        $this->setSessionData(isset($_SESSION) ? $_SESSION : array());
+        // Need to add session data so that notifiers can do their thing
+        $this->setSessionData($_SESSION ?? []);
         $this->mapping();
 
         $this->monitor->cacheIndices($this);
