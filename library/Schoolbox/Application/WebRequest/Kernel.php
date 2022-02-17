@@ -370,9 +370,7 @@ class Kernel extends WebKernelAbstract
 
         $method->invokeArgs($controller, $args);
         $response = $controller->getResponse();
-
-        /** @var OutputInterface $output */
-        $output = $response->content->get();
+        $output   = $response->content->get();
         if (!$output instanceof OutputInterface) {
             if (is_array($output)) {
                 // Figure out output type.

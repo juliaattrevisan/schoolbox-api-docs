@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
@@ -95,6 +96,7 @@ class Module extends BaseModule
         }
 
         // If the assessment isn't a specification - it can't be imported anywhere
+        /** @var IAssessable $assessment */
         if (!$assessment->isSpecification()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }

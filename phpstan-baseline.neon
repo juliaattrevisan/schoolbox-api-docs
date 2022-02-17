@@ -2966,16 +2966,6 @@ parameters:
 			path: library/Schoolbox/Application/WebRequest/Kernel.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
-			message: "#^Elseif branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\ReturnedWorkMapper\\:\\:getSubmissionBoxMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
