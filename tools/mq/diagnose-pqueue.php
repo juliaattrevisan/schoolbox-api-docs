@@ -8,6 +8,8 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
  * Tool for assessing the contents of the pqueue (SQL table `scheduleq` and determining any reason as to why the
  * records contained there cannot be processed)
  *
+ * @deprecate 22.0 scheduleq table SA-13195
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -18,9 +20,10 @@ $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, Monolog\Logger::DEBUG);
 
+$d->info("Deprecated: 22.0 removing table scheduleq [SA-13195]");
 $stmt = Database::getInstance()->prepare("
 	SELECT *
-	FROM scheduleq
+	FROM _scheduleq
 ");
 
 $stmt->execute();

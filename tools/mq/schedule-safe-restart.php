@@ -81,8 +81,10 @@ set_error_handler(
     E_RECOVERABLE_ERROR
 );
 
+$d->info("Deprecated: 22.0 removing table scheduleq [SA-13195]");
+
 // we have to fetch all because the DB conn is about to be reset :/
-$sqlq = Database::getInstance()->query("SELECT * FROM scheduleq")->fetchAll(PDO::FETCH_ASSOC);
+$sqlq = Database::getInstance()->query("SELECT * FROM _scheduleq")->fetchAll(PDO::FETCH_ASSOC);
 
 // init this
 DeprecatedDatabase::getInstance();
@@ -104,7 +106,7 @@ foreach ($sqlq as $qi) {
             if ($perform) {
                 // split this message off onto a special queue
                 Database::reinitialise();
-                Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
+                Database::getInstance()->exec("DELETE FROM _scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
             }
         } else {
             $d->notice('Message retained', [ 'char' => '+' ]);
@@ -125,7 +127,7 @@ foreach ($sqlq as $qi) {
 
     if ($perform) {
         Database::reinitialise();
-        Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
+        Database::getInstance()->exec("DELETE FROM _scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
     }
 }
 
