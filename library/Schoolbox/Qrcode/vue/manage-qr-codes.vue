@@ -22,6 +22,10 @@ export default {
             type: String,
             required: true,
         },
+        folderNameWithCode: { //the class name, to show in the print styles below the student name
+            type: String,
+            required: true,
+        },
     },
 
     data () {
@@ -112,6 +116,19 @@ export default {
             }
         },
 
+        /**
+         * To notify that codes are currently being generated
+         * 
+         * @returns { String }
+         */
+        generateCodesStatus () {
+            if (this.isProcessing && this.isDataLoaded) {
+                return 'Generating codes...';
+            } else {
+                return 'Generate codes';
+            }
+        },
+
     },
 
     mounted  () {
@@ -131,6 +148,7 @@ export default {
                 });
                 const data = await response.json();
                 this.students = data.students;
+                // this.students = [...this.students, ...this.students, ...this.students];
                 this.selectedStudents = this.students; //all students are selected by default
             } catch (error) {
                 console.warn(error);
@@ -240,6 +258,7 @@ export default {
                         :selectedStudents="selectedStudents"
                         :loginUrl="loginUrl"
                         :expiry="expiry"
+                        :folder-name-with-code="folderNameWithCode"
                         @student-selected="onStudentSelected"
                     />
                 </div>
@@ -278,7 +297,7 @@ export default {
                         <option value="6">6 months</option>
                     </select>
                 </div>
-                <button @click.prevent="generateCodes()" class="button submit icon-tiles options-list__option" title="Generate codes" :disabled="isGenerateCodesDisabled">Generate codes</button>
+                <button @click.prevent="generateCodes()" class="button submit icon-tiles options-list__option" title="Generate codes" :disabled="isGenerateCodesDisabled">{{ generateCodesStatus }}</button>
                 <button @click.prevent="onPrintSelected()" class="button submit icon-print options-list__option" title="Print codes" :disabled="!hasGeneratedCodes">Print codes</button>
             </div>
         </bottom-drawer>
@@ -322,20 +341,28 @@ export default {
         flex: 1 1 0; //keep both sides equal
     }
 
-
 .students {
-    display: flex;
-    flex-wrap: wrap;
     padding: 1rem 0;
 }
 
-/* override styles when printing */
+</style>
+
+<style>
+
 @media print {
 
-    .bottom-drawer {
-        display: none;
+    #container, .island {
+        padding: 0; /* to get more of the page estate */
     }
-    
+
+    .breadcrumb, h1, .bottom-drawer, #footer {
+        display: none; /* not needed for print */
+    }
+
+    .manage-qrcodes {
+        background: white; /* ensure white background, may have been changed by custom styles */
+    }
+
 }
 
 </style>

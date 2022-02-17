@@ -9,6 +9,7 @@
 <div id="manage-qr-codes-container">
     <manage-qr-codes
         endpoint-generate="{{ routeLookupIfAuthorized('qrcode.generate', {folder:folder, folderId:folder.id}) }}"
+        folder-name-with-code="{{ folder.nameWithCodes }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/manageQrCodes.js"></script>

@@ -31,6 +31,10 @@ export default {
             type: String,
             required: true,
         },
+        folderNameWithCode: { //the class name, to show in the print styles below the student name
+            type: String,
+            required: true,
+        },
     },
 
     data () {
@@ -75,6 +79,10 @@ export default {
 
     },
 
+    mounted () {
+        gsap.set(this.$refs.container, { perspective: 1000 } ); //so the qr code change animation has depth
+    },
+
     methods: {
 
         /**
@@ -90,15 +98,16 @@ export default {
          * To help the user realise there's been a change of QR code
          */
         animateQrCodeChange () {
-            gsap.to(this.$refs.code, { 
+            gsap.to(this.$refs.qrCodeContainer, { 
                 duration: 0.7, 
-                ease: 'power2.out',
+                ease: 'power2.inOut',
                 opacity: 1, 
-                scale: 1,
+                rotationY: 0,
                 startAt: {
-                    opacity: 0.5, 
-                    scale: 0.75,
-                }
+                    opacity: 0, 
+                    rotationY: 180,
+                },
+                onComplete: () => this.$refs.emptyState.remove(), //so we don't see the empty state in any subsequent animations
             })
         },
 
@@ -108,21 +117,24 @@ export default {
 
 <template>
 
-    <div class="student" @click.prevent="onStudentSelected()">
-        <input type="checkbox"
-            :id="`selectStudent-${student.id}`"
-            :checked="isInSelectedStudents"
-            @change="onStudentSelected()"
-        >
-        <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
-        <div class="student__code">
-            <div class="student_code-option empty-state"></div>
-            <div class="student_code-option qr-code" ref="code">
-                <qrcode-vue :value="qrCodeValue" :size="300" />
+    <div :class="`student ${ hasQrCode ? 'has-qr-code' : 'no-qr-code' }`" @click="onStudentSelected()">
+        <div class="student__checkbox">
+            <input type="checkbox"
+                :id="`selectStudent-${student.id}`"
+                :checked="isInSelectedStudents"
+                @change="onStudentSelected()"
+            >
+            <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
+        </div>
+        <div class="student__code" ref="container">
+            <div class="student_code-option empty-state" ref="emptyState"></div>
+            <div class="student_code-option qr-code-container" ref="qrCodeContainer">
+                <qrcode-vue :value="qrCodeValue" :size="170" class="qr-code" />
             </div>
         </div>
         <div class="student__details">
             <a :href="`/search/user/${student.id}`" title="View profile">{{ student.fullname }}</a>
+            <h4 class="folder-name">{{ folderNameWithCode }}</h4>
             <h5 v-if="hasQrCode">Expires {{ studentExpiry }}</h5>
             <h5 v-else>&nbsp;</h5>
         </div>
@@ -134,6 +146,7 @@ export default {
 
 .student {
     border: 1px solid var(--form-border-color);
+    display: inline-block;
     margin: 0 0.5rem 1rem 0.5rem;
     padding: 1rem;
     transition: background-color 0.3s;
@@ -144,8 +157,8 @@ export default {
 
     .student__code {
         position: relative;
-        height: 300px;
-        width: 300px;
+        height: 170px;
+        width: 170px;
     }
 
     .student_code-option {
@@ -153,30 +166,63 @@ export default {
         position: absolute;
         top: 0px;
         width: 100%;
-        }
+    }
 
-    .qr-code {
+    .qr-code-container {
         opacity: 0; //will be animated in with gsap once the code is set
     }
 
     .student__details {
         padding: 1rem 0;
         text-align: center;
-        h2 {
-            margin-bottom: 0.5rem;
+        h4 {
+            display: none; //only show in print
         }
-        h5 {
+        h4, h5 {
             margin-bottom: 0; //remove the 1rem default
         }
+        h5 {
+            font-style: italic;
+        }
     }
-    
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 0.3s, top 0.4s;
+@media print {
+    
+    .student:nth-child(10n) {
+        break-before: page;
+    }
+
+    .student { 
+        border: 1px dashed black;
+        margin: 0 -1px -1px 0;
+        padding: 2.5rem 1rem;
+    }
+
+    .no-qr-code {
+        display: none; //only show those with QR codes
+    }
+
+    .student__checkbox {
+        display: none; //remove the checkbox as you can't select a checkbox on a printed page *_*
+    }
+
+    .student__details {
+        padding-bottom: 0;
+        a, h4, h5 {
+            color: black; //enusre everything
+        }
+        a {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        h4, h5 {
+            display: block;
+            font-size: 12px;
+        }
+    }
+
 }
-.fade-enter, .fade-leave-to {
-    opacity: 0;
-    top: 20px;
-}    
+
 
 </style>
