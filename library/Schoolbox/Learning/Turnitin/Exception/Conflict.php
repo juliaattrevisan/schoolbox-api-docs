@@ -16,7 +16,7 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  * (https://developers.turnitin.com/docs/tca#generate-similarity-report) if the
  * submission's state is not complete.
  */
-class Conflict extends \InvalidArgumentException
+class Conflict extends Exception
 {
 
 }

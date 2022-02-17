@@ -16,7 +16,7 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  *
  * Check it on https://developers.turnitin.com/docs/tca#error-responses
  */
-class Credentials extends \RuntimeException
+class Credentials extends Exception
 {
 
 }

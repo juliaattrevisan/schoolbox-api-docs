@@ -134,13 +134,12 @@ class Transmit
      * When that's done a secondary process generates the Report info
      *
      * @param Turnitin\File\Model $model
-     * @throws Credentials
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
     public function process(Turnitin\File\Model $model): void
@@ -281,7 +280,7 @@ class Transmit
                      */
                 }
             }
-        } catch (BadEndpoint | Credentials | Conflict | \DomainException $e) {
+        } catch (Turnitin\Exception\Exception $e) {
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model
@@ -363,7 +362,7 @@ class Transmit
          */
         try {
             $group = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $box->getId(), ['cache' => false]);
-        } catch (\Schoolbox\Mapper\Exception | \RuntimeException $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             /* Create a group if it doesn't already exist
              */
             $this->logDebug(sprintf(

@@ -298,7 +298,7 @@ class Group
             if (!\in_array($turnitinGroupAttachment->getSubmissionBoxFileId(), $submissionBoxFileIds, true)) {
                 try {
                     $this->api->retrieve('DELETE', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}", []);
-                } catch (\DomainException | Turnitin\Exception\BadEndpoint $e) {
+                } catch (Turnitin\Exception\Exception $e) {
                     if (404 === $e->getCode()) {
                         /* 404 Not Found occurs when you tell turnitin to delete something it doesn't have
                          * This can happen if your transmit script screws up and it half-does something
@@ -436,7 +436,7 @@ class Group
 
         try {
             $this->api->retrieve('UPLOAD', "/api/v1/groups/{$turnitinGroup->getGroupId()}/attachments/{$turnitinGroupAttachment->getTurnitinGroupAttachmentId()}/original", $payload);
-        } catch (\DomainException | Turnitin\Exception\BadEndpoint $e) {
+        } catch (Turnitin\Exception\Exception $e) {
             if (409 === $e->getCode()) {
                 /* 409 is thrown when you try to upload file contents into a container which
                  * already received file contents. This might be okay if it's the same file
