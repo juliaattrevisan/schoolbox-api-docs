@@ -74,10 +74,6 @@ class Controller extends Assessment\Controller
      */
     private UserCodec $userCodec;
 
-    /**
-     * @var LatestViewMapper
-     */
-    private LatestViewMapper $latestViewMapper;
 
     /**
      * Constructor
