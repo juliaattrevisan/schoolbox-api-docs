@@ -17,6 +17,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\Log\Mapper as LogMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 class Module extends BaseModule
@@ -61,7 +62,8 @@ class Module extends BaseModule
             $this->injector->get('kamiConnector'),
             $this->injector->get('databaseFactory'),
             $this->injector->get('databaseExternal'),
-            $this->getMapperFactory()->get(ConfigMapper::class)
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(LogMapper::class),
         );
     }
 
