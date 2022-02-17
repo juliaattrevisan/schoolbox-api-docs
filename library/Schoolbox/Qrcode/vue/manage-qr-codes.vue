@@ -29,6 +29,7 @@ export default {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             isProcessing: true, //to disable various actions while active
+            hasGeneratedCodes: false, //to enable printing when codes are available
             students: [], //the entire list of students
             selectedStudents: [], //those students currently selected
             destination: 'homepage',
@@ -183,6 +184,7 @@ export default {
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
+                this.hasGeneratedCodes = true; //enable the print button
             }
         },
 
@@ -211,6 +213,13 @@ export default {
             } else {
                 this.selectedStudents = this.students;
             }
+        },
+
+        /**
+         * Print the qrcodes 
+         */
+        onPrintSelected () {
+            window.print();
         },
 
     }
@@ -248,11 +257,11 @@ export default {
 
         <div v-else class="loader"></div>
 
-        <bottom-drawer :showDrawer="true">
+        <bottom-drawer :showDrawer="true" class="bottom-drawer">
             <h3 class="selected-count"><em>{{ selectedStudentsStatus }}</em></h3>
             <button @click.prevent="onToggleStudentSelection" @keyup.enter="onToggleStudentSelection" class="button-toggle-selection">{{ toggleStudentSelectionStatus }}</button>
             <div class="options-list">
-                <div class="option-list__option">
+                <div class="options-list__option">
                     <label class="required-with-tip">Login destination <span data-tooltip class="hint has-tip tip-top"
                         title="The page the student will be sent to after logging in with the QR code">?</span></label>
                     <select v-model="destination">
@@ -260,7 +269,7 @@ export default {
                         <option value="dashboard">Dashboard</option>
                     </select>
                 </div>
-                <div class="option-list__option">
+                <div class="options-list__option">
                     <label>Login expiry <span data-tooltip class="hint has-tip tip-top"
                         title="How long the login codes will last for. After this time they will need to be regenerated">?</span></label>
                     <select v-model="expiryMonth">
@@ -269,8 +278,9 @@ export default {
                         <option value="6">6 months</option>
                     </select>
                 </div>
+                <button @click.prevent="generateCodes()" class="button submit icon-tiles options-list__option" title="Generate codes" :disabled="isGenerateCodesDisabled">Generate codes</button>
+                <button @click.prevent="onPrintSelected()" class="button submit icon-print options-list__option" title="Print codes" :disabled="!hasGeneratedCodes">Print codes</button>
             </div>
-            <button @click.prevent="generateCodes()" class="button submit" title="Generate codes" :disabled="isGenerateCodesDisabled">Generate codes</button>
         </bottom-drawer>
 
     </div>
@@ -280,7 +290,7 @@ export default {
 <style lang="scss" scoped>
 
 .manage-qrcodes {
-    padding-bottom: 100px; // allow space for bottom-drawer at the bottom
+    padding-bottom: 190px; // allow space for bottom-drawer at the bottom
 }
 
 .selected-count {
@@ -288,28 +298,44 @@ export default {
     margin-right: 0.5rem;
 }
 
-
 .button-toggle-selection {
     display: inline-block;
-    padding: 0px;
     background: none;
-    vertical-align: baseline;
     font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
 }
 
 .options-list {
+    align-items: flex-end; //so the selects and buttons line up at the bottom
     display: flex;
     gap: 1rem; //@todo consider safari 14
+    select, button {
+        margin-bottom: 0;
+    }
+    button {
+        max-height: 1rem; //to allign the buttons to be the same height as the selects
+    }
 }
 
-    .option-list__option { 
+    .options-list__option { 
         flex: 1 1 0; //keep both sides equal
     }
+
 
 .students {
     display: flex;
     flex-wrap: wrap;
     padding: 1rem 0;
+}
+
+/* override styles when printing */
+@media print {
+
+    .bottom-drawer {
+        display: none;
+    }
+    
 }
 
 </style>
