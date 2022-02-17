@@ -253,8 +253,7 @@ class Transmit
 
                     /* Continue with file upload itself
                      */
-                    $submission['id'] = '378357fa-bf02-460e-8dff-cd98f793f501';
-                    $upload           = $this->uploadFile($model, $ssf, $submission);
+                    $upload = $this->uploadFile($model, $ssf, $submission);
 
                     /* Once we uploaded, we wait for turnitin
                      */
