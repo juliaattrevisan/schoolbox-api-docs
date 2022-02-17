@@ -5,6 +5,8 @@
  */
 
 import qrcodeVue from 'qrcode.vue';
+import { gsap } from 'gsap/all';
+
 
 export default {
    
@@ -66,6 +68,7 @@ export default {
                     this.studentExpiry = this.expiry;
                     this.qrCodeValue = `${this.loginUrl}${value.token}`;
                     this.hasQrCode = true;
+                    this.animateQrCodeChange();
                 } 
             }
         }
@@ -83,6 +86,22 @@ export default {
             this.$emit('student-selected', this.student);
         },
 
+        /**
+         * To help the user realise there's been a change of QR code
+         */
+        animateQrCodeChange () {
+            gsap.to(this.$refs.code, { 
+                duration: 0.5, 
+                ease: 'power2.out',
+                opacity: 1, 
+                scale: 1,
+                startAt: {
+                    opacity: 0.5, 
+                    scale: 0.75,
+                }
+            })
+        },
+
     }
 }
 </script>
@@ -97,12 +116,10 @@ export default {
         >
         <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
         <div class="student__code">
-            <transition name="fade">
-                <div v-if="hasQrCode" class="student_code-option" key="qrCode">
-                    <qrcode-vue :value="qrCodeValue" :size="300" />
-                </div>
-                <div v-else class="student_code-option" key="placeholder">&nbsp;</div>
-            </transition>
+            <div class="student_code-option">&nbsp;</div>
+            <div class="student_code-option qr-code" ref="code">
+                <qrcode-vue :value="qrCodeValue" :size="300" />
+            </div>
         </div>
         <div class="student__details">
             <a :href="`/search/user/${student.id}`" title="View profile">{{ student.fullname }}</a>
@@ -135,7 +152,12 @@ export default {
         background: #DDDDDD;
         height: 100%;
         position: absolute;
+        top: 0px;
         width: 100%;
+    }
+
+    .qr-code {
+        opacity: 0; //will be animated in with gsap once the code is set
     }
 
     .student__details {
@@ -151,10 +173,11 @@ export default {
     
 
 .fade-enter-active, .fade-leave-active {
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, top 0.4s;
 }
 .fade-enter, .fade-leave-to {
     opacity: 0;
+    top: 20px;
 }    
 
 </style>
