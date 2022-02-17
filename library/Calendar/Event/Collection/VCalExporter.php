@@ -40,7 +40,7 @@ class VCalExporter implements IExporter
 
         $baseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
         foreach ($renderer->getAllEvents() as $currentEvent) {
-            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL, null, $baseUrl, false);
+            echo $renderer->renderEvent($currentEvent, EventBase::RENDER_FORMAT_VCAL, null, $baseUrl);
         }
 
         echo "END:VCALENDAR";

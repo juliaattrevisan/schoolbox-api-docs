@@ -29,8 +29,8 @@ class Javascript extends Base
          */
         $all_day = $this->getEvent()->getAllday();
         if (!$all_day) {
-            $start = $this->getEvent()->getStartTimeForCalendar($this->w3c);
-            $end   = $this->getEvent()->getEndTimeForCalendar($this->w3c);
+            $start = $this->getEvent()->getStartTimeForCalendar();
+            $end   = $this->getEvent()->getEndTimeForCalendar();
         } else {
             $start   = $this->getEvent()->getStartTime()->getDatabaseDate();
             // FullCalendar (and vCal) 2.0 treats event ends as exclusive.

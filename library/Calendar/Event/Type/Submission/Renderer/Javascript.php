@@ -54,7 +54,7 @@ class Javascript extends Base
         $start  = $event->getStartTime()->getDatabaseDate();
         $allDay = $event->getAllday();
         if (!$allDay) {
-            $start = $event->getStartTimeForCalendar($this->w3c);
+            $start = $event->getStartTimeForCalendar();
         }
 
         $data = [

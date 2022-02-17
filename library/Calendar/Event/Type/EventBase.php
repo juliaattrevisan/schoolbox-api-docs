@@ -514,27 +514,21 @@ abstract class EventBase implements EventInterface
     }
 
     /**
-     * @param bool $w3c
+     * Returns time in the format that Vue can convert to browser timezone
      * @return string
      */
-    public function getStartTimeForCalendar(bool $w3c): string
+    public function getStartTimeForCalendar(): string
     {
-        if ($w3c) {
             return $this->startTime->toW3cString();
-        }
-        return $this->startTime->getDatabase();
     }
 
     /**
-     * @param bool $w3c
+     * Returns time in the format that Vue can convert to browser timezone
      * @return string
      */
-    public function getEndTimeForCalendar(bool $w3c): string
+    public function getEndTimeForCalendar(): string
     {
-        if ($w3c) {
-            return $this->endTime->toW3cString();
-        }
-        return $this->endTime->getDatabase();
+        return $this->endTime->toW3cString();
     }
 
     /**

@@ -115,11 +115,11 @@ class Renderer
      * @return string[]
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderAll(string $format, bool $w3c): array
+    public function renderAll(string $format): array
     {
         $output = [];
         foreach ($this->allEvents as $currentEvent) {
-            $output[] = $this->renderEvent($currentEvent, $format, null, null, $w3c);
+            $output[] = $this->renderEvent($currentEvent, $format);
         }
         return $output;
     }
@@ -130,12 +130,11 @@ class Renderer
      * @param string         $format
      * @param string|null    $returnStr
      * @param string|null    $baseUrl
-     * @param bool           $w3c
      *
      * @return mixed
      * @throws \Exception If unable to find a rendering class for the specified type
      */
-    public function renderEvent($event, $format, ?string $returnStr = null, ?string $baseUrl = null, bool $w3c = false)
+    public function renderEvent($event, $format, ?string $returnStr = null, ?string $baseUrl = null)
     {
         $rendererClass = $event->getRendererClass($format);
 
@@ -152,9 +151,6 @@ class Renderer
         }
         if ($baseUrl && method_exists($renderObj, 'setBaseUrl')) {
             $renderObj->setBaseUrl($baseUrl);
-        }
-        if ($w3c && method_exists($renderObj, 'setW3C')) {
-            $renderObj->setW3C($w3c);
         }
         return $renderObj->render();
     }

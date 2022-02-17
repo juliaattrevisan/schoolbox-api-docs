@@ -14,7 +14,6 @@ use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 
@@ -246,15 +245,7 @@ class Controller extends Base
             $this->getRouter(),
             $this->getUser()
         );
-        $output = json_decode(
-            '[' . \implode(
-                ',',
-                $calendar->renderAll(
-                    EventBase::RENDER_FORMAT_JSON,
-                    $this->getConfigLoader()->get(ConfigMapper::NAME_CALENDAR_VIEW_TIMEZONE) === 'local'
-                )
-            ) . ']'
-        );
+        $output = json_decode('[' . \implode(',', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']');
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
