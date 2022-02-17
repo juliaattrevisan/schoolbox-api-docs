@@ -7161,11 +7161,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Module/AbstractModuleNotifier.php
 
 		-
-			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Persistence\\\\QueueItemMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Persistence/QueueItemMapper.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
@@ -7174,11 +7169,6 @@ parameters:
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Scheduler.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\SchedulerDispatchStrategy\\:\\:\\$mapper \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Persistence\\\\QueueItemMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/SchedulerDispatchStrategy.php
 
 		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Compressed\\\\CompressedTrigger\\:\\:\\$trigger \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\InstantTriggerInterface\\) does not accept null\\.$#"
