@@ -30,7 +30,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *   sis_timetable_cycle
  *   sis_timetable_period
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\App
+{
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -142,6 +143,9 @@ NULLTYPE;
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
         $randomMapper = UserMapper::getInstance();
+
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),
             $frequency,
@@ -149,8 +153,9 @@ NULLTYPE;
             $factory,
             $type,
             $file,
-            $this->getLogger()
-        ))->run(time());
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+        ))->run(time(), $runId, Endpoint\Scheduler::SISIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
          */

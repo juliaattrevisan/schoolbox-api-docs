@@ -103,6 +103,11 @@ NULLTYPE;
          */
         $perform = $this->perform();
 
+        /* This identifier indicates that the two schedulers were part of this
+         * script execution together
+         */
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
         /* Execute scheduler
          */
         $factory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
@@ -115,8 +120,9 @@ NULLTYPE;
             $factory,
             $type,
             $file,
-            $this->getLogger()
-        ))->run(time());
+            $this->getLogger(),
+            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+        ))->run(time(), $runId, Endpoint\Scheduler::CALENDARIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
          */

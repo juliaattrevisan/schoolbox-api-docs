@@ -67,6 +67,7 @@ class Module extends BaseModule
             'fieldStrategyFactory' => $injector->lazy(function () {
                 return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
             }),
+            'importLogMapper'      => $this->getMapperFactory()->getLazy(\Schoolbox\External\Connector\Log\Mapper::class),
         ];
     }
 

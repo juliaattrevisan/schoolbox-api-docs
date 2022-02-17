@@ -61,17 +61,31 @@ class Controller extends Base
     /** @var ConfigMapper  */
     private ConfigMapper $configMapper;
 
+
+    /**
+     * @var \Schoolbox\External\Connector\Log\Mapper
+     */
+    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
     /**
      * @param Kami\IConnector  $kamiConnector
      * @param Database\Factory $databaseFactory
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      */
-    public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal, ConfigMapper $configMapper)
-    {
+    public function __construct(
+        Kami\IConnector $kamiConnector,
+        Database\Factory $databaseFactory,
+        ?IConnector $databaseExternal,
+        ConfigMapper $configMapper,
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+    ) {
         $this->kamiConnector    = $kamiConnector;
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = $databaseExternal;
         $this->configMapper     = $configMapper;
+        $this->importLogMapper  = $importLogMapper;
     }
 
     /**
@@ -333,6 +347,20 @@ class Controller extends Base
 
         $version = new Version($this->getConfigLoader());
 
+        /* Decide if we have any SUDS import indicators to render
+         * If you're running csv, no suds selected, or running a live connector,
+         * not much point showing this thing
+         */
+        $sudsEnabled = !in_array((string)$this->getConfigLoader()->get('schooldata_import_data_source'), ['', \Schoolbox\External\Importer\Endpoint\Factory::CSV], true);
+
+        /* Find the most recent import logs for each of the possibilities
+         */
+        $importLogs = null;
+
+        if ($sudsEnabled) {
+            $importLogs = $this->importLogMapper->status();
+        }
+
         $this->response->content->set(
             array(
                 'template' => '@adminHome/index.twig',
@@ -377,6 +405,12 @@ class Controller extends Base
                     /* Turnitin status indicator
                      */
                     'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
+
+                    /* SUDS panel
+                     */
+                    'suds_import_data_enabled' => $sudsEnabled,
+                    'suds_import_logs' => $importLogs,
+
                     'amqpOnline' => $amqpOnline,
                     'isCustomCert' => $isCustomCert,
                     'certExpiry'   => $certExpiry,

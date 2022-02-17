@@ -123,10 +123,11 @@ class Api implements IApi
          */
         $credentials = (new DSNCodec())->decode($key);
 
-        $headers = array_combine(
-            ['X-API-KEY', 'X-API-TENANT', 'X-API-OPTIONS'],
-            [$credentials['key'], $credentials['tenant'], 'map-include,inline-include']
-        );
+        $headers = [
+            'X-API-KEY' => $credentials['key'],
+            'X-API-TENANT' => $credentials['tenant'],
+            'X-API-OPTIONS' => 'map-include,inline-include'
+        ];
 
         return new Client([
             'headers' => $headers,
@@ -142,9 +143,8 @@ class Api implements IApi
      *
      * @param string $endpoint
      * @return array
-     * @throws InvalidArgumentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws DomainException
+     * @throws InvalidArgumentException
      */
     public function retrieveDocument(string $endpoint): array
     {
@@ -187,7 +187,7 @@ class Api implements IApi
                 $decoded = json_decode($response->getBody()->getContents(), true);
             } catch (\RuntimeException $e) {
                 throw new InvalidArgumentException(sprintf(
-                    'Sentral Endpoint error: could not json_decode payload for endpoint %s; did something snap?',
+                    'Sentral Endpoint error: could not json_decode payload for endpoint %s - malformed payload from Sentral',
                     $endpoint
                 ), 400);
             }
@@ -197,7 +197,7 @@ class Api implements IApi
              */
             if ($decoded === null) {
                 throw new InvalidArgumentException(sprintf(
-                    'Sentral Endpoint error: could not json_decode payload for endpoint %s - it is null; did something snap?',
+                    'Sentral Endpoint error: could not json_decode payload for endpoint %s - null payload from Sentral',
                     $endpoint
                 ), 400);
             }

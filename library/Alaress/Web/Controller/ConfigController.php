@@ -30,8 +30,9 @@ abstract class ConfigController extends Base
 
 
     /**
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param ConfigMapper                             $configMapper
+     * @param FieldStrategyFactory                     $fieldStrategyFactory
+
      */
     public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory)
     {

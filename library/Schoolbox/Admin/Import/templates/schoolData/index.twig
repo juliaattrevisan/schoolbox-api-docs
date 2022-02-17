@@ -199,6 +199,17 @@
             </div>
         </div>
 
+        {% if importLogs|length %}
+        <div>
+            <div class="small-12 island" id="previous">
+                <h3 class="subheader">Previous Imports</h3>
+                    {% include '@adminImportIndex/schoolData/importLog.twig' with {
+                        importLogs: importLogs
+                    } %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="small-12 island">
             <h3 class="subheader">Your Data</h3>
 

@@ -19,6 +19,7 @@ use PDOException;
 use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
@@ -40,6 +41,28 @@ class Controller extends ConfigController
      * but you got your settings arbitrarily reset
      */
     private const DEFAULT_UNKNOWN_DATA_SOURCE = 'Unknown data source selected.';
+
+
+    /**
+     * @var \Schoolbox\External\Connector\Log\Mapper
+     */
+    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
+    /**
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     */
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory);
+
+        $this->importLogMapper = $importLogMapper;
+    }
 
 
     /**
@@ -70,6 +93,7 @@ class Controller extends ConfigController
             'configContext' => $configContext,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
+            'importLogs' => $this->importLogMapper->findLogsWithDuration()
         ])->setTitle('School Data Import'));
     }
 

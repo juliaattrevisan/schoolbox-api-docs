@@ -1,0 +1,83 @@
+{##
+ # importLog
+ #
+ # Display a series of logs which detail the outcome of every suds import
+ # automatically executed via crontabs scheduler.php
+ #
+ # If it dies unexpectedly, the last known error message is caught and logged
+ # here for human perusal
+ #
+ # @param array $importLog  An array of Log\Model instances along with precalculated duration metadata
+ #}
+{%- apply spaceless -%}
+{# Enforce a max-height here so you don't get a super Shaquille list of log entries
+ # Ideally this would be a jiggles vue table so users have filter powers, pagination
+ # and all that fad witchery
+ #}
+<div class="scrollable" style="max-height:20rem;">
+    <table>
+        <thead>
+        <tr>
+            <th>Data Source</th>
+            <th>Start</th>
+            <th>Duration</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for importLog in importLogs %}
+            {# Figure out if this has a meaningful error message
+             # This can be kind of long, so slap it underneath the
+             # corresponding log row in the table
+             #}
+            {% set hasErrorMessage = false %}
+            {% set borderStyle = '' %}
+
+            {% if importLog.instance.errorMessage | length %}
+                {% set hasErrorMessage = true %}
+
+                {# Some border-bottom shenanigans here to combine the log row
+                 # with the dynamically-spawned error message colspan row
+                 #
+                 # Fight the #design
+                 #}
+                {% set borderStyle = "style='border-bottom:0;padding-bottom:0'" %}
+            {% endif %}
+
+            <tr>
+                <td {{ borderStyle|raw }}>{{ importLog.instance.script }}</td>
+                <td {{ borderStyle|raw }}><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
+                <td {{ borderStyle|raw }}>
+                    {% if not importLog.instance.finishAt.isNull %}
+                        <time title="{{ importLog.duration.sec }} sec">
+                            {{ importLog.duration.hms }}
+                        </time>
+                    {% endif %}
+                </td>
+                <td {{ borderStyle|raw }}>
+                    {% set statusCss = '' %}
+
+                    {# Paint the log status #}
+                    {% if importLog.instance.isComplete %}
+                        {% set statusCss = 'success' %}
+                    {% elseif importLog.instance.isRunning %}
+                        {% set statusCss = 'warning' %}
+                    {% elseif importLog.instance.isError %}
+                        {% set statusCss = 'alert' %}
+                    {% endif %}
+
+                    <span class="{{ statusCss }}">{{ importLog.instance.status|capitalize }}</span>
+                </td>
+            </tr>
+            {% if hasErrorMessage %}
+                <tr>
+                    <td colspan="5">
+                        <span class="meta">{{ importLog.instance.errorMessage }}</span>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{%- endapply -%}
