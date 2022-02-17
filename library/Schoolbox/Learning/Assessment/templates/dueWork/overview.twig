@@ -55,8 +55,8 @@
                             {% for criteria in headers %}
                                 {% for id, criterion in criteria %}
                                     {% set mark = marks[participant.id][id] ?? null %}
-                                    <td>
-                                        <p>{{ (mark.descriptor.description ?? '') | nl2br }}</p>
+                                    <td class="markdown">
+                                        {{ (mark.descriptor.description ?? '') | markdown }}
                                         <p>{{ mark.value ?? '' }}</p>
                                     </td>
                                 {% endfor %}
