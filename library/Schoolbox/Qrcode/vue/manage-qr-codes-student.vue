@@ -1,7 +1,8 @@
 <script>
 
 /**
- * To maintain the QR code state when multiple re-generations have taken place
+ * An individual student with a linked QR code.
+ * Split to consider the QR code state when multiple re-generations have taken place.
  */
 
 import qrcodeVue from 'qrcode.vue';
@@ -23,11 +24,11 @@ export default {
             type: Array,
             required: true,
         },
-        loginUrl: { //
+        loginUrl: { //the base url to login to
             type: String,
             required: true,
         },
-        expiry: { //
+        expiry: { //when the qr code will expire
             type: String,
             required: true,
         },
@@ -40,8 +41,8 @@ export default {
     data () {
         return {
             hasQrCode: false, //to determine whether to show the qr code
-            qrCodeValue: '',
-            studentExpiry: '',
+            qrCodeValue: '', //the qr code is updated on every new generation request, so needs to be stored
+            studentExpiry: '', //the expiry is updated on every new generation request, so needs to be stored
         }
     },
 
@@ -61,7 +62,7 @@ export default {
     watch: {
 
         /**
-         * Every student is always returned, with those not selected just returning null token.
+         * Every student is always returned, with those not selected just returning a null token.
          * So we need to ensure that qr codes previously generated for a student aren't 
          * overwritten with every new generation request. 
          */
@@ -87,8 +88,6 @@ export default {
 
         /**
          * Update the selected student list with the selected or unselected student
-         * 
-         * @params { Object } 
          */
         onStudentSelected () {
             this.$emit('student-selected', this.student);
@@ -101,13 +100,13 @@ export default {
             gsap.to(this.$refs.qrCodeContainer, { 
                 duration: 0.7, 
                 ease: 'power2.inOut',
+                onComplete: () => this.$refs.emptyState.remove(), //so we don't see the empty state in any subsequent animations
                 opacity: 1, 
                 rotationY: 0,
                 startAt: {
                     opacity: 0, 
                     rotationY: 180,
                 },
-                onComplete: () => this.$refs.emptyState.remove(), //so we don't see the empty state in any subsequent animations
             })
         },
 
@@ -149,7 +148,7 @@ export default {
     display: inline-block;
     margin: 0 0.5rem 1rem 0.5rem;
     padding: 1rem;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s; //shows that the student can be selected to toggle selection status
     &:hover {
         background-color: var(--form-bg-hover-color);
     }
@@ -157,13 +156,13 @@ export default {
 
     .student__code {
         position: relative;
-        height: 170px;
+        height: 170px; //should be the same as the qr code size
         width: 170px;
     }
 
     .student_code-option {
         height: 100%;
-        position: absolute;
+        position: absolute; //so the qr code and empty-state can sit on top of each other
         top: 0px;
         width: 100%;
     }
@@ -187,13 +186,9 @@ export default {
     }
 
 @media print {
-    
-    .student:nth-child(10n) {
-        break-before: page;
-    }
 
     .student { 
-        border: 1px dashed black;
+        border: 1px dashed black; //change to 'scissor cut' guide lines
         margin: 0 -1px -1px 0;
         padding: 2.5rem 1rem;
     }
@@ -209,12 +204,12 @@ export default {
     .student__details {
         padding-bottom: 0;
         a, h4, h5 {
-            color: black; //enusre everything
+            color: black; //enusre any custom print styles are ignored
         }
-        a {
-            text-decoration: none;
+        a { //remove default link styles
             font-size: 14px;
             font-weight: bold;
+            text-decoration: none; 
         }
         h4, h5 {
             display: block;

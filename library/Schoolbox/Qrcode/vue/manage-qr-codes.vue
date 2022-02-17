@@ -36,10 +36,10 @@ export default {
             hasGeneratedCodes: false, //to enable printing when codes are available
             students: [], //the entire list of students
             selectedStudents: [], //those students currently selected
-            destination: 'homepage',
-            expiry: '',
-            expiryMonth: '1',
-            loginUrl: '',
+            destination: 'homepage', //where to redirect the student on login
+            expiry: '', //when the returned qr code will expire
+            expiryMonth: '1', //how long to set the login expiry for
+            loginUrl: '', //the base url to login to
         }
     },
 
@@ -148,19 +148,18 @@ export default {
                 });
                 const data = await response.json();
                 this.students = data.students;
-                // this.students = [...this.students, ...this.students, ...this.students];
                 this.selectedStudents = this.students; //all students are selected by default
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
             } finally {
                 this.isDataLoaded = true; //update the display to show the list or error
-                this.isProcessing = false;
+                this.isProcessing = false; //to update to student display
             }
         },
 
         /**
-         * To determine the display of the checkbox on the student
+         * To determine the checked/unchecked display of the checkbox on the student
          * 
          * @param { Number }
          * 
@@ -186,7 +185,7 @@ export default {
         /**
          * Generate the QR codes for the selected students
          */
-        async generateCodes () {
+        async onGenerateCodesSelected () {
             try {
                 this.isProcessing = true;
                 const response = await fetch(this.endpointGenerate, {
@@ -229,7 +228,7 @@ export default {
             if (this.selectedStudentsCount > 0) {
                 this.selectedStudents = [];
             } else {
-                this.selectedStudents = this.students;
+                this.selectedStudents = [...this.students];
             }
         },
 
@@ -297,7 +296,7 @@ export default {
                         <option value="6">6 months</option>
                     </select>
                 </div>
-                <button @click.prevent="generateCodes()" class="button submit icon-tiles options-list__option" title="Generate codes" :disabled="isGenerateCodesDisabled">{{ generateCodesStatus }}</button>
+                <button @click.prevent="onGenerateCodesSelected()" class="button submit icon-tiles options-list__option" title="Generate codes" :disabled="isGenerateCodesDisabled">{{ generateCodesStatus }}</button>
                 <button @click.prevent="onPrintSelected()" class="button submit icon-print options-list__option" title="Print codes" :disabled="!hasGeneratedCodes">Print codes</button>
             </div>
         </bottom-drawer>
