@@ -1468,7 +1468,7 @@ abstract class Kernel
                     'plagscanMapper'           => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
-                    'route'                    => $di->lazyGet('router'),
+                    'router'                   => $di->lazyGet('router'),
                 ]
             )
         );
