@@ -221,10 +221,9 @@ class SubmissionBoxMapper extends BaseMapper
         $submissionMapper = $this->getJoinMapper('submission');
         $submissions      = $submissionMapper->findByColumn('box_id', $dueWork->getId(), ['deleted' => true]);
 
-        // TODO This should *really* be silenceNotifications() and unSilenceNotifications()
-        $submissionMapper->setSessionData([]);
+        $submissionMapper->suppressNotification();
         $submissionMapper->delete($submissions);
-        $submissionMapper->setSessionData($this->getSessionData());
+        $submissionMapper->restoreNotification();
     }
 
     /**
