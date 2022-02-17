@@ -32,6 +32,7 @@ use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
 use Aura\Router\Router;
+use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Config\Modules\ModuleConfigInterface;
@@ -545,7 +546,7 @@ abstract class Kernel
 
         // Web request/response factory
 //        $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
-        $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory', ['globals' => $GLOBALS]));
+        $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
 
 //        // inject request and response into controller
 //        // (I may need to mangle requests in pre-processing though)
