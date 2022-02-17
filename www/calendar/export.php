@@ -438,6 +438,15 @@ try {
                 );
                 $api->add($subApi);
             }
+
+            //include timetabled classes
+            $subApi = buildApiClass(
+                Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
+                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                true,
+                $sentry
+            );
+            $api->add($subApi);
             break;
 
         case '':
