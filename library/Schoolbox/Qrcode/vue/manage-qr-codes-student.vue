@@ -116,7 +116,7 @@ export default {
         >
         <label :for="`selectStudent-${student.id}`" class="checkbox-label"></label>
         <div class="student__code">
-            <div class="student_code-option">&nbsp;</div>
+            <div class="student_code-option empty-state"></div>
             <div class="student_code-option qr-code" ref="code">
                 <qrcode-vue :value="qrCodeValue" :size="300" />
             </div>
@@ -149,12 +149,11 @@ export default {
     }
 
     .student_code-option {
-        background: #DDDDDD;
         height: 100%;
         position: absolute;
         top: 0px;
         width: 100%;
-    }
+        }
 
     .qr-code {
         opacity: 0; //will be animated in with gsap once the code is set
