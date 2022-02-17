@@ -74,6 +74,7 @@ class NotifierInflector
      */
     private function newInstance(string $classname): ModuleNotifierInterface
     {
+        // @phpstan-ignore-next-line: this will always be a ModuleNotifierInterface
         return $this->configurator->newInstance($classname);
     }
 }

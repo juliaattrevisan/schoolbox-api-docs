@@ -23,19 +23,12 @@ class Controller extends Base
     public function getRouteList()
     {
         $routeSummaries = [];
-
-        $di = $this->getDi();
-
         foreach ($this->getRouter()->getRoutes() as $route) {
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
                 $module = Module::retrieveInstalledModule($parsedName['controller']);
-//                /** @var BaseModule $module */
-//                $module = $di->get('module:' . $parsedName['controller']);
                 $module->initControllerDependencies();
-//                $module->initControllers($di);
-//                $controller = $di->get('controller:' . $parsedName['controller']);
                 $controller = $module->buildController();
             } catch (\Throwable $e) {
                 // Something went wrong when parsing this controller
@@ -58,7 +51,7 @@ class Controller extends Base
                     'method'     => $method,
                     'path'       => $route->path,
                     'basename'   => $parsedName['controller'],
-                    'controller' => $controller ? get_class($controller) : null,
+                    'controller' => get_class($controller),
                     'action'     => $parsedName['action'],
                     'error'      => null,
                 ];

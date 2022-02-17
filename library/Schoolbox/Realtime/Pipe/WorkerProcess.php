@@ -202,6 +202,7 @@ class WorkerProcess extends AbstractProcess
 
             try {
                 // return a new, shiny instance of this class, correctly configured
+                // @phpstan-ignore-next-line: this will always be a ModuleNotifierInterface
                 return $this->configurator->newInstance($notifierClassName);
             } catch (ReflectionException $e) {
                 // kennet configure? ok, just return as-is
