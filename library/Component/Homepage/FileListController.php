@@ -220,6 +220,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 $this->parse('files_block', 'files', true);
             }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
             $this->parse('has_file_block', 'has_file');
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
@@ -229,7 +230,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             } else {
                 $this->parse("component_action_block", "component_action");
             }
-            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         return true;
