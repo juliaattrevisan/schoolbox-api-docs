@@ -10,8 +10,6 @@
 
 namespace Alaress\Web\Output;
 
-use Aura\Web\Response;
-
 class Html extends Base
 {
     /**

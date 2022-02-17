@@ -729,8 +729,8 @@ abstract class Kernel
         );
 
         // Web output class - currently uses Sitepage
-        $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
-        $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+//        $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+//        $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
         $di->set('webOutput:html', $di->lazy(function () use ($di, $mapperFactory) {
 
@@ -810,12 +810,14 @@ abstract class Kernel
 
             return $output;
         }));
-        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
+
+        $outputSetters = ['setTemplateEngine' => $di->lazyGet('templateEngine')];
+        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class, [], $outputSetters));
         $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
         $di->set('webOutput:file', $di->lazyNew(Output\File::class));
-        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class));
+        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class, [], $outputSetters));
         $di->set('webOutput:noContent', $di->lazyNew(Output\NoContent::class));
-        $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class));
+        $di->set('webOutput:xml', $di->lazyNew(Output\Xml::class, [], $outputSetters));
 
         // Template engine and functions
         // Template loader: sets up link to templates without a namespace.
@@ -846,13 +848,31 @@ abstract class Kernel
 //        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class, ['di' => $di]));
 
-        $di->setters[TwigMethod\RouteLookup::class]['setRouter'] = $di->lazyGet('router');
-        $di->set('templateEngine:routeLookup', $di->lazyNew(TwigMethod\RouteLookup::class));
+//        $di->setters[TwigMethod\RouteLookup::class]['setRouter'] = $di->lazyGet('router');
+        $di->set(
+            'templateEngine:routeLookup',
+            $di->lazyNew(
+                TwigMethod\RouteLookup::class,
+                [],
+                ['setRouter' => $di->lazyGet('router')],
+            )
+        );
 
-        $di->setters[TwigMethod\IsRouteAuthorized::class]['setRouter']     = $di->lazyGet('router');
-        $di->setters[TwigMethod\IsRouteAuthorized::class]['setAuthorizer'] = $di->lazyGet('authorizer');
-        $di->setters[TwigMethod\IsRouteAuthorized::class]['setSession']    = $di->lazyGet('session');
-        $di->set('templateEngine:isRouteAuthorized', $di->lazyNew(TwigMethod\IsRouteAuthorized::class));
+//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setRouter']     = $di->lazyGet('router');
+//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setAuthorizer'] = $di->lazyGet('authorizer');
+//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setSession']    = $di->lazyGet('session');
+        $di->set(
+            'templateEngine:isRouteAuthorized',
+            $di->lazyNew(
+                TwigMethod\IsRouteAuthorized::class,
+                [],
+                [
+                    'setRouter'     => $di->lazyGet('router'),
+                    'setAuthorizer' => $di->lazyGet('authorizer'),
+                    'setSession'    => $di->lazyGet('session'),
+                ],
+            )
+        );
 
 //        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
 //        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
@@ -1601,19 +1621,19 @@ abstract class Kernel
 //            'log'   => $di->lazyValue('logger')
 //        ];
 
-        $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
-            'setGenerator'  => $di->lazyNew(
-                \Schoolbox\Notif\Queue\Bindings\Generator::class,
-                [
-                    'xUserHandler'      => $di->lazyGet('externalUser'),
-                    'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
-                    'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
-                    'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
-                ]
-            )
-        ];
+//        $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
+//            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
+//            'setGenerator'  => $di->lazyNew(
+//                \Schoolbox\Notif\Queue\Bindings\Generator::class,
+//                [
+//                    'xUserHandler'      => $di->lazyGet('externalUser'),
+//                    'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
+//                    'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
+//                    'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
+//                    'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
+//                ]
+//            )
+//        ];
 
         $di->set(
             'subscriptionCache',
@@ -1627,6 +1647,19 @@ abstract class Kernel
                         [
                             'redis' => $di->lazyGet('redis.storage'),
                             'log'   => $di->lazyValue('logger')
+                        ],
+                        [
+                            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
+                            'setGenerator'  => $di->lazyNew(
+                                \Schoolbox\Notif\Queue\Bindings\Generator::class,
+                                [
+                                    'xUserHandler'      => $di->lazyGet('externalUser'),
+                                    'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
+                                    'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
+                                    'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
+                                    'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
+                                ]
+                            )
                         ]
                     ),
                     'redisQueue'    => $di->lazyGet('redis.signalQueue.pub'),
