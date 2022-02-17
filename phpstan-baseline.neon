@@ -971,11 +971,6 @@ parameters:
 			path: library/Chat.php
 
 		-
-			message: "#^Dead catch \\- Alaress\\\\Database\\\\Exception is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Component/Config/CalendarFilter.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Component_ConfigMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Component/ConfigMapper.php
@@ -1281,11 +1276,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Module.php
-
-		-
 			message: "#^Method Custom\\\\Help\\\\Nesa\\\\Selector\\:\\:generate\\(\\) should return iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>&Schoolbox\\\\GenericCollection but returns array\\<int\\|string, Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Custom/Help/Nesa/Selector.php
@@ -1294,11 +1284,6 @@ parameters:
 			message: "#^Property Custom\\\\Lc\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
 			count: 1
 			path: library/Custom/Lc/Survey/Controller.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
@@ -1314,21 +1299,6 @@ parameters:
 			message: "#^string does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
 			path: library/Custom/Sk/OleReport/Controller.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/Admin/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 2
-			path: library/Custom/Tigs/Summative/Admin/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
@@ -1394,16 +1364,6 @@ parameters:
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 3
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/NesaScoreGraphMiddleYears.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\.$#"
@@ -2906,11 +2866,6 @@ parameters:
 			path: library/Schoolbox/API/Translator/ArrayToModel/Base.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/API/Module.php
-
-		-
 			message: "#^Property Schoolbox\\\\Admin\\\\CourseBuilder\\\\Controller\\:\\:\\$folderMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/CourseBuilder/Controller.php
@@ -2919,16 +2874,6 @@ parameters:
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Module.php
 
 		-
 			message: "#^Cannot access offset int on true\\.$#"
@@ -2951,26 +2896,6 @@ parameters:
 			path: library/Schoolbox/Admin/Import/Profile/Reader.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/News/Policy/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/News/Policy/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Oauth/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Admin/Oauth/Module.php
-
-		-
 			message: "#^Access to protected property Aura\\\\Router\\\\Route\\:\\:\\$method\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/RouteSummary/Controller.php
@@ -2989,16 +2914,6 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/FileMulti/Renderer.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Settings/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Settings/Module.php
 
 		-
 			message: "#^Property Schoolbox\\\\Admin\\\\Timezone\\\\Timezone\\:\\:\\$offset \\(int\\) does not accept array\\|string\\.$#"
@@ -3104,11 +3019,6 @@ parameters:
 			message: "#^PHPDoc tag @param for parameter \\$description with type string\\|null is not subtype of native type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Api/Curriculum.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Import/Atlas/Module.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
@@ -3256,11 +3166,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Markbook/Module.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/MarkedGrid/Test/Generator.php
@@ -3394,11 +3299,6 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Calendar/Event/Access.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Module.php
 
 		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\EventLevel\\:\\:\\$id \\(int\\) does not accept default value of type string\\.$#"
@@ -3816,11 +3716,6 @@ parameters:
 			path: library/Schoolbox/Curriculum/Import/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Import/Module.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Curriculum/Node/Mapper.php
@@ -3834,11 +3729,6 @@ parameters:
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Database/Factory.php
-
-		-
-			message: "#^Invalid array key type Schoolbox\\\\Di\\\\IDiConfigurable\\.$#"
-			count: 2
-			path: library/Schoolbox/Di/Configurator.php
 
 		-
 			message: "#^Property Schoolbox\\\\Discussion\\\\Comment\\\\Controller\\:\\:\\$threadMapper is never read, only written\\.$#"
@@ -4981,11 +4871,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Component/ComponentDelegate.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Division/Module.php
-
-		-
 			message: "#^Constant Schoolbox\\\\Fixtures\\\\Import\\\\Controller\\:\\:TYPE_DIVISION is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Import/Controller.php
@@ -5791,11 +5676,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Model.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
@@ -6276,11 +6156,6 @@ parameters:
 			path: library/Schoolbox/Learning/Grades/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Module.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
@@ -6401,11 +6276,6 @@ parameters:
 			path: library/Schoolbox/Learning/Markbook/Markbook.php
 
 		-
-			message: "#^Empty array passed to foreach\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Mastery/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForToday\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Module.php
@@ -6509,11 +6379,6 @@ parameters:
 			message: "#^Constant Schoolbox\\\\Learning\\\\Turnitin\\\\ValidFile\\:\\:MIN_TURNITIN_TEXT_LENGTH is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Turnitin/ValidFile.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Upcoming/Module.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
@@ -7396,11 +7261,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
 
 		-
-			message: "#^Anonymous function has an unused use \\$injector\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Resources/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\:\\:getTitle\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/Resources/Node.php
@@ -7716,11 +7576,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Module.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Series.php
@@ -7741,11 +7596,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Category/Module.php
-
-		-
 			message: "#^Dead catch \\- Schoolbox\\\\Application\\\\Exception\\\\NotFound is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Controller.php
@@ -7761,29 +7611,9 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Item/Model.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Report/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ResourceBooking\\\\Booking\\\\Validation\\:\\:method\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Search/Mock/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Search/Mock/Module.php
 
 		-
 			message: "#^Access to an undefined property Faker\\\\Generator\\:\\:\\$bs\\.$#"
@@ -7804,11 +7634,6 @@ parameters:
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Statistics/DataSource.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Statistics/Module.php
 
 		-
 			message: "#^Method Schoolbox\\\\Survey\\\\Controller\\:\\:getSelectize\\(\\) should return string but returns null\\.$#"
