@@ -8,6 +8,7 @@
 
 namespace Alaress\Application;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
@@ -513,6 +514,14 @@ abstract class Kernel
         $di->set('mapperFactory', $mapperFactory);
 
         // Preload of route parameters, and its module loader
+        $di->set(
+            'moduleLoader',
+            $di->lazyNew(
+                ModuleLoader::class,
+                ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
+            ),
+        );
+
 //        $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
 //            ModuleLoader::class,
 //            ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
@@ -521,17 +530,18 @@ abstract class Kernel
             'preloader',
             $di->lazyNew(
                 PathMatcher::class,
-                [
-                    'moduleLoader' => $di->lazyNew(
-                        ModuleLoader::class,
-                        ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
-                    ),
-                ]
+                ['moduleLoader' => $di->lazyGet('moduleLoader'),]
             ),
         );
 
         // Authorization
-        $di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
+        $di->set(
+            'authorizer',
+            $di->lazyNew(
+                Authorizer::class,
+                ['moduleLoader' => $di->lazyGet('moduleLoader'),]
+            )
+        );
 
         // Web request/response factory
 //        $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
