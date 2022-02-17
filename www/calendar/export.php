@@ -447,6 +447,7 @@ try {
                 $api->add($subApi);
             }
 
+            //if including timetable classes, append them now, as we fellthrough from that...
             if (isset($timeApi)) {
                 $api->add($timeApi);
             }
