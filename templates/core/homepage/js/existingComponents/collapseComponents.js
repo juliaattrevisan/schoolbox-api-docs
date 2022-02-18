@@ -29,10 +29,12 @@ export function initCollapseComponents () {
  */
 function init (component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    collapseButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        isOpen(component) ? close(component) : open(component);
-    });
+    if (collapseButton) { //not all components have a collapse button to access
+        collapseButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            isOpen(component) ? close(component) : open(component);
+        });
+    }
 } 
 
 /**

@@ -4,11 +4,11 @@
  */
 
 
-import { initToggleLockComponents } from './existingComponents/toggleLockComponents';
 import { initPostToMyLinks } from './postToMyLinks';
+import { initExistingComponents } from './existingComponents/existingComponents';
+import { initToggleLockComponents } from './existingComponents/toggleLockComponents';
 import { initEditColumns } from './editColumns/editColumns';
 import { initNewComponents } from './newComponents/newComponents';
-import { initExistingComponents } from './existingComponents/existingComponents';
 import { initUpdatePlaceHolders } from './updatePlaceHolders';
   
 export const EXISTING_COMPONENT_SELECTOR = '[data-component]'; 
@@ -27,13 +27,24 @@ export function getComponentID (component) {
 }
 
 /**
+ * To determine whether the user has full edit control, or is read-only
+ * 
+ * @returns { Boolean } 
+ */
+export function canEditHomepage () {
+    return document.getElementById('component-lock-switch') ? true : false;
+}
+
+/**
  * Fire everything up
  */
 document.addEventListener('DOMContentLoaded', () => {
-    initToggleLockComponents();
     initPostToMyLinks();
-    initEditColumns();
-    initNewComponents();
     initExistingComponents();
-    initUpdatePlaceHolders();
+    if (canEditHomepage()) {
+        initToggleLockComponents();
+        initEditColumns();
+        initNewComponents();
+        initUpdatePlaceHolders();
+    }
 });
