@@ -4,7 +4,7 @@
  */
 
 import { UPDATE_URL } from '../updateHomepage';
-import { loadNewHTML } from '@js/util/domUtils';
+import { getLoadedHTML } from '@js/util/domUtils';
 
 
 /**
@@ -36,7 +36,7 @@ export async function getNewComponent (component) {
  * @returns { Element }  
  */
 async function replaceExistingComponent (component, newComponentHTML) {
-    const newComponent = await loadNewHTML(newComponentHTML.outerHTML); //enure the new html is properly loaded
+    const newComponent = await getLoadedHTML(newComponentHTML.outerHTML); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly created component
     return newComponent;
 }

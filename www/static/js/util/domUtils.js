@@ -199,7 +199,7 @@ export function setAndGetAttribute (element, attribute, value) {
  * 
  * @return { Element } 
  */
-export async function loadNewHTML (htmlString) {
+export async function getLoadedHTML (htmlString) {
     const documentFragment = document.createRange().createContextualFragment(htmlString); //createContextualFragment ensures any </script> tags within the element are run
     const scriptTags = documentFragment.querySelectorAll('script[src]'); //get each <script src></script>
     const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page

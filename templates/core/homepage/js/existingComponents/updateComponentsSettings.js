@@ -5,7 +5,7 @@
 
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import { loadNewHTML } from '@js/util/domUtils';
+import { getLoadedHTML } from '@js/util/domUtils';
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL } from '../updateHomepage';
 import UpdateHomepageEvents from '../updateHomepageEvents';
 import { updateRemovedComponent } from './removeComponents';
@@ -49,7 +49,7 @@ function initToggleButtons (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
-        gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+        gsap.to(toggleButton, { rotation: '+=90', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
         isOpen(component) ? close(component) : open(component);
     });
     const emptyStateToggleButton = component.querySelector(`${BUTTON_SELECTOR}.empty-edit`);
@@ -168,7 +168,7 @@ function getSaveComponentSettingsParams (form) {
  */
 async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
-    const newComponent = await loadNewHTML(updatedComponent.outerHTML); //enure the new html is properly loaded
+    const newComponent = await getLoadedHTML(updatedComponent.outerHTML); //enure the new html is properly loaded
     component.replaceWith(newComponent); //switch over to the newly updated component
     gsap.to(newComponent, { //fade in the updated component
         duration: ANIMATE_SPEED,

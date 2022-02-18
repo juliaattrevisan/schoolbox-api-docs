@@ -32,7 +32,7 @@ export function getComponentID (component) {
  * @returns { Boolean } 
  */
 export function canEditHomepage () {
-    return document.getElementById('component-lock-switch') ? true : false;
+    return document.getElementById('component-lock-switch') ? true : false; //this element won't be on the page if is read-only
 }
 
 /**

@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-import { loadNewHTML } from '@js/util/domUtils';
+import { getLoadedHTML } from '@js/util/domUtils';
 
 
 ;(function ($, window, document, undefined) {
@@ -597,7 +597,7 @@ import { loadNewHTML } from '@js/util/domUtils';
         $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
 
         if (typeof data === 'string' && /<\/?[a-z][\s\S]*>/i.test(data)) { //if it's a string and if it contains any HTML markup
-            const loadedHTMLData = await loadNewHTML(data); //we need to ensure any <script> tags are preloaded prior to adding to the page
+            const loadedHTMLData = await getLoadedHTML(data); //we need to ensure any <script> tags are preloaded prior to adding to the page
             // call the callback (this would include any specific manipulation for the section being targeted)
             onXhrDone.call(this.element, loadedHTMLData.innerHTML);
         } else { //oterwise proceed as normal
