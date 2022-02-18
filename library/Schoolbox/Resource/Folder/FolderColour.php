@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
 
@@ -40,9 +39,9 @@ class FolderColour
 
     /**
      * The current cache of the used colours
-     * @var GenericCollection
+     * @var array
      */
-    protected GenericCollection $colourCache;
+    protected array $colourCache;
 
     /**
      * @param \Timetable_ColourMapper $timetableColourMapper
@@ -53,7 +52,7 @@ class FolderColour
     {
         $this->timetableColourMapper = $timetableColourMapper;
         $this->colourFactory = $colorFactory;
-        $this->colourCache   = new GenericCollection(Color::class);
+        $this->colourCache   = [];
     }
 
     /**
@@ -68,14 +67,14 @@ class FolderColour
         $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
 
         // Build colour object from hex string and cache the colour object
-        if (!$this->colourCache->offsetExists($hexColour)) {
-            $this->colourCache->setOffset($hexColour, $this->colourFactory->build($hexColour));
+        if (!in_array($hexColour, $this->colourCache)) {
+            $this->colourCache[$hexColour] = $this->colourFactory->build($hexColour);
         }
 
         //sets or loops the colour index back to the start if we overflow
         $this->colourIndex = ($this->colourIndex + 1) % $this->colourList->count();
 
-        return $this->colourCache->getOffset($hexColour);
+        return $this->colourCache[$hexColour];
     }
 
     /**
