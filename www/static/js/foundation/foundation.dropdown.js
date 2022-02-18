@@ -226,6 +226,7 @@
         var p = this.dirs.bottom.call(dropdown, target, settings);
 
         dropdown.attr('style', '').removeClass('drop-left drop-right drop-top').css({
+          position : 'absolute',
           top : p.top
         });
 
