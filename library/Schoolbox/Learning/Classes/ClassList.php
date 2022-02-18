@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Classes;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
