@@ -17,14 +17,15 @@ const props = defineProps({
         required: true,
         default: 'settings',
     },
-    /* Decide if we need special polling mechanism for dropzones and color pickers
-        * since they don't trigger onchange normally, probably because jquery
-        */
-    polling: {
-        type: Number,
+    /** 
+     * Decide if we need special usePolling mechanism for dropzones and color pickers
+     * since they don't trigger onchange normally, probably because jquery
+     */
+    usePolling: {
+        type: Boolean,
         required: true,
         default: 0,
-    }
+    },
 });
 
 const saveContainer = ref(null)
@@ -78,7 +79,7 @@ function initFormChangeListeners () {
     /* Polling is required for dropzones and colorpickers since they don't
         * trigger onchange events normally (probably because jquery plugins)
         */
-    if (props.polling) {
+    if (props.usePolling) {
         setInterval(onFormDataChange, 500);
     } else {
         document.getElementById(props.formId).addEventListener('change', () => onFormDataChange());
