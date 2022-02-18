@@ -16,4 +16,6 @@ export default Object.freeze({
     EDIT_COLUMNS_RESET: 'UPDATE_HOMEPAGE__EDIT_COLUMNS_RESET', //reset all column settings back to defaults
     EDIT_COLUMNS_UNDO_CHANGES: 'UPDATE_HOMEPAGE__EDIT_COLUMNS_UNDO_CHANGES', //undo any previously saved column setting changes
     EDIT_COLUMNS_SAVE: 'UPDATE_HOMEPAGE__EDIT_COLUMNS_SAVE', //save all column settings
+    PROCESSING_START: 'UPDATE_HOMEPAGE__PROCESSING_START', //to disable behaviour such as adding a new component while an existing one is being sorted
+    PROCESSING_END: 'UPDATE_HOMEPAGE__PROCESSING_END', //re-enable any disabled actions
 })

@@ -43,8 +43,68 @@ let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position cha
  * Fire everything up
  */
 export function initSortExistingComponents () {
-    initDraggables();
     initListeners();
+    initDraggables();
+}
+
+/**
+ * To respond to any events that require action
+ */
+function initListeners () {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => onComponentAddedOrUpdated(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => onComponentAddedOrUpdated(event.detail.component)); //updated components
+    initOnComponentRemovedListener();
+    initOnProcessingStartListener();
+    initOnProcessingEndListener();
+}
+
+/**
+ * To add a newly created or udpated component to the sortable list
+ * @tod - pull out the old Dragable when re-added 
+ */
+function onComponentAddedOrUpdated (component) {
+    const newDraggable = addNewDraggable(component);
+    __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
+    updateSortableElements(); //update the position of all elements due to the new element that's been added
+}
+
+/**
+ * To remove a component from the sortable list
+ */
+function initOnComponentRemovedListener () {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
+        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
+        draggableToRemove.kill(); //disables the Draggable instance
+        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
+        updateSortableElements(); //update the position of all elements due to the new element being added
+    });
+}
+
+/**
+ * Prevent rapid fire dragging while a data save is already taking place
+ */
+function initOnProcessingStartListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
+        updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Re-enable dragging once any processes (like sort saving) have taken place
+ */
+function initOnProcessingEndListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, (event) => {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+function updateDraggablesStatus (isEnabled) {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -74,37 +134,6 @@ function addNewDraggable (component) {
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
     })[0];
-}
-
-/**
- * To respond to any events that require action
- */
-function initListeners () {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => onComponentAddedOrUpdated(event.detail.component)); //newly added components
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => onComponentAddedOrUpdated(event.detail.component)); //updated components
-    initOnComponentRemovedListener();
-}
-
-/**
- * To add a newly created or udpated component to the sortable list
- * @tod - pull out the old Dragable when re-added 
- */
-function onComponentAddedOrUpdated (component) {
-    const newDraggable = addNewDraggable(component);
-    __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
-    updateSortableElements(); //update the position of all elements due to the new element that's been added
-}
-
-/**
- * To remove a component from the sortable list
- */
-function initOnComponentRemovedListener () {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
-        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
-        draggableToRemove.kill(); //disables the Draggable instance
-        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
-        updateSortableElements(); //update the position of all elements due to the new element being added
-    });
 }
 
 
@@ -255,6 +284,7 @@ function updateSortableElements () {
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -368,18 +398,9 @@ function clearFlipElements () {
  * Just snap back to where it now belongs
  */
 function onDragEnd () {
-    updateDraggablesStatus(false); //prevent quick reclicks on elements
-    snapBackActiveComponent();
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
     document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END));
-}
-
-/**
- * Run through each Draggable instance and enable/disable
- * 
- * @param { Boolean }  
- */
-function updateDraggablesStatus (isEnabled) {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
+    snapBackActiveComponent();
 }
 
 /**
@@ -446,7 +467,7 @@ async function onActiveComponentExpanded () {
     }
     updateDocumentOnDragEnd();
     updateSortableElements();
-    updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
 }
 
 /**

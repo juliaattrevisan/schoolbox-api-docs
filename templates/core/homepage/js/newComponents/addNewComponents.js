@@ -35,7 +35,43 @@ let __newComponentTabsContainer; //to reinsert the newComponentClone into the ne
  * Fire everything up
  */
 export function initAddNewComponents () {
+    initListeners();
     initDraggables();
+}
+
+/**
+ * To respond to any events that require action
+ */
+function initListeners () {
+    initOnProcessingStartListener();
+    initOnProcessingEndListener();
+}
+
+/**
+ * Prevent rapid fire dragging while a data save is already taking place
+ */
+function initOnProcessingStartListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
+        updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Re-enable dragging once any processes (like sort saving) have taken place
+ */
+function initOnProcessingEndListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, (event) => {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+function updateDraggablesStatus (isEnabled) {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -82,8 +118,8 @@ function onNewComponentClicked (event) {
         __hasNewComponent = true;
         __isFlipping = true;
 
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
         updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-        updateDraggablesStatus(false); //prevent any others being dragged while a component is alread being added
         reinsertNewComponentButton();
 
         const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
@@ -121,15 +157,6 @@ function onNewComponentClicked (event) {
     __newComponentClone = __newComponent.cloneNode(true); //to replace the new component in the tabs when/if the __newComponent has been added in
     __newComponentClone.style.opacity = 0.5; //so the __newComponent stands out when animating from the component tabs
     __newComponentTabsContainer = __newComponent.parentElement; //so can put a copy of the __newComponent back into the palette once the addition is complete
-}
-
-/**
- * Run through each Draggable instance and enable/disable
- * 
- * @param { Boolean }  
- */
-function updateDraggablesStatus (isEnabled) {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 
@@ -238,6 +265,7 @@ function updateSortableElements () {
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -402,10 +430,10 @@ function animateFlip (state) {
  * Just snap back to where it now belongs
  */
 function onDragEnd () {
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
-    updateDraggablesStatus(false); //prevent quick reclicks on elements
     alignNewComponent();
 }
 
@@ -436,7 +464,7 @@ function onAlignNewComponentComplete () {
     if (__hasNewComponent) {
         addNewComponent();
     } else {
-        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
 }
 
@@ -475,7 +503,7 @@ async function addNewComponent () {
         startAt: { opacity: 0 },
     } );
     await saveComponentOrder(newComponent);
-    updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     __hasNewComponent = false;
 }
 
