@@ -203,7 +203,6 @@ class Api implements IApi
     }
 
 
-
     /**
      * @return ApiUsage
      */

@@ -15,7 +15,7 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Clipboard\Hierarchy\Cli\HierarchyTool;
+use Schoolbox\Clipboard\Cli\ImporterTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
@@ -87,7 +87,7 @@ class Inspector extends CliTool\App
 
         /* Clipboard CLI Tools
          */
-        HierarchyTool::CLIPBOARD_HIERARCHY_LOCK_NAME => 'Clipboard Sport/Division/Team Hierarchy (./tools/clipboard/hierarchy.php)',
+        ImporterTool::CLIPBOARD_IMPORTER_LOCK_NAME => 'Clipboard Sport/Division/Team/Players/Sessions (./tools/clipboard/importer.php)',
     ];
 
 

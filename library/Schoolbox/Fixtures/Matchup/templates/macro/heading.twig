@@ -23,7 +23,11 @@
         {% set awayTeamData = match.awaySchool.name %}
     {% endif %}
 
-    {{ homeTeamData }} vs {{ awayTeamData }}
+    {% if awayTeamData %}
+        {{ homeTeamData }} vs {{ awayTeamData }}
+    {% else %}
+        {{ homeTeamData }}
+    {% endif %}
 {% endapply %}
 {% endmacro %}
 
@@ -53,7 +57,11 @@
         {% set awayTeamData = match.awayTeam.name %}
     {% endif %}
 
-    {{ homeTeamData }} vs {{ awayTeamData }}
+    {% if awayTeamData %}
+        {{ homeTeamData }} vs {{ awayTeamData }}
+    {% else %}
+        {{ homeTeamData }}
+    {% endif %}
 {% endapply %}
 {% endmacro %}
 
@@ -76,7 +84,7 @@
     {% if match.awayTeam %}
         {{ match.awayTeam.name }}
     {% else %}
-        {{ match.awaySchool.name }}
+        {{ match.awaySchool.name ?? '' }}
     {% endif %}
 
 {% endapply %}
@@ -112,7 +120,11 @@
         {% set awayTeamData = match.awaySchool.name %}
     {% endif %}
 
-    {{ homeTeamData }} vs {{ awayTeamData }}
+    {% if awayTeamData %}
+        {{ homeTeamData }} vs {{ awayTeamData }}
+    {% else %}
+        {{ homeTeamData }}
+    {% endif %}
 {% endapply %}
 {% endmacro %}
 

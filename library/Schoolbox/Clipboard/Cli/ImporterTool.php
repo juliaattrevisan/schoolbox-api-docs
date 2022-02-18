@@ -7,12 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Clipboard\Hierarchy\Cli;
+namespace Schoolbox\Clipboard\Cli;
 
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Clipboard\Hierarchy\Factory;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
@@ -21,13 +20,13 @@ use Symfony\Component\Lock\Store\RedisStore;
 /**
  * Encapsulated cli tool
  */
-class HierarchyTool extends CliTool\App
+class ImporterTool extends CliTool\App
 {
 
     /**
      * Lock name
      */
-    public const CLIPBOARD_HIERARCHY_LOCK_NAME = 'clipboard_hierarchy';
+    public const CLIPBOARD_IMPORTER_LOCK_NAME = 'clipboard_importer';
 
 
     /**
@@ -45,6 +44,24 @@ class HierarchyTool extends CliTool\App
 
 
     /**
+     * --hierarchy
+     *
+     * Setting this flag imports Students and their relations in addition
+     * to processing the Hierarchy
+     */
+    private const OPT_LONG_MEMBERSHIP = 'membership';
+
+
+    /**
+     * --sessions
+     *
+     * Setting this flag imports Clipboard Sessions, the equivalent of our Matchups,
+     * assigning participating users and participating Positions
+     */
+    private const OPT_LONG_SESSIONS = 'sessions';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -59,7 +76,9 @@ class HierarchyTool extends CliTool\App
     public function getLongOpts(): array
     {
         return [
-            self::OPT_LONG_HELP
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_MEMBERSHIP,
+            self::OPT_LONG_SESSIONS,
         ];
     }
 
@@ -69,12 +88,39 @@ class HierarchyTool extends CliTool\App
      */
     public function run(): void
     {
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equivalent.
+Import Clipboard Fixtures into schoolbox Fixtures, assuming command of our Fixtures
+module in its entirety to do so. Schools will be sacrificing their Fixtures module
+to support Clipboard imported data.
 
-Usage: php hierarchy.php
+----
+
+Import Clipboard Category/Subcategory/Teams into schoolbox Divisions/Teams equivalent.
+This will not import students or their relationships or anything like that; it's the
+barest bones that can be added.
+
+Usage: php importer.php [--perform]
+
+----
+
+Import Clipboard Students into schoolbox Teams. This depends on the hierarchy which 
+you will end up obtaining anyway, so you have to augment with students' data by using this 
+additional flag. This would be your main day-to-day usage as it periodically synchronises
+most of the Clipbard hierarchy to schoolbox.
+
+Usage: php importer.php --membership [--perform]
+
+---
+
+Import Clipboard Sessions into schoolbox Matchups. This also depends on the existence of
+ memberships. This creates schoolbox Fixtures, assigns students to their respective positions,
+ adds coaches, etc. Anyone who can't be found will be skipped. This usage assigns team members
+ to positions and matchups, so last-minute variations or alterations take place here.
+ 
+Usage: php importer.php --sessions [--perform]
 
 
 HELP;
@@ -89,7 +135,7 @@ HELP;
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
 
         $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::CLIPBOARD_HIERARCHY_LOCK_NAME, self::LOCK_TTL);
+        $lock        = $lockFactory->createLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
 
         try {
             $acquired = $lock->acquire();
@@ -101,12 +147,15 @@ HELP;
             $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
             try {
-                $composites = (new Factory(
+                $composites = (new \Schoolbox\Clipboard\Factory(
                     $this->getLogger(),
                     $this->perform(),
                     (string)$this->getConfig()->get('clipboard_endpoint_host'),
                     (string)$this->getConfig()->get('clipboard_endpoint_token'),
-                ))->produce();
+                ))->produce(
+                    $this->getOpt(self::OPT_LONG_MEMBERSHIP),
+                    $this->getOpt(self::OPT_LONG_SESSIONS),
+                );
             } catch (\DomainException $e) {
                 $this->getLogger()->warning($e->getMessage());
 

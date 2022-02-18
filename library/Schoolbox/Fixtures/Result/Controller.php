@@ -294,7 +294,7 @@ class Controller extends AbstractController
 
                 $matchup->setAwayTeam($facelessTeam);
             } else {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+                $matchup->setAwayTeam($this->getTeamMapper()->createModel());
             }
         }
 
