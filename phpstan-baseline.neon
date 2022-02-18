@@ -5796,11 +5796,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/ListController.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\ListController\\:\\:getDelegateController\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\Controller but returns Alaress\\\\Web\\\\Controller\\\\Base\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php
