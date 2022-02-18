@@ -170,9 +170,9 @@ export function setStylesOnElement (element,styles) {
 export function injectScript (src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = src;
         script.addEventListener('load', resolve);
         script.addEventListener('error', e => reject(e.error));
+        script.src = src;
         document.head.appendChild(script);
     });
 }
@@ -201,7 +201,7 @@ export function setAndGetAttribute (element, attribute, value) {
  */
 export async function getLoadedHTML (htmlString) {
     const documentFragment = document.createRange().createContextualFragment(htmlString); //createContextualFragment ensures any </script> tags within the element are run
-    const scriptTags = documentFragment.querySelectorAll('script[src]'); //get each <script src></script>
+    const scriptTags = documentFragment.querySelectorAll('script[src]:not([data-is-vue])'); //get each <script src></script> that isn't a vue component (which don't require preloading)
     const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page
     for (const scriptTag of newScriptTags) { //add each into the document head
         await injectScript(scriptTag.getAttribute('src'));

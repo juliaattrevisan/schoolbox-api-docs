@@ -19,7 +19,7 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
 const COMPONENT_SELECTOR = '[data-component]'; //any existing component that will be sorted
 const COMPONENT_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
-const ANIMATE_SPEED = 0.3; //the speed of animations
+const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
