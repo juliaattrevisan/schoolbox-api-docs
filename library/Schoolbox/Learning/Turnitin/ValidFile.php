@@ -41,6 +41,7 @@ class ValidFile
         'doc',      // Microsoft Word/Google Docs
         'docx',     // Microsoft Word/Google Docs
         'ppt',      // Microsoft Powerpoint/Google Docs
+        'pptx',     // Microsoft Powerpoint/Google Docs
         'ppsx',     // Microsoft Powerpoint/Google Docs
         'pps',      // Microsoft Powerpoint/Google Docs
         'xls',      // Microsoft Excel/Google Docs
