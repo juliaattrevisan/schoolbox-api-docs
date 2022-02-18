@@ -9,16 +9,15 @@
 
 namespace Schoolbox\Groups;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\Folder\FolderColour;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
@@ -71,12 +70,8 @@ class Controller extends BaseController
     {
         $user = $this->getUser();
 
-        //colours for groups with no colours
-        /* Get Timetable colours to use as random colours for folders */
-        $colourList    = $this->timetableColourMapper->findAll();
-        $colourIndex   = 0;
-        $colourFactory = new ColorFactory();
-        $colourCache   = new GenericCollection(Color::class);
+        //folder colours helper
+        $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
 
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
@@ -124,15 +119,7 @@ class Controller extends BaseController
                 $imageHash = $folder->getCoverImage()->getHash();
             }
             if (!$folder->getColour()) {
-                /* Apply colour from list if no colour exists */
-                $hexColour = $colourList[$colourIndex]->getHexColour();
-                if (!$colourCache->offsetExists($hexColour)) {
-                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
-                }
-                $folder->setColour($colourCache->getOffset($hexColour));
-                //add colour to folder, and continue the cycle of colour indices
-                //remember the % (modulo) returns the remainder of the equation and just ignores how many loops it can do
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
+                $folder->setColour($folderColours->getNewColour());
             }
 
             $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;

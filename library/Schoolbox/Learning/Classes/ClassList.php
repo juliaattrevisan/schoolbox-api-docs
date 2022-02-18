@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Classes;
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
@@ -109,7 +108,8 @@ class ClassList
 
         $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
 
-        $this->applyFolderColours($folderList);
+        $folderColours = new Folder\FolderColour($this->timetableColourMapper, new ColorFactory());
+        $folderColours->applyFolderColours($folderList);
 
         $homepageUrls = [];
         $access       = Access::getInstance();
@@ -154,34 +154,5 @@ class ClassList
             $term->getStart(),
             $term->getActualFinish()
         );
-    }
-
-
-    /**
-     * If a folder does not have a colour, sets its colour from the configured timetable colours
-     *
-     * @param GenericCollection|Folder\Model[] $folderList
-     */
-    protected function applyFolderColours(GenericCollection $folderList): void
-    {
-        // Get Timetable colours to use as random colours for null set folders
-        $colourList  = $this->timetableColourMapper->findAll();
-        $colourIndex = 0;
-
-        $colourFactory = new ColorFactory();
-        $colourCache   = new GenericCollection(Color::class);
-        foreach ($folderList as $folder) {
-            if (!$folder->getColour()) {
-                $hexColour = $colourList[$colourIndex]->getHexColour();
-
-                // Build colour object from hex string and cache the colour object
-                if (!$colourCache->offsetExists($hexColour)) {
-                    $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
-                }
-
-                $folder->setColour($colourCache->getOffset($hexColour));
-                $colourIndex = ($colourIndex + 1) % $colourList->count();
-            }
-        }
     }
 }

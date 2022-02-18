@@ -94,8 +94,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
             $maxFolders  = $this->getConfig('size');
             $j           = 0;
-            $colourIndex = 0;
-            $colourList  = Timetable_ColourMapper::getInstance()->findAll();
+            $folderColours = new Folder\FolderColour(Timetable_ColourMapper::getInstance(), new \Alaress\Color\ColorFactory());
 
             foreach ($allFolders as $currentFolder) {
                 if ($maxFolders > 0 && $j >= $maxFolders) {
@@ -110,8 +109,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                      * Check for folder colour and apply colour from list if no colour exists
                      */
                     if (empty($currentFolder['colour'])) {
-                        $folderColour = $colourList[$colourIndex]->getHexColour();
-                        $colourIndex  = ($colourIndex + 1) % $colourList->count();
+                        $folderColour = $folderColours->getNewColour();
                     } else {
                         $folderColour = Scrub::text($currentFolder['colour']);
                     }
