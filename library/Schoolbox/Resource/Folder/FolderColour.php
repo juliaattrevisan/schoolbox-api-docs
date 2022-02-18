@@ -67,9 +67,7 @@ class FolderColour
         $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
 
         // Build colour object from hex string and cache the colour object
-        if (!in_array($hexColour, $this->colourCache)) {
-            $this->colourCache[$hexColour] = $this->colourFactory->build($hexColour);
-        }
+        $this->colourCache[$hexColour] ??= $this->colourFactory->build($hexColour);
 
         //sets or loops the colour index back to the start if we overflow
         $this->colourIndex = ($this->colourIndex + 1) % $this->colourList->count();
