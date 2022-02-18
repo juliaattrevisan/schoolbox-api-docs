@@ -185,6 +185,17 @@
                 return false;
             };
 
+            /* check if repeating the event
+             * to confirm the repeat till date is correctly formatted
+             * the easiest way, check if repeating is set to `single event=''`
+             */
+            var isRepeating = function () {
+                if ($('select[name="repeat"]').length) {
+                    return '' !== $('select[name=repeat]').val();
+                }
+                return false;
+            };
+
             $(config.element).alaressValidate({
                 rules: {
                     'campus[]': {
@@ -220,6 +231,15 @@
                     },
                     endDate: {
                         required: true,
+                        datepickerDate: true
+                    },
+                    repeat_until: {
+                        datepickerDate: {
+                            param: true,
+                            depends: isRepeating
+                        }
+                    },
+                    publishDate: {
                         datepickerDate: true
                     }
                 },
