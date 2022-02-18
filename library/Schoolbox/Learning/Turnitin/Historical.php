@@ -197,7 +197,7 @@ class Historical
             $this->logDebug(sprintf(
                 'Student Submission File Id %s: historically adding into turnitin_report id %s with status [%s]',
                 $turnitinFile->getStudentSubmissionFileId(),
-                $turnitinFile->getId() ?? '(as a new record)',
+                $turnitinFile->getId() ?: '(as a new record)',
                 File\Model::STATUS_TRANSMIT_PENDING
             ));
 
