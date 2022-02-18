@@ -260,9 +260,9 @@ class HandlerFactory
             case Notif::TOPIC_AUTH:
                 $sql->setQuery("
                     INSERT INTO `login_log`
-                        (`username`, `date`, `ip`, `login`)
+                        (`username`, `date`, `ip`, `login`, `jwt_id`)
                     VALUES
-                        (:username, NOW(), :ip, :login)
+                        (:username, NOW(), :ip, :login, :jwtId)
                 ");
                 return $sql;
 

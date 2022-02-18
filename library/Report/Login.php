@@ -208,7 +208,18 @@ class Report_Login extends Report_Abstract implements Report_IReport
             return 0;
         }
 
-        $dataQuery = "SELECT `login_log`.`username`, `date`, login, ip, user.id AS user, title, firstname, lastname, groups.name as role, groups.group_type as roletype
+        $dataQuery = "SELECT
+                        `login_log`.`username`,
+                        `date`,
+                        login,
+                        ip,
+                        user.id AS user,
+                        title,
+                        firstname,
+                        lastname,
+                        groups.name as role,
+                        groups.group_type as roletype,
+                        jwt_id
                       FROM login_log
                       $joins
                       $sqlFilterString
@@ -288,6 +299,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                         'ACTION'      => Scrub::text($action),
                         'IP'          => Scrub::text($log['ip']),
                         'ROLE'        => Scrub::text($log['role']),
+                        'BY_TOKEN'    => $log['jwt_id'] ? '&#10004;' : '',
                     )
                 );
 
