@@ -410,7 +410,14 @@ class ListController extends Web\Controller\Base
     {
         $module = Module::retrieveInstalledModule('learningAssessment');
         if ($module instanceof Module) {
-            return $module->buildControllerForType($type);
+            // Dependencies need to be set up too
+            $module->initControllerDependencies();
+            $controller = $module->installControllerDependencies(
+                $module->buildControllerForType($type),
+                $this->di,
+            );
+            $controller->setUser($this->getUser());
+            return $controller;
         }
         throw new InvalidArgumentException(
             sprintf(
