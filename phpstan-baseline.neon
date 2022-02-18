@@ -8136,11 +8136,6 @@ parameters:
 			path: library/Schoolbox/Wiki/WikiMapper.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Session.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Session.php
