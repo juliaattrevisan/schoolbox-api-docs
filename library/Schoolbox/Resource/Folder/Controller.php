@@ -909,7 +909,7 @@ class Controller extends BaseController
     public function getGroups(): void
     {
         /* Get Timetable colours to use as random colours for null set folders */
-        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance());
+        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance(), new ColorFactory());
         $folderList = new Collection();
         $userAccess  = [];
 

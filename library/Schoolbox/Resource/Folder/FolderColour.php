@@ -46,12 +46,13 @@ class FolderColour
 
     /**
      * @param \Timetable_ColourMapper $timetableColourMapper
+     * @param ColorFactory            $colorFactory
      * @return void
      */
-    public function __construct(\Timetable_ColourMapper $timetableColourMapper)
+    public function __construct(\Timetable_ColourMapper $timetableColourMapper, ColorFactory $colorFactory)
     {
         $this->timetableColourMapper = $timetableColourMapper;
-        $this->colourFactory = new ColorFactory();
+        $this->colourFactory = $colorFactory;
         $this->colourCache   = new GenericCollection(Color::class);
     }
 

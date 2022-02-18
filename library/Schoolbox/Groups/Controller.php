@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Groups;
 
+use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -70,7 +71,7 @@ class Controller extends BaseController
         $user = $this->getUser();
 
         //folder colours helper
-        $folderColours = new FolderColour($this->timetableColourMapper);
+        $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
 
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status

@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Resource\Folder\Component\Dashboard;
 
+use Alaress\Color\ColorFactory;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Collection;
@@ -59,7 +60,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         /* Get Timetable colours to use as random colours for null set folders */
-        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance());
+        $folderColours = new FolderColour(Timetable_ColourMapper::getInstance(), new ColorFactory());
         $userAccess  = array();
 
         $allFolders = FolderMapper::getInstance()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);

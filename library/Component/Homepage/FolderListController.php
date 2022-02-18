@@ -94,7 +94,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
             $maxFolders  = $this->getConfig('size');
             $j           = 0;
-            $folderColours = new Folder\FolderColour(Timetable_ColourMapper::getInstance());
+            $folderColours = new Folder\FolderColour(Timetable_ColourMapper::getInstance(), new \Alaress\Color\ColorFactory());
 
             foreach ($allFolders as $currentFolder) {
                 if ($maxFolders > 0 && $j >= $maxFolders) {

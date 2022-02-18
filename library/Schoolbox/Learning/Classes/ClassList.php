@@ -109,7 +109,7 @@ class ClassList
 
         $courseSpecs = $this->getCourseSpecsHavingUnitsInTerm($folderList, $term);
 
-        $folderColours = new Folder\FolderColour($this->timetableColourMapper);
+        $folderColours = new Folder\FolderColour($this->timetableColourMapper, new ColorFactory());
         $folderColours->applyFolderColours($folderList);
 
         $homepageUrls = [];
