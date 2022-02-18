@@ -62,9 +62,7 @@ class FolderColour
     public function getNewColour(): \Alaress\Color\Color
     {
         //check if colourlist has been created or not...
-        if (null === $this->colourList) {
-            $this->colourList = $this->timetableColourMapper->findAll();
-        }
+        $this->colourList ??= $this->timetableColourMapper->findAll();
 
         $hexColour = $this->colourList[$this->colourIndex]->getHexColour();
 
