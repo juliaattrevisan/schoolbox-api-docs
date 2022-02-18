@@ -17,6 +17,8 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
@@ -370,9 +372,16 @@ class Module extends BaseModule
     }
 
     /**
-     * @inheritdoc
+     * Build a controller for this class name.
+     *
+     * @template T of Base
+     * @param class-string<T> $className
+     * @return Base
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
-    public function buildController(): Base
+    public function buildControllerForClass(string $className): Base
     {
         // Common dependencies across the controllers this module _may_ create.
         $userMapper       = $this->getMapperFactory()->get(UserMapper::class);
@@ -404,7 +413,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
         );
 
-        switch ($this->controllerClass) {
+        switch ($className) {
             case ListController::class:
                 return new ListController(
                     $userMapper,
@@ -519,8 +528,69 @@ class Module extends BaseModule
                 );
 
             default:
-                return parent::buildController();
+                throw new InvalidArgumentException(
+                    sprintf('Assessment controller for class "%s" not found', $className),
+                );
         }
+    }
+
+    /**
+     * Build a controller for one of the assessment sub-types.
+     *
+     * @param string $type One of the One of the `AssessmentType::TYPE_*` constants
+     * @return Controller
+     * @throws InvalidArgumentException    if the controller isn't a Controller
+     *                                     instance
+     * @throws ContainerExceptionInterface something went wrong when building
+     *                                     the controller
+     * @throws NotFoundExceptionInterface  something went wrong when building
+     *                                     the controller
+     */
+    public function buildControllerForType(string $type): Controller
+    {
+        switch ($type) {
+            case AssessmentType::TYPE_DUE_WORK:
+                $controller = $this->buildControllerForClass(Assessment\DueWork\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_QUIZ:
+                $controller = $this->buildControllerForClass(Assessment\Quiz\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_TASK:
+                $controller = $this->buildControllerForClass(Assessment\Task\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_PROJECT:
+                $controller = $this->buildControllerForClass(Assessment\Project\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_LTI_ASSESSMENT:
+                $controller = $this->buildControllerForClass(Assessment\Lti\Controller::class);
+                break;
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf('Assessment controller for type "%s" not found', $type),
+                );
+        }
+        if ($controller instanceof Controller) {
+            return $controller;
+        }
+        throw new InvalidArgumentException(
+            sprintf('Assessment controller for type "%s" not a "%s" instance', $type, Controller::class),
+        );
+    }
+
+    /**
+     * @return Base
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    public function buildController(): Base
+    {
+        return $this->buildControllerForClass($this->controllerClass);
     }
 
     /* Getters / Setters

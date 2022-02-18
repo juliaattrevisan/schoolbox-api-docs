@@ -14,7 +14,10 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
+use InvalidArgumentException;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
@@ -396,14 +399,25 @@ class ListController extends Web\Controller\Base
      *
      * @param string $type One of the `AssessmentType::TYPE_*` constants
      * @return Controller  The controller for the given assessment type
-     * @throws ServiceNotFound
+     * @throws InvalidArgumentException    if the module can't find a controller
+     *                                     of the correct type
+     * @throws ContainerExceptionInterface something went wrong when building
+     *                                     the controller
+     * @throws NotFoundExceptionInterface  something went wrong when building
+     *                                     the controller
      */
-    private function getDelegateController($type)
+    private function getDelegateController($type): Controller
     {
-        // We know this will be a Controller object:
-        // We've configured this controller in the module.
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getController("learningAssessment/$type");
+        $module = Module::retrieveInstalledModule('learningAssessment');
+        if ($module instanceof Module) {
+            return $module->buildControllerForType($type);
+        }
+        throw new InvalidArgumentException(
+            sprintf(
+                'Module "learningAssessment" does not exist or is not a "%s" instance',
+                Module::class,
+            ),
+        );
     }
 
     /**
