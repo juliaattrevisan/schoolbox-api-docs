@@ -152,7 +152,7 @@ HELP;
                 $end->getDatabase()
             ));
 
-            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), $this->perform(), $this->getLogger()))
+            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->perform(), $this->getLogger()))
                 ->historical($start, $end, $lock);
 
             if (!$this->perform()) {

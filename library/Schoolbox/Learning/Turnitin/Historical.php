@@ -47,15 +47,27 @@ class Historical
 
 
     /**
+     * @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper
+     */
+    private \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+
+
+    /**
      * Historical constructor.
      *
-     * @param File\Mapper          $turnitinFileMapper
-     * @param bool                 $perform
-     * @param LoggerInterface|null $log
+     * @param File\Mapper                                                                $turnitinFileMapper
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
+     * @param bool                                                                       $perform
+     * @param LoggerInterface|null                                                       $log
      */
-    public function __construct(File\Mapper $turnitinFileMapper, bool $perform, ?LoggerInterface $log = null)
-    {
+    public function __construct(
+        File\Mapper $turnitinFileMapper,
+        \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        bool $perform,
+        ?LoggerInterface $log = null
+    ) {
         $this->turnitinFileMapper = $turnitinFileMapper;
+        $this->singleFileMapper = $singleFileMapper;
         $this->perform = $perform;
         $this->log = $log;
     }
@@ -104,7 +116,7 @@ class Historical
         $query = '
             SELECT 
                 sb.id AS submission_box_id, sb.name AS submission_box_name, 
-                ssf.*
+                ssf.id
             FROM submission_box sb
             INNER JOIN (
                 SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
@@ -131,21 +143,47 @@ class Historical
             'endDate' => $end->getDatabase()
         ]);
 
+        $rows = $statement->fetchAll();
+
+        /* Find the ids so we can hydrate instances easier
+         */
+        $ids = [];
+
+        foreach ($rows as $row) {
+            $ids[] = $row['id'];
+        }
+
+        $singleFiles = $this->singleFileMapper->findByColumn('id', $ids)->indexBy('id');
+
         $numFiles = 0;
 
         /* Build a collection of models
          */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        foreach ($rows as $row) {
+            $singleFile = $singleFiles->getOffset($row['id']);
+
+            /* All files discovered for historical addition must adhere to the usual criteria
+             */
+            if (!(new ValidFile())->isSatisfiedBy($singleFile)) {
+                $this->logDebug(sprintf(
+                    'Student Submission File Id %s: "%s" not suitable for historical addition (invalid file)',
+                    $singleFile->getId(),
+                    $singleFile->getBasename()
+                ));
+
+                continue;
+            }
+
             $turnitinFile = $this->turnitinFileMapper->createModel()
-                ->setStudentSubmissionFileId((int)$row['id'])
+                ->setStudentSubmissionFileId((int)$singleFile->getId())
                 ->setHistorical(true)
                 ->setStatus(File\Model::STATUS_TRANSMIT_PENDING);
 
             $this->logInfo(sprintf(
-                'Id %s (%s): %s, in box %s called "%s"',
-                $row['id'],
-                $row['created_at'],
-                $row['realname'],
+                'Id %s (%s): "%s", in box %s called "%s"',
+                $singleFile->getId(),
+                $singleFile->getCreatedAt()->getDatabase(),
+                $singleFile->getBasename(),
                 $row['submission_box_id'],
                 $row['submission_box_name']
             ));
@@ -159,7 +197,7 @@ class Historical
             $this->logDebug(sprintf(
                 'Student Submission File Id %s: historically adding into turnitin_report id %s with status [%s]',
                 $turnitinFile->getStudentSubmissionFileId(),
-                $turnitinFile->getId(),
+                $turnitinFile->getId() ?? '(as a new record)',
                 File\Model::STATUS_TRANSMIT_PENDING
             ));
 
@@ -167,8 +205,6 @@ class Historical
              * $timeout seconds until we're done, or until we died
              */
             if ($lock) {
-                $this->logDebug('Refreshing lock');
-
                 $lock->refresh();
             }
 
