@@ -134,6 +134,7 @@ function initForm (component) {
 async function saveComponentSettings (component, form) {
     const submitFormButton = form.querySelector('input[type="submit"]');
     try {
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
         submitFormButton.disabled = true;
         submitFormButton.value = 'Updating...';
         const response = await fetch(UPDATE_URL + '?' + getSaveComponentSettingsParams(form));
@@ -143,7 +144,9 @@ async function saveComponentSettings (component, form) {
         console.warn(error);
         updateRemovedComponent(component); //currently the assumed error, that the component no longer exists
         slideUp(component.querySelector(PANEL_SELECTOR), ANIMATE_SPEED);
-    } 
+    } finally {
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
+    }
 }
 
 /**

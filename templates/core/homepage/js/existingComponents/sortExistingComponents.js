@@ -84,7 +84,7 @@ function initOnComponentRemovedListener () {
  * Prevent rapid fire dragging while a data save is already taking place
  */
 function initOnProcessingStartListener () {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, () => {
         updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
     });
 }
@@ -93,7 +93,7 @@ function initOnProcessingStartListener () {
  * Re-enable dragging once any processes (like sort saving) have taken place
  */
 function initOnProcessingEndListener () {
-    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, (event) => {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, () => {
         updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
     });
 }
