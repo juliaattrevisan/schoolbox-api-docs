@@ -1039,7 +1039,7 @@ class Profile implements IStrategy
     private function importPortrait(UserProfile\Model $baseProfile, array $fileInfo): UserProfile\Model
     {
         $image = base64_decode($fileInfo['image']);
-        if ($image === false) {
+        if (!$image) {
             return $baseProfile;
         }
 
