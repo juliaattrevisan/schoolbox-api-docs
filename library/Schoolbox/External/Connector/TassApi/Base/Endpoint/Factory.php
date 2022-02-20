@@ -162,6 +162,11 @@ class Factory
      */
     private ClassPeriodMapper $classPeriodMapper;
 
+    /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
 
     /**
      * Factory constructor.
@@ -185,6 +190,7 @@ class Factory
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
+     * @param bool                            $includePhoto
      */
     public function __construct(
         LoggerInterface $log,
@@ -207,7 +213,8 @@ class Factory
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassPeriodMapper $classPeriodMapper,
+        bool $includePhoto
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -234,6 +241,7 @@ class Factory
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
+        $this->includePhoto = $includePhoto;
     }
 
 
@@ -304,7 +312,8 @@ class Factory
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $this->includePhoto
             ))
             ->add(new Profile\Cleanup(
                 $this->log,

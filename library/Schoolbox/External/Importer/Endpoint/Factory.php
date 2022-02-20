@@ -214,7 +214,8 @@ class Factory implements IFactory
                     TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    ClassPeriodMapper::getInstance(),
+                    (bool)Loader::getInstance()->get('photo_sis_import')
                 ))->produce();
 
             case self::COMPASS:

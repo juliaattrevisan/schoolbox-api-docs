@@ -23,6 +23,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\Mapper;
 use UnexpectedValueException;
 
 /**
@@ -163,6 +164,11 @@ class Profile implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -178,6 +184,7 @@ class Profile implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param bool                            $includePhoto
      */
     public function __construct(
         LoggerInterface $log,
@@ -192,7 +199,8 @@ class Profile implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        UserProfile\Relationship\Mapper $relationshipMapper,
+        bool $includePhoto
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -207,6 +215,7 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->includePhoto = $includePhoto;
     }
 
 
@@ -261,11 +270,15 @@ class Profile implements IStrategy
             ));
         }
 
+        $params = ['currentstatus' => 'current'];
+        if ($this->includePhoto) {
+            $params['includephoto'] = true;
+            $params['thumnail']     = true;
+        }
+
         /* Process each current student, and their parents too
          */
-        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
-            'currentstatus' => 'current'
-        ]);
+        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', $params);
 
         foreach ($students['students'] as $student) {
             $externalId = trim((string)$student['general_details']['student_code']);
@@ -343,6 +356,13 @@ class Profile implements IStrategy
                 ->setTitle($title)
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
+
+            if ($this->includePhoto && isset($student['general_details']['student_photo']['file_info']['image'])) {
+                $studentBaseProfile = $this->importPortrait(
+                    $studentBaseProfile,
+                    $student['general_details']['student_photo']['file_info']
+                );
+            }
 
             /* Log it
              */
@@ -767,9 +787,12 @@ class Profile implements IStrategy
 
         /* Get a list of teaching staff
          */
-        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
-            'currentstatus' => 'current'
-        ]);
+        $params = ['currentstatus' => 'current'];
+        if ($this->includePhoto) {
+            $params['includephoto'] = true;
+            $params['thumnail']     = true;
+        }
+        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', $params);
 
         /* Get a list of non-teaching staff
          */
@@ -960,6 +983,13 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
 
+            if ($this->includePhoto && isset($staff['teacher_photo']['file_info']['image'])) {
+                $staffBaseProfile = $this->importPortrait(
+                    $staffBaseProfile,
+                    $staff['teacher_photo']['file_info']
+                );
+            }
+
             /* Log it
              */
             $this->log->info(sprintf(
@@ -999,5 +1029,27 @@ class Profile implements IStrategy
                 $this->staffProfileMapper->save($staffProfile);
             }
         }
+    }
+
+    /**
+     * @param UserProfile\Model $baseProfile
+     * @param array             $fileInfo
+     * @return UserProfile\Model
+     */
+    private function importPortrait(UserProfile\Model $baseProfile, array $fileInfo): UserProfile\Model
+    {
+        $image = base64_decode($fileInfo['image']);
+        if ($image === false) {
+            return $baseProfile;
+        }
+
+        // Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
+        try {
+            $portrait = Mapper::getInstance()->acceptStream($baseProfile->getExternalId() . '.jpg', $image);
+            $baseProfile->setPortrait($portrait);
+        } catch (\Exception $e) {
+            // noop
+        }
+        return $baseProfile;
     }
 }

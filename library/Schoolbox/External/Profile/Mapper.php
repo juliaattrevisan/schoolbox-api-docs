@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Profile;
 
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage;
+
 /**
  * Class Mapper
  *
@@ -32,6 +35,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('firstname', self::TYPE_STRING);
         $this->uses('lastname', self::TYPE_STRING);
+        $this->joins('portrait_hash', Storage\Mapper::class, 'hash', null, null, 'portrait', 'portrait');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }

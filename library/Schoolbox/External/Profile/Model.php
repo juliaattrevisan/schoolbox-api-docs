@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Profile;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Resource\Storage;
 
 class Model
 {
@@ -38,6 +38,12 @@ class Model
      */
     private $lastname;
 
+    /**
+     * Portrait images are stored in storage now
+     *
+     * @var Storage\Model|null
+     */
+    private ?Storage\Model $portrait = null;
 
     /**
      * @return string $externalId
@@ -109,6 +115,24 @@ class Model
     public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
+        return $this;
+    }
+
+    /**
+     * @return Storage\Model|null
+     */
+    public function getPortrait(): ?Storage\Model
+    {
+        return $this->portrait;
+    }
+
+    /**
+     * @param Storage\Model|null $portrait
+     * @return self
+     */
+    public function setPortrait(?Storage\Model $portrait): self
+    {
+        $this->portrait = $portrait;
         return $this;
     }
 }
