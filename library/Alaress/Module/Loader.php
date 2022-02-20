@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Alaress\Module;
 
+use LogicException;
+
 /**
  * A loader class for loading module's controller dependencies dynamically.
  */
@@ -48,18 +50,15 @@ class Loader implements LoaderInterface
     {
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
-            $module     = Module::retrieveInstalledModule($moduleName);
+            try {
+                $module = Module::retrieveInstalledModule($moduleName);
+            } catch (LogicException $e) {
+                // There was no module to load.
+                // That's fine, as `addTemplatePath` can set a different
+                // basename for a template folder.
+                return;
+            }
             $module->initControllerDependencies();
-//            if (empty($this->loadedModules[$moduleName])) {
-//                if ($this->injector->has('module:' . $moduleName)) {
-//                    $module = $this->injector->get('module:' . $moduleName);
-//                    if ($module instanceof Module) {
-//                        $module->initControllerDependencies();
-//                    }
-//                }
-//                // Don't try to init again, even if it wasn't found
-//                $this->loadedModules[$moduleName] = true;
-//            }
         }
     }
 }
