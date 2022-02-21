@@ -19,6 +19,10 @@
                     <div class="small-12 medium-10 columns no-pad">
                         <dl>
                             {# Display student name #}
+                            <dt class="small-12 medium-3">Student Name</dt>
+                            <dd class="small-12 medium-9">
+                                <a href="{{ profile.link(student) }}">{{ student.fullName }}</a>
+                            </dd>
                             <dt class="small-4 medium-3 columns">Campus</dt>
                             <dd class="small-8 medium-9 columns">{% for campus in student.campusCollection %}{{ campus.name }} {% endfor %}</dd>
                             <dt class="small-4 medium-3 columns">Year Level</dt>
