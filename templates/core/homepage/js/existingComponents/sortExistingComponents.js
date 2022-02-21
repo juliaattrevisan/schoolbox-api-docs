@@ -234,13 +234,13 @@ function extractActiveComponent () {
         left: `${__referenceElement.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-    updateActiveComponentComputedStyles(__activeComponent);
+    addActiveComponentComputedStyles(__activeComponent);
 }
 
 /**
  * Ensure custom set colour vars are respected and set when moving between parent containers
  */
-function updateActiveComponentComputedStyles () {
+function addActiveComponentComputedStyles () {
 
     const containerPosition = __referenceElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
@@ -251,6 +251,16 @@ function updateActiveComponentComputedStyles () {
     __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = headFont );
     __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = headFont );
 
+}
+
+/**
+ * Reset the set custom colours set in addActiveComponentComputedStyles(), 
+ * otherwise further user colour changes in the edit columns palette will not be reflected
+ */
+function removeActiveComponentComputedStyles () {
+    __activeComponent.querySelectorAll('.component-titlebar').forEach((item) => item.style.backgroundColor = '' );
+    __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = '' );
+    __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = '' );
 }
 
 /**
@@ -428,7 +438,7 @@ function onSnapBackActiveComponentComplete () {
     gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
     __activeComponent.setAttribute('data-component', ''); //so it can be dragged again
-    updateActiveComponentComputedStyles(); //ensure the defined colours are respected
+    removeActiveComponentComputedStyles(); //ensure the defined colours are respected
 
     insertElementAfter(__referenceElement, __activeComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
