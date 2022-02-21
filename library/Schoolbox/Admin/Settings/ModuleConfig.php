@@ -36,12 +36,14 @@ class ModuleConfig
      * @param string                     $siteVersion
      * @param GenericCollection|Config[] $configs
      * @param string                     $postRoute
+     * @param array                      $additionalContext
      * @return array
      */
     public function getContext(
         string $siteVersion,
         GenericCollection $configs,
-        string $postRoute
+        string $postRoute,
+        array $additionalContext
     ): array {
 
         $isEditable = $hasColourPicker = $hasTimePicker = $hasHtmlEditor = $hasResourcePicker = false;
@@ -68,7 +70,7 @@ class ModuleConfig
             $settings[] = $this->fieldStrategyFactory->makeRenderer($config->getFieldId())->getTemplateAndData($config);
         }
 
-        return [
+        return $additionalContext + [
             'siteVersion'       => $siteVersion,
             'hasColourPicker'   => $hasColourPicker,
             'hasTimePicker'     => $hasTimePicker,

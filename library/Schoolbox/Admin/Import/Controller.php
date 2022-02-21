@@ -75,7 +75,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('adminImportIndex.postSchoolDataOptions')
+            $this->router->generate('adminImportIndex.postSchoolDataOptions'),
         );
 
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');

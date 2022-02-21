@@ -70,7 +70,8 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('adminLti.postConfig')
+            $this->router->generate('adminLti.postConfig'),
+            ['useBottomDrawer' => false,],
         );
 
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();

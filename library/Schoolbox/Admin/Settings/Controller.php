@@ -44,7 +44,7 @@ class Controller extends ConfigController
 
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
-            $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel])
+            $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel]),
         );
 
         /* Not sure if this was intended to be in configContext?
