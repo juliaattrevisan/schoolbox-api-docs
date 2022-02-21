@@ -486,9 +486,10 @@ class Classes implements IStrategy
             $timetableClassPeriod->setTeacher($subject['teachers'][0]['externalId']);
 
             $this->log->info(sprintf(
-                'Creating class period relation for teacher %s %s in room %s',
+                'Creating class period relation for teacher %s %s (%s) in room %s',
                 $subject['teachers'][0]['firstname'],
                 $subject['teachers'][0]['surname'],
+                $subject['teachers'][0]['externalId'],
                 $subject['room']['name']
             ));
         } else {
