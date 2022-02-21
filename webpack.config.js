@@ -156,83 +156,83 @@ module.exports = {
         highchartsMore: './www/static/js/vendors/highcharts/highchartsMore.js',
 
         //Search Bar
-        searchBar: './vue/components/searchBar/searchBar.js',
+        // searchBar: './vue/components/searchBar/searchBar.js',
 
         //Calendars
-        sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
-        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
-        upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
-        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
-        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js',
-        calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
-        calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
+        // sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
+        // assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
+        // upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
+        // resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
+        // resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js',
+        // calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
+        // calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
 
         //News related
-        visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
-        articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
-        articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
-        newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
-        newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js',
-        newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js',
-        newsItemFormActions: './library/Schoolbox/Comms/News/vue/newsItemFormActions.js',
-        newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
+        // visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
+        // articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
+        // articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
+        // newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
+        // newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js',
+        // newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js',
+        // newsItemFormActions: './library/Schoolbox/Comms/News/vue/newsItemFormActions.js',
+        // newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
 
         //Learning
-        learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
-        userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
-        badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
-        badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
-        badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
-        evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
-        checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
-        similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',
+        // learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
+        // userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
+        // badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
+        // badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
+        // badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
+        // evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
+        // checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
+        // similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',
 
         // Textboxes
-        textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
+        // textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
 
         //Admin
-        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
-        adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
-        staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
-        adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
-        saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
+        // adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
+        // adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
+        // staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
+        // adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
+        // saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
 
-        usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
-        usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
-        usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
-        usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
-        usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
+        // usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
+        // usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
+        // usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
+        // usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
+        // usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
 
-        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
-        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
-        usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
-        usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
+        // usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
+        // usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
+        // usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
+        // usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
 
         //Record Media Modal
-        recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
+        // recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
 
         // Class
-        classList: './library/Schoolbox/Learning/vue/classList.js',
+        // classList: './library/Schoolbox/Learning/vue/classList.js',
 
         // Groups
-        manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
+        // manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
 
         // QR codes
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
 
         // Pastoral
-        pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
-        pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
-        pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
+        // pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
+        // pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
+        // pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
 
         //Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
-        viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
+        // viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
         //Most functionality for a home page
         updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
-        canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
+        // canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chromeFoundation.scss',
@@ -369,7 +369,7 @@ module.exports = {
     },
     resolve: { //https://webpack.js.org/configuration/resolve/
         alias: {
-            'vue$': 'vue/dist/vue.esm.js',
+            'vue$': 'vue/dist/vue.runtime.esm-bundler.js',
             '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
