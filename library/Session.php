@@ -91,11 +91,12 @@ class Session
      * Note the `$remember` param is gone: remembering a login is now handled
      * outside of this class, in `Schoolbox\Auth\Remember`.
      *
-     * @param string $username New user's user.username
+     * @param string      $username New user's user.username
+     * @param string|null $jwtId
      * @return bool Whether new Session started for proposed user
      * @throws MapperException
      */
-    public function create($username)
+    public function create(string $username, ?string $jwtId = null): bool
     {
         $userHandler  = new \User();
         $userMapper   = UserMapper::getInstance();
@@ -158,11 +159,12 @@ class Session
 
             if ($this->getUseLoginLog()) {
                 $notif = Notifactory::create(Notif::TOPIC_AUTH);
-                $notif->notice("Login success for $username", array(
+                $notif->notice("Login success for $username", [
                     'username' => $user->getUsername(),
                     'ip'       => $ip,
                     'login'    => 1,
-                ));
+                    'jwtId'    => $jwtId
+                ]);
             }
 
             return $result;
@@ -201,8 +203,14 @@ class Session
             throw new SchoolboxAccessDeniedException();
         }
 
-        $ip    = Session::getIP();
-        $notif = Notifactory::create(Notif::TOPIC_AUTH);
+        $notif              = Notifactory::create(Notif::TOPIC_AUTH);
+        $notifFailureParams = [
+            'username' => $username,
+            'ip'       => Session::getIP(),
+            'login'    => 0,
+            'jwtId'    => null,
+        ];
+
         $userMapper = UserMapper::getInstance();
 
         // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
@@ -221,21 +229,13 @@ class Session
 
         if (!$user instanceof \Schoolbox\User) {
             // Log the fact that user doesn't exist
-            $notif->notice("Login failure for non-existent user " . $username, array(
-                'username' => $username,
-                'ip'       => $ip,
-                'login'    => 0,
-            ));
+            $notif->notice("Login failure for non-existent user " . $username, $notifFailureParams);
             throw new SchoolboxNotFoundException();
         }
 
         if (!($user->getEnabled())) {
             // Log the fact that user is not enabled
-            $notif->notice("Login failure for non-enabled user " . $user->getUsername(), array(
-                'username' => $user->getUsername(),
-                'ip'       => $ip,
-                'login'    => 0,
-            ));
+            $notif->notice("Login failure for non-enabled user " . $user->getUsername(), $notifFailureParams);
             throw new SchoolboxAccountDisabledException();
         }
 
@@ -253,32 +253,22 @@ class Session
 
         if (!$result) {
             /* Log failure */
-            $notif->notice("Login failure for " . $user->getUsername(), array(
-                'username' => $user->getUsername(),
-                'ip'       => $ip,
-                'login'    => 0,
-            ));
+            $notif->notice("Login failure for " . $user->getUsername(), $notifFailureParams);
             throw new SchoolboxAccessDeniedException();
-        } else {
-            // Store password as hash for DAV authentication later
-            $save = [
-                'username' => $username,
-                'hash'     => md5($username . ':' . Config::get('site_school_code') . ':' . $password)
-            ];
+        }
+        // Store password as hash for DAV authentication later
+        $save = [
+            'username' => $username,
+            'hash'     => md5($username . ':' . Config::get('site_school_code') . ':' . $password),
+        ];
 
-            // ensure a key is set on login
-            if (!$user->getKey()) {
-                $save['key'] = substr(md5(uniqid() . time()), 0, 25);
-            }
-
-            $this->db->update('user', 'username', $save);
+        // ensure a key is set on login
+        if (!$user->getKey()) {
+            $save['key'] = substr(md5(uniqid() . time()), 0, 25);
         }
 
-        if ($result) {
-            return $user;
-        } else {
-            return null;
-        }
+        $this->db->update('user', 'username', $save);
+        return $user;
     }
 
 

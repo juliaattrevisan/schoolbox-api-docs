@@ -60,18 +60,19 @@ class Authenticator
      * assumes that the user has already been authenticated as a valid user
      * somehow.
      *
-     * @param string $username
+     * @param string                $username
+     * @param User\Token\Model|null $userToken
      * @return bool
-     * @throws SchoolboxNotAuthenticatedException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function createSession(string $username): bool
+    public function createSession(string $username, ?User\Token\Model $userToken = null): bool
     {
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
         if (session_start()) {
             $session = new Session();
-            if (!$session->create($username)) {
+            if (!$session->create($username, $userToken ? $userToken->getJwtId() : null)) {
                 throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
             }
 

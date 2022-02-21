@@ -341,7 +341,7 @@ class Controller extends Base
         // TODO combine decoding of Schoolbox JWTs and oAuth provider JWTs into one class
         $claims = $this->tokenValidator->decode($jwt);
         $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
-
+        $token  = null;
         if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI]) && $this->tokenValidator->issuedBySchoolbox($claims)) {
             // if issued by schoolbox and jti is provided, validate the jti
             try {
@@ -362,9 +362,8 @@ class Controller extends Base
         }
 
         if ($user) {
-
             // TODO this used to remember the authenticated user: should it?
-            $this->auth->createSession($user->getUsername());
+            $this->auth->createSession($user->getUsername(), $token);
             return $user;
         }
 
