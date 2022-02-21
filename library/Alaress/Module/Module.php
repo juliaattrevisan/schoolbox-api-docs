@@ -249,9 +249,6 @@ class Module
             return;
         }
         $this->isControllerDependenciesInstalled = true;
-//        $injector                                = $this->injector;
-//        $this->preInitControllerDependencies($injector);
-//        $this->initDependingModules();
 
         // configure pre-registered preloaders
         foreach ($this->preloadIndex as [$preload, $methods]) {

@@ -367,21 +367,9 @@ abstract class Base
     {
         $module = Module::retrieveInstalledModule($name);
 
-        // initialise the controller into the DI
+        // initialise controller's routes and dependencies, and then build it
         $module->initControllerDependencies();
-//        $module->initControllers($this->getDi());
-
-//        // remove this reference, we don't need it anymore
-//        unset($module);
-
-//        // obtain and return the controller from DI now that it's been registered
-//        /** @var self $controller */
-//        $controller = $this->getDi()->get("controller:$name");
-
-        $controller = $module->installControllerDependencies(
-            $module->buildController(),
-            $this->di,
-        );
+        $controller = $module->installControllerDependencies($module->buildController(), $this->di);
         $controller->setUser($this->user);
         return $controller;
     }

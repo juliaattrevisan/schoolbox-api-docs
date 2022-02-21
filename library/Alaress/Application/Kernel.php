@@ -519,11 +519,6 @@ abstract class Kernel
                 ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
             ),
         );
-
-//        $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
-//            ModuleLoader::class,
-//            ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
-//        );
         $di->set(
             'preloader',
             $di->lazyNew(
@@ -542,37 +537,9 @@ abstract class Kernel
         );
 
         // Web request/response factory
-//        $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
         $di->set('webFactory', $di->lazyNew(WebFactory::class, ['globals' => $GLOBALS]));
 
-//        // inject request and response into controller
-//        // (I may need to mangle requests in pre-processing though)
-//        $di->setters['Alaress\\Web\\Controller\\Base'] = array(
-//            'setRequest'    => $di->lazy(
-//                function () use ($di) {
-//                    return $di->get('webFactory')->newRequest();
-//                }
-//            ),
-//            'setResponse'   => $di->lazy(
-//                function () use ($di) {
-//                    return $di->get('webFactory')->newResponse();
-//                }
-//            ),
-//            'setSession'    => $di->lazyGet('session'),
-//            'setRouter'     => $di->lazyGet('router'),
-//            'setAuthorizer' => $di->lazyGet('authorizer'),
-//            'setDi'         => $di,
-//            'setExceptionGenerator' => $mapperFactory->getLazy(Error\Mapper::class),
-//            'setSentry'     => $di->lazy(
-//            // Use lazy function to insulate from service registration sequencing
-//                function () use ($di) {
-//                    return $di->has('sentry') ? $di->get('sentry') : null;
-//                }
-//            ),
-//            'setIsJsonSpec' => $di->lazyNew(IsJson::class),
-//            'setIsXhrSpec'  => $di->lazyNew(IsXhr::class)
-//        );
-
+        // SitePage :D
         $di->set(
             'sitePage',
             $di->lazyNew(SitePage::class, ['di' => $di])
@@ -727,8 +694,6 @@ abstract class Kernel
         );
 
         // Web output class - currently uses Sitepage
-//        $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
-//        $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
         $di->set('webOutput:html', $di->lazy(function () use ($di, $mapperFactory) {
 
@@ -843,10 +808,7 @@ abstract class Kernel
             )
         );
 
-//        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class, ['di' => $di]));
-
-//        $di->setters[TwigMethod\RouteLookup::class]['setRouter'] = $di->lazyGet('router');
         $di->set(
             'templateEngine:routeLookup',
             $di->lazyNew(
@@ -855,10 +817,6 @@ abstract class Kernel
                 ['setRouter' => $di->lazyGet('router')],
             )
         );
-
-//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setRouter']     = $di->lazyGet('router');
-//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setAuthorizer'] = $di->lazyGet('authorizer');
-//        $di->setters[TwigMethod\IsRouteAuthorized::class]['setSession']    = $di->lazyGet('session');
         $di->set(
             'templateEngine:isRouteAuthorized',
             $di->lazyNew(
@@ -871,9 +829,6 @@ abstract class Kernel
                 ],
             )
         );
-
-//        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['routeLookup'] = $di->lazyGet('templateEngine:routeLookup');
-//        $di->params[TwigMethod\RouteLookupIfAuthorized::class]['isRouteAuthorized'] = $di->lazyGet('templateEngine:isRouteAuthorized');
         $di->set(
             'templateEngine:routeLookupIfAuthorized',
             $di->lazyNew(
@@ -911,13 +866,7 @@ abstract class Kernel
 
                     $twig = new Environment($di->get('templateEngine:loader'), $options);
 
-                //                    if($this->debugEnabled) {
-                //                        $twig = new TraceableTwigEnvironment($twig);
-                //                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
-                //                    }
-
                     // HTML Purifier filter - known to output safe HTML
-
                     $twig->addFilter(
                         new TwigFilter(
                             'purify',
@@ -1079,9 +1028,6 @@ abstract class Kernel
                 }
             )
         );
-
-//        // Paginator internal object
-//        $di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
 
         // Build a user provisioner
         // TODO unify this definition and the one in Daemon\Bootstrap
@@ -1275,11 +1221,6 @@ abstract class Kernel
         );
 
         // Register assessment data source
-//        $di->params[AssessmentDataSource::class] = [
-//            'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
-//            'translator'            => $di->lazyGet('assessmentTranslator'),
-//            'participantDataSource' => $di->lazyGet('participantDataSource'),
-//        ];
         $di->set(
             'assessmentDataSource',
             $di->lazyNew(
@@ -1293,14 +1234,6 @@ abstract class Kernel
         );
 
         // Register participant data source (with responses and feedback)
-//        $di->params[ParticipantDataSource::class] = [
-//            'externalDb'         => $di->lazyGet('externalClass'),
-//            'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
-//            'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
-//            'responseDataSource' => $di->lazyGet('responseDataSource'),
-//            'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
-//            'planMapper'         => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class)
-//        ];
         $di->set(
             'participantDataSource',
             $di->lazyNew(
@@ -1325,8 +1258,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(SubmissionMapper::class)]
             )
         );
-//        $di->params[DueWorkSubmissionMapperProxy::class]['mapper'] = $mapperFactory->getLazy(SubmissionMapper::class);
-
         $di->set(
             'returnDataSource',
             $di->lazyNew(
@@ -1334,7 +1265,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(ReturnedWorkMapper::class)]
             )
         );
-//        $di->params[DueWorkFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(ReturnedWorkMapper::class);
 
 
         /* QUIZ SOURCES */
@@ -1345,8 +1275,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(QuizAttemptMapper::class)]
             )
         );
-//        $di->params[QuizAttemptMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
-
         $di->set(
             'reviewDataSource',
             $di->lazyNew(
@@ -1354,7 +1282,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(QuizAttemptMapper::class)]
             )
         );
-//        $di->params[QuizFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(QuizAttemptMapper::class);
 
 
         /* TASK SOURCES */
@@ -1365,8 +1292,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(TaskCompletionMapper::class)]
             )
         );
-//        $di->params[TaskResponseMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
-
         $di->set(
             'ratificationDataSource',
             $di->lazyNew(
@@ -1374,7 +1299,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(TaskCompletionMapper::class)]
             )
         );
-//        $di->params[TaskFeedbackMapperProxy::class]['mapper'] = $mapperFactory->getLazy(TaskCompletionMapper::class);
 
 
         // LTI sources, without funny names
@@ -1447,14 +1371,6 @@ abstract class Kernel
                 }
             )
         );
-
-//        $di->params[LearningAssessmentTransactor::class] = [
-//            'folderMapper'                  => $mapperFactory->getLazy(Folder\Mapper::class),
-//            'unitImplementationMapperProxy' => $di->lazyGet('unitImplementationDataSource'),
-//            'unitSpecificationMapperProxy'  => $di->lazyGet('unitSpecificationDataSource'),
-//            'assessmentMapperProxy'         => $di->lazyGet('assessmentDataSource'),
-//            'router'                        => $di->lazyGet('router'),
-//        ];
 
         $di->set(
             'transactor',
@@ -1604,35 +1520,7 @@ abstract class Kernel
             )
         );
 
-        // notificaton routing cache
-
-//        $di->params[\Schoolbox\Notif\Queue\Bindings\Generator::class] = [
-//            'xUserHandler'      => $di->lazyGet('externalUser'),
-//            'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
-//            'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
-//            'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
-//            'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
-//        ];
-
-//        $di->params[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-//            'redis' => $di->lazyGet('redis.storage'),
-//            'log'   => $di->lazyValue('logger')
-//        ];
-
-//        $di->setters[\Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class] = [
-//            'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
-//            'setGenerator'  => $di->lazyNew(
-//                \Schoolbox\Notif\Queue\Bindings\Generator::class,
-//                [
-//                    'xUserHandler'      => $di->lazyGet('externalUser'),
-//                    'userMapper'        => $mapperFactory->getLazy(UserMapper::class),
-//                    'roleMapper'        => $mapperFactory->getLazy(\Schoolbox\RoleMapper::class),
-//                    'userAccessMapper'  => $mapperFactory->getLazy(UserAccessMapper::class),
-//                    'categoryMapper'    => $mapperFactory->getLazy(Folder\Mapper::class)
-//                ]
-//            )
-//        ];
-
+        // notification routing cache
         $di->set(
             'subscriptionCache',
             $di->lazyNew(
