@@ -551,7 +551,7 @@ class Classes implements IStrategy
          */
         if ($involvement->count()) {
             $this->log->debug(sprintf(
-                'Reusing class involvement %s %s for %s (user %s)',
+                'Reusing class involvement %s %s for %s (%s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
                 "{$person['firstname']} {$person['surname']}",
@@ -568,7 +568,7 @@ class Classes implements IStrategy
             ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for %s (user %s)',
+            'Creating class involvement %s %s for %s (%s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
             "{$person['firstname']} {$person['surname']}",

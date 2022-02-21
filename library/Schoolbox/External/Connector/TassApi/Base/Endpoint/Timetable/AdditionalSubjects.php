@@ -329,11 +329,9 @@ class AdditionalSubjects implements IStrategy
                     }
 
                     $this->log->info(sprintf(
-                        "Additional subject %s (%s) added for %s (user %s)",
+                        "Additional subject %s (%s) added",
                         $additionalSubject['sub_long'],
-                        $code,
-                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                        $externalId
+                        $code
                     ));
 
                     $classes->add($nonUnitisedClass);
