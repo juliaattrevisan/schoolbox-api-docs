@@ -215,6 +215,19 @@ class Reader implements \Iterator
 
         rewind($this->fp);
 
+        /**
+         * check if the start of the file contains BOM character
+         */
+        $bom = "\xef\xbb\xbf";
+        // Progress file pointer and get first 3 characters to compare to the BOM string.
+        if (fgets($this->fp, 4) !== $bom) {
+            // BOM not found - rewind pointer to start of file.
+            rewind($this->fp);
+        }
+        /**
+         * file should now be clean and ready to start using
+         */
+
         $header = $this->loadRow();
 
         fseek($this->fp, $currentLocation);
