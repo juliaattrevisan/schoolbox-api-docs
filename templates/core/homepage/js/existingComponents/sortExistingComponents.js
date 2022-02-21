@@ -354,11 +354,7 @@ function updateActiveComponentPosition (closestElement, isShiftingDown) {
 
     const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR)); //record position of elements before we move them around
     
-    if (isShiftingDown) { //now move the elements depending on position of the component being sorted
-        insertElementAfter(closestElement, __referenceElement); //below if below the element
-    } else {
-        insertElementBefore(closestElement, __referenceElement); //and above if... well above
-    }
+    isShiftingDown ? insertElementAfter(closestElement, __referenceElement) : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
     clearFlipElements(); //check for flip bug
 

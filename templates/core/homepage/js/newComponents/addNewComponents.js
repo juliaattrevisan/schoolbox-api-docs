@@ -116,8 +116,12 @@ function onNewComponentClicked (event) {
     __isFlipping = true;
 
     document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+    
     updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-    reinsertNewComponentButton();
+    __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
+    __referenceElement.removeAttribute('data-component'); //in this instance we don't want the reference element to animate
+    disableAllOtherDraggables();
+    extractNewComponent();
 
     const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
     
@@ -125,6 +129,9 @@ function onNewComponentClicked (event) {
     insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
     __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
     __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
+    __newComponent.style.zIndex = 9999;
+    __newComponent.style.position = 'static';
+    __newComponent.style.width = '100%';
 
     Flip.from(state, {
         absolute: true, //to accurately animate elements
@@ -134,9 +141,9 @@ function onNewComponentClicked (event) {
         zIndex: 9999, //ensure it stays on top
         onComplete: () => {
             __isFlipping = false;
-            gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-            __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-            __newComponent.style.transform = 'translate3d(0, 0, 0)'; //ensure the gsap movement is reset
+            reinsertNewComponentButton();
+            __referenceElement.remove(); //and now the placeholder can be pulled out
+            updateSortableElements();
             addNewComponent();
         },
     });
@@ -368,11 +375,7 @@ function updateDraggedComponentOnPage (closestElement, isShiftingDown) {
 
     const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
     
-    if (isShiftingDown) {
-        insertElementAfter(closestElement, __referenceElement);
-    } else {
-        insertElementBefore(closestElement, __referenceElement);
-    }
+    isShiftingDown ? insertElementAfter(closestElement, __referenceElement) : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
     __referenceElement.style.marginBottom = '2rem'; //existing components all have a margin
     __newComponent.style.marginBottom = '2rem'; //existing components all have a margin
@@ -394,7 +397,7 @@ function updateDraggedComponentOnPage (closestElement, isShiftingDown) {
  * Flip currently sometimes leaves a left over element while dragging between elements. It's cleared on mouse release, but we need 
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
- function clearFlipElements () {
+function clearFlipElements () {
     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
         if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
             parentContainer.removeChild(parentContainer.children[0]);
@@ -452,8 +455,6 @@ function alignNewComponent () {
 /**
  * Tidy up once the element has snapped back 
  * setting up for another drag, returning various variables back to there pre dragging state etc
- * 
- * @param { Element }  
  */
 function onAlignNewComponentComplete () {
     resetNewComponent();
@@ -471,9 +472,10 @@ function onAlignNewComponentComplete () {
  */
 function resetNewComponent () {
     gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-    __newComponent.style.transform = 'translate3d(0, 0, 0)'; //ensure the dragging movement is reset
-    __newComponent.setAttribute('data-component', ''); //so it can be dragged again
+    __newComponent.style.position = ''; //was absolute, now sitting as it should
+    __newComponent.style.transform = ''; //ensure the dragging movement is reset
+    __newComponent.style.left = ''; //ensure the dragging movement is reset
+    __newComponent.style.top = ''; //ensure the dragging movement is reset
     insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
 }
@@ -481,7 +483,7 @@ function resetNewComponent () {
 /**
  * Return the document back to its pre onDragStart behaviour 
  */
- function updateDocumentOnDragEnd () {
+function updateDocumentOnDragEnd () {
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
@@ -508,6 +510,8 @@ async function addNewComponent () {
 
 /**
  * Reinsert the cloned new component button into the new component tabs 
+ * 
+ * @todo - this should be the reference element not this __newComponentClone
  */
 function reinsertNewComponentButton () {
     __newComponentTabsContainer.appendChild(__newComponentClone); 
@@ -518,7 +522,7 @@ function reinsertNewComponentButton () {
  * The Draggable instance was on the element that's now been inserted into the page
  * so we need to tidy that up and then add a new Draggable instance to the new component button thats back in the tabs
  */
- function updateDraggablesWithNewComponentButton () {
+function updateDraggablesWithNewComponentButton () {
     const draggableToRemove = __draggablesList.find((draggable) => draggable.target !== __newComponent);
     draggableToRemove.kill();
     __draggablesList = __draggablesList.filter((draggable) => draggable.target !== __newComponent);
