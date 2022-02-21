@@ -273,7 +273,6 @@ class Profile implements IStrategy
         $params = ['currentstatus' => 'current'];
         if ($this->includePhoto) {
             $params['includephoto'] = true;
-            $params['thumnail']     = true;
         }
 
         /* Process each current student, and their parents too
@@ -790,7 +789,6 @@ class Profile implements IStrategy
         $params = ['currentstatus' => 'current'];
         if ($this->includePhoto) {
             $params['includephoto'] = true;
-            $params['thumnail']     = true;
         }
         $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', $params);
 
