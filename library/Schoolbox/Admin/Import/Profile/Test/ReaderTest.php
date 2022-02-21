@@ -563,16 +563,7 @@ class ReaderTest extends TestCase
      */
     public function testValidBOMChar()
     {
-        $expectedColumns = ['External ID' => 'external_id',
-                            'Type' => 'parent',
-                            'Username' => 'username',
-                            'Title' => 'title',
-                            'Firstname' => 'firstname',
-                            'Surname' => 'lastname',
-                            'Email' => 'email',
-                            'Mobile' => 'mobile',
-                            'Home Phone' => 'phone_home',
-                            'Work Phone' => 'phone_work'];
+        $expectedColumns = ['External ID', 'Type', 'Username', 'Title', 'Firstname', 'Surname', 'Email', 'Mobile', 'Home Phone', 'Work Phone'];
 
         $reader = (new Reader(__DIR__ . '/bomChar.csv', true, false))
             ->setExpectedColumns($expectedColumns);
