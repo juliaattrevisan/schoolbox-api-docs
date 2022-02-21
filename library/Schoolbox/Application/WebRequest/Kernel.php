@@ -64,7 +64,7 @@ class Kernel extends WebKernelAbstract
      * @throws SchoolboxException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
@@ -104,7 +104,7 @@ class Kernel extends WebKernelAbstract
     /**
      * Execute the main script
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
@@ -243,7 +243,7 @@ class Kernel extends WebKernelAbstract
      * @param Route $route  the route to render: the controller and action are
      *                      extracted from its name.
      * @param array $server Vars from $_SERVER
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
@@ -432,7 +432,7 @@ class Kernel extends WebKernelAbstract
      *
      * @param string|null $path  the base path that was requested
      * @param array       $server Vars from $_SERVER
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function outputSitepageContent(?string $path, array $server): void
     {
@@ -521,7 +521,7 @@ class Kernel extends WebKernelAbstract
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
@@ -549,7 +549,7 @@ class Kernel extends WebKernelAbstract
     /**
      * Web requests require CSRF protection: that belongs in middleware.
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws SchoolboxException
      */
     protected function runMiddleware(): void
@@ -675,7 +675,7 @@ class Kernel extends WebKernelAbstract
      * logged in, or destroy the session completely if nobody was logged in.
      *
      * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function authenticateUserForThisRequestOnly(User $user): void
     {
