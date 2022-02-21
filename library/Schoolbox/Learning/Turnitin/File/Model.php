@@ -81,6 +81,39 @@ class Model implements ISoftDeletable
     public const STATUS_ERROR = 'error';
 
 
+    /**
+     * Translate mixed Turnitin errors into something human readable
+     */
+    private const ERROR_TRANSLATION = [
+        /* 409 Conflict means multiple things in specific parts of turnitin
+         * Uploading a binary into a container already containing a binary,
+         * creating a Turnitin Submission in a broken state, etc.
+         */
+        '404' => 'Turnitin is missing some data about this file.',
+        '409' => 'Conflicting data in Turnitin.',
+        /* Generic message for these techy reasons
+         */
+        '400' => 'Turnitin configuration issue.',
+        '403' => 'Turnitin configuration issue.',
+        '429' => 'Turnitin configuration issue.',
+        '500' => 'Turnitin configuration issue.',
+        /* Sizes
+         */
+        '413' => 'File is too big.',
+        '422' => 'File is too small.',
+        /* Specifically about files, not the general Turnitin process
+         */
+        'UNSUPPORTED_FILETYPE' => 'This file type is not supported by Turnitin.',
+        'PROCESSING_ERROR' => 'Turnitin could not process this file.',
+        'CANNOT_EXTRACT_TEXT' => 'This file does not contain enough text for Turnitin to analyse properly.',
+        'TOO_LITTLE_TEXT' => 'This file does not contain enough text for Turnitin to analyse properly.',
+        'TOO_MUCH_TEXT' => 'This file contains too much text for Turnitin to analyse properly.',
+        'TOO_MANY_PAGES' => 'This file contains too many pages for Turnitin to analyse properly.',
+        'FILE_LOCKED' => 'The file requires a password to be opened.',
+        'CORRUPT_FILE' => 'The file is corrupted.',
+    ];
+
+
      /**
      * A string that represents the current state of a Similarity Report
      * Denotes whether it has successfully finished or not
@@ -207,6 +240,34 @@ class Model implements ISoftDeletable
     public function isPending(): bool
     {
         return self::STATUS_TRANSMIT_PENDING === $this->getStatus();
+    }
+
+
+    /**
+     * Get the human readable error for the current status
+     *
+     * This is used to translate error codes like 409, TOO_LITTLE_TEXT, etc into
+     * something fit for the average citizen who don't talky a developer words
+     *
+     * Unknown translations return the error_message value instead
+     *
+     * Note that http status codes mean different things in different places.
+     *
+     * @return string|null
+     */
+    public function getHumanReadableError(): ?string
+    {
+        if (null === $this->errorCode) {
+            return null;
+        }
+
+        /* Try to find a human readable version; if not, you get the nerd words
+         */
+        if (array_key_exists($this->errorCode, self::ERROR_TRANSLATION)) {
+            return self::ERROR_TRANSLATION[$this->errorCode];
+        }
+
+        return $this->errorMessage;
     }
 
 

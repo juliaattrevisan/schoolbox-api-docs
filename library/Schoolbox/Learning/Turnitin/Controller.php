@@ -148,8 +148,12 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing our report
      *
+     * @throws Exception\Exception
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postReportComplete(): void
     {
@@ -169,8 +173,12 @@ class Controller extends Base
     /**
      * This method fires when Turnitin finishes processing user-made changes to a report
      *
+     * @throws Exception\Exception
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postReportUpdated(): void
     {
@@ -199,15 +207,14 @@ class Controller extends Base
      * @param string $currentFunction
      * @param string $submissionIdentifierKey
      * @return array
-     * @throws \DomainException
-     * @throws \RuntimeException
+     * @throws Exception\Exception
      */
     private function generateModelAndPayload(string $headerKey, string $currentFunction, string $submissionIdentifierKey): array
     {
         /* Only accept a specific header
          */
         if ($headerKey !== $this->getRequest()->headers->get(self::HEADER_EVENT_TYPE)) {
-            throw new \DomainException(sprintf(
+            throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin accessed %s webhook with non-matching webhook header: %s = %s',
                 $currentFunction,
                 self::HEADER_EVENT_TYPE,
@@ -222,7 +229,7 @@ class Controller extends Base
         try {
             $payload = json_decode($rawPayload, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new \RuntimeException(sprintf(
+            throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin sent %s json payload but we cannot decode it: %s',
                 'postUploadComplete',
                 $rawPayload
@@ -237,7 +244,7 @@ class Controller extends Base
          * careful pls, don't mass pasta without checking the spec first
          */
         if (!isset($payload[$submissionIdentifierKey])) {
-            throw new \RuntimeException(sprintf(
+            throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin submission identifier key %s does not exist in the payload; cannot find turnitin model.',
                 $submissionIdentifierKey
             ));
@@ -250,7 +257,7 @@ class Controller extends Base
         try {
             $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
         } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \RuntimeException(sprintf(
+            throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
                 $turnitinSubmissionId
             ));
@@ -285,7 +292,7 @@ class Controller extends Base
          * produced in the webhook endpoints above
          */
         if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
-            throw new \DomainException('Turnitin configuration invalid.');
+            throw new Turnitin\Exception\Exception('Turnitin configuration invalid.');
         }
 
         return new Api(

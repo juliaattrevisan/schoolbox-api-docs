@@ -9,14 +9,16 @@
  # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
  #}
 {% if currentFile.turnitin %}
-{% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
-    assessmentId: assessment.id,
-    assessment:   assessment,
-    responseId:   response.id,
-    response:     response,
-    participant:  participant,
-    turnitinId:   currentFile.turnitin.id })
-%}
+    {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
+        assessmentId: assessment.id,
+        assessment:   assessment,
+        responseId:   response.id,
+        response:     response,
+        participant:  participant,
+        turnitinId:   currentFile.turnitin.id })
+    %}
 
-<a href="{{ reportRoute }}" class="icon-due-work" title="Similarity Report"></a>
+    {% if currentFile.turnitin.isComplete and reportRoute %}
+        <a href="{{ reportRoute }}" class="icon-due-work" title="Similarity Report"></a>
+    {% endif %}
 {% endif %}

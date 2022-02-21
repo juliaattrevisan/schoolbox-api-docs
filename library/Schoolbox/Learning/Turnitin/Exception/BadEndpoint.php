@@ -14,7 +14,7 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  * your params and that you access an extant endpoint as per
  * https://developers.turnitin.com/docs/tca#introduction
  */
-class BadEndpoint extends \InvalidArgumentException
+class BadEndpoint extends Exception
 {
 
 }

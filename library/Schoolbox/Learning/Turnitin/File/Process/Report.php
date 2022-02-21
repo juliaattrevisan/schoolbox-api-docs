@@ -108,7 +108,7 @@ class Report
     {
         try {
             $uploadInfo = $this->getUploadInfo($model);
-        } catch (BadEndpoint | Credentials | \DomainException $e) {
+        } catch (Turnitin\Exception\Exception $e) {
             $this->turnitinMapper->save($model
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($e->getMessage()));

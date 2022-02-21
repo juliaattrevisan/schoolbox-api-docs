@@ -227,6 +227,12 @@ class Api
             ), 404);
         }
 
+        /* 413 and 422 can fire out of "Upload Submission File Contents" but
+         * our ValidFile() check should prevent those even being a possibility
+         *
+         * 409 occurs when you try to reuse a turnitin submission identifier that
+         * something else already created
+         */
         if (409 === $result->getStatusCode()) {
             throw new Exception\Conflict(
                 sprintf(
@@ -239,6 +245,8 @@ class Api
                 409
             );
         }
+
+
 
         /* I guess we succeeded, which should be the case most of the time,
          * but we should check for other errors in the caller function to decide
@@ -254,7 +262,7 @@ class Api
          * Can develop this further as per suds tass, to remember payloads etc.
          * for diagnostics
          */
-        throw new \DomainException(sprintf(
+        throw new Exception\Exception(sprintf(
             "Turnitin failed to retrieve(): %s %s - %s %s",
             $method,
             $endpoint,

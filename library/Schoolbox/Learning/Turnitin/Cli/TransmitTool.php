@@ -175,7 +175,7 @@ HELP;
             if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
                 /* Optionally:
                  * Forcibly retransmit everything in Pending, Group, Submission
-                 * regardless of whether they're in those states normally; used
+                 * statuses - regardless of whether they're in those states normally; used
                  * to recommence a stalled or broken process, but you might also
                  * reprocess something that's in this state naturally
                  */

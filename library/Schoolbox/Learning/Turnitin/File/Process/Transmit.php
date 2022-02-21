@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
+use Schoolbox\Learning\Turnitin\Exception\Conflict;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
@@ -133,13 +134,12 @@ class Transmit
      * When that's done a secondary process generates the Report info
      *
      * @param Turnitin\File\Model $model
-     * @throws Credentials
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
     public function process(Turnitin\File\Model $model): void
@@ -221,7 +221,6 @@ class Transmit
              * if you repeatedly a group, it just updates it)
              */
 
-
             /* The box has to exist (i.e. not deleted)
              */
             try {
@@ -279,7 +278,26 @@ class Transmit
                      */
                 }
             }
-        } catch (BadEndpoint | Credentials | \DomainException $e) {
+        } catch (Turnitin\Exception\Conflict $e) {
+            /* A non-recoverable situation - you're trying to upload data
+             * into a place which is already associated with data
+             */
+            $errorMessage = sprintf(
+                '%s - last status was [%s]',
+                $e->getMessage(),
+                $model->getStatus()
+            );
+
+            $this->logWarning($errorMessage);
+
+            $this->turnitinMapper->save($model
+                ->setErrorCode((string)$e->getCode())
+                ->setErrorMessage($errorMessage)
+                ->setStatus(Turnitin\File\Model::STATUS_ERROR));
+        } catch (Turnitin\Exception\Exception $e) {
+            /* Potentially recoverable by running transmit forcibly
+             * which is what the crontab does anyway
+             */
             $this->logWarning($e->getMessage());
 
             $this->turnitinMapper->save($model
@@ -330,6 +348,7 @@ class Transmit
      * @param SingleFile\Model    $ssf
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -360,7 +379,7 @@ class Transmit
          */
         try {
             $group = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $box->getId(), ['cache' => false]);
-        } catch (\Schoolbox\Mapper\Exception | \RuntimeException $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             /* Create a group if it doesn't already exist
              */
             $this->logDebug(sprintf(
@@ -421,10 +440,12 @@ class Transmit
      *  - That means "owners" struct, and its fields, is a required subfield in metadata
      *
      * @param Turnitin\File\Model $model
+     * @param SubmissionBox       $box
      * @param SingleFile\Model    $ssf
      * @param array               $group
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -552,6 +573,7 @@ class Transmit
      * @param array               $submission
      * @return array|null
      * @throws BadEndpoint
+     * @throws Conflict
      * @throws Credentials
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
