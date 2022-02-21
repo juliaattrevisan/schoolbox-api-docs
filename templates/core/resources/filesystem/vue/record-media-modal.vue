@@ -5,11 +5,11 @@
  */
 
 import RecordMediaModalMenu from './record-media-modal-menu';
-import RecordAudioOnly from '@schoolboxVuecomponents/record/record-audio-only';
-import RecordPhoto from '@schoolboxVuecomponents/record/record-photo';
-import RecordCamera from '@schoolboxVuecomponents/record/record-camera';
-import RecordScreen from '@schoolboxVuecomponents/record/record-screen';
-import OverMediaModal from '@schoolboxVuecomponents/videojs-record/over-media-modal';
+import RecordAudioOnly from '@schoolboxVue/components/record/record-audio-only';
+import RecordPhoto from '@schoolboxVue/components/record/record-photo';
+import RecordCamera from '@schoolboxVue/components/record/record-camera';
+import RecordScreen from '@schoolboxVue/components/record/record-screen';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import axios from 'axios';
 import filesize from 'filesize';

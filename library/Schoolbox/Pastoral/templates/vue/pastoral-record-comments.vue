@@ -5,11 +5,11 @@
  * This component manages both 'public' and 'private' recordTypes
  */
 
-import AddCommentInput from '@schoolboxVuecomponents/ckeditor/add-comment-input';
-import MediaArticle from '@schoolboxVuecomponents/media-article';
-import Toast from '@schoolboxVuecomponents/toast';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal';
-import cdnPrefixMixin from '@schoolboxVuecomponents/cdn-prefix-mixin';
+import AddCommentInput from '@schoolboxVue/components/ckeditor/add-comment-input';
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 
 export default {

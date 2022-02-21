@@ -6,13 +6,13 @@ import dayGridPlugin      			from '@fullcalendar/daygrid'
 import timeGridPlugin     			from '@fullcalendar/timegrid'
 import listPlugin         			from '@fullcalendar/list'
 import adaptivePlugin     			from '@fullcalendar/adaptive'
-import RevealModal        			from '@schoolboxVuecomponents/reveal-modal'
-import ViewEventModal     			from '@schoolboxVuecomponents/fullcalendar/view-event-modal';
-import FlatPickr          			from '@schoolboxVuecomponents/fullcalendar/flat-pickr';
+import RevealModal        			from '@schoolboxVue/components/reveal-modal'
+import ViewEventModal     			from '@schoolboxVue/components/fullcalendar/view-event-modal';
+import FlatPickr          			from '@schoolboxVue/components/fullcalendar/flat-pickr';
 import axios              			from 'axios'
-import fullCalendarHelper           from '@schoolboxVuecomponents/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper           from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        			from 'qs';
-import CustomisedCalendarEvent	  	from '@schoolboxVuecomponents/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent	  	from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -269,5 +269,5 @@ export default {
 </template>
 
 <style lang="scss">
-@import "@schoolboxVuecomponents/fullcalendar/styles/calendar";
+@import "@schoolboxVue/components/fullcalendar/styles/calendar";
 </style>

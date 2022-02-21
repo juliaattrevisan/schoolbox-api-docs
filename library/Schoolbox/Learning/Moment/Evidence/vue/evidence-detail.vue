@@ -1,9 +1,9 @@
 <script>
-import MediaArticle   from '@schoolboxVuecomponents/media-article';
-import Storage        from '@schoolboxVuecomponents/storage';
+import MediaArticle   from '@schoolboxVue/components/media-article';
+import Storage        from '@schoolboxVue/components/storage';
 import RelativeTime   from '@schoolboxLearningMomentEvidence/relative-time';
 import CommentThread  from './comment-thread';
-import cdnPrefixMixin from '@schoolboxVuecomponents/cdn-prefix-mixin';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 export default {
     /**

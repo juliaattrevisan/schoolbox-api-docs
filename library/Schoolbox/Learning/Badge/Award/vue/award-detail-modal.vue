@@ -2,8 +2,8 @@
 import BadgeImage from './../../vue/badge-image';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal'
-import toastMixin from '@schoolboxVuecomponents/toast-mixin';
+import RevealModal from '@schoolboxVue/components/reveal-modal'
+import toastMixin from '@schoolboxVue/components/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
 import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'

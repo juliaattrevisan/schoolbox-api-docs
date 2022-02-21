@@ -6,8 +6,8 @@
  *
  */
 
-import RecordedMedia from '@schoolboxVuecomponents/videojs-record/recorded-media';
-import OverMediaModal from '@schoolboxVuecomponents/videojs-record/over-media-modal';
+import RecordedMedia from '@schoolboxVue/components/videojs-record/recorded-media';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 
@@ -181,6 +181,6 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@schoolboxVuecomponents/inputCapture/input-capture';
+@import '@schoolboxVue/components/inputCapture/input-capture';
 
 </style>

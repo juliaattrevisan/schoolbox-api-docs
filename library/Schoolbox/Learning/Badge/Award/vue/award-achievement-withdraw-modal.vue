@@ -1,8 +1,8 @@
 <script>
 
 import BadgeImage from './../../vue/badge-image';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal'
-import toastMixin from '@schoolboxVuecomponents/toast-mixin';
+import RevealModal from '@schoolboxVue/components/reveal-modal'
+import toastMixin from '@schoolboxVue/components/toast-mixin';
 
 export default {
 

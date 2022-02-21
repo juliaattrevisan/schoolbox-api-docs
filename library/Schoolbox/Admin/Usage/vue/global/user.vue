@@ -1,7 +1,7 @@
 <script>
 
 import filesize from 'filesize';
-import footerUI from '@schoolboxVuecomponents/vueTables2/mixinFooterUI';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 
 export default {
@@ -215,6 +215,6 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolboxVuecomponents/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 </style>

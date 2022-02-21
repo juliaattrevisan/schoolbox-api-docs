@@ -1,6 +1,6 @@
 <script>
 
-import RevealModal from '@schoolboxVuecomponents/reveal-modal'
+import RevealModal from '@schoolboxVue/components/reveal-modal'
 import axios from 'axios'
 import debounce from 'lodash/debounce';
 import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
@@ -14,7 +14,7 @@ import "vue-select/dist/vue-select.css";
 * It's not well documented, but you can trawl through closed PRs to figger out how
 * https://github.com/sagalbot/vue-select/issues/994
 */
-import Deselect from '@schoolboxVuecomponents/selectize/Deselect';
+import Deselect from '@schoolboxVue/components/selectize/Deselect';
 vSelect.props.components.default = () => ({ Deselect });
 
 const EVENT_CREATED = 'eventCreated';

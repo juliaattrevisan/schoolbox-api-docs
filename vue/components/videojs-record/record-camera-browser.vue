@@ -12,15 +12,15 @@ import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
-import RecordDeviceOptions from '@schoolboxVuecomponents/videojs-record/record-device-options';
-import RecordedMedia from '@schoolboxVuecomponents/videojs-record/recorded-media';
-import OverMediaModal from '@schoolboxVuecomponents/videojs-record/over-media-modal';
+import RecordDeviceOptions from '@schoolboxVue/components/videojs-record/record-device-options';
+import RecordedMedia from '@schoolboxVue/components/videojs-record/recorded-media';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 import { isDeviceAlreadyInUseError, isPermissionDeniedError, isDeviceChangeError } from '@js/record-media/recordMediaErrors';
 import { isOfMimeType } from '@js/util/fileUtils';
-import chooseDevice from '@schoolboxVuemixins/videojs-record/mixinChooseDevice';
+import chooseDevice from '@schoolboxVue/mixins/videojs-record/mixinChooseDevice';
 
 
 export default {
@@ -330,6 +330,6 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@schoolboxVuecomponents/videojs-record/videojs-record';
+@import '@schoolboxVue/components/videojs-record/videojs-record';
 
 </style>

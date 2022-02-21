@@ -1,8 +1,8 @@
 import { createApp } from 'vue';
-// import BadgeReport from './badge-report';
+import BadgeReport from './badge-report';
 
-// createApp({
-//     components: {
-//         BadgeReport
-//     }
-// }).mount('#badge-report-container');
+createApp({
+    components: {
+        BadgeReport
+    }
+}).mount('#badge-report-container');

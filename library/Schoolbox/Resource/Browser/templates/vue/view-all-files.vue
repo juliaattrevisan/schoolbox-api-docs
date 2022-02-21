@@ -11,7 +11,7 @@ import ViewAllFilesRowName from './view-all-files-row-name.vue';
 import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
 import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
-import footerUI from '@schoolboxVuecomponents/vueTables2/mixinFooterUI.js';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI.js';
 
 const SB_SELECTED_FILTERS_STORAGE = 'sb_viewAllFilesSelectedFilters'
 
@@ -481,7 +481,7 @@ export default {
 <style lang="scss">
 
 @import 'www/static/css/foundation/utils/_colors.scss';
-@import '@schoolboxVuecomponents/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
     table-layout: fixed; //to ensure the flex within view-all-files-row-name can shrink all the way down

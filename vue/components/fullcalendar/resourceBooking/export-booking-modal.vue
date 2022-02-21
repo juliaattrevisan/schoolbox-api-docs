@@ -1,6 +1,6 @@
 <script>
 
-import RevealModal from "@schoolboxVuecomponents/reveal-modal";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 import qs          from 'qs';
 
 export default {

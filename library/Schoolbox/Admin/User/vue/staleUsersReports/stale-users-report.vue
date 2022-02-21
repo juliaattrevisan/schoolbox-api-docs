@@ -6,10 +6,10 @@
  *
  */
 
-import Toast from '@schoolboxVuecomponents/toast';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal';
-import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer';
-import footerUI from '@schoolboxVuecomponents/vueTables2/mixinFooterUI';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -322,7 +322,7 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolboxVuecomponents/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 #stale-users-report {
     position: relative;

@@ -6,8 +6,8 @@
  */
 
 import { mapState } from 'vuex';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal';
-import Toast from '@schoolboxVuecomponents/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
 import { DELETE_ROW_CONFIRMED } from './store/adminListMutationTypes';
 
 export default {

@@ -2,8 +2,8 @@
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 import BadgeImage from '../../vue/badge-image';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal'
-import toastMixin from '@schoolboxVuecomponents/toast-mixin';
+import RevealModal from '@schoolboxVue/components/reveal-modal'
+import toastMixin from '@schoolboxVue/components/toast-mixin';
 
 /* Vue select
  */
@@ -14,7 +14,7 @@ import "vue-select/dist/vue-select.css";
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import Deselect from '@schoolboxVuecomponents/selectize/Deselect';
+import Deselect from '@schoolboxVue/components/selectize/Deselect';
 import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 

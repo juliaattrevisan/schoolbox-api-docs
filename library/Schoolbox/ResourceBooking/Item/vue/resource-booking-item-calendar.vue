@@ -6,13 +6,13 @@ import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
 import adaptivePlugin             from '@fullcalendar/adaptive'
-import ViewEventModal             from '@schoolboxVuecomponents/fullcalendar/view-event-modal';
-import CreateBookingModal         from '@schoolboxVuecomponents/fullcalendar/resourceBooking/create-booking-modal';
-import ExportModal                from '@schoolboxVuecomponents/fullcalendar/resourceBooking/export-booking-modal';
-import FilterModal                from '@schoolboxVuecomponents/fullcalendar/resourceBooking/filter-modal';
-import FlatPickr                  from '@schoolboxVuecomponents/fullcalendar/flat-pickr';
+import ViewEventModal             from '@schoolboxVue/components/fullcalendar/view-event-modal';
+import CreateBookingModal         from '@schoolboxVue/components/fullcalendar/resourceBooking/create-booking-modal';
+import ExportModal                from '@schoolboxVue/components/fullcalendar/resourceBooking/export-booking-modal';
+import FilterModal                from '@schoolboxVue/components/fullcalendar/resourceBooking/filter-modal';
+import FlatPickr                  from '@schoolboxVue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
-import fullCalendarHelper         from '@schoolboxVuecomponents/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper         from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -380,5 +380,5 @@ export default {
 </template>
 
 <style lang="scss">
-@import "@schoolboxVuecomponents/fullcalendar/styles/calendar";
+@import "@schoolboxVue/components/fullcalendar/styles/calendar";
 </style>

@@ -5,7 +5,7 @@
  *
  */
 
-import RecordAudioOnlyBrowser from '@schoolboxVuecomponents/videojs-record/record-audio-only-browser';
+import RecordAudioOnlyBrowser from '@schoolboxVue/components/videojs-record/record-audio-only-browser';
 
 
 export default {

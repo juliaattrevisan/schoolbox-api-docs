@@ -1,15 +1,15 @@
 <script>
 
-import MediaArticle from '@schoolboxVuecomponents/media-article';
-import Storage from '@schoolboxVuecomponents/storage';
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Storage from '@schoolboxVue/components/storage';
 import CommentThread from './comment-thread';
-import RevealModal from "@schoolboxVuecomponents/reveal-modal";
-import Toast from "@schoolboxVuecomponents/toast";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
-import foundationMixin from "@schoolboxVuecomponents/foundation-mixin";
+import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
-import cdnPrefixMixin from '@schoolboxVuecomponents/cdn-prefix-mixin';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 
 export default {

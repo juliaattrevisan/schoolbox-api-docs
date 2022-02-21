@@ -1,8 +1,8 @@
 <script>
 import filesize from 'filesize';
-import RevealModal from '@schoolboxVuecomponents/reveal-modal';
-import Toast from '@schoolboxVuecomponents/toast';
-import footerUI from '@schoolboxVuecomponents/vueTables2/mixinFooterUI';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -276,6 +276,6 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolboxVuecomponents/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 </style>

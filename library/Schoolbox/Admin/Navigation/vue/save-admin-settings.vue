@@ -6,7 +6,7 @@
  * no need to scroll down to the bottom of the page
  */
 
-import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import debounce from 'lodash/debounce';
 
 

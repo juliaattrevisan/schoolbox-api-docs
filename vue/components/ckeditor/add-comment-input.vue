@@ -8,7 +8,7 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
 
-import cdnPrefixMixin from '@schoolboxVuecomponents/cdn-prefix-mixin'
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin'
 import { injectScript } from '@js/util/domUtils';
 import { EDITOR_DEFAULT_CONFIG, EDITOR_CONFIG_FOR_COMMENTS, EDITOR_CONFIG_WITH_USER_TOKENS } from '@js/editor/editorConfigTypes';
 

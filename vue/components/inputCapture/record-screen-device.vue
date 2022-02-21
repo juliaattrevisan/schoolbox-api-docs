@@ -26,5 +26,5 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import '@schoolboxVuecomponents/inputCapture/input-capture';
+@import '@schoolboxVue/components/inputCapture/input-capture';
 </style>

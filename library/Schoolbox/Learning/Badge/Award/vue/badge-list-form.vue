@@ -1,12 +1,12 @@
 <script>
 
 import axios from 'axios';
-import RevealModal from "@schoolboxVuecomponents/reveal-modal";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
-import toastMixin from '@schoolboxVuecomponents/toast-mixin';
-import HorizontalScoller from '@schoolboxVuecomponents/scroll/horizontal-scoller';
-import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer';
+import toastMixin from '@schoolboxVue/components/toast-mixin';
+import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 
 
 /**
