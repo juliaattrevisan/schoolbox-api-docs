@@ -178,7 +178,7 @@ class Controller extends Base
          */
         if ($response) {
             if (!$this->getUser()->isSuperuser() && $this->getUser()->getRole()->isStaff() && !$response->isSubmitted()) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
             // The file that's being reviewed
@@ -216,7 +216,7 @@ class Controller extends Base
 
         $data = [
             'assessment' => $assessment,
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                 ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
                 ->add(['Inline Grader', '']),
             'response' => $response,
@@ -450,7 +450,7 @@ class Controller extends Base
         $data = [];
 
         try {
-            $this->getResponseDataSource()->delete($response);
+            $this->responseDataSource->delete($response);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $code = 400;
             $data = $e->getMessage();
@@ -539,7 +539,7 @@ class Controller extends Base
                 'assessment' => $assessment,
                 'response' => $response,
                 'participant' => $participant,
-                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
                     ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                     ->add(['Similarity Check', '']),
             ];
@@ -611,44 +611,5 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-
-    /**
-     * @param DataSource $responseDataSource
-     * @return static
-     */
-    public function setResponseDataSource($responseDataSource)
-    {
-        $this->responseDataSource = $responseDataSource;
-        return $this;
-    }
-
-
-    /**
-     * @return DataSource
-     */
-    protected function getResponseDataSource()
-    {
-        return $this->responseDataSource;
-    }
-
-    /**
-     * @return BreadcrumbFactory
-     */
-    protected function getBakery()
-    {
-        return $this->bakery;
     }
 }
