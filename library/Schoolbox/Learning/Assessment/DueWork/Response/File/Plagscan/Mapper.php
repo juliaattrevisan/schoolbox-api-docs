@@ -10,8 +10,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use Aura\Di\Exception\ServiceNotFound;
 use PDOStatement;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
@@ -480,7 +481,7 @@ class Mapper extends \Schoolbox\Mapper
         try {
             /** @var HubInterface $sentry */
             $sentry = self::getDi()->get('sentry');
-        } catch (ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             return;
         }
         $sentry->captureException($ce);

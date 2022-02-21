@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Config;
 
-use Aura\Di\Exception\ServiceNotFound;
 use Etherpad\PadMapper;
 use LogicException;
 use PDOException;
@@ -59,7 +58,6 @@ class InstanceIdManager extends CliTool\App
 
     /**
      * @throws LogicException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws PDOException
      * @throws MapperException
@@ -266,7 +264,6 @@ class InstanceIdManager extends CliTool\App
     /**
      * Rebuild subscripts so users are bound to correct channels
      * @param string $newInstanceId
-     * @throws ServiceNotFound
      * @throws UnderflowException
      */
     private function rebuildSubscriptionCache(string $newInstanceId): void

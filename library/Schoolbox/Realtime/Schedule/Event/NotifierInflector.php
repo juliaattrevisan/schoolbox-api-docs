@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Realtime\Schedule\Event;
 
-use Aura\Di\Exception\ReflectionFailure;
 use ReflectionException;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;

@@ -13,7 +13,6 @@ use Alaress\Database;
 use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Application\CliTool;
 use PDOException;
-use Aura\Di\Exception\ServiceNotFound;
 
 /**
  * A strictly-typed helper to insert config items that rely on PHP code.
@@ -33,7 +32,6 @@ abstract class InsertHelper extends CliTool\App
      * Hands off execution over to the App
      *
      * @throws PDOException
-     * @throws ServiceNotFound
      */
     public function run(): void
     {

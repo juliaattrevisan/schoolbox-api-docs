@@ -11,9 +11,10 @@ namespace Schoolbox\Calendar\Event;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Attendance\Payload;
 use Schoolbox\Calendar\EventLevelCollection;
@@ -129,10 +130,8 @@ class Controller extends Base
      *
      * @param Event $event
      * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function getEvent(Event $event): void
     {
@@ -188,7 +187,6 @@ class Controller extends Base
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */
@@ -296,7 +294,6 @@ class Controller extends Base
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws \Schoolbox\Application\Exception\Exception
      */

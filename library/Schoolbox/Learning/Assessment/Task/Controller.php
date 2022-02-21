@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound;
@@ -110,7 +109,6 @@ class Controller extends Assessment\Controller
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
      * @throws MapperException
-     * @throws ServiceNotFound
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -147,7 +145,6 @@ class Controller extends Assessment\Controller
      * @param IAssessable|Task $assessment
      * @param User             $student
      * @throws MapperException
-     * @throws ServiceNotFound
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {

@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
@@ -198,7 +197,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException
-     * @throws ServiceNotFound If unable to locate HTML web Output renderer in DI
      * @throws UnexpectedValueException If unable to derive a project's participant collection
      */
     public function getCreateAssessmentForm(AssessmentContext $context): void
@@ -266,7 +264,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      * @param IAssessable $assessment
      * @throws InvalidArgumentException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function getUpdateAssessmentForm(IAssessable $assessment): void

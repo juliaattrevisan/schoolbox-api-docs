@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
@@ -276,7 +275,6 @@ class Factory
      * @return IAssessable
      * @throws MapperException
      * @throws ResourceException
-     * @throws ServiceNotFound
      */
     public function produce(IAssessable $assessment = null): IAssessable
     {
@@ -295,7 +293,6 @@ class Factory
      * @throws DomainException
      * @throws MapperException
      * @throws ResourceException
-     * @throws ServiceNotFound
      */
     private function produceNew(): IAssessable
     {
@@ -321,7 +318,6 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @throws ServiceNotFound
      * @throws \RangeException
      * @throws MapperException
      * @throws ResourceException

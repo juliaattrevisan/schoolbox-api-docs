@@ -12,7 +12,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -270,7 +269,6 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws NotFound
-     * @throws ServiceNotFound
      */
     protected function preloadAssessmentAndStudent(array $params): array
     {
@@ -300,13 +298,8 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws Mapper\DefinitionException
-     * @throws NotFound
-     * @throws UnexpectedValueException
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadContext(array $params): array
     {
@@ -342,7 +335,6 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws UnexpectedValueException If unable to derive project participant collections
-     * @throws ServiceNotFound
      */
     protected function preloadAssessment(array $params, User $student = null): array
     {
@@ -627,7 +619,8 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getAssessmentMapperProxy()
     {

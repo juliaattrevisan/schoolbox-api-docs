@@ -8,13 +8,10 @@
 namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Page\AvailabilityChecker;
 use Schoolbox\Filter\Page\LabelBuilder;
-use Schoolbox\Filter\Page\Model as PageModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -97,7 +94,6 @@ class Controller extends BaseController
      *
      * @api   GET /adminv2/filters
      * @since 17.0
-     * @throws ServiceNotFound
      */
     public function getIndex(): void
     {
@@ -121,7 +117,6 @@ class Controller extends BaseController
      * @since 17.0
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws ServiceNotFound
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect

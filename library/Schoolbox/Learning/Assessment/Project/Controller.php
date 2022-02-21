@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
@@ -98,7 +97,6 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param Project|IAssessable $assessment
-     * @throws ServiceNotFound
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -140,7 +138,6 @@ class Controller extends Assessment\Controller
      * @since 165
      * @param IAssessable|Project $assessment
      * @param User                $student
-     * @throws ServiceNotFound If unable to find web renderer
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws LogicException

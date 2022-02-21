@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Feed;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Exception\InvalidComponent;
 use InvalidArgumentException;
 use PDOException;
@@ -67,7 +66,6 @@ class Controller extends Base
      *
      * @param User $user
      * @throws InvalidComponent
-     * @throws ServiceNotFound
      * @throws InvalidColumnException
      * @throws InvalidArgumentException
      * @throws PDOException
@@ -99,7 +97,6 @@ class Controller extends Base
      * @throws InvalidColumnException
      * @throws InvalidComponent
      * @throws PDOException
-     * @throws ServiceNotFound
      * @throws UnderflowException
      * @throws DefinitionException
      * @throws NotFound
@@ -128,7 +125,6 @@ class Controller extends Base
      * @throws InvalidComponent
      * @throws NotFound
      * @throws PDOException
-     * @throws ServiceNotFound
      * @throws UnderflowException
      */
     private function renderArticlesAsXml(array $articleIdFilter, string $topicSlug, Folder\Model $folder = null): void

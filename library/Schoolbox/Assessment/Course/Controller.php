@@ -834,7 +834,6 @@ class Controller extends Base\Base
      * @throws Deleted
      * @throws MapperException
      * @throws RangeException
-     * @throws ServiceNotFound
      * @throws InvalidArgumentException
      * @throws PDOException
      * @throws Application\Exception\Exception
@@ -1159,7 +1158,6 @@ class Controller extends Base\Base
      * @param bool                $deleteFolder
      * @throws Application\Exception\Exception
      * @throws MapperException
-     * @throws ServiceNotFound
      */
     public function deleteCourseSpecification(CourseSpecification $courseSpec, $deleteFolder = false)
     {

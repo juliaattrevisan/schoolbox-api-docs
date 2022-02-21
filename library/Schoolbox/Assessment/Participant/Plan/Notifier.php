@@ -13,8 +13,9 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
@@ -155,8 +156,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
-     * @throws ServiceNotFound if somehow my assessment data
-     *                                            source wasn't found
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function loadDependencies($dependencies = null): void
     {
@@ -574,7 +575,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws ServiceNotFound
      * @throws DeletedException
      */
     public function notifyOpen(Model $plan): Envelope
@@ -714,7 +714,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws ServiceNotFound
      * @throws DeletedException
      */
     public function notifyUpcoming(Model $plan): Envelope
@@ -779,7 +778,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws ServiceNotFound
      * @throws DeletedException
      */
     public function notifyOverdue(Model $plan): Envelope
@@ -846,7 +844,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      *
      * @param Model $plan
      * @return Envelope
-     * @throws ServiceNotFound
      * @throws DeletedException
      */
     public function notifyClosed(Model $plan): Envelope
@@ -964,7 +961,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param User       $effector
      * @param array|null $diff
      * @return Envelope
-     * @throws ServiceNotFound
      * @throws DeletedException
      * @throws BaseMapper\Exception
      */

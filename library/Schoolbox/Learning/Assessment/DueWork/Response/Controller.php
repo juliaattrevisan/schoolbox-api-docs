@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
@@ -294,7 +293,6 @@ class Controller extends Base
      * @throws Kami\Exception\EmptyApiKeyException
      * @throws Kami\Exception\NotFound
      * @throws Kami\Exception\ResponseDecodeException
-     * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \PDOException

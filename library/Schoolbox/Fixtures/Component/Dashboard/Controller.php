@@ -10,7 +10,6 @@ namespace Schoolbox\Fixtures\Component\Dashboard;
 
 use Alaress\Database\Connector\Base;
 use Alaress\Session\Session;
-use Aura\Di\Exception\ServiceNotFound;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use RuntimeException;
@@ -49,7 +48,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
-     * @throws ServiceNotFound
      * @throws RuntimeException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
@@ -65,7 +63,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     /**
      * @return bool  Whether to continue on and attempt Component render
      * @throws RuntimeException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function execute()

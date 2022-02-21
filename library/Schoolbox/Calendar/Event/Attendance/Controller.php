@@ -11,10 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventRecurrenceMapper;
@@ -85,10 +86,8 @@ class Controller extends Base
      *
      * @param Event $event
      * @throws MapperException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function getCurrent(Event $event): void
     {
@@ -102,13 +101,9 @@ class Controller extends Base
      * Add attendees to the list
      *
      * @param Event $event
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws ContainerExceptionInterface
      * @throws MapperException
-     * @throws PDOException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
+     * @throws NotFoundExceptionInterface
      */
     public function postCreate(Event $event): void
     {
@@ -164,11 +159,9 @@ class Controller extends Base
      * Remove attendees from the list
      *
      * @param Event $event
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws ContainerExceptionInterface
      * @throws MapperException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
+     * @throws NotFoundExceptionInterface
      */
     public function postDelete(Event $event): void
     {
@@ -187,13 +180,9 @@ class Controller extends Base
      * User accepts invitation to an event
      *
      * @param Event $event
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws ContainerExceptionInterface
      * @throws MapperException
-     * @throws PDOException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
+     * @throws NotFoundExceptionInterface
      */
     public function postAccept(Event $event): void
     {
@@ -236,12 +225,9 @@ class Controller extends Base
      * User declines invitation to an event
      *
      * @param Event $event
-     * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws ContainerExceptionInterface
      * @throws MapperException
-     * @throws PDOException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
+     * @throws NotFoundExceptionInterface
      */
     public function postDecline(Event $event): void
     {

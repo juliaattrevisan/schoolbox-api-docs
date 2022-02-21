@@ -14,7 +14,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
@@ -83,7 +82,6 @@ class Module extends BaseModule
      * @throws Mapper\Exception
      * @throws ApplicationException
      * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -133,7 +131,6 @@ class Module extends BaseModule
      * @throws ApplicationException
      * @throws MapperException
      * @throws Mapper\DefinitionException
-     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
@@ -310,7 +307,6 @@ class Module extends BaseModule
 
     /**
      * @return object|MapperProxy
-     * @throws ServiceNotFound
      */
     protected function getAssessmentDataSource()
     {
@@ -370,7 +366,6 @@ class Module extends BaseModule
 
     /**
      * @return object|Participant\DataSource
-     * @throws ServiceNotFound
      */
     protected function getParticipantDataSource()
     {

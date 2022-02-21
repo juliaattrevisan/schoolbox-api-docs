@@ -12,8 +12,9 @@ namespace Schoolbox\Assessment\Rubric\Repair;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use OutOfRangeException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\CoreContext;
@@ -264,7 +265,8 @@ abstract class Base extends CliTool\App
     /**
      * Set up basic dependencies for all repair scripts.
      *
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function setupDependencies(): void
     {
@@ -307,8 +309,6 @@ abstract class Base extends CliTool\App
      * is raised).
      *
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public function run(): void
     {

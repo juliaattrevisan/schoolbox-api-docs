@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Calendar;
 
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -76,7 +75,6 @@ class Controller extends Base
      * Displays the synchronous portion of the Assessment Calendar page.
      *
      * @throws Mapper\Exception
-     * @throws ServiceNotFound
      * @api   GET /learning/assessment/calendar
      * @since 19.1
      */

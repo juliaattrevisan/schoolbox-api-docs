@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
@@ -288,7 +287,6 @@ class ListController extends Web\Controller\Base
      * @throws LogicException
      * @throws Mapper\DefinitionException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
      */
@@ -487,7 +485,6 @@ class ListController extends Web\Controller\Base
      * @param AssessmentContext $context
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      */
@@ -501,7 +498,7 @@ class ListController extends Web\Controller\Base
                 $delegate->getCreateAssessmentForm($context);
                 $this->setResponse($delegate->getResponse());
                 return;
-            } catch (ServiceNotFound $e) {
+            } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
                 // if the client enters an invalid type: ignore
                 // and allow passthru to the "unselected" section
             }

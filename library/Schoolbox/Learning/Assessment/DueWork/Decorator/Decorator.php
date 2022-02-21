@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
 use RangeException;
@@ -96,7 +95,6 @@ class Decorator implements DecoratorInterface
 
     /**
      * @param DueWork $assessment
-     * @throws ServiceNotFound
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws RangeException
