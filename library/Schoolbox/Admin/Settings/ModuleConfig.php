@@ -77,7 +77,8 @@ class ModuleConfig
             'settings'          => $settings,
             'isEditable'        => $isEditable,
             'postRoute'         => $postRoute,
-            'typeLabel'         => ''
+            'typeLabel'         => '',
+            'useBottomDrawer'   => true,
         ];
     }
 }
