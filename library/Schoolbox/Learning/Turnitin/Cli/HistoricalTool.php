@@ -152,8 +152,13 @@ HELP;
                 $end->getDatabase()
             ));
 
-            (new Turnitin\Historical(Turnitin\File\Mapper::getInstance(), $this->perform(), $this->getLogger()))
-                ->historical($start, $end, $lock);
+            (new Turnitin\Historical(
+                Turnitin\File\Mapper::getInstance(),
+                \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+                \Schoolbox\Resource\Storage\Mapper::getInstance(),
+                $this->perform(),
+                $this->getLogger()
+            ))->historical($start, $end, $lock);
 
             if (!$this->perform()) {
                 $this->getLogger()->info('Planning finished.');
