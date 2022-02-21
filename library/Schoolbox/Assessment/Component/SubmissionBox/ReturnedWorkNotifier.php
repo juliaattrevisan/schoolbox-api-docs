@@ -13,8 +13,9 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Term;
@@ -64,8 +65,9 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
      * Instantiate all your dependencies within yourself.
      *
      * @param mixed $dependencies
-     * @throws ServiceNotFound if somehow my assessment data source wasn't found
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function loadDependencies($dependencies = null)
     {

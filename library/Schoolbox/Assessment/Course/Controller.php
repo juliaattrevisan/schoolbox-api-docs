@@ -9,9 +9,10 @@
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
-use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
 use Schoolbox\Resource\Folder\Ancestry;
 use UnexpectedValueException;
@@ -440,7 +441,6 @@ class Controller extends Base\Base
      * @throws MapperException
      * @throws PDOException
      * @throws RangeException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      */
@@ -809,7 +809,7 @@ class Controller extends Base\Base
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
             $this->courseTpl('unit', $data);
-        } catch (ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             // quite simple not able to find things we need. bye bye.
             $this->sendError('Could not save because of an internal error.', [], 500);
         } catch (\Exception $e) {

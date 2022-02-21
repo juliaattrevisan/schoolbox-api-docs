@@ -12,7 +12,6 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
@@ -145,7 +144,6 @@ class Controller extends Web\Controller\Base
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @throws Database\Exception

@@ -11,7 +11,6 @@ namespace Custom\Help\CourseParticipation;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request;
 use Custom\Help\CourseParticipation\Exception\ParticipantRolesNotFoundException;
 use GuzzleHttp\Client;
@@ -102,8 +101,6 @@ class Controller extends Base
     /**
      * @api   GET /api/course-participation/apitest
      * @since 170
-     *
-     * @throws ServiceNotFound
      */
     public function getApiTest()
     {

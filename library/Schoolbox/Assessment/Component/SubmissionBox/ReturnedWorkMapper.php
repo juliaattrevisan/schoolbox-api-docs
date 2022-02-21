@@ -10,10 +10,11 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
-use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use PDOException;
 use PDOStatement;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -321,7 +322,8 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function syncToExternalMarkbook(ReturnedWork $object): void
     {

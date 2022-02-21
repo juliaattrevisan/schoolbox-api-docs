@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Comment;
 
 use Alaress\Web;
-use Aura\Di\Exception\ServiceNotFound;
 
 class Controller extends Web\Controller\Base
 {
@@ -23,7 +22,6 @@ class Controller extends Web\Controller\Base
      * @since 18.1.0
      * @param int    $roleId
      * @param string $termSlug
-     * @throws ServiceNotFound
      */
     public function getDeanComments(int $roleId, string $termSlug): void
     {
@@ -45,7 +43,6 @@ class Controller extends Web\Controller\Base
      * @since 18.1.0
      * @param int $folderId
      * @param string $termSlug
-     * @throws ServiceNotFound
      */
     public function getTeacherComments(int $folderId, string $termSlug): void
     {

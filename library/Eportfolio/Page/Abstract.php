@@ -8,7 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di\Exception\ServiceNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -229,7 +230,8 @@ abstract class Eportfolio_Page_Abstract
      * Get assessments linked to given showcased items
      * @param Collection $showcasedItems
      * @return GenericCollection
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getAssessments(Collection $showcasedItems): GenericCollection
     {

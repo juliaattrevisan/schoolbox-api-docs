@@ -3,7 +3,9 @@
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Web\Output;
 use Aura\Router\Router;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Auth\Remember;
@@ -626,7 +628,7 @@ class SitePage extends Page
         try {
             $this->getDi()->get('webFactory');
             throw new Unauthenticated();
-        } catch (\Aura\Di\Exception\ServiceNotFound | RuntimeException $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
                 if ($parts['path'] != '/') {
@@ -904,7 +906,7 @@ class SitePage extends Page
         try {
             $router = $this->getDi()->get('router');
             return $router->generate($name, $params);
-        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             return '';
         } catch (\Aura\Router\Exception\RouteNotFound $e) {
             return '';
