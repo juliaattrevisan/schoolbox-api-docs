@@ -769,8 +769,8 @@ class DataSource
      */
     public function raiseNotification($object, $verb, $previous = null): bool
     {
-        $sessionData = $this->mapper->getSessionData();
-        if (empty($sessionData['user'])) {
+        $sessionUser = $this->mapper->getSessionUser();
+        if (!$sessionUser) {
             return false;
         }
 
@@ -797,7 +797,7 @@ class DataSource
             }
         }
 
-        $this->mapper->getEventPropagator()->propagate($sessionData['user'], $verb, $object, $this->mapper, $diff);
+        $this->mapper->getEventPropagator()->propagate($sessionUser, $verb, $object, $this->mapper, $diff);
         return true;
     }
 }

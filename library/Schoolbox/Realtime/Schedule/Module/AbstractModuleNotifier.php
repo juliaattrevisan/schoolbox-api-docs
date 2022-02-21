@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionMethod;
@@ -69,13 +70,13 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     /**
      * Returns the $di->params[static:class] for this class
      *
-     * @param \Aura\Di\ContainerInterface $di
+     * @param ContainerInterface $di
      * @return array
      */
-    public static function getParams(\Aura\Di\ContainerInterface $di): array
+    public static function getParams(ContainerInterface $di): array
     {
         return [
-            'configLoader' => $di->lazyGet('config'),
+            'configLoader' => $di->get('config'),
         ];
     }
 
@@ -83,17 +84,17 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     /**
      * Returns the $di->setters[static:class] for this class
      *
-     * @param \Aura\Di\ContainerInterface $di
+     * @param ContainerInterface $di
      * @return array
      */
-    public static function getSetters(\Aura\Di\ContainerInterface $di): ?array
+    public static function getSetters(ContainerInterface $di): array
     {
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
 
         return [
-            'setNsMapper'  => $mf->getLazy(NSMapper::class),
-            'setSrcMapper' => $mf->getLazy(SourceMapper::class),
+            'setNsMapper'  => $mf->get(NSMapper::class),
+            'setSrcMapper' => $mf->get(SourceMapper::class),
         ];
     }
 
@@ -102,7 +103,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param IConfigLoader $configLoader
      * @param Mapper[]      $dependencies
      */
-    public function __construct($configLoader, $dependencies = array())
+    public function __construct(IConfigLoader $configLoader, $dependencies = array())
     {
         $this->conf = $configLoader;
         $this->loadDependencies($dependencies);

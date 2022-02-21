@@ -60,7 +60,7 @@ class Controller extends AbstractController
      *
      * @param object $context
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)

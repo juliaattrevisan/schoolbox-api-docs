@@ -7,9 +7,10 @@ namespace Schoolbox\Admin\Profile\Button;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Campus;
@@ -64,11 +65,21 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(IconMapper::class),
+            $this->getMapperFactory()->get(ProfileButtonMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(Campus\Availability\Mapper::class),
+            $this->getMapperFactory()->get(Role\Availability\Mapper::class),
+            $this->getMapperFactory()->get(Campus\Visibility\Mapper::class),
+            $this->getMapperFactory()->get(Role\Visibility\Mapper::class),
+        );
     }
 
     /**

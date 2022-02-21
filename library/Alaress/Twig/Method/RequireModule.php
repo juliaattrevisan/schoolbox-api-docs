@@ -13,24 +13,25 @@
 
 namespace Alaress\Twig\Method;
 
-use Alaress\Module\Module as BaseModule;
-use Aura\Di;
+use Alaress\Module\Module;
+use LogicException;
+use Psr\Container\ContainerInterface;
 use Twig\Error\RuntimeError;
 
 class RequireModule
 {
     /**
-     * @var Di\ContainerInterface
+     * @var ContainerInterface
      */
-    protected $di;
+    protected ContainerInterface $di;
 
     /**
      * Constructor
      *
-     * @param Di\ContainerInterface $di A DI container, which contains the
+     * @param ContainerInterface $di A DI container, which contains the
      *                                  modules required.
      */
-    public function __construct(Di\ContainerInterface $di)
+    public function __construct(ContainerInterface $di)
     {
         $this->di = $di;
     }
@@ -45,18 +46,9 @@ class RequireModule
     public function __invoke($moduleName)
     {
         try {
-            $module = $this->di->get('module:' . $moduleName);
-        } catch (Di\Exception\ServiceNotFound $e) {
+            $module = Module::retrieveInstalledModule($moduleName);
+        } catch (LogicException $e) {
             throw new RuntimeError(sprintf('Module "%s" does not exist', $moduleName));
-        }
-        if (!$module instanceof BaseModule) {
-            throw new RuntimeError(
-                sprintf(
-                    'Module "%s" is not an instance of "%s"',
-                    $moduleName,
-                    BaseModule::class
-                )
-            );
         }
         $module->initControllerDependencies();
     }

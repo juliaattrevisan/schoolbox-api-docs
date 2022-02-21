@@ -11,10 +11,9 @@ namespace Schoolbox\Admin\Terminology;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\L10n\Mapper as L10nMapper;
 
 /**
  * The module for managing school terms through the admin section.
@@ -61,19 +60,11 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'localisationMapper' => $this->getMapperFactory()->getLazy(L10nMapper::class),
-                ]
-            )
-        );
+        return new Controller();
     }
 
     /**

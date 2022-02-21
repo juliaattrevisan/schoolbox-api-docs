@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
 
-use Aura\Di\Container;
-use Aura\Di\Exception\ServiceNotFound;
 use InvalidArgumentException;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
@@ -33,7 +34,7 @@ class Payload
 {
 
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $di;
 
@@ -47,10 +48,10 @@ class Payload
     /**
      * Payload constructor.
      *
-     * @param Container $di
-     * @param Mapper    $attendanceMapper
+     * @param ContainerInterface $di
+     * @param Mapper             $attendanceMapper
      */
-    public function __construct(Container $di, Mapper $attendanceMapper)
+    public function __construct(ContainerInterface $di, Mapper $attendanceMapper)
     {
         $this->di = $di;
         $this->attendanceMapper = $attendanceMapper;
@@ -66,7 +67,8 @@ class Payload
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws LogicException
-     * @throws ServiceNotFound
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws UnexpectedValueException
      */
     public function generate(Event $event, User $user): array

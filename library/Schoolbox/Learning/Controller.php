@@ -11,7 +11,6 @@ namespace Schoolbox\Learning;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Codec;
@@ -181,7 +180,6 @@ class Controller extends Base
      * @param Filter\IFactoryFactory $filterFactoryFactory
      * @var mixed[][] $_GET. Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws Mapper\Exception
      * @throws \ReflectionException If unable to find the class for a filter registered on this page
@@ -225,7 +223,6 @@ class Controller extends Base
      * @throws \LogicException
      * @throws \DomainException
      * @throws \OutOfRangeException
-     * @throws ServiceNotFound
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
@@ -374,7 +371,6 @@ class Controller extends Base
      * @since 165
      *
      * @param Term $term
-     * @throws ServiceNotFound If unable to find HTML builder
      * @throws DefinitionException
      * @throws UnexpectedValueException
      */
@@ -442,8 +438,6 @@ class Controller extends Base
 
     /**
      * @param Folder\Model $folder
-     *
-     * @throws ServiceNotFound
      */
     public function getClassListPage(Folder\Model $folder): void
     {

@@ -341,7 +341,7 @@ class Controller extends Base
      * Return JSON list of all appointments for a given date
      *
      * @param Alaress_Date_Format $date
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @return void
      */

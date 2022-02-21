@@ -140,7 +140,7 @@ class Controller extends WebController\Base
      * @since 18.0
      * @param CourseSpec\Model $courseSpec
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
      * @throws \InvalidArgumentException

@@ -1,10 +1,17 @@
 #!/usr/bin/php
 <?php
 
+/**
+ * The Bell Daemon.
+ *
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Alaress\Date\Clock;
-use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\CampusMapper;
@@ -14,21 +21,13 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
 use Schoolbox\Realtime\Timetable\TimetableScheduler;
 
-/**
- * The Bell Daemon.
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
- */
-
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     try {
         /** @var IConfigLoader $conf */

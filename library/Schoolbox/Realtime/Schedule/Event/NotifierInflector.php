@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Realtime\Schedule\Event;
 
-use Aura\Di\Exception\ReflectionFailure;
+use ReflectionException;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
@@ -38,7 +38,7 @@ class NotifierInflector
      *   * Replace last word in namespace with "Notifier"
      *   (so "\\Schoolbox\\User\\Model" becomes "\\Schoolbox\\User\\Notifier")
      *
-     * @throws ReflectionFailure
+     * @throws ReflectionException
      * @return ModuleNotifierInterface
      */
     public function getModule(CrudEventInterface $event): ?ModuleNotifierInterface
@@ -65,39 +65,15 @@ class NotifierInflector
 
 
     /**
-     * Passthru to the configurator beneath
-     *
-     * @param string $classname
-     * @throws ReflectionFailure
-     */
-    public function configureClass(string $classname): void
-    {
-        $this->configurator->configureClass($classname);
-    }
-
-
-    /**
      * Instantiate ModuleNotifier via DI
      *
      * @param string $classname
-     * @throws ReflectionFailure
+     * @throws ReflectionException
      * @return ModuleNotifierInterface
      */
     private function newInstance(string $classname): ModuleNotifierInterface
     {
-        try {
-            $this->configurator->configureClass($classname);
-        } catch (ReflectionFailure $e) {
-            // noop (for now, this is ok)
-        }
-
-        try {
-            /** @var ModuleNotifierInterface $notifier */
-            $notifier = $this->configurator->newInstance($classname);
-        } catch (\Aura\Di\Exception $e) {
-            throw new ReflectionFailure($e->getMessage(), $e->getCode(), $e);
-        }
-
-        return $notifier;
+        // @phpstan-ignore-next-line: this will always be a ModuleNotifierInterface
+        return $this->configurator->newInstance($classname);
     }
 }

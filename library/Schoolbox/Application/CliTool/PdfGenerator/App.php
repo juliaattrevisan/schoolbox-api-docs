@@ -11,11 +11,10 @@ namespace Schoolbox\Application\CliTool\PdfGenerator;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
-use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Predis\ClientInterface as RedisClient;
-use Proxy\Server as ProxyServer;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
@@ -27,7 +26,6 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use TheCodingMachine\Gotenberg;
-use Laminas\Uri\Uri;
 use Laminas\Uri\UriInterface;
 use ZipArchive;
 
@@ -368,7 +366,7 @@ BASE;
         // Find the redis client
         try {
             $redis = $this->getDi()->get('redis.storage');
-        } catch (ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             $redis = null;
         }
         if (!$redis instanceof RedisClient) {

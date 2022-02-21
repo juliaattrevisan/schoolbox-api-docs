@@ -8,7 +8,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
@@ -102,7 +101,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
     /**
      * Render page
-     * @throws ServiceNotFound
      */
     protected function render()
     {
@@ -176,7 +174,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      * @todo For now, just to get this working for 165, we are rendering the first file in StudentSubmissions and
      * ReturnedWork. But since 165+ can have multiple files per Submission or Return, this templates needs updating.
      * @see  SA-1606
-     * @throws ServiceNotFound
      */
     private function renderShowcasedWork()
     {

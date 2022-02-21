@@ -13,7 +13,7 @@ namespace Schoolbox\Groups;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
@@ -56,24 +56,19 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'groupMapper'               => $this->getMapperFactory()->getLazy(GroupMapper::class),
-                    'userAccessMapper'          => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                    'folderMapper'              => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'accessHelper'              => $this->getMapperFactory()->getLazy(Access::class),
-                    'timetable_ColourMapper'    => $this->getMapperFactory()->getLazy(\Timetable_ColourMapper::class),
-                    'reRouteOverrideMapper'     => $this->getMapperFactory()->getLazy(RerouteOverrideMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(GroupMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
+            $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );
     }
 }

@@ -68,14 +68,15 @@ class Kernel extends WebKernelAbstract
     protected function installDependencies(Di\Container $di): Di\Container
     {
         // Config loader
-        $di->set('config', $di->lazyNew(ConfigLoader::class));
+        $config = new ConfigLoader();
+        $di->set('config', $config);
 
         // Redis cache (memory-only, not persistent)
-        Redis::getCacheInstance()->connect($di->get('config')->get('redis_ephemeral_url'), null, INSTANCE_ID);
+        Redis::getCacheInstance()->connect($config->get('redis_ephemeral_url'), null, INSTANCE_ID);
         $di->set('redis.cache', Redis::getCacheClientInstance());
 
         // Redis storage (persisted to disk)
-        Redis::getStorageInstance()->connect($di->get('config')->get('redis_url'), null, INSTANCE_ID);
+        Redis::getStorageInstance()->connect($config->get('redis_url'), null, INSTANCE_ID);
         $di->set('redis.storage', Redis::getStorageClientInstance());
 
         // Redis queue publish (not persistent)
@@ -117,7 +118,7 @@ class Kernel extends WebKernelAbstract
         Mapper::di($di);
 
         // Set correct timezone
-        date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
+        date_default_timezone_set($config->get('date_timezone'));
 
         // Notification factory
         $di->set(
@@ -203,16 +204,6 @@ class Kernel extends WebKernelAbstract
 
         // register an empty logger to maintain interfaces as required
         $di->values['logger'] = new NullLogger();
-
-        // Mapper notifications:
-        // They rely upon the session being injected into them, so do that.
-        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function () use ($di) {
-            $session = $di->get('session');
-            if (!$session->isStarted()) {
-                $session->start();
-            }
-            return $_SESSION ?? [];
-        });
 
         // install sentry
         $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
@@ -321,7 +312,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
 
                     // Global access to returnUrl vars
-                    $encodedUrl = Redirect::encode($_GET["page"]);
+                    $encodedUrl = Redirect::encode($_GET["page"] ?? '');
                     $twig->addGlobal(
                         'RETURN_URL',
                         [
@@ -365,8 +356,7 @@ class Kernel extends WebKernelAbstract
             )
         );
 
-        $di->params[TwigMethod\RequireModule::class]['di'] = $di;
-        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
+        $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class, ['di' => $di]));
 
         // Unfortunately basic request needs a SitePage for now
         $di->set(

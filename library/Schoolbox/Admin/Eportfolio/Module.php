@@ -11,7 +11,7 @@ namespace Schoolbox\Admin\Eportfolio;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Eportfolio\PageMapper as EportfolioPageMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -62,20 +62,17 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'eportfolioImportMapper' => $this->getMapperFactory()->getLazy(Import\Mapper::class),
-                'eportfolioImportLogMapper' => $this->getMapperFactory()->getLazy(Import\Log\Mapper::class),
-                'eportfolioPageMapper' => $this->getMapperFactory()->getLazy(EportfolioPageMapper::class),
-                'roleMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\RoleMapper::class),
-                'campusMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\CampusMapper::class),
-                'userMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\UserMapper::class)
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(EportfolioPageMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\RoleMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
+            $this->getMapperFactory()->get(Import\Mapper::class),
+            $this->getMapperFactory()->get(Import\Log\Mapper::class)
         );
     }
 

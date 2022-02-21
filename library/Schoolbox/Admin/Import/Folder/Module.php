@@ -11,13 +11,10 @@ namespace Schoolbox\Admin\Import\Folder;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
-use InvalidArgumentException;
 use Schoolbox\Error;
-use Schoolbox\MapperFactory;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
 
@@ -54,27 +51,18 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
 
-
     /**
-     * {@inheritdoc}
-     * @throws ServiceNotFound
-     * @throws InvalidArgumentException
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        /** @var MapperFactory $mapperFactory */
-        $mapperFactory = $injector->get('mapperFactory');
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(
-            Controller::class,
-            [
-                'roleMapper' => $mapperFactory->getLazy(RoleMapper::class),
-                'errorMapper' => $mapperFactory->getLazy(Error\Mapper::class),
-                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
-                'configLoader' => $injector->lazyGet('config'),
-            ]
-        ));
+        return new Controller(
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(Error\Mapper::class),
+            $this->getMapperFactory()->get(HomepageTemplateMapper::class),
+            $this->getConfig(),
+        );
     }
-
 
     /**
      * {@inheritdoc}

@@ -170,7 +170,7 @@ class Controller extends BaseController
      * User profile.
      * @param User $user
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
@@ -273,7 +273,7 @@ class Controller extends BaseController
     /**
      * @param User $student
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError

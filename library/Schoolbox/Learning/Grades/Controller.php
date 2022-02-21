@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Grades;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
@@ -155,7 +154,6 @@ class Controller extends Base
      * @param User       $viewee
      * @param Term\Model $term
      * @throws DefinitionException If a required mapper join is not defined
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException If cyclic graph detected during translation
@@ -247,7 +245,6 @@ class Controller extends Base
      * @param null|int                 $year Null if looking at a term, instead of a full-year
      * @param Term\Model               $term
      * @param Collection               $workTypes
-     * @throws ServiceNotFound If unable to find mail handler service
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
      * @throws MapperException
@@ -359,7 +356,6 @@ class Controller extends Base
      * @throws RouteNotFound If unable to generate the route to fetch the filtered report
      * @throws InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
      * @throws DomainException If the filter FactoryFactory has not defined its filterable entity
-     * @throws ServiceNotFound If unable to fetch the HTML output renderer from the DI
      * @throws DefinitionException If specified mapper join is not defined
      * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
      * @throws MapperException If a database column alias is incorrect
@@ -442,7 +438,6 @@ class Controller extends Base
      * @param User $viewee
      * @param int  $year
      * @throws MapperException
-     * @throws ServiceNotFound If unable to find mail handler service
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      */
@@ -472,7 +467,6 @@ class Controller extends Base
      * @throws InvalidArgumentException If unable to find the filter mapper class
      * @throws DomainException If this class has not defined what entity it is filtering
      * @throws Filter\BrokenFilterException If a filter is unable to be processed
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws DefinitionException If specified mapper join is not defined
      * @throws LogicException If cyclic graph detected during assessment translation
      * @throws UnexpectedValueException If unable to merge student collections
@@ -822,7 +816,6 @@ class Controller extends Base
      * @return array
      * @throws DomainException
      * @throws InvalidColumnException
-     * @throws ServiceNotFound
      * @throws \RangeException
      * @throws \UnderflowException
      */

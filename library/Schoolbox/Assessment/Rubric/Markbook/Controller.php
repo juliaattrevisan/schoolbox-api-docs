@@ -12,14 +12,12 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use RangeException;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Column\Decimal;
@@ -122,7 +120,6 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws Router\Exception\RouteNotFound
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
      * @throws DomainException
      * @throws UnexpectedValueException

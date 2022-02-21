@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Rubric;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
@@ -21,7 +21,6 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
-use Twig\Error\Loader;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -68,25 +67,19 @@ class Module extends BaseModule
 
 
     /**
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                'mapper'               => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-                'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'groupMapper'          => $this->getMapperFactory()->getLazy(CapabilityMapper::class),
-                'criterionMapper'      => $this->getMapperFactory()->getLazy(IndicatorMapper::class),
-                'rosettaStone'         => $injector->lazyGet('l10n'),
-                'markTypeMapper'       => $this->getMapperFactory()->getLazy(MarkTypeMapper::class),
-                'gradeGroupMapper'     => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(CapabilityMapper::class),
+            $this->getMapperFactory()->get(IndicatorMapper::class),
+            $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(MarkTypeMapper::class),
+            $this->getMapperFactory()->get(GradeGroupMapper::class),
         );
     }
 }

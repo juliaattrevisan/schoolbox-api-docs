@@ -85,7 +85,7 @@ class Kernel extends CliKernelAbstract
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
@@ -336,7 +336,7 @@ EOL;
 
     /**
      * @return LoggerInterface
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function createDefaultLogger(): LoggerInterface
     {
@@ -367,7 +367,7 @@ EOL;
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */

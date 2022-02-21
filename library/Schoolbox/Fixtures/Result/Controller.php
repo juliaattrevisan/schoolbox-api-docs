@@ -98,7 +98,7 @@ class Controller extends AbstractController
      * @param object $entity
      * @param object $team
      * @param object $context
-     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface|\Schoolbox\Application\Exception\Exception
      * @return void
      */
     public function getCreateFormForTeam($entity, $team, $context = null)
@@ -166,7 +166,7 @@ class Controller extends AbstractController
      * List of Results and the Match they are in
      *
      * @param Matchup $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound|\Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
@@ -236,7 +236,7 @@ class Controller extends AbstractController
      * @param Matchup $context
      * @param Team $team
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface|\Schoolbox\Application\Exception\Exception
      */
     public function getResultForTeam($context, $team)
     {
@@ -387,7 +387,7 @@ class Controller extends AbstractController
      * @param Matchup $context
      * @throws MapperException
      * @throws MapperException\Deleted
-     * @throws \Aura\Di\Exception\ServiceNotFound|\Schoolbox\Application\Exception\Exception
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface|\Schoolbox\Application\Exception\Exception
      */
     protected function getForm($entity, $context = null)
     {

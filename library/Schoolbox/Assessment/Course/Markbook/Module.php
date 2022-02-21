@@ -12,8 +12,7 @@ namespace Schoolbox\Assessment\Course\Markbook;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
@@ -81,29 +80,21 @@ class Module extends \Alaress\Module\Module
         );
     }
 
-
     /**
      * @inheritdoc
-     * @param ContainerInterface|Container $injector
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \InvalidArgumentException
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->getBasename(),
-            $injector->lazyNew(Controller::class, [
-                'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-                'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
-                'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
-                'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'courseImplMapper' => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
-                'unitImplMapper' => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),
-            ])
+        return new Controller(
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
+            $this->getMapperFactory()->get(UnitImpl\Mapper::class),
         );
     }
-
 
     /**
      * @return \Schoolbox\Mapper|CourseSpec\Mapper

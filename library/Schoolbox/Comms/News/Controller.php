@@ -16,7 +16,6 @@ use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
@@ -140,7 +139,6 @@ class Controller extends Base
      * @since 18.1
      *
      * @throws MapperException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws UnknownEntityTypeException
@@ -299,7 +297,6 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
-     * @throws ServiceNotFound
      */
     public function getUpdate(Model $article): void
     {
@@ -739,7 +736,6 @@ class Controller extends Base
      * @since 18.1
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws ServiceNotFound
      */
     public function getIndex(): void
     {
@@ -934,7 +930,6 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @api   GET /news/archive{/year,month}
@@ -1101,7 +1096,6 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws PDOException
@@ -1156,7 +1150,6 @@ class Controller extends Base
      * Index of articles you've authored
      *
      * @api GET /news/me
-     * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getAuthored()

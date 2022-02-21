@@ -662,7 +662,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param string          $sortProperty
      * @param string          $sortDirection
      * @return Search\Result
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC'): Search\Result
     {

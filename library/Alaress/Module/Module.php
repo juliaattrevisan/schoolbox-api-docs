@@ -11,13 +11,19 @@
 namespace Alaress\Module;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\IsJson;
+use Alaress\Web\Request\IsXhr;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
 use Aura\Router\Route;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
@@ -45,12 +51,10 @@ class Module
      *
      * @var ContainerInterface
      */
-    protected $injector;
+    protected ContainerInterface $injector;
 
     /**
      * The base name for this module.
-     *
-     * This module will be injected into the dependency injector at "module:$basename".
      *
      * @var string
      */
@@ -102,18 +106,22 @@ class Module
 
 
     /**
-     * Constructor
+     * A list of initialised modules.
      *
-     * TODO don't set $injector here, pass as a param to init() instead.
-     * (This would mean that custom constructors could be used, and $injector
-     *  shouldn't be used outside of init() anyway)
+     * @var array<string, self>
+     */
+    private static array $installedModules = [];
+
+
+    /**
+     * Constructor
      *
      * @param ContainerInterface $injector
      * @param string             $basename
      */
     public function __construct(ContainerInterface $injector, $basename = '')
     {
-        $this->setInjector($injector);
+        $this->injector = $injector;
         if ($basename) {
             $this->setBasename($basename);
         }
@@ -211,9 +219,8 @@ class Module
      */
     protected function internalInit($basePath, $override)
     {
-        $injector = $this->getInjector();
-        if ($this->installModule($injector, $override)) {
-            $this->initSubmodules($injector, $basePath);
+        if ($this->installModule()) {
+            $this->initSubmodules($this->injector, $basePath);
 
             // perform any route registration available
             $this->registerRoutes();
@@ -244,9 +251,6 @@ class Module
             return;
         }
         $this->isControllerDependenciesInstalled = true;
-        $injector                                = $this->getInjector();
-        $this->preInitControllerDependencies($injector);
-        $this->initDependingModules();
 
         // configure pre-registered preloaders
         foreach ($this->preloadIndex as [$preload, $methods]) {
@@ -278,39 +282,34 @@ class Module
     /**
      * Installs this module into the dependency injection system.
      *
-     * @param  ContainerInterface $injector
-     * @param  bool               $override If true, override a previous definition with this basename
      * @return bool Was the module installed?
      * @throws LogicException if this module has no basename, or it is already defined as a different class
      */
-    protected function installModule(ContainerInterface $injector, $override = false)
+    protected function installModule(): bool
     {
         if (!$this->basename) {
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
-        $key = 'module:' . $this->basename;
-        if (!$override && $injector->has($key)) {
-            $other = $injector->get($key);
-            if (get_class($other) != get_class($this)) {
-                throw new LogicException(
-                    sprintf(
-                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
-                        $this->basename,
-                        get_class($other),
-                        get_class($this)
-                    )
-                );
-            } else {
-                user_error(
-                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
-                    E_USER_WARNING
-                );
-                return false;
-            }
-        }
-        $injector->set($key, $this);
+        self::$installedModules[$this->basename] = $this;
         return true;
     }
+
+
+    /**
+     * Retrieves a module previously installed via `$this->init`.
+     *
+     * @param string $baseName
+     * @return self
+     * @throws LogicException if module isn't installed
+     */
+    public static function retrieveInstalledModule(string $baseName): self
+    {
+        if (!(self::$installedModules[$baseName] ?? null) instanceof Module) {
+            throw new LogicException(sprintf('Module "%s" does not exist', $baseName));
+        }
+        return self::$installedModules[$baseName];
+    }
+
 
     /**
      * Initializes any submodules of this module.
@@ -464,38 +463,6 @@ class Module
     }
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-    }
-
-    /**
-     * Calls the secondary init on each module that this one depends on.
-     *
-     * @deprecated Module dependencies should now be automatically installed when required
-     *             (@see `Alaress\Module\Loader` and classes which use it)
-     *
-     * @throws LogicException if a dependency doesn't exist
-     */
-    protected function initDependingModules()
-    {
-        foreach ($this->moduleDependencies as $dependency) {
-            $dependingModule = $this->getInjector()->get('module:' . $dependency);
-            if (!$dependingModule instanceof Module) {
-                throw new LogicException(sprintf('Module "%s" does not exist', $dependency));
-            }
-            $dependingModule->initControllerDependencies();
-        }
-    }
-
-    /**
      * Initializes any preloads on routes for this module.
      *
      * Preloads adjust route params before they are passed to the controller.
@@ -609,7 +576,7 @@ class Module
     protected function getMapperFactory(): MapperFactory
     {
         /** @noinspection PhpUnhandledExceptionInspection */
-        return $this->getInjector()->get('mapperFactory');
+        return $this->injector->get('mapperFactory');
     }
 
     /**
@@ -617,7 +584,7 @@ class Module
      */
     protected function getExternalUser()
     {
-        return $this->getInjector()->get('externalUser');
+        return $this->injector->get('externalUser');
     }
 
     /**
@@ -625,7 +592,7 @@ class Module
      */
     protected function getExternalTimetable()
     {
-        return $this->getInjector()->get('externalTimetable');
+        return $this->injector->get('externalTimetable');
     }
 
     /**
@@ -673,7 +640,7 @@ class Module
      */
     protected function getConfig(): IConfigLoader
     {
-        return $this->getInjector()->get('config');
+        return $this->injector->get('config');
     }
 
     /**
@@ -685,38 +652,58 @@ class Module
     {
         try {
             return $this->injector->get("rule:$name");
-        } catch (\Aura\Di\Exception\ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new \InvalidArgumentException("Auth rule '$name' does not exist", 0, $e);
         }
     }
 
 
     /**
-     * Initializes controller classes into the dependency injector.
+     * Actually builds the controller, if this module has one.
      *
-     * @param ContainerInterface $injector The dependency injection container.
+     * Modules which instantiate only a homepage/dashboard/ePortfolio component
+     * will not have a controller: they will not have any routes either, as
+     * they have no controller to reference those routes to. This method will
+     * throw a `LogicException` in this case.
+     *
+     * This may pull dependencies from the DI container, but will not write to
+     * it.
+     *
+     * @return Base
+     * @throws LogicException if this module has no controller
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
+        throw new LogicException(sprintf('Controller does not exist for module "%s"', $this->basename));
     }
 
-    /**
-     * @param  ContainerInterface $injector
-     * @return $this
-     */
-    public function setInjector(ContainerInterface $injector)
-    {
-        $this->injector = $injector;
-        return $this;
-    }
 
     /**
-     * @return ContainerInterface
+     * Installs dependencies into the controller.
+     *
+     * Ported from DI configuration of controller
+     *
+     * @template T of Base
+     * @param T               $controller
+     * @param ContainerInterface $container
+     * @return T
      */
-    public function getInjector()
+    public function installControllerDependencies(Base $controller, ContainerInterface $container): Base
     {
-        return $this->injector;
+        $controller
+            ->setRequest($container->get('webFactory')->newRequest())
+            ->setResponse($container->get('webFactory')->newResponse())
+            ->setSession($container->get('session'))
+            ->setRouter($container->get('router'))
+            ->setAuthorizer($container->get('authorizer'))
+            ->setDi($container)
+            ->setExceptionGenerator($container->get('mapperFactory')->get(ErrorMapper::class))
+            ->setSentry($container->has('sentry') ? $container->get('sentry') : null)
+            ->setIsJsonSpec(new IsJson())
+            ->setIsXhrSpec(new IsXhr());
+        return $controller;
     }
+
 
     /**
      * @return string

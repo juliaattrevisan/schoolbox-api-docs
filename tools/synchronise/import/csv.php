@@ -3,6 +3,8 @@
 
 use Alaress\Csv\Reader;
 use Alaress\Lumberjack\Logger;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\External\Importer;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 
@@ -148,7 +150,7 @@ if (isset($options['user']) || isset($options['enrolment'])) {
         /** @var WritableCache $cache */
         $cache = $kernel->get('subscriptionCache');
         $cache->cacheAllUsers(INSTANCE_ID);
-    } catch (\RuntimeException | \Aura\Di\Exception $e) {
+    } catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
         $logger->error($e->getMessage(), [ 'exception' => $e ]);
     }
 }

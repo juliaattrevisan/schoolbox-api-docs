@@ -163,7 +163,7 @@ class Controller extends Base
      * Generate payload for System Usage
      *
      * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getSpecificUserSystemPayload(User $user): void
     {
@@ -180,7 +180,7 @@ class Controller extends Base
      * Generate payload for Total Usage
      *
      * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getSpecificUserTotalPayload(User $user): void
     {
@@ -198,7 +198,7 @@ class Controller extends Base
      *
      * @param User $user
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getSpecificUserFilePayload(User $user): void
     {
@@ -215,7 +215,7 @@ class Controller extends Base
      * Generate payload for User Usage
      * @param User $user
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getSpecificUserFileTypePayload(User $user): void
     {

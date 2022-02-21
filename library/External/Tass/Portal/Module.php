@@ -12,10 +12,10 @@ namespace External\Tass\Portal;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\IConfigLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\UserMapper;
 
 class Module extends \Alaress\Module\Module
@@ -49,42 +49,29 @@ class Module extends \Alaress\Module\Module
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        /** @var IConfigLoader $config */
-        $config = $injector->get('config');
-        $injector->set(
-            'tassportal:sso',
-            $injector->lazyNew(
-                SSO::class,
+        $config = $this->getConfig();
+        return new Controller(
+            new SSO(
                 [
-                    'configuration' => [
-                        'token_key' => $config->get('external_tass_sso_token_key'),
-                        'cmpy_code' => $config->get('external_tass_company_code'),
-                    ],
-                    'server'        => $config->get('external_tass_sso_server'),
-                    'ssoStrategy'   => $config->get('external_tass_sso_token_generation_strategy') ?: SSO::SSO_STRATEGY_DEFAULT,
-                ]
-            )
-        );
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'sso'        => $injector->lazyGet('tassportal:sso'),
-                    'portalHost' => $config->get('external_staff_portal'),
-                    'appCodes'   => [
-                        'parentLounge' => $config->get('external_tass_app_code_parent_lounge'),
-                        'tassWeb'      => $config->get('external_tass_app_code_tassweb'),
-                        'teacherKiosk' => $config->get('external_tass_app_code_teacherkiosk'),
-                        'webBook'      => $config->get('external_tass_app_code_webbook'),
-                        'studentCafe'  => $config->get('external_tass_app_code_studentcafe'),
-                    ]
-                ]
-            )
+                    'token_key' => $config->get('external_tass_sso_token_key'),
+                    'cmpy_code' => $config->get('external_tass_company_code'),
+                ],
+                $config->get('external_tass_sso_server'),
+                $config->get('external_tass_sso_token_generation_strategy') ?: SSO::SSO_STRATEGY_DEFAULT,
+            ),
+            $config->get('external_staff_portal'),
+            [
+                'parentLounge' => $config->get('external_tass_app_code_parent_lounge'),
+                'tassWeb'      => $config->get('external_tass_app_code_tassweb'),
+                'teacherKiosk' => $config->get('external_tass_app_code_teacherkiosk'),
+                'webBook'      => $config->get('external_tass_app_code_webbook'),
+                'studentCafe'  => $config->get('external_tass_app_code_studentcafe'),
+            ],
+            $this->getMapperFactory()->get(ErrorMapper::class)
         );
     }
 

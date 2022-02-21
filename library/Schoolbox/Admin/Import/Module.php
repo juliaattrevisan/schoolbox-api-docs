@@ -13,8 +13,7 @@ namespace Schoolbox\Admin\Import;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
@@ -54,32 +53,17 @@ class Module extends BaseModule
         $this->register('GET', '/schoolDataImport/status/report', 'getStatusReport', $perms);
     }
 
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'fieldStrategyFactory' => $injector->lazy(function () {
-                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
-            }),
-            'importLogMapper'      => $this->getMapperFactory()->getLazy(\Schoolbox\External\Connector\Log\Mapper::class),
-        ];
-    }
-
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->getMapperFactory()->get(\Schoolbox\External\Connector\Log\Mapper::class),
+        );
     }
-
 
     /**
      * {@inheritdoc}

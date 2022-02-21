@@ -37,7 +37,7 @@ class Controller extends Base
      * Display all documents for selected student
      * @param User $student
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getIndex(User $student): void
     {

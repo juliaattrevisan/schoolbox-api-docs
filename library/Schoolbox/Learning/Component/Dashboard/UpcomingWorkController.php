@@ -59,7 +59,7 @@ class UpcomingWorkController extends Component_Dashboard_ControllerAbstract
      * Business logic to collate data ready for output
      *
      * @return bool Whether to continue on and attempt Component render
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\DefinitionException

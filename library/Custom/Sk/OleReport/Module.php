@@ -11,8 +11,8 @@ namespace Custom\Sk\OleReport;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
@@ -85,14 +85,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'database' => $injector->lazyGet('databaseExternal'),
-            ])
-        );
+        return new Controller($this->injector->get('databaseExternal'));
     }
 
     /**

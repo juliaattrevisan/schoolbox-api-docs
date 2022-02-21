@@ -11,8 +11,6 @@ namespace Schoolbox\Calendar;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Aura\Di\Exception;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Config_Mapper;
@@ -96,7 +94,6 @@ class Controller extends Base
 
     /**
      * @param string|null $selectedDate
-     * @throws ServiceNotFound
      * @throws MapperException
      */
     public function getOwnCalendar(?string $selectedDate): void
@@ -107,7 +104,6 @@ class Controller extends Base
     /**
      * @param string|null $selectedDate
      * @param User        $user
-     * @throws ServiceNotFound
      * @throws MapperException
      */
     public function getCalendar(?string $selectedDate, User $user): void
@@ -149,7 +145,6 @@ class Controller extends Base
     /**
      * @param User        $user
      * @param string|null $selectedDate
-     * @throws ServiceNotFound
      */
     private function buildResponse(User $user, ?string $selectedDate): void
     {
@@ -160,11 +155,7 @@ class Controller extends Base
 
         /* Get the current session vars that store the Filter settings
          */
-        try {
-            $persistedFilters = $this->session->get('calendarFilter');
-        } catch (Exception $e) {
-            throw new Exception\ServiceNotFound();
-        }
+        $persistedFilters = $this->session->get('calendarFilter');
 
         $filters = (new Filter($persistedFilters))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 

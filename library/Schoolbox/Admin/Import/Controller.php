@@ -13,7 +13,6 @@ namespace Schoolbox\Admin\Import;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\ConfigController;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
 use ReflectionException;
@@ -68,7 +67,6 @@ class Controller extends ConfigController
     /**
      * Landing Page for School Data Import
      *
-     * @throws ServiceNotFound
      * @throws RouteNotFound
      * @throws ReflectionException
      * @throws InvalidColumnException

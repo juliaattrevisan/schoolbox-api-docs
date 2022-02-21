@@ -7,7 +7,7 @@
  * Time: 15:16
  */
 
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Assessment\Component;
@@ -28,7 +28,7 @@ $kernel = new Daemon\Kernel(
 
 $kernel->run(function ($di, $loop, $log, $opts) {
     /**
-     * @var Di\Container $di
+     * @var ContainerInterface $di
      * @var LoopInterface $loop
      * @var LoggerInterface $log
      * @var array $opts

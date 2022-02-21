@@ -15,7 +15,6 @@
 declare(strict_types=1);
 
 use Alaress\Database;
-use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -197,7 +196,6 @@ function normalizeEncoding(string $string): string
  * @param Alaress_Date_Format $date
  * @throws Database\Exception
  * @throws RuntimeException
- * @throws ServiceNotFound
  * @throws \Schoolbox\Mapper\Exception
  */
 function processCsvData(

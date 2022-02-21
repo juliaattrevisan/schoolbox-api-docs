@@ -9,9 +9,8 @@
 namespace Schoolbox;
 
 use Aura\Di\Container;
-use Aura\Di\Lazy;
+use Aura\Di\Injection\Lazy;
 use InvalidArgumentException;
-use Schoolbox\Mapper as BaseMapper;
 
 class MapperFactory
 {
@@ -38,41 +37,40 @@ class MapperFactory
      */
     public function get($mapperName)
     {
-        $di = $this->injector;
-
-        if (!$di->has($mapperName)) {
-            // register the lazy into the DI
-            $di->set($mapperName, $this->getLazy($mapperName));
+        if (!class_exists($mapperName)) {
+            throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
         }
 
-        // yank it straight back out (but now it's registered!)
-        // @phpstan-ignore-next-line: can't enforce this constraint here
-        return $di->get($mapperName);
+        // Does this have a getInstance? Use it if so
+        if (is_callable([ $mapperName, 'getInstance' ])) {
+            $mapper = $mapperName::getInstance();
+        } else {
+            $mapper = new $mapperName();
+        }
+
+        return $mapper;
     }
 
     /**
      * Gets Lazy reference to the specified mapper
      *
-     * Use this when registering a service on the DI.
-     * Only the DI knows how to transform a lazy ref to a Mapper into a Mapper instance.
+     * Use this when registering a service on the DI: only the DI container
+     * knows how to transform a lazy ref to a Mapper into a Mapper instance.
      *
      * @template T
      * @param class-string<T> $mapperName
-     * @throws InvalidArgumentException If mapper class not found
      * @return Lazy
+     * @throws InvalidArgumentException If mapper class not found
      */
     public function getLazy($mapperName)
     {
         if (!class_exists($mapperName)) {
             throw new InvalidArgumentException('Mapper class not found: ' . $mapperName);
         }
-        return $this->injector->lazy(function () use ($mapperName) {
-            // utilise getInstance if possible
-            if (is_callable([ $mapperName, 'getInstance' ])) {
-                return $mapperName::getInstance();
+        return $this->injector->lazy(
+            function () use ($mapperName) {
+                return $this->get($mapperName);
             }
-
-            return new $mapperName();
-        });
+        );
     }
 }

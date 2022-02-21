@@ -17,10 +17,10 @@ Changing behaviour in one place changes it everywhere it's used, resulting in co
 * php abstract classes, traits and/or includes
 * constants (providing you use them...)
 
-http://www.ifsq.org/single-point-of-maintenance.html 
+http://www.ifsq.org/single-point-of-maintenance.html
 
 ## Don't repeat yourself
-Don't copy-paste code if you can avoid it, because you then have to maintain each copy separately and nobody likes doing that. This isn't a single point of control and you'll be doomed to experiencing anomalous behaviour all day. 
+Don't copy-paste code if you can avoid it, because you then have to maintain each copy separately and nobody likes doing that. This isn't a single point of control and you'll be doomed to experiencing anomalous behaviour all day.
 
 Use functions, classes and traits to reduce cloning.
 
@@ -41,11 +41,11 @@ https://en.wikipedia.org/wiki/Object-oriented_programming
 
 ## Cohesion and Coupling
 We aim to have high-cohesion, low-coupling classes; that is, to build classes which serve a particular purpose, they do it well without superflous behaviours, and can be freely reused because they aren't wantonly influencing the behaviour of other stuff.
- 
+
 https://stackoverflow.com/questions/3085285/cohesion-coupling
 
 # Folder Safary
-Let's have a quick look at some high-profile folders. You'll invariably visit these folders more than others. 
+Let's have a quick look at some high-profile folders. You'll invariably visit these folders more than others.
 * *conf.* Aura Controller configurations live here - more on these later.
 * *library.* The guts of schoolbox business logic. Contains both Handler and Aura Paradigms. Everything except the *library/Schoolbox* folder is Handler Paradigm. More on that later.
 * *library/Schoolbox.* Contains Aura Paradigm stuff. More on that later.
@@ -53,7 +53,7 @@ Let's have a quick look at some high-profile folders. You'll invariably visit th
 * *www.* Handler Paradigm files that you access via the url.
 
 # Paradigms
-As mentioned earlier, schoolbox is a cultural melting pot of ideas. Over time, two paradigms emerged and co-exist today. These represent two different philosophies on how to organise, access and execute php functionality. They both have various pros and cons, but I'll spare you those details for now. 
+As mentioned earlier, schoolbox is a cultural melting pot of ideas. Over time, two paradigms emerged and co-exist today. These represent two different philosophies on how to organise, access and execute php functionality. They both have various pros and cons, but I'll spare you those details for now.
 
 The oldest of these is Handler Paradigm. We are trying to phase this out entirely in favour of the Aura Paradigm.
 
@@ -66,17 +66,17 @@ Four major pieces are involved in the Handler Paradigm.
 * *www.* All of the php files here execute via the url. These basic controller files instantiate Handlers to interact with the database, then they process the results in preparation for rendering to screen.
 * *SitePage.* This is a giant, all-encompassing object that that fulfils a potpourri of duties. Its main activity is to `include()` a file from *www*. This file (with the help of other files) generates content to display to the end user.
 * *phplib.* The ultimate developer curse-word. We'll see how to use it shortly, but it's a php-based templating engine that takes a controller script's output, an html template, and substitutes placeholder strings for actual content. It does this in a really weird manner that is notoriously confusing.
- 
+
 In summary, this is what happens:
 
-When the controller file is `include()`d in `SitePage`, *www* controller files instantiate Handlers which are able to interact with the database. The output of these Handlers are processed into an html template via the *phplib* templating engine. SitePage echoes the processed html output to screen.  
+When the controller file is `include()`d in `SitePage`, *www* controller files instantiate Handlers which are able to interact with the database. The output of these Handlers are processed into an html template via the *phplib* templating engine. SitePage echoes the processed html output to screen.
 
 Incidentally, because of this `include()`, nearly every file in *www* has the unorthodox sensation of being able to inexplicably access `$this`.
 
 Even though we're trying to cull the Handler population, it's still in use. You'll inevitably encounter it and have to fix something-or-other in it, so there's value in understanding its fundamentals. Also, when you reach the other Paradigm, you'll appreciate it more for its conveniences!
 
 ### The Controller
-To start with, make a `www/test.php` file. This is your main controller file where all the action takes place. As previously described, it'll be included into `SitePage` and then its contents will be unceremoniously dumped out. 
+To start with, make a `www/test.php` file. This is your main controller file where all the action takes place. As previously described, it'll be included into `SitePage` and then its contents will be unceremoniously dumped out.
 
 
 ```php
@@ -87,17 +87,17 @@ die();
 
 ```
 
-Now visit http://192.168.36.10/test - stuff appears! The `die()` is noteworthy here. Remember that this file is being `include()`d elsewhere, and that *elsewhere* will continue trying to do stuff. In this case, `SitePage` will continue trying to render html. But there's no template for it, so it complains angrily at you. 
+Now visit http://192.168.36.10/test - stuff appears! The `die()` is noteworthy here. Remember that this file is being `include()`d elsewhere, and that *elsewhere* will continue trying to do stuff. In this case, `SitePage` will continue trying to render html. But there's no template for it, so it complains angrily at you.
 
 Try removing the `die()` command, and refresh the screen. You'll be attacked by `phplib` complaining at you in a most unholy way:
- 
+
  ```
  Warning: loadfile: contentTpl is not a valid handle. in /vagrant/library/HtmlTemplate.php on line 710
  Warning: subst: unable to load contentTpl. in /vagrant/library/HtmlTemplate.php on line 710
  ```
- 
+
 It does this sort of stuff when you haven't specified an html file for it to process and output. Don't try to comprehend these warning and error messages. There's no hope. Associate a message with a known solution; it's much easier this way.
- 
+
 Let's fix this problem by specifying an html template for it to render.
 
 ### The HTML Template
@@ -119,7 +119,7 @@ Make a `kingdoms.html` file in `templates/core` folder. Dump in some html conten
 </html>
 ```
 
-Now we need to tell our Controller which html file it should try to load. Note that we don't need to `die()` anymore, because we're giving the `SitePage` monster some html to eat. 
+Now we need to tell our Controller which html file it should try to load. Note that we don't need to `die()` anymore, because we're giving the `SitePage` monster some html to eat.
 
 ```php
 <?php
@@ -147,10 +147,10 @@ Let's do that now by putting some placeholder vars into the html template, which
 </html>
 ```
 
-Now we need to tell the Controller to put contents into the placeholder vars. Note that `[]` is simply a shorthand syntax for `array()`. 
+Now we need to tell the Controller to put contents into the placeholder vars. Note that `[]` is simply a shorthand syntax for `array()`.
 
 `setVar()` is a phplib command that identifies which placeholder vars should be replaced with content, and what that content should be, in an associative array.
- 
+
 ```php
 <?php
 
@@ -160,7 +160,7 @@ $this->setVar([
 ]);
 ```
 
-Update the controller and have a play with the contents of `FAVOURITE_WARCRY`. 
+Update the controller and have a play with the contents of `FAVOURITE_WARCRY`.
 
 > Time To Experiment!
 >
@@ -199,7 +199,7 @@ $this->setVar([
 Clearly that won't do. Thus, we come to `phplib blocks`.
 
 ### phplib Blocks
-phplib `blocks` are a special kind of placeholder. `blocks` contain placeholder vars and this is essentially used as a "blueprint" - the placeholder vars are substituted and the result is stored in memory in some arcane variable. Upon repeated iterations, the blueprint is reused and its results repeatedly stacked up in this variable, until all the iterations are finished. When all iterations are complete, the arcane var's contents are all concatenated together and returned. 
+phplib `blocks` are a special kind of placeholder. `blocks` contain placeholder vars and this is essentially used as a "blueprint" - the placeholder vars are substituted and the result is stored in memory in some arcane variable. Upon repeated iterations, the blueprint is reused and its results repeatedly stacked up in this variable, until all the iterations are finished. When all iterations are complete, the arcane var's contents are all concatenated together and returned.
 
 Kind of like filling out the same paper form year after year, splaying them out on the ground in order of occurrence and gluing them together head to tail.
 
@@ -221,8 +221,8 @@ $this->setVar([
 ]);
 ```
 
-...and html file. 
- 
+...and html file.
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -252,7 +252,7 @@ The block contains two placeholder vars - `WIKI_ID` and `WIKI_SLUG`. Each wiki a
 If you reload your screen now, you'll see this placeholder var: `{wiki_article_block}`. This is because we haven't put any data into it and processed it into the html file - a procedure we conduct using `parse()` and known as *parsing blocks*. This is a very tedious exercise and really strange, but if you follow the conventions you'll be alright.
 
 #### Parsing blocks
-To make use of our `block` "blueprint", we need to parse it out. This processes the block by putting in contents, stacking them up in memory, then putting the entire stack into the block's original location - thus substituting it with an accumulation of content. 
+To make use of our `block` "blueprint", we need to parse it out. This processes the block by putting in contents, stacking them up in memory, then putting the entire stack into the block's original location - thus substituting it with an accumulation of content.
 
 We can offer a once-off parse which only remembers the contents of the last "blueprint" that was processed:
 
@@ -266,8 +266,8 @@ $this->parse('wiki_article_block', 'wiki_article');
 $this->parse('wiki_article_block', 'wiki_article', true);
 ```
 
-Let's try both. 
- 
+Let's try both.
+
 #### Once-off parse
 The first two arguments in `$this->parse()` are the reverse of the last two arguments in `$this->setBlock()`. We've adopted this convention everywhere so you'll be able to comprehend what's going on.
 
@@ -301,11 +301,11 @@ $this->parse('wiki_article_block', 'wiki_article');
 
 ```
 
-If you refresh your screen, you'll see the test content render because the block has (finally) been parsed. 
+If you refresh your screen, you'll see the test content render because the block has (finally) been parsed.
 
 > Time To Experiment!
 >
-> You can experiment here, repeatedly executing `$this->parse()` etc. to your heart's content to see what happens. 
+> You can experiment here, repeatedly executing `$this->parse()` etc. to your heart's content to see what happens.
 
 #### Accumulated parse
 To show all the wiki articles, we need to iteratively parse blocks. We simply use a `for` or `foreach` loop, set the placeholder vars to contain something meaningful, then parse them out with the third boolean argument set to `true`.
@@ -332,14 +332,14 @@ foreach ($allArticles as $currentArticle) {
         'WIKI_ID' => $currentArticle['wikiID'],
         'WIKI_SLUG' => $currentArticle['slug'],
     ]);
-    
+
     // Accumulated parse
-    
+
     $this->parse('wiki_article_block', 'wiki_article', true);
 }
 ```
 
-Try refreshing your screen now. Your wiki articles should show in a very bland list! 
+Try refreshing your screen now. Your wiki articles should show in a very bland list!
 
 > Time To Experiment!
 >
@@ -352,7 +352,7 @@ Blocks can be used to include/exclude html chunks from rendering, conditionally 
 
 To prevent a block from rendering, we use a `setVar()` on it and set it to an empty string `''`. We toggle blocks to hide or show buttons or other content - sometimes even other blocks.
 
-Let's set up a new `block` called `toggle`. 
+Let's set up a new `block` called `toggle`.
 
 ```php
 <?php
@@ -377,9 +377,9 @@ foreach ($allArticles as $currentArticle) {
         'WIKI_ID' => $currentArticle['wikiID'],
         'WIKI_SLUG' => $currentArticle['slug'],
     ]);
-    
+
     // Accumulated parse
-    
+
     $this->parse('wiki_article_block', 'wiki_article', true);
 }
 
@@ -424,7 +424,7 @@ Now you can refresh the screen to see what happens. You'll see the contents of t
 
 > Time To Experiment!
 >
-> At this point you should try constructing more blocks and conditionally hiding and showing some of them. It takes some getting used to, but so long as you follow the convention shown in this guide you should be alright. For now, get comfortable with the syntax and the concept. 
+> At this point you should try constructing more blocks and conditionally hiding and showing some of them. It takes some getting used to, but so long as you follow the convention shown in this guide you should be alright. For now, get comfortable with the syntax and the concept.
 
 If you're okay with this, we'll move on to a more advanced utilisation of `blocks` - nesting them within each other to present more complex data.
 
@@ -438,7 +438,7 @@ Let's start afresh with our html and controller files. For this example we won't
 // Countries, Kingdoms and their Monarchies
 $data = [
     'Australia' => [
-        'Camberwell' => 'Geoffrey Rush', 
+        'Camberwell' => 'Geoffrey Rush',
         'Hawthorn' => 'Robert',
         'CBD' => 'Karl'
     ],
@@ -478,13 +478,13 @@ foreach ($data as $country => $kingdoms) {
 ```
 
 To set up a nested block, we change the first argument in `setBlock()` to be the name of the parent (containing) block. In this case, kingdoms exist in a country. Let's add a `kingdom` block and start parsing out some kingdom names.
- 
+
 ```php
 <?php
 // Countries, Kingdoms and their Monarchies
 $data = [
     'Australia' => [
-        'Camberwell' => 'Geoffrey Rush', 
+        'Camberwell' => 'Geoffrey Rush',
         'Hawthorn' => 'Robert',
         'CBD' => 'Karl'
     ],
@@ -504,14 +504,14 @@ foreach ($data as $country => $kingdoms) {
             'KINGDOM_NAME' => $kingdom,
             'KINGDOM_RULER' => $ruler
         ]);
-        
+
         $this->parse('kingdom_block', 'kingdom', true);
     }
 
     $this->parse('country_block', 'country', true);
 }
 ```
- 
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -520,7 +520,7 @@ foreach ($data as $country => $kingdoms) {
     <title>Title</title>
 </head>
 <body>
- 
+
 <ul>
     <!-- BEGIN country -->
     <li>
@@ -533,11 +533,11 @@ foreach ($data as $country => $kingdoms) {
     </li>
     <!-- END country -->
 </ul>
- 
+
 </body>
 </html>
 ```
- 
+
 If you refresh your screen now you'll see the country of Australia and a nested list of kingdoms and assorted rulers. But we're missing a crucial step that often leads to misbehaviours. Let's add another country and see what happens.
 
 ```php
@@ -545,7 +545,7 @@ If you refresh your screen now you'll see the country of Australia and a nested 
 // Countries, Kingdoms and their Monarchies
 $data = [
     'Australia' => [
-        'Camberwell' => 'Geoffrey Rush', 
+        'Camberwell' => 'Geoffrey Rush',
         'Hawthorn' => 'Robert',
         'CBD' => 'Karl'
     ],
@@ -569,7 +569,7 @@ foreach ($data as $country => $kingdoms) {
             'KINGDOM_NAME' => $kingdom,
             'KINGDOM_RULER' => $ruler
         ]);
-        
+
         $this->parse('kingdom_block', 'kingdom', true);
     }
 
@@ -588,7 +588,7 @@ To clear a block, we simply use a `setVar()` once its container block has been p
 // Countries, Kingdoms and their Monarchies
 $data = [
     'Australia' => [
-        'Camberwell' => 'Geoffrey Rush', 
+        'Camberwell' => 'Geoffrey Rush',
         'Hawthorn' => 'Robert',
         'CBD' => 'Karl'
     ],
@@ -612,12 +612,12 @@ foreach ($data as $country => $kingdoms) {
             'KINGDOM_NAME' => $kingdom,
             'KINGDOM_RULER' => $ruler
         ]);
-        
+
         $this->parse('kingdom_block', 'kingdom', true);
     }
-    
+
     $this->parse('country_block', 'country', true);
-    
+
     // Clear children after parsing out the parent
 
     $this->setVar([
@@ -628,14 +628,14 @@ foreach ($data as $country => $kingdoms) {
 
 > Time To Experiment!
 >
-> Try adding extra content to our `$data` array - perhaps add some heirs to the throne and so on, so that you can explore nested blocks some more. 
+> Try adding extra content to our `$data` array - perhaps add some heirs to the throne and so on, so that you can explore nested blocks some more.
 
 If you made it this far - good work! You've survived the fundamentals of phplib sorcery and can go on to greater (and more convenient) things.
 
 ## Aura Paradigm
 The Aura Paradigm uses a model-view-controller (MVC) framework to figure out how to render contents. https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller
 
-We kind of made our own with the help of Aura (hence the title) http://auraphp.com/ Compared to the Handler paradigm, the Aura approach gives us nicer tools to use. 
+We kind of made our own with the help of Aura (hence the title) http://auraphp.com/ Compared to the Handler paradigm, the Aura approach gives us nicer tools to use.
 
 There are five major pieces to look at:
 
@@ -738,11 +738,11 @@ class Model
 You'll also need to create a corresponding database schema. This is a simplified schema for illustration - there's normally more stuff in them, but that's for another time.
 
 ```sql
-CREATE TABLE `kingdom`( 
-    `id` INT(11) NOT NULL AUTO_INCREMENT, 
-    `name` VARCHAR(255), 
-    `country` VARCHAR(255), 
-    PRIMARY KEY (`id`) 
+CREATE TABLE `kingdom`(
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255),
+    `country` VARCHAR(255),
+    PRIMARY KEY (`id`)
 );
 ```
 
@@ -752,7 +752,7 @@ Now that we have a Kingdom representation and storage location, we need to build
 The mapper's primary responsibility is to insert and extract Kingdom records to and from the database. They're similar in concept to handlers, but they understand object instances. They will typically return you a Collection of instances, each of which have their own set of properties and methods.
 
 > About Collections
-> 
+>
 > A Collection is an object that contains an array. The object has methods that allow you to manipulate the array's contents in a more sophisticated and self-contained manner. For example, traversing, sorting and splicing.
 
 The mapper requires an explicit statement of which database columns "map" to object properties - hence the term "Mapper". The act of setting the object's properties to values is known as *hydrating*. You can read more about hydrating here: https://stackoverflow.com/questions/6991135/what-does-it-mean-to-hydrate-an-object
@@ -782,7 +782,7 @@ class Mapper extends BaseMapper
 }
 ```
 
-The `uses()` method determines which database columns map to object properties and accepts four arguments - some are optional: 
+The `uses()` method determines which database columns map to object properties and accepts four arguments - some are optional:
 * the database column
 * the data type
   * `TYPE_INTEGER`, `TYPE_STRING` and `TYPE_DATETIME` are the most common
@@ -792,7 +792,7 @@ The `uses()` method determines which database columns map to object properties a
   * sometimes database columns and object properties don't match up exactly. This allows you to represent a database column with a different name in the object. For example, the database column may be `user_id` but is accessed in an object via `$this->getAuthor()`. This aliasing occurs sometimes when we update code, but don't want to change schema (there are a variety of reasons)
 
 ### Experiment
-At this point you'll have set up a database table for our Kingdoms, a Mapper to get data into (and out of) the database and a Model to represent it in the business logic - the Controller. You can put together a `test.php` which allows you to try things out in a rudimentary fashion. 
+At this point you'll have set up a database table for our Kingdoms, a Mapper to get data into (and out of) the database and a Model to represent it in the business logic - the Controller. You can put together a `test.php` which allows you to try things out in a rudimentary fashion.
 
 We'll take this opportunity to also load in some test data for later. Here you'll see how to retrieve data and how to insert new data.
 
@@ -862,7 +862,7 @@ class Kingdom implements ModuleConfigInterface
 ```
 
 ### Module
-The Module lets us decide the format of urls where we can interact with our future. We'll see how to do that later. For now we'll create a _Kingdom_ module. Create `library/Schoolbox/Kingdom/Module.php` 
+The Module lets us decide the format of urls where we can interact with our future. We'll see how to do that later. For now we'll create a _Kingdom_ module. Create `library/Schoolbox/Kingdom/Module.php`
 
 ```php
 <?php
@@ -871,7 +871,6 @@ namespace Schoolbox\Kingdom;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Error\LoaderError;
@@ -884,10 +883,8 @@ class Module extends BaseModule
     /**
      * Initializes any routes for this module, with a given base path.
      *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
+     * The alias of each route added needs to match a public method in the
+     * controller built by buildController().
      *
      * @param Router $router
      * @param string $basePath The base route for this module
@@ -926,16 +923,21 @@ class Module extends BaseModule
     }
 
     /**
-     * Initializes controller classes into the dependency injector.
+     * Build the controller for this module.
      *
-     * @param ContainerInterface $injector The dependency injection container.
+     * Dependencies can and should be injected into the controller's
+     * constructor:
+     * * objects specific to this controller may simply be constructed here
+     * * mappers may be retrieved with
+     *   `$this->getMapperFactory()->get(Mapper::class)`
+     * * previously configured services may be extracted from the DI container
+     *   with `$this->injector->get($serviceName)`
+     *
+     * @return Base
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        return new Controller();
     }
 }
 ```
@@ -944,7 +946,7 @@ The only methods you really need to think about for now is `initRoutes()` and `i
 
 ### Controller
 Now we need something to harness the power of Mappers, Models and the Module itself. The Controller manipulates the Mapper and Model(s) and produces output for twig, which can be accessed via the Module. This is where all the pieces come together and we'll finally be able to access it from the browser.
- 
+
 Start up a `library/Schoolbox/Kingdom/Controller.php` and add the `getList()` method. All this does is get a list of Kingdoms and passes the output to twig.
 
 ```php
@@ -962,13 +964,13 @@ class Controller extends Base
     public function getList()
     {
         // If you Experimented earlier, this will be familiar
-        
+
         $kingdomMapper = KingdomMapper::getInstance();
-        
+
         $twigData = [
             'allKingdoms' => $kingdomMapper->findAll()
         ];
-        
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput("@kingdom/list.twig", $twigData)
         );
@@ -984,10 +986,10 @@ At this stage you should also create a `templates` folder in `library/Schoolbox/
 {% endfor %}
 ```
 
-Note that in the Controller, we passed some content to twig via the `allKingdoms` var which is made available to the twig rendering engine. 
+Note that in the Controller, we passed some content to twig via the `allKingdoms` var which is made available to the twig rendering engine.
 
 > About Twig
-> 
+>
 > `Twig` is a templating engine that is much nicer than `phplib`. It gives front-end developers a lot of power and control over rendering of data. It's actually php-based, but has its own syntax and stuff. You can read about `twig` here: https://twig.symfony.com/
 >
 > Due to its powerful nature, it can be utilised independently of php controllers - unfortunately it means bugs can manifest in two places: data generation or data rendering (or both)
@@ -996,7 +998,7 @@ Note that in the Controller, we passed some content to twig via the `allKingdoms
 To access `getList()` we need to make *routes*. These are urls that match a particular pattern and we specify them in Module, along with a corresponding Controller method which creates the output found at these urls. Let's do that now by updating `$routes` to contain a new `GET` route for our Kingdom list.
 
 > GET and POST
-> 
+>
 > Routes are divided into two sections: `GET` and `POST`. These corresponding to the http request type. See https://stackoverflow.com/questions/3477333/what-is-the-difference-between-post-and-get for some more debates.
 
 ```php
@@ -1011,7 +1013,7 @@ $routes = [
 ];
 ```
 
-Now you can finally visit http://192.168.36.10/kingdom/myKingdomList and see the list of Kingdoms! 
+Now you can finally visit http://192.168.36.10/kingdom/myKingdomList and see the list of Kingdoms!
 
 > Time To Experiment!
 >
@@ -1027,10 +1029,10 @@ Let's add some dynamic data to the url. We'll pass in a kingdom id and display t
 // route (url) => controllerMethod()
 $routes = [
     'GET' => [
-        
+
         // Get a list of kingdoms
         '/myKingdomList' => 'getList',
-        
+
         // Show the details of a particular kingdom via /kingdom/detail/1 etc.
         '/detail/{kingdomId}' => 'getKingdom',
     ],
@@ -1059,7 +1061,7 @@ Add the `getKingdom()` method to the Controller as well. Note that in our route,
     }
 ```
 
-Routes have a 1:1 relation to Controller methods. 
+Routes have a 1:1 relation to Controller methods.
 * multiple routes cannot use the same Controller method
 * a route cannot use multiple Controller methods
 
@@ -1094,7 +1096,7 @@ Twig-based locations are a bit more advanced - it does some stuff for you. Howev
 {{ model.description | purify }}
 ```
 
-* Always `scrub` on output. 
+* Always `scrub` on output.
 * Never `scrub` on input.
 
 You can read more in `scrub.md`
@@ -1102,10 +1104,10 @@ You can read more in `scrub.md`
 # Boss Fight
 At this point you will have completed quests in both Handler and Aura Paradigms and recognised how both of them fundamentally operate. Let's apply all that learned knowledge in a more realistic scenario. You'll draw on previous knowledge of html, css and javascript in addition to the php concepts you've acquired thus far in this guide.
 
-Create a view in your schoolbox vagrant so that I can display the information listed below. As usual we'll recycle a familiar theme. 
+Create a view in your schoolbox vagrant so that I can display the information listed below. As usual we'll recycle a familiar theme.
 
-* There are three Kingdoms. 
-* Each Kingdom has a Monarch. 
+* There are three Kingdoms.
+* Each Kingdom has a Monarch.
 * A Monarch has zero or more Heirs to the throne.
 * Heirs are ordered by succession (sequence). They are sorted in ascending order; the lowest sequence is the successor to the Monarch.
 * Heirs can die (get deleted)
@@ -1217,15 +1219,15 @@ $allKingdoms = [
 
 Build a report which shows this information:
 * Display a list of Kingdoms, their Monarchs and their Heirs in a series of nested lists.
-* If the Kingdom has a Monarch, display their title, name and description. 
+* If the Kingdom has a Monarch, display their title, name and description.
 ** The Kingdom's title should link to a fictitious url, http://kingdoms.schoolbox.com.au/kingdom/$kingdomId
 ** Description is an html field; all others are non-html fields
 * Below each Monarch, display their Heirs in a list. This list should have its own subheading.
 * Heirs do not exist without a corresponding Monarch.
 * The Heir next in line for the Monarchy should be displayed differently than all other Heirs.
-* Deceased (deleted) heirs should display with the italicised suffix "(Deceased on xxxx)" e.g. "Jon Snow (Deceased 2015-06-01 00:00:00)". 
+* Deceased (deleted) heirs should display with the italicised suffix "(Deceased on xxxx)" e.g. "Jon Snow (Deceased 2015-06-01 00:00:00)".
 * Deceased Heirs do not disrupt their previously-established sequence in line to the throne.
-* If there is no Monarch, display a grey empty state (http://192.168.36.10/pantry#empty-states) with a meaningful message. 
+* If there is no Monarch, display a grey empty state (http://192.168.36.10/pantry#empty-states) with a meaningful message.
 * If a Monarch has no Heirs, hide the corresponding subheading and don't show any list html for the heirs.
 * Bonus points if you manufacture Mappers and Models for Kingdoms, Monarchs, and Heirs.
 

@@ -13,7 +13,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -210,9 +210,9 @@ $app = new class extends CliTool\App
 
         // Reload cache (if not dry run)
         if ($this->perform()) {
-            /** @var WritableCache $cache */
-            $this->getDi()->values['logger'] = $this->getLogger();
+            /** @var WriteCache $cache */
             $cache = $this->getDi()->get('subscriptionCache');
+            $cache->setLog($this->getLogger());
 
             try {
                 $cache->cacheAllUsers(INSTANCE_ID);

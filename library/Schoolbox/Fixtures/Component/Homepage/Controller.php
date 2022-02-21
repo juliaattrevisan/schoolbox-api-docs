@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Fixtures\Component\Homepage;
 
-use Aura\Di\Exception\ServiceNotFound;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use RuntimeException;
@@ -78,7 +77,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
-     * @throws ServiceNotFound
      * @throws RuntimeException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
@@ -95,7 +93,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * Loads the grid component into its set configuration.
      *
      * @return bool
-     * @throws ServiceNotFound
      * @throws RuntimeException
      */
     public function execute()

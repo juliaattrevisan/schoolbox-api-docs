@@ -10,11 +10,13 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
+use InvalidArgumentException;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
@@ -285,7 +287,6 @@ class ListController extends Web\Controller\Base
      * @throws LogicException
      * @throws Mapper\DefinitionException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws Web\Controller\Exception
      */
@@ -396,14 +397,32 @@ class ListController extends Web\Controller\Base
      *
      * @param string $type One of the `AssessmentType::TYPE_*` constants
      * @return Controller  The controller for the given assessment type
-     * @throws ServiceNotFound
+     * @throws InvalidArgumentException    if the module can't find a controller
+     *                                     of the correct type
+     * @throws ContainerExceptionInterface something went wrong when building
+     *                                     the controller
+     * @throws NotFoundExceptionInterface  something went wrong when building
+     *                                     the controller
      */
-    private function getDelegateController($type)
+    private function getDelegateController($type): Controller
     {
-        // We know this will be a Controller object:
-        // We've configured this controller in the module.
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getController("learningAssessment/$type");
+        $module = Module::retrieveInstalledModule('learningAssessment');
+        if ($module instanceof Module) {
+            // Dependencies need to be set up too
+            $module->initControllerDependencies();
+            $controller = $module->installControllerDependencies(
+                $module->buildControllerForType($type),
+                $this->di,
+            );
+            $controller->setUser($this->getUser());
+            return $controller;
+        }
+        throw new InvalidArgumentException(
+            sprintf(
+                'Module "learningAssessment" does not exist or is not a "%s" instance',
+                Module::class,
+            ),
+        );
     }
 
     /**
@@ -466,7 +485,6 @@ class ListController extends Web\Controller\Base
      * @param AssessmentContext $context
      * @throws DomainException
      * @throws Mapper\DefinitionException
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws RouteNotFound
      */
@@ -480,7 +498,7 @@ class ListController extends Web\Controller\Base
                 $delegate->getCreateAssessmentForm($context);
                 $this->setResponse($delegate->getResponse());
                 return;
-            } catch (ServiceNotFound $e) {
+            } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
                 // if the client enters an invalid type: ignore
                 // and allow passthru to the "unselected" section
             }

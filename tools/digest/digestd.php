@@ -11,9 +11,9 @@
 
 use Alaress\Date\Clock;
 use Alaress\Redis\Async;
-use Aura\Di;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Predis\ClientInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
@@ -35,7 +35,7 @@ $kernel = new Daemon\Kernel(
 );
 
 // CREATE DIGEST APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     $instance      = INSTANCE_ID;
     $topic         = "digestd.$instance.*";

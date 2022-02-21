@@ -10,10 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Async\Notification\Parameter\Param;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Learning\Moment\Evidence\Model as Evidence;
 use Alaress\Async\Notification\Instance\Builder;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -45,8 +44,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -54,17 +51,9 @@ class Notifier extends AbstractModuleNotifier
         $mf = $di->get('mapperFactory');
 
         return [
-            'setMapper'     => $mf->getLazy(Mapper::class),
-            'setUserMapper' => $mf->getLazy(UserMapper::class),
+            'setMapper'     => $mf->get(Mapper::class),
+            'setUserMapper' => $mf->get(UserMapper::class),
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($configLoader)
-    {
-        parent::__construct($configLoader);
     }
 
     /**

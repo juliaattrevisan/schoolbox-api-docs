@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Folder\Search;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper;
@@ -31,22 +31,14 @@ class Module extends BaseModule
         $this->register('GET', '', 'getFolderSearch', new Rule\IsLoggedIn());
     }
 
-
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $mapperFactory = $this->getMapperFactory();
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'folderMapper' => $mapperFactory->getLazy(Mapper::class),
-                'access'       => $mapperFactory->getLazy(Access::class),
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 }

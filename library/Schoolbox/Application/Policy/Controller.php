@@ -17,7 +17,7 @@ class Controller extends Base
      * @api   GET /policy
      * @since 18.2
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getPolicy(): void
     {

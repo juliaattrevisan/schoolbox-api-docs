@@ -9,15 +9,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
 
-use Aura\Di;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
+use Throwable;
+use UnexpectedValueException;
 
 use function count;
 use function get_class;
 use function implode;
-
-use UnexpectedValueException;
-use Psr\Log\LoggerInterface;
-use Throwable;
 
 /**
  * A composite app: contains one or more sub-apps to be run in sequence.
@@ -89,7 +90,7 @@ class Composite extends App
      *
      * @inheritDoc
      */
-    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): App
+    public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
         foreach ($this->subApps as $subApp) {
@@ -102,18 +103,19 @@ class Composite extends App
     /**
      * Overridable setup for sub-apps.
      *
-     * @param App             $subApp
-     * @param array           $appOptions
-     * @param Di\Container    $di
-     * @param resource        $outStream
-     * @param LoggerInterface $logger
-     * @param bool            $perform
-     * @throws Di\Exception\ServiceNotFound
+     * @param App                $subApp
+     * @param array              $appOptions
+     * @param ContainerInterface $di
+     * @param resource           $outStream
+     * @param LoggerInterface    $logger
+     * @param bool               $perform
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function setupSubApp(
         App $subApp,
         array $appOptions,
-        Di\Container $di,
+        ContainerInterface $di,
         $outStream,
         LoggerInterface $logger,
         bool $perform

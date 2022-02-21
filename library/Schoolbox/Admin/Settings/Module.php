@@ -10,8 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Authorizer\Rule;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -32,22 +31,6 @@ class Module extends \Alaress\Module\Module
         $this->register('POST', '/{typeLabel}', 'postSettings', $isSuper);
     }
 
-
-    /**
-     * @param ContainerInterface|Container $injector
-     * @inheritdoc
-     * @throws \InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'fieldRendererFactory' => $injector->lazy(function () {
-                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
-            }),
-        ];
-    }
-
     /**
      * @inheritdoc
      */
@@ -59,8 +42,11 @@ class Module extends \Alaress\Module\Module
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set("controller:{$this->basename}", $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+        );
     }
 }

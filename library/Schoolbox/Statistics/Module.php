@@ -13,7 +13,7 @@ namespace Schoolbox\Statistics;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -134,32 +134,20 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        // dependencies for DataSource
-        $injector->params[DataSource::class] = [
-            'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'folderLogMapper'  => $this->getMapperFactory()->getLazy(FolderLogMapper::class),
-            'visitMapper'      => $this->getMapperFactory()->getLazy(VisitsMapper::class),
-            'logMapper'        => $this->getMapperFactory()->getLazy(LogMapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-        ];
-
-        // dependencies for Controller
-        $injector->params[Controller::class] = [
-            'dataSource' => $injector->lazyNew(DataSource::class)
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            new DataSource(
+                $this->getMapperFactory()->get(UserMapper::class),
+                $this->getMapperFactory()->get(FolderLogMapper::class),
+                $this->getMapperFactory()->get(VisitsMapper::class),
+                $this->getMapperFactory()->get(LogMapper::class),
+                $this->getMapperFactory()->get(UserAccessMapper::class),
+                $this->getMapperFactory()->get(FolderMapper::class),
+            )
+        );
     }
 
     /**

@@ -38,7 +38,7 @@ class Controller extends Base
      * @param array $externalUser
      * @param int  $year
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getReport(User $user, array $externalUser, int $year)
     {

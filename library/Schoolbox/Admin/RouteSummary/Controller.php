@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Admin\RouteSummary;
 
-use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
 
@@ -23,18 +22,13 @@ class Controller extends Base
     public function getRouteList()
     {
         $routeSummaries = [];
-
-        $di = $this->getDi();
-
         foreach ($this->getRouter()->getRoutes() as $route) {
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
-                /** @var BaseModule $module */
-                $module = $di->get('module:' . $parsedName['controller']);
+                $module = Module::retrieveInstalledModule($parsedName['controller']);
                 $module->initControllerDependencies();
-                $module->initControllers($di);
-                $controller = $di->get('controller:' . $parsedName['controller']);
+                $controller = $module->buildController();
             } catch (\Throwable $e) {
                 // Something went wrong when parsing this controller
                 $routeSummaries[$parsedName['controller']][] = [

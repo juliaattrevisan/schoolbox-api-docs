@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Mock;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Faker;
 
 /**
@@ -32,31 +32,17 @@ class Module extends BaseModule
         $this->register('GET', '', 'getSearch');
     }
 
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        // Build a Faker instance and shove it in
-        $injector->params[Controller::class] = [
-            'resultBuilder' => $injector->lazy(static function () {
-                // Surprised that undefinedClass::class evaluates to "undefinedClass"
-                return new ResultBuilder(
-                    class_exists(Faker\Factory::class)
-                        ? Faker\Factory::create()
-                        : null
-                );
-            }),
-        ];
+        return new Controller(
+            new ResultBuilder(
+                class_exists(Faker\Factory::class)
+                    ? Faker\Factory::create()
+                    : null
+            )
+        );
     }
 }

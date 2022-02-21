@@ -22,7 +22,7 @@ This will call a controller's `getContainer` method; as usual, add that to the c
 /**
  * Load vue container for our new Vue app
  *
- * @throws \Aura\Di\Exception\ServiceNotFound
+ * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
  */
 public function getContainer(): void
 {

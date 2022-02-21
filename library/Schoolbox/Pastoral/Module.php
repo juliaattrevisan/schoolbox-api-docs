@@ -12,21 +12,23 @@ use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
+use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsCommentAllowed;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -43,7 +45,6 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
-use InvalidArgumentException;
 
 class Module extends BaseModule
 {
@@ -238,51 +239,44 @@ class Module extends BaseModule
         );
     }
 
-
     /**
-     * @param Container $injector
-     *
-     * @throws InvalidArgumentException If invalid mapper name is specified
-     * @throws \Aura\Di\Exception\ServiceNotFound if a service wasn't found
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $mappers = [
-            'config'                     => $injector->get('config'),
-            'errorMapper'                => ErrorMapper::getInstance(),
-            'fileMapper'                 => FileMapper::getInstance(),
-            'pastoralDataSource'         => $injector->get('pastoralDataSource'),
-            'pastoralRevisionDataSource' => $injector->get('pastoralRevisionDataSource'),
-            'pastoralAccessMapper'       => PastoralAccessMapper::getInstance(),
-            'pastoralActionMapper'       => Action\Mapper::getInstance(),
-            'pastoralRecordActionMapper' => RecordAction\Mapper::getInstance(),
-            'pastoralAttachmentMapper'   => PastoralAttachmentMapper::getInstance(),
-            'pastoralSubTypeMapper'      => PastoralSubTypeMapper::getInstance(),
-            'pastoralGroupMapper'        => PastoralGroupMapper::getInstance(),
-            'pastoralGroupMemberMapper'  => PastoralGroupMemberMapper::getInstance(),
-            'pastoralCommentMapper'      => PastoralCommentMapper::getInstance(),
-            'pastoralSeverityMapper'     => PastoralSeverityMapper::getInstance(),
-            'pastoralTagMapper'          => PastoralTagMapper::getInstance(),
-            'pastoralTypeMapper'         => PastoralTypeMapper::getInstance(),
-            'pastoralUploadQueueMapper'  => PastoralUploadQueueMapper::getInstance(),
-            'roleMapper'                 => RoleMapper::getInstance(),
-            'userMapper'                 => UserMapper::getInstance(),
-            'userAccessMapper'           => UserAccessMapper::getInstance(),
-            'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'termMapper'                 => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
-            'pastoralRecordTranslator'   => '',
-            'pastoralCommentTranslator'  => $injector->lazy(function () use ($injector) {
-                return new Comment\Translator\ModelToArray(
-                    new User\Translator\Author\ModelToArray(),
-                    $injector->get('router'),
-                    $injector->get('authorizer'),
-                    $injector->get('user'),
-                    new ScrubAdapter(),
-                );
-            }),
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return new Controller(
+            $this->injector->get('config'),
+            $this->getMapperFactory()->get(FileMapper::class),
+            $this->injector->get('pastoralDataSource'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(PastoralAuditMapper::class),
+            $this->getMapperFactory()->get(PastoralSubTypeMapper::class),
+            $this->getMapperFactory()->get(PastoralTypeMapper::class),
+            $this->getMapperFactory()->get(PastoralUploadQueueMapper::class),
+            $this->getMapperFactory()->get(PastoralSeverityMapper::class),
+            $this->injector->get('pastoralRevisionDataSource'),
+            $this->getMapperFactory()->get(PastoralTagMapper::class),
+            $this->getMapperFactory()->get(Action\Mapper::class),
+            $this->getMapperFactory()->get(RecordAction\Mapper::class),
+            $this->getMapperFactory()->get(PastoralCommentMapper::class),
+            $this->getMapperFactory()->get(PastoralAttachmentMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(PastoralAccessMapper::class),
+            $this->getMapperFactory()->get(PastoralGroupMapper::class),
+            $this->getMapperFactory()->get(PastoralGroupMemberMapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(PastoralReportMapper::class),
+            $this->getMapperFactory()->get(Audience\Mapper::class),
+            $this->getMapperFactory()->get(TermMapper::class),
+            new Comment\Translator\ModelToArray(
+                new User\Translator\Author\ModelToArray(),
+                $this->injector->get('router'),
+                $this->injector->get('authorizer'),
+                $this->injector->get('user'),
+                new ScrubAdapter(),
+            ),
+        );
     }
 
     /**
@@ -356,10 +350,10 @@ class Module extends BaseModule
                 try {
                     // TODO make current user easily available in path matcher
                     /** @var DataSource $pastoralDataSource */
-                    $pastoralDataSource = $this->getInjector()->get('pastoralDataSource');
+                    $pastoralDataSource = $this->injector->get('pastoralDataSource');
 
                     /** @var User $user */
-                    $user = $this->getInjector()->get('user');
+                    $user = $this->injector->get('user');
 
                     $record                      = $pastoralDataSource->findById($user, $params['recordId']);
                     $injectedValues['record']    = $record;

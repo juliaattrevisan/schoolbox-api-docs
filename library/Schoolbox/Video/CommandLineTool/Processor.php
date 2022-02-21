@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Video\CommandLineTool;
 
 use Alaress_Byte_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Exception;
 use League\Flysystem\FileNotFoundException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
@@ -61,8 +62,7 @@ class Processor extends CliTool\App
         try {
             /** @var MapperFactory $mapperFactory */
             $mapperFactory = $this->getDi()->get('mapperFactory');
-        } catch (ServiceNotFound $e) {
-            $log->critical("Unknown service requested", ['exception' => $e]);
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             exit(1);
         }
 

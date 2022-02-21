@@ -75,7 +75,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
     /**
      * Render page
-     * @throws Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function render()
     {

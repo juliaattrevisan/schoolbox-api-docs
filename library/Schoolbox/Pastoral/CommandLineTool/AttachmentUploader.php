@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\CommandLineTool;
 
-use Aura\Di;
 use Exception;
 use External_Pastoral;
 use PDOException;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Pastoral;
@@ -60,7 +60,7 @@ class AttachmentUploader extends CliTool\App
     }
 
     /** @inheritDoc */
-    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
+    public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 

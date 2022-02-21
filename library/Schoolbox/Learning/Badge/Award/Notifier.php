@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress\Async\Notification\Parameter\Param;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Badge\Award\Model as Award;
 use Alaress\Async\Notification\Instance\Builder;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -59,8 +59,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -68,15 +66,15 @@ class Notifier extends AbstractModuleNotifier
         $mf = $di->get('mapperFactory');
 
         return [
-            'setMapper'     => $mf->getLazy(Mapper::class),
-            'setUserMapper' => $mf->getLazy(UserMapper::class),
+            'setMapper'     => $mf->get(Mapper::class),
+            'setUserMapper' => $mf->get(UserMapper::class),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         parent::__construct($configLoader);
     }

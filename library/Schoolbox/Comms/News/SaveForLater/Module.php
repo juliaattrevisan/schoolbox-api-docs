@@ -15,8 +15,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
@@ -77,12 +76,17 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(SaveForLaterMapper::class),
+            $this->getMapperFactory()->get(NewsMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Comms\News\File\Mapper::class),
+        );
     }
 
     /**
@@ -91,26 +95,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
-            'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
-            'fileMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Comms\News\File\Mapper::class),
-        ];
     }
 
 

@@ -12,7 +12,6 @@ namespace Calendar\Event\Collection;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
-use Aura\Di\ContainerInterface;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;

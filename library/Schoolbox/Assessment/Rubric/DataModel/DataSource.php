@@ -193,7 +193,7 @@ class DataSource
     /**
      * Saves this row set to the database.
      *
-     * @noinspection PhpDocMissingThrowsInspection Ignore spurious Aura\Di exception
+     * @noinspection PhpDocMissingThrowsInspection Ignore spurious DI exception
      *
      * @param RowSet           $rowSet
      * @param bool             $persistCurriculum    Should curriculum nodes for capabilities and

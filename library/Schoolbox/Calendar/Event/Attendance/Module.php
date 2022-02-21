@@ -20,8 +20,7 @@ use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Calendar\Event;
@@ -31,6 +30,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -116,9 +116,14 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            new EventRecurrenceMapper($this->getMapperFactory()->get(EventMapper::class)),
+        );
     }
 
 
@@ -127,30 +132,6 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper'           => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'eventMapper'           => $this->getMapperFactory()->getLazy(EventMapper::class),
-            'attendanceMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
-            'eventRecurrenceMapper' => $injector->lazyNew(EventRecurrenceMapper::class, [
-                'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
-            ]),
-        ];
     }
 
 

@@ -12,9 +12,8 @@ namespace Schoolbox\Comms\News;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Lookup\ReadMore;
@@ -76,39 +75,28 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
 
-        $userResolver = $di->lazyGet('commsNewsUserResolver');
+        $userResolver = $di->get('commsNewsUserResolver');
 
-        $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
-            'audienceMapper'   => $mf->getLazy(Audience\Mapper::class),
-            'userAccessMapper' => $mf->getLazy(UserAccessMapper::class),
-            'db'               => $di->lazyGet('databaseInternal'),
-        ]);
+        $moderatorResolver = new ModeratorResolver(
+            $mf->get(Audience\Mapper::class),
+            $mf->get(UserAccessMapper::class),
+            $di->get('databaseInternal'),
+        );
 
         return [
-            'setMapper'            => $mf->getLazy(Mapper::class),
-            'setUserMapper'        => $mf->getLazy(UserMapper::class),
+            'setMapper'            => $mf->get(Mapper::class),
+            'setUserMapper'        => $mf->get(UserMapper::class),
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
-            'setPrefixGenerator'   => $di->lazyGet('cdnPrefixGenerator'),
-            'setFileMapper'        => $mf->getLazy(\Schoolbox\Comms\News\File\Mapper::class)
+            'setPrefixGenerator'   => $di->get('cdnPrefixGenerator'),
+            'setFileMapper'        => $mf->get(\Schoolbox\Comms\News\File\Mapper::class)
         ];
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($configLoader)
-    {
-        parent::__construct($configLoader);
     }
 
 

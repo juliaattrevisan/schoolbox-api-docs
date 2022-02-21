@@ -11,8 +11,8 @@ namespace Schoolbox\Tour;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Learning\Assessment\Redirect;
 
 class Module extends BaseModule
@@ -39,17 +39,15 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $mappers = [
-            'tourMapper'       => $injector->get('mapperFactory')->getLazy(Mapper::class),
-            'tourStepMapper'   => $injector->get('mapperFactory')->getLazy(Step\Mapper::class),
-            'tourStatusMapper' => $injector->get('mapperFactory')->getLazy(Status\Mapper::class)
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Step\Mapper::class),
+            $this->getMapperFactory()->get(Status\Mapper::class)
+        );
     }
 
     /**

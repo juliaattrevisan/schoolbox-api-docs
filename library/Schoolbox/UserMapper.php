@@ -9,13 +9,14 @@
 namespace Schoolbox;
 
 use Alaress\Database\Predicate\Builder;
-use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use House;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Predis\ClientInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -74,7 +75,7 @@ class UserMapper extends Mapper
             }, E_USER_WARNING);
             $externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
             restore_error_handler();
-        } catch (ServiceNotFound $e) {
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
             throw new DomainException('externalCommunityPortal service is not configured');
         }
 
@@ -818,7 +819,8 @@ class UserMapper extends Mapper
     /**
      * Post-softDelete callback to delete redis queues for this user
      * @param User $user
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function deleteNotificationQueue(User $user)
     {

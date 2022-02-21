@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Course;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
@@ -154,30 +154,23 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
-                'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-                'unitSpecificationMapper'    => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
-                'unitImplementationMapper'   => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
-                'folderMapper'               => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'homepageTemplateMapper'     => $this->getMapperFactory()->getLazy(HomepageTemplateMapper::class),
-                'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-                'courseConfigMapper'         => $this->getMapperFactory()->getLazy(CourseConfigMapper::class),
-                'userAccessMapper'           => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'assessmentMapper'           => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
-                'curriculumNodeMapper'       => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
-            ])
+        return new Controller(
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+            $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            $this->getMapperFactory()->get(UnitImplementationMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(HomepageTemplateMapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(CourseConfigMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(AssessmentMapper::class),
+            $this->getMapperFactory()->get(CurriculumNodeMapper::class),
         );
     }
 

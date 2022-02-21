@@ -14,7 +14,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Aura\Di\Container as Injector;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
@@ -103,7 +103,7 @@ Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] 
 HELP;
 }
 
-$kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(static function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $help       = isset($opts['h']) || isset($opts['help']);
     $parentId   = $opts['p'] ?? 0;

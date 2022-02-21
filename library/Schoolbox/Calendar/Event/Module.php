@@ -18,7 +18,7 @@ use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -177,12 +177,22 @@ class Module extends BaseModule
         $this->register('POST', '/{eventId:\d+}/delete', 'postDelete', $modifyPerms, $preloadEvent);
     }
 
+
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(EventMapper::class),
+            $this->getMapperFactory()->get(EventTypeMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Attendance\Mapper::class),
+        );
     }
 
     /**
@@ -212,22 +222,5 @@ class Module extends BaseModule
     private function getEventMapper(): EventMapper
     {
         return $this->getMapperFactory()->get(EventMapper::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'eventMapper' => $this->getMapperFactory()->getLazy(EventMapper::class),
-            'eventTypeMapper' => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
-            'campusMapper' => $this->getMapperFactory()->getLazy(CampusMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'attendanceMapper' => $this->getMapperFactory()->getLazy(Attendance\Mapper::class),
-        ];
     }
 }

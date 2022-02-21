@@ -13,8 +13,7 @@ namespace Schoolbox\Admin\LTI;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
@@ -44,17 +43,20 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
              ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->getMapperFactory()->get(ProviderMapper::class),
+        );
     }
 
     /**
@@ -78,7 +80,6 @@ class Module extends BaseModule
             $matcher,
             '.*',
             function ($params) use ($providerMapper) {
-
                 $returnArray = [];
 
                 // Load LTI provider
@@ -90,24 +91,6 @@ class Module extends BaseModule
                 return $returnArray;
             }
         );
-    }
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'providerMapper'       => $this->getMapperFactory()->getLazy(ProviderMapper::class),
-            'fieldStrategyFactory' => $injector->lazy(
-                function () {
-                    return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
-                }
-            ),
-        ];
     }
 
     /**

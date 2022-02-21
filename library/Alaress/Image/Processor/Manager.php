@@ -15,7 +15,6 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Image;
 use Alaress\Image\Transformation\ITransformFactory;
 use Alaress\Lock\InstanceLockFactory;
-use Aura\Di as AuraDi;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use PDO;
@@ -210,10 +209,6 @@ class Manager
 
     /**
      * @throws OutOfBoundsException
-     * @throws AuraDi\Exception
-     * @throws AuraDi\Exception\ContainerLocked
-     * @throws AuraDi\Exception\ServiceNotFound
-     * @throws AuraDi\Exception\ServiceNotObject
      * @throws InvalidArgumentException
      * @throws RuntimeException
      * @throws SchoolboxExternal\Exception
@@ -619,10 +614,6 @@ class Manager
      * Process all transformations by launching a worker per transformation
      *
      * @param Transformation[] $transformations
-     * @throws AuraDi\Exception
-     * @throws AuraDi\Exception\ContainerLocked
-     * @throws AuraDi\Exception\ServiceNotFound
-     * @throws AuraDi\Exception\ServiceNotObject
      * @throws InvalidArgumentException
      * @throws LockAcquiringException
      * @throws LockConflictedException

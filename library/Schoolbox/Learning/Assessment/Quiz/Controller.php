@@ -10,7 +10,6 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use External\Canvas\Importer\CanvasDb;
@@ -144,7 +143,6 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
-     * @throws ServiceNotFound
      * @throws RouteNotFound
      */
     public function getStatus(IAssessable $assessment): void
@@ -181,7 +179,6 @@ class Controller extends Assessment\Controller
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @throws Deleted
-     * @throws ServiceNotFound
      * @throws DomainException
      * @throws PDOException
      * @throws DefinitionException

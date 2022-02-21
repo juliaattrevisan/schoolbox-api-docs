@@ -13,7 +13,8 @@ namespace Schoolbox\ResourceBooking\Category;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Paginator\UrlPaginator;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
@@ -79,27 +80,18 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->setters[Controller::class]['setMapper']
-            = $this->getMapperFactory()->getLazy(Mapper::class);
-        $injector->setters[Controller::class]['setPaginator']
-            = $injector->lazyNew(
-                'Alaress\\Paginator\\UrlPaginator',
-                array(),
-                array(
-                'setPageSize' => 10,
-                'setParam'    => 'page',
-                )
+        return (new Controller($this->getMapperFactory()->get(ResourceBooking\Item\Mapper::class)))
+            ->setMapper($this->getMapperFactory()->get(Mapper::class))
+            ->setPaginator(
+                (new UrlPaginator())
+                    ->setPaginator(new \Alaress\Paginator\Paginator())
+                    ->setPageSize(10)
+                    ->setParam('page')
             );
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
-            ])
-        );
     }
 
     /* Getters / Setters

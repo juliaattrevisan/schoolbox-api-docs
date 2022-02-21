@@ -12,8 +12,8 @@ namespace Schoolbox\Resource\Folder;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Curriculum;
@@ -158,33 +158,23 @@ class Module extends BaseModule
     }
 
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $mapperFactory = $this->getMapperFactory();
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'folderMapper'           => $mapperFactory->getLazy(Mapper::class),
-                    'homepageConfigMapper'   => $mapperFactory->getLazy(HomepageConfigMapper::class),
-                    'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
-                    'roleAccessMapper'       => $mapperFactory->getLazy(RoleAccessMapper::class),
-                    'userAccessMapper'       => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
-                    'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
-                    'access'                 => $mapperFactory->getLazy(Access::class),
-                    'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
-                    'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
-                    'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
-                    'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(HomepageConfigMapper::class),
+            $this->getMapperFactory()->get(HomepageTemplateMapper::class),
+            $this->getMapperFactory()->get(RoleAccessMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(Error\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(Curriculum\Node\Mapper::class),
+            $this->getMapperFactory()->get(GroupMapper::class),
+            $this->getMapperFactory()->get(File\Mapper::class),
+            $this->getMapperFactory()->get(YearLevel\Mapper::class),
         );
     }
 }

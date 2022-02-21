@@ -10,8 +10,8 @@ namespace Schoolbox\LTI\Consumer;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Component_Homepage_Factory;
 use Component_InstanceMapper;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
@@ -23,27 +23,6 @@ class Module extends BaseModule
 {
     /** @var string $basename */
     protected $basename = 'ltiConsumer';
-
-    /** @var FolderMapper $folderMapper */
-    private $folderMapper;
-
-    /** @var ProviderMapper $providerMapper */
-    private $providerMapper;
-
-    /** @var Component_InstanceMapper $componentInstanceMapper */
-    private $componentInstanceMapper;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param ContainerInterface $injector
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $this->folderMapper            = $this->getMapperFactory()->get(FolderMapper::class);
-        $this->providerMapper          = $this->getMapperFactory()->get(ProviderMapper::class);
-        $this->componentInstanceMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
-    }
 
     /**
      * {@inheritdoc}
@@ -71,9 +50,9 @@ class Module extends BaseModule
     {
         // Preload required data for the various routes
 
-        $folderMapper            = $this->folderMapper;
-        $providerMapper          = $this->providerMapper;
-        $componentInstanceMapper = $this->componentInstanceMapper;
+        $folderMapper            = $this->getMapperFactory()->get(FolderMapper::class);
+        $providerMapper          = $this->getMapperFactory()->get(ProviderMapper::class);
+        $componentInstanceMapper = $this->getMapperFactory()->get(Component_InstanceMapper::class);
 
         $this->addRoutePreload(
             $matcher,
@@ -92,7 +71,7 @@ class Module extends BaseModule
                 if (array_key_exists('componentId', $params)) {
 
                     /** @var SitePage $page */
-                    $page = $this->getInjector()->get('sitePage');
+                    $page = $this->injector->get('sitePage');
 
                     $factory   = new Component_Homepage_Factory(new User(), $page);
                     $component = $componentInstanceMapper->findByInstanceId($params['componentId']);
@@ -114,13 +93,11 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller();
     }
 
     /**

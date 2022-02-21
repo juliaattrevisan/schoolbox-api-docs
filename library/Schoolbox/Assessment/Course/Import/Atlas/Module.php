@@ -9,7 +9,7 @@ namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\BridgeFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Course;
@@ -59,42 +59,25 @@ class Module extends \Alaress\Module\Module
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                    'courseSpecMapper' => $this->getMapperFactory()->getLazy(CourseSpecMapper::class),
-                    'apiBridge'        => $injector->lazy(
-                        function () use ($injector) {
-                            return (new BridgeFactory(
-                                $this->getConfig()->get('rubicon_atlas_api_token'),
-                                $injector->get('redis.cache')
-                            ))->build();
-                        }
-                    ),
-                    'importer'         => $injector->lazy(
-                        function () use ($injector) {
-                            return (new ImporterFactory(
-                                $injector->get('user'),
-                                $this->getConfig(),
-                                $this->getMapperFactory(),
-                                $injector->get('assessmentDataSource'),
-                                RubricDataSource::getInstance()
-                            ))->build();
-                        }
-                    ),
-                ]
-            )
+        return new Controller(
+            (new BridgeFactory(
+                $this->getConfig()->get('rubicon_atlas_api_token'),
+                $this->injector->get('redis.cache')
+            ))->build(),
+            (new ImporterFactory(
+                $this->injector->get('user'),
+                $this->getConfig(),
+                $this->getMapperFactory(),
+                $this->injector->get('assessmentDataSource'),
+                $this->getMapperFactory()->get(RubricDataSource::class)
+            ))->build(),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(CourseSpecMapper::class),
         );
     }
 }

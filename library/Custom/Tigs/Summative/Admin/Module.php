@@ -12,12 +12,11 @@ namespace Custom\Tigs\Summative\Admin;
 use Alaress;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use InvalidArgumentException;
 use Alaress\Database\Quoter\Mysql\Quoter;
 
 class Module extends Alaress\Module\Module
@@ -46,13 +45,16 @@ class Module extends Alaress\Module\Module
         $this->register('POST', '', 'postAdmin', $isSuper);
     }
 
-
     /**
-     * @inheritdoc
+     * @return Base
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . self::BASE_NAME, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            new Quoter()
+        );
     }
 
 
@@ -62,24 +64,5 @@ class Module extends Alaress\Module\Module
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'fieldStrategyFactory' => $injector->lazy(function () {
-                return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
-            }),
-            'quoter'               => $injector->lazy(function () {
-                return new Quoter();
-            }),
-        ];
     }
 }

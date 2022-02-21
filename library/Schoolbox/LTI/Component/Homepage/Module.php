@@ -11,7 +11,6 @@ namespace Schoolbox\LTI\Component\Homepage;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
@@ -25,14 +24,6 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

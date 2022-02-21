@@ -10,16 +10,17 @@
 
 namespace Alaress\Web\Controller;
 
+use Alaress\Module\Module;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
-use Aura\Di;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Session\SegmentInterface;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use LogicException;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -40,9 +41,9 @@ abstract class Base
     protected $response;
 
     /**
-     * @var Di\Container
+     * @deprecated you should be injecting your dependencies from the constructor!
      */
-    protected $di;
+    protected ContainerInterface $di;
 
     /**
      * @var Router
@@ -142,10 +143,12 @@ abstract class Base
     }
 
     /**
-     * @param  Di\Container $di
+     * @deprecated you should be injecting your dependencies from the constructor!
+     *
+     * @param  ContainerInterface $di
      * @return $this
      */
-    public function setDi($di)
+    public function setDi(ContainerInterface $di)
     {
         $this->di = $di;
         return $this;
@@ -154,9 +157,9 @@ abstract class Base
     /**
      * @deprecated you should be injecting your dependencies from the constructor!
      *
-     * @return Di\Container
+     * @return ContainerInterface
      */
-    public function getDi()
+    public function getDi(): ContainerInterface
     {
         return $this->di;
     }
@@ -358,30 +361,15 @@ abstract class Base
      * @param  string $name The name of the controller, as defined in the
      *                      controller's module's basename.
      * @return self
-     * @throws ServiceNotFound
+     * @throws LogicException if module `$name` doesn't have a controller
      */
     protected function getController($name)
     {
-        try {
-            /** @var self $controller */
-            $controller = $this->getDi()->get("controller:$name");
-        } catch (ServiceNotFound $e) {
-            // the controller isn't registered... hawkward. Let's remedy that
+        $module = Module::retrieveInstalledModule($name);
 
-            /** @var \Alaress\Module\Module $module */
-            $module = $this->getDi()->get("module:$name");
-
-            // initialise the controller into the DI
-            $module->initControllerDependencies();
-            $module->initControllers($this->getDi());
-
-            // remove this reference, we don't need it anymore
-            unset($module);
-
-            // obtain and return the controller from DI now that it's been registered
-            $controller = $this->getDi()->get("controller:$name");
-        }
-
+        // initialise controller's routes and dependencies, and then build it
+        $module->initControllerDependencies();
+        $controller = $module->installControllerDependencies($module->buildController(), $this->di);
         $controller->setUser($this->user);
         return $controller;
     }
@@ -619,19 +607,23 @@ abstract class Base
 
     /**
      * @param IExceptionGenerator $eg
+     * @return $this
      */
-    public function setExceptionGenerator(IExceptionGenerator $eg)
+    public function setExceptionGenerator(IExceptionGenerator $eg): self
     {
         $this->eg = $eg;
+        return $this;
     }
 
 
     /**
      * @param null|HubInterface $sentry
+     * @return $this
      */
-    public function setSentry(?HubInterface $sentry)
+    public function setSentry(?HubInterface $sentry): self
     {
         $this->sentry = $sentry;
+        return $this;
     }
 
 

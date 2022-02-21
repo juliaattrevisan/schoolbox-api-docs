@@ -9,7 +9,6 @@
 namespace Schoolbox\Fixtures\Team;
 
 use Alaress\Web\Controller\Exception;
-use Aura\Di\Exception\ServiceNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -125,7 +124,6 @@ class Controller extends AbstractController
      * Generate a list of Teams and the Division they are in
      *
      * @param null|Division $context
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws ApplicationException\Exception If no sport found in DB
      */
     public function getList($context = null)
@@ -418,7 +416,6 @@ class Controller extends AbstractController
      * Renders a HTML list of teams
      *
      * @param Division $context Intentionally does not permit null
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws ApplicationException\Exception If no sport found in DB
      */
     private function getHtmlList(Division $context)

@@ -12,11 +12,7 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Config;
-use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
 abstract class AbstractModule extends BaseModule
@@ -56,51 +52,4 @@ abstract class AbstractModule extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
-
-    /**
-     * @param ContainerInterface $injector
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        // set
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew($this->getControllerClass(), [], $this->getSetterList($injector))
-        );
-
-        $this->initSetters($injector);
-    }
-
-
-    /**
-     * @param Container $ci
-     * @return array
-     */
-    protected function getSetterList(Container $ci)
-    {
-        return [
-            'setFileMapper'       => null,
-            'setConfig'           => $ci->lazyNew(Config\Loader::class),
-            'setUserMapper'       => $ci->lazyNew(UserMapper::class),
-            'setNodeFactory'      => $ci->lazyNew(NodeFactory::class),
-            'setTreeBuilder'      => null,
-            'setFolderMapper'     => null,
-            'setNamespace'        => $this->basename,
-            'setNodeType'         => '',
-        ];
-    }
-
-
-    /**
-     * @param Container $injector
-     * @return void
-     */
-    abstract protected function initSetters(Container $injector);
-
-
-    /**
-     * @return string
-     */
-    abstract protected function getControllerClass();
 }

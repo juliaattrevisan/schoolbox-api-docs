@@ -286,7 +286,7 @@ class Controller extends Base
      * @param User $user
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException

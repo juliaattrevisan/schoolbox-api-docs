@@ -46,7 +46,7 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getChangePassword()

@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Repair;
 
 use Alaress\Database\Connector\IConnector;
-use Aura\Di;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Composite;
@@ -40,18 +42,19 @@ class Folder extends Composite
     /**
      * All sub-apps have no-transaction turned on.
      *
-     * @param App             $subApp
-     * @param array           $appOptions
-     * @param Di\Container    $di
-     * @param resource        $outStream
-     * @param LoggerInterface $logger
-     * @param bool            $perform
-     * @throws Di\Exception\ServiceNotFound
+     * @param App                $subApp
+     * @param array              $appOptions
+     * @param ContainerInterface $di
+     * @param resource           $outStream
+     * @param LoggerInterface    $logger
+     * @param bool               $perform
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function setupSubApp(
         App $subApp,
         array $appOptions,
-        Di\Container $di,
+        ContainerInterface $di,
         $outStream,
         LoggerInterface $logger,
         bool $perform
@@ -64,7 +67,6 @@ class Folder extends Composite
     /**
      * All sub-apps are wrapped in a transaction before running.
      *
-     * @throws Di\Exception\ServiceNotFound
      * @throws Throwable if any sub-app threw anything
      */
     public function run(): void

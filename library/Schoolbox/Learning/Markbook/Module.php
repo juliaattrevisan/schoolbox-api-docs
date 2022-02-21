@@ -11,9 +11,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
@@ -80,24 +78,18 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * @inheritdoc
-     * @param Container $injector
-     * @throws InvalidArgumentException If class not found
-     * @throws ServiceNotFound
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->getBasename(),
-            $injector->lazyNew(Controller::class, [
-                'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                'termMapper'            => $this->getMapperFactory()->getLazy(Term\Mapper::class),
-                // Access has a static 'getInstance()' method
-                'access'                => $this->getMapperFactory()->getLazy(Access::class),
-                'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-                'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
-            ])
+        return new Controller(
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(Term\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('filters.assessmentIdFinder'),
+            $this->injector->get('filters.factoryFactory'),
         );
     }
 

@@ -13,12 +13,12 @@ use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -61,15 +61,24 @@ class Module extends Alaress\Module\Module
         $this->register('GET', '/{userId}/folder/{folderId}{/reportDate}', 'getReport', $canSeeSubjectReport, $preloadUserAndFolder);
     }
 
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . self::BASE_NAME, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('externalUser'),
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Assessment\Mapper::class),
+            $this->getMapperFactory()->get(Textbox\Mapper::class),
+            new Visibility($this->getMapperFactory()->get(Access::class)),
+            $this->injector->get('databaseInternal')
+        );
     }
-
 
     /**
      * @inheritdoc
@@ -78,34 +87,6 @@ class Module extends Alaress\Module\Module
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'externalUser'          => $injector->lazyGet('externalUser'),
-            'externalClass'         => $injector->lazyGet('externalClass'),
-            'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'assessmentMapper'      => $this->getMapperFactory()->getLazy(Assessment\Mapper::class),
-            'textboxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
-            'visibility'            => $injector->lazy(function () {
-                /** @var Access $access */
-                $access = $this->getMapperFactory()->get(Access::class);
-                return new Visibility($access);
-            }),
-            'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
-            'database'              => $injector->lazyGet('databaseInternal'),
-        ];
-    }
-
 
     /**
      * Preload a User instance

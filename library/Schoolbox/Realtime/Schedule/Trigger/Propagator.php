@@ -11,8 +11,7 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Notification\Instance\Instance;
-use JsonSerializable;
-use Predis\ClientInterface;
+use ReflectionException;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 use Schoolbox\Realtime\Schedule\Event\Event;
@@ -71,7 +70,7 @@ class Propagator implements IPropagator
      *
      * @param CrudEventInterface $event
      * @return string|null
-     * @throws \Aura\Di\Exception\ReflectionFailure
+     * @throws ReflectionException
      */
     public function propagateEvent(CrudEventInterface $event)
     {

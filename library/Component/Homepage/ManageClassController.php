@@ -59,7 +59,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @throws PDOException
      * @throws RuntimeException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -322,7 +322,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @return string|null
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildMarkbookLink(): ?string
@@ -345,7 +345,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @param bool $isCoursePage
      * @return string
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string

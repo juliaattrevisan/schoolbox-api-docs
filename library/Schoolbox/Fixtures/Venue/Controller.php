@@ -41,7 +41,7 @@ class Controller extends AbstractController
      * @since 165
      *
      * @param object $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getList($context = null)
     {
@@ -96,7 +96,7 @@ class Controller extends AbstractController
      * @since 165
      *
      * @param Model $entity
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getEntity($entity)
     {
@@ -114,7 +114,7 @@ class Controller extends AbstractController
      *
      * @param Model $entity
      * @param object $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getForm($entity, $context = null)
     {

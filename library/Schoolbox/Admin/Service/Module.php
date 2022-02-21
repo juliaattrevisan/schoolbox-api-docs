@@ -11,9 +11,8 @@ namespace Schoolbox\Admin\Service;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use InvalidArgumentException;
+use Alaress\Web\Controller\Base;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Twig\Error\LoaderError;
 
@@ -39,25 +38,6 @@ class Module extends BaseModule
     }
 
     /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Error\Mapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
-        ];
-    }
-
-    /**
      * @param IChainLoader $templateLoader
      * @throws LoaderError
      */
@@ -67,12 +47,13 @@ class Module extends BaseModule
     }
 
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+        );
     }
 }

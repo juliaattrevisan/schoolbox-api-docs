@@ -10,7 +10,7 @@
  */
 
 use Alaress\Lumberjack\CompositeLoggerInterface;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
@@ -41,7 +41,7 @@ pcntl_signal(SIGQUIT, $cleanup);
 $kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
-    function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+    function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
         // Ensure tool being run as www-data user
         $requiredUser = 'www-data';
@@ -58,8 +58,8 @@ $kernel->run(
         $instanceId = $opts["instance"] ?? INSTANCE_ID;
 
 
-        // define the redis key we'll use for this run
-        $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
+        // AFAICT this is unused
+        // $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
 
         /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');

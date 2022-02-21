@@ -13,7 +13,7 @@ namespace Schoolbox\ResourceBooking\Report;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Calendar_Api_Composite;
 use External_Timetable;
@@ -66,18 +66,18 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        // Build a calendar API composite and an API factory
-        $injector->params[CalendarApiFactory::class]['user']      = $injector->lazyGet('user');
-        $injector->params[CalendarApiFactory::class]['timetable'] = $injector->lazyNew(External_Timetable::class);
-
-        $injector->params[Controller::class]['itemMapper']     = $this->getMapperFactory()->getLazy(Item\Mapper::class);
-        $injector->params[Controller::class]['categoryMapper'] = $this->getMapperFactory()->getLazy(Category\Mapper::class);
-        $injector->params[Controller::class]['apiFactory']     = $injector->lazyNew(CalendarApiFactory::class);
-        $injector->params[Controller::class]['api']            = $injector->lazyNew(Calendar_Api_Composite::class);
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(Item\Mapper::class),
+            $this->getMapperFactory()->get(Category\Mapper::class),
+            new Calendar_Api_Composite(),
+            new CalendarApiFactory(
+                $this->injector->get('user'),
+                new External_Timetable(),
+            ),
+        );
     }
 }

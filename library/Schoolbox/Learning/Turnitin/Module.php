@@ -11,9 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use InvalidArgumentException;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Turnitin;
 
 /**
@@ -54,27 +52,8 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'turnitinFileMapper' => $this->getMapperFactory()->getLazy(Turnitin\File\Mapper::class),
-        ];
+        return new Controller($this->getMapperFactory()->get(Turnitin\File\Mapper::class));
     }
 }

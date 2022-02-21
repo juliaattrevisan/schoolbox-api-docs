@@ -13,8 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -65,7 +64,7 @@ class Module extends BaseModule
                                 }
 
                                 /** @var IConnector $externalDb */
-                                $externalDb = $this->getInjector()->get('databaseExternal');
+                                $externalDb = $this->injector->get('databaseExternal');
 
                                 /* Permission to NCEA Report and its button, controlled by STK
                                  */
@@ -114,7 +113,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function preloadUser(array $params): array
     {
@@ -141,9 +140,9 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
     }
 
     /**
@@ -152,24 +151,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
-        ];
     }
 
     /**

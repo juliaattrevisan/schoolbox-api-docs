@@ -21,7 +21,7 @@ class Controller extends Base
      * This enables the user to then use the Immersive Reader service with a short lived token.
      * This is done on the backend to protect the server secret from the end user.
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getTokenAndSubdomain()
     {

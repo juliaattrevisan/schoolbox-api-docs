@@ -11,8 +11,7 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 
 /**
@@ -72,20 +71,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        /** @var Container $injector */
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'keyChains'         => $injector->lazyGet('lti.keyChains'),
-                    'registrations'     => $injector->lazyGet('lti.registrations'),
-                    'userAuthenticator' => $injector->lazyGet('lti.userAuthenticator'),
-                    'accessTokenCache'  => $injector->lazyGet('lti.accessTokenCache'),
-                ]
-            )
+        return new Controller(
+            $this->injector->get('lti.keyChains'),
+            $this->injector->get('lti.registrations'),
+            $this->injector->get('lti.userAuthenticator'),
+            $this->injector->get('lti.accessTokenCache'),
         );
     }
 

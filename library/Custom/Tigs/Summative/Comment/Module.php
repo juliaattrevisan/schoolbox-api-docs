@@ -11,7 +11,8 @@ namespace Custom\Tigs\Summative\Comment;
 
 use Alaress;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Role;
 
 class Module extends Alaress\Module\Module
@@ -40,15 +41,13 @@ class Module extends Alaress\Module\Module
         $this->register('GET', '/folder/{folderId}/term/{termSlug}', 'getTeacherComments', $isStaff);
     }
 
-
     /**
-     * @inheritdoc
+     * @return Base
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . self::BASE_NAME, $injector->lazyNew(Controller::class));
+        return new Controller();
     }
-
 
     /**
      * @inheritdoc

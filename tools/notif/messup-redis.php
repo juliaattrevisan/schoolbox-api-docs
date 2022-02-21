@@ -9,7 +9,7 @@
  */
 
 use Alaress\Redis;
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 
@@ -26,7 +26,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Messup', [
     'expiry'  => max(1, $opts['x'] ?? 3600),
 ]);
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) {
     $redis  = Redis::getStorageClientInstance();
     $count  = (int)$opts['count'];
     $expiry = (int)$opts['expiry'];

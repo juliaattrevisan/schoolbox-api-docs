@@ -83,7 +83,7 @@ class Controller extends Base
      * Selection of capabilities, indicators, descriptors which are used to configure a report output
      *
      * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getNesa()
     {
@@ -116,7 +116,7 @@ class Controller extends Base
      * NESA Report generation
      *
      * @throws \Schoolbox\Application\Exception\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function postNesa()
     {
@@ -159,7 +159,7 @@ class Controller extends Base
      * I can't trust the url to preserve the contents of the indicators chosen, which must be transmitted
      * in plaintext on the url (no id integers to rely upon)
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function postNesaCsv()
     {

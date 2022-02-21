@@ -95,7 +95,7 @@ class Controller extends Base
      *
      * @api   /adminv2/shaps/provisioning
      * @since 18.1
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws InvalidArgumentException
      */
     public function getAll(): void
@@ -145,7 +145,7 @@ class Controller extends Base
      * @api GET /adminv2/shaps/provisioning/provisioned
      * @since 18.1
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function getProvisioned(): void
@@ -192,7 +192,7 @@ class Controller extends Base
      * @api GET /adminv2/shaps/provisioning/unprovisioned
      * @since 18.1
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function getUnprovisioned(): void
@@ -238,7 +238,7 @@ class Controller extends Base
      * @api GET /adminv2/shaps/provisioning/search
      * @since 18.1
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getUserProvisioningSearch(): void
     {
@@ -306,7 +306,7 @@ class Controller extends Base
      * @api GET /adminv2/shaps/courses
      * @since 18.1
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function getUsersInCourses(): void
@@ -333,7 +333,7 @@ class Controller extends Base
      * @api GET /adminv2/shaps/courses/search
      * @since 18.1
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getUserEnrolmentSearch()
     {

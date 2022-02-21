@@ -17,7 +17,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Aura\Di;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
@@ -32,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
     // If no instance ID is provided, fall back to default if it exists
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
 

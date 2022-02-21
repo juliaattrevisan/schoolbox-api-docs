@@ -11,7 +11,6 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Aura\Di\ContainerInterface as DependencyInjector;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
@@ -26,11 +25,10 @@ class User implements ModuleConfigInterface
      * @param Kernel $kernel
      *
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function configure($kernel): void
     {
-        /** @var DependencyInjector $di */
         $di = $kernel->getDependencyInjector();
 
         $userModule = new UserModule($di);

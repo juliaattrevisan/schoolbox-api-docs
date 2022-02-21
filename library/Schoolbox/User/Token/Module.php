@@ -11,7 +11,7 @@ namespace Schoolbox\User\Token;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
@@ -68,21 +68,14 @@ class Module extends BaseModule
         throw new \InvalidArgumentException('A user ID must be provided in path param "userId"');
     }
 
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'tokenBuilder'     => $injector->lazyGet('user.tokenBuilder'),
-                    'tokenMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                ]
-            )
+        return new Controller(
+            $this->injector->get('user.tokenBuilder'),
+            $this->getMapperFactory()->get(Mapper::class),
         );
     }
 }

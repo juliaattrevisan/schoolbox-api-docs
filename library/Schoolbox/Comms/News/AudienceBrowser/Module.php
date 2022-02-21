@@ -10,8 +10,7 @@ namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Resource\Folder;
@@ -43,23 +42,13 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
-
-    /**
-     * @inheritdoc
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'db'               => $injector->lazyGet('databaseInternal'),
-            'audienceMapper'   => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'folderMapper'     => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'strategyFactory'  => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
-        ];
+        return new Controller(
+            $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(Audience\Mapper::class),
+            $this->getMapperFactory()->get(Folder\Mapper::class),
+            $this->injector->get('commsNewsAudienceStrategyFactory'),
+        );
     }
 }

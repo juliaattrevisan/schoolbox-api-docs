@@ -13,13 +13,13 @@ namespace Schoolbox\Curriculum;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Curriculum\LearningArea\Mapper as LearningAreaMapper;
 
 class Module extends BaseModule
 {
@@ -95,20 +95,15 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'nodeMapper'      => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                    'articleResolver' => $injector->lazyGet('commsNewsArticleResolver'),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(NodeMapper::class),
+            $this->injector->get('commsNewsArticleResolver'),
         );
     }
 

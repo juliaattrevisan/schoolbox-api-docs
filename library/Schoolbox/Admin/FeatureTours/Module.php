@@ -5,7 +5,8 @@ namespace Schoolbox\Admin\FeatureTours;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Schoolbox\Tour\Mapper as TourMapper;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -33,17 +34,11 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        return new Controller($this->getMapperFactory()->get(TourMapper::class));
     }
 }

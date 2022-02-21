@@ -11,13 +11,13 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Web\Controller\Base;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
@@ -52,6 +52,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsSimilarityCheckEnabled;
 use Schoolbox\Learning\Authorizer\Rule\ParticipantHasNoInteractions;
 use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -268,7 +269,6 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws NotFound
-     * @throws ServiceNotFound
      */
     protected function preloadAssessmentAndStudent(array $params): array
     {
@@ -298,13 +298,8 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws Mapper\DefinitionException
-     * @throws NotFound
-     * @throws UnexpectedValueException
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function preloadContext(array $params): array
     {
@@ -340,7 +335,6 @@ class Module extends BaseModule
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws UnexpectedValueException If unable to derive project participant collections
-     * @throws ServiceNotFound
      */
     protected function preloadAssessment(array $params, User $student = null): array
     {
@@ -370,105 +364,225 @@ class Module extends BaseModule
     }
 
     /**
-     * Override with any steps required for a controller and its routes
+     * Build a controller for this class name.
      *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container&ContainerInterface $injector The dependency injection container.
+     * @template T of Base
+     * @param class-string<T> $className
+     * @return Base
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    public function buildControllerForClass(string $className): Base
     {
-        // NOTE the pointer magic to make things more concise
+        // Common dependencies across the controllers this module _may_ create.
+        $userMapper       = $this->getMapperFactory()->get(UserMapper::class);
+        $errorMapper      = $this->getMapperFactory()->get(ErrorMapper::class);
+        $workTypeMapper   = $this->getMapperFactory()->get(WorkTypeMapper::class);
+        $courseSpecMapper = $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+        $unitSpecMapper   = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        $folderMapper     = $this->getMapperFactory()->get(FolderMapper::class);
+        $termMapper       = $this->getMapperFactory()->get(Term\Mapper::class);
 
-        // base list controller
-        $lc =& $injector->params[ListController::class];
-        $lc['userMapper']  = $this->getMapperFactory()->getLazy(UserMapper::class);
-        $lc['errorMapper'] = $this->getMapperFactory()->getLazy(ErrorMapper::class);
-        $lc['access']      = $this->getMapperFactory()->getLazy(Access::class);
-        $lc['transactor']  = $injector->lazyGet('transactor');
-        $lc['participantDataSource'] = $injector->lazyGet('participantDataSource');
+        /** @var AssessmentMapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->injector->get('assessmentDataSource');
 
-        // abstract controller
-        $ac =& $injector->params[Controller::class];
-        $ac['bakery'] = $injector->lazyNew(Breadcrumb\Factory::class, [
-            'router'     => $injector->lazyGet('router'),
-            'authorizer' => $injector->lazyGet('authorizer'),
-            'access'     => $this->getAccess(),
-        ]);
-        $ac['workTypeMapper']        = $this->getMapperFactory()->getLazy(WorkTypeMapper::class);
-        $ac['termMapper']            = $this->getMapperFactory()->getLazy(Term\Mapper::class);
-        $ac['courseSpecificationMapper'] = $this->getMapperFactory()->getLazy(\Schoolbox\Learning\Course\DataModel\Specification\Mapper::class);
-        $ac['replicator'] = $injector->lazyNew(Replicator::class, [
-            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-            'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
-        ]);
-        // due work specific
-        $dc =& $injector->params[Assessment\DueWork\Controller::class];
-        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
-        $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(RubricResultSetMapper::class);
-        $dc['feedbackDataSource']       = $injector->lazyGet('feedbackDataSource');
+        /** @var Transactor $transactor */
+        $transactor = $this->injector->get('transactor');
 
-        $dc['dueWorkResponseMapper'] = $injector->lazyGet('submissionDataSource');
-        $dc['participantMapper'] = $injector->lazyNew(ParticipantDataSource::class);
-        $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
-        $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
-        $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
-        $dc['pdfGenerator'] = $injector->lazyGet('pdfGenerator');
-        $dc['turnitinFileMapper'] = $this->getMapperFactory()->getLazy(\Schoolbox\Learning\Turnitin\File\Mapper::class);
-        $dc['folderMapper'] = $this->injector->lazyNew(\Schoolbox\Resource\Folder\Mapper::class);
+        /** @var ParticipantDataSource $participantDataSource */
+        $participantDataSource = $this->injector->get('participantDataSource');
 
-        // project specific
-        // $pc =& $injector->params[Assessment\Project\Controller::class];
-
-        // quiz specific
-        $qc =& $injector->params[Assessment\Quiz\Controller::class];
-        $qc['quizMapper']        = $this->getMapperFactory()->getLazy(QuizMapper::class);
-        $qc['quizSectionMapper'] = $this->getMapperFactory()->getLazy(QuizSectionMapper::class);
-        $qc['quizAttemptMapper'] = $this->getMapperFactory()->getLazy(QuizAttemptMapper::class);
-        $dc['folderMapper'] = $this->injector->lazyNew(\Schoolbox\Resource\Folder\Mapper::class);
-
-        // task specific
-        $tc =& $injector->params[Assessment\Task\Controller::class];
-        $tc['taskResponseDataSource'] = $injector->lazyNew(
-            TaskResponseDataSource::class,
-            ['mapper' => $this->getMapperFactory()->getLazy(TaskResponseMapper::class)]
+        $bakery = new Breadcrumb\Factory(
+            $this->getRouter(),
+            $this->getAuthorizer(),
+            $this->getAccess(),
         );
 
-        // LTI assessment specific
-        $lc =& $injector->params[Assessment\Lti\Controller::class];
-        $lc['ltiToolMapper']            = $this->getMapperFactory()->getLazy(LtiToolMapper::class);
-        $lc['ltiAssessmentMapper']      = $this->getMapperFactory()->getLazy(LtiAssessmentMapper::class);
-        $lc['ltiAssessmentScoreMapper'] = $this->getMapperFactory()->getLazy(LtiAssessmentScoreMapper::class);
-        $lc['instance']                 = $injector->lazyGet('instance');
-        $lc['registrations']            = $injector->lazyGet('lti.registrations');
-        $lc['userCodec']                = $injector->lazyGet('lti.userCodec');
+        $replicator = new Replicator(
+            $assessmentDataSource,
+            $this->getMapperFactory()->get(QuizMapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+        );
+
+        switch ($className) {
+            case ListController::class:
+                return new ListController(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $this->getAccess(),
+                    $transactor,
+                    $participantDataSource,
+                    $this->getUnitSpecificationMapper(),
+                );
+
+            case Assessment\DueWork\Controller::class:
+                return new Assessment\DueWork\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $this->getMapperFactory()->get(RubricDataSource::class),
+                    $this->getMapperFactory()->get(RubricResultSetMapper::class),
+                    $this->injector->get('submissionDataSource'),
+                    $participantDataSource,
+                    $termMapper,
+                    $this->getMapperFactory()->get(SingleFile\Mapper::class),
+                    $this->injector->get('kamiConnector'),
+                    $this->getMapperFactory()->get(Kami\Mapper::class),
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                    $this->injector->get('pdfGenerator'),
+                    $this->getMapperFactory()->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
+                    $this->injector->get('feedbackDataSource'),
+                    $folderMapper,
+                );
+
+            case Assessment\Project\Controller::class:
+                return new Assessment\Project\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                );
+
+            case Assessment\Quiz\Controller::class:
+                return new Assessment\Quiz\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $this->getMapperFactory()->get(QuizMapper::class),
+                    $this->getMapperFactory()->get(QuizSectionMapper::class),
+                    $this->getMapperFactory()->get(QuizAttemptMapper::class),
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                    $folderMapper,
+                );
+
+            case Assessment\Task\Controller::class:
+                return new Assessment\Task\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    new TaskResponseDataSource($this->getMapperFactory()->get(TaskResponseMapper::class)),
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                );
+
+            case Assessment\Lti\Controller::class:
+                return new Assessment\Lti\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                    $this->getMapperFactory()->get(LtiToolMapper::class),
+                    $this->getMapperFactory()->get(LtiAssessmentMapper::class),
+                    $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+                    $this->injector->get('lti.registrations'),
+                    $this->injector->get('instance'),
+                    $this->injector->get('lti.userCodec'),
+                );
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf('Assessment controller for class "%s" not found', $className),
+                );
+        }
     }
 
     /**
-     * @inheritdoc
+     * Build a controller for one of the assessment sub-types.
+     *
+     * @param string $type One of the One of the `AssessmentType::TYPE_*` constants
+     * @return Controller
+     * @throws InvalidArgumentException    if the controller isn't a Controller
+     *                                     instance
+     * @throws ContainerExceptionInterface something went wrong when building
+     *                                     the controller
+     * @throws NotFoundExceptionInterface  something went wrong when building
+     *                                     the controller
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildControllerForType(string $type): Controller
     {
-        $basename = 'controller:' . $this->basename;
+        switch ($type) {
+            case AssessmentType::TYPE_DUE_WORK:
+                $controller = $this->buildControllerForClass(Assessment\DueWork\Controller::class);
+                break;
 
-        // dynamically choose your poison
-        $injector->set($basename, $injector->lazyNew($this->controllerClass));
+            case AssessmentType::TYPE_QUIZ:
+                $controller = $this->buildControllerForClass(Assessment\Quiz\Controller::class);
+                break;
 
-        $d = AssessmentType::TYPE_DUE_WORK;
-        $p = AssessmentType::TYPE_PROJECT;
-        $q = AssessmentType::TYPE_QUIZ;
-        $t = AssessmentType::TYPE_TASK;
+            case AssessmentType::TYPE_TASK:
+                $controller = $this->buildControllerForClass(Assessment\Task\Controller::class);
+                break;
 
-        // declare all the options anyway
-        $injector->set("$basename/$d", $injector->lazyNew(Assessment\DueWork\Controller::class));
-        $injector->set("$basename/$p", $injector->lazyNew(Assessment\Project\Controller::class));
-        $injector->set("$basename/$q", $injector->lazyNew(Assessment\Quiz\Controller::class));
-        $injector->set("$basename/$t", $injector->lazyNew(Assessment\Task\Controller::class));
-        $injector->set("$basename/" . AssessmentType::TYPE_LTI_ASSESSMENT, $injector->lazyNew(Assessment\Lti\Controller::class));
+            case AssessmentType::TYPE_PROJECT:
+                $controller = $this->buildControllerForClass(Assessment\Project\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_LTI_ASSESSMENT:
+                $controller = $this->buildControllerForClass(Assessment\Lti\Controller::class);
+                break;
+
+            default:
+                throw new InvalidArgumentException(
+                    sprintf('Assessment controller for type "%s" not found', $type),
+                );
+        }
+        if ($controller instanceof Controller) {
+            return $controller;
+        }
+        throw new InvalidArgumentException(
+            sprintf('Assessment controller for type "%s" not a "%s" instance', $type, Controller::class),
+        );
+    }
+
+    /**
+     * @return Base
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    public function buildController(): Base
+    {
+        return $this->buildControllerForClass($this->controllerClass);
     }
 
     /* Getters / Setters
@@ -505,7 +619,8 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws ServiceNotFound
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function getAssessmentMapperProxy()
     {

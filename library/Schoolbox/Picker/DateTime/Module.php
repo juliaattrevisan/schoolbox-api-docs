@@ -13,15 +13,15 @@ namespace Schoolbox\Picker\DateTime;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Participant\Finder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
@@ -109,23 +109,17 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'userMapper'          => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'termMapper'          => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'folderMapper'        => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'timetableHandler'    => $this->getInjector()->lazyGet('externalTimetable'),
-                'participationFinder' => $this->getInjector()->lazyNew(
-                    Finder::class,
-                    ['database' => $this->getInjector()->lazyGet('databaseInternal')]
-                )
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->injector->get('externalTimetable'),
+            new Finder($this->injector->get('databaseInternal')),
         );
     }
 

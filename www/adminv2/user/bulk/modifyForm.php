@@ -7,6 +7,8 @@
  */
 
 // sitepage context is required
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -82,7 +84,7 @@ try {
     /** @var WritableCache $cache */
     $cache = $this->getDi()->get('subscriptionCache');
     $cache->cacheUsers(INSTANCE_ID, $userIds);
-} catch (\RuntimeException | \Aura\Di\Exception $e) {
+} catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
     $userMapper->log($e->getMessage());
 }
 

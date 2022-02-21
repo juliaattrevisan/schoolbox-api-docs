@@ -82,7 +82,8 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
      */
     protected function getSessionUserId()
     {
-        return $this->sessionData['user'] instanceof User ? $this->sessionData['user']->getId() : null;
+        $sessionUser = $this->getSessionUser();
+        return $sessionUser ? $sessionUser->getId() : null;
     }
 
 

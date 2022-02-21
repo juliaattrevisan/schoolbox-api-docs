@@ -13,8 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -22,7 +21,6 @@ use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Discussion\Permission\CanModerateThread;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access;
@@ -57,7 +55,7 @@ class Module extends BaseModule
 
         $canCreate = new Rule\LazyCallback(function () {
             /** @var IConnector $db */
-            $db = $this->getInjector()->get('databaseInternal');
+            $db = $this->injector->get('databaseInternal');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -76,8 +74,8 @@ class Module extends BaseModule
              * @var UserResolver $userResolver
              * @var StrategyFactory $strategyFactory
              */
-            $userResolver    = $this->getInjector()->get('commsNewsUserResolver');
-            $strategyFactory = $this->getInjector()->get('commsNewsAudienceStrategyFactory');
+            $userResolver    = $this->injector->get('commsNewsUserResolver');
+            $strategyFactory = $this->injector->get('commsNewsAudienceStrategyFactory');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -140,7 +138,7 @@ class Module extends BaseModule
         // Associating a discussion thread with a comms article:
         // Use the authorizer the discussion thread uses.
         $canAssociate = new Rule\Callback(function ($params, ?User $user) {
-            $authorizer = $this->getInjector()->get('authorizer');
+            $authorizer = $this->injector->get('authorizer');
             $rule       = new CanModerateThread(
                 $authorizer,
                 new ThreadLocator(
@@ -209,9 +207,24 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Topic\Mapper::class),
+            $this->getMapperFactory()->get(SaveForLater\Mapper::class),
+            $this->getMapperFactory()->get(Statistics\Mapper::class),
+            $this->getMapperFactory()->get(Statistics\Cumulative\Mapper::class),
+            $this->getMapperFactory()->get(Audience\Mapper::class),
+            $this->getMapperFactory()->get(Folder\Mapper::class),
+            $this->injector->get('databaseInternal'),
+            $this->injector->get('commsNewsArticleResolver'),
+            $this->injector->get('commsNewsAudienceStrategyFactory'),
+            $this->getMapperFactory()->get(Access\Access::class),
+            $this->getMapperFactory()->get(Thread\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Discussion\Comment\Mapper::class),
+            $this->getMapperFactory()->get(File\Mapper::class),
+        );
     }
 
 
@@ -221,41 +234,6 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'newsMapper'                 => $this->getMapperFactory()->getLazy(Mapper::class),
-            'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
-            'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
-            'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
-            'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),
-            'audienceMapper'             => $this->getMapperFactory()->getLazy(Audience\Mapper::class),
-            'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
-            'databaseInternal'           => $injector->lazyGet('databaseInternal'),
-            'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
-            'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
-            'access'                     => $injector->lazy(function () {
-                return Access\Access::getInstance();
-            }),
-            'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
-            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'commentMapper'              => $this->getMapperFactory()->getLazy(\Schoolbox\Discussion\Comment\Mapper::class),
-            'fileMapper'                 => $this->getMapperFactory()->getLazy(File\Mapper::class),
-        ];
     }
 
 
@@ -321,7 +299,7 @@ class Module extends BaseModule
 
     /**
      * @return StrategyFactory|object
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): StrategyFactory
     {

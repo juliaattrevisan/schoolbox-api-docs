@@ -9,8 +9,6 @@
 namespace Schoolbox\Fixtures\Component\Dashboard;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
@@ -19,14 +17,6 @@ class Module extends BaseModule
      * @var string
      */
     protected $basename = 'sportsfixturesDashboard';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
-    }
 
     /**
      * {@inheritdoc}

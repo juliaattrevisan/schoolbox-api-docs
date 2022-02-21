@@ -9,7 +9,8 @@ namespace Schoolbox\Filter;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as AlaressModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters;
 use Alaress\Twig\Loader\IChainLoader;
@@ -51,7 +52,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
                 case Page\Model::PAGE_BADGE_LIST:
                 case Page\Model::PAGE_AWARD_LIST:
-                    return ['factoryFactory' => $this->getInjector()->get('filters.factoryFactory')];
+                    return ['factoryFactory' => $this->injector->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }
             return [];
@@ -67,20 +68,19 @@ class Module extends AlaressModule
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException If mapper class not found
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'filterMapper'    => $this->getMapperFactory()->getLazy(Mapper::class),
-            'pageMapper'      => $this->getMapperFactory()->getLazy(Page\Mapper::class),
-            'optionsMapper'   => $this->getMapperFactory()->getLazy(Page\Option\Mapper::class),
-            'defaultsMapper'  => $this->getMapperFactory()->getLazy(Page\Option\Defaults\Mapper::class),
-            'selectionMapper' => $this->getMapperFactory()->getLazy(Selection\Mapper::class),
-            'roleMapper'      => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'errorMapper'     => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'rosettaStone'    => $injector->lazyGet('l10n'),
-        ]));
+        return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Page\Mapper::class),
+            $this->getMapperFactory()->get(Page\Option\Mapper::class),
+            $this->getMapperFactory()->get(Page\Option\Defaults\Mapper::class),
+            $this->getMapperFactory()->get(Selection\Mapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('l10n'),
+        );
     }
 
 

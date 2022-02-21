@@ -10,8 +10,8 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Psr\Log\NullLogger;
 use Schoolbox\Mail;
@@ -73,31 +73,24 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'passwordService' => $injector->lazyNew(PasswordService::class),
-                'userMapper'      => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'resetMapper'     => $this->getMapperFactory()->getLazy(Mapper::class),
-                'passwordMailService' => $injector->lazyNew(MailService::class, [
-                    'config' => $injector->lazyGet('config'),
-                    'resetMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'mailFactory' => $injector->lazyNew(Mail\TwigEmailFactory::class, [
-                        'context' => $injector->lazyNew(Mail\CoreContext::class, [
-                            'conf' => $injector->lazyGet('config')
-                        ]),
-                        'log' => $injector->lazyNew(NullLogger::class),
-                    ]),
-                ]),
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+            new MailService(
+                $this->getConfig(),
+                $this->getMapperFactory()->get(Mapper::class),
+                $this->getMapperFactory()->get(UserMapper::class),
+                new Mail\TwigEmailFactory(
+                    new Mail\CoreContext($this->getConfig()),
+                    new NullLogger(),
+                ),
+            ),
+            new PasswordService(),
         );
     }
 

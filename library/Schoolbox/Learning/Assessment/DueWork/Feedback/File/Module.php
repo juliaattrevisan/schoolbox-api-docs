@@ -9,8 +9,9 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback\File;
 
 use Alaress\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile;
 use Schoolbox\Mapper;
 
@@ -50,9 +51,9 @@ class Module extends BaseModule\Module
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller($this->getMapper());
     }
 
 

@@ -11,12 +11,12 @@ namespace Schoolbox\Learning\Moment\Evidence\Discussion\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Discussion\Comment\Model as Comment;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Moment\Evidence\Discussion\ThreadLocator;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Evidence\Model as Evidence;
@@ -46,8 +46,6 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -56,9 +54,9 @@ class Notifier extends AbstractModuleNotifier
 
 
         return [
-            'setMapper'         => $mf->getLazy(CommentMapper::class),
-            'setThreadMapper'   => $mf->getLazy(ThreadMapper::class),
-            'setEvidenceMapper' => $mf->getLazy(EvidenceMapper::class),
+            'setMapper'         => $mf->get(CommentMapper::class),
+            'setThreadMapper'   => $mf->get(ThreadMapper::class),
+            'setEvidenceMapper' => $mf->get(EvidenceMapper::class),
         ];
     }
 
@@ -66,7 +64,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
     }

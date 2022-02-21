@@ -41,7 +41,7 @@ class Controller extends ConfigController
      *
      * @api   GET /modules/custom/tigs/summative/admin
      * @since 18.1.0
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      */

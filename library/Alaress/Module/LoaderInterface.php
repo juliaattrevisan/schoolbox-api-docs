@@ -1,15 +1,17 @@
 <?php
 
 /**
- * An interface for module loaders.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Module;
 
+/**
+ * An interface for module loaders.
+ */
 interface LoaderInterface
 {
     /**
@@ -17,5 +19,5 @@ interface LoaderInterface
      *
      * @param string $moduleString A string to extract a module name from somehow.
      */
-    public function loadModule($moduleString);
+    public function loadModule(string $moduleString);
 }

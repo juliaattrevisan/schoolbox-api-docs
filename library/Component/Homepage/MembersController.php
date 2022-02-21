@@ -39,7 +39,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      *
      * @param String $templateHandle
      * @return bool
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
@@ -257,7 +257,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
     /**
      * Gets external user interface
      * @return External_UserInterface
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getExternalUser(): External_UserInterface
     {

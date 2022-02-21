@@ -12,7 +12,6 @@ namespace Schoolbox\Submenu;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 
 /**
@@ -42,32 +41,10 @@ class Module extends BaseModule
 
 
     /**
-     * @inheritdoc
-     */
-    public function initControllers(ContainerInterface $injector): void
-    {
-    }
-
-
-    /**
      * {@inheritdoc}
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-
-    /**
-     * Override with any steps required for a controller and its routes
-     *
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
     }
 }

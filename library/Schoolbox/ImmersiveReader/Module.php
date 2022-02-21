@@ -10,8 +10,7 @@ namespace Schoolbox\ImmersiveReader;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
-use Schoolbox\Config\ConfigMapper;
+use Alaress\Web\Controller\Base;
 
 class Module extends BaseModule
 {
@@ -34,21 +33,12 @@ class Module extends BaseModule
         $this->register('GET', '/getAuth', 'getTokenAndSubdomain', $isLoggedIn, null);
     }
 
+
     /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                        'configMapper'           => $this->getMapperFactory()->getLazy(ConfigMapper::class)
-                ]
-            )
-        );
+        return new Controller();
     }
 }

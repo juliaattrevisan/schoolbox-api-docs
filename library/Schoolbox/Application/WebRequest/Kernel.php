@@ -15,6 +15,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Module\Module;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
@@ -33,6 +34,7 @@ use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
+use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
@@ -62,7 +64,7 @@ class Kernel extends WebKernelAbstract
      * @throws SchoolboxException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
@@ -102,7 +104,7 @@ class Kernel extends WebKernelAbstract
     /**
      * Execute the main script
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
@@ -241,7 +243,7 @@ class Kernel extends WebKernelAbstract
      * @param Route $route  the route to render: the controller and action are
      *                      extracted from its name.
      * @param array $server Vars from $_SERVER
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
@@ -258,8 +260,8 @@ class Kernel extends WebKernelAbstract
         $controllerName = $parsedName['controller'];
         $action         = $parsedName['action'];
 
-        /** @var \Alaress\Module\Module $module */
-        $module = $this->di->get('module:' . $controllerName);
+        // Get module out of its own cache, instead of from DI
+        $module = Module::retrieveInstalledModule($controllerName);
         $module->initControllerDependencies();
 
         // User is from:
@@ -286,9 +288,6 @@ class Kernel extends WebKernelAbstract
             }
         }
 
-        /** @var \Aura\Web\Response $response */
-        $response = null;
-
         // Has session expired? Assume no user here then, but that should probably
         // be handled in authenticator.
         $params = [];
@@ -307,11 +306,19 @@ class Kernel extends WebKernelAbstract
         }
 
         // now the preloading is done initialise the controller
-        $module->initControllers($this->di);
+        $controller = $module->installControllerDependencies(
+            $module->buildController(),
+            $this->di,
+        );
         unset($module);
 
-        /** @var \Alaress\Web\Controller\Base $controller */
-        $controller = $this->di->get('controller:' . $controllerName);
+//        // now the preloading is done initialise the controller
+//        $module->initControllers($this->di);
+//        unset($module);
+//
+//        // TODO replace with a create controller method
+//        /** @var \Alaress\Web\Controller\Base $controller */
+//        $controller = $this->di->get('controller:' . $controllerName);
 
         // The user is now injected directly into the controller, instead of the
         // user being loaded from the session within the controller.
@@ -361,9 +368,7 @@ class Kernel extends WebKernelAbstract
 
         $method->invokeArgs($controller, $args);
         $response = $controller->getResponse();
-
-        /** @var OutputInterface $output */
-        $output = $response->content->get();
+        $output   = $response->content->get();
         if (!$output instanceof OutputInterface) {
             if (is_array($output)) {
                 // Figure out output type.
@@ -371,10 +376,10 @@ class Kernel extends WebKernelAbstract
                 // * set in the response content
                 // * set in route
                 // * default to 'html'
-                $format = $output['format'];
+                $format = $output['format'] ?? null;
                 if (empty($format)) {
                     // Strip leading . from format
-                    $format = preg_replace('/^\\./', '', $params['format']);
+                    $format = preg_replace('/^\\./', '', $params['format'] ?? '');
                     if (empty($format)) {
                         $format = 'html';
                     }
@@ -427,7 +432,7 @@ class Kernel extends WebKernelAbstract
      *
      * @param string|null $path  the base path that was requested
      * @param array       $server Vars from $_SERVER
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function outputSitepageContent(?string $path, array $server): void
     {
@@ -446,6 +451,14 @@ class Kernel extends WebKernelAbstract
         $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
         if ($user) {
             $this->authenticateUserForThisRequestOnly($user);
+        }
+
+        // Time to start the session
+        // TODO is this necessary?
+        /** @var \Alaress\Session\Session $session */
+        $session = $this->di->get('session');
+        if (!$session->isStarted()) {
+            $session->start();
         }
 
         /** @var \SitePage $sitePage */
@@ -508,7 +521,7 @@ class Kernel extends WebKernelAbstract
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
@@ -518,19 +531,6 @@ class Kernel extends WebKernelAbstract
 
         // register an empty logger to maintain interfaces as required
         $di->values['logger'] = new NullLogger();
-
-        // Mapper notifications:
-        // They rely upon the session being injected into them, so do that.
-        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(
-            function () use ($di) {
-                $session = $di->get('session');
-                if (!$session->isStarted()) {
-                    $session->start();
-                }
-                return $_SESSION ?? [];
-            }
-        );
-
         return $di;
     }
 
@@ -549,7 +549,7 @@ class Kernel extends WebKernelAbstract
     /**
      * Web requests require CSRF protection: that belongs in middleware.
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws SchoolboxException
      */
     protected function runMiddleware(): void
@@ -675,7 +675,7 @@ class Kernel extends WebKernelAbstract
      * logged in, or destroy the session completely if nobody was logged in.
      *
      * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function authenticateUserForThisRequestOnly(User $user): void
     {
@@ -693,7 +693,10 @@ class Kernel extends WebKernelAbstract
         $sessionHandler->create($user->getUsername());
 
         // Also: override the DI user with this user?
-        $this->di->set('user', $user);
+        // Should not be required because the DI user is fetched from the
+        // session, anyway.
+        // (This would die when the container was locked, anyway)
+//        $this->di->set('user', $user);
 
         // Restore or destroy the session when all is done
         $this->getShutdownHandler()->registerFunction(

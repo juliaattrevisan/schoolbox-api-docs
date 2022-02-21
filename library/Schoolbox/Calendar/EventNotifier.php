@@ -13,9 +13,8 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Event\Attendance\Model as EventAttendance;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -47,7 +46,6 @@ class EventNotifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     * @throws ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -55,8 +53,8 @@ class EventNotifier extends AbstractModuleNotifier
         $mf = $di->get('mapperFactory');
 
         return [
-            'setMapper'           => $mf->getLazy(EventMapper::class),
-            'setAttendanceMapper' => $mf->getLazy(AttendanceMapper::class),
+            'setMapper'           => $mf->get(EventMapper::class),
+            'setAttendanceMapper' => $mf->get(AttendanceMapper::class),
         ];
     }
 

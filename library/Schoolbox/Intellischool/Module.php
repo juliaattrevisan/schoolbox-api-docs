@@ -12,8 +12,7 @@ namespace Schoolbox\Intellischool;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -123,29 +122,21 @@ class Module extends BaseModule
         );
     }
 
+
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        /** @var Container $injector */
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'jwtFactory' => $injector->lazy(function () {
-                        return new JwtFactory(
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
-                            $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
-                            (new Factory($this->getConfig()))->buildFullyQualified()->toString()
-                        );
-                    }),
-                ]
+        return new Controller(
+            new JwtFactory(
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
+                $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL),
+                (new Factory($this->getConfig()))->buildFullyQualified()->toString()
             )
         );
     }

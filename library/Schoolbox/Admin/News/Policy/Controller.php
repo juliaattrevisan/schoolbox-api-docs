@@ -54,7 +54,7 @@ class Controller extends ConfigController
      *
      * @throws MapperException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Aura\Router\Exception\RouteNotFound
      */

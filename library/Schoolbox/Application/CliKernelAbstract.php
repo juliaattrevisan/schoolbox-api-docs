@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
-use Aura\Di;
 use Aura\Di\Container;
 use Database;
 use Alaress\Exception\IO\IOException;
@@ -146,11 +145,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @param int    $errLine
      * @return bool
      * @throws ErrorException
-     * @throws IOException
-     * @throws PDOException
-     * @throws RangeException
-     * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\ContainerExceptionInterface|\Psr\Container\NotFoundExceptionInterface
      */
     public function onError($errNum, $errStr, $errFile, $errLine): ?bool
     {
@@ -362,7 +357,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      * @throws PDOException
      * @throws RangeException
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     abstract protected function onWarning($errNum, $errStr, $errFile, $errLine): void;
 
@@ -374,7 +369,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      *
      * @param Lumberjack\Logger $logger
      * @return bool
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function addSentryHandler(Lumberjack\Logger $logger): bool
     {
@@ -404,7 +399,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     }
 
     /** @inheritDoc */
-    protected function getKnownUserClassesFromSession(Di\Container $di): array
+    protected function getKnownUserClassesFromSession(Container $di): array
     {
         // No session in CLI context.
         return [];

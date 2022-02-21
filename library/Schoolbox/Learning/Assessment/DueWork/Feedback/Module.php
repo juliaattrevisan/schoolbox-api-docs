@@ -12,8 +12,7 @@ use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -187,36 +186,21 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-    /**
-     * Override with any steps required for a controller and its routes
-     * You should use this method to initialize any mappers or other objects
-     * which the controller needs, but are too heavy to initialize at module
-     * init time.
-     *
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $injector->params[Controller::class] = [
-            'feedbackDataSource'    => $injector->lazyGet('feedbackDataSource'),
-            'participantDataSource' => $injector->lazyGet('participantDataSource'),
-            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
-            'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
-            'responseDataSource'    => $injector->lazyGet('responseDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->get(RubricDataSource::class),
-            'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
-        ];
-    }
 
     /**
      * @inheritdoc
-     *
-     * @param ContainerInterface $injector
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('feedbackDataSource'),
+            $this->injector->get('participantDataSource'),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('responseDataSource'),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RubricDataSource::class),
+            $this->getMapperFactory()->get(ReturnedWorkMapper::class),
+        );
     }
 
     /**
@@ -226,7 +210,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -244,7 +228,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -264,7 +248,7 @@ class Module extends BaseModule
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -295,7 +279,7 @@ class Module extends BaseModule
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -348,37 +332,37 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getAssessmentDataSource()
     {
-        return $this->getInjector()->get('assessmentDataSource');
+        return $this->injector->get('assessmentDataSource');
     }
 
     /**
      * @return object|ParticipantDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getParticipantDataSource()
     {
-        return $this->getInjector()->get('participantDataSource');
+        return $this->injector->get('participantDataSource');
     }
 
     /**
      * @return object|ResponseDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getResponseDataSource()
     {
-        return $this->getInjector()->get('responseDataSource');
+        return $this->injector->get('responseDataSource');
     }
 
     /**
      * @return object|FeedbackDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getFeedbackDataSource()
     {
-        return $this->getInjector()->get('feedbackDataSource');
+        return $this->injector->get('feedbackDataSource');
     }
 }

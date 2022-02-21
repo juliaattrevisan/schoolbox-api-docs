@@ -13,8 +13,7 @@ namespace Schoolbox\Sync\Ruleset;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
-use Aura\Di;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\File\MimetypeMapper;
@@ -53,16 +52,12 @@ class Module extends BaseModule
             $matcher,
             '(?:dryRun|performUpdate)',
             function () {
-
-                /** @var Di\Container $di */
-                $di = $this->getInjector();
-
-                // prep the key Redis will use for this dry run
-                $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
-
-                return array(
-                    'provisioner' => $this->getInjector()->get('ups.provisioner'),
-                );
+                // AFAICT ups.redisKey is unused
+                // // prep the key Redis will use for this dry run
+                // $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid() . '.dry';
+                return [
+                    'provisioner' => $this->injector->get('ups.provisioner'),
+                ];
             }
         );
     }
@@ -89,18 +84,10 @@ class Module extends BaseModule
     }
 
     /**
-     * Set up controllers
-     *
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                ['mimetypeMapper' => $this->getMapperFactory()->getLazy(MimetypeMapper::class),]
-            )
-        );
+        return new Controller($this->getMapperFactory()->get(MimetypeMapper::class));
     }
 }

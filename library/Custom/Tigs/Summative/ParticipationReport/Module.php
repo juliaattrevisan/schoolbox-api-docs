@@ -12,11 +12,11 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -60,15 +60,27 @@ class Module extends Alaress\Module\Module
         $this->register('GET', '/user/{userId}{/reportDate}', 'getReport', $canSeeParticipationReport, $preloadUser);
     }
 
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set('controller:' . self::BASE_NAME, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('databaseInternal'),
+            $this->injector->get('externalUser'),
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(PastoralMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(Textbox\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('databaseExternal'),
+            $this->getMapperFactory()->get(Assessment\Mapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
+        );
     }
-
 
     /**
      * @inheritdoc
@@ -77,32 +89,6 @@ class Module extends Alaress\Module\Module
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
-
-    /**
-     * @inheritdoc
-     * @param Container|ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        $injector->params[Controller::class] = [
-            'database'              => $injector->lazyGet('databaseInternal'),
-            'externalUser'          => $injector->lazyGet('externalUser'),
-            'externalClass'         => $injector->lazyGet('externalClass'),
-            'courseImplMapper'      => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
-            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'pastoralMapper'        => $this->getMapperFactory()->getLazy(PastoralMapper::class),
-            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'textBoxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
-            'access'                => $this->getMapperFactory()->getLazy(Access::class),
-            'externalDatabase'      => $injector->lazyGet('databaseExternal'),
-            'assessmentMapper'      => $this->getMapperFactory()->getLazy(Assessment\Mapper::class),
-            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataModel\DataSource::class),
-        ];
-    }
-
 
     /**
      * Preload a User instance

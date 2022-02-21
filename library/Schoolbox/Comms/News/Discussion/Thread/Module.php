@@ -117,7 +117,7 @@ class Module extends Thread\Module
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
                     /** @var Auth\Authorizer $authorizer */
-                    $authorizer = $this->getInjector()->get('authorizer');
+                    $authorizer = $this->injector->get('authorizer');
                     return new Thread\Authorizer\CanActUponContext(
                         new News\Discussion\Permission\CanGetComments($authorizer)
                     );
@@ -142,7 +142,7 @@ class Module extends Thread\Module
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
                     /** @var Auth\Authorizer $authorizer */
-                    $authorizer = $this->getInjector()->get('authorizer');
+                    $authorizer = $this->injector->get('authorizer');
                     return new Thread\Authorizer\CanActUponContext(
                         new News\Discussion\Permission\CanPostComment($authorizer)
                     );
@@ -183,7 +183,7 @@ class Module extends Thread\Module
                 new Auth\Rule\IsSuperuser(),
                 new Auth\Rule\LazyCallback(function () {
                     /** @var Auth\Authorizer $authorizer */
-                    $authorizer = $this->getInjector()->get('authorizer');
+                    $authorizer = $this->injector->get('authorizer');
                     return new Thread\Authorizer\CanActUponContext(
                         new News\Discussion\Permission\CanModerateThread($authorizer)
                     );

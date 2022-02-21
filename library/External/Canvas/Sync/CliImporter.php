@@ -12,14 +12,13 @@ namespace External\Canvas\Sync;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
-use Aura\Di\Exception\ServiceNotFound;
-use DomainException;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
-use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
@@ -45,7 +44,6 @@ use Schoolbox\Resource\Folder;
 use RuntimeException;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
-use UnderflowException;
 use UnexpectedValueException;
 
 use function fclose;
@@ -98,16 +96,9 @@ class CliImporter extends CliTool\App
 
     /**
      * @inheritDoc
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws DomainException
-     * @throws InvalidArgumentException
+     * @throws ContainerExceptionInterface
      * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws RuntimeException
-     * @throws ServiceNotFound
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
+     * @throws NotFoundExceptionInterface
      */
     public function run(): void
     {
@@ -291,15 +282,9 @@ class CliImporter extends CliTool\App
      * Syncs data from canvas staging db to schoolbox db
      *
      * @param IConnector $canvasDb
-     * @throws Database\Exception
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws InvalidArgumentException
-     * @throws PDOException
-     * @throws ServiceNotFound
-     * @throws UnexpectedValueException
      * @throws Mapper\Exception
-     * @throws UnderflowException
-     * @throws DomainException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     private function syncStagingDataWithSchoolbox(IConnector $canvasDb): void
     {

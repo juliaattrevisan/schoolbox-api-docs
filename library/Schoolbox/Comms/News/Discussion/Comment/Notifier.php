@@ -12,10 +12,10 @@ namespace Schoolbox\Comms\News\Discussion\Comment;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Database\Predicate;
-use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Monolog\Logger;
 use PDO;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\IUserResolver;
@@ -29,6 +29,7 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Discussion\Comment\Model as Comment;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccess;
@@ -79,27 +80,25 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @inheritdoc
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public static function getSetters(ContainerInterface $di): array
     {
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
 
-        $userResolver = $di->lazyGet('commsNewsUserResolver');
+        $userResolver = $di->get('commsNewsUserResolver');
 
-        $moderatorResolver = $di->lazyNew(ModeratorResolver::class, [
-            'audienceMapper'   => $mf->getLazy(AudienceMapper::class),
-            'userAccessMapper' => $mf->getLazy(UserAccessMapper::class),
-            'db'               => $di->lazyGet('databaseInternal'),
-        ]);
+        $moderatorResolver = new ModeratorResolver(
+            $mf->get(AudienceMapper::class),
+            $mf->get(UserAccessMapper::class),
+            $di->get('databaseInternal'),
+        );
 
         return [
-            'setMapper'            => $mf->getLazy(CommentMapper::class),
-            'setUserMapper'        => $mf->getLazy(UserMapper::class),
-            'setThreadMapper'      => $mf->getLazy(ThreadMapper::class),
-            'setArticleMapper'     => $mf->getLazy(ArticleMapper::class),
+            'setMapper'            => $mf->get(CommentMapper::class),
+            'setUserMapper'        => $mf->get(UserMapper::class),
+            'setThreadMapper'      => $mf->get(ThreadMapper::class),
+            'setArticleMapper'     => $mf->get(ArticleMapper::class),
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
         ];
@@ -109,7 +108,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      */
-    public function __construct($configLoader)
+    public function __construct(IConfigLoader $configLoader)
     {
         parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
     }

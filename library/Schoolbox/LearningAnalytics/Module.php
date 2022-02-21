@@ -13,8 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
@@ -83,7 +82,6 @@ class Module extends BaseModule
      * @throws Mapper\Exception
      * @throws ApplicationException
      * @throws \InvalidArgumentException
-     * @throws ServiceNotFound
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
@@ -133,7 +131,6 @@ class Module extends BaseModule
      * @throws ApplicationException
      * @throws MapperException
      * @throws Mapper\DefinitionException
-     * @throws ServiceNotFound
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
@@ -272,21 +269,16 @@ class Module extends BaseModule
     }
 
 
+
     /**
-     * Set up controllers
-     *
-     * {@inheritdoc}
-     * @throws \InvalidArgumentException
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
-                'termMapper'           => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'workTypeMapper' => $this->getMapperFactory()->getLazy(WorkTypeMapper::class),
-            ])
+        return new Controller(
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(WorkTypeMapper::class),
         );
     }
 
@@ -315,11 +307,10 @@ class Module extends BaseModule
 
     /**
      * @return object|MapperProxy
-     * @throws ServiceNotFound
      */
     protected function getAssessmentDataSource()
     {
-        return $this->getInjector()->get('assessmentDataSource');
+        return $this->injector->get('assessmentDataSource');
     }
 
 
@@ -375,10 +366,9 @@ class Module extends BaseModule
 
     /**
      * @return object|Participant\DataSource
-     * @throws ServiceNotFound
      */
     protected function getParticipantDataSource()
     {
-        return $this->getInjector()->get('participantDataSource');
+        return $this->injector->get('participantDataSource');
     }
 }

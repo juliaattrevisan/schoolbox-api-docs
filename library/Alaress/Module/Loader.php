@@ -1,26 +1,21 @@
 <?php
 
 /**
- * A loader class for loading module's controller dependencies dynamically.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Module;
 
-use Aura\Di\ContainerInterface;
+use LogicException;
 
+/**
+ * A loader class for loading module's controller dependencies dynamically.
+ */
 class Loader implements LoaderInterface
 {
-    /**
-     * The dependency injection container.
-     *
-     * @var ContainerInterface
-     */
-    protected $injector;
-
     /**
      * Modules that have already been loaded. Don't try to load them again.
      *
@@ -41,32 +36,29 @@ class Loader implements LoaderInterface
     /**
      * Constructor
      *
-     * @param ContainerInterface $injector
-     * @param string             $moduleRegex
+     * @param string $moduleRegex
      */
-    public function __construct(ContainerInterface $injector, $moduleRegex)
+    public function __construct($moduleRegex)
     {
-        $this->injector    = $injector;
         $this->moduleRegex = $moduleRegex;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadModule($moduleString)
+    public function loadModule(string $moduleString)
     {
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
-            if (empty($this->loadedModules[$moduleName])) {
-                if ($this->injector->has('module:' . $moduleName)) {
-                    $module = $this->injector->get('module:' . $moduleName);
-                    if ($module instanceof Module) {
-                        $module->initControllerDependencies();
-                    }
-                }
-                // Don't try to init again, even if it wasn't found
-                $this->loadedModules[$moduleName] = true;
+            try {
+                $module = Module::retrieveInstalledModule($moduleName);
+            } catch (LogicException $e) {
+                // There was no module to load.
+                // That's fine, as `addTemplatePath` can set a different
+                // basename for a template folder.
+                return;
             }
+            $module->initControllerDependencies();
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Assessment\Exporter;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Controller\Exception as ControllerException;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\GenericCollection;
@@ -109,7 +108,6 @@ class Controller extends BaseController
      * @param IAssessable $assessment Assessment specification
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      */
     public function getExportForm(IAssessable $assessment): void
     {

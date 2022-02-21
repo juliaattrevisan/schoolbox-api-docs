@@ -150,7 +150,7 @@ HELP;
      * @param LockInterface $lock
      * @return Kami\StatusUpdater
      * @throws GuzzleHttp\Exception\InvalidArgumentException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      */
     private function buildStatusUpdater(int $maxAttempts, int $baseBackOff, LockInterface $lock): Kami\StatusUpdater

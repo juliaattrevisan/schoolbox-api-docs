@@ -98,7 +98,7 @@ class Controller extends Base
     /**
      * Provide form
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \ReflectionException
      * @throws \UnexpectedValueException
@@ -153,7 +153,7 @@ class Controller extends Base
      * Process the form vars
      *
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \InvalidArgumentException
      * @throws \ReflectionException
@@ -223,7 +223,7 @@ class Controller extends Base
      * Export csv from db, for a given $type (student staff parent relationship)
      *
      * @param string $type
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function getExport(string $type)

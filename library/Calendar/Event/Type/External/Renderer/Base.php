@@ -12,7 +12,6 @@
 namespace Calendar\Event\Type\External\Renderer;
 
 use Alaress\Authorizer\Authorizer;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Calendar\Event\Type\External;
 use Calendar\Event\Type\RendererBase;

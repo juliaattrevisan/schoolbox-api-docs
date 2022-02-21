@@ -13,8 +13,8 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Color\ColorFactory;
 use Alaress\Module as AlaressModule;
+use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
@@ -67,28 +67,25 @@ class Module extends AlaressModule\Module
         ]);
     }
 
-
     /**
-     * {@inheritdoc}
-     * @throws InvalidArgumentException If invalid mapper class specified
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $mappers = [
-            'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'pastoralGroupMapper'    => $this->getMapperFactory()->getLazy(Pastoral\Group\Mapper::class),
-            'pastoralAudienceMapper' => $this->getMapperFactory()->getLazy(Pastoral\Audience\Mapper::class),
-            'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
-            'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
-            'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
-            'pastoralActionMapper'   => $this->getMapperFactory()->getLazy(Pastoral\Action\Mapper::class),
-            'iconMapper'             => $this->getMapperFactory()->getLazy(IconMapper::class),
-            'rosettaStone'           => $injector->lazyGet('l10n'),
-            'colorFactory'           => $injector->lazyNew(ColorFactory::class),
-        ];
-
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Audience\Mapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Action\Mapper::class),
+            $this->getMapperFactory()->get(IconMapper::class),
+            $this->injector->get('l10n'),
+            new ColorFactory(),
+        );
     }
+
 
     /**
      * {@inheritdoc}

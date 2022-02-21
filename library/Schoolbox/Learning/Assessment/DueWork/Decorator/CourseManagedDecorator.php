@@ -8,11 +8,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use InvalidArgumentException;
 use RangeException;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
@@ -79,7 +77,6 @@ class CourseManagedDecorator implements DecoratorInterface
 
     /**
      * @param DueWork $assessment
-     * @throws ServiceNotFound
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws RangeException

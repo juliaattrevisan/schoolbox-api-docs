@@ -201,7 +201,7 @@ class Controller extends Base
      *
      * @param int $logId
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function log($logId)
@@ -216,7 +216,7 @@ class Controller extends Base
      *
      * @param int    $logId
      * @param string $format
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function logFormat($logId, $format = '')

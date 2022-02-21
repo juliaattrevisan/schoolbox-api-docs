@@ -11,7 +11,7 @@ namespace Schoolbox\Search\User;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -43,35 +43,27 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/{userId:\d+}', 'getProfile', new IsLoggedIn(), $preloadUser);
     }
 
-
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'userMapper'                    => $this->getMapperFactory()->getLazy(UserMapper::class),
-                    'roleMapper'                    => $this->getMapperFactory()->getLazy(RoleMapper::class),
-                    'folderMapper'                  => $this->getMapperFactory()->getLazy(\Schoolbox\Resource\Folder\Mapper::class),
-                    'access'                        => $this->getMapperFactory()->getLazy(Access::class),
-                    'externalUser'                  => $injector->lazyGet('externalUser'),
-                    'externalClass'                 => $injector->lazyGet('externalClass'),
-                    'profileButtonMapper'           => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
-                    'timetableColourMapper'         => $this->getMapperFactory()->getLazy(\Timetable_ColourMapper::class),
-                    'professionalDevelopmentMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\ProfessionalDevelopment\Mapper::class),
-                    'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Type\Mapper::class),
-                    'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
-                    'pastoralDataSource'            => $injector->lazyGet('pastoralDataSource'),
-                    'termMapper'                    => $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Term\Mapper::class),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('externalUser'),
+            $this->injector->get('externalClass'),
+            $this->getMapperFactory()->get(ProfileButtonMapper::class),
+            $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\ProfessionalDevelopment\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Pastoral\Type\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Pastoral\SubType\Mapper::class),
+            $this->injector->get('pastoralDataSource'),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
         );
     }
-
 
     /**
      * Preload a User instance

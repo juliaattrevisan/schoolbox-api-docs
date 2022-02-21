@@ -10,18 +10,15 @@ namespace Schoolbox\Learning;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Twig\Error\LoaderError;
 use UnexpectedValueException;
-use Aura\Di\Container;
-use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
@@ -146,7 +143,7 @@ class Module extends BaseModule
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
                 return [
-                    'filterFactoryFactory' => $this->getInjector()->get('filters.factoryFactory'),
+                    'filterFactoryFactory' => $this->injector->get('filters.factoryFactory'),
                 ];
             }
         );
@@ -200,40 +197,26 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
-    /**
-     * {@inheritdoc}
-     * @throws InvalidArgumentException If mapper class not found
-     * @throws ServiceNotFound If cannot fetch service from DI
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'assessmentMapperProxy' => $this->getInjector()->lazyGet('assessmentDataSource'),
-            'folderMapper'          => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'            => $this->getMapperFactory()->getLazy(TermMapper::class),
-            'timetableColourMapper' => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
-            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
-            'externalClass'         => $this->getInjector()->get('externalClass'),
-            'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'logMapper'             => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
-            'rosettaStone'          => $injector->lazyGet('l10n'),
-            'assessmentIdFinder'    => $injector->lazyGet('filters.assessmentIdFinder'),
-            'classListFactory'      => $injector->lazy(function () {
-                /** @var IConnector $database */
-                $database = $this->getInjector()->get('databaseInternal');
-                return new Folder\ClassListFactory($database);
-            }),
-            'database'              => $this->getInjector()->get('databaseInternal'),
-        ];
-    }
 
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        return new Controller(
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(Timetable_ColourMapper::class),
+            $this->getMapperFactory()->get(FilterSelection\Mapper::class),
+            $this->injector->get('filters.assessmentIdFinder'),
+            new Folder\ClassListFactory($this->injector->get('databaseInternal')),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Folder\Log\Mapper::class),
+            $this->injector->get('externalClass'),
+            $this->injector->get('l10n'),
+            $this->injector->get('databaseInternal'),
+        );
     }
 
     /* Getters / Setters

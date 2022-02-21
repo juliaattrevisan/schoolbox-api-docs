@@ -9,15 +9,13 @@
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
-use Aura\Di\Exception\ContainerLocked;
-use Aura\Di\Exception\ServiceNotFound;
-use Aura\Di\Exception\ServiceNotObject;
+use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
@@ -83,7 +81,6 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws ServiceNotFound
      * @throws \InvalidArgumentException
      * @throws ApplicationException
      * @throws \Exception
@@ -99,6 +96,7 @@ class Module extends BaseModule
         }
 
         // If the assessment isn't a specification - it can't be imported anywhere
+        /** @var IAssessable $assessment */
         if (!$assessment->isSpecification()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
@@ -116,31 +114,22 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * @inheritdoc
-     * @param ContainerInterface $injector
-     * @throws ServiceNotFound
-     * @throws ContainerLocked
-     * @throws ServiceNotObject
      */
-    public function initControllers(ContainerInterface $injector): void
+    public function buildController(): Base
     {
-        /** @var Container $injector */
-        $injector->set(
-            'controller:' . $this->basename,
-            $injector->lazyNew(
-                Controller::class,
-                [
-                    'access'                    => Access::getInstance(),
-                    'assessmentDataSource'      => $this->getAssessmentMapperProxy(),
-                    'unitImplementationMapper'  => $this->getUnitImplementationMapper(),
-                    'replicator'                => $injector->lazyNew(Replicator::class, [
-                        'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-                        'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                    ]),
-                    'assessmentIdFinder'        => $injector->lazyGet('filters.assessmentIdFinder'),
-                ]
-            )
+        return new Controller(
+            $this->getMapperFactory()->get(Access::class),
+            $this->getAssessmentMapperProxy(),
+            $this->getUnitImplementationMapper(),
+            new Replicator(
+                $this->getAssessmentMapperProxy(),
+                $this->getQuizMapper(),
+                $this->getMapperFactory()->get(RubricDataSource::class),
+            ),
+            $this->injector->get('filters.assessmentIdFinder'),
         );
     }
 
@@ -178,8 +167,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|AssessmentMapperProxy
-     * @throws ServiceNotFound
+     * @return AssessmentMapperProxy
      */
     protected function getAssessmentMapperProxy()
     {

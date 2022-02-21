@@ -171,7 +171,7 @@ class Controller extends BaseController
      *
      * @api GET /adminv2/messages/apps
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getApps()
     {

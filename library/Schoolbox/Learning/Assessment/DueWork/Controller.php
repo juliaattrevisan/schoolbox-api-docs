@@ -10,7 +10,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
-use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
@@ -781,7 +780,6 @@ class Controller extends Assessment\Controller
      *
      * @param Model $assessment
      * @param User              $student
-     * @throws ServiceNotFound If unable to locate HTML web Output in DI
      * @since 165
      * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      */
@@ -964,7 +962,6 @@ class Controller extends Assessment\Controller
      * @throws MapperException\Deleted If specified Response is deleted
      * @throws PDOException If unable to save the Response
      * @throws RouteNotFound If unable to generate a specified Route
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      * @throws LogicException If files are not saved prior to insertion into kami upload queue
      * @throws \Schoolbox\File\Exception

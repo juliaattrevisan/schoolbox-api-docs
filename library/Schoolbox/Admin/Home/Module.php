@@ -12,13 +12,12 @@ namespace Schoolbox\Admin\Home;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Database;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Aura\Di\Container;
-use Aura\Di\ContainerInterface;
+use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\Log\Mapper as LogMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 class Module extends BaseModule
@@ -55,26 +54,17 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
-     * @param Container|ContainerInterface $injector
+     * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function buildController(): Base
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            'configMapper'     => $this->getMapperFactory()->getLazy(ConfigMapper::class),
-            'kamiConnector'    => $this->getInjector()->lazyGet('kamiConnector'),
-            'databaseFactory'  => $this->getInjector()->lazyGet('databaseFactory'),
-            'databaseExternal' => $injector->lazyGet('databaseExternal'),
-//            'databaseExternal' => $injector->lazy(
-//                static function () use ($injector) {
-//                    try {
-//                        return $injector->get('databaseExternal');
-//                    } catch (Database\Exception $e) {
-//                        return null;
-//                    }
-//                }
-//            ),
-        ]));
+        return new Controller(
+            $this->injector->get('kamiConnector'),
+            $this->injector->get('databaseFactory'),
+            $this->injector->get('databaseExternal'),
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(LogMapper::class),
+        );
     }
 
 
