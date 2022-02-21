@@ -7,7 +7,7 @@
 import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
 import { getIndex } from '@js/util/domUtils';
-import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
+import HorizontalScoller from '@schoolboxVuecomponents/scroll/horizontal-scoller';
 
 const BADGE_ANIMATE_DURATION = 0.3;
 

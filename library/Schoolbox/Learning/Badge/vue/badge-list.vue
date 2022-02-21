@@ -1,7 +1,7 @@
 <script>
 
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
+import Toast from '@schoolboxVuecomponents/toast';
+import RevealModal from '@schoolboxVuecomponents/reveal-modal';
 import BadgeAward from "../Award/vue/badgeAward";
 import BadgeDetail from './badgeDetail';
 import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';

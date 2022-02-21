@@ -6,8 +6,8 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
-import Toast from '@vue/components/toast';
+import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer';
+import Toast from '@schoolboxVuecomponents/toast';
 import FilterEvents from './similarityReportFilterEvents';
 import SimilarityReportRowStudent from './similarity-report-row-student';
 import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
@@ -408,7 +408,7 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVuecomponents/vueTables2/vueTables2';
 @import './similarity-report';
 
 .VuePagination {

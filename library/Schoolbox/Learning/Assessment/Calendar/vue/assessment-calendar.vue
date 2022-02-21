@@ -5,14 +5,14 @@ import interactionPlugin  from '@fullcalendar/interaction'
 import dayGridPlugin      from '@fullcalendar/daygrid'
 import timeGridPlugin     from '@fullcalendar/timegrid'
 import adaptivePlugin     from '@fullcalendar/adaptive'
-import RevealModal        from '@vue/components/reveal-modal'
-import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
+import RevealModal        from '@schoolboxVuecomponents/reveal-modal'
+import ViewEventModal     from '@schoolboxVuecomponents/fullcalendar/view-event-modal';
 import axios              from 'axios'
-import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@schoolboxVuecomponents/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolboxVuecomponents/fullcalendar/customised-calendar-event';
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -989,7 +989,7 @@ export default {
 
 <style lang="scss">
 
-@import "@vue/components/fullcalendar/styles/calendar";
+@import "@schoolboxVuecomponents/fullcalendar/styles/calendar";
 
 // Please forgive me...
 

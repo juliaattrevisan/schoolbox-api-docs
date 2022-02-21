@@ -4,9 +4,9 @@
  * Provides UI for deleting selected rows and processing a confirmed request
  */
 
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer.vue';
-import Toast from '@vue/components/toast.vue';
-import RevealModal from '@vue/components/reveal-modal.vue';
+import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer.vue';
+import Toast from '@schoolboxVuecomponents/toast.vue';
+import RevealModal from '@schoolboxVuecomponents/reveal-modal.vue';
 
 
 export default {

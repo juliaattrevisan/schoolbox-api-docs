@@ -1,12 +1,12 @@
 <script>
 
 import axios  from 'axios';
-import MediaArticle from '@vue/components/media-article';
-import Storage from '@vue/components/storage';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
-import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
-import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import MediaArticle from '@schoolboxVuecomponents/media-article';
+import Storage from '@schoolboxVuecomponents/storage';
+import Toast from '@schoolboxVuecomponents/toast';
+import RevealModal from '@schoolboxVuecomponents/reveal-modal';
+import AddCommentInput from '@schoolboxVuecomponents/ckeditor/add-comment-input';
+import cdnPrefixMixin from '@schoolboxVuecomponents/cdn-prefix-mixin';
 
 
 export default {

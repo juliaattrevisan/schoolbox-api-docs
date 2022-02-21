@@ -1,8 +1,8 @@
 <script>
 
 import axios from 'axios';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
+import Toast from '@schoolboxVuecomponents/toast';
+import RevealModal from '@schoolboxVuecomponents/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
 const EVENT_BEFORE_UNLOAD = 'beforeunload';

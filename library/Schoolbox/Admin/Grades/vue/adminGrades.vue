@@ -1,7 +1,7 @@
 <script>
 
-import RevealModal from "@vue/components/reveal-modal";
-import Toast from "@vue/components/toast";
+import RevealModal from "@schoolboxVuecomponents/reveal-modal";
+import Toast from "@schoolboxVuecomponents/toast";
 
 export default {
     components: {

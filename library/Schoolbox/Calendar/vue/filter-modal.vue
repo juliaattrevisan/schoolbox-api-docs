@@ -1,6 +1,6 @@
 <script>
 import tinycolor from 'tinycolor2';
-import RevealModal from "@vue/components/reveal-modal";
+import RevealModal from "@schoolboxVuecomponents/reveal-modal";
 
 const FILTER_CHANGED = "filterChanged";
 

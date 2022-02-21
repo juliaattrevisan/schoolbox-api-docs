@@ -1,7 +1,7 @@
 <script>
     
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import footerUI from '@schoolboxVuecomponents/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -168,7 +168,7 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVuecomponents/vueTables2/vueTables2';
 
 </style>
 

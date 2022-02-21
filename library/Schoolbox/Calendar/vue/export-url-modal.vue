@@ -1,5 +1,5 @@
 <script>
-    import RevealModal from '@vue/components/reveal-modal';
+    import RevealModal from '@schoolboxVuecomponents/reveal-modal';
     import ClipboardJs from 'clipboard/dist/clipboard';
 
     export default {

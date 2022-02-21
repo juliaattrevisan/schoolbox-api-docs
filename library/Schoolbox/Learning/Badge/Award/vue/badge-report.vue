@@ -10,7 +10,7 @@ import { isObject, convertObjectToArray } from '@js/util/jsUtils';
 import BadgeReportHeader from './badge-report-header';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVuecomponents/bottomDrawer/bottom-drawer';
 
 
 export default {
