@@ -53,21 +53,30 @@ class Historical
 
 
     /**
+     * @var \Schoolbox\Resource\Storage\Mapper
+     */
+    private \Schoolbox\Resource\Storage\Mapper $storageMapper;
+
+
+    /**
      * Historical constructor.
      *
      * @param File\Mapper                                                                $turnitinFileMapper
      * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
+     * @param \Schoolbox\Resource\Storage\Mapper                                         $storageMapper
      * @param bool                                                                       $perform
      * @param LoggerInterface|null                                                       $log
      */
     public function __construct(
         File\Mapper $turnitinFileMapper,
         \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        \Schoolbox\Resource\Storage\Mapper $storageMapper,
         bool $perform,
         ?LoggerInterface $log = null
     ) {
         $this->turnitinFileMapper = $turnitinFileMapper;
         $this->singleFileMapper = $singleFileMapper;
+        $this->storageMapper = $storageMapper;
         $this->perform = $perform;
         $this->log = $log;
     }
@@ -113,10 +122,11 @@ class Historical
          *
          * Ignore submission_boxes that did not enable similarity check
          */
-        $query = '
+        $query = "
             SELECT 
                 sb.id AS submission_box_id, sb.name AS submission_box_name, 
-                ssf.id
+                ssf.*,
+                s.*
             FROM submission_box sb
             INNER JOIN (
                 SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
@@ -126,6 +136,7 @@ class Historical
             ) maxdates ON sb.id = maxdates.box_id
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+            INNER JOIN storage s ON ssf.hash = s.hash
             INNER JOIN assessment a ON sb.assessment_id = a.id
             LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
             WHERE ss.submitted_at >= :startDate
@@ -135,7 +146,7 @@ class Historical
             AND a.deleted_at IS NULL
             AND sb.similarity_check_enabled = 1
             ORDER BY ssf.id
-        ';
+        ";
 
         $statement = $this->turnitinFileMapper->getDatabase()->prepare($query);
         $statement->execute([
@@ -145,22 +156,15 @@ class Historical
 
         $rows = $statement->fetchAll();
 
-        /* Find the ids so we can hydrate instances easier
-         */
-        $ids = [];
-
-        foreach ($rows as $row) {
-            $ids[] = $row['id'];
-        }
-
-        $singleFiles = $this->singleFileMapper->findByColumn('id', $ids)->indexBy('id');
-
         $numFiles = 0;
 
         /* Build a collection of models
          */
         foreach ($rows as $row) {
-            $singleFile = $singleFiles->getOffset($row['id']);
+            $singleFile = $this->singleFileMapper->hydrate($row);
+            $storage = $this->storageMapper->hydrate($row);
+
+            $singleFile->setStorage($storage);
 
             /* All files discovered for historical addition must adhere to the usual criteria
              */
