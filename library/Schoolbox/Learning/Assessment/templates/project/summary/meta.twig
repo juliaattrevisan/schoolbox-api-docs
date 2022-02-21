@@ -25,10 +25,12 @@
             {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
         </li>
         {% for parent in lastViews.parents %}
-            <li class="icon-staff">
-                <span title="{{ parent.date }}">{{ parent.name }}</span>
-                {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
-            </li>
+            {% if parent.date is not null %}
+                <li class="icon-staff">
+                    <span title="{{ parent.date }}">{{ parent.name }}</span>
+                    {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
+                </li>
+            {% endif %}
         {% endfor %}
     {% endif %}
 </ul>
