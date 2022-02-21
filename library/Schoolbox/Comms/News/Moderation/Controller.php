@@ -69,7 +69,7 @@ class Controller extends Base
      *
      * @api GET /news/moderation
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function getList(): void

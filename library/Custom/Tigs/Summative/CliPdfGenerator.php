@@ -106,7 +106,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      * @inheritdoc
      * @throws RuntimeException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws InvalidArgumentException

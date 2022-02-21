@@ -202,7 +202,7 @@ class Module extends BaseModule
 
     /**
      * @return News\Audience\Segment\StrategyFactory|object
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): News\Audience\Segment\StrategyFactory
     {

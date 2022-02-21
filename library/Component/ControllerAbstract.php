@@ -130,7 +130,7 @@ abstract class Component_ControllerAbstract
     /**
      * @return Alaress\Authorizer\Authorizer|object
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getAuthorizer(): Alaress\Authorizer\Authorizer
     {
@@ -141,7 +141,7 @@ abstract class Component_ControllerAbstract
     /**
      * @return Router|object
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getRouter()
     {

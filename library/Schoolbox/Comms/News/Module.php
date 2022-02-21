@@ -299,7 +299,7 @@ class Module extends BaseModule
 
     /**
      * @return StrategyFactory|object
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getStrategyFactory(): StrategyFactory
     {

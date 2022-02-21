@@ -113,7 +113,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      * @throws \Alaress\Database\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function preloadUser(array $params): array
     {

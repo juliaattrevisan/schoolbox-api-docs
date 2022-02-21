@@ -56,7 +56,7 @@ class Module extends BaseModule
      * @throws \InvalidArgumentException If mapper class not found
      * @throws MapperException\Deleted If a deleted assessment is requested
      * @throws \UnexpectedValueException If the kami files owner is not a participant
-     * @throws \Aura\Di\Exception\ServiceNotFound If unable to find service in DI
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface If unable to find service in DI
      * @throws NotFound If the requested Kami Doc has not finished processing
      * @throws OutOfBoundsException
      */
@@ -139,7 +139,7 @@ class Module extends BaseModule
 
     /**
      * @return object|Kami\IConnector
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     private function getKamiConnector()
     {
@@ -216,7 +216,7 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array [ assessment, participant, response ]
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
@@ -272,7 +272,7 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array [ assessment, response, turnitin ]
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
@@ -321,7 +321,7 @@ class Module extends BaseModule
     /**
      * @param array $params
      * @return array [ assessment, response, plagscan ]
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \UnexpectedValueException
@@ -404,7 +404,7 @@ class Module extends BaseModule
      * @return array
      * @throws MapperException\Deleted If the assessment the kami belongs to is deleted
      * @throws OutOfBoundsException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \InvalidArgumentException If mapper class not found
      * @throws \UnexpectedValueException If the kami files owner is not a participant
      */
@@ -472,7 +472,7 @@ class Module extends BaseModule
 
     /**
      * @return object|IConfigLoader
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getConfigLoader()
     {
@@ -482,7 +482,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentMapperProxy
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getAssessmentMapperProxy()
     {
@@ -492,7 +492,7 @@ class Module extends BaseModule
 
     /**
      * @return object|ResponseMapperProxy
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getResponseMapperProxy()
     {
@@ -502,7 +502,7 @@ class Module extends BaseModule
 
     /**
      * @return object|FeedbackMapperProxy
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getFeedbackMapperProxy()
     {

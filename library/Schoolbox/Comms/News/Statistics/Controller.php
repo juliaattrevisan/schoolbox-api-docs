@@ -84,7 +84,7 @@ class Controller extends Base
      * @param News\Model $article
      * @throws \Alaress\Database\Exception
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \PDOException
      */
     public function getOverview(News\Model $article): void
@@ -155,7 +155,7 @@ class Controller extends Base
 
     /**
      * @param News\Model $article
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getVisitation(News\Model $article): void
     {

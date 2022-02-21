@@ -209,7 +209,7 @@ abstract class AbstractController extends BaseController
      * @param int $folderId
      * @throws Mapper\Exception
      * @throws Resource\Exception
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function browse(?int $folderId)

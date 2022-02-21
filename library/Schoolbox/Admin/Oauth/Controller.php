@@ -39,7 +39,7 @@ class Controller extends ConfigController
     /**
      * Renders the module admin page
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @api   GET /adminv2/oauth

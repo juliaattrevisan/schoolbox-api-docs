@@ -19,7 +19,7 @@ class Admin implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function configure($kernel)
     {

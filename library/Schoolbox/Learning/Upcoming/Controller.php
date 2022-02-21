@@ -173,7 +173,7 @@ class Controller extends Base
      * @param User                $student
      * @param Alaress_Date_Format $date
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws DomainException
      * @throws InvalidArgumentException

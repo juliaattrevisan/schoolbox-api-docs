@@ -264,7 +264,7 @@ class Mapper extends BaseMapper
      * Saves a record in external markbook system.
      *
      * @param Model $object
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function syncToExternalMarkbook(Model $object): void
     {
@@ -280,7 +280,7 @@ class Mapper extends BaseMapper
      * Removes this assessment from the external markbook.
      *
      * @param Model $object
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function deleteFromMarkbook(Model $object): void
     {

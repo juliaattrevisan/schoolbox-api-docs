@@ -210,7 +210,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -228,7 +228,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -248,7 +248,7 @@ class Module extends BaseModule
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -279,7 +279,7 @@ class Module extends BaseModule
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws Mapper\DefinitionException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \DomainException
      * @throws \LogicException
      * @throws \UnexpectedValueException
@@ -332,7 +332,7 @@ class Module extends BaseModule
 
     /**
      * @return object|AssessmentDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getAssessmentDataSource()
     {
@@ -341,7 +341,7 @@ class Module extends BaseModule
 
     /**
      * @return object|ParticipantDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getParticipantDataSource()
     {
@@ -350,7 +350,7 @@ class Module extends BaseModule
 
     /**
      * @return object|ResponseDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getResponseDataSource()
     {
@@ -359,7 +359,7 @@ class Module extends BaseModule
 
     /**
      * @return object|FeedbackDataSource
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getFeedbackDataSource()
     {

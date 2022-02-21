@@ -59,7 +59,7 @@ class Controller extends Base
     /**
      * Load $templateName
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getIndex()
     {
@@ -95,7 +95,7 @@ class Controller extends Base
     /**
      * Load $templateName
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function restoreFolder()
     {
@@ -117,7 +117,7 @@ class Controller extends Base
     /**
      * Load $templateName
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function restoreAssessment()
     {

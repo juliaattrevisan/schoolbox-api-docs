@@ -170,7 +170,7 @@ class Controller extends Web\Controller\Base
      *
      * @api POST /api/admin/process
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     public function postProcess()

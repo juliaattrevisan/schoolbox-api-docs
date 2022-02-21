@@ -47,7 +47,7 @@ class Controller extends Base
      * Provide form
      *
      * @param User $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getExample(User $user)
     {

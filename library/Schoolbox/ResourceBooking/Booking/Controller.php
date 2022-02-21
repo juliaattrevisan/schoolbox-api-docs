@@ -610,7 +610,7 @@ class Controller extends Base
      *
      * @param Item\Model $item
      * @throws \DomainException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Exception
      */
     public function bookingCalendar(Item\Model $item)

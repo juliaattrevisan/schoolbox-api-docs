@@ -68,7 +68,7 @@ class Controller extends AbstractController
      * List of ItineraryItems and the Match they are in
      *
      * @param Matchup $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getList($context = null)
@@ -105,7 +105,7 @@ class Controller extends AbstractController
      * View a single Itinerary Item
      *
      * @param Model $entity
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Application\Exception\Exception
      */
     public function getEntity($entity)
@@ -142,7 +142,7 @@ class Controller extends AbstractController
      *
      * @param Model $entity
      * @param Matchup $context
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function getForm($entity, $context = null)

@@ -35,7 +35,7 @@ class Controller extends Base
     /**
      * get Assignments
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getAssignments()
     {

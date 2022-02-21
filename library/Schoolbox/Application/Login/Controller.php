@@ -50,7 +50,7 @@ class Controller extends Base
      *
      * @param string|null $error
      * @param string|null $page
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getLogin($error = null, $page = null): void
     {
@@ -134,7 +134,7 @@ class Controller extends Base
      * @api   POST /login
      * @since 18.2
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function postLogin(): void
     {

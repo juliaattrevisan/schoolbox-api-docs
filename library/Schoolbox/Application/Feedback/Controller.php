@@ -33,7 +33,7 @@ class Controller extends Base
      * @api   GET /feedback
      * @since 18.2
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getFeedback(): void
     {
@@ -54,7 +54,7 @@ class Controller extends Base
      * @api   GET /feedback/thank-you
      * @since 18.2
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getFeedbackReceipt()
     {

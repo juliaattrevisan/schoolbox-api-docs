@@ -70,7 +70,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      * Loads the grid component into its set configuration.
      *
      * @return true
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\DefinitionException
      */

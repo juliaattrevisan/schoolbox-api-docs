@@ -36,7 +36,7 @@ class Renderer extends Base
      *
      * @param MapperResult $mapperResult
      * @param string       $type
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \RuntimeException
      */
     public function render(MapperResult $mapperResult, $type): void

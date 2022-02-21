@@ -45,7 +45,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \RuntimeException
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)

@@ -102,7 +102,7 @@ class Controller extends Base\Base
      * @param null|Folder\Model              $targetClass Null if a '0' in URL.
      * @param null|Component_Instance        $component   Null if not specified in URL
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getImport(
         ?CourseSpecification\Model $courseSpec,
@@ -166,7 +166,7 @@ class Controller extends Base\Base
      * @throws Base\Exception
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function postClasses()
     {

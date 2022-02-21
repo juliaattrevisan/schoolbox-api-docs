@@ -194,7 +194,7 @@ class Controller extends Base
      * Builds a logger for use in the importer.
      *
      * @return CacheableLoggerInterface
-     * @throws \Aura\Di\Exception\ServiceNotFound if the logger wasn't found?
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface if the logger wasn't found?
      */
     protected function buildLogger(): CacheableLoggerInterface
     {
