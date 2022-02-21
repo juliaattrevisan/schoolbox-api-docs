@@ -52,7 +52,7 @@ function initListeners () {
  */
 function initOnProcessingStartListener () {
     document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
-        updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
+        updateDraggablesStatus(false); //ensure all are disabled while process is active
     });
 }
 
@@ -90,12 +90,13 @@ function initDraggables () {
  * @returns { Draggable }
  */
 function addNewDraggable (component) {
-    component.addEventListener('click', (event) => onNewComponentClicked(event));
+    component.addEventListener('click', (event) => event.preventDefault());
     component.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(component, {
         type: 'x, y',
         trigger: component,
         autoScroll: 1,
+        onClick: (event) => onNewComponentClicked(event),
         onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
@@ -110,39 +111,35 @@ function addNewDraggable (component) {
  * @param { MouseEvent }  
  */
 function onNewComponentClicked (event) {
+
+    __hasNewComponent = true;
+    __isFlipping = true;
+
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+    updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+    reinsertNewComponentButton();
+
+    const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
     
-    event.preventDefault();
-    
-    if (!__hasNewComponent) { //ensure there's no rapid fire going on
+    const topContainer = document.querySelector('[data-position="top"]');
+    insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
+    __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
+    __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
 
-        __hasNewComponent = true;
-        __isFlipping = true;
-
-        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
-        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-        reinsertNewComponentButton();
-
-        const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
-        
-        const topContainer = document.querySelector('[data-position="top"]');
-        insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
-        __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
-        __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
-
-        Flip.from(state, {
-            absolute: true, //to accurately animate elements
-            duration: ANIMATE_SPEED * 2,
-            ease: "power1.inOut",
-            nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
-            zIndex: 9999, //ensure it stays on top
-            onComplete: () => {
-                __isFlipping = false;
-                __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-                addNewComponent();
-            },
-        });
-
-    }
+    Flip.from(state, {
+        absolute: true, //to accurately animate elements
+        duration: ANIMATE_SPEED * 2,
+        ease: "power1.inOut",
+        nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
+        zIndex: 9999, //ensure it stays on top
+        onComplete: () => {
+            __isFlipping = false;
+            gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
+            __newComponent.style.position = 'static'; //was absolute, now sitting as it should
+            __newComponent.style.transform = 'translate3d(0, 0, 0)'; //ensure the gsap movement is reset
+            addNewComponent();
+        },
+    });
 
 }
 
@@ -175,7 +172,7 @@ function onNewComponentClicked (event) {
 function onDragStart (event) {
     updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
-    __referenceElement = getReferenceElement(); //to use a refernce where the new component is / where it will be dragged to
+    __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractNewComponent();
@@ -252,6 +249,7 @@ function extractNewComponent () {
         top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
         left: `${__referenceElement.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        transform: 'translate3d(0, 0, 0)',
     });
 }
 
@@ -474,6 +472,7 @@ function onAlignNewComponentComplete () {
 function resetNewComponent () {
     gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __newComponent.style.position = 'static'; //was absolute, now sitting as it should
+    __newComponent.style.transform = 'translate3d(0, 0, 0)'; //ensure the dragging movement is reset
     __newComponent.setAttribute('data-component', ''); //so it can be dragged again
     insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
