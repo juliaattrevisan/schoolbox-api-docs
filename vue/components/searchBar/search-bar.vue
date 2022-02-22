@@ -73,19 +73,6 @@ export default {
         },
 
         /**
-         * Close the search results as focus has been lost
-         */
-        lostFocus () {
-            this.isFocused = false;
-            this.arrowCounter = -1; // Reset arrow pointer to none
-
-            /**
-             * Revert back the z-index value back to the default value of 1001
-             */
-            document.querySelector('#menu-toggle').classList.remove('search-is-active');
-        },
-
-        /**
          * Display the search results
          * 
          * @param { Event }
@@ -165,7 +152,7 @@ export default {
 </script>
 
 <template>
-    <form id="search" class="global-search" action="/search" v-bind:class="{focus: isFocused}">
+    <form id="search" class="global-search" action="/search" :class="{focus: isFocused}">
         <input id="search-field"
                type="text"
                name="keyword"
@@ -180,7 +167,6 @@ export default {
                @mouseover="onFocusOver"
                @blur="isFocused=false"
                @focusout="isFocused=false"
-               v-click-outside="lostFocus"
                maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
@@ -188,9 +174,9 @@ export default {
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @click="goToPath(paths.userPage + result.id)" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
+                <a class="link-row" @click="goToPath(paths.userPage + result.id)" @mousedown.left="goToPath(paths.userPage + result.id)" :class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
                     <div class="card small-12">
-                        <img v-bind:src="formatPortrait(result.id)">
+                        <img :src="formatPortrait(result.id)" alt="portrait photo">
                         <h3 class="name">{{ result.formattedName }}</h3>
                         <p class="meta">{{ result.metadata }}</p>
                     </div>
