@@ -1,10 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import CanvasAssignments from './canvas-assignments';
 
-new Vue({
-    el: '#canvas-assignments-container',
+createApp({
     components: {
         CanvasAssignments
     }
-});
-
+}).mount('#canvas-assignments-container');
