@@ -168,7 +168,7 @@ class Classes implements IStrategy
                  */
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Looking for ext_timetable_code %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],
@@ -350,9 +350,10 @@ class Classes implements IStrategy
         $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
+            'Creating class period relation for teacher %s %s (%s) in room %s',
             $mainTeacher['firstname'],
             $mainTeacher['surname'],
+            $teacherExternalId,
             $class['room']['name']
         ));
 
@@ -394,7 +395,7 @@ class Classes implements IStrategy
          */
         if ($involvement->count()) {
             $this->log->debug(sprintf(
-                'Reusing class involvement %s %s for %s (user %s)',
+                'Reusing class involvement %s %s for %s (%s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
                 "{$person['firstname']} {$person['surname']}",
@@ -411,7 +412,7 @@ class Classes implements IStrategy
                                                                   ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for %s (user %s)',
+            'Creating class involvement %s %s for %s (%s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
             "{$person['firstname']} {$person['surname']}",

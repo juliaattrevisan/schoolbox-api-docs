@@ -255,7 +255,7 @@ class Classes implements IStrategy
         try {
             $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Reusing previously-saved class %s %s with id %s',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
@@ -328,9 +328,10 @@ class Classes implements IStrategy
         $timetableClassPeriod->setTeacher($class['teachers']['username']);
 
         $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
+            'Creating class period relation for teacher %s %s (%s) in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
+            $class['teachers']['username'],
             $class['period']['room']['name'],
             $class['period']['day'],
             $class['period']['sequence'],
@@ -373,8 +374,8 @@ class Classes implements IStrategy
         /* Relation already exists; nothing to change
          */
         if ($involvement->count()) {
-            $this->log->info(sprintf(
-                'Reusing class involvement %s %s for %s (user %s)',
+            $this->log->debug(sprintf(
+                'Reusing class involvement %s %s for %s (%s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
                 "{$person['firstname']} {$person['surname']}",
@@ -391,7 +392,7 @@ class Classes implements IStrategy
                                                                   ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for %s (user %s)',
+            'Creating class involvement %s %s for %s (%s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
             "{$person['firstname']} {$person['surname']}",

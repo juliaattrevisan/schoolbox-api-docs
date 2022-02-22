@@ -458,7 +458,7 @@ class Profile implements IStrategy
             if (isset($this->siblingLinks[$siblingLink][$caregiverIndex])) {
                 $externalId = $this->siblingLinks[$siblingLink][$caregiverIndex];
 
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Reusing parent external id %s for %s',
                     $externalId,
                     trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")

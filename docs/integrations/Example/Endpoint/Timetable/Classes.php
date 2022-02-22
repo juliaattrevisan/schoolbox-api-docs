@@ -185,7 +185,7 @@ class Classes implements IStrategy
                  */
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Looking for ext_timetable_code %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],
@@ -263,7 +263,7 @@ class Classes implements IStrategy
         try {
             $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Reusing previously-saved class %s %s with id %s',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
@@ -323,7 +323,7 @@ class Classes implements IStrategy
                 'period_id' => $period->getId()
             ]);
 
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Reusing previously saved class period %s using period_id %s, with id %s',
                 $timetableClass->getName(),
                 $period->getId(),
@@ -356,9 +356,10 @@ class Classes implements IStrategy
         $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
 
         $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
+            'Creating class period relation for teacher %s %s (%s) in room %s',
             $class['teachers']['firstname'],
             $class['teachers']['surname'],
+            $class['teachers']['externalId'],
             $class['room']['name']
         ));
 
@@ -399,8 +400,8 @@ class Classes implements IStrategy
         /* Relation already exists; nothing to change
          */
         if ($involvement->count()) {
-            $this->log->info(sprintf(
-                'Reusing class involvement %s %s for %s (user %s)',
+            $this->log->debug(sprintf(
+                'Reusing class involvement %s %s for %s (%s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
                 "{$person['firstname']} {$person['surname']}",
@@ -417,7 +418,7 @@ class Classes implements IStrategy
                                                                   ->setClass($timetableClass);
 
         $this->log->info(sprintf(
-            'Creating class involvement %s %s for %s (user %s)',
+            'Creating class involvement %s %s for %s (%s)',
             $timetableClass->getName(),
             $timetableClass->getCode(),
             "{$person['firstname']} {$person['surname']}",
