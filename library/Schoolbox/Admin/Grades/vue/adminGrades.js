@@ -1,9 +1,8 @@
-import Vue from "vue";
-import AdminGrades from './adminGrades.vue';
+import { createApp } from 'vue';
+import AdminGrades from './admin-grades';
 
-new Vue({
-    el: '#admin-grades',
-    render: function (createElement) {
-        return createElement(AdminGrades)
+createApp({
+    components: {
+        AdminGrades
     }
-});
+}).mount('#admin-grades');
