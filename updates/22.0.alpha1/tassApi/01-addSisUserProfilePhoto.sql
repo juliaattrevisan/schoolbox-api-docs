@@ -1,26 +1,2 @@
 ALTER TABLE sis_user_profile
     ADD COLUMN `portrait_hash` varchar(100) CHARACTER SET ascii DEFAULT NULL AFTER `lastname`;
-INSERT INTO config (name,
-                    value,
-                    title,
-                    description,
-                    field_id,
-                    options,
-                    type_id,
-                    editable,
-                    hidden,
-                    required,
-                    module,
-                    sequence)
-VALUES ('schooldata_import_include_photo',
-        0,
-        'Include photo',
-        'If true, photos will be imported (only for Tass API.',
-        (SELECT id FROM lu_config_field WHERE field = 'boolean'),
-        '',
-        null,
-        'true',
-        'false',
-        'false',
-        'schoolData',
-        (SELECT MAX(sequence) + 1 FROM config c WHERE module = 'schoolData'));
