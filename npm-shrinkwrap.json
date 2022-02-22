@@ -35,7 +35,8 @@
         "tinycolor2": "^1.4.2",
         "ts-ebml": "^2.0.2",
         "videojs-record": "^4.4.0",
-        "vue": "^3.2.31"
+        "vue": "^3.2.31",
+        "vue3-resize": "^0.2.0"
       },
       "devDependencies": {
         "@babel/core": "^7.12.10",
@@ -53,6 +54,7 @@
         "source-map-loader": "^0.2.4",
         "style-loader": "^2.0.0",
         "vue-loader": "^17.0.0",
+        "vue-style-loader": "^4.1.3",
         "webpack": "^5.28.0",
         "webpack-cli": "^4.5.0",
         "webpack-remove-empty-scripts": "^0.7.1"
@@ -6003,6 +6005,30 @@
         "node": ">=8"
       }
     },
+    "node_modules/vue-style-loader": {
+      "version": "4.1.3",
+      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz",
+      "integrity": "sha512-sFuh0xfbtpRlKfm39ss/ikqs9AbKCoXZBpHeVZ8Tx650o0k0q/YCM7FRvigtxpACezfq6af+a7JeqVTWvncqDg==",
+      "dev": true,
+      "dependencies": {
+        "hash-sum": "^1.0.2",
+        "loader-utils": "^1.0.2"
+      }
+    },
+    "node_modules/vue-style-loader/node_modules/hash-sum": {
+      "version": "1.0.2",
+      "resolved": "https://registry.npmjs.org/hash-sum/-/hash-sum-1.0.2.tgz",
+      "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ=",
+      "dev": true
+    },
+    "node_modules/vue3-resize": {
+      "version": "0.2.0",
+      "resolved": "https://registry.npmjs.org/vue3-resize/-/vue3-resize-0.2.0.tgz",
+      "integrity": "sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==",
+      "peerDependencies": {
+        "vue": "^3.0.0"
+      }
+    },
     "node_modules/watchpack": {
       "version": "2.1.1",
       "resolved": "https://registry.npmjs.org/watchpack/-/watchpack-2.1.1.tgz",
@@ -11267,6 +11293,30 @@
           }
         }
       }
+    },
+    "vue-style-loader": {
+      "version": "4.1.3",
+      "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz",
+      "integrity": "sha512-sFuh0xfbtpRlKfm39ss/ikqs9AbKCoXZBpHeVZ8Tx650o0k0q/YCM7FRvigtxpACezfq6af+a7JeqVTWvncqDg==",
+      "dev": true,
+      "requires": {
+        "hash-sum": "^1.0.2",
+        "loader-utils": "^1.0.2"
+      },
+      "dependencies": {
+        "hash-sum": {
+          "version": "1.0.2",
+          "resolved": "https://registry.npmjs.org/hash-sum/-/hash-sum-1.0.2.tgz",
+          "integrity": "sha1-M7QHd3VMZDJXPBIMw4CLvRDUfwQ=",
+          "dev": true
+        }
+      }
+    },
+    "vue3-resize": {
+      "version": "0.2.0",
+      "resolved": "https://registry.npmjs.org/vue3-resize/-/vue3-resize-0.2.0.tgz",
+      "integrity": "sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==",
+      "requires": {}
     },
     "watchpack": {
       "version": "2.1.1",

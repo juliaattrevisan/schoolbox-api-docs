@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
@@ -369,7 +370,7 @@ module.exports = {
     },
     resolve: { //https://webpack.js.org/configuration/resolve/
         alias: {
-            'vue$': 'vue/dist/vue.runtime.esm-bundler.js',
+            'vue$': 'vue/dist/vue.esm-bundler.js',
             '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
@@ -381,6 +382,10 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
+        new webpack.DefinePlugin({
+            __VUE_OPTIONS_API__: JSON.stringify(true),
+            __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+        }),
         new VueLoaderPlugin(),
         new RemoveEmptyScriptsPlugin(),
     ]
