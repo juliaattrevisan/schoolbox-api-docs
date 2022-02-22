@@ -557,4 +557,37 @@ class ReaderTest extends TestCase
             $outcome[] = $row;
         }
     }
+
+    /**
+     * What happens when you have a csv with a BOM character, it should remove the BOM char and continue
+     */
+    public function testValidBOMChar()
+    {
+        $expectedColumns = ['External ID', 'Type', 'Username', 'Title', 'Firstname', 'Surname', 'Email', 'Mobile', 'Home Phone', 'Work Phone'];
+
+        $reader = (new Reader(__DIR__ . '/bomChar.csv', true, false))
+            ->setExpectedColumns($expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+        $expected = [
+            [
+                'External ID' => 'PCL1-3861',
+                'Type' => 'Parent',
+                'Username' => 'CL1-3861',
+                'Title' => 'Mr & Mrs',
+                'Firstname' => 'Mic & Michelle',
+                'Surname' => 'Dempsey',
+                'Email' => 'test@user.edu.au',
+                'Mobile' => '12345678',
+                'Home Phone' => '12345678',
+                'Work Phone' => '12345678'
+            ]
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
 }
