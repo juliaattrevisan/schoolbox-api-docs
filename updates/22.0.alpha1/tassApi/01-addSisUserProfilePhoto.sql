@@ -1,7 +1,26 @@
 ALTER TABLE sis_user_profile
     ADD COLUMN `portrait_hash` varchar(100) CHARACTER SET ascii DEFAULT NULL AFTER `lastname`;
--- Turn off photo_sis_import for TassApi, as this should be enabled after enabling the feature in TASS
-UPDATE config
-SET value =
-        IF((SELECT value FROM config WHERE name = 'schooldata_import_data_source') = 'tassapi', 0, value)
-WHERE name = 'photo_sis_import';
+INSERT INTO config (name,
+                    value,
+                    title,
+                    description,
+                    field_id,
+                    options,
+                    type_id,
+                    editable,
+                    hidden,
+                    required,
+                    module,
+                    sequence)
+VALUES ('schooldata_import_include_photo',
+        0,
+        'Include photo',
+        'If true, photos will be imported (only for Tass API.',
+        (SELECT id FROM lu_config_field WHERE field = 'boolean'),
+        '',
+        null,
+        'true',
+        'false',
+        'false',
+        'schoolData',
+        (SELECT MAX(sequence) + 1 FROM config c WHERE module = 'schoolData'));

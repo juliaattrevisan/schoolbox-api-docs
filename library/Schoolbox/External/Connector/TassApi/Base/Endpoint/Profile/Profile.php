@@ -23,7 +23,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\Mapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 
 /**
@@ -169,11 +169,17 @@ class Profile implements IStrategy
     private bool $includePhoto;
 
     /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Api[]                           $api
+     * @param bool                            $includePhoto
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
@@ -184,12 +190,13 @@ class Profile implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param bool                            $includePhoto
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         array $api,
+        bool $includePhoto,
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
@@ -200,11 +207,12 @@ class Profile implements IStrategy
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-        bool $includePhoto
+        StorageMapper $storageMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
@@ -215,7 +223,7 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
-        $this->includePhoto = $includePhoto;
+        $this->storageMapper = $storageMapper;
     }
 
 
@@ -270,14 +278,16 @@ class Profile implements IStrategy
             ));
         }
 
-        $params = ['currentstatus' => 'current'];
-        if ($this->includePhoto) {
-            $params['includephoto'] = true;
-        }
-
-        /* Process each current student, and their parents too
+        /* Process each current student, and their parents too.
+           The includephoto parameter is available for both:
+              https://github.com/TheAlphaSchoolSystemPTYLTD/lms-integration/blob/master/getStudents.md
+              https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getStudentsDetails.md
+           Using getStudents for now, so that we don't have to make a call for each student.
          */
-        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', $params);
+        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+            'currentstatus' => 'current',
+            'includephoto'  => $this->includePhoto
+        ]);
 
         foreach ($students['students'] as $student) {
             $externalId = trim((string)$student['general_details']['student_code']);
@@ -785,12 +795,16 @@ class Profile implements IStrategy
     {
 
         /* Get a list of teaching staff
+           The includephoto parameter is available for both:
+             https://github.com/TheAlphaSchoolSystemPTYLTD/lms-integration/blob/master/getTeachers.md
+             https://github.com/TheAlphaSchoolSystemPTYLTD/employee-hr/blob/master/getEmployeesDetails.md
+           It is not available for
+             https://github.com/TheAlphaSchoolSystemPTYLTD/IdM/blob/master/GetEmployees.md
          */
-        $params = ['currentstatus' => 'current'];
-        if ($this->includePhoto) {
-            $params['includephoto'] = true;
-        }
-        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', $params);
+        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+            'currentstatus' => 'current',
+            'includephoto'  => $this->includePhoto,
+        ]);
 
         /* Get a list of non-teaching staff
          */
@@ -885,6 +899,15 @@ class Profile implements IStrategy
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
             ];
+
+            // For employees, this seems to be the only way to get photo
+//            if ($this->includePhoto && isset($this->api[Codec\DSN::MODULE_EMPLOYEE_HR])) {
+//                $detail = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
+//                    'date' => date('d/m/Y'),
+//                    'code' => (string)$employee['user_code'],
+//                    'includephoto'  => $this->includePhoto,
+//                ]);
+//            }
         }
 
         /* Combine the two sets; this contains all the staff members
@@ -1043,8 +1066,10 @@ class Profile implements IStrategy
 
         // Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
         try {
-            $portrait = Mapper::getInstance()->acceptStream($baseProfile->getExternalId() . '.jpg', $image);
-            $baseProfile->setPortrait($portrait);
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $image);
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $baseProfile->setPortrait($portrait);
+            }
         } catch (\Exception $e) {
             // noop
         }

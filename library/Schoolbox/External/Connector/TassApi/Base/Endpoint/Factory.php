@@ -21,6 +21,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 
 /**
@@ -167,6 +168,10 @@ class Factory
      */
     private bool $includePhoto;
 
+    /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
 
     /**
      * Factory constructor.
@@ -175,6 +180,7 @@ class Factory
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $key
+     * @param bool                            $includePhoto
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
@@ -190,36 +196,38 @@ class Factory
      * @param ClassEntryMapper                $classEntryMapper
      * @param ClassInvolvementMapper          $classInvolvementMapper
      * @param ClassPeriodMapper               $classPeriodMapper
-     * @param bool                            $includePhoto
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         string $host,
         string $key,
+        bool $includePhoto,
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
         string $fatherAddressDescription,
-        string $motherAddressDescription,
         /* Profile pieces */
+        string $motherAddressDescription,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
+        UserProfile\Relationship\Mapper $relationshipMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
-        bool $includePhoto
+        StorageMapper $storageMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
@@ -233,6 +241,7 @@ class Factory
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
 
         /* Timetable pieces
          */
@@ -241,7 +250,6 @@ class Factory
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-        $this->includePhoto = $includePhoto;
     }
 
 
@@ -303,6 +311,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->includePhoto,
                 $this->spousePrefix,
                 $this->addnumFather,
                 $this->addnumMother,
@@ -313,7 +322,7 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper,
-                $this->includePhoto
+                $this->storageMapper
             ))
             ->add(new Profile\Cleanup(
                 $this->log,

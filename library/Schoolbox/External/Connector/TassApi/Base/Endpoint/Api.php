@@ -218,7 +218,7 @@ class Api implements IApi
 
 
     /**
-     * Try accessing an enpoint with the $queryArgs provided
+     * Try accessing an endpoint with the $queryArgs provided
      *
      * @param string $method
      * @param array  $params
@@ -261,7 +261,19 @@ class Api implements IApi
              * so try to decode it. If it can't decode properly, return null
              */
             if ($response->getStatusCode() === 200) {
-                return json_decode($response->getBody()->getContents(), true);
+                $contents = json_decode($response->getBody()->getContents(), true);
+                // When required parameters are not provided or request is rejected by system setting,
+                // this will return __status : invalid and reasons in __invalid
+                if (isset($contents['__status']) && $contents['__status'] === 'invalid') {
+                    $message = '';
+                    if (is_array($contents['__invalid'])) {
+                        array_walk($contents['__invalid'], function ($value, $key) use (&$message) {
+                            $message .= " $key : $value ";
+                        });
+                    }
+                    throw new RuntimeException(sprintf('Invalid request: %s. Method: %s', $message, $method));
+                }
+                return $contents;
             }
 
             /* We got a response but it's broken
