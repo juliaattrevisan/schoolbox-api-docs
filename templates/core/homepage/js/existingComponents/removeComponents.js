@@ -106,10 +106,10 @@ function initCancelButton (component) {
  * @param { Element } 
  */
 function initConfirmButton (component) {
-    const comfirmDeleteButton = component.querySelector('[data-remove="1"]');
-    comfirmDeleteButton.addEventListener('click', (event) => {
+    const confirmDeleteButton = component.querySelector('[data-remove="1"]');
+    confirmDeleteButton.addEventListener('click', (event) => {
         event.preventDefault();
-        removeComponent(component);
+        removeComponent(component, confirmDeleteButton);
     });
 }
  
@@ -117,9 +117,13 @@ function initConfirmButton (component) {
  * Save the removed component to the DB
  * 
  * @param { Element } 
+ * @param { Element } 
  */
-async function removeComponent (component) {
+async function removeComponent (component, confirmDeleteButton) {
     try {
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+        confirmDeleteButton.classList.add('disabled');
+        confirmDeleteButton.innerText = 'Removing...';
         await fetch(UPDATE_URL, {
             method: 'POST',
             body: getFormData(component),
@@ -127,6 +131,8 @@ async function removeComponent (component) {
         await slideUp(component);
     } catch (error) {
         console.warn(error);
+        updateRemovedComponent(component);
+        slideUp(component);
     } finally {
         component.remove();
         document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, { 
@@ -134,6 +140,7 @@ async function removeComponent (component) {
                 component: component 
             }
         })); 
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
 }
 

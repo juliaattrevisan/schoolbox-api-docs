@@ -19,7 +19,7 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers
 const COMPONENT_SELECTOR = '[data-component]'; //any existing component that will be sorted
 const COMPONENT_TRIGGER_SELECTOR = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
-const ANIMATE_SPEED = 0.3; //the speed of animations
+const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
@@ -43,8 +43,68 @@ let __startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position cha
  * Fire everything up
  */
 export function initSortExistingComponents () {
-    initDraggables();
     initListeners();
+    initDraggables();
+}
+
+/**
+ * To respond to any events that require action
+ */
+function initListeners () {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => onComponentAddedOrUpdated(event.detail.component)); //newly added components
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => onComponentAddedOrUpdated(event.detail.component)); //updated components
+    initOnComponentRemovedListener();
+    initOnProcessingStartListener();
+    initOnProcessingEndListener();
+}
+
+/**
+ * To add a newly created or udpated component to the sortable list
+ * @tod - pull out the old Dragable when re-added 
+ */
+function onComponentAddedOrUpdated (component) {
+    const newDraggable = addNewDraggable(component);
+    __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
+    updateSortableElements(); //update the position of all elements due to the new element that's been added
+}
+
+/**
+ * To remove a component from the sortable list
+ */
+function initOnComponentRemovedListener () {
+    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
+        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
+        draggableToRemove.kill(); //disables the Draggable instance
+        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
+        updateSortableElements(); //update the position of all elements due to the new element being added
+    });
+}
+
+/**
+ * Prevent rapid fire dragging while a data save is already taking place
+ */
+function initOnProcessingStartListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, () => {
+        updateDraggablesStatus(false); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Re-enable dragging once any processes (like sort saving) have taken place
+ */
+function initOnProcessingEndListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, () => {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+function updateDraggablesStatus (isEnabled) {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -74,37 +134,6 @@ function addNewDraggable (component) {
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
     })[0];
-}
-
-/**
- * To respond to any events that require action
- */
-function initListeners () {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => onComponentAddedOrUpdated(event.detail.component)); //newly added components
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => onComponentAddedOrUpdated(event.detail.component)); //updated components
-    initOnComponentRemovedListener();
-}
-
-/**
- * To add a newly created or udpated component to the sortable list
- * @tod - pull out the old Dragable when re-added 
- */
-function onComponentAddedOrUpdated (component) {
-    const newDraggable = addNewDraggable(component);
-    __draggablesList = [...__draggablesList, newDraggable]; //add the component into the Draggable instances list
-    updateSortableElements(); //update the position of all elements due to the new element that's been added
-}
-
-/**
- * To remove a component from the sortable list
- */
-function initOnComponentRemovedListener () {
-    document.addEventListener(UpdateHomepageEvents.COMPONENT_REMOVED, (event) => {
-        const draggableToRemove = __draggablesList.find((draggable) => draggable.target.isEqualNode(event.detail.component));
-        draggableToRemove.kill(); //disables the Draggable instance
-        __draggablesList = __draggablesList.filter((draggable) => !draggable.target.isEqualNode(event.detail.component)); //update the __draggablesList list, pullling out the removed component
-        updateSortableElements(); //update the position of all elements due to the new element being added
-    });
 }
 
 
@@ -205,13 +234,13 @@ function extractActiveComponent () {
         left: `${__referenceElement.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
-    updateActiveComponentComputedStyles(__activeComponent);
+    addActiveComponentComputedStyles(__activeComponent);
 }
 
 /**
  * Ensure custom set colour vars are respected and set when moving between parent containers
  */
-function updateActiveComponentComputedStyles () {
+function addActiveComponentComputedStyles () {
 
     const containerPosition = __referenceElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
@@ -222,6 +251,16 @@ function updateActiveComponentComputedStyles () {
     __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = headFont );
     __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = headFont );
 
+}
+
+/**
+ * Reset the set custom colours set in addActiveComponentComputedStyles(), 
+ * otherwise further user colour changes in the edit columns palette will not be reflected
+ */
+function removeActiveComponentComputedStyles () {
+    __activeComponent.querySelectorAll('.component-titlebar').forEach((item) => item.style.backgroundColor = '' );
+    __activeComponent.querySelectorAll('.component-titlebar h2').forEach((item) => item.style.color = '' );
+    __activeComponent.querySelectorAll('.component-titlebar a').forEach((item) => item.style.color = '' );
 }
 
 /**
@@ -255,6 +294,7 @@ function updateSortableElements () {
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -314,11 +354,7 @@ function updateActiveComponentPosition (closestElement, isShiftingDown) {
 
     const state = Flip.getState(document.querySelectorAll(COMPONENT_SELECTOR)); //record position of elements before we move them around
     
-    if (isShiftingDown) { //now move the elements depending on position of the component being sorted
-        insertElementAfter(closestElement, __referenceElement); //below if below the element
-    } else {
-        insertElementBefore(closestElement, __referenceElement); //and above if... well above
-    }
+    isShiftingDown ? insertElementAfter(closestElement, __referenceElement) : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
     clearFlipElements(); //check for flip bug
 
@@ -368,18 +404,9 @@ function clearFlipElements () {
  * Just snap back to where it now belongs
  */
 function onDragEnd () {
-    updateDraggablesStatus(false); //prevent quick reclicks on elements
-    snapBackActiveComponent();
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
     document.dispatchEvent(new Event(UpdateHomepageEvents.EXISTING_COMPONENT_SORT_END));
-}
-
-/**
- * Run through each Draggable instance and enable/disable
- * 
- * @param { Boolean }  
- */
-function updateDraggablesStatus (isEnabled) {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
+    snapBackActiveComponent();
 }
 
 /**
@@ -407,7 +434,7 @@ function onSnapBackActiveComponentComplete () {
     gsap.set(__activeComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __activeComponent.style.position = 'static'; //was absolute, now sitting as it should
     __activeComponent.setAttribute('data-component', ''); //so it can be dragged again
-    updateActiveComponentComputedStyles(); //ensure the defined colours are respected
+    removeActiveComponentComputedStyles(); //ensure the defined colours are respected
 
     insertElementAfter(__referenceElement, __activeComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
@@ -446,7 +473,7 @@ async function onActiveComponentExpanded () {
     }
     updateDocumentOnDragEnd();
     updateSortableElements();
-    updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
 }
 
 /**

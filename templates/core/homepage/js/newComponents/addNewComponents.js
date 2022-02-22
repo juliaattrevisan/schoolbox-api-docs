@@ -10,7 +10,7 @@ gsap.registerPlugin(Draggable, Flip);
 const COMPONENT_CONTAINERS_SELECTOR = '[data-components-container]'; //the top/left/right parent containers and the tabs container
 const COMPONENT_SELECTOR = '[data-component-palette]'; //any component that will be dragged/added/sorted
 const SORTABLE_SELECTOR = '[data-component]'; //existing components that can be sorted
-const ANIMATE_SPEED = 0.3; //the speed of animations
+const ANIMATE_SPEED = 0.15; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
@@ -35,7 +35,43 @@ let __newComponentTabsContainer; //to reinsert the newComponentClone into the ne
  * Fire everything up
  */
 export function initAddNewComponents () {
+    initListeners();
     initDraggables();
+}
+
+/**
+ * To respond to any events that require action
+ */
+function initListeners () {
+    initOnProcessingStartListener();
+    initOnProcessingEndListener();
+}
+
+/**
+ * Prevent rapid fire dragging while a data save is already taking place
+ */
+function initOnProcessingStartListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_START, (event) => {
+        updateDraggablesStatus(false); //ensure all are disabled while process is active
+    });
+}
+
+/**
+ * Re-enable dragging once any processes (like sort saving) have taken place
+ */
+function initOnProcessingEndListener () {
+    document.addEventListener(UpdateHomepageEvents.PROCESSING_END, (event) => {
+        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    });
+}
+
+/**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+function updateDraggablesStatus (isEnabled) {
+    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 /**
@@ -54,12 +90,13 @@ function initDraggables () {
  * @returns { Draggable }
  */
 function addNewDraggable (component) {
-    component.addEventListener('click', (event) => onNewComponentClicked(event));
+    component.addEventListener('click', (event) => event.preventDefault());
     component.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(component, {
         type: 'x, y',
         trigger: component,
         autoScroll: 1,
+        onClick: (event) => onNewComponentClicked(event),
         onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
@@ -74,39 +111,42 @@ function addNewDraggable (component) {
  * @param { MouseEvent }  
  */
 function onNewComponentClicked (event) {
+
+    __hasNewComponent = true;
+    __isFlipping = true;
+
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
     
-    event.preventDefault();
+    updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+    __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
+    __referenceElement.removeAttribute('data-component'); //in this instance we don't want the reference element to animate
+    disableAllOtherDraggables();
+    extractNewComponent();
+
+    const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
     
-    if (!__hasNewComponent) { //ensure there's no rapid fire going on
+    const topContainer = document.querySelector('[data-position="top"]');
+    insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
+    __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
+    __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
+    __newComponent.style.zIndex = 9999;
+    __newComponent.style.position = 'static';
+    __newComponent.style.width = '100%';
 
-        __hasNewComponent = true;
-        __isFlipping = true;
-
-        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-        updateDraggablesStatus(false); //prevent any others being dragged while a component is alread being added
-        reinsertNewComponentButton();
-
-        const state = Flip.getState([document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR), document.querySelectorAll(SORTABLE_SELECTOR), __newComponent]);
-        
-        const topContainer = document.querySelector('[data-position="top"]');
-        insertElementBefore(topContainer.firstChild, __newComponent); //add to the top of the container
-        __newComponent.style.float = 'none'; //needs to be factored into the document flow, so take float off
-        __newComponent.style.marginBottom = '2rem'; //add the appropriate margin in
-
-        Flip.from(state, {
-            absolute: true, //to accurately animate elements
-            duration: ANIMATE_SPEED * 2,
-            ease: "power1.inOut",
-            nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
-            zIndex: 9999, //ensure it stays on top
-            onComplete: () => {
-                __isFlipping = false;
-                __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-                addNewComponent();
-            },
-        });
-
-    }
+    Flip.from(state, {
+        absolute: true, //to accurately animate elements
+        duration: ANIMATE_SPEED * 2,
+        ease: "power1.inOut",
+        nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
+        zIndex: 9999, //ensure it stays on top
+        onComplete: () => {
+            __isFlipping = false;
+            reinsertNewComponentButton();
+            __referenceElement.remove(); //and now the placeholder can be pulled out
+            updateSortableElements();
+            addNewComponent();
+        },
+    });
 
 }
 
@@ -121,15 +161,6 @@ function onNewComponentClicked (event) {
     __newComponentClone = __newComponent.cloneNode(true); //to replace the new component in the tabs when/if the __newComponent has been added in
     __newComponentClone.style.opacity = 0.5; //so the __newComponent stands out when animating from the component tabs
     __newComponentTabsContainer = __newComponent.parentElement; //so can put a copy of the __newComponent back into the palette once the addition is complete
-}
-
-/**
- * Run through each Draggable instance and enable/disable
- * 
- * @param { Boolean }  
- */
-function updateDraggablesStatus (isEnabled) {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
 }
 
 
@@ -148,7 +179,7 @@ function updateDraggablesStatus (isEnabled) {
 function onDragStart (event) {
     updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
-    __referenceElement = getReferenceElement(); //to use a refernce where the new component is / where it will be dragged to
+    __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
     updateDocumentOnDragStart();
     disableAllOtherDraggables();
     extractNewComponent();
@@ -225,6 +256,7 @@ function extractNewComponent () {
         top: `${__referenceElement.getBoundingClientRect().top + window.scrollY}px`,
         left: `${__referenceElement.getBoundingClientRect().left}px`, //subtracting 16 to deal with 1rem padding-left that's applied
         width: `${__referenceElement.getBoundingClientRect().width}px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
+        transform: 'translate3d(0, 0, 0)',
     });
 }
 
@@ -238,6 +270,7 @@ function updateSortableElements () {
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -342,11 +375,7 @@ function updateDraggedComponentOnPage (closestElement, isShiftingDown) {
 
     const state = Flip.getState(document.querySelectorAll(SORTABLE_SELECTOR));
     
-    if (isShiftingDown) {
-        insertElementAfter(closestElement, __referenceElement);
-    } else {
-        insertElementBefore(closestElement, __referenceElement);
-    }
+    isShiftingDown ? insertElementAfter(closestElement, __referenceElement) : insertElementBefore(closestElement, __referenceElement); //insert into the appropriate spot depending on drag position
 
     __referenceElement.style.marginBottom = '2rem'; //existing components all have a margin
     __newComponent.style.marginBottom = '2rem'; //existing components all have a margin
@@ -368,7 +397,7 @@ function updateDraggedComponentOnPage (closestElement, isShiftingDown) {
  * Flip currently sometimes leaves a left over element while dragging between elements. It's cleared on mouse release, but we need 
  * it to be cleared sooner as we need to check for whether we need to add place holders after a component shift
  */
- function clearFlipElements () {
+function clearFlipElements () {
     document.querySelectorAll(COMPONENT_CONTAINERS_SELECTOR).forEach((parentContainer) => {
         if (parentContainer.children.length === 1 && !parentContainer.children[0].id) { //there's the flip element here, so we should clear it out
             parentContainer.removeChild(parentContainer.children[0]);
@@ -402,10 +431,10 @@ function animateFlip (state) {
  * Just snap back to where it now belongs
  */
 function onDragEnd () {
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
-    updateDraggablesStatus(false); //prevent quick reclicks on elements
     alignNewComponent();
 }
 
@@ -426,8 +455,6 @@ function alignNewComponent () {
 /**
  * Tidy up once the element has snapped back 
  * setting up for another drag, returning various variables back to there pre dragging state etc
- * 
- * @param { Element }  
  */
 function onAlignNewComponentComplete () {
     resetNewComponent();
@@ -436,7 +463,7 @@ function onAlignNewComponentComplete () {
     if (__hasNewComponent) {
         addNewComponent();
     } else {
-        updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+        document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
 }
 
@@ -445,8 +472,10 @@ function onAlignNewComponentComplete () {
  */
 function resetNewComponent () {
     gsap.set(__newComponent, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    __newComponent.style.position = 'static'; //was absolute, now sitting as it should
-    __newComponent.setAttribute('data-component', ''); //so it can be dragged again
+    __newComponent.style.position = ''; //was absolute, now sitting as it should
+    __newComponent.style.transform = ''; //ensure the dragging movement is reset
+    __newComponent.style.left = ''; //ensure the dragging movement is reset
+    __newComponent.style.top = ''; //ensure the dragging movement is reset
     insertElementAfter(__referenceElement, __newComponent); //the element was taken out, so put it back where it now belongs
     __referenceElement.remove(); //and now the placeholder can be pulled out
 }
@@ -454,7 +483,7 @@ function resetNewComponent () {
 /**
  * Return the document back to its pre onDragStart behaviour 
  */
- function updateDocumentOnDragEnd () {
+function updateDocumentOnDragEnd () {
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
@@ -475,12 +504,14 @@ async function addNewComponent () {
         startAt: { opacity: 0 },
     } );
     await saveComponentOrder(newComponent);
-    updateDraggablesStatus(true); //ensure all are enabled again once animation and form change is complete
+    document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     __hasNewComponent = false;
 }
 
 /**
  * Reinsert the cloned new component button into the new component tabs 
+ * 
+ * @todo - this should be the reference element not this __newComponentClone
  */
 function reinsertNewComponentButton () {
     __newComponentTabsContainer.appendChild(__newComponentClone); 
@@ -491,7 +522,7 @@ function reinsertNewComponentButton () {
  * The Draggable instance was on the element that's now been inserted into the page
  * so we need to tidy that up and then add a new Draggable instance to the new component button thats back in the tabs
  */
- function updateDraggablesWithNewComponentButton () {
+function updateDraggablesWithNewComponentButton () {
     const draggableToRemove = __draggablesList.find((draggable) => draggable.target !== __newComponent);
     draggableToRemove.kill();
     __draggablesList = __draggablesList.filter((draggable) => draggable.target !== __newComponent);
