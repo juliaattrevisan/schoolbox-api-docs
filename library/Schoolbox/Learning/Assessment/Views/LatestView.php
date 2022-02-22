@@ -127,6 +127,7 @@ class LatestView
         /**
          * check if there was a view recorded? in our special table
          */
+        $feedback = null;
         if (null !== $studentView) {
             /**
              * student has viewed the assessment
