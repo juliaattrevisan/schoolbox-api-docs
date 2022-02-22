@@ -225,11 +225,9 @@ class AdditionalSubjects implements IStrategy
                     $this->classEntryMapper->save($class);
 
                     $this->log->info(sprintf(
-                        "Additional subject %s (%s) added for %s (user %s)",
+                        "Additional subject %s (%s) added",
                         $additionalSubject['sub_long'],
-                        $code,
-                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                        $externalId
+                        $code
                     ));
                 }
 
@@ -248,7 +246,7 @@ class AdditionalSubjects implements IStrategy
                     $this->classInvolvementMapper->save($classInvolvement);
 
                     $this->log->info(sprintf(
-                        "Additional subject involvement in %s (%s) added for %s (user %s)",
+                        "Additional subject involvement in %s (%s) added for %s (%s)",
                         $additionalSubject['sub_long'],
                         $code,
                         trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),

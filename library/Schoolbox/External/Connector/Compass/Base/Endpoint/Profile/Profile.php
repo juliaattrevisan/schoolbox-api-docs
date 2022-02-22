@@ -337,7 +337,7 @@ class Profile implements IStrategy
             /* If the externalId was empty, skip them
              */
             if (null === $externalId) {
-                $this->log->info(sprintf(
+                $this->log->warning(sprintf(
                     'Skipping %s %s (no external identifier)',
                     $firstname,
                     $lastname
@@ -376,13 +376,6 @@ class Profile implements IStrategy
                 ->setTitle($title)
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */
@@ -462,8 +455,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding student profile for %s',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                'Adding student profile for %s (%s)',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
@@ -785,11 +779,12 @@ class Profile implements IStrategy
             /* Can't find parent? Skip it
              */
             if (!isset($families[$relationship['compassPersonToId']])) {
-                $this->log->info(sprintf(
-                    'Skipping: could not find parent %s for %s %s',
+                $this->log->warning(sprintf(
+                    'Skipping: Could not find parent %s for %s %s (%s)',
                     $relationship['compassPersonToId'],
                     $studentBaseProfile->getFirstname(),
-                    $studentBaseProfile->getLastname()
+                    $studentBaseProfile->getLastname(),
+                    $studentBaseProfile->getExternalId()
                 ));
             }
 
@@ -804,7 +799,7 @@ class Profile implements IStrategy
             /* If the externalId was empty, skip them
              */
             if (null === $externalId) {
-                $this->log->info(sprintf(
+                $this->log->warning(sprintf(
                     'Skipping parent %s (no external identifier)',
                     $relationship['compassPersonToId']
                 ));
@@ -868,13 +863,6 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-            ));
-
             /* Then save it
              */
             if ($this->perform) {
@@ -891,8 +879,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding parent profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                'Adding parent profile for %s (%s)',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
@@ -907,10 +896,12 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding relation between %s, the %s of %s',
+                'Adding relation between %s (%s), the %s of %s (%s)',
                 trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $parentBaseProfile->getExternalId(),
                 trim($relationship),
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $studentBaseProfile->getExternalId()
             ));
 
             /* Then save it
@@ -1036,12 +1027,6 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */
@@ -1063,8 +1048,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding staff profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+                'Adding staff profile for %s (%s)',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it

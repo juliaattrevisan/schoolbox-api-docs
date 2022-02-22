@@ -443,7 +443,7 @@ class Definition implements IStrategy
          */
         if (!(isset($data[$key]) && \count($data[$key]))) {
             $this->log->warning(sprintf(
-                'Timetable not found for %s (user %s).',
+                'Timetable not found for %s (%s).',
                 trim("{$person['firstname']} {$person['lastname']}"),
                 $externalId
             ));
@@ -454,7 +454,7 @@ class Definition implements IStrategy
         /* Let us know so we can test with their id
          */
         $this->log->info(sprintf(
-            'Processing timetable definition for %s (user %s).',
+            'Processing timetable definition for %s (%s).',
             trim("{$person['firstname']} {$person['lastname']}"),
             $externalId
         ));

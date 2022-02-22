@@ -310,7 +310,7 @@ class Classes implements IStrategy
                          */
                         $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], (string)$class['period']['name']);
 
-                        $this->log->info(sprintf(
+                        $this->log->debug(sprintf(
                             'Looking for ext_timetable_code %s, day %s, period %s',
                             $ext,
                             $class['period']['day'],
@@ -375,8 +375,8 @@ class Classes implements IStrategy
         try {
             $timetableClass = $this->classEntryMapper->findOneByColumn('code', $subject['class']['code']);
 
-            $this->log->info(sprintf(
-                'Reusing previously-saved class %s %s with id %s',
+            $this->log->debug(sprintf(
+                'Reusing previously-saved class %s (%s) with id %s',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),
                 $timetableClass->getId()
@@ -389,7 +389,7 @@ class Classes implements IStrategy
                 ->setDescription($subject['class']['name']);
 
             $this->log->info(sprintf(
-                'Creating new class %s %s',
+                'Creating new class %s (%s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
@@ -442,7 +442,7 @@ class Classes implements IStrategy
                         'teacher_external_id' => $teacher['externalId']
                     ]);
 
-                    $this->log->info(sprintf(
+                    $this->log->debug(sprintf(
                         'Reusing previously saved class period %s using period_id %s, taught by %s, with id %s',
                         $timetableClass->getName(),
                         $period->getId(),
@@ -493,7 +493,7 @@ class Classes implements IStrategy
             // check here to see whether the ->first() is the one without teachers
 
             if (null !== $timetableClassPeriod) {
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Reusing previously saved class period %s using period_id %s, with id %s',
                     $timetableClass->getName(),
                     $period->getId(),
@@ -550,7 +550,7 @@ class Classes implements IStrategy
         /* Relation already exists; nothing to change
          */
         if ($involvement->count()) {
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Reusing class involvement %s %s for %s (user %s)',
                 $timetableClass->getName(),
                 $timetableClass->getCode(),

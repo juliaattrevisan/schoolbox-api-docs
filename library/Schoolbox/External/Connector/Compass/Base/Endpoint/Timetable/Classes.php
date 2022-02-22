@@ -168,7 +168,7 @@ class Classes implements IStrategy
                  */
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->info(sprintf(
+                $this->log->debug(sprintf(
                     'Looking for ext_timetable_code %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],
