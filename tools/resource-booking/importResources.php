@@ -90,6 +90,9 @@ HELP
                 ->setMinLeadTime(0)
                 ->setMinReservationTime(0)
                 ->setMaxReservationTime(0)
+                ->setRoleList(new Collection())
+                ->setRelatedResourceList(new Collection())
+                ->setModeratorList(new Collection())
             ;
 
             // Category
@@ -103,7 +106,6 @@ HELP
 
             // Set its moderators
             if ($row['ManagedBy_SynergeticID']) {
-                $resource->setModeratorList(new Collection());
                 try {
                     $moderator = $userMapper->findByExternalId($row['ManagedBy_SynergeticID']);
                     $resource->addModerator($moderator);
