@@ -299,7 +299,7 @@ $collapseStudent: 1000px;
         height: 100%;
     }
 
-    .award__image-container::v-deep { //v-deep is used so can target the img succesfully
+    :deep(.award__image-container) { //v-deep is used so can target the img succesfully
         position: relative;
         flex: 0 0 50px;
         padding: 0.25rem 0.5rem;

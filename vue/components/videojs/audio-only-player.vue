@@ -210,7 +210,7 @@ export default {
     height: auto;
 }
 
-.vjs-play-skin::v-deep {
+:deep(.vjs-play-skin) {
     .vjs-control-bar {
         height: 5em;
     }

@@ -187,7 +187,7 @@ export default {
     text-align: center;
 }    
 
-.dzone::v-deep { //piggy back on the existing dropzone styles, and update as needed
+:deep(.dzone) { //piggy back on the existing dropzone styles, and update as needed
     position: absolute;
     z-index: 1;
     width: 100%;

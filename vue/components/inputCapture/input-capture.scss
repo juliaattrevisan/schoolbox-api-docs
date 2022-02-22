@@ -29,7 +29,7 @@
   text-align: center;
 }
 
-.dzone::v-deep {
+:deep(.dzone) {
   //piggy back on the existing dropzone styles, and update as needed
   position: absolute;
   z-index: 1;

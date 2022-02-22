@@ -249,7 +249,7 @@ ul {
   margin: 0px;
   list-style: none;
 }
-label::v-deep {
+:deep(label) {
   padding-right: 1rem !important;
 }
 </style>
