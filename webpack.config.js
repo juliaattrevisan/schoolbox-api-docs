@@ -189,7 +189,7 @@ module.exports = {
         // similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',
 
         // Textboxes
-        // textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
+        textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
 
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
