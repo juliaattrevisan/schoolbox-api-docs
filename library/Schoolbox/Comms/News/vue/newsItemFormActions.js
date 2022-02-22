@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import NewsItemFormActions from './news-item-form-actions';
 
-new Vue({
-	el: '#create-form-actions',
+createApp({
 	components: {
 		NewsItemFormActions
     }
-});
+}).mount('#create-form-actions');

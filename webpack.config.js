@@ -170,13 +170,13 @@ module.exports = {
 
         //News related
         // visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
-        // articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
-        // articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
-        // newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
-        // newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js',
-        // newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js',
-        // newsItemFormActions: './library/Schoolbox/Comms/News/vue/newsItemFormActions.js',
-        // newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
+        articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
+        articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
+        newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
+        newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js',
+        newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js',
+        newsItemFormActions: './library/Schoolbox/Comms/News/vue/newsItemFormActions.js',
+        newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
 
         //Learning
         // learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',

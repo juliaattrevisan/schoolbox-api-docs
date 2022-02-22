@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import ArticleList from './article-list';
 
-Vue.component('article-list', require('./article-list.vue').default);
-
-new Vue({
-    el: '#news-component'
-});
+createApp({
+    components: {
+        ArticleList
+    }
+}).mount('#news-component');

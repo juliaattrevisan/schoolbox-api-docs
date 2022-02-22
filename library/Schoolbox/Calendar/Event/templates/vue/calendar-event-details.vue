@@ -576,7 +576,7 @@
                                 <li class="actions-small-1" v-for="guest in guests" :key="guest.id">
                                     <div class="compact card small-11">
                                         <a :href="'/search/user/' + guest.id" title="View Profile">
-                                            <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
+                                            <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" alt="portrait photo" />
 
                                             <p :class="{
                                                 pending: isPending(guest.status),
