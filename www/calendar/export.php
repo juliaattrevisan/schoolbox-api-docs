@@ -448,9 +448,9 @@ try {
                     true,
                     $sentry
                 );
-
-                //build external events, including vcal source
                 $api->add($subApi);
+
+                //build external events
                 /** @var IConnector $databaseExternal */
                 $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
                 $factory          = new ExternalConnectorFactory();
@@ -467,6 +467,18 @@ try {
                     $sentry
                 );
                 $api->add($subApi);
+
+                //build vcal source
+                $subApi = buildApiClass(
+                    Calendar_Api_EventType_Event_Vcal_Default::class,
+                    [$user, $viewer],
+                    true,
+                    $sentry
+                );
+                $api->add($subApi);
+
+                //set the end of the export
+                $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             }
             break;
 
