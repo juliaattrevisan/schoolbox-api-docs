@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageGlobalSystem from './system';
 
-Vue.component('usageGlobalSystem', require('./system.vue').default);
-
-new Vue({
-    el: '#usage-global-system-container'
-});
+createApp({
+    components: {
+        UsageGlobalSystem
+    }
+}).mount('#usage-global-system-container'); 

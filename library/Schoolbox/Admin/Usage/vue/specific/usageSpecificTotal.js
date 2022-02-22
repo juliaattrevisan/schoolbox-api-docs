@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageSpecificTotal from './total';
 
-Vue.component('usageSpecificTotal', require('./total.vue').default);
-
-new Vue({
-    el: '#usage-specific-total-container'
-});
+createApp({
+    components: {
+        UsageSpecificTotal
+    }
+}).mount('#usage-specific-total-container'); 

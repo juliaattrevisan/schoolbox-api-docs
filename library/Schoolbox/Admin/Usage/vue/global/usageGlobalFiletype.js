@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageGlobalFiletype from './filetype';
 
-Vue.component('usageGlobalFiletype', require('./filetype.vue').default);
-
-new Vue({
-    el: '#usage-global-filetype-container'
-});
+createApp({
+    components: {
+        UsageGlobalFiletype
+    }
+}).mount('#usage-global-filetype-container'); 

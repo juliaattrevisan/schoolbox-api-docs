@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageSpecificSystem from './system';
 
-Vue.component('usageSpecificSystem', require('./system.vue').default);
-
-new Vue({
-    el: '#usage-specific-system-container'
-});
+createApp({
+    components: {
+        UsageSpecificSystem
+    }
+}).mount('#usage-specific-system-container'); 

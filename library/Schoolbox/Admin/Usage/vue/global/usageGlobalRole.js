@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageGlobalRole from './role';
 
-Vue.component('usageGlobalRole', require('./role.vue').default);
-
-new Vue({
-    el: '#usage-global-role-container'
-});
+createApp({
+    components: {
+        UsageGlobalRole
+    }
+}).mount('#usage-global-role-container'); 

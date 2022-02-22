@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageSpecificFiletype from './filetype';
 
-Vue.component('usageSpecificFiletype', require('./filetype.vue').default);
-
-new Vue({
-    el: '#usage-specific-filetype-container'
-});
+createApp({
+    components: {
+        UsageSpecificFiletype
+    }
+}).mount('#usage-specific-filetype-container'); 

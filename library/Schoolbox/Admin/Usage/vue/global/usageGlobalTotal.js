@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import UsageGlobalTotal from './total';
 
-Vue.component('usageGlobalTotal', require('./total.vue').default);
-
-new Vue({
-    el: '#usage-global-total-container'
-});
+createApp({
+    components: {
+        UsageGlobalTotal
+    }
+}).mount('usage-global-total-container'); 

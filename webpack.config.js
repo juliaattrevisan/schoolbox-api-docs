@@ -198,15 +198,15 @@ module.exports = {
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
 
-        // usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
-        // usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
-        // usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
-        // usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
+        usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
+        usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
+        usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
+        usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
         // usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
 
-        // usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
-        // usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
-        // usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
+        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
+        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
+        usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
         // usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
 
         //Record Media Modal
