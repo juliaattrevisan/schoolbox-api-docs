@@ -8,7 +8,7 @@
 import { mapState } from 'vuex';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import Toast from '@schoolboxVue/components/toast';
-import { DELETE_ROW_CONFIRMED } from './store/adminListMutationTypes';
+import { DELETE_ROW_CONFIRMED, DELETE_ROW_CANCELLED } from './store/adminListMutationTypes';
 
 export default {
     
@@ -37,10 +37,10 @@ export default {
     watch: {
 
         rowToDelete (newValue) {
-            if (newValue.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
+            if (newValue && newValue.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
                 const rowToRemove = this.rows.find((row) => row.id === newValue.id);
                 this.$store.commit(DELETE_ROW_CONFIRMED, rowToRemove);
-            } else { //otherwise open up the modal to confirm or cancel
+            } else if (newValue) { //otherwise open up the modal to confirm or cancel
                 this.$refs.deleteModal.open();
             }
         }
@@ -89,10 +89,11 @@ export default {
         },
 
         /**
-         * Cancel the the selected row deletion
+         * Cancel the selected row deletion
          */
         onCancelDeleteRowSelected () {
             this.$refs.deleteModal.close();
+            this.$store.commit(DELETE_ROW_CANCELLED, this.row);
         },
 
     }

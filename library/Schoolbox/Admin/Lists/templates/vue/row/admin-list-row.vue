@@ -97,66 +97,53 @@ export default {
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
             <div class="list-item">
-                <template v-for="(field, index) in headerFields">
-                    <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
-                       
-                        <span class="hide-for-medium-up">{{ field.caption }}</span>
-                        
-                        <template v-if="field.readonly">
-                            <p>{{ row[field.id] }}</p>
-                        </template>
 
-                        <template v-else-if="field.checkbox">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    type="checkbox"
-                                    v-model="row[field.id]"
-                                />
-                                <label :for="`${row.id}-${field.caption}`"></label>
-                            </div>
-                        </template>
+                <div v-for="(field) in headerFields" :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="field.id">
+                    
+                    <span class="hide-for-medium-up">{{ field.caption }}</span>
+                    
+                    <template v-if="field.readonly">
+                        <p>{{ row[field.id] }}</p>
+                    </template>
 
-                        <template v-else-if="field.lookup">
-                            <admin-list-row-lookup
-                                :field="field"
-                                :row="row"
+                    <template v-else-if="field.checkbox">
+                        <div class="checklist">
+                            <input 
+                                :id="`${row.id}-${field.caption}`"
+                                type="checkbox"
+                                v-model="row[field.id]"
                             />
-                        </template>
+                            <label :for="`${row.id}-${field.caption}`"></label>
+                        </div>
+                    </template>
 
-                        <template v-else-if="field.colour">
-                            <admin-list-row-colour
-                                :caption="field.caption"
-                                :colour="row[field.id]"
-                                @input="row[field.id] = $event"
-                            />
-                        </template>
+                    <template v-else-if="field.lookup">
+                        <admin-list-row-lookup
+                            :field="field"
+                            :row="row"
+                        />
+                    </template>
 
-                        <template v-else-if="field.isPopOutList">
-                            <admin-list-row-pop-out
-                                :row="row"
-                            />
-                        </template>
+                    <template v-else-if="field.colour">
+                        <admin-list-row-colour
+                            :caption="field.caption"
+                            :colour="row[field.id]"
+                            @input="row[field.id] = $event"
+                        />
+                    </template>
 
-                        <template v-else>
-                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
-                        </template>
+                    <template v-else-if="field.isPopOutList">
+                        <admin-list-row-pop-out
+                            :row="row"
+                        />
+                    </template>
 
-                        <!-- <template v-if="field.nullable">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    v-model="row[field.id]"
-                                    type="checkbox"
-                                />
-                                <label :for="`${row.id}-${field.caption}`">
-                                    {{ field.nullable_label }}
-                                </label>
-                            </div>
-                        </template> -->
-                        
-                    </div>
-                </template>
+                    <template v-else>
+                        <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
+                    </template>
+                    
+                </div>
+
             </div><!-- .list-item -->
 
             <nav v-if="canDelete">

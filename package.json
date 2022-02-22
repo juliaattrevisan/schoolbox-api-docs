@@ -32,7 +32,8 @@
     "ts-ebml": "^2.0.2",
     "videojs-record": "^4.4.0",
     "vue": "^3.2.31",
-    "vue3-resize": "^0.2.0"
+    "vue3-resize": "^0.2.0",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

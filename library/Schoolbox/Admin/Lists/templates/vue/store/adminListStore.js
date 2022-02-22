@@ -1,15 +1,12 @@
 
-import Vue from 'vue';
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
 import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
-         ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, 
+         ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, DELETE_ROW_CANCELLED,
          OPEN_POP_UP, CLOSE_POP_UP, UPDATE_SEQUENCE } from './adminListMutationTypes';
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+export default createStore({
 
     state: {
         loadedData: null, //contains the loaded data
@@ -108,6 +105,13 @@ export default new Vuex.Store({
          */
         [DELETE_ROW_CONFIRMED] (state, rowToDelete) {
             state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
+        },
+
+        /**
+         * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete 
+         */
+        [DELETE_ROW_CANCELLED] (state, rowToDelete) {
+            state.rowToDelete = null;
         },
 
         /**

@@ -1,11 +1,9 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import store from './store/adminListStore'
 import AdminList from './admin-list';
 
-new Vue({
-	el: '#admin-list',
-    store,
+createApp({
 	components: {
 		AdminList
     }
-});
+}).use(store).mount('#admin-list');

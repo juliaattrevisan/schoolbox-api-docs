@@ -195,7 +195,7 @@ module.exports = {
         // adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
         // staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
-        // adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
+        adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
 
         // usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
