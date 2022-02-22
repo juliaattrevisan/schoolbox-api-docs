@@ -40,6 +40,7 @@ class DSN
     public const MODULE_STUDENT_DETAILS = 'studentdetails';
     public const MODULE_IDENTITY_MANAGEMENT = 'identitymanagement';
     public const MODULE_SCHOOL_CALENDAR_AND_NOTICES = 'schoolcalendarandnotices';
+    public const MODULE_EMPLOYEE_HR = 'employee-hr';
 
 
     /**

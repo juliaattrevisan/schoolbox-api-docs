@@ -64,7 +64,8 @@ class Specification implements ISpecification
             Codec\DSN::MODULE_LMS_INTEGRATION,
             Codec\DSN::MODULE_STUDENT_DETAILS,
             Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
-            Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES
+            Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+            Codec\DSN::MODULE_EMPLOYEE_HR,
         ];
 
         foreach ($modules as $module) {
@@ -106,7 +107,8 @@ class Specification implements ISpecification
                 'method' => 'getStudentSubjects',
                 'version' => 3,
                 'args' => [
-                    'lmsflag' => 'Y'
+                    'lmsflag' => 'Y',
+                    'code'    => 'all',
                 ]
             ],
             [
@@ -122,7 +124,8 @@ class Specification implements ISpecification
                 'method' => 'getStudents',
                 'version' => 3,
                 'args' => [
-                    'currentstatus' => 'current'
+                    'currentstatus' => 'current',
+                    'includephoto'  => true,
                 ]
             ],
             [
@@ -149,6 +152,7 @@ class Specification implements ISpecification
                 'version' => 3,
                 'args' => [
                     'currentstatus' => 'current',
+                    'includephoto'  => true,
                 ]
             ],
             [
@@ -495,6 +499,14 @@ class Specification implements ISpecification
                 'version' => 3,
                 'args' => [
                     'user_code' => 'all',
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_EMPLOYEE_HR,
+                'method' => 'getEmployeesDetails',
+                'version' => 2,
+                'args' => [
+                    'date' => date('d/m/Y'),
                 ]
             ],
 

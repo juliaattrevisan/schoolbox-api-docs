@@ -262,6 +262,31 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getPortrait(User $user): ?Storage\Model
     {
+        if ($user->getPortrait()) {
+            return $user->getPortrait();
+        }
+
+        $hash = $this->internalDatabase->executeQuery(
+            'SELECT portrait_hash
+                FROM sis_user_profile
+                WHERE external_id = :externalUserId
+            ',
+            [
+                'externalUserId' => $user->getExternalId(),
+            ]
+        )->fetchColumn();
+
+        if ($hash) {
+            $storageMapper = Storage\Mapper::getInstance();
+            try {
+                $portrait = $storageMapper->findByHash($hash);
+                $user->setPortrait($portrait);
+                \Schoolbox\UserMapper::getInstance()->save($user);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop
+            }
+        }
+
         return $user->getPortrait();
     }
 
@@ -540,10 +565,10 @@ class External_Schoolbox_User implements External_UserInterface
          * to create the user accounts and year level/house assignations (if any exist)
          */
         $query = "
-            SELECT 
+            SELECT
                 u.id,
-                u.firstname, 
-                u.lastname, 
+                u.firstname,
+                u.lastname,
                 lyl.name AS yearLevel,
                 h.house,
                 sup.external_id,
