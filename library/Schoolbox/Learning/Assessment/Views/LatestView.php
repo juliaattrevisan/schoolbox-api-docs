@@ -127,27 +127,22 @@ class LatestView
         /**
          * check if there was a view recorded? in our special table
          */
-        if (null === $studentView) {
+        if (null !== $studentView) {
             /**
-             * no student entry, error out
+             * student has viewed the assessment
              */
-            return $views;
-        }
+            $views['student']['status'] = 'has viewed';
 
-        /**
-         * student has viewed the assessment
-         */
-        $views['student']['status'] = 'has viewed';
+            $studentDate = $studentView->getLastVisit();
+            $views['student']['date']   = $studentDate->getLong();
 
-        $studentDate = $studentView->getLastVisit();
-        $views['student']['date']   = $studentDate->getLocal();
-
-        $feedback = $participant->getAuthoritativeFeedback(true);
-        if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
-            /**
-             * was the last student view after feedback?
-             */
-            $views['student']['object'] = 'feedback';
+            $feedback = $participant->getAuthoritativeFeedback(true);
+            if (null !== $feedback && $feedback->getPublishedAt() < $studentDate) {
+                /**
+                 * was the last student view after feedback?
+                 */
+                $views['student']['object'] = 'feedback';
+            }
         }
 
         /**
@@ -161,6 +156,7 @@ class LatestView
              */
             $view = [
                 'name'      => $parent->getFullName(),
+                'id'        => $parent->getId(),
                 'status'    => 'has not viewed',
                 'object'    => 'assessment',
                 'date'      => null,
@@ -172,7 +168,7 @@ class LatestView
             $parentView = $last_views->getBy('user', $parent);
             if (null !== $parentView) {
                 $parentDate = $parentView->getLastVisit();
-                $view['date'] = $parentDate->getLocal();
+                $view['date'] = $parentDate->getLong();
                 $view['status'] = 'has viewed';
                 /**
                  * check if view after feedback?

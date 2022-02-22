@@ -42,7 +42,7 @@
     {% for parent in lastViews.parents %}
         {% if parent.date is not null %}
         <li class="icon-staff" title="{{ parent.date }}">
-                <span>{{ parent.name }}</span>
+                <a href="/search/user/{{ parent.id }}">{{ parent.name }}</a>
             {{ parent.status }} {% if 'assessment' is same as(parent.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}
         </li>
         {% endif %}
