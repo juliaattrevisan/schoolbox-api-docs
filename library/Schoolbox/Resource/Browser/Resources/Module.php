@@ -37,6 +37,12 @@ class Module extends AbstractModule
      */
     public function buildController(): Base
     {
+        $treeBuilder = new TreeBuilder(
+            $this->getMapperFactory()->get(Resource\Folder\Mapper::class),
+            $this->injector->get('user'),
+            $this->injector->get('l10n')->translate('resource', true, true),
+        );
+        $treeBuilder->setFileLocator($this->getMapperFactory()->get(Resource\File\Mapper::class));
         return (
             new Controller(
                 $this->getMapperFactory()->get(Resource\File\Mapper::class),
@@ -47,13 +53,7 @@ class Module extends AbstractModule
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
             ->setNodeFactory(new Resource\Browser\NodeFactory())
-            ->setTreeBuilder(
-                new TreeBuilder(
-                    $this->getMapperFactory()->get(Resource\Folder\Mapper::class),
-                    $this->injector->get('user'),
-                    $this->injector->get('l10n')->translate('resource', true, true),
-                )
-            )
+            ->setTreeBuilder($treeBuilder)
             ->setFolderMapper($this->getMapperFactory()->get(Resource\Folder\Mapper::class))
             ->setNamespace($this->basename)
             ->setNodeType(Resource\Browser\NodeFactory::SBFS)

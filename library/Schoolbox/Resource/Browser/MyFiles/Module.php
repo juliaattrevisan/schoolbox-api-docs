@@ -25,17 +25,17 @@ class Module extends AbstractModule
      */
     public function buildController(): Base
     {
+        $treeBuilder = new TreeBuilder(
+            $this->getMapperFactory()->get(My\Folder\Mapper::class),
+            $this->injector->get('user'),
+        );
+        $treeBuilder->setFileLocator($this->getMapperFactory()->get(My\File\Mapper::class));
         return (new FullAccessController())
             ->setFileMapper($this->getMapperFactory()->get(My\File\Mapper::class))
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
             ->setNodeFactory(new NodeFactory())
-            ->setTreeBuilder(
-                new TreeBuilder(
-                    $this->getMapperFactory()->get(My\Folder\Mapper::class),
-                    $this->injector->get('user'),
-                )
-            )
+            ->setTreeBuilder($treeBuilder)
             ->setFolderMapper($this->getMapperFactory()->get(My\Folder\Mapper::class))
             ->setNamespace($this->basename)
             ->setNodeType(NodeFactory::MYFILE)
