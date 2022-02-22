@@ -1,9 +1,8 @@
-import Vue from "vue";
-import ClassList from "./class-list";
+import { createApp } from 'vue';
+import ClassList from './class-list';
 
-new Vue({
-    el: '#email-class-lists',
+createApp({
     components: {
-        'class-list': ClassList
+        ClassList
     }
-});
+}).mount('#email-class-lists');

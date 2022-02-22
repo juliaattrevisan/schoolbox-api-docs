@@ -213,7 +213,7 @@ module.exports = {
         // recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
 
         // Class
-        // classList: './library/Schoolbox/Learning/vue/classList.js',
+        classList: './library/Schoolbox/Learning/vue/classList.js',
 
         // Groups
         manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
