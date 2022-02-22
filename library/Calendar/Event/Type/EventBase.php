@@ -514,6 +514,24 @@ abstract class EventBase implements EventInterface
     }
 
     /**
+     * Returns time in the format that Vue can convert to browser timezone
+     * @return string
+     */
+    public function getStartTimeForCalendar(): string
+    {
+            return $this->startTime->toW3cString();
+    }
+
+    /**
+     * Returns time in the format that Vue can convert to browser timezone
+     * @return string
+     */
+    public function getEndTimeForCalendar(): string
+    {
+        return $this->endTime->toW3cString();
+    }
+
+    /**
      * Set start date and time
      *
      * @param Alaress_Date_Format $startTime
