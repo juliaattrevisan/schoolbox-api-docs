@@ -267,7 +267,11 @@ class Controller extends Base
         if ($resourceId) {
             $start    = new Alaress_Date_Format(
                 $event['start'],
-                [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT]
+                [
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    Alaress_Date_Format::DATABASE_DATE_FORMAT,
+                    DATE_W3C
+                ]
             );
             $start    = $start->startOfWeek();
             $end      = (clone $start)->endOfWeek()->addDays(1);
