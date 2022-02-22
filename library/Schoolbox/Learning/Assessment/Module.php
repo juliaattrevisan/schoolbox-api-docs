@@ -33,6 +33,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
@@ -383,6 +384,7 @@ class Module extends BaseModule
         $unitSpecMapper   = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
         $folderMapper     = $this->getMapperFactory()->get(FolderMapper::class);
         $termMapper       = $this->getMapperFactory()->get(Term\Mapper::class);
+        $viewLatestMapper = $this->getMapperFactory()->get(LatestViewMapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
@@ -442,6 +444,7 @@ class Module extends BaseModule
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
                     $this->injector->get('feedbackDataSource'),
                     $folderMapper,
+                    $viewLatestMapper,
                 );
 
             case Assessment\Project\Controller::class:
@@ -458,6 +461,7 @@ class Module extends BaseModule
                     $courseSpecMapper,
                     $unitSpecMapper,
                     $replicator,
+                    $viewLatestMapper,
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -478,6 +482,7 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $folderMapper,
+                    $viewLatestMapper,
                 );
 
             case Assessment\Task\Controller::class:
@@ -495,6 +500,7 @@ class Module extends BaseModule
                     $courseSpecMapper,
                     $unitSpecMapper,
                     $replicator,
+                    $viewLatestMapper,
                 );
 
             case Assessment\Lti\Controller::class:
@@ -517,6 +523,7 @@ class Module extends BaseModule
                     $this->injector->get('lti.registrations'),
                     $this->injector->get('instance'),
                     $this->injector->get('lti.userCodec'),
+                    $viewLatestMapper,
                 );
 
             default:

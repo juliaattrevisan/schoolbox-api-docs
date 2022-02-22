@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -95,6 +96,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param UnitSpecificationMapper   $unitSpecificationMapper
      * @param Replicator                $replicator
+     * @param LatestViewMapper          $latestViewMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -112,7 +114,8 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        LatestViewMapper $latestViewMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -126,7 +129,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator
+            $replicator,
+            $latestViewMapper
         );
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
@@ -242,7 +246,14 @@ class Controller extends Assessment\Controller
         $canAttempt = $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId()
             && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
 
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
         $twigData = [
+            'lastViews'         => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'        => $assessment,
             'student'           => $student,

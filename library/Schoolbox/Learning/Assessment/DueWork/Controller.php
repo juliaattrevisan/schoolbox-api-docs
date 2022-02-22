@@ -64,6 +64,7 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -154,6 +155,7 @@ class Controller extends Assessment\Controller
      * @param Turnitin\File\Mapper                    $turnitinFileMapper
      * @param Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper       $folderMapper
+     * @param LatestViewMapper                        $latestViewMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -178,7 +180,8 @@ class Controller extends Assessment\Controller
         Gotenberg\Client $pdfGenerator,
         Turnitin\File\Mapper $turnitinFileMapper,
         Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        LatestViewMapper $latestViewMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -192,7 +195,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator
+            $replicator,
+            $latestViewMapper
         );
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
@@ -359,12 +363,18 @@ class Controller extends Assessment\Controller
                 }
             }
         }
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
+        $lastView->addNewView($assessment, $student, $this->getUser());
 
         /* Find all the records spawned by $participant
          *
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
+            'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
                     $assessment->getTitle(),

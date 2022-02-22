@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 
 /**
  * Class Controller
@@ -66,6 +67,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param UnitSpecificationMapper       $unitSpecificationMapper
      * @param Replicator                    $replicator
+     * @param LatestViewMapper              $latestViewMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -80,7 +82,8 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
-        Replicator $replicator
+        Replicator $replicator,
+        LatestViewMapper $latestViewMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -94,7 +97,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator
+            $replicator,
+            $latestViewMapper
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
@@ -205,7 +209,14 @@ class Controller extends Assessment\Controller
             'teacherAssessed' => 'incomplete',
         ];
 
+        /**
+         * record view
+         */
+        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
         $twigData = [
+            'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'   => $assessment,
             'student'      => $student,
