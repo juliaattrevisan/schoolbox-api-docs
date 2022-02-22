@@ -192,7 +192,7 @@ module.exports = {
         // textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
 
         //Admin
-        // adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
+        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
         // staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',

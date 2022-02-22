@@ -5,4 +5,4 @@ createApp({
     components: {
         AdminGrades
     }
-}).mount('#admin-grades');
+}).mount('#admin-grades-container');
