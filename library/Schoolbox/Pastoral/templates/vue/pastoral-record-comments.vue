@@ -218,8 +218,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteComment" class="button submit">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+                <li><button @click.prevent="deleteComment" class="button submit">Delete</button></li>
+                <li><button @click.prevent="$refs.deleteModal.close" class="button">Cancel</button></li>
             </ul>
         </reveal-modal>
 

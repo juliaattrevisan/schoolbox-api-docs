@@ -176,9 +176,9 @@ export default {
        <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">{{ getAddCommentButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="`comment-${uniqueId}`" rows="4"></textarea>
-            <a class="button submit"
+            <button class="button submit"
                 @click="postComment"
-                :disabled="isPostCommentDisabled">Post comment</a>
+                :disabled="isPostCommentDisabled">Post comment</button>
         </div>
    </div>
 </template>

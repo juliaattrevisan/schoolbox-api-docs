@@ -1,9 +1,8 @@
-import Vue from "vue";
-import PastoralCountBadge from "./pastoral-count-badge";
+import { createApp } from 'vue';
+import PastoralCountBadge from './pastoral-count-badge';
 
-new Vue({
-    el: '#pastoral-count-badge',
+createApp({
     components: {
-        'pastoral-count-badge': PastoralCountBadge
+        PastoralCountBadge
     }
-});
+}).mount('#pastoral-count-badge');
