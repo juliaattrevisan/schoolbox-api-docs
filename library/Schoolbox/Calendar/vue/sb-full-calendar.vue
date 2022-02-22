@@ -1,6 +1,6 @@
 <script>
 
-import FullCalendar               from '@fullcalendar/vue'
+import FullCalendar               from '@fullcalendar/vue3'
 import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
@@ -791,7 +791,7 @@ export default {
             ref="fullCalendar"
             :options="calendarOptions"
         >
-            <template v-slot:eventContent="arg">
+            <template #eventContent="arg">
                 <customised-calendar-event :content="arg" />
             </template>
         </full-calendar>

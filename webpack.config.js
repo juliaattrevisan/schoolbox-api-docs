@@ -160,7 +160,7 @@ module.exports = {
         searchBar: './vue/components/searchBar/searchBar.js',
 
         //Calendars
-        // sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
+        sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
         // assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
         // upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
         // resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',

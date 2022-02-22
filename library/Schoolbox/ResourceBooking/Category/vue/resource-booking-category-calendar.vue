@@ -1,6 +1,6 @@
 <script>
 
-import FullCalendar               from '@fullcalendar/vue'
+import FullCalendar               from '@fullcalendar/vue3'
 import interactionPlugin          from '@fullcalendar/interaction'
 import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@schoolboxVue/components/fullcalendar/view-event-modal';
