@@ -161,12 +161,12 @@ module.exports = {
 
         //Calendars
         sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
-        // assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
-        // upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
-        // resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
-        // resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js',
-        // calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
-        // calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
+        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
+        upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
+        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
+        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js',
+        calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
+        calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
 
         //News related
         // visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
