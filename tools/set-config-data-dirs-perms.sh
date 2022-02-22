@@ -140,6 +140,7 @@ function parse_cli_args(){
       shift # past value
       ;;
       *)    # unknown option
+
       error "Unrecognised option: '$1'"
       errors='1'
       shift # past argument
@@ -187,6 +188,31 @@ function parse_sql_credentials(){
   if [[ $errors == '1' ]]; then
     exit 1
   fi
+}
+
+
+# Check if script is already running
+function check_script_overlap() {
+	stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
+	lf=$stream_dir/lockfile.lock;
+	# Create empty lock file if none exists
+	touch $lf;
+	# Read the contents of the lockfile into a variable
+	read lastPID < $lf;
+	# If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
+	if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]
+	then
+		if ! dpkg -s mailutils &> /dev/null;
+		then
+			warn "mailutils is not installed. Cannot send email."
+		else
+			mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
+
+		fi
+		exit
+	fi
+	# else write the PID of the current running script to the lock file
+	echo $$ > $lf;
 }
 
 
@@ -302,7 +328,10 @@ function update_directories(){
       find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
+  rm $stream_dir/lockfile.lock
 }
+
+
 
 
 function main(){
@@ -312,6 +341,7 @@ function main(){
   parse_cli_args "$@"
   log "Updating data directory permissions";
   parse_sql_credentials
+  check_script_overlap
   parse_available_data_dirs
   derive_data_dirs
   update_directories
@@ -319,4 +349,5 @@ function main(){
 }
 
 main "$@"
+
 
