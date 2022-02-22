@@ -86,8 +86,8 @@ export default {
                             <label for="export-all">All events</label>
                         </li>
                         <li>
-                            <input type="radio" v-model="form.export" name="export" value="all_timetable" id="export-all_timetable" />
-                            <label for="export-all_timetable">All events (Including Timetable classes)</label>
+                            <input type="radio" v-model="form.export" name="export" value="all_external" id="export-all_external" />
+                            <label for="export-all_external">All events (including external events)</label>
                         </li>
                         <li>
                             <input type="radio" v-model="form.export" name="export" value="personal" id="export-personal" />

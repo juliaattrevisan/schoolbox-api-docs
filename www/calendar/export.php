@@ -397,6 +397,7 @@ try {
 
             break;
         case 'all':
+        case 'all_external':
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
             $subApi = buildApiClass(
@@ -439,10 +440,29 @@ try {
             }
 
             //if including timetable classes, do that now
-            if ('all_timetable' === $export_type) {
+            if ('all_external' === $export_type) {
+                //build timetable
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
                     [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                    true,
+                    $sentry
+                );
+
+                //build external events, including vcal source
+                $api->add($subApi);
+                /** @var IConnector $databaseExternal */
+                $databaseExternal = $kernel->getDependencyInjector()->get('databaseExternal');
+                $factory          = new ExternalConnectorFactory();
+                $externalEvents   = $factory->build(
+                    $kernel->getDependencyInjector()->get('config'),
+                    $databaseExternal,
+                    ExternalConnectorFactory::EXTERNAL_EVENTS
+                );
+
+                $subApi = buildApiClass(
+                    Calendar_Api_EventType_Event_External_Default::class,
+                    [$user, $viewer, $externalEvents],
                     true,
                     $sentry
                 );
