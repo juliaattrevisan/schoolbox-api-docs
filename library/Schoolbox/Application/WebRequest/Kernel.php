@@ -138,7 +138,7 @@ class Kernel extends WebKernelAbstract
             if ($route instanceof Route) {
                 $this->outputAuraContent($route, $server);
             } else {
-                $this->outputSitepageContent($_GET['page'] ?? null, $server);
+                $this->outputSitepageContent($path, $server);
             }
         } catch (Unauthenticated $e) {
             // Unauthenticated response - redirect to a login page.
