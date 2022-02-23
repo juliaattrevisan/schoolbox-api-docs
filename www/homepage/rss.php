@@ -1,12 +1,13 @@
 <?php
 
 use Aura\Router\Router;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // trim in case the leading slash is captured in the URI
-$page = trim($_GET['page'], '/');
+$page = trim(RequestUriParser::parseUrlPath($_SERVER), '/');
 $args = explode('/', $page);
 
 $catID = isset($args[2]) ? $args[2] : '';

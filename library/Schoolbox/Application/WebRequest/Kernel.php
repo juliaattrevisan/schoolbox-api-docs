@@ -112,16 +112,8 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
-        $parsedUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        if (!$parsedUrl) {
-            // because parse_url returns false when the url contains ":", replacing it.
-            $parsedUrl = parse_url(str_replace(':', '%3A', $_SERVER['REQUEST_URI']), PHP_URL_PATH);
-            $parsedUrl = str_replace('%3A', ':', $parsedUrl);
-        }
-
         // Run router with requested path (trim trailing /)
-        $path  = preg_replace('|/$|', '', $parsedUrl);
+        $path  = RequestUriParser::parseUrlPath($_SERVER);
 
         // take a copy
         $server = $_SERVER;
