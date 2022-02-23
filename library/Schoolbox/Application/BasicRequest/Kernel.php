@@ -312,7 +312,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
 
                     // Global access to returnUrl vars
-                    $encodedUrl = Redirect::encode($_GET["page"] ?? '');
+                    $encodedUrl = Redirect::encode($_SERVER['REQUEST_URI'] ?? '');
                     $twig->addGlobal(
                         'RETURN_URL',
                         [
