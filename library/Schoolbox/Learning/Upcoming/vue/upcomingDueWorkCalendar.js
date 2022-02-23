@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import UpcomingDueWorkCalendar from './upcoming-due-work-calendar';
 
-window.upcomingDueworkCalendar = createApp({
+createApp({
     components: {
         UpcomingDueWorkCalendar
     }

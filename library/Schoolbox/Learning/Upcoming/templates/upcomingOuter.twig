@@ -54,8 +54,12 @@
             // Filtered content has been [re]loaded
             // (Shouldn't this trigger contain the filters that are selected?)
             $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-                // Somehow pass the list of filters into the Vue calendar
-                window.upcomingDueworkCalendar.$children[0].onFilterChange(selectedFilters);
+                // Pass the list of filters into upcoming-due-work-calendar.vue
+                document.dispatchEvent(new CustomEvent('upcoming-due-work-calendar__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
             });
         });
 

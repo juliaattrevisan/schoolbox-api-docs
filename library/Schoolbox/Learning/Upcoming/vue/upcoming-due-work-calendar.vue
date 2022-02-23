@@ -142,6 +142,9 @@ export default {
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+
+        document.addEventListener('upcoming-due-work-calendar__onFilterChange', this.onFilterChange);
+
     },
 
     methods: {
@@ -225,12 +228,12 @@ export default {
         /**
          * Callback for when the filters for this calendar are updated.
          *
-         * Fired from outer space (i.e. from the outside window).
+         * Fired from outer space, currently from: library/Schoolbox/Learning/Upcoming/templates/upcomingOuter.twig
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange(selectedFilters) {
-            this.selectedFilters = selectedFilters;
+        onFilterChange(event) {
+            this.selectedFilters = event.detail.selectedFilters;
             this.calendarApi.refetchEvents();
         },
 

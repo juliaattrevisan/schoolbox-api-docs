@@ -75,6 +75,10 @@ export default {
         this.filter_endpoint = this.getBadgesRoute; //assign endpoint for the mixinFilter
     },
 
+    mounted () {
+        document.addEventListener('badge-list__onFilterChange', this.onFilterChange);
+    },
+
     methods: {
 
         /**
@@ -144,12 +148,21 @@ export default {
         /**
          * Callback for when the filters for this badge list are updated.
          *
-         * Fired from outer space (i.e. from the outside window).
+         * Fired from outer space, currently from library/Schoolbox/Learning/Badge/templates/list.twig
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange (selectedFilters) {
-            this.selectedFilters    = selectedFilters;
+        onFilterChange (event) {
+            this.changeFilters(event.detail.selectedFilters);
+        },
+
+        /**
+         * Update the display with the selected filters
+         *
+         * @param {object} selectedFilters The filters that were selected
+         */
+        changeFilters (selectedFilters) {
+            this.selectedFilters = selectedFilters;
             this.showSkeletonLoader = true;
             this.filter_load(false);
             this.filter_emitChange();

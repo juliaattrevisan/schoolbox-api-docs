@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import BadgeList from './badge-list';
 
-window.badgeList = createApp({
+createApp({
     components: {
         BadgeList
     }
