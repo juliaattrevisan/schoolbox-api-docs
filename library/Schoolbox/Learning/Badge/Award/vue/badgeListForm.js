@@ -1,7 +1,8 @@
-import Vue from "vue";
+import { createApp } from 'vue';
 import BadgeListForm from './badge-list-form';
 
-Vue.component('badge-list-form', BadgeListForm);
-window.badgeList = new Vue({
-    el: '#badge-list-form-container'
-});
+window.badgeList = createApp({
+    components: {
+        BadgeListForm
+    }
+}).mount('#badge-list-form-container');

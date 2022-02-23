@@ -276,12 +276,12 @@ export default {
                   label="name"
                   :placeholder="placeholder"
                   v-model="selected">
-            <template slot="option" slot-scope="option">
+            <template #option="option">
                 <span class="d-center">
                     {{ option.name }}
                 </span>
             </template>
-            <template slot="selected-option" slot-scope="option">
+            <template #selected-option="option">
                 <span class="selected d-center">
                     {{ option.name }}
                 </span>
