@@ -206,68 +206,66 @@ export default {
     <div>
         <template v-if="this.loading">
             <dl class="tabs">
-                <dd class="skeleton" v-for="n in 3">
+                <dd class="skeleton" v-for="n in 3" :key="n">
                     <a></a>
                 </dd>
             </dl>
         </template>
         <template v-else-if="this.data.categories">
             <section class="awards">
-                <template v-for="category in this.data.categories">
-                    <div class="content divider">
-                        <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>
+                <div v-for="(category, index) in this.data.categories" class="content divider" :key="index">
+                    <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>
 
-                        <div class="badge-grid v-card-list">
-                            <div class="badge v-card" v-for="award in category.awards">
-                                <div class="card-feature-image">
-                                    <a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">
-                                        <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
-                                    </a>
-                                    <template v-if="award.count > 1">
-                                        <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
-                                    </template>
+                    <div class="badge-grid v-card-list">
+                        <div class="badge v-card" v-for="award in category.awards" :key="award.badge.id">
+                            <div class="card-feature-image">
+                                <a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">
+                                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
+                                </a>
+                                <template v-if="award.count > 1">
+                                    <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
+                                </template>
+                            </div>
+                            <div class="actions-small-1 card-content">
+                                <div class="list-item">
+                                    <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
                                 </div>
-                                <div class="actions-small-1 card-content">
-                                    <div class="list-item">
-                                        <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
-                                    </div>
-                                    <template v-if="hasTot(award)">
-                                    <nav>
-                                      <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
-                                    </nav>
-                                    <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                <template v-if="hasTot(award)">
+                                <nav>
+                                    <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
+                                </nav>
+                                <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
 
-                                      <!-- Only show Withdraw button if you can actually do it
-                                        -- Students can't withdraw their own Achievement
+                                    <!-- Only show Withdraw button if you can actually do it
+                                    -- Students can't withdraw their own Achievement
+                                    -->
+                                    <template v-if="canWithdraw(award)">
+                                    <template v-if="!award.isGoal">
+                                        <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
+                                    </template>
+                                    <template v-else>
+                                        <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
+                                        <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                    </template>
+                                    </template>
+                                </ul>
+                                </template>
+                                <p class="meta">
+                                    <!-- Change metadata text subtly depending on the Award status
+                                        -- Goals and Achievements, while badges, aren't the same thing
                                         -->
-                                      <template v-if="canWithdraw(award)">
-                                        <template v-if="!award.isGoal">
-                                          <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                        </template>
-                                        <template v-else>
-                                          <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
-                                          <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                        </template>
-                                      </template>
-                                    </ul>
+                                    <template v-if="award.isGoal">
+                                        Goal set
                                     </template>
-                                    <p class="meta">
-                                        <!-- Change metadata text subtly depending on the Award status
-                                          -- Goals and Achievements, while badges, aren't the same thing
-                                          -->
-                                        <template v-if="award.isGoal">
-                                          Goal set
-                                        </template>
-                                        <template v-else>
-                                          Awarded
-                                        </template>
-                                        <relative-time :datetime="award.awardedAt"></relative-time>
-                                    </p>
-                                </div>
+                                    <template v-else>
+                                        Awarded
+                                    </template>
+                                    <relative-time :datetime="award.awardedAt"></relative-time>
+                                </p>
                             </div>
                         </div>
                     </div>
-                </template>
+                </div>
             </section>
         </template>
         <template v-else>
