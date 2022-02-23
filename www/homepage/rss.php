@@ -19,7 +19,7 @@ $di = $kernel->getDependencyInjector();
 /** @var Router $router */
 $router = $di->get('router');
 $url = $catID
-    ? $router->generate('commsNewsFeed.getFeedForFolder', ['folderId' => $catID])
+    ? $router->generate('commsNewsFeed.getFeedForFolder', ['key' => $token, 'folderId' => $catID])
     : $router->generate('commsNewsFeed.getFeedForUser', ['key' => $token]);
 
 SitePage::localRedir($url, false, 308);
