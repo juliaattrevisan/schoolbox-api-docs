@@ -1,7 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import EvidenceDetail from './evidence-detail';
 
-Vue.component('evidence-detail', require('./evidence-detail.vue').default);
-
-new Vue({
-    el: '#evidence-detail-container'
-});
+createApp({
+    components: {
+        EvidenceDetail
+    }
+}).mount('#evidence-detail-container');

@@ -179,7 +179,7 @@ module.exports = {
         newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
 
         //Learning
-        // learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
+        learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
         // userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
         // badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
         // badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
