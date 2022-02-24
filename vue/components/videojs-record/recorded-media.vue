@@ -306,7 +306,7 @@ export default {
         >
             <p>Are you sure you wish to delete the current {{currentRecordingType}}?</p>
             <div class="modal-actions">
-                <button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
+                <button class="submit" @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
             </div>
         </over-media-modal>
@@ -349,6 +349,7 @@ export default {
     display: flex;
     button {
         margin: 0px 2px; 
+        width: 100%;
     }
 }
 

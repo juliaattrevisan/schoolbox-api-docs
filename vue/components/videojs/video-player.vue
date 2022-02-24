@@ -43,7 +43,7 @@ export default {
         }
     },
 
-    beforeDestroy () {
+    beforeUnmount () {
         if (this.player) {
             this.player.dispose(); //cleanup, can be re-activated later on the same page
         }

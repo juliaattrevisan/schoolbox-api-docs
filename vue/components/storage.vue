@@ -54,7 +54,7 @@ export default {
                 break;
         }
     },
-    beforeDestroy() {
+    beforeUnmount() {
         switch (this.storage.type) {
             case 'audio':
             case 'video':
@@ -68,7 +68,7 @@ export default {
                 break;
         }
     },
-    filters: {
+    methods: {
         filesize(size) {
             // This uses the JEDEC standard (1KB = 1024B),
             // rather than the SI standard (1KB = 1000B, 1KiB = 1024B):
@@ -97,6 +97,6 @@ export default {
     <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
     <a v-else :href="storage._links.fetch">
         <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
-        <span class="meta">({{ storage.size | filesize }})</span>
+        <span class="meta">({{ filesize(storage.size) }})</span>
     </a>
 </template>

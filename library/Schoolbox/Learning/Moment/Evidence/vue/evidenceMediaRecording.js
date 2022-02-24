@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import EvidenceMediaRecording from './evidence-media-recording';
 
-new Vue({
-    el: '#evidence-media-recording',
+createApp({
     components: {
         EvidenceMediaRecording
     }
-});
+}).mount('#evidence-media-recording');

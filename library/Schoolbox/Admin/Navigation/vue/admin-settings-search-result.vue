@@ -70,7 +70,7 @@ export default {
         this.checkIndex();
     },
 
-    beforeDestroy () {
+    beforeUnmount () {
         this.checkIndex();
     },
 

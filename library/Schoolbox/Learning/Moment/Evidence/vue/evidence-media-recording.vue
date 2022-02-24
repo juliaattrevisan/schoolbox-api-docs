@@ -398,11 +398,4 @@ export default {
     }
 }
 
-.modal-actions {
-    display: flex;
-    button {
-        margin: 0px 2px; 
-    }
-}
-
 </style>

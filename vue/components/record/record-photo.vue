@@ -36,12 +36,12 @@ export default {
     <record-photo-device
         v-if="hasDeviceCapture"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
     <record-photo-browser
         v-else
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
 
 </template>

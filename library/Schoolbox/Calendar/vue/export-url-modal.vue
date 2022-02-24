@@ -34,7 +34,7 @@
         /**
          * On destroy: clean up the clipboardJS object
          */
-        beforeDestroy() {
+        beforeUnmount() {
             this.clipboardJs.destroy();
         },
 

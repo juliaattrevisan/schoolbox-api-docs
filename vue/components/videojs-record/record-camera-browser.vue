@@ -70,7 +70,7 @@ export default {
         }
     },
 
-    beforeDestroy () {
+    beforeUnmount () {
         this.destroyVideojs();
     },
 
