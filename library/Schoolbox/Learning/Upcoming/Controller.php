@@ -16,6 +16,7 @@ use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -353,7 +354,7 @@ class Controller extends Base
         $data = [
             'student'         => $student,
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
-            'returnUrl'       => Redirect::queryString($this->getRequest()->query->get('page')),
+            'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->request->server->getArrayCopy())),
             'readableFolders' => \array_unique($readableFolders),
             'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];

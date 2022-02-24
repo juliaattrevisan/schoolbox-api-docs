@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Quiz;
 
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
@@ -152,7 +153,8 @@ class Controller extends AbstractController
      */
     public function getQuizIntro($assessmentId)
     {
-        $returnUrlSuffix = "?returnUrl=" . ($this->getRequest()->query->get('returnUrl') ?: Redirect::encode($this->getRequest()->query->get('page')));
+        $returnUrlSuffix = "?returnUrl=" .
+            ($this->getRequest()->query->get('returnUrl') ?: Redirect::encode(RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()))));
 
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $this->getResponse()->redirect->to("/assess/intro/$assessId" . $returnUrlSuffix);

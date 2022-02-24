@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Moderation;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
@@ -75,7 +76,7 @@ class Controller extends Base
     public function getList(): void
     {
         $lists = new Lists($this->newsMapper);
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
         $data = array_merge([
             'articles' => $this->newsMapper->findByPredicates($this->newsMapper->getPredicateAwaitingModeration()),

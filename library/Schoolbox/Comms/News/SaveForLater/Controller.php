@@ -11,6 +11,7 @@
 namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\ValidHasReadMore;
@@ -74,7 +75,7 @@ class Controller extends Base
             return;
         }
 
-        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
         /* Attachment counts for each article in this set
          */
