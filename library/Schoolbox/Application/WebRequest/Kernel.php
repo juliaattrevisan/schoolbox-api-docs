@@ -112,16 +112,8 @@ class Kernel extends WebKernelAbstract
      */
     public function run()
     {
-        $parsedUrl = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        if (!$parsedUrl) {
-            // because parse_url returns false when the url contains ":", replacing it.
-            $parsedUrl = parse_url(str_replace(':', '%3A', $_SERVER['REQUEST_URI']), PHP_URL_PATH);
-            $parsedUrl = str_replace('%3A', ':', $parsedUrl);
-        }
-
         // Run router with requested path (trim trailing /)
-        $path  = preg_replace('|/$|', '', $parsedUrl);
+        $path  = RequestUriParser::parseUrlPath($_SERVER);
 
         // take a copy
         $server = $_SERVER;
@@ -138,7 +130,7 @@ class Kernel extends WebKernelAbstract
             if ($route instanceof Route) {
                 $this->outputAuraContent($route, $server);
             } else {
-                $this->outputSitepageContent($_GET['page'] ?? null, $server);
+                $this->outputSitepageContent($path, $server);
             }
         } catch (Unauthenticated $e) {
             // Unauthenticated response - redirect to a login page.

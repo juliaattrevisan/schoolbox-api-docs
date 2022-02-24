@@ -13,6 +13,7 @@ use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -312,7 +313,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
 
                     // Global access to returnUrl vars
-                    $encodedUrl = Redirect::encode($_GET["page"] ?? '');
+                    $encodedUrl = Redirect::encode(RequestUriParser::parseUrlPath($_SERVER));
                     $twig->addGlobal(
                         'RETURN_URL',
                         [

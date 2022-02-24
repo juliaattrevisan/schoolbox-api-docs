@@ -1,12 +1,13 @@
 <?php
 
 use Aura\Router\Router;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // trim in case the leading slash is captured in the URI
-$page = trim($_GET['page'], '/');
+$page = trim(RequestUriParser::parseUrlPath($_SERVER), '/');
 $args = explode('/', $page);
 
 $catID = isset($args[2]) ? $args[2] : '';
@@ -18,7 +19,7 @@ $di = $kernel->getDependencyInjector();
 /** @var Router $router */
 $router = $di->get('router');
 $url = $catID
-    ? $router->generate('commsNewsFeed.getFeedForFolder', ['folderId' => $catID])
+    ? $router->generate('commsNewsFeed.getFeedForFolder', ['key' => $token, 'folderId' => $catID])
     : $router->generate('commsNewsFeed.getFeedForUser', ['key' => $token]);
 
 SitePage::localRedir($url, false, 308);

@@ -23,6 +23,7 @@ use PDOException;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
@@ -780,7 +781,7 @@ class Controller extends Base
             'key' => $this->getUser()->getKey(),
         ];
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
         $data = array_merge($data, $sidebar->generate());
 
@@ -979,7 +980,7 @@ class Controller extends Base
             ],
             'slug' => $params->getSlug(),
             'referrer' => $params->getReferrer(),
-            'page' => $this->getRequest()->query['page'],
+            'page' => RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()),
             'pageWithoutParams' => $this->getRouter()->generate('commsNews.getArchive'),
             'availableYearsAndMonths' => $availableYearsAndMonths,
             'year' => $year,
@@ -1162,7 +1163,7 @@ class Controller extends Base
             $status = 'All';
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
         $data = array_merge([
             'pageNum' => $pageNum,

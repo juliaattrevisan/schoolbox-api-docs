@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -256,8 +257,8 @@ class Controller extends Base
         }
 
         // requires filter params and returnUrl
-        unset($queryArgs['page']);
-        $returnUrl =  $_GET["page"] . '?' . http_build_query($queryArgs);
+        $requestUri = RequestUriParser::parseUrlPath($this->request->server->getArrayCopy());
+        $returnUrl  = $requestUri . '?' . http_build_query($queryArgs);
 
         $translator = new User\Translator\Author\ModelToArray();
         $this->response->content->set(

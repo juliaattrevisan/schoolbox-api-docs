@@ -122,7 +122,7 @@ class SitePage extends Page
     public function loadContent($pageFile, $execute = true)
     {
         /* sanitise data, force all 404s through pageNotFound() */
-        if (!preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || $pageFile == 'common/404') {
+        if (!preg_match("/^[a-zA-Z0-9\/\-\_\.]+/", $pageFile) || ($_GET['page'] ?? '') === 'common/404') {
             $this->pageNotFound();
         }
 
