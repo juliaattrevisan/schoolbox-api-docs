@@ -551,12 +551,12 @@
 
                             <template v-if="canInviteAttendees()">
                                 <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Search for people to invite" v-model="selected">
-                                    <template slot="option" slot-scope="option">
+                                    <template #option="option">
                                         <div class="d-center">
                                             {{ option.name }}
                                         </div>
                                     </template>
-                                    <template slot="selected-option" slot-scope="option">
+                                    <template #selected-option="option">
                                         <div class="selected d-center">
                                             {{ option.name }}
                                         </div>

@@ -288,9 +288,9 @@ export default {
             @loaded="onLoaded"
             @select="onRowSelected"
         >
-            <div slot="afterTable">
+            <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
-            </div>
+            </template>
         </v-client-table>
 
         <toast ref="toast"></toast>
