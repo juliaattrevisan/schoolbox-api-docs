@@ -1,12 +1,11 @@
-import Vue from 'vue';
-import { ClientTable } from 'vue-tables-2-premium';
+import { createApp } from 'vue';
 import UsageSpecificFile from './file';
+import { ClientTable } from 'v-tables-3-select-rows';
 
-Vue.use(ClientTable);
-
-new Vue({
-    el: '#usage-specific-file-container',
+const app = createApp({
     components: {
-        'usage-specific-file': UsageSpecificFile
+        UsageSpecificFile
     }
 });
+app.use(ClientTable)
+app.mount('#usage-specific-file-container');

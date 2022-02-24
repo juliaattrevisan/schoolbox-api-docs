@@ -305,8 +305,8 @@ export default {
                     available.
             </div>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
-                <li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
+                <li><button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</button></li>
+                <li><button @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</button></li>
             </ul>
         </reveal-modal>
 

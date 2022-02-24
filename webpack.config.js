@@ -202,12 +202,12 @@ module.exports = {
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
         usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
         usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
-        // usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
+        usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
 
         usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
         usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
         usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
-        // usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
+        usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',

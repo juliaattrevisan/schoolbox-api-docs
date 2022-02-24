@@ -1,12 +1,11 @@
-import Vue from 'vue';
-import { ClientTable } from 'vue-tables-2-premium';
+import { createApp } from 'vue';
 import UsageGlobalUser from './user';
+import { ClientTable } from 'v-tables-3-select-rows';
 
-Vue.use(ClientTable);
-
-new Vue({
-    el: '#usage-global-user-container',
+const app = createApp({
     components: {
-        'usage-global-user': UsageGlobalUser
+        UsageGlobalUser
     }
 });
+app.use(ClientTable)
+app.mount('#usage-global-user-container');
