@@ -25,7 +25,7 @@ if (is_numeric($_REQUEST['cid'])) {
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
     /* The RETURN_URL twig global presumes that the encoded portion comes from
-     * $_GET['REQUEST_URI'].
+     * $_SERVER['REQUEST_URI'].
      *
      * Without it, returnUrl will be an /homepage/configForm.php which, when
      * clicked, sends users to a 404.
