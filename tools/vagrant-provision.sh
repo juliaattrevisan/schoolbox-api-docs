@@ -437,6 +437,8 @@ else
     rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
 fi
 
+usermod -G www-data -a vagrant
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart;
 eval "service php${phpversion_supported}-fpm restart"

@@ -158,7 +158,8 @@ class External_DatabaseFactory
             $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC
         ) {
             try {
-                return new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'));
+                $log = \Schoolbox\Notif\Notifactory::create(\Schoolbox\Notif\Notif::TOPIC_SYNERGY, $config);
+                return new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $log);
             } catch (Alaress\Database\Exception $e) {
             }
         }

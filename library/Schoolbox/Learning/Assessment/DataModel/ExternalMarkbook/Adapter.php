@@ -100,19 +100,21 @@ class Adapter
      *
      * @param IAssessableDataModel $assessmentModel
      * @param User                 $student
+     * @param int                  $feedbackId
+     * @return void
      */
-    public function syncParticipation(IAssessableDataModel $assessmentModel, User $student): void
+    public function syncParticipation(IAssessableDataModel $assessmentModel, User $student, int $feedbackId): void
     {
         try {
             $assessment = $this->findAssessmentFromDataModel($assessmentModel, $student);
-        } catch (BaseMapper\Exception\Deleted $e) {
+        } catch (BaseMapper\Exception $e) {
             return;
         }
 
         if ($assessment instanceof IAssessable && $this->externalMarkbook->isSyncable($assessment)) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
-                $feedback = $participant->findMostRecentInstructorGivenFeedback();
+                $feedback = $participant->getAllFeedbacks()->indexBy('id')->offsetGet($feedbackId);
                 if ($feedback) {
                     try {
                         $this->externalMarkbook->syncFeedback($feedback);
@@ -135,6 +137,7 @@ class Adapter
      * @param User|null            $student Find this student's particpation (if provided)
      * @return IAssessable
      * @throws BaseMapper\Exception\Deleted if the assessment has been deleted
+     * @throws BaseMapper\Exception
      * @throws TypeError                    if `$assessmentModel` isn't recognized
      */
     private function findAssessmentFromDataModel(
@@ -169,7 +172,8 @@ class Adapter
                 $field,
                 $assessmentModel->getId(),
                 isset($student),
-                $student
+                $student,
+                ['cache' => false]
             );
         }
 

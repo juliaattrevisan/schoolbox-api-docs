@@ -126,17 +126,21 @@ class DataSource
      *       as it is more efficient when loading responses and feedbacks.
      *
      * @param IAssessable $assessment
-     * @param null|User   $user            If specified, only load this user's interactions
+     * @param null|User   $user    If specified, only load this user's interactions
+     * @param array       $options Options for findByColumnList
      * @return IAssessable $assessment, with participation loaded.
      * @throws UnexpectedValueException If unable to derive project participant collection
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    public function loadParticipationIntoAssessment(IAssessable $assessment, User $user = null): IAssessable
+    public function loadParticipationIntoAssessment(IAssessable $assessment, ?User $user = null, array $options = []): IAssessable
     {
         $this->loadParticipationIntoAssessmentCollection(
             new GenericCollection(IAssessable::class, [$assessment]),
-            $user
+            $user,
+            false,
+            false,
+            $options
         );
         return $assessment;
     }
@@ -152,6 +156,7 @@ class DataSource
      * @param bool                     $removeExcluded      Set to true to exclude excluded non-member participants
      * @param bool                     $assumeParticipation if true, assume $user is a participant in the assessment
      *                                                      without checking the assessment's folder.
+     * @param array                    $options Options for findByColumnList
      * @return GenericCollection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -159,16 +164,17 @@ class DataSource
      */
     public function loadParticipationIntoAssessmentCollection(
         GenericCollection $assessments,
-        User $user = null,
+        ?User $user = null,
         bool $removeExcluded = false,
-        bool $assumeParticipation = false
+        bool $assumeParticipation = false,
+        array $options = []
     ): GenericCollection {
         /** @var GenericCollection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user, $removeExcluded, $assumeParticipation);
+        $this->findForAssessmentCollection($assessableWithDescendants, $user, $removeExcluded, $assumeParticipation, $options);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -199,12 +205,14 @@ class DataSource
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function findForAssessmentCollection(
         GenericCollection $assessments,
         User $user = null,
         bool $removeExcluded = false,
-        bool $assumeParticipation = false
+        bool $assumeParticipation = false,
+        array $options = []
     ): void {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
@@ -230,13 +238,13 @@ class DataSource
         // Add Responses
         $this->loadResponses(
             $assessments,
-            $this->responseDataSource->findForAssessmentCollection($assessments, $user)
+            $this->responseDataSource->findForAssessmentCollection($assessments, $user, $options)
         );
 
         // Add Feedback
         $this->loadFeedbacks(
             $assessments,
-            $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
+            $this->feedbackDataSource->findForAssessmentCollection($assessments, $user, $options)
         );
 
         if ($removeExcluded) {

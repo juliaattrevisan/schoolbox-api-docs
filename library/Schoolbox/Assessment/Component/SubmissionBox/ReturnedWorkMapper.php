@@ -330,7 +330,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         if ($object->isPublished() && !$object->isSelfAssess()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
-            $markbookAdapter->syncParticipation($object->getSubmissionBox(), $object->getOwner());
+            $markbookAdapter->syncParticipation($object->getSubmissionBox(), $object->getOwner(), $object->getId());
         }
     }
 

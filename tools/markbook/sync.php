@@ -137,7 +137,7 @@ $kernel->run(static function (ContainerInterface $di, LoopInterface $loop, Logge
     // Synergetic Markbook uses FileYear/FileSemester and exposes command line parameters not available to other connectors.
     if ($config->get('external_type') === 'synergetic') {
         try {
-            $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $year, $semester);
+            $markbookExternal = new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'), $log, $year, $semester);
         } catch (InvalidArgumentException $e) {
             $log->error("ERROR: {$e->getMessage()}");
             help($config);
@@ -290,7 +290,7 @@ $kernel->run(static function (ContainerInterface $di, LoopInterface $loop, Logge
             $log->info(sprintf("    %s%d", str_pad("Assessment Feedback Missing:", 30, " "), $noFeedbackCount));
 
             foreach ($assessment->getAllParticipants() as $participant) {
-                $feedback = $participant->findMostRecentInstructorGivenFeedback();
+                $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                 $student  = $participant->getUser();
 
                 // Output the HR and normalized mark that are synced

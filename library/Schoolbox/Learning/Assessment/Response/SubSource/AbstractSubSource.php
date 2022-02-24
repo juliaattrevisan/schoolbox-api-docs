@@ -69,10 +69,11 @@ abstract class AbstractSubSource implements IResponseDataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $student If set, only return this student's responses
+     * @param User|null                $student If set, only return this student's responses
+     * @param array                    $options Options for findByColumnList
      * @return Collection|IResponse[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, User $student = null)
+    public function findForAssessmentCollection(Collection $assessments, ?User $student = null, array $options = [])
     {
         // Find responses which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getPropertyValues('id');
@@ -90,7 +91,7 @@ abstract class AbstractSubSource implements IResponseDataSource
         // Group responses by assessment
         /** @var Collection|IResponse[][] $responses */
         $responses = $this->mapperProxy
-            ->findByColumnList($columns)
+            ->findByColumnList($columns, $options)
             ->groupByCallback(function (IResponse $v) {
                 return $v->getAssessable()->getId();
             })

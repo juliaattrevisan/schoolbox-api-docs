@@ -1499,6 +1499,7 @@ class MapperProxy
      * @param mixed     $value
      * @param bool      $loadParticipants Should we load participations?
      * @param null|User $student          If specified, only load this user's interactions
+     * @param array     $options          Options for findByColumnList
      * @return IAssessable
      * @throws DefinitionException      If unable to locate a specified mapper join
      * @throws DomainException          If user has interaction but not participant record
@@ -1510,7 +1511,7 @@ class MapperProxy
      *                                  due work, task or project.
      * @throws MapperException\Deleted  if the assessment was soft-deleted
      */
-    public function findOneByColumn(string $column, $value, bool $loadParticipants = false, User $student = null): IAssessable
+    public function findOneByColumn(string $column, $value, bool $loadParticipants = false, ?User $student = null, array $options = []): IAssessable
     {
         $assessmentId = null;
         try {
@@ -1519,11 +1520,11 @@ class MapperProxy
             // the try and catch deleted block.
             try {
                 // Load model and its participants
-                $originalModel = $this->baseMapper->findOneByColumnList([$column => $value]);
+                $originalModel = $this->baseMapper->findOneByColumnList([$column => $value], $options);
                 $assessmentId  = $originalModel->getId();
                 $assessment    = $this->translateToDomainModel($originalModel);
                 if ($loadParticipants) {
-                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                    $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                 }
                 return $assessment;
             } catch (MapperException\Deleted $e) {
@@ -1533,7 +1534,7 @@ class MapperProxy
                     $assessmentId = $originalModel->getId();
                     $assessment   = $this->translateToDomainModel($originalModel);
                     if ($loadParticipants) {
-                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student, $options);
                     }
                     $e->setDeletedObject($assessment);
                 }
