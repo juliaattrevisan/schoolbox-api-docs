@@ -382,11 +382,11 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
-        new webpack.DefinePlugin({
+        new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production: 
             __VUE_OPTIONS_API__: JSON.stringify(true),
             __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
         }),
-        new VueLoaderPlugin(),
+        new VueLoaderPlugin(), //to handle .vue files
         new RemoveEmptyScriptsPlugin(),
     ]
 };

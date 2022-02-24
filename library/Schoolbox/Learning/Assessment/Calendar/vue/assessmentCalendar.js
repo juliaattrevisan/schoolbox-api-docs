@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import AssessmentCalendar from './assessment-calendar';
 
-window.assessmentCalendar = createApp({
+createApp({
     components: {
         AssessmentCalendar
     }
