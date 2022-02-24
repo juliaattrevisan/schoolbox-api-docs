@@ -8,8 +8,7 @@ const app = createApp({
         SimilarityReport
     }
 });
-app.use(ClientTable);
-// app.use(ClientTable, {}, false, 'bootstrap3', {
-//     noResultsRow: markRaw(SimilarityReportNoResults) //use a custom template for no results to add in reset filter button: https://matanya.gitbook.io/vue-tables-2/custom-template
-// });
+app.use(ClientTable, {}, 'bootstrap3', {
+    noResultsRow: markRaw(SimilarityReportNoResults) //use a custom template for no results to add in reset filter button: https://matanya.gitbook.io/vue-tables-2/custom-template
+});
 app.mount('#similarity-report-container');
