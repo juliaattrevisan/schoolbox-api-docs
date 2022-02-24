@@ -31,7 +31,8 @@ if (is_numeric($_REQUEST['cid'])) {
      */
 
     //This is a hack to trick twig into thinking the component is on a homepage
-    $_GET['page'] = '/homepage/' . $_REQUEST['cid'];
+    // TODO undo this hack, properly set return URL in templates
+    $_SERVER['REQUEST_URI'] = '/homepage/' . $_REQUEST['cid'];
 
 
     // AJAX request for drag and drop of components
