@@ -24,13 +24,17 @@ if (is_numeric($_REQUEST['cid'])) {
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-    /* The RETURN_URL twig global presumes that the encoded portion comes from $_GET['page']
-     * without it, returnUrl will be an empty string which, when clicked, sends users to a
-     * completely blank screen. This hack fulfils the expected requirements in
-     * library/Alaress/Application/Kernel.php:876
+    /* The RETURN_URL twig global presumes that the encoded portion comes from
+     * $_GET['REQUEST_URI'].
+     *
+     * Without it, returnUrl will be an /homepage/configForm.php which, when
+     * clicked, sends users to a 404.
+     *
+     * This hack fulfils the expected requirements in the Twig setup in
+     * library/Alaress/Application/Kernel.php.
      */
 
-    //This is a hack to trick twig into thinking the component is on a homepage
+    // This is a hack to trick twig into thinking the component is on a homepage
     // TODO undo this hack, properly set return URL in templates
     $_SERVER['REQUEST_URI'] = '/homepage/' . $_REQUEST['cid'];
 
