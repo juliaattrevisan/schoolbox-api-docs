@@ -6,9 +6,10 @@
 <div class="small-12 island">
     <h1>Generate login codes for {{ folder.nameWithCodes }}</h1>
 </div>
-<div id="manage-qrcodes-container">
-    <manage-qrcodes
-            endpoint-generate="{{ routeLookupIfAuthorized('qrcode.generate', {folder:folder, folderId:folder.id}) }}"
+<div id="manage-qr-codes-container">
+    <manage-qr-codes
+        endpoint-generate="{{ routeLookupIfAuthorized('qrcode.generate', {folder:folder, folderId:folder.id}) }}"
+        folder-name-with-code="{{ folder.nameWithCodes }}"
     />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/manageQrcodes.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/manageQrCodes.js"></script>

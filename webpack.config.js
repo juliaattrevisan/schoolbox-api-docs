@@ -218,7 +218,7 @@ module.exports = {
         manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
 
         // QR codes
-        manageQrcodes: './library/Schoolbox/Qrcode/vue/manageQrcodes.js',
+        manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
 
         // Pastoral
         pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
