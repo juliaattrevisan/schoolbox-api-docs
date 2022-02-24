@@ -77,10 +77,10 @@ if (is_numeric($_REQUEST['cid'])) {
             if (is_object($instance)) {
                 $cClass = $instance->getDefinition()->getClass();
             } else {
-                $page->outputJson(['hasComponentBeenDeleted'=>true], false, 200);
+                $page->outputJson(['hasComponentBeenDeleted' => true], false, 200);
                 die();
             }
-            $page->outputJson(['hasComponentBeenDeleted'=>false], false, 200);
+            $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         }
     } elseif ($_POST['cid'] && is_numeric($_POST['delete'])) { // AJAX request to delete component from homepage
 // locate the instance, locate its config instances, then blast them away
