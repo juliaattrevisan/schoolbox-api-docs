@@ -4,7 +4,7 @@
  * Contains the similarity report filters, score and status
  */
 
-import { Event } from 'vue-tables-2-premium';
+import { EventBus } from 'v-tables-3-select-rows';
 import FilterEvents from './similarityReportFilterEvents';
 
 export default {
@@ -46,7 +46,7 @@ export default {
          * score above is required
          */
         onSimilarityScoreChange () {
-            Event.$emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
+            EventBus.emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
             this.$nextTick(() => { //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue and similarity-report.vue 
                 document.dispatchEvent(new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } } ) );
             });
@@ -59,7 +59,7 @@ export default {
          */
         onResubmissionRequiredChange () {
             const filterParam = this.isResubmissionRequiredChecked ? '' : 'failed'; 
-            Event.$emit(`vue-tables.filter::${FilterEvents.RESUBMISSION_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
+            EventBus.emit(`vue-tables.filter::${FilterEvents.RESUBMISSION_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
             this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.RESUBMISSION_REQUIRED))); //picked up by similarity-report.vue 
         },
 
@@ -70,7 +70,7 @@ export default {
          */
         onMarkingRequiredChange () {
             const filterParam = this.isMarkingRequiredChecked ? '' : 'pending'; 
-            Event.$emit(`vue-tables.filter::${FilterEvents.MARKING_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
+            EventBus.emit(`vue-tables.filter::${FilterEvents.MARKING_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
             this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.MARKING_REQUIRED))); //picked up by similarity-report.vue 
         },
 
@@ -81,7 +81,7 @@ export default {
          */
         onReviewedChange () {
             const filterParam = this.isReviewedChecked ? '' : 'reviewed'; 
-            Event.$emit(`vue-tables.filter::${FilterEvents.REVIEWED}`, filterParam); //picked up by similarity-report.vue 
+            EventBus.emit(`vue-tables.filter::${FilterEvents.REVIEWED}`, filterParam); //picked up by similarity-report.vue 
             this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.REVIEWED))); //picked up by similarity-report.vue 
         },
 
