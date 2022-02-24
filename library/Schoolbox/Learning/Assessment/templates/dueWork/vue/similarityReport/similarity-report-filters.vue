@@ -96,15 +96,10 @@ export default {
             <label>Similarity score</label>
             <select v-model="similarityScoreSelection" @change="onSimilarityScoreChange()">
                 <option value="0">-</option>
-                <option value="90">Above 90%</option>
-                <option value="80">Above 80%</option>
-                <option value="70">Above 70%</option>
-                <option value="60">Above 60%</option>
+                <option value="75">Above 75%</option>
                 <option value="50">Above 50%</option>
-                <option value="40">Above 40%</option>
-                <option value="30">Above 30%</option>
-                <option value="20">Above 20%</option>
-                <option value="10">Above 10%</option>
+                <option value="25">Above 25%</option>
+                <option value="1">Above 1%</option>
             </select>
         </div>
         <div class="filters__column">

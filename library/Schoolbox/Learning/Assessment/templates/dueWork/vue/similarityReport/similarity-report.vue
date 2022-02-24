@@ -223,6 +223,7 @@ export default {
         },
 
         /**
+         * Show only the files within selected similarity range
          * 
          * @param { Object }
          */
@@ -266,19 +267,17 @@ export default {
          */
         getFileColour (file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
-            if (this.isBetween(percentageRounded, 0, 50)) {
-                return '#4fa74f';
-            } else if (this.isBetween(percentageRounded, 50, 59)) {
-                return '#7a904d';
-            } else if (this.isBetween(percentageRounded, 60, 69)) {
-                return '#9f7c4b';
-            } else if (this.isBetween(percentageRounded, 70, 79)) {
-                return '#ba6d4a';
-            } else if (this.isBetween(percentageRounded, 80, 89)) {
-                return '#da5c49';
-            } else if (this.isBetween(percentageRounded, 90, 100)) {
-                return '#fa4a47';
-            }
+            if (percentageRounded == 0) {
+                return '#0c78cf'; //blue 
+            } else if (this.isBetween(percentageRounded, 1, 24)) {
+                return '#278829'; //green
+            } else if (this.isBetween(percentageRounded, 25, 49)) {
+                return '#eab42c'; //yellow
+            } else if (this.isBetween(percentageRounded, 50, 74)) {
+                return '#e27600'; //orange
+            } else if (this.isBetween(percentageRounded, 75, 100)) {
+                return '#ff0000'; //red
+            } 
         },
 
         /**
