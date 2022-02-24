@@ -41,6 +41,7 @@
         "lodash": "4.17.21",
         "magnific-popup": "1.0.0",
         "mediaelement": "4.2.16",
+        "qrcode.vue": "^3.3.3",
         "qs": "^6.9.6",
         "spectrum-colorpicker": "1.6.0",
         "strtotime": "^1.0.0",
@@ -5143,6 +5144,14 @@
       "dev": true,
       "engines": {
         "node": ">=6"
+      }
+    },
+    "node_modules/qrcode.vue": {
+      "version": "3.3.3",
+      "resolved": "https://registry.npmjs.org/qrcode.vue/-/qrcode.vue-3.3.3.tgz",
+      "integrity": "sha512-OsD4tQjIbxg/K6D5ZkWjBdYI9eg9K2i8qeYILdEAX5mdAydSAxV7xKmmZSP/hA12olLqEMZ9ryqDQrwa9jEMgw==",
+      "peerDependencies": {
+        "vue": "^3.0.0"
       }
     },
     "node_modules/qs": {
@@ -10949,6 +10958,12 @@
       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz",
       "integrity": "sha1-tYsBCsQMIsVldhbI0sLALHv0eew=",
       "dev": true
+    },
+    "qrcode.vue": {
+      "version": "3.3.3",
+      "resolved": "https://registry.npmjs.org/qrcode.vue/-/qrcode.vue-3.3.3.tgz",
+      "integrity": "sha512-OsD4tQjIbxg/K6D5ZkWjBdYI9eg9K2i8qeYILdEAX5mdAydSAxV7xKmmZSP/hA12olLqEMZ9ryqDQrwa9jEMgw==",
+      "requires": {}
     },
     "qs": {
       "version": "6.10.1",
