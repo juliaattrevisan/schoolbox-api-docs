@@ -312,14 +312,12 @@ export default {
 
                 <toast ref="toast"></toast>
                 <reveal-modal ref="deleteModal">
-                    <template>
-                        <h2>Please confirm</h2>
-                        <p>Are you sure you want to delete this comment?</p>
-                        <ul class="flex-list buttons">
-                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Delete</a></li>
-                            <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
-                        </ul>
-                    </template>
+                    <h2>Please confirm</h2>
+                    <p>Are you sure you want to delete this comment?</p>
+                    <ul class="flex-list buttons">
+                        <li><button @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Delete</button></li>
+                        <li><button @click.prevent="$refs.deleteModal.close" class="button">Cancel</button></li>
+                    </ul>
                 </reveal-modal>
             </div>
         </section>
