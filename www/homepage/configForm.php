@@ -24,14 +24,19 @@ if (is_numeric($_REQUEST['cid'])) {
     $componentInstanceMapper       = Component_InstanceMapper::getInstance();
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-    /* The RETURN_URL twig global presumes that the encoded portion comes from $_GET['page']
-     * without it, returnUrl will be an empty string which, when clicked, sends users to a
-     * completely blank screen. This hack fulfils the expected requirements in
-     * library/Alaress/Application/Kernel.php:876
+    /* The RETURN_URL twig global presumes that the encoded portion comes from
+     * $_SERVER['REQUEST_URI'].
+     *
+     * Without it, returnUrl will be an /homepage/configForm.php which, when
+     * clicked, sends users to a 404.
+     *
+     * This hack fulfils the expected requirements in the Twig setup in
+     * library/Alaress/Application/Kernel.php.
      */
 
-    //This is a hack to trick twig into thinking the component is on a homepage
-    $_GET['page'] = '/homepage/' . $_REQUEST['cid'];
+    // This is a hack to trick twig into thinking the component is on a homepage
+    // TODO undo this hack, properly set return URL in templates
+    $_SERVER['REQUEST_URI'] = '/homepage/' . $_REQUEST['cid'];
 
 
     // AJAX request for drag and drop of components
@@ -72,10 +77,10 @@ if (is_numeric($_REQUEST['cid'])) {
             if (is_object($instance)) {
                 $cClass = $instance->getDefinition()->getClass();
             } else {
-                $page->outputJson(['hasComponentBeenDeleted'=>true], false, 200);
+                $page->outputJson(['hasComponentBeenDeleted' => true], false, 200);
                 die();
             }
-            $page->outputJson(['hasComponentBeenDeleted'=>false], false, 200);
+            $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         }
     } elseif ($_POST['cid'] && is_numeric($_POST['delete'])) { // AJAX request to delete component from homepage
 // locate the instance, locate its config instances, then blast them away
