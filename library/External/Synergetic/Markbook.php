@@ -1112,12 +1112,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
     {
+        $folderMapper = FolderMapper::getInstance();
         $folder      = $this->retrieveFolderFromAssessment($assessment);
         $folderCodes = $folder->getCodes();
         if (!isset($folderCodes)) {
             // Need to actually load folder codes
             try {
-                $folderCodes = FolderMapper::getInstance()->findById($folder->getId());
+                $folderCodes = $folderMapper->findById($folder->getId())->getCodes();
             } catch (MapperException $e) {
                 $this->logger->warning("Failed to find folder {$folder->getId()}:" . $e->getMessage());
                 return [];
@@ -1131,7 +1132,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             foreach ($folderCodes as $folderCode) {
                 if ($folderCode->isDeleted()) {
                     try {
-                        $archivedFolders = FolderMapper::getInstance()->findAllByArchivedCode($folderCode->getCode());
+                        $archivedFolders = $folderMapper->findAllByArchivedCode($folderCode->getCode());
                     } catch (MapperException $e) {
                         $this->logger->warning("Failed to find folder code: {$folderCode->getCode()}:" . $e->getMessage());
                         continue;

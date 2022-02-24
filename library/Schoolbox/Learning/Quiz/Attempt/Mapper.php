@@ -215,8 +215,6 @@ class Mapper extends BaseMapper
      *
      * @param Model $object
      * @return void
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     protected function syncToExternalMarkbook(Model $object): void
     {
