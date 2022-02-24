@@ -4,11 +4,9 @@
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import { Event } from 'vue-tables-2-premium';
+import { EventBus } from 'v-tables-3-select-rows';
 import fileTypes from './viewAllFilesFileTypes.js';
 import ViewAllFilesFilters from './view-all-files-filters.vue';
-import ViewAllFilesRowName from './view-all-files-row-name.vue';
-import ViewAllFilesRowEdit from './view-all-files-row-edit.vue';
 import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
 import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI.js';
@@ -132,10 +130,6 @@ export default {
                     down: 'glyphicon-chevron-down'
                 },
                 tabbable: false,
-                templates: { //custom vue templates - refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
-                    name: ViewAllFilesRowName,
-                    edit: ViewAllFilesRowEdit,
-                },
                 texts: {
                     count: '{from}-{to} of {count} files|{count} files|1 file',
                     filterPlaceholder: 'Search files',
@@ -240,6 +234,7 @@ export default {
             this.$nextTick(() => {
                 this.footerUI_update();
                 this.initFilterDisplay();
+                $('[data-plugin="preview"]').preview(); //Ensure the link uses the pop up modal
                 if (this.canEdit) {
                     this.$refs.dropzone.initDropzone();
                 }
@@ -251,19 +246,19 @@ export default {
          */
         initFilterDisplay () {
             if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
-                Event.$emit(`vue-tables.filter::${fileTypes.DOCUMENT}`, fileTypes.DOCUMENT);
+                EventBus.emit(`vue-tables.filter::${fileTypes.DOCUMENT}`, fileTypes.DOCUMENT);
             }
             if (!this.selectedFilters.includes(fileTypes.AUDIO)) {
-                Event.$emit(`vue-tables.filter::${fileTypes.AUDIO}`, fileTypes.AUDIO);
+                EventBus.emit(`vue-tables.filter::${fileTypes.AUDIO}`, fileTypes.AUDIO);
             }
             if (!this.selectedFilters.includes(fileTypes.VIDEO)) {
-                Event.$emit(`vue-tables.filter::${fileTypes.VIDEO}`, fileTypes.VIDEO);
+                EventBus.emit(`vue-tables.filter::${fileTypes.VIDEO}`, fileTypes.VIDEO);
             }
             if (!this.selectedFilters.includes(fileTypes.IMAGE)) {
-                Event.$emit(`vue-tables.filter::${fileTypes.IMAGE}`, fileTypes.IMAGE);
+                EventBus.emit(`vue-tables.filter::${fileTypes.IMAGE}`, fileTypes.IMAGE);
             }
             if (!this.selectedFilters.includes(fileTypes.OTHER)) {
-                Event.$emit(`vue-tables.filter::${fileTypes.OTHER}`, fileTypes.OTHER);
+                EventBus.emit(`vue-tables.filter::${fileTypes.OTHER}`, fileTypes.OTHER);
             }
         },
 
@@ -310,7 +305,7 @@ export default {
          */
         dispatchFilterEvent (fileType) {
             const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
-            Event.$emit(`vue-tables.filter::${fileType}`, filterParam);
+            EventBus.emit(`vue-tables.filter::${fileType}`, filterParam);
         },
 
         /**
@@ -359,7 +354,7 @@ export default {
         checkFileFilterIsActive (file) {
             if (!this.selectedFilters.includes(file.type)) {
                 this.selectedFilters = [...this.selectedFilters, file.type];
-                Event.$emit(`vue-tables.filter::${file.type}`, '');
+                EventBus.emit(`vue-tables.filter::${file.type}`, '');
                 this.updateSessionStorage();
             }
         },
@@ -410,7 +405,6 @@ export default {
             this.$refs.table.resetSelectedRows();
         },
 
-
     },
 
 }
@@ -438,13 +432,29 @@ export default {
                     @filter="markAllFilesAsOld"
                     @sorted="markAllFilesAsOld"
                 >
-                    <div slot="beforeTable">
+                    <template #beforeTable>
                         <view-all-files-filters
                             :selected-filters="selectedFilters"
                             @on-filter-change="onFilterChange"
                         />
-                    </div>
-                    <div slot="afterTable">
+                    </template>
+                    <template #name="props"> 
+                        <div>
+                            <a data-plugin="preview" :href="props.row.url" rel="external">
+                                <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
+                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description"> 
+                                    {{ props.row.name }}
+                                </h3>
+                            </a>
+                            <p class="meta">Date modified: {{ props.row.dateModified.formatted }}</p>
+                        </div>
+                    </template>
+                    <template #edit="props">
+                        <nav class="edit">
+                            <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
+                        </nav>
+                    </template>
+                    <template #afterTable>
                         <view-all-files-dropzone
                             v-if="canEdit"
                             ref="dropzone"
@@ -458,7 +468,7 @@ export default {
                                 <p><a :href="`/cms/file/new/${this.sourceFolderId}`">Select a file</a> or drag and drop multiple onto this component</p>
                             </section>
                         </div>
-                    </div>
+                    </template>
                 </v-client-table>
 
             </div>
@@ -509,6 +519,35 @@ export default {
 
 .VueTables__select-row {
     width: 30px;
+}
+
+.name {
+    font-size: 0.825rem;
+    margin-bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.meta {
+    display: none;
+    @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
+        display: block;
+    }
+}
+
+.edit {
+    height: 2.5rem;
+    text-align: center;
+    width: 2.5rem;
+}
+
+.edit a {
+    color: var(--content-ui-foreground);
+    display: block;
+    line-height: 2.5;
+    opacity: 0.7;
+    padding-left: 8px; //move the pencil into the centre
 }
 
 .date-modified-td {

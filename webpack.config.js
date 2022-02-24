@@ -228,7 +228,7 @@ module.exports = {
 
         //Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
-        // viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
+        viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
         //Most functionality for a home page
         updateHomepage: './templates/core/homepage/js/updateHomepage.js',
