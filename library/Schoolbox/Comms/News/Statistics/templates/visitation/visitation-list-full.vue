@@ -149,15 +149,15 @@ export default {
                             :options="options" 
                             @loaded="onLoaded"
                         >
-                            <template v-slot:fullname="props"> 
+                            <template #fullname="props"> 
                                 <a :href="`/search/user/${props.row.id}`" :title="props.row.fullname">{{props.row.fullname}}</a>
                             </template>
-                            <template v-slot:occursAt="props"> 
+                            <template #occursAt="props"> 
                                 <span v-if="props.row.occursAt">{{ formatLastVisited(props.row.occursAt) }}</span>
                             </template>
-                            <div slot="afterTable">
+                            <template #afterTable>
                                 <div class="VueTables__table-footer" ref="tableFooter"></div>
-                            </div>
+                            </template>
                         </v-client-table>
                     </section>
                 </template>
