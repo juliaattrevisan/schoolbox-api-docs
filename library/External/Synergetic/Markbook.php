@@ -1127,20 +1127,18 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // If no folder code, attempt to get it from archived folder
         if ($folderCodes->count() === 0) {
             $folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
-            $folderCodes = $folderCodeMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
+            $folderCodes      = $folderCodeMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
             /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
             foreach ($folderCodes as $folderCode) {
                 if ($folderCode->isDeleted()) {
                     try {
-                        $archivedFolders = $folderMapper->findAllByArchivedCode($folderCode->getCode());
+                        $archivedFolderIds = $folderMapper->findAllByArchivedCode($folderCode->getCode())->getPropertyValues('id');
                     } catch (MapperException $e) {
                         $this->logger->warning("Failed to find folder code: {$folderCode->getCode()}:" . $e->getMessage());
                         continue;
                     }
-                    foreach ($archivedFolders as $archivedFolder) {
-                        if ($folder->getId() === $archivedFolder->getId()) {
-                            $folderCodes->add($folderCode);
-                        }
+                    if (in_array($folder->getId(), $archivedFolderIds)) {
+                        $folderCodes->add($folderCode);
                     }
                 }
             }
