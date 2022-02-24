@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import VisitationListFull from './visitation-list-full';
-import { ClientTable } from 'vue-tables-2-premium';
+import { ClientTable } from 'v-tables-3-select-rows';
 
 const app = createApp({
     components: {

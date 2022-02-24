@@ -169,7 +169,7 @@ module.exports = {
         calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
 
         //News related
-        // visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
+        visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
         newsAuthored: './library/Schoolbox/Comms/News/vue/newsAuthored.js',
@@ -194,7 +194,7 @@ module.exports = {
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
-        // staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
+        staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
 
