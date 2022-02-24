@@ -52,6 +52,7 @@ use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
@@ -963,7 +964,7 @@ abstract class Kernel
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
 
                     // Global access to returnUrl vars
-                    $encodedUrl = Redirect::encode($_SERVER['REQUEST_URI'] ?? '');
+                    $encodedUrl = Redirect::encode(RequestUriParser::parseUrlPath($_SERVER));
                     $twig->addGlobal(
                         'RETURN_URL',
                         [
