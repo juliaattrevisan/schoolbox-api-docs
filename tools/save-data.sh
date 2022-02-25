@@ -3,7 +3,7 @@
 # Global const
 readonly CACHE_DIR='/vagrant/vagrantcache';
 readonly BUCKET='schoolbox-data';
-readonly INSTANCE_DATA_DIR='/vagrant/data/vagrantx';  # Location of 'vagrantx' instance data files
+readonly INSTANCE_DATA_DIR='/var/lib/schoolbox/vagrantx';  # Location of 'vagrantx' instance data files
 readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_ERROR=400

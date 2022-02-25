@@ -13,14 +13,14 @@ vag="[schoolbox]";
 cachedir='/vagrant/vagrantcache';
 
 echo "$vag Removing current Schoolbox Data directory";
-rm /vagrant/data/* -fR;
+rm /var/lib/schoolbox/* -fR;
 
 echo "$vag Creating Schoolbox data directories";
 cd /vagrant;
 tar -xzf $cachedir/schoolboxdemo-v6.1.tar.gz;
-rm -rf /vagrant/data/cache;
+rm -rf /var/lib/schoolbox/cache;
 cd /vagrant/tools;
-./create-data-dirs.sh /vagrant/data;
+./create-data-dirs.sh /var/lib/schoolbox;
 
 echo "$vag Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -ptnp879 mysql;
@@ -33,7 +33,7 @@ mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COL
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
 
 echo "$vag Generating data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
+/vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
 
 echo "$vag Applying vagrant SQL fixes";
 mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-vagrant-v6.1.sql
