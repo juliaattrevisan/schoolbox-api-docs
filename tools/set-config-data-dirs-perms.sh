@@ -201,7 +201,8 @@ function check_script_overlap() {
   # Read the contents of the lockfile into a variable
   read -r lastPID < "$lock_file";
   # If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
-  if [[ -n "$lastPID" ]] && [[ -d /proc/$lastPID ]] && "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh""; then
+  script_name=$(basename "$0")
+  if [[ -n "$lastPID" ]] && [[ -d /proc/$lastPID ]] && pgrep --full "$script_name" | grep -qE "^$lastPID$"; then
     if ! dpkg -s mailutils &> /dev/null; then
       warn "mailutils is not installed. Cannot send email."
     else
