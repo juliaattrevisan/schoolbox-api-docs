@@ -201,14 +201,11 @@ function check_script_overlap() {
 	# Read the contents of the lockfile into a variable
 	read -r lastPID < "$lock_file";
 	# If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
-	if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]
-	then
-		if ! dpkg -s mailutils &> /dev/null;
-		then
+	if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]; then
+		if ! dpkg -s mailutils &> /dev/null; then
 			warn "mailutils is not installed. Cannot send email."
 		else
 			mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
-
 		fi
 		exit
 	fi
