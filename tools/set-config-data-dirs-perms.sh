@@ -203,8 +203,8 @@ function check_script_overlap() {
   # If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
   script_name=$(basename "$0")
   if [[ -n "$lastPID" ]] && [[ -d /proc/$lastPID ]] && pgrep --full "$script_name" | grep -qE "^$lastPID$"; then
-    if ! dpkg -s mailutils &> /dev/null; then
-      warn "mailutils is not installed. Cannot send email."
+    if ! type mail &> /dev/null; then
+      warn "mail is not available. Cannot send email."
     else
       mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
     fi
