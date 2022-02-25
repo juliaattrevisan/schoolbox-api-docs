@@ -415,7 +415,7 @@ class Profile implements IStrategy
     private function findHousemaster(string $houseName): array
     {
         $houseName = trim($houseName);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[Name[text()='{$houseName}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->HouseMaster));
@@ -461,7 +461,7 @@ class Profile implements IStrategy
     private function findYearLevelCoordinator(string $year): array
     {
         $year = trim($year);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[Code[text()='{$year}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
