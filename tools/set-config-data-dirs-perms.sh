@@ -206,7 +206,7 @@ function check_script_overlap() {
     if ! type mail &> /dev/null; then
       warn "mail is not available. Cannot send email."
     else
-      mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
+      mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $script_name was prevented on $(schoolbox-read-instances --option instance-list)".
     fi
     exit
   fi
