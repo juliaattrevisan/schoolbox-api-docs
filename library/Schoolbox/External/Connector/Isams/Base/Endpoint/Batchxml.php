@@ -12,8 +12,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use RuntimeException;
 use SimpleXMLElement;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Batchxml
@@ -64,8 +62,6 @@ class Batchxml
      * @param string $path
      * @return SimpleXMLElement[]
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function fetchXml(string $path): array
     {
