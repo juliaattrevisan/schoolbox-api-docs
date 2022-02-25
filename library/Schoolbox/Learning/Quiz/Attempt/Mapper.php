@@ -214,13 +214,14 @@ class Mapper extends BaseMapper
      * Writes mark data back into remote markbook
      *
      * @param Model $object
+     * @return void
      */
     protected function syncToExternalMarkbook(Model $object): void
     {
         if ($object->isReviewed()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
-            $markbookAdapter->syncParticipation($object->getQuiz(), $object->getUser());
+            $markbookAdapter->syncParticipation($object->getQuiz(), $object->getUser(), $object->getId());
         }
     }
 

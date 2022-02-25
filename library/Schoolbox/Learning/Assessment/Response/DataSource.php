@@ -68,14 +68,15 @@ class DataSource implements IResponseDataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $student If set, only return this student's responses
+     * @param User|null                $student If set, only return this student's responses
+     * @param array                    $options Options for findByColumnList
      * @return Collection|IResponse[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, User $student = null)
+    public function findForAssessmentCollection(Collection $assessments, ?User $student = null, array $options = [])
     {
         $responses = new Collection();
         foreach ($this->subSources as $subSource) {
-            $responses = $responses->union($subSource->findForAssessmentCollection($assessments, $student));
+            $responses = $responses->union($subSource->findForAssessmentCollection($assessments, $student, $options));
         }
         return $responses;
     }

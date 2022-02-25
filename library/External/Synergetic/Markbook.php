@@ -8,6 +8,7 @@
  */
 
 use Alaress\Database\Predicate;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -93,6 +94,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private $markType;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * Constructor
      *
      * If $fileYearOverride and $fileSemesterOverride are provided, they will override both the
@@ -103,7 +109,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param int|null $fileSemesterOverride
      * @todo There's a heap of dependencies in this class that are plucked from the ether. They should be constructor dependencies, injected by a factory.
      */
-    public function __construct(int $markType, int $fileYearOverride = null, int $fileSemesterOverride = null)
+    public function __construct(int $markType, LoggerInterface $logger, int $fileYearOverride = null, int $fileSemesterOverride = null)
     {
         if (null === $fileYearOverride xor null === $fileSemesterOverride) {
             throw new InvalidArgumentException('You must override both year and semester, or neither');
@@ -114,6 +120,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $this->markType             = $markType;
         $this->fileYearOverride     = $fileYearOverride;
         $this->fileSemesterOverride = $fileSemesterOverride;
+        $this->logger               = $logger;
     }
 
     /**
@@ -143,8 +150,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @inheritdoc
      *
      * @throws \Alaress\Database\Exception
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     public function syncAssessment(IAssessable $assessment): bool
     {
@@ -154,6 +159,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
+            $this->logger->warning("Unable to sync assessment {$assessment->getId()}: No folder code found");
             return false;
         }
 
@@ -169,6 +175,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         } else {
             $markbookId = $this->getMarkbookIdentifier($assessment);
             if (!isset($markbookId)) {
+                $this->logger->warning("Unable to sync assessment {$assessment->getId()}: Could not get markbook identifier");
                 return false;
             }
 
@@ -198,7 +205,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 'dueDate'              => $assessment->getDueAt()->getDatabase(),
             ];
 
-            return $this->getConnector()->prepareQuery($sql, $params)->execute();
+            try {
+                $this->getConnector()->prepareQuery($sql, $params)->execute();
+                return true;
+            } catch (\Exception $e) {
+                $this->logger->warning("Unable to sync assessment {$assessment->getId()}: Unable to update staff markbook {$markbookId}: {$e->getMessage()}");
+                return false;
+            }
         }
     }
 
@@ -232,6 +245,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
+            $this->logger->warning("No folder code found for assessment {$assessment->getId()}");
             return false;
         }
 
@@ -264,8 +278,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
 
     /**
-     * @inheritdoc
-     * @throws \Alaress\Database\Exception
+     * @param IAssessable $assessment
+     * @return bool
      */
     public function deleteAssessment(IAssessable $assessment): bool
     {
@@ -275,6 +289,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $folderCodes = $this->retrieveFolderCodesFromAssessment($assessment);
         if (!count($folderCodes)) {
+            $this->logger->warning("No folder code found for assessment {$assessment->getId()}");
             return false;
         }
 
@@ -347,6 +362,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             throw new InvalidArgumentException('Unable to sync this assessment type because it is a specification or unsupported');
         }
 
+        if ($feedback->isDraft()) {
+            $this->logger->warning("Unable to sync feedback {$feedback->getId()}: Feedback is draft");
+            return false;
+        }
+
         $student = $feedback->getReviewee();
         $marker  = $feedback->getReviewer();
 
@@ -354,9 +374,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // * Student's ID is invalid
         // * Marker's ID is invalid
         if (!$this->isExternalIdValid($student->getExternalId())) {
+            $this->logger->warning("Unable to sync feedback {$feedback->getId()} : Student ({$student->getUsername()}) has an invalid external ID: {$student->getExternalId()}");
             throw new InvalidArgumentException('Student (' . $student->getUsername() . ') has an invalid external ID: ' . $student->getExternalId());
         }
         if (!$this->isExternalIdValid($marker->getExternalId())) {
+            $this->logger->warning("Unable to sync feedback {$feedback->getId()} : Provider of feedback ({$marker->getUsername()}) has invalid external ID: {$marker->getExternalId()}");
             throw new InvalidArgumentException('Provider of feedback (' . $marker->getUsername() . ') has invalid external ID: ' . $marker->getExternalId());
         }
 
@@ -413,6 +435,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     ): bool {
         $markbookId = $this->getMarkbookIdentifier($assessment);
         if (!isset($markbookId)) {
+            $this->logger->warning("Unable to create staff markbook for assessment {$assessment->getId()}: Could not get markbook identifier");
             return false;
         }
 
@@ -420,6 +443,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $class         = $externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
 
         if (empty($class)) {
+            $this->logger->warning("Unable to create staff markbook for assessment {$assessment->getId()}: Could not get class {$classCode}");
             return false;
         }
 
@@ -475,7 +499,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ]);
-        return $statement->execute();
+
+        try {
+            $statement->execute();
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->warning("Unable to insert StaffAssessmentMarkBook for folder {$class['ClassCode']} assessment {$assessment->getId()}: {$e->getMessage()}");
+            return false;
+        }
     }
 
 
@@ -544,9 +575,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IFeedback $feedback
      * @return bool
-     * @throws \Alaress\Database\Exception
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     private function setActivityMark(IFeedback $feedback): bool
     {
@@ -565,6 +593,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         /** @var string[] $folderCodes */
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
+        if (count($folderCodes) === 0) {
+            $this->logger->warning("Unable to sync this feedback {$feedback->getId()} : No folder code found for assessment {$activity->getId()}");
+            return false;
+        }
 
         // Performance optimization:
         // Only filter the folder codes to the student's class codes if the
@@ -579,6 +611,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $this->normalizeClassCodes($classCodes)
             );
         } else {
+            // one folder code
             $markbookFolderCodes = $this->normalizeClassCodes($folderCodes);
         }
 
@@ -588,6 +621,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $assessmentRemoteList = $this->getSynergeticMarkbookList($activity, $studentFileYear, $studentFileSemester);
 
         if (!count($assessmentRemoteList)) {
+            $this->logger->warning("Unable to sync this feedback {$feedback->getId()} : Unable to find StaffAssessmentMarkBook for HdgAbbrev2 {$this->getMarkbookIdentifier($activity)}");
             throw new UnderflowException('Unable to find assessment:  ' .
                                          $this->getMarkbookIdentifier($activity) . ' in ' .
                                          implode(',', $markbookFolderCodes));
@@ -608,7 +642,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 continue;
             }
 
-            // Does the student have already have a mark for the assessment in Synergetic?
+            // Does the student already have a mark for the assessment in Synergetic?
             $remoteMarkExists = $this->doesMarkExist($assessmentRemote, $feedback);
 
             if (!$remoteMarkExists && $hasMarkOrComment) {
@@ -638,7 +672,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param array     $assessmentRemote
      * @param IFeedback $feedback
      * @return bool
-     * @throws \Alaress\Database\Exception
      */
     private function updateActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
@@ -664,7 +697,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $valueParams = $this->determineActivityMarkValueParams($feedback);
         $params      = array_merge($keyParams, $valueParams);
         $statement   = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($params);
+        try {
+            $statement->execute($params);
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->warning("Unable to update feedback {$feedback->getId()} in StudentAssessmentMarkbook {$params['markbookSeq']} : {$e->getMessage()}");
+            return false;
+        }
     }
 
 
@@ -674,7 +713,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param array $assessmentRemote
      * @param User  $student
      * @return bool
-     * @throws \Alaress\Database\Exception
      */
     private function deleteActivityMark(array $assessmentRemote, User $student): bool
     {
@@ -688,8 +726,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             AND     MarkBookSeq  = :markbookSeq
             AND     ID           = :externalID
         ';
+        $params = $this->determineActivityMarkKeyParams($assessmentRemote, $student);
         $statement = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute($this->determineActivityMarkKeyParams($assessmentRemote, $student));
+        try {
+            $statement->execute($params);
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->warning("Unable to delete StudentAssessmentMarkbook {$params['markbookSeq']} : {$e->getMessage()}");
+            return false;
+        }
     }
 
 
@@ -699,7 +744,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param array     $assessmentRemote
      * @param IFeedback $feedback
      * @return bool
-     * @throws \Alaress\Database\Exception
      */
     private function insertActivityMark(array $assessmentRemote, IFeedback $feedback): bool
     {
@@ -737,7 +781,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $keyParams   = $this->determineActivityMarkKeyParams($assessmentRemote, $feedback->getReviewee());
         $valueParams = $this->determineActivityMarkValueParams($feedback);
         $statement   = $this->getConnector()->prepareQuery($sql);
-        return $statement->execute(array_merge($keyParams, $valueParams));
+
+        try {
+            $result = $statement->execute(array_merge($keyParams, $valueParams));
+        } catch (\Exception $e) {
+            $this->logger->warning("Failed to insert activity mark for feedback {$feedback->getId()}: {$e->getMessage()}");
+            return false;
+        }
+        return $result;
     }
 
 
@@ -746,8 +797,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IAssessable $assessment
      * @return string
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     private function getResultType(IAssessable $assessment): string
     {
@@ -860,9 +909,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param int         $fileYear
      * @param int         $fileSemester
      * @return bool
-     * @throws \Alaress\Database\Exception
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     private function insertMarkbooksIfNotExists(IAssessable $activity, array $folderCodes, int $fileYear, int $fileSemester): bool
     {
@@ -870,9 +916,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $owner = $this->retrieveOwnerFromAssessment($activity);
-        if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
+        try {
+            $owner = $this->retrieveOwnerFromAssessment($activity);
+        } catch (MapperException $e) {
+            $this->logger->warning("Unable to insert markbook for assessment {$activity->getId()}: Failed to find the assessment");
+            return false;
+        }
+        if (!$owner) {
+            $this->logger->warning("Unable to insert markbook for assessment {$activity->getId()}: Failed to find its owner");
               return false;
+        }
+        if (!$this->isExternalIdValid($owner->getExternalId())) {
+            $this->logger->warning("Unable to insert markbook for assessment {$activity->getId()}: Owner ({$owner->getUsername()}) has an invalid external ID: {$owner->getExternalId()}");
+            return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
@@ -1018,6 +1074,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IAssessable $assessment
      * @return User|null
+     * @throws MapperException
      */
     private function retrieveOwnerFromAssessment(IAssessable $assessment): ?User
     {
@@ -1052,16 +1109,39 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      *
      * @param IAssessable $assessment
      * @return array
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     private function retrieveFolderCodesFromAssessment(IAssessable $assessment): array
     {
+        $folderMapper = FolderMapper::getInstance();
         $folder      = $this->retrieveFolderFromAssessment($assessment);
         $folderCodes = $folder->getCodes();
         if (!isset($folderCodes)) {
             // Need to actually load folder codes
-            $folderCodes = FolderMapper::getInstance()->findById($folder->getId());
+            try {
+                $folderCodes = $folderMapper->findById($folder->getId())->getCodes();
+            } catch (MapperException $e) {
+                $this->logger->warning("Failed to find folder {$folder->getId()}:" . $e->getMessage());
+                return [];
+            }
+        }
+        // If no folder code, attempt to get it from archived folder
+        if ($folderCodes->count() === 0) {
+            $folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+            $folderCodes      = $folderCodeMapper->findByColumn('folder_id', $folder->getId(), ['deleted' => true]);
+            /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
+            foreach ($folderCodes as $folderCode) {
+                if ($folderCode->isDeleted()) {
+                    try {
+                        $archivedFolderIds = $folderMapper->findAllByArchivedCode($folderCode->getCode())->getPropertyValues('id');
+                    } catch (MapperException $e) {
+                        $this->logger->warning("Failed to find folder code: {$folderCode->getCode()}:" . $e->getMessage());
+                        continue;
+                    }
+                    if (in_array($folder->getId(), $archivedFolderIds)) {
+                        $folderCodes->add($folderCode);
+                    }
+                }
+            }
         }
         return $folderCodes->getPropertyValues('code');
     }

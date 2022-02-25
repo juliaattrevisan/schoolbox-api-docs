@@ -81,10 +81,11 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
     /**
      * @param Collection|IAssessable[] $assessments
-     * @param User                     $student If set, only return this student's responses
+     * @param User|null                $student If set, only return this student's responses
+     * @param array                    $options Options for findByColumnList
      * @return Collection|IFeedback[][]
      */
-    public function findForAssessmentCollection(Collection $assessments, User $student = null)
+    public function findForAssessmentCollection(Collection $assessments, ?User $student = null, array $options = [])
     {
         // Find feedback which belong to any assessments this recognizes
         $recognizedIds = $assessments->filter([$this, 'recognizes'])->getPropertyValues('id');
@@ -102,7 +103,7 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         // Group feedback by assessment
         /** @var Collection|IFeedback[][] $feedbacks */
         $feedbacks = $this->mapperProxy
-            ->findByColumnList($columns)
+            ->findByColumnList($columns, $options)
             ->groupByCallback(function (IFeedback $v) {
                 return $v->getAssessable()->getId();
             })
