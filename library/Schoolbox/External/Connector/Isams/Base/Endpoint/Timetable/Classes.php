@@ -314,31 +314,32 @@ class Classes implements IStrategy
             ->setPeriod($period)
             ->setRoom($class['period']['room']['name']);
 
-        /* Throw warning, but assign them anyway
-         */
-        if (!isset($users[$class['teachers']['username']])) {
-            $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; username might not exist in schoolbox user table',
-                $class['teachers']['username'],
-                $timetableClass->getName(),
-                $timetableClass->getCode()
-            ));
-        }
-
         $timetableClassPeriod->setTeacher($class['teachers']['username']);
 
-        $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s (%s) in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
-            $class['teachers']['username'],
-            $class['period']['room']['name'],
-            $class['period']['day'],
-            $class['period']['sequence'],
-            $class['period']['start'],
-            $class['period']['end'],
-            $ext
-        ));
+        if ('' !== $class['teachers']['username']) {
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s (%s) in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
+                $class['teachers']['firstname'],
+                $class['teachers']['surname'],
+                $class['teachers']['username'],
+                $class['period']['room']['name'],
+                $class['period']['day'],
+                $class['period']['sequence'],
+                $class['period']['start'],
+                $class['period']['end'],
+                $ext
+            ));
+        } else {
+            $this->log->warning(sprintf(
+                'Creating class period relation with an unknown/unspecified teacher in room %s on Day %s (sequence %s) %s-%s in campus with cycle_identifier %s',
+                $class['period']['room']['name'],
+                $class['period']['day'],
+                $class['period']['sequence'],
+                $class['period']['start'],
+                $class['period']['end'],
+                $ext
+            ));
+        }
 
         $this->log->debug(sprintf(
             'Using timetableClass id %s, timetableClassPeriod id %s',
