@@ -35,6 +35,7 @@ declare available_data_dirs=();  # Fetched from Database
 declare data_dir_include=();     # CLI args
 declare data_dir_skip=();        # CLI args
 declare data_dirs=();            # Data dirs we will actually modify
+declare lock_file;               # Contains PID of process executing this script. Used to prevent overlapping execution.
 
 function debug(){
   if [[ $verbose == '1' ]]; then
@@ -194,11 +195,11 @@ function parse_sql_credentials(){
 # Check if script is already running
 function check_script_overlap() {
 	stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
-	lf=$stream_dir/lockfile.lock;
+	lock_file=$stream_dir/lockfile.lock;
 	# Create empty lock file if none exists
-	touch $lf;
+	touch "$lock_file";
 	# Read the contents of the lockfile into a variable
-	read lastPID < $lf;
+	read -r lastPID < "$lock_file";
 	# If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
 	if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]
 	then
@@ -212,7 +213,7 @@ function check_script_overlap() {
 		exit
 	fi
 	# else write the PID of the current running script to the lock file
-	echo $$ > $lf;
+	echo $$ > "$lock_file";
 }
 
 
@@ -328,7 +329,7 @@ function update_directories(){
       find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
-  rm $stream_dir/lockfile.lock
+  rm "$lock_file"
 }
 
 
