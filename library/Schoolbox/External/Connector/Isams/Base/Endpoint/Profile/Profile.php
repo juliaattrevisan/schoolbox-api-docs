@@ -246,17 +246,41 @@ class Profile implements IStrategy
              */
             $tutor = $this->findTutor((string)$student->Tutor);
 
+            $this->log->debug(sprintf(
+                'Tutor %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
+
             /* Fish out a staff member via their user code
              */
             $housemaster = $this->findHousemaster($academicHouse);
+
+            $this->log->debug(sprintf(
+                'Housemaster %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
 
             /* Find out a staff member via their user code
              */
             $formTeacher = $this->findFormTeacher($form);
 
+            $this->log->debug(sprintf(
+                'Form Teacher %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
+
             /* Find out a staff member via their user code
              */
             $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+
+            $this->log->debug(sprintf(
+                'Year Level Coordinator %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
 
             /* Add their parents' profile data
              * Messages come from parents' nodes
