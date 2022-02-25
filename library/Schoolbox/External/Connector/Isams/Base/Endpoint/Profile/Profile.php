@@ -373,8 +373,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findComments(string $studentId): string
     {
@@ -399,8 +397,6 @@ class Profile implements IStrategy
      *
      * @param string $id
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
      */
     private function findTutor(string $id): array
@@ -414,10 +410,7 @@ class Profile implements IStrategy
      *
      * @param string $houseName
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findHousemaster(string $houseName): array
     {
@@ -440,10 +433,7 @@ class Profile implements IStrategy
      *
      * @param string $form
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findFormTeacher(string $form): array
     {
@@ -467,8 +457,6 @@ class Profile implements IStrategy
      * @param string $year
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findYearLevelCoordinator(string $year): array
     {
@@ -492,23 +480,36 @@ class Profile implements IStrategy
      * @param string $id
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findStaffMemberById(string $id): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
+        $defaultStaff = [
+            'id' => $id,
+            'name' => ''
+        ];
 
-        $name = '';
-
-        if ($node) {
-            $staffMember = $node[0];
-            $name = trim((string)$staffMember->FullName);
+        /* $id is empty; there wasn't a specified Staff;
+         * return Unknown Staff as default case
+         */
+        if ('' === $id) {
+            return $defaultStaff;
         }
+
+        /* Otherwise, go hunting for them
+         */
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$id}']]");
+
+        /* Unknown staff: can't find it via its UserCode
+         */
+        if (empty($node)) {
+            return $defaultStaff;
+        }
+
+        $staffMember = $node[0];
 
         return [
             'id' => $id,
-            'name' => $name,
+            'name' => trim((string)$staffMember->FullName),
         ];
     }
 
@@ -520,8 +521,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string|null
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findMedicalAlert(string $studentId): ?string
     {
@@ -545,8 +544,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return bool
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findSpecialNeeds(string $studentId): bool
     {
@@ -565,8 +562,6 @@ class Profile implements IStrategy
      *
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function prefetchCampuses(): array
     {
@@ -607,8 +602,6 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): string
     {
