@@ -194,23 +194,23 @@ function parse_sql_credentials(){
 
 # Check if script is already running
 function check_script_overlap() {
-	stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
-	lock_file=$stream_dir/lockfile.lock;
-	# Create empty lock file if none exists
-	touch "$lock_file";
-	# Read the contents of the lockfile into a variable
-	read -r lastPID < "$lock_file";
-	# If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
-	if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]; then
-		if ! dpkg -s mailutils &> /dev/null; then
-			warn "mailutils is not installed. Cannot send email."
-		else
-			mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
-		fi
-		exit
-	fi
-	# else write the PID of the current running script to the lock file
-	echo $$ > "$lock_file";
+  stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
+  lock_file=$stream_dir/lockfile.lock;
+  # Create empty lock file if none exists
+  touch "$lock_file";
+  # Read the contents of the lockfile into a variable
+  read -r lastPID < "$lock_file";
+  # If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
+  if [ ! -z "$lastPID" -a -d /proc/$lastPID -a "ps -o cmd "$lastPID" | grep "set-config-data-dirs-perms.sh"" ]; then
+    if ! dpkg -s mailutils &> /dev/null; then
+      warn "mailutils is not installed. Cannot send email."
+    else
+      mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $(schoolbox-read-instances --option instance-list)".
+    fi
+    exit
+  fi
+  # else write the PID of the current running script to the lock file
+  echo $$ > "$lock_file";
 }
 
 
