@@ -7,23 +7,21 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 
 /**
- * Class Cleanup
+ * Class Prepare
  *
- * Remove any stale profiles
+ * Clears data from a db in preparation for a kamar import
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Profile
  */
-class Cleanup implements IStrategy
+class Prepare implements IStrategy
 {
-
 
     /**
      * @var LoggerInterface
@@ -68,7 +66,7 @@ class Cleanup implements IStrategy
 
 
     /**
-     * Cleanup constructor.
+     * Prepare constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
@@ -99,32 +97,24 @@ class Cleanup implements IStrategy
 
 
     /**
-     * Remove stale profiles
+     * Purge classes that were previously imported
      */
     public function import(): void
     {
-
-        /* Only remove profiles if we're performing
-         */
         if ($this->perform) {
-            /* Remove everything that wasn't touched
+            /* Set all the updated_at fields to null in all the profiles everywhere
+             * Everyone we don't update gets deleted in Cleanup
              */
-            $this->studentProfileMapper->getDatabase()->query("DELETE FROM {$this->studentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
-            $this->parentProfileMapper->getDatabase()->query("DELETE FROM {$this->parentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
-            $this->staffProfileMapper->getDatabase()->query("DELETE FROM {$this->staffProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
-            $this->baseProfileMapper->getDatabase()->query("DELETE FROM {$this->baseProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->parentProfileMapper->getDatabase()->query("UPDATE {$this->parentProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->staffProfileMapper->getDatabase()->query("UPDATE {$this->staffProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->baseProfileMapper->getDatabase()->query("UPDATE {$this->baseProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
 
-            /* Remove any orphaned profiles (base profiles that have no extension)
+            /* Truncate other data entirely
              */
-            $orphans = (new OrphanRemover(
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))->remove();
+            $this->relationshipMapper->truncate();
 
-            $this->log->info("Removed {$orphans} orphaned profiles.");
+            $this->log->info('Purged existing profiles and relations');
         }
     }
 }
