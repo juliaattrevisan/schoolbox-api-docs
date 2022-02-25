@@ -8,7 +8,7 @@ readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_WARN=300;
 readonly L_ERROR=400;
-readonly cachedir='/vagrant/vagrantcache';
+readonly cachedir='/usr/share/schoolbox/vagrantcache';
 
 # Global vars
 # Defaults
@@ -84,7 +84,7 @@ find $cachedir -type f -empty -delete;
 # Function to fetch value from .env file by key
 # Usage: value=$(read_var $key)
 read_var() {
-    VAR=$(grep -E "^\s*$1" /vagrant/.env | xargs)
+    VAR=$(grep -E "^\s*$1" /usr/share/schoolbox/.env | xargs)
     IFS="=" read -ra VAR <<< "$VAR"
     echo "${VAR[1]}"
 }
@@ -106,7 +106,7 @@ if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
-/vagrant/tools/maintenance/site_down.sh;
+/usr/share/schoolbox/tools/maintenance/site_down.sh;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
@@ -128,9 +128,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
 cd $cachedir || exit;
 vendorfile='';
 composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
-if [ -f /vagrant/vendor/composer.lock.checksum ];
+if [ -f /usr/share/schoolbox/vendor/composer.lock.checksum ];
 then
-    currentvendorsha=`awk '{print $1}' /vagrant/vendor/composer.lock.checksum`;
+    currentvendorsha=`awk '{print $1}' /usr/share/schoolbox/vendor/composer.lock.checksum`;
     if [ "$currentvendorsha" == "$composerlocksha" ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Vendor build up to date, nothing to change";
@@ -169,11 +169,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
                             # Cleanup for purity
-                            rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                            rm -fR /usr/share/schoolbox/vagrantcache/vendor 2>/dev/null;
                             # Extract checksum
                             tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
                             vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-                            rm -fR /vagrant/vagrantcache/vendor 2>/dev/null;
+                            rm -fR /usr/share/schoolbox/vagrantcache/vendor 2>/dev/null;
                             # Add new file to vendor cache
                             echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
                             # Check if this is file we need
@@ -187,27 +187,27 @@ then
             fi
         done
     fi
-    cd /vagrant || exit;
+    cd /usr/share/schoolbox || exit;
     if [ "$vendorfile" != '' ];
     then
-        if [ -f /vagrant/vagrantcache/$vendorfile ];
+        if [ -f /usr/share/schoolbox/vagrantcache/$vendorfile ];
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
-            rm -fR /vagrant/vendor 2>/dev/null;
-            tar xzf /vagrant/vagrantcache/$vendorfile;
+            rm -fR /usr/share/schoolbox/vendor 2>/dev/null;
+            tar xzf /usr/share/schoolbox/vagrantcache/$vendorfile;
         else
             # Still no luck, build from scratch with composer
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-            /vagrant/tools/composer.sh 2>&1;
+            /usr/share/schoolbox/tools/composer.sh 2>&1;
         fi
     else
         # Still no luck, build from scratch with composer
         echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-        /vagrant/tools/composer.sh 2>&1;
+        /usr/share/schoolbox/tools/composer.sh 2>&1;
     fi
 fi
-cd /vagrant || exit;
+cd /usr/share/schoolbox || exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
 composer dump-autoload -o --no-interaction;
@@ -227,7 +227,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --sql-schema 'schoolbox' \
 --sql-user 'schoolboxvagrant' \
 --sql-pass 'abc123' \
---cache-dir '/vagrant/vagrantcache' \
+--cache-dir '/usr/share/schoolbox/vagrantcache' \
 --config amqp_host 'localhost' \
 --config amqp_user 'guest' \
 --config amqp_pass 'guest' \
@@ -249,7 +249,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/sql/vagrant.sql
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /usr/share/schoolbox/sql/vagrant.sql
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
 
@@ -276,11 +276,11 @@ done
 
 # Set up the host for the newly-installed instance
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpversion_supported" /vagrant/puppet-apply.sh
+FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpversion_supported" /usr/share/schoolbox/puppet-apply.sh
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat /usr/share/schoolbox/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 
@@ -291,10 +291,10 @@ cd $cachedir;
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
-npmlocksha=`sha1sum /vagrant/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
-if [ -f /vagrant/node_modules/npm.shrinkwrap.checksum ];
+npmlocksha=`sha1sum /usr/share/schoolbox/npm-shrinkwrap.json 2>/dev/null | awk '{print $1}'`;
+if [ -f /usr/share/schoolbox/node_modules/npm.shrinkwrap.checksum ];
 then
-    currentnpmsha=`awk '{print $1}' /vagrant/node_modules/npm.shrinkwrap.checksum`;
+    currentnpmsha=`awk '{print $1}' /usr/share/schoolbox/node_modules/npm.shrinkwrap.checksum`;
     if [ "$currentnpmsha" == "$npmlocksha" ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] NPM build up to date, nothing to change ($npmlocksha)";
@@ -334,11 +334,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
                             # Cleanup for purity
-                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR /usr/share/schoolbox/vagrantcache/node_modules 2>/dev/null;
                             # Extract checksum
                             tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
                             npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
-                            rm -fR /vagrant/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR /usr/share/schoolbox/vagrantcache/node_modules 2>/dev/null;
                             # Add new file to NPM cache
                             echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
                             # Check if this is file we need
@@ -352,34 +352,34 @@ then
             fi
         done
     fi
-    cd /vagrant;
+    cd /usr/share/schoolbox;
     if [ "$npmfile" != '' ];
     then
-        if [ -f /vagrant/vagrantcache/$npmfile ];
+        if [ -f /usr/share/schoolbox/vagrantcache/$npmfile ];
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
-            rm -fR /vagrant/node_modules 2>/dev/null;
-            tar xzf /vagrant/vagrantcache/$npmfile;
+            rm -fR /usr/share/schoolbox/node_modules 2>/dev/null;
+            tar xzf /usr/share/schoolbox/vagrantcache/$npmfile;
         else
             # Still no luck, build from scratch with npm
             echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-            cat /vagrant/vagrantcache/npm.cache;
+            cat /usr/share/schoolbox/vagrantcache/npm.cache;
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-            /vagrant/tools/pkg-build-npm.sh 2>&1;
+            /usr/share/schoolbox/tools/pkg-build-npm.sh 2>&1;
         fi
     else
         # Still no luck, build from scratch with npm
         echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-        cat /vagrant/vagrantcache/npm.cache;
+        cat /usr/share/schoolbox/vagrantcache/npm.cache;
         echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
-        /vagrant/tools/pkg-build-npm.sh 2>&1;
+        /usr/share/schoolbox/tools/pkg-build-npm.sh 2>&1;
     fi
 fi
-cd /vagrant;
+cd /usr/share/schoolbox;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
-/vagrant/tools/pkg-build-css-js.sh
+/usr/share/schoolbox/tools/pkg-build-css-js.sh
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
@@ -389,12 +389,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 if [ "$enable_xdebug" == "true" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
-    if [ -f /vagrant/tools/xdebug.ini ]; then
+    if [ -f /usr/share/schoolbox/tools/xdebug.ini ]; then
         echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-        cp -f /vagrant/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
+        cp -f /usr/share/schoolbox/tools/xdebug.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-        cp -f /vagrant/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
+        cp -f /usr/share/schoolbox/tools/xdebug.default.ini /etc/php/"$phpversion_supported"/mods-available/xdebug.ini;
     fi
 
     ln -sf /etc/php/"$phpversion_supported"/mods-available/xdebug.ini   /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini
@@ -443,7 +443,7 @@ eval "service php${phpversion_supported}-fpm restart"
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
-/vagrant/tools/maintenance/site_up.sh;
+/usr/share/schoolbox/tools/maintenance/site_up.sh;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Gotenberg service";
 gotenberg_container_ids="$(docker ps -f ancestor=thecodingmachine/gotenberg:6 -q)"
@@ -455,8 +455,8 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
 # call custom provisioning
-if [ -f /vagrant/post-provision.sh ];
+if [ -f /usr/share/schoolbox/post-provision.sh ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
-    /vagrant/post-provision.sh;
+    /usr/share/schoolbox/post-provision.sh;
 fi

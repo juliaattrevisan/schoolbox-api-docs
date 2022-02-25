@@ -1,9 +1,9 @@
 # TASS Coalition
 SUDS TASS is a little more complex than the other SUDS connectors. TASS is a coalition of *products* which provide specific API endpoint data. We are using four such products.
 
-1. LMS Integration 
+1. LMS Integration
    https://github.com/TheAlphaSchoolSystemPTYLTD/lms-integration
-2. Student Details 
+2. Student Details
    https://github.com/TheAlphaSchoolSystemPTYLTD/student-details
 3. Identify Management
    https://github.com/TheAlphaSchoolSystemPTYLTD/IdM
@@ -15,13 +15,13 @@ This is a quick reference for the synchronisation commands. They're explained fu
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 
 // Import all the profile and timetable data
 php sisImporter.php -vvv --perform
 
 // Import calendar events, if DSN provided
-php calendarImporter.php -vvv --perform 
+php calendarImporter.php -vvv --perform
 
 // Create user accounts in schoolbox
 php userProvision.php -vvv --perform-update
@@ -31,7 +31,7 @@ php userProvision.php -vvv --perform-update
 As usual we need two pieces of data for SUDS to work: *School Data Endpoint Host* and *School Data Endpoint Key*.
 
 ## 1.1 Endpoint Host
-Each TASS API endpoint will have its own host somewhere. This goes into _School Data Endpoint Host_. 
+Each TASS API endpoint will have its own host somewhere. This goes into _School Data Endpoint Host_.
 
 For example, the test server we used to develop is this:
 
@@ -41,7 +41,7 @@ https://apidev.tassweb.com.au/tassweb/api/
 
 But a school will have a different url that's kind of like that.
 
-## 1.2 Endpoint Key (DSN Configuration)   
+## 1.2 Endpoint Key (DSN Configuration)
 Each product has a set of credentials are as follows.
 
 1. Company Code
@@ -63,7 +63,7 @@ This is the configuration string for all the products. We can break this down in
 ### 1.2.1 Example
 The following is the configuration string for the *Student Details* product. It starts with the prefix `studentdetails` which tells schoolbox that this is the set of credentials for the *Student Details* product.
 
-It also contains the Company Code, App Code and Token. Simply put the appropriate values into this format when you get them for a school. 
+It also contains the Company Code, App Code and Token. Simply put the appropriate values into this format when you get them for a school.
 
 ```
 studentdetails:companycode=10;appcode=SB02;token=h6CELiLaJ46mho8FunFSGg==
@@ -99,7 +99,7 @@ Then run the sisImporter in the usual spot. It'll chomp through all the data.
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 php sisImporter.php -vvv --perform
 ```
 
@@ -113,7 +113,7 @@ When it's done with that, you'll need to run the UPS rulesets as per tradition. 
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 php userProvision.php -vvv --perform-update
 ```
 
@@ -123,8 +123,8 @@ Note that the Calendar import is performed separately.
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
-php calendarImporter.php -vvv --perform 
+cd /usr/share/schoolbox/tools/synchronise
+php calendarImporter.php -vvv --perform
 ```
 
 It'll import events and try to match them up with the items you've configured in schoolbox at `Lists > Event Types`. If they match *exactly*, a TASS calendar event will display the corresponding colour. If it doesn't match exactly, the TASS calendar event will be given the first Event Type configured in schoolbox.
@@ -137,8 +137,8 @@ Vagrants will most likely have *Data Cache Timeout* set to `300` so if you're te
 
 The default UPS rulesets are also somewhat incompatible with TASS and you'll need to amend them slightly; you'll have to
 
-1. arbitrarily put everyone in a campus of your choice, 
-2. arbitrarily put everyone in a role of your choice, 
+1. arbitrarily put everyone in a campus of your choice,
+2. arbitrarily put everyone in a role of your choice,
 3. give everyone an arbitrary username. I just give them the username `{:id}` in the General Information section.
 
 # 3. Data
@@ -153,7 +153,7 @@ Note that in order for a contact to appear they must be enabled in the Parent Lo
 Since TASS operates on the concept of *families*, and schoolbox operates on the concept of *people*, we've had to do some micromanagement to identify individuals inside a family such that we can import them into schoolbox from TASS.
 
 ### 3.1.1 Parent and Spouse prefixes
-Parents and their Spouses share the same identifier in TASS. However, in schoolbox, we don't allow that. To deconflict individuals we prefix a parent's externalId with a `P` and their spouse with an `S`. 
+Parents and their Spouses share the same identifier in TASS. However, in schoolbox, we don't allow that. To deconflict individuals we prefix a parent's externalId with a `P` and their spouse with an `S`.
 
 > This is not user-configurable, though the spouse prefix exists as constant `DEFAULT_SPOUSE_PREFIX` in case that ever needed to be changed. A school did try once, but eventually it got too hard and we just went back to this scheme.
 
@@ -227,7 +227,7 @@ We can do the same for the Father, setting *TASS Address Number for Father* to `
 
 ### 3.1.4 Phone Numbers in a Nuclear Family vs a Split Family
 
-Bear with me on this one. It's a weird setup, so it'll take some time to explain and for you to understand. 
+Bear with me on this one. It's a weird setup, so it'll take some time to explain and for you to understand.
 
 Phone Numbers are derived from the `getCommunicationRulesDetails` endpoint. This endpoint returns a special mixed data structure containing a smooshing-together of:
 
@@ -244,8 +244,8 @@ Let's elaborate how these two concepts meet by listing some axioms.
 
 1. When a family record matches the *TASS Address Description for Mother* the misc fields are considered relevant to the Mother in a split family.
 2. When a family record matches the *TASS Address Description for Father* the misc fields are considered relevant to the Father in a split family.
-3. When a family record matches neither of these fields, the misc fields are distributed among the family's members and you're in a nuclear family. 
-   
+3. When a family record matches neither of these fields, the misc fields are distributed among the family's members and you're in a nuclear family.
+
 In a nuclear family, the "Misc fields" are shared among the parents. It is presumed that any field ending in `_1` belongs to the Mother while anything ending in `_2` belongs to the Father.
 
 #### 3.1.4.1 Example, Nuclear Family
@@ -366,7 +366,7 @@ Only teaching staff have a timetable.
 
 ### 3.2.1 Example
 
-Let's say there was an Employee with the identifier `123`.  When we import them into schoolbox, their externalId will be `E123`. This deconflicts them with a student whose externalId is also `123`. 
+Let's say there was an Employee with the identifier `123`.  When we import them into schoolbox, their externalId will be `E123`. This deconflicts them with a student whose externalId is also `123`.
 
 ## 3.3 Photos
 Photos are always imported into `sis_user_profile` via the `scheduler`. This reuses the `GetStudents` endpoint with additional args that provide photo binary data which we cache locally into storage.

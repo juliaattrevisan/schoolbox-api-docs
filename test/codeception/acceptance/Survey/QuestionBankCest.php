@@ -9,7 +9,7 @@
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/bin/codecept run --steps acceptance Survey/QuestionBankCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps acceptance Survey/QuestionBankCest
  * ./vendor/codeception/codeception/codecept --steps run acceptance Survey/QuestionBankCest
  */
 

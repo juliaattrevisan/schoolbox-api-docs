@@ -37,17 +37,17 @@ mkdir /mnt/data/php_tmp
 chmod 777 /mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
-cp -rf $fullpath/../../* /vagrant
+cp -rf $fullpath/../../* /usr/share/schoolbox
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
-cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
+cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
 cp -rf $initialdir/configfiles/php/7.4/fpm/* $CONFIG_DIR
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -rf $initialdir/data/* /var/lib/schoolbox
 cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 
-## Go to vagrant to initialise npm and composer
-cd /vagrant
+## Go to repository to initialise npm and composer
+cd /usr/share/schoolbox
 
 echo "Deploying schoolbox config files"
 mkdir -p /etc/schoolbox
@@ -81,7 +81,7 @@ service mariadb start
 echo 'started mariadb'
 
 ## Go to the tools and update the db to be the latest version.
-cd /vagrant/tools
+cd /usr/share/schoolbox/tools
 
 ./build-sql-update.sh
 ./update-sql-nocheck.sh

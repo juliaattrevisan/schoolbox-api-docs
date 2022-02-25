@@ -50,7 +50,7 @@ Then, pop it into the Endpoint Host directory, then run this:
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 # To protect against import of a partial data set, the Kamar sync won't run if
 # any file is less than 15 minutes old.
 # Set every file to have been modified yesterday to work around this.

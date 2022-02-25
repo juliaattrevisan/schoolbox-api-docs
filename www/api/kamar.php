@@ -39,7 +39,7 @@ $apiKey = Loader::getInstance()->get('schooldata_import_endpoint_key');
  * $data = file_get_contents('/var/lib/schoolbox/cache/stream/temp.xml');
  *
  * Or you can do it via the cli:
- * clear;curl --data-binary "@/vagrant/tools/synchronise/temp.xml" -k https://vagrant.dev.schoolbox.cloud/api/kamar.php
+ * clear;curl --data-binary "@/usr/share/schoolbox/tools/synchronise/temp.xml" -k https://vagrant.dev.schoolbox.cloud/api/kamar.php
  */
 (new Receiver($cacheDir, $apiKey))->receive((string)$data);
 

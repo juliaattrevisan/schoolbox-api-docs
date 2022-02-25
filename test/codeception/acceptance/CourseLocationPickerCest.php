@@ -16,7 +16,7 @@ use Exception;
  * Steps:
  * 1. Provision sales.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/bin/codecept run --steps acceptance CourseLocationPickerCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps acceptance CourseLocationPickerCest
  */
 class CourseLocationPickerCest
 {

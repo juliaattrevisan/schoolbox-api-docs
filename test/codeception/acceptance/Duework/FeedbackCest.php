@@ -9,7 +9,7 @@
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest
  *
  * To run a specific test:
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Duework/FeedbackCest:<test method name>

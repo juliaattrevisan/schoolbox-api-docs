@@ -358,7 +358,7 @@ echo -e "\n* Detecting Installs and Backups *";
 
 ## Wipe current detected list
 sbrl='/tmp/schoolbox-restore-list';
-searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php /vagrant/www/conf/conf.php';
+searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php';
 rm -f $sbrl;
 
 ## Detect database backups for this install

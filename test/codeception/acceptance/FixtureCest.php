@@ -9,7 +9,7 @@
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
  */
 
 use Page\Fixture;
@@ -25,7 +25,7 @@ class FixtureCest
      */
     public function _before(AcceptanceTester $i)
     {
-        exec('cd /vagrant/tools/notif; sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
+        exec('cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/destroy-rabbit-data.php;');
         $i->logout();
         $i->loginAsAdmin();
     }

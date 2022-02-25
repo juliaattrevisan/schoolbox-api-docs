@@ -92,8 +92,8 @@ Now visit http://192.168.36.10/test - stuff appears! The `die()` is noteworthy h
 Try removing the `die()` command, and refresh the screen. You'll be attacked by `phplib` complaining at you in a most unholy way:
 
  ```
- Warning: loadfile: contentTpl is not a valid handle. in /vagrant/library/HtmlTemplate.php on line 710
- Warning: subst: unable to load contentTpl. in /vagrant/library/HtmlTemplate.php on line 710
+ Warning: loadfile: contentTpl is not a valid handle. in /usr/share/schoolbox/library/HtmlTemplate.php on line 710
+ Warning: subst: unable to load contentTpl. in /usr/share/schoolbox/library/HtmlTemplate.php on line 710
  ```
 
 It does this sort of stuff when you haven't specified an html file for it to process and output. Don't try to comprehend these warning and error messages. There's no hope. Associate a message with a known solution; it's much easier this way.

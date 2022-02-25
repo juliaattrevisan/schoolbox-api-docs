@@ -186,7 +186,7 @@ class ISoftDeletableTest extends TestCase
             if (!$item->isFile()) {
                 continue;
             }
-            if (preg_match('[^/vagrant/library/(.*Mapper)\.php$]', $item->getRealPath(), $matches)) {
+            if (preg_match('[^/usr/share/schoolbox/library/(.*Mapper)\.php$]', $item->getRealPath(), $matches)) {
                 $classBase = $matches[1];
                 // Candidate class names
                 $candidates = [

@@ -1088,7 +1088,7 @@ class External_Synergetic_User implements External_UserInterface
     {
         // Was unable to hit this in testing, but running in isolation returned
         //
-        //    /vagrant/library/External/Synergetic/User.php:440:
+        //    /usr/share/schoolbox/library/External/Synergetic/User.php:440:
         //    array (size=1)
         //      0 =>
         //          array (size=1)

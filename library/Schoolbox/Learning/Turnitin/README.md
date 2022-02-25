@@ -17,16 +17,16 @@ Turnitin has synonymous concepts with Schoolbox; I'll always refer to them with 
 * **Submission Box File** synonymous with **Turnitin Group Attachment**
 * **Student Submission File** synonymous with **Turnitin Submission**
 
-> Sometimes I'll have referred to a thing in code called a "container". This is the turnitin file record that we have to set up before uploading the guts of a file into it. You could think of it as synonymous with our `storage` records and the file itself sitting in a data folder somewhere else.  
+> Sometimes I'll have referred to a thing in code called a "container". This is the turnitin file record that we have to set up before uploading the guts of a file into it. You could think of it as synonymous with our `storage` records and the file itself sitting in a data folder somewhere else.
 
 ## 1 Setup
 
 You need two pieces of data to activate Turnitin:
 
 * Turnitin API Host `config.turnitin_api_host`
-  * A url, e.g. https://schoolbox.tii-sandbox.com 
-* Turnitin API Key `config.turnitin_api_key` 
-  * an alphanumeric string, e.g. `88c7b32b6f...` 
+  * A url, e.g. https://schoolbox.tii-sandbox.com
+* Turnitin API Key `config.turnitin_api_key`
+  * an alphanumeric string, e.g. `88c7b32b6f...`
 
 Once you've provided both those values, schoolbox will always try to use Turnitin over Plagscan. It will do this even if your actual values are wrong so double check those when you enter them or when you're debugging.
 
@@ -36,7 +36,7 @@ Each school has a Turnitin account, but this might be shared between that school
 
 ### 1.2 Plagscan
 
-If Turnitin is configured, it will always try to run in preference to Plagscan. 
+If Turnitin is configured, it will always try to run in preference to Plagscan.
 
 ## 2 Overall Design
 
@@ -67,7 +67,7 @@ Simply attach the files. This will do the following:
   * The asynchronous process `group.php` will update the status of these `turnitin_group_attachment` records as the upload process executes.
 
  > `[1]` This is a lot of calls to be doing so you don't do it when you save the assessment. This would force users to wait a long time. This might also error out in a weird and unrecoverable manner. This would also apply when you import courses and if you import a lot of due works to a lot of places, you'll be waiting a long time.
-> 
+>
 > `[2]` This also lets users fiddle with their Attached Files in case they change their minds, upload more files, remove some etc. as they micromanage their Due Works. We can allow them these mutations and only send them up when we think they'll be done with it all, without incurring the penalty of uploading something that has been immediately changed.
 
 ### 3.1 Group CLI Tool
@@ -76,7 +76,7 @@ Exclusions can be processed via the cli tool `group.php` which you can run manua
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php group.php --help
 
 php group.php
@@ -85,12 +85,12 @@ php group.php
 `turnitin_group` records experience five statuses:
 
 * **pending** This submission box has somehow changed, but we haven't yet figured out how
-* **group** The submission box doesn't have a Turnitin Group so we're making one now and assigning it to this record. 
+* **group** The submission box doesn't have a Turnitin Group so we're making one now and assigning it to this record.
 * **group_attachment** There are attached files to look at and set up. Attachments are set up in two stages: a file record on Turnitin's end, and then we send the file contents itself into this record.
-  * Any attached files that don't have a `turnitin_group_attachment` record will get one and a corresponding `group_attachment_id` from Turnitin 
+  * Any attached files that don't have a `turnitin_group_attachment` record will get one and a corresponding `group_attachment_id` from Turnitin
   * Any files that were previously attached will get their `turnitin_group_attachment` record softdeleted.
   * Any files that are still attached and are still in Turnitin will remain untouched (nothing to do)
-* **uploading** we're sending the file contents to Turnitin. 
+* **uploading** we're sending the file contents to Turnitin.
 * **complete** we finished sending the file contents to Turnitin.
 * **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
 
@@ -125,7 +125,7 @@ The Transmission phase is handled by the cli tool `transmit.php` which you can r
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php transmit.php --help
 
 php transmit.php
@@ -138,14 +138,14 @@ php transmit.php
 * **submission** We told Turnitin to set up a file record on their end, into which we upload the actual contents separately.
 * An implicit step occurs here which is the Acceptance of EULA. Turnitin wanted us to prompt users every time for every file but that's insanity, so I programmatically accept it on everyone's behalf. There are no status changes for this; it's an implicit step that I arbitrarily take for UX reasons.
 * **uploading** We started sending the file's contents to Turnitin.
-* **loaded** We successfully sent the file's contents to Turnitin. This is the last step of Transmission. 
+* **loaded** We successfully sent the file's contents to Turnitin. This is the last step of Transmission.
 * **error** something went wrong; check the `error_code` and `error_message` columns for more information about what went wrong
 
 #### 4.1.1 Reprocessing
 
 You can manually set the status of a `turnitin_report` record to `pending` which will allow `transmit.php` to reprocess it as if it had never been processed at all.
 
-Alternatively, you can forcibly reprocess a record; using the `--force` flag will allow any `turnitin_report` stuck in `pending, group submission` statuses to be processed as if it had never been processed at all. 
+Alternatively, you can forcibly reprocess a record; using the `--force` flag will allow any `turnitin_report` stuck in `pending, group submission` statuses to be processed as if it had never been processed at all.
 
 Additionally you can specify an individual record in `turnitin_report` to be subjected to the aforementioned.
 
@@ -159,7 +159,7 @@ The Report Generation phase is handled by the cli tool `report.php` which you ca
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php report.php --help
 
 php report.php
@@ -205,7 +205,7 @@ Fortunately it's quite easy to do that, retroactively.
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php retrofit.php --help
 
 php retrofit.php --assessment=1234
@@ -224,7 +224,7 @@ Oct 5, 8:32pm
     - File 4
     - File 5
 
-Oct 4, 1:00pm 
+Oct 4, 1:00pm
     - Similarity Check enabled
 
 Oct 4, 9:00am
@@ -234,10 +234,10 @@ Oct 4, 9:00am
 ```
 
 ...only **File 4** and **File 5** will be sent to Turnitin.
- 
-Retrofit will occur when Similarity Check becomes enabled when it previously wasn't. Retrofitted files will be given the same treatment as described in the **Transmission** and **Report Generation** phases, as if everything had been in place from the beginning. 
 
-To do it, you need to know the **assessment id** specifically. Supply it in the cli option as described in the tool. 
+Retrofit will occur when Similarity Check becomes enabled when it previously wasn't. Retrofitted files will be given the same treatment as described in the **Transmission** and **Report Generation** phases, as if everything had been in place from the beginning.
+
+To do it, you need to know the **assessment id** specifically. Supply it in the cli option as described in the tool.
 
 ### 4.4 Historical CLI Tool
 
@@ -250,7 +250,7 @@ Therefore, to include them into Turnitin's similarity repository, we follow a di
 This functions in largely the same manner as previously described; we still need to upload the data into Turnitin, create Submissions, etc. With two key variances:
 * When we create the Submission in Turnitin, we set a special flag `extract_text_only`.
 * Instead of generating a report, we access a different endpoint which `indexes` the document's contents.
-* A new status **indexing** can now appear. 
+* A new status **indexing** can now appear.
 
 This means we can reuse the existing paradigms for Transmit and Report. The database column `turnitin_report.historical` identifies when documents are historically added explicitly by us, or when they're created in the Turnitin system as normal by our users.
 
@@ -260,7 +260,7 @@ Historical additions are performed manually and explicitly by running the Histor
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php historical.php --help
 
 php historical.php
@@ -289,13 +289,13 @@ Here are some general statements about the cli tools. I couldn't think of a nice
 * **Each tool shares the same implementation as the schoolbox app.** For example, the Retrofit code that you use on the cli is exactly the same code as used by the schoolbox controllers.
   * The things that I used to build and diagnose are the same things that people use in their daily tasks so if something goes wrong in either place, it should be observable and identifiable (and loggable)
   * This means you can run the entire Turnitin process without its webhooks; you can do it all manually or via cron (same thing in my book)
-  * This means you have a fallback in case your schoolbox is behind a firewall, if Turnitin didn't tell you it finished something etc. You can always initiate and re-initiate the worfklow manually. 
-  
+  * This means you have a fallback in case your schoolbox is behind a firewall, if Turnitin didn't tell you it finished something etc. You can always initiate and re-initiate the worfklow manually.
+
 * **You can smash the tools' usage, normally.** If you feel like being in the Matrix, you can run all three cli tools back-to-back, for the ultimate _make everything go_ maneuver:
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 
 php group.php; echo; php transmit.php; echo; php report.php
 ```
@@ -312,7 +312,7 @@ The CLI tools have a lock mechanism that prevents you from running them on top o
 
 ```
 vagrant ssh;
-cd /vagrant/tools/lock;
+cd /usr/share/schoolbox/tools/lock;
 
 php inspector.php
 ```
@@ -323,7 +323,7 @@ The inspector prompts you interactively.
 
 I did consider an Explorer tool so you can query things in Turnitin that aren't exposed anywhere else - e.g. _what files does Turnitin know about for this submission box_ in case you suspect Turnitin knows something that schoolbox doesn't (desync). I haven't built that yet. You'll have to make your own for now, in a test.php
 
-This is kind of nice to have; despite the logging being far more articulate now than in the old Plag days, it doesn't tell you absolutely everything. 
+This is kind of nice to have; despite the logging being far more articulate now than in the old Plag days, it doesn't tell you absolutely everything.
 
 ## 6 Webhooks
 
@@ -336,7 +336,7 @@ Webhooks are specific urls in the schoolbox instance to which Turnitin will `POS
 >* It turned out that Turnitin is firewalled out of the school
 >* The internet didn't work when Turnitin tried to tell us something
 >* Schoolbox died randomly e.g. got upgraded, or we broke it
-> 
+>
 > Therefore the entire system was built around the premise of webhooks not working at all. The cli tools themselves can keep the whole process ticking along in case the webhooks didn't work.
 
 ### 6.1 Headers (Turnitin Event Types)
@@ -355,7 +355,7 @@ Fortunately, I've made that easy for you too, with the `webhook.php` cli tool, b
 
 ```
 vagrant ssh;
-cd /vagrant/tools/turnitin;
+cd /usr/share/schoolbox/tools/turnitin;
 php webhook.php --help
 ```
 
@@ -378,7 +378,7 @@ While it's not particularly obvious, this means you could reconfigure the Turnit
 Anyway, underneath the description is the Turnitin Webhook Identifier:
 
 ```
-Identifier: 410f74b8-02cd-4232-b36a-9953fb2c87bb 
+Identifier: 410f74b8-02cd-4232-b36a-9953fb2c87bb
 ```
 
 You don't need that for anything but it does uniquely identify a specific webhook just in case you ever did.

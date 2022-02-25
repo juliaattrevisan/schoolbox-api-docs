@@ -11,7 +11,7 @@ namespace Quiz;
  * Steps:
  * 1. Provision legacy.tar.gz data
  * 2. vagrant ssh
- * 3. Execute cd /vagrant && ./vendor/codeception/codeception/codecept --steps run acceptance Quiz/ReviewCest
+ * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance Quiz/ReviewCest
  *
  * To run a specific test:
  *  ./vendor/codeception/codeception/codecept --steps run acceptance Quiz/ReviewCest:<test method name>

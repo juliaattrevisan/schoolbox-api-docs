@@ -4,7 +4,7 @@
 # when puppet is invoked during a real live schoolbox[dev] installation.
 
 # Global constants
-readonly cache_dir='/vagrant/vagrantcache';
+readonly cache_dir='/usr/share/schoolbox/vagrantcache';
 
 mkdir -p $cache_dir;
 cd $cache_dir || exit 1;  # TODO do we need to?
@@ -40,7 +40,7 @@ else
   echo "  vagrant destroy;";
   echo "  vagrant box remove ubuntu-1404-php71;";
   echo "  vagrant box remove ubuntu-1804-php71;";
-  if [ -f /vagrant/vagrant.yaml ] && [ "$(grep vagrant_box /vagrant/vagrant.yaml | grep -vc '#')" -gt 0 ]; then
+  if [ -f /usr/share/schoolbox/vagrant.yaml ] && [ "$(grep vagrant_box /usr/share/schoolbox/vagrant.yaml | grep -vc '#')" -gt 0 ]; then
     echo "then:";
     echo "  remove the 'vagrant_box' line from your vagrant.yaml file";
   fi
@@ -50,7 +50,7 @@ else
 fi;
 
 # Ensure .env environment file is present
-if [ ! -f /vagrant/.env ]; then
+if [ ! -f /usr/share/schoolbox/.env ]; then
     echo "Error: '.env' environment file missing. See LastPass for details" >&2;
     exit 1;
 fi
@@ -58,7 +58,7 @@ fi
 # Function to fetch value from .env file by key
 # Usage: value=$(read_var $key)
 read_var() {
-    VAR=$(grep -E "^\s*$1" /vagrant/.env | xargs)
+    VAR=$(grep -E "^\s*$1" /usr/share/schoolbox/.env | xargs)
     IFS="=" read -ra VAR <<< "$VAR"
     echo "${VAR[1]}"
 }
@@ -74,12 +74,7 @@ if type mysql 2>/dev/null >&2 && test -f /root/.my.cnf; then
 fi
 
 
-# We want to be able to reference schoolbox code at the standard location,
-# but have the disks on the shared mount se we can directly manipulate from the host
-rm -rf /usr/share/schoolbox
-ln -sf /vagrant /usr/share/schoolbox
-
-rm -rf /var/lib/schoolbox /vagrant/data
+#rm -rf /var/lib/schoolbox /vagrant/data  # TODO remove '/vagrant/data' once v22 is released
 mkdir -p /mnt/data
 
 # Does vagrant.yaml file indicate we wish this host to use a custom IR endpoint?
@@ -115,7 +110,7 @@ done
 if [[ -z $extra_hostname ]]; then
   # Download vagrant cert
   s3Referer=$(read_var AWS_S3_REFERER);
-  if ! /vagrant/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
+  if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
     echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
     exit 1;
   fi
