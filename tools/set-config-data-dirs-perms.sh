@@ -36,6 +36,7 @@ declare data_dir_include=();     # CLI args
 declare data_dir_skip=();        # CLI args
 declare data_dirs=();            # Data dirs we will actually modify
 declare lock_file;               # Contains PID of process executing this script. Used to prevent overlapping execution.
+declare instance_id;
 
 function debug(){
   if [[ $verbose == '1' ]]; then
@@ -159,7 +160,6 @@ function parse_cli_args(){
 # Parse SQL credentials for an instance
 function parse_sql_credentials(){
   local conf_file=$site_root/www/conf/conf.php;
-  local instance_id;
 
   instance_id=$(schoolbox-conf --conf="$conf_file" --option=INSTANCE_ID);
   if [ -z "$instance_id" ]; then
@@ -206,7 +206,7 @@ function check_script_overlap() {
     if ! type mail &> /dev/null; then
       warn "mail is not available. Cannot send email."
     else
-      mail -s "Overlapping cronjob on $(schoolbox-read-instances --option instance-list)" ist@alaress.com.au <<< "An overlap for $script_name was prevented on $(schoolbox-read-instances --option instance-list)".
+      mail -s "Overlapping cronjob on $instance_id" ist@alaress.com.au <<< "An overlap for $script_name was prevented on $instance_id".
     fi
     exit
   fi
