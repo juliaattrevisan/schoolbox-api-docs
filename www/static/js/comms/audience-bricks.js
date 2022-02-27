@@ -644,7 +644,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
         // Simple Host + Simple Guest. Must have same entity type and value
         if(this.isSimple() && other.isSimple()){
-
             // Note that simple bricks have the modifier applied at the brick level, which was checked above.
             return this.dimensions[0].entityType === other.dimensions[0].entityType && this.dimensions[0].entityValues[0] === other.dimensions[0].entityValues[0];
         }
@@ -707,7 +706,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         if(this.isSimple() !== other.isSimple()){
             return false;
         }
-        if(this.dimensions.length !==  other.dimensions.length){
+        if(this.dimensions.length !== other.dimensions.length){
             return false;
         }
 
@@ -1175,7 +1174,7 @@ function BrickManager(codec, entityTypeLabelMap) {
         var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels),
             brickCandidates = [];
 
-        for(var i in bricks){
+        for (const i of Object.keys(bricks)) {
             var brick = bricks[i];
             if(brick.containsBrick(newBrick)){
                 selectize.removeItem(key);
@@ -1304,7 +1303,7 @@ function BrickManager(codec, entityTypeLabelMap) {
      */
     var onBrickChanged = function (selectize, bricks, changedBrick) {
         for(var i in bricks){
-            if(changedBrick === bricks[i]){
+            if (changedBrick.segments[0].entityValue === bricks[i].segments[0].entityValue) {
                 continue;
             }
             if(changedBrick.containsBrick(bricks[i])){
