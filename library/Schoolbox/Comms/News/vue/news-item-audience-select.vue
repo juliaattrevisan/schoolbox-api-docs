@@ -610,8 +610,6 @@ export default {
             // Remove this option from the other dropdown if it is not a 1:N relationship
             this.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
             if (!audienceOption.isMulti) {
-                //console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
-                // Vue.delete(this.audienceOptions.intersect[otherList], audienceOption.entityType);
                 delete this.audienceOptions.intersect[otherList][audienceOption.entityType];
             }
 
