@@ -63,7 +63,7 @@ export default {
          */
         getFileColour (file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
-            if (percentageRounded == 0) {
+            if (percentageRounded === 0) {
                 return '#0c78cf'; //blue 
             } else if (this.isBetween(percentageRounded, 1, 24)) {
                 return '#278829'; //green
