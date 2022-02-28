@@ -94,6 +94,9 @@
                     {% endif %}
                 {% endfor %}
             },
+            errorPlacement: function(error, element) {
+            $.alaressValidate.defaultErrorPlacement(error, element);
+        },
         });
     });
 </script>
