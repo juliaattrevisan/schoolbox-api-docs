@@ -82,14 +82,7 @@ class Controller extends ConfigController
      */
     public function postAdmin(): void
     {
-        //check structure of uri, if invalid fix, or return with error
-        $post = $this->request->post->get();
-        $post['cloudwork_oauth_identity_provider'] = trim($post['cloudwork_oauth_identity_provider']);
-        if (null === parse_url($post['cloudwork_oauth_identity_provider'], PHP_URL_SCHEME)) {
-            throw ErrorMapper::getInstance()->generateException(0, null, '"oAuth Identity Provider URL" is not a valid URL.');
-        }
-
-        $this->updateConfig($post, $this->buildConfigPredicate());
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate(Module::BASE_NAME . '.getAdmin'));
     }
 

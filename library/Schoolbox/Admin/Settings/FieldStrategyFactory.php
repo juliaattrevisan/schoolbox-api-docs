@@ -122,6 +122,8 @@ class FieldStrategyFactory
                 return new FieldType\SelectMulti\Renderer();
             case ConfigMapper::FIELD_SELECT_DATE:
                 return new FieldType\Date\Renderer();
+            case ConfigMapper::FIELD_URI:
+                return new FieldType\URI\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -157,6 +159,8 @@ class FieldStrategyFactory
                 return new FieldValueSerializerBase();
             case ConfigMapper::FIELD_SELECT_MULTI:
                 return new FieldType\SelectMulti\ValueSerializer();
+            case ConfigMapper::FIELD_URI:
+                return new FieldType\URI\ValueSerializer();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
         throw new UnexpectedValueException("Unable to find a field value serializer for config field '{$fieldId}'");
