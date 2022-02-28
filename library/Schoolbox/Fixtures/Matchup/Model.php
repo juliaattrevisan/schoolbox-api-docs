@@ -61,6 +61,9 @@ class Model implements ISoftDeletable
     /** @var Alaress_Date_Format */
     protected $startAt;
 
+    /** @var Alaress_Date_Format */
+    protected $finishAt;
+
     /** @var Result|null */
     protected $homeTeamResult;
 
@@ -412,6 +415,27 @@ class Model implements ISoftDeletable
         $this->startAt = $startAt;
         return $this;
     }
+
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getFinishAt(): ?Alaress_Date_Format
+    {
+        return $this->finishAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $finishAt
+     * @return Model
+     */
+    public function setFinishAt(Alaress_Date_Format $finishAt): self
+    {
+        $this->finishAt = $finishAt;
+        return $this;
+    }
+
 
     /**
      * @return string

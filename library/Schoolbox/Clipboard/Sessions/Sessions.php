@@ -249,7 +249,9 @@ class Sessions implements IStrategy
                     $venue = $this->findVenue($session['locationData']['name'] ?? null);
 
                     $matchupName = trim($session['title']);
+
                     $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
+                    $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime']));
 
                     /* See if this matchup exists by taking the bestest guess
                      */
@@ -260,6 +262,7 @@ class Sessions implements IStrategy
                             'season_id' => $season->getId(),
                             'home_team_id' => $team->getId(),
                             'start_at' => $startAt->getDatabase(),
+                            'finish_at' => $finishAt->getDatabase(),
                             'venue_id' => $venue->getId()
                         ]);
 
@@ -276,7 +279,8 @@ class Sessions implements IStrategy
                             ->setDivision($division)
                             ->setVenue($venue)
                             ->setHomeTeam($team)
-                            ->setStartAt($startAt);
+                            ->setStartAt($startAt)
+                            ->setFinishAt($finishAt);
 
                         $this->log->debug(sprintf(
                             'Creating matchup %s on %s, at venue %s',

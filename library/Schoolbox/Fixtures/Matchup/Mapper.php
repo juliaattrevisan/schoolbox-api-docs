@@ -67,6 +67,7 @@ class Mapper extends BaseMapper
         $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
+        $this->uses('finish_at', self::TYPE_DATETIME);
         $this->joins('home_team_id', TeamMapper::class, 'id', null, null, 'homeTeam', 'home_team');
         $this->joins('away_team_id', TeamMapper::class, 'id', null, null, 'awayTeam', 'away_team');
         $this->joins('home_school_id', SchoolMapper::class, 'id', null, null, 'homeSchool', 'home_school');

@@ -32,3 +32,9 @@ VALUES (
    'settings',
    (SELECT MAX(sequence)+1 FROM config c)
 );
+
+
+-- Also remember the finish timestamp which we never collected before
+
+ALTER TABLE `sportsfixtures_match`
+ADD COLUMN `finish_at` DATETIME NULL DEFAULT NULL AFTER `start_at`;
