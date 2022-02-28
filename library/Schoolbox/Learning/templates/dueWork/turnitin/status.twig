@@ -8,6 +8,33 @@
  #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
+{##
+ # Decide Urgency of a Similarity Check percentage
+ #
+ # $value represents how much of the document was plagiarised
+ # so a high percentage means a lot was copied from somewhere
+ #
+ # Status of -1 should be hidden entirely, and the default
+ # thresholds are 60, 20 and 0 (represented in red, orange,
+ # and green respectively)
+ #}
+{% macro similarity(value) %}
+{% apply spaceless %}
+    {% set numericValue = value|replace({'%': ''}) %}
+    {% if numericValue >= 75 %}
+        turnitin-red
+    {% elseif numericValue >= 50 %}
+        turnitin-orange
+    {% elseif numericValue >= 25 %}
+        turnitin-yellow
+    {% elseif numericValue >= 1 %}
+        turnitin-green
+    {% elseif numericValue == 0 %}
+        turnitin-blue
+    {% endif %}
+{% endapply %}
+{% endmacro %}
+
 {% if currentFile.turnitin %}
 <p class="meta">
     {% if currentFile.turnitin.isComplete %}
@@ -21,11 +48,11 @@
         %}
         {% if reportRoute %}
             <a href="{{ reportRoute }}">
-                <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+                <span class="{{ similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             </a>
         {% else %}
-            <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+            <span class="{{ similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
             <span title="Similarity check completed.">similar content</span>
         {%  endif %}
     {% elseif currentFile.turnitin.isProcessing %}
