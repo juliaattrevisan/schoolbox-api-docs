@@ -90,7 +90,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $checkedCampusList = [];
 
-        foreach ($this->getUser()->getCampusCollection() as $campus) {
+        // Cloning, to avoid changing session user.
+        $campuses = clone $this->getUser()->getCampusCollection();
+        $campuses->sortBy('sequence', 'ASC')->indexBy('id');
+        foreach ($campuses as $campus) {
             if ($campus instanceof Campus) {
                 $campusId   = $campus->getId();
                 $campusCode = $campus->getExtTimetableCode();
