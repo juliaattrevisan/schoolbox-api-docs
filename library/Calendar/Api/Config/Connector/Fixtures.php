@@ -16,7 +16,7 @@ class Calendar_Api_Config_Connector_Fixtures extends Calendar_Api_Config_Connect
      *
      * @var string
      */
-    protected string $connectorClass = 'Fixtures';
+    protected string $connectorClass = 'Schoolbox';
 
 
     /**
