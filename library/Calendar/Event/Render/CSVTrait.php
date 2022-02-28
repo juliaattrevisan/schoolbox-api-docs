@@ -34,7 +34,7 @@ trait CSVTrait
         $fd = fopen('php://temp/maxmemory:100000', 'rw');
 
         /** @var Event $event */
-        $event = $this->getEvent();
+        $event = $this->event;
         $data  = [
             $event->getStartTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getStartTime()->getUsingFormat('H:i'),

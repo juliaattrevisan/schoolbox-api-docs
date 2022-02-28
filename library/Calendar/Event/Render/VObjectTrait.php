@@ -50,7 +50,7 @@ trait VObjectTrait
     public function render(): string
     {
         /** @var EventInterface $event */
-        $event = $this->getEvent();
+        $event = $this->event;
 
         // Output event times as UTC,
         // no client should be able to mess that up.
@@ -102,7 +102,7 @@ trait VObjectTrait
     protected function getCategories(): string
     {
         /** @var EventInterface $event */
-        $event = $this->getEvent();
+        $event = $this->event;
         return $event->getEventType();
     }
 
