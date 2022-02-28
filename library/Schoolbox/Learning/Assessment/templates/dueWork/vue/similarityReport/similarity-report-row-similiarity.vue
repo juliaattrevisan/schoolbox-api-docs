@@ -55,7 +55,7 @@ export default {
 
         /**
          * Add a colour to represent the similarity score
-         * A low score starting with green to high score red is used
+         * Colours are determined by turnitin
          *
          * @param { Object }
          *
@@ -64,15 +64,15 @@ export default {
         getFileColour (file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
             if (percentageRounded === 0) {
-                return '#0c78cf'; //blue 
+                return 'turnitin-blue'; 
             } else if (this.isBetween(percentageRounded, 1, 24)) {
-                return '#278829'; //green
+                return 'turnitin-green'; //green
             } else if (this.isBetween(percentageRounded, 25, 49)) {
-                return '#eab42c'; //yellow
+                return 'turnitin-yellow'; //yellow
             } else if (this.isBetween(percentageRounded, 50, 74)) {
-                return '#e27600'; //orange
+                return 'turnitin-orange'; //orange
             } else if (this.isBetween(percentageRounded, 75, 100)) {
-                return '#ff0000'; //red
+                return 'turnitin-red'; //red
             } 
         },
 
@@ -99,7 +99,7 @@ export default {
         <ul class="list">
             <li v-for="file in matchedFiles" :key="file.id">
                 <a class="file" :href="file._links.turnitin_report"  title="View similarity check">
-                    <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
+                    <span :class="`percentage ${getFileColour(file)}`">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
                     <span>{{ file.name + '.' + file.ext }}</span>
                 </a>
             </li>
