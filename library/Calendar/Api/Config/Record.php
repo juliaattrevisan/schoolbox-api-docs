@@ -20,15 +20,17 @@ class Calendar_Api_Config_Record
      * inactive too. This is the equivalent of checking that checkbox next to the connector
      * in admin, but without having to delete the settings.
      */
-    const ACTIVE   = 1;
-    const INACTIVE = 0;
+    public const ACTIVE   = 1;
+    public const INACTIVE = 0;
+
 
     /**
      * Primary key
      *
-     * @var int
+     * @var int|null
      */
-    public $id = null;
+    public ?int $id = null;
+
 
     /**
      * The kind of event this configuration is for
@@ -38,7 +40,8 @@ class Calendar_Api_Config_Record
      *
      * @var string
      */
-    public $eventType = '';
+    public string $eventType = '';
+
 
     /**
      * Class name of the API which will use this config
@@ -48,21 +51,24 @@ class Calendar_Api_Config_Record
      *
      * @var string
      */
-    public $connectorClass = '';
+    public string $connectorClass = '';
+
 
     /**
      * Serialized configuration object
      *
      * @var string
      */
-    public $config = '';
+    public string $config = '';
+
 
     /**
      * Status of the config
      *
      * @var int
      */
-    public $status = 1;
+    public int $status = 1;
+
 
     /* These configs are base64-encode()'d to get around a weird issue with unserialize
      * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
@@ -73,51 +79,52 @@ class Calendar_Api_Config_Record
      *
      * @param Calendar_Api_Config_Connector_Abstract $config
      */
-    public function updateConfig(Calendar_Api_Config_Connector_Abstract $config)
+    public function updateConfig(Calendar_Api_Config_Connector_Abstract $config): void
     {
-        /* Update member contents with new config object
-            */
-        $this->setConfig($config);
-        /* Encode and save it
-            */
-        $this->setConfig($this->encodeConfig());
+        $this->setConfig($this->encodeConfig($config));
     }
+
 
     /**
      * Encode config object for storage in db
      *
+     * @param Calendar_Api_Config_Connector_Abstract $config
      * @return string
      */
-    public function encodeConfig()
+    public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): string
     {
-        return base64_encode(serialize($this->getConfig()));
+        return base64_encode(serialize($config));
     }
+
 
     /**
      * Decode config object when retrieving from db
      *
      * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function decodeConfig()
+    public function decodeConfig(): Calendar_Api_Config_Connector_Abstract
     {
-        return unserialize(base64_decode($this->getConfig()));
+        return unserialize(base64_decode($this->getConfig()), [Calendar_Api_Config_Connector_Abstract::class]);
     }
+
 
     /**
      * Activate this config record
      */
-    public function activate()
+    public function activate(): void
     {
         $this->setStatus(self::ACTIVE);
     }
 
+
     /**
      * Deactivate this config record, but not delete it
      */
-    public function deactivate()
+    public function deactivate(): void
     {
         $this->setStatus(self::INACTIVE);
     }
+
 
     /**
      * This connector active?
@@ -133,97 +140,116 @@ class Calendar_Api_Config_Record
      */
 
     /**
-     * @param string $eventType
+     * @param string|null $eventType
+     * @return Calendar_Api_Config_Record
      */
-    public function setEventType($eventType)
+    public function setEventType(?string $eventType): self
     {
         $this->eventType = $eventType;
+        return $this;
     }
 
+
     /**
-     * @return string
+     * @return string|null
      */
-    public function getEventType()
+    public function getEventType(): ?string
     {
         return $this->eventType;
     }
 
+
     /**
      * Set connectorClass
      *
-     * @param string $connectorClass
+     * @param string|null $connectorClass
+     * @return Calendar_Api_Config_Record
      */
-    public function setConnectorClass($connectorClass)
+    public function setConnectorClass(?string $connectorClass): self
     {
         $this->connectorClass = $connectorClass;
+        return $this;
     }
+
 
     /**
      * Get connectorClass
      *
-     * @return string
+     * @return string|null
      */
-    public function getConnectorClass()
+    public function getConnectorClass(): ?string
     {
         return $this->connectorClass;
     }
 
+
     /**
      * Set config
      *
-     * @param string $config
+     * @param string|null $config
+     * @return Calendar_Api_Config_Record
      */
-    public function setConfig($config)
+    public function setConfig(?string $config): self
     {
         $this->config = $config;
+        return $this;
     }
+
 
     /**
      * Get config
      *
-     * @return string
+     * @return string|null
      */
-    public function getConfig()
+    public function getConfig(): ?string
     {
         return $this->config;
     }
 
+
     /**
      * Set id
      *
-     * @param int $id
+     * @param int|null $id
+     * @return Calendar_Api_Config_Record
      */
-    public function setId($id)
+    public function setId(?int $id): self
     {
         $this->id = $id;
+        return $this;
     }
+
 
     /**
      * Get id
      *
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
+
     /**
      * Set status
      *
-     * @param int $status
+     * @param int|null $status
+     * @return Calendar_Api_Config_Record
      */
-    public function setStatus($status)
+    public function setStatus(?int $status): self
     {
         $this->status = $status;
+        return $this;
     }
+
 
     /**
      * Get status
      *
-     * @return int
+     * @return int|null
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }
