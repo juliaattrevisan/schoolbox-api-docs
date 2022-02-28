@@ -78,10 +78,12 @@ class Calendar_Api_Config_Record
      * Update config object
      *
      * @param Calendar_Api_Config_Connector_Abstract $config
+     * @return Calendar_Api_Config_Record
      */
-    public function updateConfig(Calendar_Api_Config_Connector_Abstract $config): void
+    public function updateConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
-        $this->setConfig($this->encodeConfig($config));
+        $this->encodeConfig($config);
+        return $this;
     }
 
 
@@ -89,11 +91,12 @@ class Calendar_Api_Config_Record
      * Encode config object for storage in db
      *
      * @param Calendar_Api_Config_Connector_Abstract $config
-     * @return string
+     * @return $this
      */
-    public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): string
+    public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
-        return base64_encode(serialize($config));
+        $this->setConfig(base64_encode(serialize($config)));
+        return $this;
     }
 
 
@@ -110,19 +113,23 @@ class Calendar_Api_Config_Record
 
     /**
      * Activate this config record
+     * @return Calendar_Api_Config_Record
      */
-    public function activate(): void
+    public function activate(): self
     {
         $this->setStatus(self::ACTIVE);
+        return $this;
     }
 
 
     /**
      * Deactivate this config record, but not delete it
+     * @return Calendar_Api_Config_Record
      */
-    public function deactivate(): void
+    public function deactivate(): self
     {
         $this->setStatus(self::INACTIVE);
+        return $this;
     }
 
 
