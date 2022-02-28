@@ -8,19 +8,19 @@
     {# Home Team #}
     {% if match.homeTeam %}
         {% set homeTeamData %}
-            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name ?? '' }}</a>
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeSchool.name %}
+        {% set homeTeamData = match.homeSchool.name ?? '' %}
     {% endif %}
 
     {# Away Team #}
     {% if match.awayTeam %}
         {% set awayTeamData %}
-            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name ?? '' }}</a>
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awaySchool.name %}
+        {% set awayTeamData = match.awaySchool.name ?? '' %}
     {% endif %}
 
     {% if awayTeamData %}
@@ -42,19 +42,19 @@
     {# Home Team #}
     {% if match.homeTeam.url %}
         {% set homeTeamData %}
-            <a href="{{ match.homeTeam.url }}">{{ match.homeTeam.name }}</a>
+            <a href="{{ match.homeTeam.url }}">{{ match.homeTeam.name ?? '' }}</a>
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeTeam.name %}
+        {% set homeTeamData = match.homeTeam.name ?? '' %}
     {% endif %}
 
     {# Away Team #}
     {% if match.awayTeam.url %}
         {% set awayTeamData %}
-            <a href="{{ match.awayTeam.url }}">{{ match.awayTeam.name }}</a>
+            <a href="{{ match.awayTeam.url }}">{{ match.awayTeam.name ?? '' }}</a>
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awayTeam.name %}
+        {% set awayTeamData = match.awayTeam.name ?? '' %}
     {% endif %}
 
     {% if awayTeamData %}
@@ -76,13 +76,13 @@
 {% apply spaceless %}
 
     {% if match.homeTeam.id %}
-        {{ match.homeTeam.name }}
+        {{ match.homeTeam.name ?? '' }}
     {% else %}
-        {{ match.homeSchool.name }}
+        {{ match.homeSchool.name ?? '' }}
     {% endif %} vs
 
     {% if match.awayTeam %}
-        {{ match.awayTeam.name }}
+        {{ match.awayTeam.name ?? '' }}
     {% else %}
         {{ match.awaySchool.name ?? '' }}
     {% endif %}
@@ -99,25 +99,25 @@
     {# Home Team #}
     {% if match.homeTeam.id %}
         {% set homeTeamData %}
-            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name ?? '' }}</a>
             {% if match.homeTeamResult %}
-                ({{ match.homeTeamResult.status.name }})
+                ({{ match.homeTeamResult.status.name ?? '' }})
             {% endif %}
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeSchool.name %}
+        {% set homeTeamData = match.homeSchool.name ?? '' %}
     {% endif %}
 
     {# Away Team #}
     {% if match.awayTeam.id %}
         {% set awayTeamData %}
-            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name ?? '' }}</a>
             {% if match.awayTeamResult %}
-                ({{ match.awayTeamResult.status.name }})
+                ({{ match.awayTeamResult.status.name ?? '' }})
             {% endif %}
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awaySchool.name %}
+        {% set awayTeamData = match.awaySchool.name ?? '' %}
     {% endif %}
 
     {% if awayTeamData %}
