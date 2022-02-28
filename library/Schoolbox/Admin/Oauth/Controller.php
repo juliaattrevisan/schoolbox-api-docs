@@ -81,7 +81,11 @@ class Controller extends ConfigController
      */
     public function postAdmin(): void
     {
-        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        //check structure of uri, if invalid fix, or return with error
+        $post = $this->request->post->get();
+        $post['cloudwork_oauth_identity_provider'] = trim($post['cloudwork_oauth_identity_provider']);
+
+        $this->updateConfig($post, $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate(Module::BASE_NAME . '.getAdmin'));
     }
 
