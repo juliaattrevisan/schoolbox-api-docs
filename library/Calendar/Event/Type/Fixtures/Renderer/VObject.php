@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Calendar\Event\Type\Fixtures\Renderer;
 
 use Calendar\Event\Render\VObjectTrait;
