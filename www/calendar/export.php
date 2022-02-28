@@ -427,7 +427,7 @@ try {
                 $api->add($subApi);
             }
 
-            // Only include EOTC if enabled
+            // Only include EOTC if eNnabled
             $eotcEnabled = (bool)$config->get('eotc_enabled');
             if ($eotcEnabled) {
                 $subApi = buildApiClass(
@@ -472,6 +472,16 @@ try {
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Event_Vcal_Default::class,
                     [$user, $viewer],
+                    true,
+                    $sentry
+                );
+                $api->add($subApi);
+
+                /* Fixtures
+                 */
+                $subApi = buildApiClass(
+                    Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
+                    [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
                     true,
                     $sentry
                 );
