@@ -228,6 +228,8 @@ class Calendar_Api_Factory
                 return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, $viewer, new External_Timetable());
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
                 return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());
+            case Calendar_Api_EventType_Fixtures_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_Fixtures_Schoolbox_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }
