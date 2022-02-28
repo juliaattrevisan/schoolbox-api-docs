@@ -15,6 +15,7 @@ use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends ConfigController
 {
@@ -84,6 +85,9 @@ class Controller extends ConfigController
         //check structure of uri, if invalid fix, or return with error
         $post = $this->request->post->get();
         $post['cloudwork_oauth_identity_provider'] = trim($post['cloudwork_oauth_identity_provider']);
+        if (null === parse_url($post['cloudwork_oauth_identity_provider'], PHP_URL_SCHEME)) {
+            throw ErrorMapper::getInstance()->generateException(0, null, '"oAuth Identity Provider URL" is not a valid URL.');
+        }
 
         $this->updateConfig($post, $this->buildConfigPredicate());
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate(Module::BASE_NAME . '.getAdmin'));
