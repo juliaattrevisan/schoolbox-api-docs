@@ -16,11 +16,11 @@
 {% apply spaceless %}
     {% set numericValue = value|replace({'%': ''}) %}
     {% if numericValue > 60 %}
-        similarity-critical
+        plagscan-critical
     {% elseif numericValue > 20 %}
-        similarity-warning
+        plagscan-warning
     {% elseif numericValue > 0 %}
-        similarity-ok
+        plagscan-ok
     {% endif %}
 {% endapply %}
 {% endmacro %}

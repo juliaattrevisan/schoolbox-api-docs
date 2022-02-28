@@ -1,4 +1,6 @@
 
+/* Turnitin similarity colours
+ */
 .turnitin-blue {
     color: #0c78cf;
 }
@@ -17,4 +19,18 @@
 
 .turnitin-red {
     color: #ff0000;
+}
+
+/* Plagscan similarity colours
+ */
+.plagscan-ok {
+    @extend .gradient-10;
+}
+
+.plagscan-warning {
+    @extend .gradient-4;
+}
+
+.plagscan-critical {
+    @extend .gradient-0;
 }

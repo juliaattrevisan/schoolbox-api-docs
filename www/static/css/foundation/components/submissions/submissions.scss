@@ -1,19 +1,5 @@
 $table-cell-highlight-background: $content-ui-selected;
 
-/* Similarity Check
- */
-.similarity-ok {
-    @extend .gradient-10;
-}
-
-.similarity-warning {
-    @extend .gradient-4;
-}
-
-.similarity-critical {
-    @extend .gradient-0;
-}
-
 /* Hijack this unused feature
  */
 $joyride-tip-bg: $white;
