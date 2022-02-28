@@ -205,7 +205,6 @@ export async function getLoadedHTML (htmlString) {
     const newScriptTags = Array.from(scriptTags).filter((scriptTag) => !isScriptAdded(scriptTag.getAttribute('src'))); //only add those <scripts> that aren't already on the page
     for (const scriptTag of newScriptTags) { //add each into the document head
         await injectScript(scriptTag.getAttribute('src'));
-        scriptTag.remove(); //remove each from the element as the <script> is now in the document head instead
     } 
     if (documentFragment.childElementCount === 1) { //should be returning a single div
         return documentFragment.firstElementChild;
