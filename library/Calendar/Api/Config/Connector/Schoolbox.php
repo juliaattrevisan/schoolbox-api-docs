@@ -14,12 +14,12 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
      *
      * @var string
      */
-    protected $connectorClass = 'Schoolbox';
+    protected string $connectorClass = 'Schoolbox';
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'Schoolbox Events';
     }

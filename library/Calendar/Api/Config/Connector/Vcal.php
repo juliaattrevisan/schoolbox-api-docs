@@ -14,12 +14,12 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @var string
      */
-    protected $connectorClass = 'Vcal';
+    protected string $connectorClass = 'Vcal';
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'VCal Events';
     }

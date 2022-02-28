@@ -16,12 +16,12 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
      *
      * @var string
      */
-    protected $connectorClass = 'Booking';
+    protected string $connectorClass = 'Booking';
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'Resource Booking';
     }

@@ -14,14 +14,14 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      *
      * @var int
      */
-    protected $id = -1;
+    protected int $id = -1;
 
     /**
      * The label for this connector. Used in the calendar source filter.
      *
      * @var string
      */
-    protected $label = '';
+    protected string $label = '';
 
     /**
      * The kind of event this configuration is for
@@ -31,7 +31,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      *
      * @var string
      */
-    protected $eventType = '';
+    protected string $eventType = '';
 
     /**
      * Class name of the API which will use this config
@@ -41,14 +41,14 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      *
      * @var string
      */
-    protected $connectorClass = '';
+    protected string $connectorClass = '';
 
     /**
      * Corresponds to the luEventType table
      *
      * @var string
      */
-    protected $luEventType = '1';
+    protected string $luEventType = '1';
 
     /**
      * Whether or not the current user can view these events
@@ -56,7 +56,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      *
      * @var bool
      */
-    protected $hasPermissions = false;
+    protected bool $hasPermissions = false;
 
 
     /**
@@ -64,7 +64,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      *
      * @return string
      */
-    abstract public function getDefaultLabel();
+    abstract public function getDefaultLabel(): string;
 
     /**
      * Render event type lookup selector with the currently chosen
@@ -73,7 +73,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      * @param SitePage $page
      * @param int $preselected
      */
-    protected function renderEventType($page, $preselected)
+    protected function renderEventType(SitePage $page, int $preselected): void
     {
         $eventHandler = new Calendar();
 
@@ -81,19 +81,17 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
         if (is_array($allLookupEventTypes) && count($allLookupEventTypes)) {
             foreach ($allLookupEventTypes as $currentLookupEventType) {
-                if ($currentLookupEventType['eventTypeID'] == $preselected) {
+                $selected = '';
+
+                if ((int)$currentLookupEventType['eventTypeID'] === $preselected) {
                     $selected = 'selected="selected"';
-                } else {
-                    $selected = '';
                 }
 
-                $page->setVar(
-                    array(
-                        'LUEVENTTYPE_VALUE'    => $currentLookupEventType['eventTypeID'],
-                        'LUEVENTTYPE_NAME'     => Scrub::text($currentLookupEventType['eventType']),
-                        'LUEVENTTYPE_SELECTED' => $selected,
-                    )
-                );
+                $page->setVar([
+                    'LUEVENTTYPE_VALUE'    => $currentLookupEventType['eventTypeID'],
+                    'LUEVENTTYPE_NAME'     => Scrub::text($currentLookupEventType['eventType']),
+                    'LUEVENTTYPE_SELECTED' => $selected,
+                ]);
 
                 $page->parse('luEventType_block', 'luEventType', true);
             }
@@ -111,96 +109,113 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
      * Set event type
      *
      * @param string $eventType
+     * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function setEventType($eventType)
+    public function setEventType(string $eventType): self
     {
         $this->eventType = $eventType;
+        return $this;
     }
+
 
     /**
      * Get event type
      *
      * @return string
      */
-    public function getEventType()
+    public function getEventType(): string
     {
         return $this->eventType;
     }
+
 
     /**
      * Set connector class
      *
      * @param string $connectorClass
+     * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function setConnectorClass($connectorClass)
+    public function setConnectorClass(string $connectorClass): self
     {
         $this->connectorClass = $connectorClass;
+        return $this;
     }
+
 
     /**
      * Get connector class
      *
      * @return string
      */
-    public function getConnectorClass()
+    public function getConnectorClass(): string
     {
         return $this->connectorClass;
     }
+
 
     /**
      * Set id
      *
      * @param int $id
+     * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function setId($id)
+    public function setId(int $id): self
     {
         $this->id = $id;
+        return $this;
     }
+
 
     /**
      * Get id
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
+
 
     /**
      * Set luEventType
      *
      * @param string $luEventType
+     * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function setLuEventType($luEventType)
+    public function setLuEventType(string $luEventType): self
     {
         $this->luEventType = $luEventType;
+        return $this;
     }
+
 
     /**
      * Get luEventType
      *
      * @return string
      */
-    public function getLuEventType()
+    public function getLuEventType(): string
     {
         return $this->luEventType;
     }
 
+
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
+
 
     /**
      * @param  string $label
      *
      * @return $this
      */
-    public function setLabel($label)
+    public function setLabel(string $label): self
     {
         $this->label = $label;
         return $this;

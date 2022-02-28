@@ -14,12 +14,12 @@ class Calendar_Api_Config_Connector_EventExternal extends Calendar_Api_Config_Co
      *
      * @var string
      */
-    protected $connectorClass = 'External';
+    protected string $connectorClass = 'External';
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'External Events';
     }

@@ -16,12 +16,12 @@ class Calendar_Api_Config_Connector_Moderation extends Calendar_Api_Config_Conne
      *
      * @var string
      */
-    protected $connectorClass = 'Moderation';
+    protected string $connectorClass = 'Moderation';
 
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'Resource Moderation';
     }

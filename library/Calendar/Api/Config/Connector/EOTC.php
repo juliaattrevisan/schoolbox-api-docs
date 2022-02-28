@@ -17,7 +17,7 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
      *
      * @var string
      */
-    protected $connectorClass = 'EOTC';
+    protected string $connectorClass = 'EOTC';
 
     /**
      * @var RosettaStone
@@ -37,7 +37,7 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return $this->stone->translate('eotc', false, true);
     }
