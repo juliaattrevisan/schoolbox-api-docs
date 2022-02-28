@@ -117,18 +117,6 @@ class UserAccess implements IModel
      */
     public const ACCESS_FULL = 3;
 
-
-    /**
-     * Maps the ACCESS_* const values to a human-readable format
-     */
-    public const ACCESS_MAP = [
-        0 => 'Deny',
-        1 => 'Read',
-        2 => 'Write',
-        3 => 'Full'
-    ];
-
-
     /** @var User */
     protected $user;
 

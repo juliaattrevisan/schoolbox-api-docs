@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Sync\Provisioner;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Collection;
 
 /**
  * Class ExistingUserAccess
@@ -51,19 +51,15 @@ class ExistingUserAccess
     /**
      * Find the current set of userAccess instances
      *
-     * @param User $user
+     * @param Collection $existingUserAccessList
      * @return array
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function generate(User $user): array
+    public function generate(Collection $existingUserAccessList): array
     {
 
         /* Find out what you started with
          */
         $existingGroups = [];
-
-        $existingUserAccessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE);
 
         foreach ($existingUserAccessList as $userAccess) {
             $folderId = $userAccess->getServiceIdentifier();

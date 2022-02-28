@@ -175,7 +175,7 @@ class Provisioner
      * @param LoggerInterface $logger
      * @return $this
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
         return $this;
@@ -184,12 +184,14 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool   $update      If true, updates - otherwise, performs a dry run.
-     * @param string $forRoleType If set, provisions this role type
-     *                            (and only this role type) regardless of if
-     *                            it's enabled or not.
+     * @param bool        $update      If true, updates - otherwise, performs a dry run.
+     * @param string|null $forRoleType If set, provisions this role type
+     *                                 (and only this role type) regardless of if
+     *                                 it's enabled or not.
+     * @return void
+     * @throws MapperException
      */
-    public function run($update = false, $forRoleType = null)
+    public function run(bool $update = false, ?string $forRoleType = null): void
     {
         $this->prepareForLog();
         foreach ($this->runOrder as $roleType) {
@@ -238,7 +240,7 @@ class Provisioner
                     ];
 
                     // Get the currently stored user
-                    /** @var User $internalUser */
+                    $accessList = $this->userAccessMapper->createCollection();
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                         // Don't need to know about external DB access.
@@ -253,7 +255,6 @@ class Provisioner
                                 'service' => UserAccess::SERVICE_HOMEPAGE,
                             ]
                         );
-                        $internalUser->setAccessList($accessList);
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
@@ -268,12 +269,6 @@ class Provisioner
 
                     // Keep a copy of the original user, for comparison
                     $originalUser = clone $internalUser;
-
-                    /* Deliberately empty $accessList of everything except SERVICE_HOMEPAGE items
-                     * so that Role-based permissions don't get saved in addition to the Group
-                     * permissions that we can set
-                     */
-                    $internalUser->setAccessList($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE));
 
                     $commonContext['action'] = $action;
 
@@ -307,8 +302,8 @@ class Provisioner
                          * the mutations in order to find out where you ended up. These evaluations
                          * also create log->debug entries so you can see what happened
                          */
-                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($originalUser);
-                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($internalUser);
+                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($accessList);
+                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($accessList, $internalUser->getUserAccessMutations());
 
                         /* Compute the actual difference - if the set of (folderId, accessLevel)
                          * tuples are the same, then there's no difference and we don't need to
