@@ -123,6 +123,16 @@ class Provisioner
     private array $idToNameMap = [];
 
     /**
+     * 0 means group access is requested in UPS
+     */
+    private const ACCESS_MAP = [
+        0 => 'Requesting',
+        1 => 'Read',
+        2 => 'Write',
+        3 => 'Full'
+    ];
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -237,11 +247,13 @@ class Provisioner
                         // Don't want to know about any permissions other than
                         // group permissions, either: only group permissions can
                         // be changed by UPS.
-                        $internalUser->setAccessList(
-                            $this->userAccessMapper
-                                ->findAllForUser($internalUser, false)
-                                ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                        $accessList = $this->userAccessMapper->findByColumnList(
+                            [
+                                'uid' => $internalUser->getId(),
+                                'service' => UserAccess::SERVICE_HOMEPAGE,
+                            ]
                         );
+                        $internalUser->setAccessList($accessList);
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
@@ -335,7 +347,7 @@ class Provisioner
 
                                 $oldLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
-                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    self::ACCESS_MAP[$accessLevel],
                                     $folderName,
                                     $folderId
                                 );
@@ -359,7 +371,7 @@ class Provisioner
 
                                 $newLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
-                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    self::ACCESS_MAP[$accessLevel],
                                     $folderName,
                                     $folderId
                                 );
