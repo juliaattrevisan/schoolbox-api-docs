@@ -22,9 +22,10 @@ class ValueSerializer implements IFieldValueSerializer
         if ($value === '') {
             return '';
         }
+        $value = trim($value);
         if (null === parse_url($value, PHP_URL_SCHEME)) {
             throw new \UnexpectedValueException('"oAuth Identity Provider URL" is not a valid URL.');
         }
-        return trim($value);
+        return $value;
     }
 }
