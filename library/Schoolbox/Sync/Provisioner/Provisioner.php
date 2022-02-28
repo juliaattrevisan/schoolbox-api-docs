@@ -303,6 +303,8 @@ class Provisioner
                          * also create log->debug entries so you can see what happened
                          */
                         $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($accessList);
+                        // the following is for PHPStan :(
+                        /** @var User $internalUser */
                         $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($accessList, $internalUser->getUserAccessMutations());
 
                         /* Compute the actual difference - if the set of (folderId, accessLevel)
