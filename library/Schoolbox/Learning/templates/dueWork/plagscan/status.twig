@@ -2,7 +2,28 @@
  # currentFile      an instance of duework/submission/file with plagscan instance joined
  #}
 
-{% import '@learning/macro/urgency.twig' as urgency %}
+{##
+ # Decide Urgency of a Similarity Check percentage
+ #
+ # $value represents how much of the document was plagiarised
+ # so a high percentage means a lot was copied from somewhere
+ #
+ # Status of -1 should be hidden entirely, and the default
+ # thresholds are 60, 20 and 0 (represented in red, orange,
+ # and green respectively)
+ #}
+{% macro similarity(value) %}
+{% apply spaceless %}
+    {% set numericValue = value|replace({'%': ''}) %}
+    {% if numericValue > 60 %}
+        similarity-critical
+    {% elseif numericValue > 20 %}
+        similarity-warning
+    {% elseif numericValue > 0 %}
+        similarity-ok
+    {% endif %}
+{% endapply %}
+{% endmacro %}
 
 {% if currentFile.plagscan %}
     <p class="meta">
@@ -17,11 +38,11 @@
             ) %}
             {% if plagscanReport %}
                 <a href="{{ plagscanReport }}">
-                    <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                    <span class="{{ _self.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                     <span title="Similarity check completed.">similar content</span>
                 </a>
             {% else %}
-                <span class="{{ urgency.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
+                <span class="{{ _self.similarity(currentFile.plagscan.score|purify) }}">{{ currentFile.plagscan.score|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             {%  endif %}
         {% elseif currentFile.plagscan.isProcessing %}
