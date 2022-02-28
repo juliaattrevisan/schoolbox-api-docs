@@ -14,7 +14,8 @@ if (isset($this)) {
      */
     $this->error(19);
 }
-require_once '../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 
