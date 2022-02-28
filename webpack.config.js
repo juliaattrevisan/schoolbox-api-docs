@@ -222,7 +222,6 @@ module.exports = {
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
 
         // Pastoral
-        pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
         pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
         pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
 
