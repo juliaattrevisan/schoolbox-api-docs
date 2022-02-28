@@ -1,0 +1,6 @@
+{#
+    name:          string
+    value:         string
+    required:      bool
+#}
+<input id="url" {{ required ? 'required ' }}type="{% block inputType %}text{% endblock %}" name="{{ name }}" value="{{ value }}" {% if not editable %}disabled="disabled"{% endif %} />

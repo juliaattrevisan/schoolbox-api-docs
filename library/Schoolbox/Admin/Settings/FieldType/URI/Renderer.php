@@ -16,7 +16,7 @@ class Renderer extends Input\Renderer
 {
     protected function getTemplate(): string
     {
-        return 'input.twig';
+        return 'uri.twig';
     }
 
     /**
