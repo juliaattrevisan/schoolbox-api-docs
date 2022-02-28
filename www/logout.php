@@ -5,7 +5,7 @@
 use Alaress\Redis;
 use Schoolbox\Auth\Remember;
 
-require_once '../conf/core/require.php';
+require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
