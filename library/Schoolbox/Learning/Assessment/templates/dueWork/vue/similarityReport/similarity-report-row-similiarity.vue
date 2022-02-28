@@ -63,30 +63,17 @@ export default {
          */
         getFileColour (file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
-            if (percentageRounded === 0) {
+            if (percentageRounded >= 75) {
+                return 'turnitin-red'; 
+            } else if (percentageRounded >= 50) {
+                return 'turnitin-orange'; 
+            } else if (percentageRounded >= 25) {
+                return 'turnitin-yellow'; 
+            } else if (percentageRounded >= 1) {
+                return 'turnitin-green'; 
+            } else if (percentageRounded === 0) {
                 return 'turnitin-blue'; 
-            } else if (this.isBetween(percentageRounded, 1, 24)) {
-                return 'turnitin-green'; //green
-            } else if (this.isBetween(percentageRounded, 25, 49)) {
-                return 'turnitin-yellow'; //yellow
-            } else if (this.isBetween(percentageRounded, 50, 74)) {
-                return 'turnitin-orange'; //orange
-            } else if (this.isBetween(percentageRounded, 75, 100)) {
-                return 'turnitin-red'; //red
             } 
-        },
-
-        /**
-         * Check if x is between a min and max
-         *
-         * @param { Number }
-         * @param { Number }
-         * @param { Number }
-         *
-         * @returns { Boolean }
-         */
-        isBetween (x, min, max) {
-            return x >= min && x <= max;
         },
 
     },
