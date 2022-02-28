@@ -89,7 +89,7 @@ class AbstractCSV
             'Student Id',
             'Student First Name',
             'Student Last Name',
-            'Student Average',
+            'Student Weighted Average',
         ];
         //is rank enabled
         if ($this->viewRank) {
