@@ -690,7 +690,7 @@ class DataSource
         if (count($searchResults)) {
             $auditRecord = $this->pastoralAuditMapper->createModel()
                                                      ->setUser($currentUser)
-                                                     ->setSearch($search)
+                                                     ->setSearch(mb_substr($search, 0, 255))
                                                      ->setSearchResult(implode(',', $searchResults));
             $this->pastoralAuditMapper->save($auditRecord);
         }
