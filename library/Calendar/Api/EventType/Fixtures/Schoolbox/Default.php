@@ -96,7 +96,8 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($matchup->getName());
             $instance->setStartTime($matchup->getStartAt());
-            $instance->setAllDay(true);
+            $instance->setEndTime($matchup->getFinishAt());
+            $instance->setAllDay(false);
             $instance->setLocation($matchup->getVenue()->getName());
             $instance->setColour($eventColor);
             $instance->setType($eventType);
