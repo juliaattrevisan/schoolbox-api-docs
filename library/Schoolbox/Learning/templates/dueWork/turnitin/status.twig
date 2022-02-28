@@ -15,7 +15,7 @@
  #}
 {% macro similarity(value) %}
 {% apply spaceless %}
-    {% set numericValue = value|replace({'%': ''}) %}
+    {% set numericValue = value|replace({'%': ''})|round %}
     {% if numericValue >= 75 %}
         turnitin-red
     {% elseif numericValue >= 50 %}
