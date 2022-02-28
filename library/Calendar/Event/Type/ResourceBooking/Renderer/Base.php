@@ -20,7 +20,7 @@ abstract class Base extends RendererBase
 {
 
     /** @var ResourceBooking\Event */
-    private $event;
+    protected $event;
 
 
     /**

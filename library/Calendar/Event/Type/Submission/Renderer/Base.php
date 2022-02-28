@@ -20,7 +20,7 @@ abstract class Base extends RendererBase
 {
 
     /** @var Submission\Event */
-    private $event;
+    protected $event;
 
 
     /**
