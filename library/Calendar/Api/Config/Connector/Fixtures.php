@@ -44,6 +44,7 @@ class Calendar_Api_Config_Connector_Fixtures extends Calendar_Api_Config_Connect
         ]);
 
         $page->setVar('has_multiple_options_block', '');
+        $this->renderEventType($page, $this->getLuEventType());
     }
 
 
