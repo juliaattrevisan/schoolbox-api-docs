@@ -223,7 +223,7 @@ export default {
                         <label class="required" for="createEventBubbleTitle">
                             Title
                         </label>
-                        <input id="createEventBubbleTitle" name="title" type="text" v-model.trim="event.title" />
+                        <input id="createEventBubbleTitle" name="title" maxlength="250" type="text" v-model.trim="event.title" />
 
                         <label>
                             Type
