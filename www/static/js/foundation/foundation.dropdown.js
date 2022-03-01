@@ -227,8 +227,6 @@
 
         dropdown.attr('style', '').removeClass('drop-left drop-right drop-top').css({
           position : 'absolute',
-          width : '95%',
-          'max-width' : 'none',
           top : p.top
         });
 
