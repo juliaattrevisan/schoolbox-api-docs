@@ -48,7 +48,7 @@
 
 <tr data-group="{{ groupId }}" class="rb-new-criterion">
     <th colspan="{{ rubricGrid.levels|length + 2 }}">
-        <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}"></textarea>
+        <textarea data-spawn="criterion" placeholder="+ Type to add new {{ locale.translate('rubricCriterion') }} {{ group.name ? ('to ' ~ group.name) : ('with no ' ~ locale.translate('rubricGroup')) }}" maxlength="1000"></textarea>
     </th>
 </tr>
 
