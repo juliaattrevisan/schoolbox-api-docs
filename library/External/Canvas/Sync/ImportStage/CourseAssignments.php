@@ -72,6 +72,7 @@ class CourseAssignments extends CourseAssessmentAbstract
      * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
      * @param Folder\Mapper       $folderMapper
+     * @param string              $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -82,7 +83,8 @@ class CourseAssignments extends CourseAssessmentAbstract
         IConfigLoader $config,
         Bridge\Assignment $assignmentBridge,
         Bridge\Course $courseBridge,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        string $schoolboxTimezone
     ) {
         parent::__construct(
             $canvasDb,
@@ -90,7 +92,8 @@ class CourseAssignments extends CourseAssessmentAbstract
             $assessmentMapper,
             $log,
             $config,
-            $courseBridge
+            $courseBridge,
+            $schoolboxTimezone
         );
         $this->assignmentBridge    = $assignmentBridge;
         $this->submissionBoxMapper = $submissionBoxMapper;
@@ -125,8 +128,8 @@ class CourseAssignments extends CourseAssessmentAbstract
                assignment.points_possible  'assignment.points_possible',
                assignment.grading_type     'assignment.grading_type',
                assignment.submission_types 'assignment.submission_types',
-               assignment.created_at       'assignment.created_at',
-               assignment.updated_at       'assignment.updated_at',
+               CONVERT_TZ(assignment.created_at, 'UTC', :timezone) 'assignment.created_at',
+               CONVERT_TZ(assignment.updated_at, 'UTC', :timezone) 'assignment.updated_at',
                assignment.muted            'assignment.muted',
                assignment_group.name       'assignment_group.name'
         FROM course_dim course
@@ -136,7 +139,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         WHERE {$courseFilterWhere} AND quiz.id IS NULL
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
-        $statement         = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
+        $statement         = $this->canvasDb->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure
         $coursesData        = [];

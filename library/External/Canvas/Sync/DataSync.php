@@ -126,6 +126,8 @@ class DataSync
     /** @var string */
     private string $siteSchoolCode;
 
+    private string $schoolboxTimezone;
+
     /**
      * @param IConnector              $canvasDb
      * @param IConnector              $schoolboxDb
@@ -209,6 +211,7 @@ class DataSync
         $this->persist                = $persist;
         $this->log                    = $log;
         $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
+        $this->schoolboxTimezone      = $config->get('date_timezone');
     }
 
 
@@ -340,7 +343,8 @@ class DataSync
             $this->config,
             $assignmentBridge,
             $courseBridge,
-            $this->folderMapper
+            $this->folderMapper,
+            $this->schoolboxTimezone
         ))->synchronise();
     }
 
@@ -370,7 +374,8 @@ class DataSync
             $this->log,
             $this->config,
             $assignmentBridge,
-            $courseBridge
+            $courseBridge,
+            $this->schoolboxTimezone
         ))->synchronise();
     }
 
@@ -403,7 +408,8 @@ class DataSync
             $courseBridge,
             $courseGroupBridge,
             $sectionBridge,
-            new Bridge\CourseSectionDates()
+            new Bridge\CourseSectionDates(),
+            $this->schoolboxTimezone
         ))->synchronise();
 
         if (!$this->persist) {
@@ -445,7 +451,8 @@ class DataSync
             $assignmentDatesBridge,
             $courseBridge,
             $courseSectionBridge,
-            $assignmentOverrideBridge
+            $assignmentOverrideBridge,
+            $this->schoolboxTimezone
         ))->synchronise();
     }
 
@@ -487,7 +494,8 @@ class DataSync
             $assignmentDatesBridge,
             $courseBridge,
             $courseSectionBridge,
-            $assignmentOverrideBridge
+            $assignmentOverrideBridge,
+            $this->schoolboxTimezone
         ))->synchronise();
     }
 
@@ -522,7 +530,8 @@ class DataSync
             $courseSectionBridge,
             $assignmentOverrideBridge,
             $this->returnedWorkMapper,
-            $this->assessmentDataSource
+            $this->assessmentDataSource,
+            $this->schoolboxTimezone
         ))->synchronise();
     }
 }

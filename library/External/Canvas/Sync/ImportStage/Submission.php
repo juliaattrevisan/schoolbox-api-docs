@@ -80,6 +80,7 @@ class Submission extends SectionAssignment
      * @param Bridge\AssignmentOverride $assignmentOverrideBridge
      * @param ReturnedWorkMapper        $returnedWorkMapper
      * @param Assessment\MapperProxy    $assessmentDataSource
+     * @param string                    $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -99,7 +100,8 @@ class Submission extends SectionAssignment
         Bridge\CourseSection $courseSectionBridge,
         Bridge\AssignmentOverride $assignmentOverrideBridge,
         ReturnedWorkMapper $returnedWorkMapper,
-        Assessment\MapperProxy $assessmentDataSource
+        Assessment\MapperProxy $assessmentDataSource,
+        string $schoolboxTimezone
     ) {
         parent::__construct(
             $canvasDb,
@@ -117,7 +119,8 @@ class Submission extends SectionAssignment
             $assignmentDatesBridge,
             $courseBridge,
             $courseSectionBridge,
-            $assignmentOverrideBridge
+            $assignmentOverrideBridge,
+            $schoolboxTimezone
         );
 
         $this->returnedWorkMapper   = $returnedWorkMapper;
@@ -360,11 +363,11 @@ class Submission extends SectionAssignment
                 submission_fact.published_score as norm_mark,
                 reviewee.sis_user_id as reviewee_id,
                 submission_dim.grader_id as grader_user_id,
-                submission_dim.graded_at as graded_at,
+                CONVERT_TZ(submission_dim.graded_at, 'UTC', :timezone) as graded_at,
                 submission_comment_dim.comment as comment,
                 submission_comment_dim.author_id as commenter_id,
-                submission_comment_dim.created_at as comment_created_at,
-                submission_comment_dim.updated_at as comment_updated_at
+                CONVERT_TZ(submission_comment_dim.created_at, 'UTC', :timezone) as comment_created_at,
+                CONVERT_TZ(submission_comment_dim.updated_at, 'UTC', :timezone) as comment_updated_at
             FROM assignment_dim
             LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             LEFT JOIN submission_fact ON submission_fact.submission_id = submission_dim.id
@@ -376,7 +379,7 @@ class Submission extends SectionAssignment
             ORDER BY submission_dim.id
         ";
 
-        $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
+        $statement = $this->canvasDb->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
         return $statement->fetchAll();
     }
 
