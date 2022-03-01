@@ -278,12 +278,16 @@ FROM        `component_instance`
 WHERE
       `ccd`.`label` = 'Source'
 AND
-        (`component_instance`.`identifier` = :id AND `cci`.`value` is null)
+        (`component_instance`.`identifier` = :id1 AND `cci`.`value` is null)
 OR
-        (`component_instance`.`identifier` != :id AND `cci`.`value` = :id)
+        (`component_instance`.`identifier` != :id2 AND `cci`.`value` = :id3)
         ");
 
-        $statement->execute(array('id' => $folderID));
+        $statement->execute(array(
+            'id1' => $folderID,
+            'id2' => $folderID,
+            'id3' => $folderID,
+                            ));
 
         if (($row = $statement->fetch()) !== false) {
             return true;
