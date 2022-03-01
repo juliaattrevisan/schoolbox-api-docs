@@ -101,14 +101,14 @@ class Batchxml
      *
      * @param bool $formatted
      */
-    private function printXml($formatted = false): void
-    {
-        if ($formatted) {
-            print_r(str_replace('><', ">\n<", $this->api->retrieveDocument()));
-        } else {
-            print_r($this->api->retrieveDocument());
-        }
-
-        die();
-    }
+//    private function printXml($formatted = false): void
+//    {
+//        if ($formatted) {
+//            print_r(str_replace('><', ">\n<", $this->api->retrieveDocument()));
+//        } else {
+//            print_r($this->api->retrieveDocument());
+//        }
+//
+//        die();
+//    }
 }
