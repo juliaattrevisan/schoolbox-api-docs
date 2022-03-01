@@ -16,6 +16,13 @@ use Calendar\Event\Type\Day;
  */
 class Event extends Day\Event
 {
+
+    /**
+     * @var \Schoolbox\Fixtures\Matchup\Model|null
+     */
+    private ?\Schoolbox\Fixtures\Matchup\Model $matchup = null;
+
+
     /**
      * @return string[]
      */
@@ -26,5 +33,25 @@ class Event extends Day\Event
             self::RENDER_FORMAT_VCAL => Renderer\VObject::class,
             self::RENDER_FORMAT_CSV  => Renderer\Csv::class,
         ];
+    }
+
+
+    /**
+     * @return \Schoolbox\Fixtures\Matchup\Model|null
+     */
+    public function getMatchup(): ?\Schoolbox\Fixtures\Matchup\Model
+    {
+        return $this->matchup;
+    }
+
+
+    /**
+     * @param \Schoolbox\Fixtures\Matchup\Model|null $matchup
+     * @return Event
+     */
+    public function setMatchup(?\Schoolbox\Fixtures\Matchup\Model $matchup): self
+    {
+        $this->matchup = $matchup;
+        return $this;
     }
 }

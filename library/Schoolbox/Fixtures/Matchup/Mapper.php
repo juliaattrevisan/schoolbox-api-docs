@@ -180,22 +180,28 @@ class Mapper extends BaseMapper
             $to = \Alaress_Date_Format::now()->addWeeks(self::CALENDAR_MATCHUP_THRESHOLD_FUTURE)->endOfDay()->getDatabase();
         }
 
+        /* Make a pretty significant assumption here:
+
+         * Teams from Clipboard always import as the Home Team
+         *
+         * There used to be support for a person being in either the Home
+         * team or the Away team, but then you had to know which one of those
+         * caused this record to be included in the stack - because you need
+         * to link to a team id on the front end via the calendar modal
+         */
         $query = "
             SELECT
-                sm.*,  
+                sm.*,
                 {$this->getJoinColumnString('venue', 'sv')}
             FROM sportsfixtures_match sm
             LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}            
-            LEFT JOIN sportsfixtures_team st1 ON sm.home_team_id = st1.id
-            LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
-            LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
-            LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
-            WHERE (stu1.user_id = :userId OR stu2.user_id = :userId)
+            LEFT JOIN sportsfixtures_team st ON sm.home_team_id = st.id
+            LEFT JOIN sportsfixtures_team_user stu ON st.id = stu.team_id
+            WHERE stu.user_id = :userId
             AND sm.start_at > :from
             AND sm.start_at < :to
             AND sm.deleted_at IS NULL
-            AND st1.deleted_at IS NULL
-            AND st2.deleted_at IS NULL
+            AND st.deleted_at IS NULL
             ORDER BY sm.start_at
         ";
 

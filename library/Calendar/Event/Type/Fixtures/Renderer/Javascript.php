@@ -33,6 +33,18 @@ class Javascript extends Base
             $classes[] = 'source' . $connectorId;
         }
 
+        /* Apparently this is a place to put a link to More Details
+         * which spawns in the frontend under custom > moreDetailsLink...
+         * ...I think?
+         */
+        $path = $this->getRouteIfAuthorized(
+            'sportsfixturesResult.getResultForTeam',
+            [
+                'contextId' => $this->event->getMatchup()->getId(),
+                'teamId' => $this->event->getMatchup()->getHomeTeam()->getId(),
+            ]
+        );
+
         /* Flatten the representation into a standardised structure
          */
         $event = [
@@ -92,7 +104,7 @@ class Javascript extends Base
                     'listButton'    => false,
                 ],
                 'custom'     => [
-                    'modifyLink' => '',
+                    'moreDetailsLink' => $path
                 ],
             ],
         ];

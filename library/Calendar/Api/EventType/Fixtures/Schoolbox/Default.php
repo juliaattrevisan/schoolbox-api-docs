@@ -26,7 +26,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
     {
         parent::__construct($connectorId, $user, $viewer);
 
-        $this->eventTypeMapper   = $eventTypeMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
     }
 
 
@@ -101,6 +101,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setLocation($matchup->getVenue()->getName());
             $instance->setColour($eventColor);
             $instance->setType($eventType);
+            $instance->setMatchup($matchup);
 
             $stack->add($instance);
         }
