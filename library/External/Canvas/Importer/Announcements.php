@@ -87,6 +87,12 @@ class Announcements
 
 
     /**
+     * @var int
+     */
+    private int $defaultUserId;
+
+
+    /**
      * @var LoggerInterface|null
      */
     private ?LoggerInterface $log;
@@ -110,6 +116,7 @@ class Announcements
      * @param \Schoolbox\Comms\News\Audience\Mapper $audienceMapper
      * @param \Schoolbox\Comms\News\Source\Mapper   $sourceMapper
      * @param StrategyFactory                       $strategyFactory
+     * @param int                                   $defaultUserId
      * @param LoggerInterface|null                  $log
      * @param LockInterface|null                    $lock
      */
@@ -123,6 +130,7 @@ class Announcements
         \Schoolbox\Comms\News\Audience\Mapper $audienceMapper,
         \Schoolbox\Comms\News\Source\Mapper $sourceMapper,
         StrategyFactory $strategyFactory,
+        int $defaultUserId,
         ?LoggerInterface $log = null,
         ?LockInterface $lock = null
     ) {
@@ -135,6 +143,7 @@ class Announcements
         $this->audienceMapper = $audienceMapper;
         $this->sourceMapper = $sourceMapper;
         $this->strategyFactory = $strategyFactory;
+        $this->defaultUserId = $defaultUserId;
         $this->log = $log;
         $this->lock = $lock;
     }
@@ -147,18 +156,24 @@ class Announcements
      *
      * @return void
      * @throws \Alaress\Database\Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-        /* TODO: Define default author
-         *  Canvas Importer doesn't create user accounts; they're presumed toe exist somehow
-         *  but in the case where they don't exist in schoolbox.user, assume a default owner
-         *  We don't really have anyone, so assign Schoolbox Admin arbitrarily...
-         *  (There should be a non-human system user account that can be given this kind of data)
+        /* Define default author
+         * Canvas Importer doesn't create user accounts; they're presumed toe exist somehow
+         * but in the case where they don't exist in schoolbox.user, assume a default owner
+         * We don't really have anyone, so assign Schoolbox Admin arbitrarily...
+         * (There should be a non-human system user account that can be given this kind of data)
          */
-        $defaultOwner = $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
-
-        if (null === $defaultOwner) {
+        try {
+            $defaultOwner = $this->userMapper->findById($this->defaultUserId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $this->logInfo('Default owner not found; exiting');
             return;
         }

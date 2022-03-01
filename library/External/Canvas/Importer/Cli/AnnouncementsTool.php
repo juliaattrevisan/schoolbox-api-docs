@@ -44,6 +44,12 @@ class AnnouncementsTool extends CliTool\App
 
 
     /**
+     * --owner=
+     */
+    private const OPT_LONG_DEFAULTOWNER = 'owner:';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -60,6 +66,7 @@ class AnnouncementsTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
+            self::OPT_LONG_DEFAULTOWNER
         ];
     }
 
@@ -72,9 +79,12 @@ class AnnouncementsTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Import canvas' course announcements into schoolbox folder news articles
+Import canvas' course announcements into schoolbox folder news articles.
 
-Usage: announcements.php [--perform]
+You need to specify a schoolbox user id as the default owner of these articles
+if we can't find their actual owner.
+
+Usage: announcements.php --owner=<user id> [--perform]
 
 
 HELP;
@@ -105,6 +115,13 @@ HELP;
                 exit();
             }
 
+            /* Need to have a default owner param
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_LONG_DEFAULTOWNER))) {
+                $this->getLogger()->info('You need to specify a default article owner (a schoolbox user id)');
+                return;
+            }
+
             /* Used to shank a database instance
              */
             $db = \Schoolbox\UserMapper::getInstance()->getDatabase();
@@ -129,6 +146,7 @@ HELP;
                 \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
                 \Schoolbox\Comms\News\Source\Mapper::getInstance(),
                 $strategyFactory,
+                (int)$this->getOpt(self::OPT_LONG_DEFAULTOWNER),
                 $this->getLogger(),
                 $lock
             ))->import();
