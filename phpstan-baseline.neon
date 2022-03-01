@@ -841,11 +841,6 @@ parameters:
 			path: library/Calendar/Event/Type/Day/Event.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/Day/Renderer/VObject.php
-
-		-
 			message: "#^Parameter \\#1 \\$attendance \\(string\\) of method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:setAttendance\\(\\) should be compatible with parameter \\$attendance \\(bool\\) of method Calendar\\\\Event\\\\Type\\\\Day\\\\Event\\:\\:setAttendance\\(\\)$#"
 			count: 1
 			path: library/Calendar/Event/Type/EOTC/Event.php
@@ -854,11 +849,6 @@ parameters:
 			message: "#^Return type \\(string\\) of method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:getAttendance\\(\\) should be compatible with return type \\(bool\\) of method Calendar\\\\Event\\\\Type\\\\Day\\\\Event\\:\\:getAttendance\\(\\)$#"
 			count: 1
 			path: library/Calendar/Event/Type/EOTC/Event.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/EOTC/Renderer/VObject.php
 
 		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
@@ -901,29 +891,9 @@ parameters:
 			path: library/Calendar/Event/Type/EventBase.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/External/Renderer/VObject.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/ResourceBooking/Renderer/Javascript.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/ResourceBooking/Renderer/VObject.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/Submission/Renderer/VObject.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Calendar/Event/Type/Timetable/Renderer/VObject.php
 
 		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$CATEGORIES\\.$#"
