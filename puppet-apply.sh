@@ -34,7 +34,6 @@ function main() {
     --environmentpath "$environment_path" \
     --environment "$environment" \
     "$manifest_file" "$@"
-  chown -fR vagrant:vagrant /mnt/data/php_tmp;
 }
 
 ##################################################################################
