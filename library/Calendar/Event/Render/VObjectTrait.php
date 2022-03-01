@@ -32,9 +32,9 @@ trait VObjectTrait
     private ?VCalendar $vCalendar = null;
 
     /**
-     * @var Html\ToText
+     * @var Html\ToText|null
      */
-    private $textConverter;
+    private ?Html\ToText $textConverter = null;
 
     /**
      * @var string
