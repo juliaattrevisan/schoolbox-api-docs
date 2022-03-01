@@ -32,8 +32,8 @@ mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('
 
 
 ## Make directories that will be used by our schoolbox instance
-mkdir /mnt/data
-mkdir /mnt/data/php_tmp
+mkdir -p /usr/share/schoolbox
+mkdir -p /mnt/data/php_tmp
 chmod 777 /mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
