@@ -317,7 +317,7 @@ module.exports = {
                 test: /\.vue$/,
                 loader: 'vue-loader', //to handle .vue files
                 options: {
-                    appendTsSuffixTo: [/\.vue$/]
+                    appendTsSuffixTo: [/\.vue$/],
                 }
             },
             {

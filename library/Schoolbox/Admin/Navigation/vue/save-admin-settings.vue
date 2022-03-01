@@ -1,4 +1,4 @@
-<script>
+<script setup>
 
 /**
  * Quicker saving of admin settings on some pages with faster save action display 
@@ -8,122 +8,101 @@
 
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import debounce from 'lodash/debounce';
+import { ref, computed, onMounted } from 'vue';
 
 
-export default {
-
-    components: {
-        BottomDrawer
+const props = defineProps({
+    formId: { //the id of the form to listen to changes to
+        type: String,
+        required: true,
+        default: 'settings',
     },
+    /* Decide if we need special polling mechanism for dropzones and color pickers
+        * since they don't trigger onchange normally, probably because jquery
+        */
+    polling: {
+        type: Number,
+        required: true,
+        default: 0,
+    }
+});
 
-    props: {
-        formId: { //the id of the form to listen to changes to
-            type: String,
-            required: true,
-            default: 'settings',
-        },
-        /* Decide if we need special polling mechanism for dropzones and color pickers
-         * since they don't trigger onchange normally, probably because jquery
-         */
-        polling: {
-            type: Number,
-            required: true,
-            default: 0,
-        }
-    },
+const saveContainer = ref(null)
+const hasFormDataChange = ref(false);
+const isAtBottomOfPage = ref(false);
+const initialFormDataValues = ref('');
+const currentFormDataValues = ref('');
 
-    data () {
-        return { 
-            hasFormDataChange: false,
-            isAtBottomOfPage: false,
-            initialFormDataValues: '',
-            currentFormDataValues: '',
-        }
-    },
+/**
+ * Only show the save button if there's a form data change 
+ * or the bottom of the page is visible
+ */
+const showSaveButton = computed (() => hasFormDataChange.value || isAtBottomOfPage.value);
 
-    computed: {
-        
-        /**
-         * Only show the save button if there's a form data change 
-         * or the bottom of the page is visible
-         */
-        showSaveButton () {
-            return this.hasFormDataChange || this.isAtBottomOfPage;
-        },
+onMounted (() => {
+    initIntersectionObserver();
+    initFormData();
+    initFormChangeListeners();
+});
 
-    },
+/**
+ * To track whether we are at the bottom of the page, to check if we can show the bottom drawer
+ * https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+ */
+function initIntersectionObserver () {
+    const intersectionObserver = new IntersectionObserver((elements) => {
+        isAtBottomOfPage.value = elements[0].intersectionRatio !== 0;
+    });
+    intersectionObserver.observe(saveContainer.value);
+}
 
-    mounted () {
-        this.initIntersectionObserver();
-        this.initFormData();
-        this.initFormChangeListeners();
-    },
+/**
+ * Save the initial form data state for later comparision
+ */
+function initFormData () {
+    const formData = new FormData(document.getElementById(props.formId));
+    formData.forEach((value) => initialFormDataValues.value += value);
+    currentFormDataValues.value = initialFormDataValues.value;
+}
 
-    methods: {
+/**
+ * Listen for form data changes to show the save button straight away on a change
+ */
+function initFormChangeListeners () {
+    CKEDITOR.on('instanceReady', (instanceReadyEvent) => { //need to wait until the ckEditor is loaded prior to listening for chnages
+        instanceReadyEvent.editor.on('change', debounce((changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
+            document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
+            onFormDataChange()
+        }, 350));
+    });
+    /* Polling is required for dropzones and colorpickers since they don't
+        * trigger onchange events normally (probably because jquery plugins)
+        */
+    if (props.polling) {
+        setInterval(onFormDataChange, 500);
+    } else {
+        document.getElementById(props.formId).addEventListener('change', () => onFormDataChange());
+        document.getElementById(props.formId).addEventListener('keyup', debounce(() => {
+            onFormDataChange();
+        }, 350));
+    }
+}
 
-        /**
-         * To track whether we are at the bottom of the page, to check if we can show the bottom drawer
-         * https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
-         */
-        initIntersectionObserver () {
-            const intersectionObserver = new IntersectionObserver((elements) => {
-                this.isAtBottomOfPage = elements[0].intersectionRatio !== 0;
-            });
-            intersectionObserver.observe(this.$el);
-        },
-
-        /**
-         * Save the initial form data state for later comparision
-         */
-        initFormData () {
-            const formData = new FormData(document.getElementById(this.formId));
-            formData.forEach((value) => this.initialFormDataValues += value);
-            this.currentFormDataValues = this.initialFormDataValues;
-        },
-
-        /**
-         * Listen for form data changes to show the save button straight away on a change
-         */
-        initFormChangeListeners () {
-            CKEDITOR.on('instanceReady', (instanceReadyEvent) => { //need to wait until the ckEditor is loaded prior to listening for chnages
-                instanceReadyEvent.editor.on('change', debounce((changeEvent) => { //update the linked <textarea>, which doesn't update until form save otherwise
-                    document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
-                    this.onFormDataChange()
-                }, 350));
-            });
-
-            /* Polling is required for dropzones and colorpickers since they don't
-             * trigger onchange events normally (probably because jquery plugins)
-             */
-            if (this.polling) {
-                setInterval(this.onFormDataChange, 500);
-            } else {
-                document.getElementById(this.formId).addEventListener('change', () => this.onFormDataChange());
-                document.getElementById(this.formId).addEventListener('keyup', debounce(() => {
-                    this.onFormDataChange();
-                }, 350));
-            }
-        },
-
-        /**
-         * A form change has occured, so check if the data is different so we can show
-         * the save button
-         */
-        onFormDataChange () {
-            this.currentFormDataValues = '';
-            const formData = new FormData(document.getElementById(this.formId));
-            formData.forEach((value) => this.currentFormDataValues += value); //loop through and grab all the form values, creating a single string
-            this.hasFormDataChange = this.initialFormDataValues !== this.currentFormDataValues; //and now compare the old value to the new
-        },
-
-    },
-
+/**
+ * A form change has occured, so check if the data is different so we can show
+ * the save button
+ */
+function onFormDataChange () {
+    currentFormDataValues.value = '';
+    const formData = new FormData(document.getElementById(props.formId));
+    formData.forEach((value) => currentFormDataValues.value += value); //loop through and grab all the form values, creating a single string
+    hasFormDataChange.value = initialFormDataValues.value !== currentFormDataValues.value; //and now compare the old value to the new
 }
 
 </script>
 
 <template>
-   <div class="save-container">
+   <div class="save-container" ref="saveContainer">
         <bottom-drawer :showDrawer="showSaveButton">
             <input type="submit" value="Save" />
         </bottom-drawer>
