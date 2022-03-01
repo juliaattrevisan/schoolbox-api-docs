@@ -100,7 +100,7 @@ $(function() {
                                 </div>
                                 <div class="small-12 medium-6 columns">
                                     <label for="description-{MYLINK_ID}" class="required">Title</label>
-                                    <input id="description-{MYLINK_ID}" name="description" type="text" class="required" placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
+                                    <input id="description-{MYLINK_ID}" name="description" type="text" class="required" placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" maxlength="255" />
                                 </div>
                                 <div class="small-12 columns">
                                     <input type="submit" value="Modify" class="full-width" />
@@ -137,7 +137,7 @@ $(function() {
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label for="description-new" class="required">Title</label>
-                        <input id="description-new" name="description" type="text" class="required" />
+                        <input id="description-new" name="description" type="text" class="required" maxlength="255" />
                     </div>
                     <div class="small-12 columns">
                         <input type="submit" value="Add" class="full-width" />
