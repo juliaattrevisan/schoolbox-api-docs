@@ -382,6 +382,15 @@ try {
                 $sentry
             );
 
+            /* Fixtures
+             */
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
+                [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance()],
+                true,
+                $sentry
+            ));
+
             $filename = 'external';
             break;
 
@@ -479,13 +488,12 @@ try {
 
                 /* Fixtures
                  */
-                $subApi = buildApiClass(
+                $api->add(buildApiClass(
                     Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
                     [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance()],
                     true,
                     $sentry
-                );
-                $api->add($subApi);
+                ));
 
                 //set the end of the export
                 $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
