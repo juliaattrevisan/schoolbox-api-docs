@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Comms\News\Topic;
 
+/**
+ * @method Model findById($id)
+ */
 class Mapper extends \Schoolbox\Mapper
 {
 

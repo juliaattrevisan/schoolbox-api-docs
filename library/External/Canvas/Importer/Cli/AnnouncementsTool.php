@@ -44,6 +44,18 @@ class AnnouncementsTool extends CliTool\App
 
 
     /**
+     * --owner=
+     */
+    private const OPT_LONG_DEFAULT_OWNER = 'owner:';
+
+
+    /**
+     * --topic=
+     */
+    private const OPT_LONG_DEFAULT_TOPIC = 'topic:';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -60,6 +72,8 @@ class AnnouncementsTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
+            self::OPT_LONG_DEFAULT_OWNER,
+            self::OPT_LONG_DEFAULT_TOPIC,
         ];
     }
 
@@ -72,9 +86,16 @@ class AnnouncementsTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Import canvas' course announcements into schoolbox folder news articles
+Import canvas' course announcements into schoolbox folder news articles.
 
-Usage: announcements.php [--perform]
+Mandatory: you need to specify a schoolbox user id as the default owner of these 
+articles if we can't find their actual owner.
+
+Mandatory: you need to specify a schoolbox topic id as the default topic of these 
+articles because that concept doesn't exist in Canvas and articles get lost in
+the noise of everything else in schoolbox without a topic to segregate them
+
+Usage: announcements.php --owner=<user id> --topic=<topic id> [--perform]
 
 
 HELP;
@@ -105,6 +126,20 @@ HELP;
                 exit();
             }
 
+            /* Need to have a default owner param
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_LONG_DEFAULT_OWNER))) {
+                $this->getLogger()->info('You need to specify a default article owner (a schoolbox user id)');
+                return;
+            }
+
+            /* Need to have a default topic param
+             */
+            if ('' === trim((string)$this->getOpt(self::OPT_LONG_DEFAULT_TOPIC))) {
+                $this->getLogger()->info('You need to specify a default topic (a schoolbox topic id)');
+                return;
+            }
+
             /* Used to shank a database instance
              */
             $db = \Schoolbox\UserMapper::getInstance()->getDatabase();
@@ -128,7 +163,10 @@ HELP;
                 \Schoolbox\Comms\News\Mapper::getInstance(),
                 \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
                 \Schoolbox\Comms\News\Source\Mapper::getInstance(),
+                \Schoolbox\Comms\News\Topic\Mapper::getInstance(),
                 $strategyFactory,
+                (int)$this->getOpt(self::OPT_LONG_DEFAULT_OWNER),
+                (int)$this->getOpt(self::OPT_LONG_DEFAULT_TOPIC),
                 $this->getLogger(),
                 $lock
             ))->import();
