@@ -10,6 +10,7 @@
 namespace Schoolbox\Application\WebRequest;
 
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Csrf;
@@ -225,6 +226,8 @@ class Kernel extends WebKernelAbstract
              * need to do it itself. It just renders the content.
              */
             $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
+        } catch (InvalidPath $e) {
+            $this->outputError($e, $e->getMessage(), '', [], 400);
         }
     }
 

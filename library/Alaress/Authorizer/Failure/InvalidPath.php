@@ -8,7 +8,6 @@
 
 namespace Alaress\Authorizer\Failure;
 
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
@@ -16,7 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  * We cannot use NotFound as it does not extend Auth exception, hence will not be
  * caught in twig isRouteAuthorised calls and will bubble all the way up.
  */
-class InvalidPath extends SchoolboxException
+class InvalidPath extends Base
 {
     /**
      * Default error code - corresponds to message "404 Not Found"
