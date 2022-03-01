@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -222,20 +222,16 @@ class Factory
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
-            ->add(new Prepare(
+            ->add(new Profile\Prepare(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
+                $this->relationshipMapper
             ))
-            ->add(new Profile(
+            ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
                 $batchxml,
@@ -244,6 +240,23 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Timetable\Prepare(
+                $this->log,
+                $this->perform,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Timetable\Identifier(
                 $this->log,
@@ -265,15 +278,6 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
-            ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
             ));
     }
 }

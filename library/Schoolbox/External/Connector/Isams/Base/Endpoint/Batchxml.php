@@ -12,8 +12,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use RuntimeException;
 use SimpleXMLElement;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Batchxml
@@ -64,8 +62,6 @@ class Batchxml
      * @param string $path
      * @return SimpleXMLElement[]
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function fetchXml(string $path): array
     {
@@ -73,7 +69,7 @@ class Batchxml
          * you can drop a printxml() here, which does some minor formatting to
          * make it vaguely bearable to read
          *
-         * $this->printXml();
+         * $this->printXml(true);
          */
         if (!$this->nodes) {
             $xml = $this->api->retrieveDocument();
@@ -99,10 +95,20 @@ class Batchxml
      * Use this to print a vaguely-formatted version to a file for manual inspection
      *
      * e.g. php sisImporter.php > test.xml
+     *
+     * Optionally provide an arg to determine whether you want pseudo-formatted output
+     * or the raw single-line xml string
+     *
+     * @param bool $formatted
      */
-    private function printXml(): void
+    private function printXml($formatted = false): void
     {
-        print_r(str_replace(['<', '/>'], ["\n<", "/>\n"], $this->api->retrieveDocument()));
+        if ($formatted) {
+            print_r(str_replace('><', ">\n<", $this->api->retrieveDocument()));
+        } else {
+            print_r($this->api->retrieveDocument());
+        }
+
         die();
     }
 }

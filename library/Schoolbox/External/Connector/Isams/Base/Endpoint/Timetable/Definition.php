@@ -204,8 +204,8 @@ class Definition implements IStrategy
                     $this->log->info(sprintf(
                         'Creating period %s (%s-%s) in timetable cycle %s (%s)',
                         $period->getTitle(),
-                        $period->getStart(),
-                        $period->getFinish(),
+                        $period->getStart()->getTimeOnly(),
+                        $period->getFinish()->getTimeOnly(),
                         $timetableCycle->getId(),
                         $timetableCycle->getTitle()
                     ));
@@ -266,8 +266,11 @@ class Definition implements IStrategy
                     ->setTitle(trim((string)$period->Name))
                     ->setDay($dayIndex)
                     ->setSequence(trim((string)$period->Ordinal))
-                    ->setStart(trim($period->StartTime . ':00'))
-                    ->setFinish(trim($period->EndTime . ':00'));
+                    /* We only care about the Time piece of this date
+                     * but must fulfil the interface too
+                     */
+                    ->setStart(\Alaress_Date_Format::newFromTimestamp(strtotime('1970-01-01 ' . trim((string)$period->StartTime) . ':00')))
+                    ->setFinish(\Alaress_Date_Format::newFromTimestamp(strtotime('1970-01-01 ' . trim((string)$period->EndTime) . ':00')));
 
                 $struct['days'][$dayIndex][] = $timetablePeriod;
             }

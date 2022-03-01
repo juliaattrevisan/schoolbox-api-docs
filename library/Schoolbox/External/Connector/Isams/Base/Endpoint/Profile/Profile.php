@@ -205,16 +205,27 @@ class Profile implements IStrategy
             $username = trim((string)$student->UserName);
             $yearLevel = trim((string)$student->NCYear);
 
-            /* Find out if this externalId already has a student profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a student profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
              */
             try {
                 $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
                 $studentBaseProfile = $studentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
-                $studentBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $studentBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $studentProfile->setBaseProfile($studentBaseProfile);
             }
@@ -224,13 +235,6 @@ class Profile implements IStrategy
                 ->setTitle(trim((string)$student->Title))
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */
@@ -242,17 +246,41 @@ class Profile implements IStrategy
              */
             $tutor = $this->findTutor((string)$student->Tutor);
 
+            $this->log->debug(sprintf(
+                'Tutor %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
+
             /* Fish out a staff member via their user code
              */
             $housemaster = $this->findHousemaster($academicHouse);
+
+            $this->log->debug(sprintf(
+                'Housemaster %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
 
             /* Find out a staff member via their user code
              */
             $formTeacher = $this->findFormTeacher($form);
 
+            $this->log->debug(sprintf(
+                'Form Teacher %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
+
             /* Find out a staff member via their user code
              */
             $yearLevelCoordinator = $this->findYearLevelCoordinator($yearLevel);
+
+            $this->log->debug(sprintf(
+                'Year Level Coordinator %s (%s) discovered.',
+                $tutor['name'],
+                $tutor['id']
+            ));
 
             /* Add their parents' profile data
              * Messages come from parents' nodes
@@ -373,8 +401,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findComments(string $studentId): string
     {
@@ -399,8 +425,6 @@ class Profile implements IStrategy
      *
      * @param string $id
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
      */
     private function findTutor(string $id): array
@@ -414,15 +438,12 @@ class Profile implements IStrategy
      *
      * @param string $houseName
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findHousemaster(string $houseName): array
     {
         $houseName = trim($houseName);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[contains(Name, '{$houseName}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[Name[text()='{$houseName}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->HouseMaster));
@@ -440,10 +461,7 @@ class Profile implements IStrategy
      *
      * @param string $form
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findFormTeacher(string $form): array
     {
@@ -467,13 +485,11 @@ class Profile implements IStrategy
      * @param string $year
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findYearLevelCoordinator(string $year): array
     {
         $year = trim($year);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[contains(Code, '{$year}')]");
+        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[Code[text()='{$year}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
@@ -492,23 +508,36 @@ class Profile implements IStrategy
      * @param string $id
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findStaffMemberById(string $id): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$id}')]");
+        $defaultStaff = [
+            'id' => $id,
+            'name' => ''
+        ];
 
-        $name = '';
-
-        if ($node) {
-            $staffMember = $node[0];
-            $name = trim((string)$staffMember->FullName);
+        /* $id is empty; there wasn't a specified Staff;
+         * return Unknown Staff as default case
+         */
+        if ('' === $id) {
+            return $defaultStaff;
         }
+
+        /* Otherwise, go hunting for them
+         */
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$id}']]");
+
+        /* Unknown staff: can't find it via its UserCode
+         */
+        if (empty($node)) {
+            return $defaultStaff;
+        }
+
+        $staffMember = $node[0];
 
         return [
             'id' => $id,
-            'name' => $name,
+            'name' => trim((string)$staffMember->FullName),
         ];
     }
 
@@ -520,8 +549,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string|null
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findMedicalAlert(string $studentId): ?string
     {
@@ -545,8 +572,6 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return bool
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function findSpecialNeeds(string $studentId): bool
     {
@@ -565,8 +590,6 @@ class Profile implements IStrategy
      *
      * @return array
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function prefetchCampuses(): array
     {
@@ -607,8 +630,6 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws RuntimeException
      * @throws UnexpectedValueException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): string
     {
@@ -656,12 +677,27 @@ class Profile implements IStrategy
             $lastname = trim((string)$parent->Surname);
             $relationship = trim((string)$parent->RelationshipRaw);
 
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a parent profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
+             */
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $parentProfile = $this->parentProfileMapper->createModel();
-                $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $parentProfile->setBaseProfile($parentBaseProfile);
             }
@@ -671,13 +707,6 @@ class Profile implements IStrategy
                 ->setTitle(trim((string)$parent->Title))
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */
@@ -762,7 +791,12 @@ class Profile implements IStrategy
                 $staffBaseProfile = $staffProfile->getBaseProfile();
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
-                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $staffProfile->setBaseProfile($staffBaseProfile);
             }
@@ -772,13 +806,6 @@ class Profile implements IStrategy
                 ->setTitle(trim((string)$staff->Title))
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */
