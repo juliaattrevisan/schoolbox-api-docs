@@ -95,9 +95,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createExtension']);
 
         // Markbook sync
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
+            $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
+        }
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreReturnedWorkFiles']);
     }
 
@@ -327,9 +329,6 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function syncToExternalMarkbook(ReturnedWork $object): void
     {
-        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
-            return;
-        }
         if ($object->isPublished() && !$object->isSelfAssess()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
