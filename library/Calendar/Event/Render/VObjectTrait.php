@@ -27,9 +27,9 @@ trait VObjectTrait
 {
 
     /**
-     * @var VCalendar
+     * @var VCalendar|null
      */
-    private $vCalendar;
+    private ?VCalendar $vCalendar = null;
 
     /**
      * @var Html\ToText
