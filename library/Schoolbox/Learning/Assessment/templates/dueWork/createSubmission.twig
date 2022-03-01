@@ -50,7 +50,8 @@ Data:
 
         // Autosave on type to ensure that change gets saved
         let autosaveTimeout = null;
-        let textBoxContent = '';
+        let savedSubmissionContent = ''; //the most recent content saved to draft
+        let currentSubmissionContent = ''; //to compare to the most recent saved, to check if we need to save again
 
         // Method for setting up autosave - clears existing event, and creates new one.
         let initAutosave = function () {
@@ -67,13 +68,17 @@ Data:
 
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
         let autosavePresubmit = function () {
-            // Has the text box changed? If not check again later (re-init the autosave counter)
-            let currentContent = CKEDITOR.instances['editor-body'].getData();
-            if (currentContent === textBoxContent) {
-                initAutosave();
+            
+            // Has anything changed? If not check again later (re-init the autosave counter)
+            currentSubmissionContent = CKEDITOR.instances['editor-body'].getData(); //start with grabbing the ckeditor content
+            const formData = new FormData(document.getElementById('editor-form')); //then retrieve any dropzone, rubric and self-assessment changes
+            formData.forEach((value) => currentSubmissionContent += value); //loop through and grab all the form values, creating a single string
+
+            if (savedSubmissionContent === currentSubmissionContent) {
+                initAutosave(); //nothing's changed, so keep looping through to check 
             }
-            else {
-                textBoxContent = currentContent;
+            else { //othewise let's save the draft
+                savedSubmissionContent = currentSubmissionContent;
                 autosaveAjaxSubmit();
             }
         };
@@ -189,11 +194,6 @@ Data:
                 initAutosave(element);
                 autosavePresubmit(element);
             }
-        });
-
-        // For self-assessments - save a draft when the rubric or comment box is updated
-        $("#self-assessment-feedback").change(function() {
-            autosaveAjaxSubmit();
         });
 
         // Empty submission dialog
