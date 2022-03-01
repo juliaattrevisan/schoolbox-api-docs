@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Sync\Provisioner;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
@@ -62,12 +63,11 @@ class FinalUserAccess
      * deciding whether to retain Full Access settings and/or create
      * new instances
      *
-     * @param User $user
+     * @param Collection $accessList
+     * @param array      $accessMutations
      * @return array
-     * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function generate(User $user): array
+    public function generate(Collection $accessList, array $accessMutations): array
     {
         $this->log('Computing groups mutations');
 
@@ -77,21 +77,12 @@ class FinalUserAccess
         $mutationGroups = [];
         $finalGroups = [];
 
-        /* Find the existing UserAccess instances and see if any have a ACCESS_FULL access level
-         * We want to keep that instance unchanged, because people are going to lose their Group Admin
-         * access and abilities, essentially locking them out of their own Groups en masse
-         */
-        $keep = $user->getAccessList()
-            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
-            ->filterBy('accessLevel', UserAccess::ACCESS_FULL)
-            ->indexBy('serviceIdentifier');
-
         /* The ruleset records mutations with [] as initial conditions, but that meant
          * what you started with would never show up in logs; initial conditions are
          * the list of userAccess instances you originally had and the mutations act
          * upon this
          */
-        foreach ($user->getAccessList() as $userAccess) {
+        foreach ($accessList as $userAccess) {
             $folderId = $userAccess->getServiceIdentifier();
 
             $initialGroups[$folderId] = [
@@ -103,7 +94,7 @@ class FinalUserAccess
 
         /* Mutate initial conditions chronologically
          */
-        foreach (array_merge($initialGroups, $user->getUserAccessMutations()) as $mutation) {
+        foreach (array_merge($initialGroups, $accessMutations) as $mutation) {
             foreach ($mutation['instance'] as $folderId) {
                 /* Maybe this folder doesn't actually exist at runtime
                  */
@@ -145,7 +136,11 @@ class FinalUserAccess
                      */
                     $status = $mutation['status'];
 
-                    if (isset($keep[$folderId])) {
+                    /* Find the existing UserAccess instances and see if any have a ACCESS_FULL access level
+                     * We want to keep that instance unchanged, because people are going to lose their Group Admin
+                     * access and abilities, essentially locking them out of their own Groups en masse
+                     */
+                    if (isset($initialGroups[$folderId]) && ($initialGroups[$folderId]['level'] === UserAccess::ACCESS_FULL)) {
                         $status = 'retain';
                     } else {
                         unset($mutationGroups[$folderId]);
@@ -175,7 +170,7 @@ class FinalUserAccess
 
             /* If we retain it, update the intent
              */
-            if (isset($keep[$serviceIdentifier])) {
+            if (isset($initialGroups[$serviceIdentifier]) && ($initialGroups[$serviceIdentifier]['level'] === UserAccess::ACCESS_FULL)) {
                 $status = '(retain)';
                 $actualAccessLevel = UserAccess::ACCESS_FULL;
             }

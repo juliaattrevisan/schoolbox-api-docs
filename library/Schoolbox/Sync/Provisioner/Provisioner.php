@@ -123,6 +123,16 @@ class Provisioner
     private array $idToNameMap = [];
 
     /**
+     * 0 means group access is requested in UPS
+     */
+    private const ACCESS_MAP = [
+        0 => 'Requesting',
+        1 => 'Read',
+        2 => 'Write',
+        3 => 'Full'
+    ];
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -165,7 +175,7 @@ class Provisioner
      * @param LoggerInterface $logger
      * @return $this
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
         return $this;
@@ -174,12 +184,14 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool   $update      If true, updates - otherwise, performs a dry run.
-     * @param string $forRoleType If set, provisions this role type
-     *                            (and only this role type) regardless of if
-     *                            it's enabled or not.
+     * @param bool        $update      If true, updates - otherwise, performs a dry run.
+     * @param string|null $forRoleType If set, provisions this role type
+     *                                 (and only this role type) regardless of if
+     *                                 it's enabled or not.
+     * @return void
+     * @throws MapperException
      */
-    public function run($update = false, $forRoleType = null)
+    public function run(bool $update = false, ?string $forRoleType = null): void
     {
         $this->prepareForLog();
         foreach ($this->runOrder as $roleType) {
@@ -228,7 +240,7 @@ class Provisioner
                     ];
 
                     // Get the currently stored user
-                    /** @var User $internalUser */
+                    $accessList = $this->userAccessMapper->createCollection();
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
                         // Don't need to know about external DB access.
@@ -237,10 +249,11 @@ class Provisioner
                         // Don't want to know about any permissions other than
                         // group permissions, either: only group permissions can
                         // be changed by UPS.
-                        $internalUser->setAccessList(
-                            $this->userAccessMapper
-                                ->findAllForUser($internalUser, false)
-                                ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+                        $accessList = $this->userAccessMapper->findByColumnList(
+                            [
+                                'uid' => $internalUser->getId(),
+                                'service' => UserAccess::SERVICE_HOMEPAGE,
+                            ]
                         );
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
@@ -256,12 +269,6 @@ class Provisioner
 
                     // Keep a copy of the original user, for comparison
                     $originalUser = clone $internalUser;
-
-                    /* Deliberately empty $accessList of everything except SERVICE_HOMEPAGE items
-                     * so that Role-based permissions don't get saved in addition to the Group
-                     * permissions that we can set
-                     */
-                    $internalUser->setAccessList($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE));
 
                     $commonContext['action'] = $action;
 
@@ -295,8 +302,10 @@ class Provisioner
                          * the mutations in order to find out where you ended up. These evaluations
                          * also create log->debug entries so you can see what happened
                          */
-                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($originalUser);
-                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($internalUser);
+                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($accessList);
+                        // the following is for PHPStan :(
+                        /** @var User $internalUser */
+                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($accessList, $internalUser->getUserAccessMutations());
 
                         /* Compute the actual difference - if the set of (folderId, accessLevel)
                          * tuples are the same, then there's no difference and we don't need to
@@ -335,7 +344,7 @@ class Provisioner
 
                                 $oldLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
-                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    self::ACCESS_MAP[$accessLevel],
                                     $folderName,
                                     $folderId
                                 );
@@ -359,7 +368,7 @@ class Provisioner
 
                                 $newLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
-                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    self::ACCESS_MAP[$accessLevel],
                                     $folderName,
                                     $folderId
                                 );

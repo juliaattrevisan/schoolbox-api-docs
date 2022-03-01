@@ -90,7 +90,7 @@ class UserMapper extends SchoolboxMapper
             }
 
             $finalUserAccess = (new FinalUserAccess(\Schoolbox\Resource\Folder\Mapper::getInstance(), null))
-                ->generate($user);
+                ->generate($user->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE), $user->getUserAccessMutations());
 
             foreach ($finalUserAccess as $folderId => $accessLevel) {
                 $userAccess = $userAccessMapper->createModel()
