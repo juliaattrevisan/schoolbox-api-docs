@@ -23,8 +23,9 @@ class ValueSerializer implements IFieldValueSerializer
         if ($value === '') {
             return '';
         }
-        if (null === parse_url($value, PHP_URL_SCHEME)) {
-            throw new \UnexpectedValueException(sprintf('"%s": is not a valid URL', $value));
+        $url = new \Url($value);
+        if ($url->isUrl()) {
+            throw new \UnexpectedValueException("Url is not valid");
         }
         return $value;
     }
