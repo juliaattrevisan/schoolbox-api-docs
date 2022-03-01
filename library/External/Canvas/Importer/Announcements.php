@@ -81,6 +81,12 @@ class Announcements
 
 
     /**
+     * @var \Schoolbox\Comms\News\Topic\Mapper
+     */
+    private \Schoolbox\Comms\News\Topic\Mapper $topicMapper;
+
+
+    /**
      * @var StrategyFactory
      */
     private StrategyFactory $strategyFactory;
@@ -90,6 +96,12 @@ class Announcements
      * @var int
      */
     private int $defaultUserId;
+
+
+    /**
+     * @var int
+     */
+    private int $defaultTopicId;
 
 
     /**
@@ -115,8 +127,10 @@ class Announcements
      * @param \Schoolbox\Comms\News\Mapper          $newsMapper
      * @param \Schoolbox\Comms\News\Audience\Mapper $audienceMapper
      * @param \Schoolbox\Comms\News\Source\Mapper   $sourceMapper
+     * @param \Schoolbox\Comms\News\Topic\Mapper    $topicMapper
      * @param StrategyFactory                       $strategyFactory
      * @param int                                   $defaultUserId
+     * @param int                                   $defaultTopicId
      * @param LoggerInterface|null                  $log
      * @param LockInterface|null                    $lock
      */
@@ -129,8 +143,10 @@ class Announcements
         \Schoolbox\Comms\News\Mapper $newsMapper,
         \Schoolbox\Comms\News\Audience\Mapper $audienceMapper,
         \Schoolbox\Comms\News\Source\Mapper $sourceMapper,
+        \Schoolbox\Comms\News\Topic\Mapper $topicMapper,
         StrategyFactory $strategyFactory,
         int $defaultUserId,
+        int $defaultTopicId,
         ?LoggerInterface $log = null,
         ?LockInterface $lock = null
     ) {
@@ -142,8 +158,10 @@ class Announcements
         $this->newsMapper = $newsMapper;
         $this->audienceMapper = $audienceMapper;
         $this->sourceMapper = $sourceMapper;
+        $this->topicMapper = $topicMapper;
         $this->strategyFactory = $strategyFactory;
         $this->defaultUserId = $defaultUserId;
+        $this->defaultTopicId = $defaultTopicId;
         $this->log = $log;
         $this->lock = $lock;
     }
@@ -161,6 +179,8 @@ class Announcements
      * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -175,6 +195,15 @@ class Announcements
             $defaultOwner = $this->userMapper->findById($this->defaultUserId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->logInfo('Default owner not found; exiting');
+            return;
+        }
+
+        /* Default topic for all imported articles
+         */
+        try {
+            $defaultTopic = $this->topicMapper->findById($this->defaultTopicId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->logInfo('Default topic not found; exiting');
             return;
         }
 
@@ -201,7 +230,7 @@ class Announcements
             return;
         }
 
-        $this->importAnnouncements($announcements, $courseCodes, $defaultOwner);
+        $this->importAnnouncements($announcements, $courseCodes, $defaultOwner, $defaultTopic);
     }
 
 
@@ -312,19 +341,26 @@ class Announcements
      * Import $announcements into folders identified by $courseCodes
      * Assigns $defaultOwner as the author if the actual author can't be found in schoolbox.user
      *
-     * @param array           $announcements
-     * @param array           $courseCodes
-     * @param \Schoolbox\User $defaultOwner
+     * @param array                             $announcements
+     * @param array                             $courseCodes
+     * @param \Schoolbox\User                   $defaultOwner
+     * @param \Schoolbox\Comms\News\Topic\Model $defaultTopic
      * @return void
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      * @throws \Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      * @throws \UnexpectedValueException
      */
-    private function importAnnouncements(array $announcements, array $courseCodes, \Schoolbox\User $defaultOwner): void
-    {
+    private function importAnnouncements(
+        array $announcements,
+        array $courseCodes,
+        \Schoolbox\User $defaultOwner,
+        \Schoolbox\Comms\News\Topic\Model $defaultTopic
+    ): void {
         /* Build a lookup of previously-imported Announcement ids
          * This allows us to skip announcements without touching the db at all
          *
@@ -459,6 +495,7 @@ class Announcements
                 ->setBody($announcement['message'])
                 ->setSticky(false)
                 ->setAuthor($author)
+                ->setTopics($this->topicMapper->createCollection()->add($defaultTopic))
                 ->setAudience(new GenericCollection(\Schoolbox\Comms\News\Audience\Model::class));
 
             /* Assume some details about dates to map them to schoolbox concepts:
