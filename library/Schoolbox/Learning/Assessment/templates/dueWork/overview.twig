@@ -21,19 +21,19 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-            <table>
+            <table class="rb">
                 <tbody>
                     <tr>
                     {% if dueWork.useRubric %}
-                        <th rowspan="2"></th>
+                        <th rowspan="2" class="rb-group-name markdown"></th>
                         {% for group, criteria in headers %}
-                            <th colspan="{{ criteria | length }}">{{ group | nl2br }}</th>
+                            <th colspan="{{ criteria | length }}">{{ group | markdown }}</th>
                         {% endfor %}
                     </tr>
                     <tr>
                         {% for criteria in headers %}
                             {% for criterion in criteria %}
-                                <th>{{ criterion | nl2br }}</th>
+                                <th class="rb-criterion-name markdown">{{ criterion | markdown }}</th>
                             {% endfor %}
                         {% endfor %}
                     {% else %}
