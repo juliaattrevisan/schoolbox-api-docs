@@ -15,6 +15,7 @@ use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends ConfigController
 {
