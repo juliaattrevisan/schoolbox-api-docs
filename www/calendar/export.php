@@ -481,7 +481,7 @@ try {
                  */
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
-                    [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                    [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance()],
                     true,
                     $sentry
                 );

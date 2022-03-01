@@ -20,13 +20,25 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 
 
     /**
+     * @var \Schoolbox\Fixtures\Matchup\Mapper
+     */
+    private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper;
+
+
+    /**
      * @inheritdoc
      */
-    public function __construct(int $connectorId, User $user, User $viewer, \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper)
-    {
+    public function __construct(
+        int $connectorId,
+        User $user,
+        User $viewer,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+    ) {
         parent::__construct($connectorId, $user, $viewer);
 
         $this->eventTypeMapper = $eventTypeMapper;
+        $this->matchupMapper = $matchupMapper;
     }
 
 
@@ -87,7 +99,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 
         /* Skim the list
          */
-        $matchups = \Schoolbox\Fixtures\Matchup\Mapper::getInstance()->findInvolvedMatchups($this->getUser());
+        $matchups = $this->matchupMapper->findInvolvedMatchups($this->getUser());
 
         /** @var \Schoolbox\Fixtures\Matchup\Model $matchup */
         foreach ($matchups as $matchup) {
