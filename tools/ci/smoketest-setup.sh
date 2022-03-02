@@ -38,6 +38,13 @@ mkdir -p /var/log/schoolbox
 mkdir -p /var/lib/schoolbox
 chmod 777 /mnt/data/php_tmp
 
+# TODO Remove debugging
+ls -la $fullpath/../../*
+ls -la /usr/share/schoolbox
+ls -la $initialdir
+ls -la $initialdir/configfiles
+# TODO end debugging
+
 ## Move our specific config items into the correct folders
 cp -rf $fullpath/../../* /usr/share/schoolbox
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
