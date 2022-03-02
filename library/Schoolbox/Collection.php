@@ -437,10 +437,10 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
         return $this->sortByCallback(static function ($a, $b) use ($getter, $order) {
             if (self::ORDER_ASCENDING === strtolower($order)) {
-                return strnatcasecmp($a->$getter(), $b->$getter()) * -1;
+                return strnatcasecmp($a->$getter(), $b->$getter());
             }
 
-            return strnatcasecmp($a->$getter(), $b->$getter());
+            return strnatcasecmp($a->$getter(), $b->$getter()) * -1;
         }, $maintainIndexAssociation);
     }
 
