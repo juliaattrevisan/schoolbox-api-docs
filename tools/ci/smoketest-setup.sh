@@ -52,13 +52,13 @@ ls -la "$initialdir"/qa-container-config/configfiles
 
 ## Move our specific config items into the correct folders
 cp -rf "$repo_dir"/* /usr/share/schoolbox
-cp -f "$initialdir"/qa-container-config/configfiles/dhparams.pem /etc/dhparams.pem
-cp -rf "$initialdir"/qa-container-config/configfiles/nginx/* /etc/nginx
-cp -f "$initialdir"/qa-container-config/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
-cp -rf "$initialdir"/qa-container-config/configfiles/php/7.4/fpm/* $CONFIG_DIR
-cp -f "$initialdir"/qa-container-config/configfiles/redis/redis.conf /etc/redis/redis.conf
+cp -f "$initialdir"/configfiles/dhparams.pem /etc/dhparams.pem
+cp -rf "$initialdir"/configfiles/nginx/* /etc/nginx
+cp -f "$initialdir"/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
+cp -rf "$initialdir"/configfiles/php/7.4/fpm/* $CONFIG_DIR
+cp -f "$initialdir"/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -rf "$initialdir"/data/* /var/lib/schoolbox/$instance_id
-cp -rf "$initialdir"/qa-container-config/configfiles/bin/* /usr/local/bin
+cp -rf "$initialdir"/configfiles/bin/* /usr/local/bin
 
 ## Go to repository to initialise npm and composer
 cd /usr/share/schoolbox
