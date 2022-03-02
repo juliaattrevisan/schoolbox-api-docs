@@ -24,9 +24,10 @@ smokeTestResult=$?;
 
 # TODO remove debug. Dump first 10 failures
 echo "TODO. remove debug."
-find /var/log
-ls -la /usr/share/schoolbox/test/codeception/_output/*.fail.html | head -n 10
-for file in $(find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html' | head -n 10); do cat "$file"; done
+for file in $(find /var/log -type f); do
+  ls -la $file
+  cat $file
+done
 
 ## After the test is run we need to shut down the services
 cd $initialdir;
