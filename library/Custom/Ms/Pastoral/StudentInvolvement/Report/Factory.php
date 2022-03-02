@@ -587,7 +587,16 @@ class Factory
         }
 
         // Is a year level provided, and nothing found?
-        // Try finding next year's subject code, and then its folder and grades.
+        // Try finding next year's subject code: if one was found, find the
+        // involvement for this calendar year.
+        // This accounts for Meriden's class folder rollover process for year
+        // 11 subjects:
+        // * their Year 11 classes are rolled over and archived
+        // * these folders are then un-archived, and the year 12 class
+        //   code is added to these folders
+        // This means that Year 11 endeavor grades are associated with the
+        // student's current Year 12 class code: this change fetches only the
+        // Year 11 grades from that class code's folder.
         if (isset($calendarYear)) {
             $subjectCode = $this->gateway->getNextYearSubjectCode($calendarYear, $subjectCode);
             if ($subjectCode) {
@@ -598,7 +607,7 @@ class Factory
                         $student,
                         $publishedOnly,
                         $roleTypeOverride,
-                        $calendarYear + 1
+                        $calendarYear
                     );
                     if ($involvement) {
                         return [
