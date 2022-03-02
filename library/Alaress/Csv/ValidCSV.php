@@ -2,6 +2,7 @@
 
 namespace Alaress\Csv;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Resource\Exception;
 
 class ValidCSV
@@ -37,7 +38,12 @@ class ValidCSV
     public function isValid(): bool
     {
         //check the lot?
-        return !$this->hasBOM() && $this->cleanHeaders() && $this->noUTF8();
+        try {
+            !$this->hasBOM() && $this->cleanHeaders() && $this->noUTF8();
+            return true;
+        } catch (\UnexpectedValueException $e) {
+            return false;
+        }
     }
 
     public function hasBOM(): bool
@@ -54,12 +60,14 @@ class ValidCSV
 
     public function skipBom()
     {
-        if ($this->hasBOM()) {
+        try {
+            $this->hasBOM();
+            return $this->fp;
+        } catch (\UnexpectedValueException $e) {
+            rewind($this->fp);
+
             return $this->fp;
         }
-        rewind($this->fp);
-
-        return $this->fp;
     }
 
     public function cleanHeaders(): bool
@@ -101,44 +109,30 @@ class ValidCSV
         return true;
     }
 
-    public function test()
+    /**
+     * @param LoggerInterface $logger
+     * @return void
+     */
+    public function locateUTF8(LoggerInterface $logger): void
     {
-        $filename = $this->getOpt(self::OPT_LONG_FILE);
-        if (null === $filename) {
-            $this->getLogger()->error("no --file specified");
-            exit();
-        }
-        //load file
-        $fp = fopen($filename, 'r');
-
-
-
-        //check for bom
-        $bom = "\xef\xbb\xbf";
-        if (fgets($fp, 4) === $bom) {
-            $this->getLogger()->notice('file contains BOM (\xef\xbb\xbf) in the first line SA-13246 fixes this for the user import.');
-        }
-        if (fgets($fp, 4) !== $bom) {
-            // BOM not found - rewind pointer to start of file.
-            rewind($fp);
-        }
-
+        //find and return all utf8 in the file
         //parse csv
         $lineCount = 0;
-        while(!feof($fp) && ($line = fgetcsv($fp)) !== false) {
+        while (!feof($this->fp) && ($line = fgetcsv($this->fp)) !== false) {
+            $logger->debug(sprintf('checking line: "%d", "%s"', $lineCount, implode('","', $line)));
             $lineCount++;
             $cellCount = 0;
             foreach ($line as $cell) {
+                $logger->debug(sprintf('checking cell: "%d", "%s"', $cellCount, $cell));
                 $cellCount++;
                 //check line for non ascii characters
                 if (false === mb_detect_encoding($cell, 'ASCII', true)) {
-                    $this->getLogger()->notice(sprintf('Line "%d", Cell "%d" contains non ascii character(s)', $lineCount, $cellCount));
-                    //build a nice hex code, separating each hex code by a space
                     $hexCode = join(' ', str_split(bin2hex($cell), 2));
-                    $this->getLogger()->notice(sprintf('Cell: "%s" Hex: "%s"', $cell, $hexCode));
+                    $logger->notice(
+                        sprintf('Line "%d", Cell "%d" contains non ascii character(s). Cell: "%s", HEX: "%s', $lineCount, $cellCount, $cell, $hexCode)
+                    );
                 }
             }
-
         }
     }
 }

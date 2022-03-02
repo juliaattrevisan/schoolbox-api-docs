@@ -78,12 +78,7 @@ HELP;
         } catch (\UnexpectedValueException $e) {
             $this->getLogger()->error($e->getMessage());
         }
-        try {
-            $valid->noUTF8();
-            $this->getLogger()->info("File contains no UTF8");
-        } catch (\UnexpectedValueException $e) {
-            $this->getLogger()->warning($e->getMessage());
-            $this->getLogger()->warning("This might be fine....?");
-        }
+        $valid->locateUTF8($this->getLogger());
+
     }
 }
