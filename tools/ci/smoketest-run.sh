@@ -23,6 +23,8 @@ INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 smokeTestResult=$?;
 
 # TODO remove debug. Dump first 10 failures
+echo "TODO. remove debug."
+find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html'
 cat $(find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html' | head -n 10)
 
 ## After the test is run we need to shut down the services
