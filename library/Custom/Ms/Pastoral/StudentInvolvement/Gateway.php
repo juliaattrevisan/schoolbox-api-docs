@@ -686,6 +686,7 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
         $pb = $pb->equals('st.sub_desc', $thisYearSubject['sub_desc'])
+                 ->equals('st.year_grp', $thisYearSubject['year_grp'] + 1)
                  ->equals('ts.class', $class)
                  ->notEquals('ts.sub_code', $code)
                  ->equals('so.cmpy_code', self::COMPANY_CODE)
