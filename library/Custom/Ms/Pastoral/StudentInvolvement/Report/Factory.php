@@ -208,6 +208,8 @@ class Factory
                 // This is to preserve continuity between the Year 11 and 12
                 // class material: this is particularly necessary as Year 12
                 // starts for students in term 4 of Year 11.
+                // This ensures that endeavor grades given for year 11 don't
+                // show in the year 12 report.
                 $folderWithGrades = $this->getFolderWithGrades(
                     $subject->getSubjectCode(),
                     $student,
@@ -584,7 +586,29 @@ class Factory
             }
         }
 
-        // TODO find by next year's code?
+        // Is a year level provided, and nothing found?
+        // Try finding next year's subject code, and then its folder and grades.
+        if (isset($calendarYear)) {
+            $subjectCode = $this->gateway->getNextYearSubjectCode($calendarYear, $subjectCode);
+            if ($subjectCode) {
+                $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
+                if ($folder) {
+                    $involvement = $this->getStudentInvolvement(
+                        $folder,
+                        $student,
+                        $publishedOnly,
+                        $roleTypeOverride,
+                        $calendarYear + 1
+                    );
+                    if ($involvement) {
+                        return [
+                            'folder' => $folder,
+                            'grades' => $involvement['grades'],
+                        ];
+                    }
+                }
+            }
+        }
 
         // everything failed? return a null folder
         return [

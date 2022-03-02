@@ -658,6 +658,48 @@ class Gateway
     }
 
     /**
+     * Find the subject code for the given subject in the following year.
+     *
+     * @param int    $year          The calendar year of the subject.
+     * @param string $subjectCode   The code of the subject, split into a code
+     *                              and class.
+     * @return string|null
+     */
+    public function getNextYearSubjectCode($year, $subjectCode): ?string
+    {
+        $thisYearSubject = $this->getSubject($year, $subjectCode, false);
+
+        [, $code, $class] = explode('-', $subjectCode);
+
+        // Find the subject code for next year's class.
+        // We know that the subject name and class do not change, so we can use
+        // that information to find the next year's class.
+        $sql = "
+            SELECT DISTINCT
+                ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ts.class)) AS code
+            FROM suboutline so
+            INNER JOIN subtab st
+                ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            LEFT JOIN tchsub ts
+                ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
+        ";
+
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
+        $pb = $pb->equals('st.sub_desc', $thisYearSubject['sub_desc'])
+                 ->equals('ts.class', $class)
+                 ->notEquals('ts.sub_code', $code)
+                 ->equals('so.cmpy_code', self::COMPANY_CODE)
+                 ->equals('ts.year_num', $year + 1);
+
+        $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
+        $query = $this->database->prepareQuery($sql, $pb->getParams());
+        $query->execute();
+        return $query->rowCount() > 0
+            ? $query->fetchColumn()
+            : null;
+    }
+
+    /**
      * Gets the other possible class codes for related classes.
      *
      * @param string $subjectCode
@@ -666,7 +708,7 @@ class Gateway
      */
     public function getOtherSubjectClasses($subjectCode)
     {
-        list(, $code, $class) = explode('-', $subjectCode);
+        [, $code, $class] = explode('-', $subjectCode);
 
         $query = "
             SELECT DISTINCT
