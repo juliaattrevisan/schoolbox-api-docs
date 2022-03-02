@@ -14,11 +14,16 @@ class Reader implements \Iterator
 {
 
     /**
+     * @var ValidCSV
+     */
+    protected ValidCSV $validCSVHelper;
+
+    /**
      * The file name to read from.
      *
-     * @var string
+     * @var null|string
      */
-    protected $filename = '';
+    protected ?string $filename = '';
 
     /**
      * The column list for this reader. Each row returned will be mapped to its
@@ -89,6 +94,8 @@ class Reader implements \Iterator
         if (is_resource($filename)) {
             $this->filename = null;
             $this->fp       = $filename;
+            $this->validCSVHelper = new ValidCSV($this->fp);
+            $this->fp = $this->validCSVHelper->skipBom();
         } elseif (is_readable($filename)) {
             $this->filename = $filename;
         } else {
@@ -167,7 +174,9 @@ class Reader implements \Iterator
         $this->cleanup();
         if (!is_resource($this->fp)) {
             $this->fp = fopen($this->filename, 'r');
+            $this->validCSVHelper = new ValidCSV($this->fp);
         }
+        $this->fp = $this->validCSVHelper->skipBom();
 
         // Am I loading the column list from the first column?
         // If so, load that and set it as the column list.

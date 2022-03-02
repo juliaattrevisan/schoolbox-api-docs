@@ -50,6 +50,7 @@ class ValidCSV
     {
         //check for bom
         $bom = "\xef\xbb\xbf";
+        rewind($this->fp);
         if (fgets($this->fp, 4) === $bom) {
             throw new \UnexpectedValueException(
                 'File contains BOM'
@@ -73,6 +74,7 @@ class ValidCSV
     public function cleanHeaders(): bool
     {
         //scans headers for utf8 characters, to make sure they are correct.
+        $this->skipBom();
         $headers = fgetcsv($this->fp, 0);
         $cellCount = 0;
         foreach ($headers as $heading) {
