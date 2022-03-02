@@ -320,4 +320,39 @@ class GroupsHelper
         }
         return $possibleGroups;
     }
+
+    /**
+     * add user to group
+     */
+    public function addToGroup(User $user, Group $group)
+    {
+        //add the user to the group
+        $userGroup = $this->userAccessMapper->createModel();
+        $userGroup->setServiceIdentifier($group->getFolder()->getId())
+                  ->setUser($user)
+                  ->setService(UserAccess::SERVICE_HOMEPAGE)
+                  ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
+                  ->setFavourite(false); //default to no favourite groups.
+        //save group object
+        $this->userAccessMapper->save($userGroup);
+    }
+
+    /**
+     * delete user from group
+     */
+    public function deleteFromGroup(User $user, Group $group)
+    {
+        //find user record
+        $userGroup = $this->userAccessMapper->findOneByColumnList([
+                                                                      'uid' => $user->getId(),
+                                                                      'sid' => $group->getFolder()->getId(),
+                                                                  ]);
+        //remove the user group / favourite
+        $this->userAccessMapper->delete($userGroup);
+
+        /**
+         * remove the mute for the user / group this will remove the mute entry from the database.
+         */
+        $this->setNotification($group->getFolder()->getId(), $user, true);
+    }
 }
