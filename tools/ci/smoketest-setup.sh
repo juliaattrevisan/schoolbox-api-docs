@@ -39,16 +39,6 @@ mkdir -p /var/log/schoolbox/"$instance_id"
 mkdir -p /var/lib/schoolbox/"$instance_id"
 chmod 777 /mnt/data/php_tmp
 
-# TODO Remove debugging
-echo "initialdir: $initialdir"
-echo "filepath: $filepath"
-echo "fullpath: $fullpath"
-echo "repo_dir: $repo_dir"
-ls -la /usr/share/schoolbox
-ls -la "$initialdir"
-ls -la "$initialdir"/qa-container-config/configfiles
-# TODO end debugging
-
 ## Move our specific config items into the correct folders
 cp -rf "$repo_dir"/* /usr/share/schoolbox
 cp -f "$initialdir"/configfiles/dhparams.pem /etc/dhparams.pem
