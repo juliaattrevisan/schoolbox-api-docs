@@ -37,6 +37,8 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info("no input file");
             exit;
         }
+        $validCSV = new \Alaress\Csv\ValidCSV($handle);
+        $handle = $validCSV->skipBom();
 
         $headers = fgetcsv($handle, 1000, ",");
         $headers = array_flip($headers);

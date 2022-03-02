@@ -96,6 +96,8 @@ $app = new class extends CliTool\App
         $classes = [];
 
         $handle = fopen($this->getOpt(self::OPT_SHORT_FILE), 'rb');
+        $validCSV = new \Alaress\Csv\ValidCSV($handle);
+        $handle = $validCSV->skipBom();
 
         if ($handle) {
             while (($row = fgetcsv($handle)) !== false) {

@@ -86,10 +86,11 @@ class Bulk_Folder
         if (!is_resource($file)) {
             throw new TypeError(sprintf('$file must be a resource, found: %s', gettype($file)));
         }
-        $this->fp         = $file;
         $this->templateID = $templateID;
         $this->rolePerms  = array_map('\intval', $rolePerms);
         $this->inherit    = $inherit;
+        $validCSV = new \Alaress\Csv\ValidCSV($file);
+        $this->fp         = $validCSV->skipBom();
 
         // TODO inject dependencies
         $this->folderMapper         = Folder\Mapper::getInstance();

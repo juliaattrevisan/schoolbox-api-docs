@@ -57,6 +57,8 @@ class Csv extends Base
         /* Process rows
          */
         $handle = fopen($this->getFile(), 'r');
+        $validCSV = new \Alaress\Csv\ValidCSV($handle);
+        $handle = $validCSV->skipBom();
         $headerRow = fgetcsv($handle, 0, ",");
 
         $eventTypeMapper = new EventTypeMapper();

@@ -31,6 +31,8 @@ if (!file_exists($mapFile) || !is_readable($mapFile)) {
 }
 
 if (($handle = fopen($mapFile, 'r')) !== false) {
+    $validCSV = new \Alaress\Csv\ValidCSV($handle);
+    $handle = $validCSV->skipBom();
     while (($row = fgetcsv($handle, 1000, ',')) !== false) {
             $map[$row[0]] = $row[1];
     }
