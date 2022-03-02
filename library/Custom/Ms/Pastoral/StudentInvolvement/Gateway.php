@@ -623,7 +623,7 @@ class Gateway
                 st.sub_desc,
                 so.outline_text,
                 so.outline_url,
-                ts.tch_code
+                st.year_grp
             FROM suboutline so
             INNER JOIN subtab st
                 ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
