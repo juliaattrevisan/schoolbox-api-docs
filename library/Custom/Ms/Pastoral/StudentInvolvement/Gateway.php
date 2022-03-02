@@ -669,12 +669,14 @@ class Gateway
     public function getNextYearSubjectCode($year, $subjectCode): ?string
     {
         $thisYearSubject = $this->getSubject($year, $subjectCode, false);
-
-        [, $code, $class] = explode('-', $subjectCode);
+        if (empty($thisYearSubject)) {
+            return null;
+        }
 
         // Find the subject code for next year's class.
         // We know that the subject name and class do not change, so we can use
         // that information to find the next year's class.
+        [, $code, $class] = explode('-', $subjectCode);
         $sql = "
             SELECT DISTINCT
                 ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ts.class)) AS code
