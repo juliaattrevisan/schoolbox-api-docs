@@ -15,3 +15,5 @@ if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB
     $kernel = new WebRequest\Kernel();
     $kernel->run();
 }
+
+# TODO remove debug

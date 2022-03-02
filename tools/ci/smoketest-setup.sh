@@ -1,9 +1,10 @@
 #!/bin/bash
 
 ## Initial directory is where all the resources that are linked are included so save it for later use.
-initialdir=`pwd`;
-filepath=`readlink -f $0`;
-fullpath=${filepath%/*}
+initialdir=`pwd`;                       # eg "/tmp/build/6963e648"
+filepath=`readlink -f $0`;              # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci/smoketest-setup.sh"
+fullpath=${filepath%/*}                 # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci"
+repo_dir=$(realpath "$fullpath"/../..)  # eg "/tmp/build/6963e648/schoolbox-pr"
 
 PHP_VERSION=$1
 
@@ -42,21 +43,23 @@ chmod 777 /mnt/data/php_tmp
 echo "initialdir: $initialdir"
 echo "filepath: $filepath"
 echo "fullpath: $fullpath"
+echo "repo_dir: $repo_dir"
 ls -la $fullpath/../../*
 ls -la /usr/share/schoolbox
 ls -la $initialdir
-ls -la $initialdir/configfiles
+ls -la $initialdir/*
+ls -la $initialdir/qa-container-config/configfiles
 # TODO end debugging
 
 ## Move our specific config items into the correct folders
-cp -rf $fullpath/../../* /usr/share/schoolbox
-cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
-cp -rf $initialdir/configfiles/nginx/* /etc/nginx
-cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
-cp -rf $initialdir/configfiles/php/7.4/fpm/* $CONFIG_DIR
-cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
-cp -rf $initialdir/data/* /var/lib/schoolbox
-cp -rf $initialdir/configfiles/bin/* /usr/local/bin
+cp -rf "$repo_dir"/* /usr/share/schoolbox
+cp -f "$initialdir"/qa-container-config/configfiles/dhparams.pem /etc/dhparams.pem
+cp -rf "$initialdir"/qa-container-config/configfiles/nginx/* /etc/nginx
+cp -f "$initialdir"/qa-container-config/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
+cp -rf "$initialdir"/qa-container-config/configfiles/php/7.4/fpm/* $CONFIG_DIR
+cp -f "$initialdir"/qa-container-config/configfiles/redis/redis.conf /etc/redis/redis.conf
+cp -rf "$initialdir"/data/* /var/lib/schoolbox
+cp -rf "$initialdir"/qa-container-config/configfiles/bin/* /usr/local/bin
 
 ## Go to repository to initialise npm and composer
 cd /usr/share/schoolbox
