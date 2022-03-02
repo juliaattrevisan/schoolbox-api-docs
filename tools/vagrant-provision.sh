@@ -283,11 +283,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrad
 cat /usr/share/schoolbox/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
-chown -fR vagrant:vagrant /mnt/data/php_tmp;
-cd $cachedir;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
 npmfile='';
