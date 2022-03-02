@@ -563,7 +563,7 @@ class Factory
         $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
         if ($folder) {
             $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
-            if ($involvement) {
+            if ($involvement['grades'] ?? null) {
                 return [
                     'folder' => $folder,
                     'grades' => $involvement['grades'],
@@ -578,7 +578,7 @@ class Factory
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
             $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
-            if ($involvement) {
+            if ($involvement['grades'] ?? null) {
                 return [
                     'folder' => $archivedFolder,
                     'grades' => $involvement['grades'],
@@ -609,7 +609,7 @@ class Factory
                         $roleTypeOverride,
                         $calendarYear
                     );
-                    if ($involvement) {
+                    if ($involvement['grades'] ?? null) {
                         return [
                             'folder' => $folder,
                             'grades' => $involvement['grades'],
@@ -622,7 +622,7 @@ class Factory
                 $archivedFolders = $this->folderMapper->findAllByArchivedCode($nextYearSubjectCode);
                 foreach ($archivedFolders as $archivedFolder) {
                     $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
-                    if ($involvement) {
+                    if ($involvement['grades'] ?? null) {
                         return [
                             'folder' => $archivedFolder,
                             'grades' => $involvement['grades'],
@@ -685,7 +685,9 @@ class Factory
                 'grades' => $grades,
             ];
         }
-        return [];
+
+        // Not involved in this folder at all? Return nothing
+        return ['grades' => [],];
     }
 
     /**
