@@ -22,12 +22,10 @@ INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 
 smokeTestResult=$?;
 
-# TODO remove debug. Dump first 10 failures
-echo "TODO. remove debug."
-for file in $(find /var/log -type f); do
-  ls -la $file
-  cat $file
-done
+echo "Slow web/image requests:"
+cat /var/log/php-fpm.schoolbox.slow.log
+cat /var/log/php-fpm.schoolbox-images.slow.log
+
 
 ## After the test is run we need to shut down the services
 cd $initialdir;
