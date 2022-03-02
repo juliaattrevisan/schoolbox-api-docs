@@ -86,7 +86,6 @@ echo 'started mariadb'
 ## Go to the tools and update the db to be the latest version.
 cd /usr/share/schoolbox/tools
 
-./build-sql-update.sh
 ./update-sql-nocheck.sh
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance
