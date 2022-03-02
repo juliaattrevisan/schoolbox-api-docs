@@ -76,7 +76,6 @@ tools/set-plan.php --plan=elite
 service $PHP_SERVICE start
 echo 'started php'
 service nginx start
-service nginx status # TODO remove debug
 echo 'started nginx'
 service redis-server start
 echo 'started redis-server'
