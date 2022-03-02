@@ -255,6 +255,8 @@ class Provisioner
                                 'service' => UserAccess::SERVICE_HOMEPAGE,
                             ]
                         );
+                        // set original access list - this will be referred to update/keep groups in UserMapper postSave
+                        $internalUser->setAccessList($accessList);
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
