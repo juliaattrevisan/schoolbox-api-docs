@@ -47,8 +47,9 @@ class Cli extends CliTool\App
             echo <<<HELP
 
 Checks a csv for any possible issues, BOM, UTF8 in the header, or if there is UTF8 in the rest of the file
-Usage: tools/csvCheck.php [-v] [-p]
+Usage: tools/csvCheck.php [-v] --file
         -v Verbose mode (may be provided up to 3 times for increasing verbosity)
+        --file CSV input file
 
 HELP;
             exit;
