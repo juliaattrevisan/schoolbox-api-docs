@@ -87,14 +87,12 @@ class Mapper extends BaseMapper
         ));
 
         // Markbook sync
-        if ($this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
-            $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
-            $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteFromMarkbook']);
-            $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteFromMarkbook']);
-            $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
-        }
+        $this->registerCallback(self::CALLBACK_POSTSAVE, array($this, 'syncToExternalMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'deleteFromMarkbook'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteFromMarkbook'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setWorkType'));
 
@@ -270,6 +268,9 @@ class Mapper extends BaseMapper
      */
     public function syncToExternalMarkbook(Model $object): void
     {
+        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->syncAssessment($object);
@@ -286,6 +287,9 @@ class Mapper extends BaseMapper
      */
     public function deleteFromMarkbook(Model $object): void
     {
+        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);

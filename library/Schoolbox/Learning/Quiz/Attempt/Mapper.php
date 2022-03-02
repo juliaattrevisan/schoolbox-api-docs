@@ -77,11 +77,9 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
 
         // Markbook sync
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
-            $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
-            $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
-        }
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
     }
 
@@ -221,6 +219,9 @@ class Mapper extends BaseMapper
      */
     protected function syncToExternalMarkbook(Model $object): void
     {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         if ($object->isReviewed()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
