@@ -39,6 +39,9 @@ mkdir -p /var/lib/schoolbox
 chmod 777 /mnt/data/php_tmp
 
 # TODO Remove debugging
+echo "initialdir: $initialdir"
+echo "filepath: $filepath"
+echo "fullpath: $fullpath"
 ls -la $fullpath/../../*
 ls -la /usr/share/schoolbox
 ls -la $initialdir
