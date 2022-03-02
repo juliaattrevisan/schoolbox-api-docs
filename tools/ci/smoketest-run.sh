@@ -18,9 +18,12 @@ initialdir=`pwd`;
 echo "smoke tests setup"
 cd /usr/share/schoolbox
 echo "cd into vagrant"
-INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests -vvv
+INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 
 smokeTestResult=$?;
+
+# TODO remove debug. Dump first 10 failures
+cat $(find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html' | head -n 10)
 
 ## After the test is run we need to shut down the services
 cd $initialdir;
