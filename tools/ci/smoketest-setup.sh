@@ -6,11 +6,12 @@ filepath=`readlink -f $0`;              # eg "/tmp/build/6963e648/schoolbox-pr/t
 fullpath=${filepath%/*}                 # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci"
 repo_dir=$(realpath "$fullpath"/../..)  # eg "/tmp/build/6963e648/schoolbox-pr"
 
+readonly instance_id="smoketest"
 PHP_VERSION=$1
 
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
-tar xzf qa-container-config/qa-container-config.tar.gz
+tar xzfv qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
@@ -35,8 +36,8 @@ mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('
 ## Make directories that will be used by our schoolbox instance
 mkdir -p /usr/share/schoolbox
 mkdir -p /mnt/data/php_tmp
-mkdir -p /var/log/schoolbox
-mkdir -p /var/lib/schoolbox
+mkdir -p /var/log/schoolbox/"$instance_id"
+mkdir -p /var/lib/schoolbox/"$instance_id"
 chmod 777 /mnt/data/php_tmp
 
 # TODO Remove debugging
@@ -58,7 +59,7 @@ cp -rf "$initialdir"/qa-container-config/configfiles/nginx/* /etc/nginx
 cp -f "$initialdir"/qa-container-config/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
 cp -rf "$initialdir"/qa-container-config/configfiles/php/7.4/fpm/* $CONFIG_DIR
 cp -f "$initialdir"/qa-container-config/configfiles/redis/redis.conf /etc/redis/redis.conf
-cp -rf "$initialdir"/data/* /var/lib/schoolbox
+cp -rf "$initialdir"/data/* /var/lib/schoolbox/$instance_id
 cp -rf "$initialdir"/qa-container-config/configfiles/bin/* /usr/local/bin
 
 ## Go to repository to initialise npm and composer
@@ -68,7 +69,7 @@ echo "Deploying schoolbox config files"
 mkdir -p /etc/schoolbox
 cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
 cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
-export INSTANCE_ID=smoketest
+export INSTANCE_ID="$instance_id"
 
 ## Extract the NPM build
 tar xzf $initialdir/assets-artifact/*-assets.tar.gz;
