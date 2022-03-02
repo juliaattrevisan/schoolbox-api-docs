@@ -11,6 +11,9 @@ readonly instance_data_dir=/var/lib/schoolbox/$instance_id
 
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
+
+# TODO. This is currently clobbering this tarball which is being fetched from S3, we can delete the whole S3 workflow
+cp -vf "$repo_dir"/test/codeception/_data/SmokeTests/ci_schoolbox_config.tar.gz qa-container-config/qa-container-config.tar.gz
 tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
