@@ -18,7 +18,7 @@ initialdir=`pwd`;
 echo "smoke tests setup"
 cd /usr/share/schoolbox
 echo "cd into vagrant"
-INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
+INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests -vvv
 
 smokeTestResult=$?;
 
