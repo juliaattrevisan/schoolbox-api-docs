@@ -22,8 +22,10 @@ INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 
 smokeTestResult=$?;
 
-# TODO remove debug. Dump first 10 failures
-cat $(find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html' | head -n 10)
+echo "Slow web/image requests:"
+cat /var/log/php-fpm.schoolbox.slow.log
+cat /var/log/php-fpm.schoolbox-images.slow.log
+
 
 ## After the test is run we need to shut down the services
 cd $initialdir;

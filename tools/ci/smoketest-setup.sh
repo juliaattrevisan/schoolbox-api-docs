@@ -88,8 +88,10 @@ service mariadb start
 echo 'started mariadb'
 
 # Set data dirs in config table + run upgrade scripts
-tools/generate-dir-sql-dynamically.sh $instance_data_dir | mysql schoolbox
-tools/update-sql-nocheck.sh
+cd tools || exit 1
+./generate-dir-sql-dynamically.sh $instance_data_dir | mysql schoolbox
+./build-sql-update.sh
+./update-sql-nocheck.sh
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance
 # (ensure this happens after all updates happen)
