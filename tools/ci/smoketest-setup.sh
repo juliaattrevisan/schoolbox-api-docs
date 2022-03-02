@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ## Initial directory is where all the resources that are linked are included so save it for later use.
-initialdir=`pwd`;                       # eg "/tmp/build/6963e648"
-filepath=`readlink -f $0`;              # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci/smoketest-setup.sh"
+initialdir=$(pwd);                      # eg "/tmp/build/6963e648"
+filepath=$(readlink -f "$0");           # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci/smoketest-setup.sh"
 fullpath=${filepath%/*}                 # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci"
 repo_dir=$(realpath "$fullpath"/../..)  # eg "/tmp/build/6963e648/schoolbox-pr"
 
@@ -27,7 +27,7 @@ mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
-mysql schoolbox < $initialdir/data/schoolbox.sql
+mysql schoolbox < "$initialdir"/data/schoolbox.sql
 mysql schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
 mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
 
@@ -69,10 +69,10 @@ cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
 export INSTANCE_ID="$instance_id"
 
 ## Extract the NPM build
-tar xzf $initialdir/assets-artifact/*-assets.tar.gz;
+tar xzf "$initialdir"/assets-artifact/*-assets.tar.gz;
 
 ## Extract the develop vendor build
-tar xzf $initialdir/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
+tar xzf "$initialdir"/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /var/lib/schoolbox/*
@@ -104,4 +104,4 @@ cd /usr/share/schoolbox/tools
 mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 
 ## Finish where we started.
-cd $initialdir
+cd "$initialdir"
