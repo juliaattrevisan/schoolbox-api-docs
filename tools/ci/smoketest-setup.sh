@@ -21,9 +21,9 @@ PHP_SERVICE="php7.4-fpm"
 service mariadb start
 
 ## Initialise database
-mariadb -e "create database schoolbox;"
-mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
-mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
+mariadb -e "CREATE DATABASE schoolbox;"
+mariadb -e "CREATE USER 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
+mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
