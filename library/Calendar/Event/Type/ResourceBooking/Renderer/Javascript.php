@@ -51,7 +51,7 @@ class Javascript extends Base
 
         // Modify butonye
         $editUrl = $this->getEditURL();
-        $returnUrl = $_GET[Redirect::RETURN_URL] ? '?' . Redirect::queryStringEncodedParam($_GET[Redirect::RETURN_URL]) : '';
+        $returnUrl = !empty($_GET[Redirect::RETURN_URL]) ? '?' . Redirect::queryStringEncodedParam($_GET[Redirect::RETURN_URL]) : '';
 
         if ($editUrl !== false) {
             $bookingButtons[] = [

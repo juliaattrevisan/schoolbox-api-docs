@@ -146,7 +146,7 @@ class PDO extends BasePDO
      * @inheritdoc
      * @return bool|PDOStatement
      */
-    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, $arg3 = null, $ctorargs = [])
+    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs)
     {
         $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
 

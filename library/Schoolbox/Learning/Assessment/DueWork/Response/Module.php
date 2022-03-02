@@ -158,10 +158,10 @@ class Module extends BaseModule
         return new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             function ($params) {
-                if ($params['response'] instanceof IResponse && $params['response']->getAssessable()) {
+                if (isset($params['response']) && $params['response'] instanceof IResponse && $params['response']->getAssessable()) {
                     return $params['response']->getAssessable()->getContext()->getFolder()->getId();
                 }
-                if ($params['assessment'] instanceof IAssessable) {
+                if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
                     return $params['assessment']->getContext()->getFolder()->getId();
                 }
                 throw new Unauthorized();

@@ -56,7 +56,11 @@ class Component_Config_ImportedCourse extends Component_Config_Abstract
          */
         $courseSpecCounts = [];
         foreach ($allCourseImpls as $currentCourse) {
-            $courseSpecCounts[$currentCourse->getSpecification()->getId()]++;
+            if (isset($courseSpecCounts[$currentCourse->getSpecification()->getId()])) {
+                $courseSpecCounts[$currentCourse->getSpecification()->getId()]++;
+            } else {
+                $courseSpecCounts[$currentCourse->getSpecification()->getId()] = 1;
+            }
         }
 
         foreach ($allCourseImpls as $currentCourse) {

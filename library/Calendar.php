@@ -207,7 +207,7 @@ class Calendar extends DeprecatedModel
             $event = $this->getByID($eventID);
         }
 
-        if ($_SESSION['su']) {
+        if (!empty($_SESSION['su'])) {
             return 3;
         }
 
@@ -228,7 +228,7 @@ class Calendar extends DeprecatedModel
 
             case EventModel::ACCESS_GROUP:
                 // Need to check all groups, not just one.
-                if (is_array($event['categoryList'])) {
+                if (isset($event['categoryList']) && is_array($event['categoryList'])) {
                     $categoryList = $event['categoryList'];
                 } else {
                     $categoryList = $this->getEventCategory((int)$event['id']);
@@ -505,7 +505,7 @@ class Calendar extends DeprecatedModel
 
             // Ensure that requested group is included in filter
             // (as long as user has at least read permission on that group)
-            if ($filter['group']) {
+            if (isset($filter['group'])) {
                 if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= UserAccess::ACCESS_READ) {
                     $groupList[] = intval($filter['group']);
                 }
@@ -541,33 +541,33 @@ class Calendar extends DeprecatedModel
         // for extra filters.
         $filter_query = [];
 
-        if ($filter['campus']) {
+        if (isset($filter['campus'])) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_CAMPUS;
             $filter_query[] = 'event_campus.campus_id = ' . intval($filter['campus']);
         }
 
-        if ($filter['group']) {
+        if (isset($filter['group'])) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_GROUP;
             $filter_query[] = 'event_folder.folder_id = ' . intval($filter['group']);
         }
 
-        if ($filter['type']) {
+        if (isset($filter['type'])) {
             $filter_query[] = 'type = ' . intval($filter['type']);
         }
 
         /* Filter to specific event types
          * TODO: Replace injections with something less injecty (rewrite in prepared statements)
          */
-        if ($filter['typeSet']) {
+        if (isset($filter['typeSet'])) {
             $filter_query[] = 'type IN (' . implode(',', array_map('intval', $filter['typeSet'])) . ')';
         }
 
-        if ($filter['personal']) {
+        if (isset($filter['personal'])) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_PERSONAL;
             $filter_query[] = 'event_user.user_id = ' . intval($filter['personal']);
         }
 
-        if ($filter['id']) {
+        if (isset($filter['id'])) {
             $filter_query[] = 'event.id = ' . intval($filter['id']);
         }
 

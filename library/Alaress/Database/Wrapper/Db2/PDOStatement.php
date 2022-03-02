@@ -202,7 +202,7 @@ class PDOStatement extends BasePDOStatement
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
-    public function fetchAll($how = null, $class_name = null, $ctor_args = null)
+    public function fetchAll($how = null, $class_name = null, ...$args)
     {
         $result = [];
 
@@ -256,7 +256,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * @inheritdoc
      */
-    public function setFetchMode($mode, $params = null)
+    public function setFetchMode($mode, $className = null, ...$params)
     {
         $this->fetchStyleDefault = $mode;
         return true;
