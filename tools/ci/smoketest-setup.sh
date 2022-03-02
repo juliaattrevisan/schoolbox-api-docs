@@ -7,7 +7,6 @@ fullpath=${filepath%/*}                 # eg "/tmp/build/6963e648/schoolbox-pr/t
 repo_dir=$(realpath "$fullpath"/../..)  # eg "/tmp/build/6963e648/schoolbox-pr"
 
 readonly instance_id="smoketest"
-PHP_VERSION=$1
 
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
