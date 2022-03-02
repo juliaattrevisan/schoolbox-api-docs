@@ -45,11 +45,9 @@ echo "initialdir: $initialdir"
 echo "filepath: $filepath"
 echo "fullpath: $fullpath"
 echo "repo_dir: $repo_dir"
-ls -la $fullpath/../../*
 ls -la /usr/share/schoolbox
-ls -la $initialdir
-ls -la $initialdir/*
-ls -la $initialdir/qa-container-config/configfiles
+ls -la "$initialdir"
+ls -la "$initialdir"/qa-container-config/configfiles
 # TODO end debugging
 
 ## Move our specific config items into the correct folders
