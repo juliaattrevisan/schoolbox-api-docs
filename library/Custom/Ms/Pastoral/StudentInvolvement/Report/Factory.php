@@ -598,9 +598,9 @@ class Factory
         // student's current Year 12 class code: this change fetches only the
         // Year 11 grades from that class code's folder.
         if (isset($calendarYear)) {
-            $subjectCode = $this->gateway->getNextYearSubjectCode($calendarYear, $subjectCode);
-            if ($subjectCode) {
-                $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
+            $nextYearSubjectCode = $this->gateway->getNextYearSubjectCode($calendarYear, $subjectCode);
+            if ($nextYearSubjectCode) {
+                $folder = $this->folderMapper->findForCampusAndClass('', $nextYearSubjectCode);
                 if ($folder) {
                     $involvement = $this->getStudentInvolvement(
                         $folder,
@@ -612,6 +612,19 @@ class Factory
                     if ($involvement) {
                         return [
                             'folder' => $folder,
+                            'grades' => $involvement['grades'],
+                        ];
+                    }
+                }
+
+                // No current folder for next year's code?
+                // find an archived folder
+                $archivedFolders = $this->folderMapper->findAllByArchivedCode($nextYearSubjectCode);
+                foreach ($archivedFolders as $archivedFolder) {
+                    $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
+                    if ($involvement) {
+                        return [
+                            'folder' => $archivedFolder,
                             'grades' => $involvement['grades'],
                         ];
                     }
