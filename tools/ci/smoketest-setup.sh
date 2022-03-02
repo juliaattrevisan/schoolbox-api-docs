@@ -10,7 +10,7 @@ readonly instance_id="smoketest"
 
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
-tar xzfv qa-container-config/qa-container-config.tar.gz
+tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
