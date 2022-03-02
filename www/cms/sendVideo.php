@@ -163,50 +163,53 @@ if (isset($type) && isset($id)) {
     $byteOffset = 0;
     $byteLength = $videoSize;
 
-    if ($_SERVER['HTTP_RANGE']) {
-        $ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
-        $parts  = explode('-', $ranges[0]);
-
-        // Offset signifies where we should begin to read the file
-
-        $byteOffset = (int)$parts[0];
-
-        // Length is how long we should read the file according to the browser, and can never go beyond the file size
-
-        if (isset($parts[1]) && $parts[1] != '' && $parts[1] < $videoSize) {
-            $byteLength = (int)$parts[1];
-        } else {
-            $byteLength = $videoSize - 1;
-        }
-
-        // Make sure the requested range is satisfiable
-
-        if ($byteOffset > $byteLength) {
-            http_response_code(416);
-            header("Content-Range: bytes */{$videoSize}");
-            exit;
-        }
-
-        // Partial content
-
-        http_response_code(206);
-
-        // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
-
-        header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $videoSize));
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
     // Set HTTP headers
-    // ----------------------------------------------------------------------------------------------------------------
-
-    $byteRange = $byteLength - $byteOffset + 1;
-
     header_remove("Cache-Control");
     header_remove("Pragma");
-
     header("Content-Type: {$mimeType}", true);
     header("Accept-Ranges: bytes", true);
+
+    if (!isset($_SERVER['HTTP_RANGE'])) {
+        // Just stream the whole video
+        header("Content-Length: {$byteLength}", true);
+        fpassthru($videoStream);
+        exit;
+    }
+
+    // Stream a range
+    $ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
+    $parts  = explode('-', $ranges[0]);
+
+    // Offset signifies where we should begin to read the file
+
+    $byteOffset = (int)$parts[0];
+
+    // Length is how long we should read the file according to the browser, and can never go beyond the file size
+
+    if (isset($parts[1]) && $parts[1] != '' && $parts[1] < $videoSize) {
+        $byteLength = (int)$parts[1];
+    } else {
+        $byteLength = $videoSize - 1;
+    }
+
+    // Make sure the requested range is satisfiable
+
+    if ($byteOffset > $byteLength) {
+        http_response_code(416);
+        header("Content-Range: bytes */{$videoSize}");
+        exit;
+    }
+
+    // Partial content
+
+    http_response_code(206);
+
+    // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
+
+    header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $videoSize));
+
+    // Output content length header
+    $byteRange = $byteLength - $byteOffset + 1;
     header("Content-Length: {$byteRange}", true);
 
     fseek($videoStream, $byteOffset, SEEK_SET);
