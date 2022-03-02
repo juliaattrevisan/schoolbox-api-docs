@@ -16,12 +16,18 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
+use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -48,6 +54,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
         $this->register('GET', '/search', 'search', $loggedIn);
+        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $loggedIn);
     }
 
     /**
@@ -132,6 +139,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->injector->get('externalUser'),
             $this->getMapperFactory()->get(Logger\Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(GroupMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
+            $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );
     }
 

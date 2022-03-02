@@ -10,16 +10,29 @@ namespace Schoolbox\User;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\External\Normalise\TupleStack;
+use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Timetable_ColourMapper;
 use User\Logger;
 use External_User;
 
 class Controller extends Base
 {
+    private GroupsHelper $groupsHelper;
+    protected UserMapper $userMapper;
+
     /**
      * @var UserAccessMapper
      */
@@ -33,16 +46,29 @@ class Controller extends Base
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param External_User   $externalHandler
-     * @param Logger\Mapper    $assumeUserLogMapper
-     */
-    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler, Logger\Mapper $assumeUserLogMapper)
-    {
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        External_User $externalHandler,
+        Logger\Mapper $assumeUserLogMapper,
+        UserMapper $userMapper,
+        GroupMapper $groupMapper,
+        FolderMapper $folderMapper,
+        Access $accessHelper,
+        Timetable_ColourMapper $timetableColourMapper,
+        RerouteOverrideMapper $reRouteOverrideMapper
+    ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->externalHandler     = $externalHandler;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
+        $this->userMapper           = $userMapper;
+        $this->groupsHelper = new GroupsHelper(
+            $groupMapper,
+            $userAccessMapper,
+            $folderMapper,
+            $accessHelper,
+            $timetableColourMapper,
+            $reRouteOverrideMapper,
+        );
     }
 
 
@@ -157,5 +183,57 @@ class Controller extends Base
                 $result
             )
         );
+    }
+
+    /**
+     * @api /user/{userId}/groupMembership
+     * @param string $userId
+     */
+    public function apiMembership(string $userId)
+    {
+        //check perms, if none exit
+        if (!$this->hasApiAccess()) {
+            return;
+        }
+        //check for invalid / deleted users?
+        try {
+            /* Check that the selected user exists in schoolbox
+             */
+            $user = $this->userMapper->findById($userId);
+        } catch (MapperException $e) {
+            /* If they weren't found in either, exit
+             */
+            $problem = (new ApiProblem('User does not exist'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        $users_groups = $this->groupsHelper->getAllGroups($user);
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                $users_groups
+            )
+        );
+    }
+
+    /**
+     * check requesting user has correct perms, and return API error if not
+     */
+    private function hasApiAccess(): bool
+    {
+        if ($this->getUser()->isSuperuser()) {
+            return true;
+        } else {
+            $problem = (new ApiProblem('User does not have permissions to view the requested user'))
+                ->setStatus(403)
+                ->asArray();
+            $this->getResponse()->status->setCode(403);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return false; //exit early the user is part of the group.
+        }
     }
 }
