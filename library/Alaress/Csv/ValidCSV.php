@@ -9,11 +9,12 @@ class ValidCSV
 {
 
     /**
+     * @var resource
      */
     private $fp;
 
     /**
-     * @param $filePointer
+     * @param resource $filePointer
      * @return void
      * @throws Exception
      */
