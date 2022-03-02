@@ -83,10 +83,9 @@ echo 'started redis-server'
 service mariadb start
 echo 'started mariadb'
 
-## Go to the tools and update the db to be the latest version.
-cd /usr/share/schoolbox/tools
-
-./update-sql-nocheck.sh
+# Set data dirs in config table + run upgrade scripts
+tools/generate-dir-sql-dynamically.sh | mysql schoolbox
+tools/update-sql-nocheck.sh
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance
 # (ensure this happens after all updates happen)
