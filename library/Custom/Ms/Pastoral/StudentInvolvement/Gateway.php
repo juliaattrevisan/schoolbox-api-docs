@@ -695,9 +695,7 @@ class Gateway
         $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
         $query = $this->database->prepareQuery($sql, $pb->getParams());
         $query->execute();
-        return $query->rowCount() > 0
-            ? $query->fetchColumn()
-            : null;
+        return $query->fetchColumn();
     }
 
     /**
