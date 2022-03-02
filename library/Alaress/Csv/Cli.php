@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+namespace Alaress\Csv;
+
+use Schoolbox\Application\CliTool;
+
+class Cli extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+    /**
+     * --file
+     *
+     * Load csv contents from a file path specified by this arg
+     */
+    private const OPT_LONG_FILE = 'file:';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+            self::OPT_LONG_FILE,
+        ];
+    }
+
+    /** @inheritdoc */
+    public function runAsRoot(): ?bool
+    {
+        return false;
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Checks a csv for any possible issues, BOM, UTF8 in the header, or if there is UTF8 in the rest of the file
+Usage: tools/csvCheck.php [-v] [-p]
+        -v Verbose mode (may be provided up to 3 times for increasing verbosity)
+
+HELP;
+            exit;
+        }
+        $filename = $this->getOpt(self::OPT_LONG_FILE);
+        if (null === $filename) {
+            $this->getLogger()->error("no --file specified");
+            exit();
+        }
+        //load file
+        $fp = fopen($filename, 'r');
+        try {
+            $valid = new ValidCSV($fp);
+        } catch (\Exception $e) {
+            $this->getLogger()->error($e->getMessage());
+            exit();
+        }
+        try {
+            $valid->hasBOM();
+            $this->getLogger()->info("No Bom");
+        } catch (\UnexpectedValueException $e) {
+            $this->getLogger()->error($e->getMessage());
+        }
+        try {
+            $valid->cleanHeaders();
+            $this->getLogger()->info("Headers are clean of UTF8");
+        } catch (\UnexpectedValueException $e) {
+            $this->getLogger()->error($e->getMessage());
+        }
+        try {
+            $valid->noUTF8();
+            $this->getLogger()->info("File contains no UTF8");
+        } catch (\UnexpectedValueException $e) {
+            $this->getLogger()->warning($e->getMessage());
+            $this->getLogger()->warning("This might be fine....?");
+        }
+    }
+}
