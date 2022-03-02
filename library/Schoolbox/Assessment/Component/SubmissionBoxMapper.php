@@ -333,6 +333,9 @@ class SubmissionBoxMapper extends BaseMapper
      */
     public function syncToExternalMarkbook(SubmissionBox $object): void
     {
+        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->syncAssessment($object);
@@ -348,6 +351,9 @@ class SubmissionBoxMapper extends BaseMapper
      */
     public function deleteFromMarkbook(SubmissionBox $object): void
     {
+        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         /** @var MarkbookAdapter $markbookAdapter */
         $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');
         $markbookAdapter->deleteAssessment($object);

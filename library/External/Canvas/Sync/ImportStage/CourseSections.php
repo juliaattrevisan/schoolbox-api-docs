@@ -91,6 +91,8 @@ class CourseSections
     private $countUnitImplUpdated;
     private $countUnitImplDeleted;
 
+    private string $schoolboxTimezone;
+
     /**
      * @param IConnector                $canvasDb
      * @param IConnector                $schoolboxDb
@@ -104,6 +106,7 @@ class CourseSections
      * @param Bridge\CourseGroup        $courseGroupBridge
      * @param Bridge\CourseSection      $courseSectionBridge
      * @param Bridge\CourseSectionDates $courseSectionDatesBridge
+     * @param string                    $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -117,7 +120,8 @@ class CourseSections
         Bridge\Course $courseBridge,
         Bridge\CourseGroup $courseGroupBridge,
         Bridge\CourseSection $courseSectionBridge,
-        Bridge\CourseSectionDates $courseSectionDatesBridge
+        Bridge\CourseSectionDates $courseSectionDatesBridge,
+        string $schoolboxTimezone
     ) {
         $this->canvasDb                 = $canvasDb;
         $this->schoolboxDb              = $schoolboxDb;
@@ -131,6 +135,7 @@ class CourseSections
         $this->courseGroupBridge        = $courseGroupBridge;
         $this->courseSectionBridge      = $courseSectionBridge;
         $this->courseSectionDatesBridge = $courseSectionDatesBridge;
+        $this->schoolboxTimezone = $schoolboxTimezone;
     }
 
 
@@ -163,17 +168,17 @@ class CourseSections
                     account.canvas_id                                   'account.canvas_id',
                     course.code                                         'course.code',
                     course.canvas_id                                    'course.canvas_id',
-                    CONVERT_TZ(course.start_at, 'UTC', 'SYSTEM')        'course.start_at',
-                    CONVERT_TZ(course.conclude_at, 'UTC', 'SYSTEM')     'course.conclude_at',
-                    CONVERT_TZ(courseTerm.date_start, 'UTC', 'SYSTEM')  'courseTerm.date_start',
-                    CONVERT_TZ(courseTerm.date_end, 'UTC', 'SYSTEM')    'courseTerm.date_end',
+                    CONVERT_TZ(course.start_at, 'UTC', :timezone)        'course.start_at',
+                    CONVERT_TZ(course.conclude_at, 'UTC', :timezone)     'course.conclude_at',
+                    CONVERT_TZ(courseTerm.date_start, 'UTC', :timezone)  'courseTerm.date_start',
+                    CONVERT_TZ(courseTerm.date_end, 'UTC', :timezone)    'courseTerm.date_end',
                     section.canvas_id                                   'section.canvas_id',
                     section.name                                        'section.name',
                     section.sis_source_id                               'section.sis_source_id',
-                    CONVERT_TZ(section.start_at, 'UTC', 'SYSTEM')       'section.start_at',
-                    CONVERT_TZ(section.end_at, 'UTC', 'SYSTEM')         'section.end_at',
-                    CONVERT_TZ(sectionTerm.date_start, 'UTC', 'SYSTEM') 'sectionTerm.date_start',
-                    CONVERT_TZ(sectionTerm.date_end, 'UTC', 'SYSTEM')   'sectionTerm.date_end'
+                    CONVERT_TZ(section.start_at, 'UTC', :timezone)       'section.start_at',
+                    CONVERT_TZ(section.end_at, 'UTC', :timezone)         'section.end_at',
+                    CONVERT_TZ(sectionTerm.date_start, 'UTC', :timezone) 'sectionTerm.date_start',
+                    CONVERT_TZ(sectionTerm.date_end, 'UTC', :timezone)   'sectionTerm.date_end'
                 FROM course_section_dim section
                 JOIN course_dim course ON course.id = section.course_id
                 JOIN account_dim account ON account.id = course.account_id
@@ -182,7 +187,7 @@ class CourseSections
                 WHERE {$whereClause}
                 ORDER BY account.canvas_id, course.code, course.canvas_id, section.canvas_id
             ";
-            $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
+            $statement = $this->canvasDb->executeQuery($sql, array_merge($pb->getParams(), ['timezone' => $this->schoolboxTimezone]));
             while ($row = $statement->fetch()) {
                 $accountCanvasId = $row['account.canvas_id'];
                 $courseGroupCode = $row['course.code'];

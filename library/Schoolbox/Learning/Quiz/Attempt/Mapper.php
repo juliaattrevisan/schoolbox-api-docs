@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -218,6 +219,9 @@ class Mapper extends BaseMapper
      */
     protected function syncToExternalMarkbook(Model $object): void
     {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         if ($object->isReviewed()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');

@@ -88,6 +88,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param IConfigLoader       $config
      * @param Bridge\Assignment   $assignmentBridge
      * @param Bridge\Course       $courseBridge
+     * @param string              $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -102,7 +103,8 @@ class CourseQuiz extends CourseAssessmentAbstract
         LoggerInterface $log,
         IConfigLoader $config,
         Bridge\Assignment $assignmentBridge,
-        Bridge\Course $courseBridge
+        Bridge\Course $courseBridge,
+        string $schoolboxTimezone
     ) {
         parent::__construct(
             $canvasDb,
@@ -110,7 +112,8 @@ class CourseQuiz extends CourseAssessmentAbstract
             $assessmentMapper,
             $log,
             $config,
-            $courseBridge
+            $courseBridge,
+            $schoolboxTimezone
         );
         $this->assignmentBridge   = $assignmentBridge;
         $this->quizMapper         = $quizMapper;
@@ -150,8 +153,8 @@ class CourseQuiz extends CourseAssessmentAbstract
                quiz.canvas_id              'quiz.canvas_id',
                quiz.name                   'quiz.name',
                quiz.description            'quiz.description',
-               quiz.created_at             'quiz.created_at',
-               quiz.updated_at             'quiz.updated_at',
+               CONVERT_TZ(quiz.created_at, 'UTC', :timezone) 'quiz.created_at',
+               CONVERT_TZ(quiz.updated_at, 'UTC', :timezone) 'quiz.updated_at',
                quiz_fact.points_possible   'quiz.points_possible',
                quiz.quiz_type              'quiz.quiz_type',
                quiz.anonymous_submissions  'quiz.anonymous_submissions',
@@ -166,7 +169,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         -- TODO cater for quiz/assignment positioning
         ORDER BY course.code, course.canvas_id, assignment_group.position, assignment.position
         ";
-        $statement         = $this->canvasDb->executeQuery($sql, $courseFilterPb->getParams());
+        $statement = $this->canvasDb->executeQuery($sql, array_merge($courseFilterPb->getParams(), ['timezone' => $this->schoolboxTimezone]));
 
         // Parse results into hierarchical structure
         $coursesData        = [];

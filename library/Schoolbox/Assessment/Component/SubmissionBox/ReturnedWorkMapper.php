@@ -327,6 +327,9 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function syncToExternalMarkbook(ReturnedWork $object): void
     {
+        if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_MARKBOOK)) {
+            return;
+        }
         if ($object->isPublished() && !$object->isSelfAssess()) {
             /** @var MarkbookAdapter $markbookAdapter */
             $markbookAdapter = self::getDi()->get('externalMarkbookAdapter');

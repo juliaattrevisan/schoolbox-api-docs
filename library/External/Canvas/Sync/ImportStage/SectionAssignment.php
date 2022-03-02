@@ -68,6 +68,7 @@ class SectionAssignment extends SectionAssessmentAbstract
      * @param Bridge\Course             $courseBridge
      * @param Bridge\CourseSection      $courseSectionBridge
      * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @param string                    $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -85,7 +86,8 @@ class SectionAssignment extends SectionAssessmentAbstract
         Bridge\AssignmentDates $assignmentDatesBridge,
         Bridge\Course $courseBridge,
         Bridge\CourseSection $courseSectionBridge,
-        Bridge\AssignmentOverride $assignmentOverrideBridge
+        Bridge\AssignmentOverride $assignmentOverrideBridge,
+        string $schoolboxTimezone
     ) {
         parent::__construct(
             $canvasDb,
@@ -102,7 +104,8 @@ class SectionAssignment extends SectionAssessmentAbstract
             $assignmentDatesBridge,
             $courseBridge,
             $courseSectionBridge,
-            $assignmentOverrideBridge
+            $assignmentOverrideBridge,
+            $schoolboxTimezone
         );
         $this->submissionBoxMapper   = $submissionBoxMapper;
     }
@@ -142,16 +145,16 @@ class SectionAssignment extends SectionAssessmentAbstract
                 assignment.canvas_id                                'assessable.canvas_id',
                 assignment.title                                    'assessable.title',
                 assignment.visibility                               'assessable.visibility',
-                CONVERT_TZ(assignment.unlock_at, 'UTC', 'SYSTEM')   'assessable.unlock_at',
-                CONVERT_TZ(assignment.lock_at, 'UTC', 'SYSTEM')     'assessable.lock_at',
-                CONVERT_TZ(assignment.due_at, 'UTC', 'SYSTEM')      'assessable.due_at',
+                CONVERT_TZ(assignment.unlock_at, 'UTC', :timezone)  'assessable.unlock_at',
+                CONVERT_TZ(assignment.lock_at, 'UTC', :timezone)    'assessable.lock_at',
+                CONVERT_TZ(assignment.due_at, 'UTC', :timezone)     'assessable.due_at',
                 assignment.all_day                                  'assessable.all_day',
                 assignment.all_day_date                             'assessable.all_day_date',
                 override.canvas_id                                  'override.canvas_id',
                 override.title                                      'override.title',
-                CONVERT_TZ(override.unlock_at, 'UTC', 'SYSTEM')     'override.unlock_at',
-                CONVERT_TZ(override.lock_at, 'UTC', 'SYSTEM')       'override.lock_at',
-                CONVERT_TZ(override.due_at, 'UTC', 'SYSTEM')        'override.due_at',
+                CONVERT_TZ(override.unlock_at, 'UTC', :timezone)    'override.unlock_at',
+                CONVERT_TZ(override.lock_at, 'UTC', :timezone)      'override.lock_at',
+                CONVERT_TZ(override.due_at, 'UTC', :timezone)       'override.due_at',
                 override.all_day                                    'override.all_day',
                 override.all_day_date                               'override.all_day_date',
                 override_section.canvas_id                          'override_section.canvas_id',
@@ -178,7 +181,14 @@ class SectionAssignment extends SectionAssessmentAbstract
             WHERE {$whereClause}
             ORDER BY course.code, course.canvas_id, section.canvas_id, assignment.canvas_id, override.canvas_id
         ";
-        $statement                  = $this->canvasDb->executeQuery($sql, array_merge($pb->getParams(), $assignmentCanvasIdBindings->getParams()));
+        $statement = $this->canvasDb->executeQuery(
+            $sql,
+            array_merge(
+                $pb->getParams(),
+                $assignmentCanvasIdBindings->getParams(),
+                ['timezone' => $this->schoolboxTimezone]
+            )
+        );
         return $this->buildCanvasOverrideData($statement);
     }
 

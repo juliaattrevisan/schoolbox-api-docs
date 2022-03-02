@@ -122,6 +122,7 @@ abstract class SectionAssessmentAbstract
     private $countParticipantsUpdated;
     private $countParticipantsDeleted;
 
+    protected string $schoolboxTimezone;
 
     /**
      * @param IConnector                $canvasDb
@@ -139,6 +140,7 @@ abstract class SectionAssessmentAbstract
      * @param Bridge\Course             $courseBridge
      * @param Bridge\CourseSection      $courseSectionBridge
      * @param Bridge\AssignmentOverride $assignmentOverrideBridge
+     * @param string                    $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -155,7 +157,8 @@ abstract class SectionAssessmentAbstract
         Bridge\AssignmentDates $assignmentDatesBridge,
         Bridge\Course $courseBridge,
         Bridge\CourseSection $courseSectionBridge,
-        Bridge\AssignmentOverride $assignmentOverrideBridge
+        Bridge\AssignmentOverride $assignmentOverrideBridge,
+        string $schoolboxTimezone
     ) {
         $this->canvasDb                 = $canvasDb;
         $this->schoolboxDb              = $schoolboxDb;
@@ -172,6 +175,7 @@ abstract class SectionAssessmentAbstract
         $this->courseBridge             = $courseBridge;
         $this->courseSectionBridge      = $courseSectionBridge;
         $this->assignmentOverrideBridge = $assignmentOverrideBridge;
+        $this->schoolboxTimezone        = $schoolboxTimezone;
     }
 
 

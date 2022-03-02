@@ -55,6 +55,8 @@ abstract class CourseAssessmentAbstract
     /** @var Bridge\Course */
     protected $courseBridge;
 
+    protected string $schoolboxTimezone;
+
     /**
      * @param IConnector        $canvasDb
      * @param IConnector        $schoolboxDb
@@ -62,6 +64,7 @@ abstract class CourseAssessmentAbstract
      * @param LoggerInterface   $log
      * @param IConfigLoader     $config
      * @param Bridge\Course     $courseBridge
+     * @param string            $schoolboxTimezone
      */
     public function __construct(
         IConnector $canvasDb,
@@ -69,7 +72,8 @@ abstract class CourseAssessmentAbstract
         Assessment\Mapper $assessmentMapper,
         LoggerInterface $log,
         IConfigLoader $config,
-        Bridge\Course $courseBridge
+        Bridge\Course $courseBridge,
+        string $schoolboxTimezone
     ) {
         $this->canvasDb         = $canvasDb;
         $this->schoolboxDb      = $schoolboxDb;
@@ -83,6 +87,7 @@ abstract class CourseAssessmentAbstract
         $htmlPurifierConfig->set('URI.MakeAbsolute', true);
         $this->htmlPurifier = new HTMLPurifier($htmlPurifierConfig);
         $this->courseBridge = $courseBridge;
+        $this->schoolboxTimezone = $schoolboxTimezone;
     }
 
     /**
