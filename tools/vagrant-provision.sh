@@ -112,7 +112,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
-mysqlcheck -r -A;
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
@@ -282,11 +281,6 @@ FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpv
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
 cat /usr/share/schoolbox/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
-chown -fR vagrant:vagrant /mnt/data/php_tmp;
-cd $cachedir;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
