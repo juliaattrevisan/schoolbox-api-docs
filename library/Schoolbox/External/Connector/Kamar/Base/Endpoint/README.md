@@ -34,7 +34,7 @@ Import it via `Timetable Structure`. This sets up the Cycles for you.
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `Kamar`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly:
 
-* Endpoint Host: `/vagrant/data/cache/stream/kamar`
+* Endpoint Host: `/var/lib/schoolbox/cache/stream/kamar`
 * Endpoint Key: `schoolbox:schoolboxkamar`
 
 The Endpoint Key is a colon-separated username/password tuple. Kamar instance sends it and is supposed to match something we're expecting; if it doesn't match, we can reject data.
@@ -50,11 +50,11 @@ Then, pop it into the Endpoint Host directory, then run this:
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 # To protect against import of a partial data set, the Kamar sync won't run if
 # any file is less than 15 minutes old.
 # Set every file to have been modified yesterday to work around this.
-touch -d "yesterday" /vagrant/data/cache/stream/kamar/*
+touch -d "yesterday" /var/lib/schoolbox/cache/stream/kamar/*
 php sisImporter.php --perform -vvv
 ```
 

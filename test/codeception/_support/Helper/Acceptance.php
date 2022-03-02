@@ -47,7 +47,7 @@ class Acceptance extends \Codeception\Module
     {
         parent::_before($test);
         $this->changeDBConfig('debug_mode', 0);
-        exec('sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
+        exec('sudo php /usr/share/schoolbox/test/socket/destroy-rabbit-data.php;');
     }
 
     /**

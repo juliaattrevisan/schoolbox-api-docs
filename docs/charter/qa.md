@@ -157,7 +157,7 @@ In the event we need to test further into the past because we need to update dat
 1. you should be on master branch with data ready from set up step
 1. git checkout develop
 1. vagrant ssh (needs to be run on vagrant)
-1. cd /vagrant
+1. cd /usr/share/schoolbox
 1. run sudo tools/build-sql-update.sh
 1. run sudo tools/update-sql.sh
 1. run npm install

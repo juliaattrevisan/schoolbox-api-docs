@@ -8,7 +8,7 @@ composer.lock binary
 # and npm-shrinkwrap.json conflicts:
 # git reset HEAD npm-shrinkwrap.json
 # vagrant ssh
-# cd /vagrant
+# cd /usr/share/schoolbox
 # rm -rf node_modules/*
 # npm install
 # npm shrinkwrap --dev

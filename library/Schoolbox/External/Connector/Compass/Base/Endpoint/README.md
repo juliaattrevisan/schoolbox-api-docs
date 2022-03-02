@@ -1,5 +1,5 @@
 # Compass
-The Compass importer accesses a set of API endpoints to fetch its data. It's also a bit special in that SUDS Compass ventures into new territory: importing timetable data as standard Schoolbox Events instead of trying to make them conform to our repeating rectangular timetable grid. There are currently some wonky quirks in that area which we'll cover in this doc.  
+The Compass importer accesses a set of API endpoints to fetch its data. It's also a bit special in that SUDS Compass ventures into new territory: importing timetable data as standard Schoolbox Events instead of trying to make them conform to our repeating rectangular timetable grid. There are currently some wonky quirks in that area which we'll cover in this doc.
 
 # 1 Connector Setup
 As usual we need two pieces of data for SUDS to work: *School Data Endpoint Host* and *School Data Endpoint Key*.
@@ -20,8 +20,8 @@ https://schoolbox-integration-vic.compass.education/api/
 Put that into `School Data Endpoint Host`.
 
 ## 1.2 Endpoint Key
-The Endpoint Key has two pieces of data: 
-* the key tuple itself, and 
+The Endpoint Key has two pieces of data:
+* the key tuple itself, and
 * a `timetableowner` tuple. The `timetableowner` specifies a schoolbx user account id that exists purely to own the timetable events that are spawned.
 
 > Since we're importing timetable data as events, they must adhere to our usual schoolbox event rules such as having an owner of the event (the person whose calendar can see the event) and an author of the event (the person who created it, since you can make events for other people)
@@ -41,7 +41,7 @@ Then run the sisImporter in the usual spot. It'll chomp through all the data.
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 php sisImporter.php -vvv --perform
 ```
 
@@ -58,7 +58,7 @@ You should be looking at data only for today. If you're doing it for some other 
 
 ## 3.1 Host Matching
 
-Data is organised in a somewhat peculiar manner: a person in Compass can exist in multiple contexts (such as a staff member existing in two related schools) so to figure out which data is relevant we have to match on a url corresponding to the `School Data Endpoint Host`. 
+Data is organised in a somewhat peculiar manner: a person in Compass can exist in multiple contexts (such as a staff member existing in two related schools) so to figure out which data is relevant we have to match on a url corresponding to the `School Data Endpoint Host`.
 
 The Compass API is riddled with this philosophy and you have to manually sift through it every time. There's a `Helper` class which explains how this works in more detail and also illustrates where it's used.
 
@@ -84,7 +84,7 @@ Intersect between these data:
 
 In this case, if the first part of `friendlyOrgId` is a substring of `School Data Endpoint Host` then this is the record we want; in this example, `schoolbox-integration` is the common ground between the host and the api payload.
 
-> There are numerous usages of this to identify data, because at Wyndham we found they had data shared with Heatherton and we needed to make sure we got the right data. 
+> There are numerous usages of this to identify data, because at Wyndham we found they had data shared with Heatherton and we needed to make sure we got the right data.
 >
 > A data record for John Smith would come with information relevant to both Wyndham and Heatherton campuses (and they could be different) so we use this technique to identify which data we want.
 
@@ -95,7 +95,7 @@ Compass Timetable Data goes into schoolbox as `events` like the ones you'd norma
 
 In the interim, we've just slapped these timetable events into the usual schoolbox calendar. They manifest in the `Event > Schoolbox Events` subscription; they currently do not have their own subscription.
 
-> A SUDS-specific calendar subscription is being planned to give users more control over this data. At the moment you're going to get it mixed in with other events. 
+> A SUDS-specific calendar subscription is being planned to give users more control over this data. At the moment you're going to get it mixed in with other events.
 
 ## 4.1 Preparation
 However, this means we need to do a few more preparations in each import - purging the relationships of previously-imported timetable events. You'll see this as a set of purges when the importer beings processing timetable data.
@@ -142,13 +142,13 @@ An Activity must:
 * have at least one corresponding `Activity Instance` otherwise the Activity doesn't take place and therefore has no functional meaning.
 
 ### 4.4.1 Activity Types
-Depending on the Activity Type, we obtain involved people in different ways. There are two ways that involved people are specified: 
+Depending on the Activity Type, we obtain involved people in different ways. There are two ways that involved people are specified:
 * you have to go and find out, explicitly
   * Academically-oriented classes use a special enrolments endpoint `GetStandardClassDetails` to find out who's in that class. Such Activities have an Activity Type of `1`. We have to explicitly ask that endpoint who is involved in a particular class.
 
 * it already comes with the payload from `GetSchedule`
   * Every other Activity Type is classified as a non-teaching timetable event and obtain their involved humans via the `attendees` node which already comes with the output of `GetSchedule`.
-  
+
 As per their parent Activity nodes, Activity Instances must also pass a set of criteria before they are imported. Activity Instances must:
 * have a `runningStatus 1` (I've interpreted every other status to mean "not running" and therefore not import)
 * start within a certain threshold of today, e.g. 7 days before today
@@ -170,4 +170,4 @@ These spawn as events for a homepage like you'd make with a Calendar component. 
 If a homepage can't be found via the Folder Code lookup, then it'll create personal events instead. Everyone involved will get a copy of this event in their calendar via records in the `event_user` table.
 
 > This unlocked the ability to share personal events with other people...
- 
+

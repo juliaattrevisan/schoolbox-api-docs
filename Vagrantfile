@@ -152,6 +152,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}' '#{data_source}' '#{extra_hostname}' '#{aws_iam_key}' '#{aws_iam_secret}'"
   end
 
+
+  # Mount package files with ownership that simulates real deployments
+  config.vm.synced_folder ".", "/usr/share/schoolbox", owner: "alaress", group: "alaress"
+
+
   # Mount the puppet directory and execute the puppet hook.
   # This enables us to invoke current environment code for non-current SB versions.
   # This script runs inside vagrant and can access the shared mount at '/tmp/puppet'

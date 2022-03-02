@@ -6,7 +6,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-WD_ROOT="/vagrant"
+WD_ROOT="/usr/share/schoolbox"
 INSTANCE_ID="vagrantx"
 
 # move to application root directory

@@ -41,7 +41,7 @@ Then, pop it into the www directory as test.xml, then run this:
 
 ```
 vagrant ssh
-cd /vagrant/tools/synchronise
+cd /usr/share/schoolbox/tools/synchronise
 php sisImporter.php --perform -vvv --file ../../www/test.xml
 ```
 

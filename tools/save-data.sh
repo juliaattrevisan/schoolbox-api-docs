@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Global const
-readonly CACHE_DIR='/vagrant/vagrantcache';
+readonly CACHE_DIR='/usr/share/schoolbox/vagrantcache';
 readonly BUCKET='schoolbox-data';
-readonly INSTANCE_DATA_DIR='/vagrant/data/vagrantx';  # Location of 'vagrantx' instance data files
+readonly INSTANCE_DATA_DIR='/var/lib/schoolbox/vagrantx';  # Location of 'vagrantx' instance data files
 readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_ERROR=400
@@ -45,7 +45,7 @@ help_msg() {
 stop_services() {
   log "Stopping Services";
   service nginx stop
-  /vagrant/tools/notif/allstop
+  /usr/share/schoolbox/tools/notif/allstop
   find /etc/cron.d -maxdepth 1 -iname 'sbc_*' -type f -delete
 }
 
@@ -53,17 +53,17 @@ stop_services() {
 restart_services() {
   log "Restarting Services";
   service nginx restart
-  /vagrant/tools/notif/allrestart
+  /usr/share/schoolbox/tools/notif/allrestart
   /usr/local/bin/schoolboxcloud-rebuild-cronjobs --is-primary-host 1
 }
 
 # Prepare instance to be archived so it can be deployed to new SB environments
 cleanup_vagrant() {
   log "Reverting vagrant-specific changes";
-  mysql --defaults-extra-file=~/.my.cnf schoolbox < /vagrant/sql/vagrant-cleanup.sql;
+  mysql --defaults-extra-file=~/.my.cnf schoolbox < /usr/share/schoolbox/sql/vagrant-cleanup.sql;
   mysql --defaults-extra-file=~/.my.cnf schoolbox < $CACHE_DIR/vagrant-cleanup-secrets.sql;
   log "Applying data dir sql changes";
-  /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+  /usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
   # These files are not migrated by s3-migration tool, so will cause issues if we use the generated dataset with S3
   log "Deleting invalid 'storage_transform' rows"
@@ -73,10 +73,10 @@ cleanup_vagrant() {
 # Update instance to act like a vagrant development environment
 localise_vagrant() {
   log "Re-localising vagrant"
-  mysql schoolbox < /vagrant/sql/vagrant.sql;
+  mysql schoolbox < /usr/share/schoolbox/sql/vagrant.sql;
   mysql schoolbox < "${CACHE_DIR}"/vagrant-secrets.sql;
   log "Applying data dir sql changes";
-  /vagrant/tools/generate-dir-sql.sh "$INSTANCE_DATA_DIR" | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+  /usr/share/schoolbox/tools/generate-dir-sql.sh "$INSTANCE_DATA_DIR" | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
 # Parse CLI args
@@ -132,7 +132,7 @@ parse_args(){
 
 # Check we are saving data from a stable release point
 check_is_stable(){
-  cd /vagrant || exit 1
+  cd /usr/share/schoolbox || exit 1
   tag=$(git log --oneline --decorate -n 1 | grep -oE 'tag: [0-9a-zA-Z.-]+')
   if [[ -n $tag ]]; then
     echo "Branch HEAD appears to be stable. $tag"
@@ -169,13 +169,13 @@ truncate_instance_registry_table(){
 cleanup_deleted_and_log_files(){
   log "Cleaning data";
   log "Cleaning: deleted files";
-  /vagrant/tools/gc-storage.php $long_verbose -n 10000000 -p;
+  /usr/share/schoolbox/tools/gc-storage.php $long_verbose -n 10000000 -p;
   log "Cleaning: log and cache files";
   rm -f "$long_verbose" "$INSTANCE_DATA_DIR"/*.log{,.gz};
   rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/cache/logs;
   rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/storage/css;
-  /vagrant/tools/clean-cache-dir.sh
-  /vagrant/tools/create-data-dirs.sh "$INSTANCE_DATA_DIR"
+  /usr/share/schoolbox/tools/clean-cache-dir.sh
+  /usr/share/schoolbox/tools/create-data-dirs.sh "$INSTANCE_DATA_DIR"
   log "Cleaning: old sql backups";
   rm -f "$long_verbose" "$INSTANCE_DATA_DIR"/*.sql{,.gz};
 }

@@ -16,7 +16,7 @@ initialdir=`pwd`;
 ## Smoke test runs a setup script first
 "$fullpath"/smoketest-setup.sh
 echo "smoke tests setup"
-cd /vagrant
+cd /usr/share/schoolbox
 echo "cd into vagrant"
 INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 

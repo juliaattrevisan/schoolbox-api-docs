@@ -36,9 +36,9 @@ class EotcReminders extends AbstractNotificationTest
     public function prepare()
     {
         // fear not - you are sudo
-        `mysql schoolbox < /vagrant/sql/custom/stkentigern/eotc-initial.sql 2>&1`;
+        `mysql schoolbox < /usr/share/schoolbox/sql/custom/stkentigern/eotc-initial.sql 2>&1`;
         $this->log->notice('EOTC Initial applied');
-        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        `mysql schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1`;
         $this->log->notice('Weapons to maximum');
         $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
         `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;

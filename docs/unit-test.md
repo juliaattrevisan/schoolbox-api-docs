@@ -10,11 +10,11 @@ But whatever tests we _do_ have need to be passing.
 To run tests in your vagrant, it's as simple as
 ```bash
 $ vagrant ssh
-$ cd /vagrant
+$ cd /usr/share/schoolbox
 $ vendor/bin/phpunit
 ```
 
-This will run all the tests and provide you the report. 
+This will run all the tests and provide you the report.
 
 ### In PHPStorm
 
@@ -40,10 +40,10 @@ but here's an outline of the steps you need to undertake to make it work:
 6. Select your vagrant Interpreter and click **Ok**
 7. In the **PHPUnit library** section:
     * Select **Use Composer autoloader**
-    * Path to script: `/vagrant/vendor/autoload.php`
+    * Path to script: `/usr/share/schoolbox/vendor/autoload.php`
 8. In the **Test Runner** section:
-    * Default configuration file: `/vagrant/phpunit.xml`
-    * Default bootstrap file: `/vagrant/test/bootstrap/unit.php`
+    * Default configuration file: `/usr/share/schoolbox/phpunit.xml`
+    * Default bootstrap file: `/usr/share/schoolbox/test/bootstrap/unit.php`
 9. Click **Ok** - you're now configured ready to go!
 
 From here, you can now open a test file, right-click and select **Run...** -

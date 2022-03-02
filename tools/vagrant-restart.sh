@@ -9,16 +9,16 @@ fi
 # Override vagrant's network configuration with this host's network config
 /etc/init.d/procps restart
 
-# wait for /vagrant to mount correctly
+# wait for /usr/share/schoolbox to mount correctly
 for i in {1..60};
 do
-    if [ -f "/vagrant/tools/notif/syscheck.php" ];
+    if [ -f "/usr/share/schoolbox/tools/notif/syscheck.php" ];
     then
         break;
     fi
     sleep 1;
 done
-if [ -f "/vagrant/tools/notif/syscheck.php" ];
+if [ -f "/usr/share/schoolbox/tools/notif/syscheck.php" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Restarting daemons in background";
     sleep 5 && service schoolbox-cloud-socketd@vagrantx restart &
@@ -26,14 +26,14 @@ then
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
 else
-    echo "Unable to locate: /vagrant/tools/notif/syscheck.php";
+    echo "Unable to locate: /usr/share/schoolbox/tools/notif/syscheck.php";
 fi
 
 # Need to read the actual run-time value, rather than puppet-configured value, as it's possible to
 # `vagrant up` without a `vagrant provision` so the puppet value may not have yet been applied
 rabbitmq_management_port=$(rabbitmqctl status | grep -Eo "http,[0-9]+" | awk -F',' '{ print $2 }')
 
-# This will fail to start when VM booted because /vagrant may not yet be mounted
+# This will fail to start when VM booted because /usr/share/schoolbox may not yet be mounted
 eval "service php${primary_php_majver}-fpm restart"
 
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;

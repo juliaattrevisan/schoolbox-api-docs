@@ -12,7 +12,7 @@ All Codeception acceptance tests go in this folder.
         phantomjs/ # created by phantomjs-server.sh
         phantomjs-server.sh
     *Cest.php # individual test scenarios
-    
+
 
 ## Running tests
 
@@ -20,12 +20,12 @@ These tests are currently configured to run within Schoolbox's Vagrant box.
 The acceptance tests are configured to automatically start chromedriver
 (the web driver for Chrome Headless).
 
-If the tests do not run properly due to compatibility of chrome driver with 
+If the tests do not run properly due to compatibility of chrome driver with
 your version of google chrome try updating the chromedriver with the one that
 vagrant downloads in its vendor folder.
 
-    cd /vagrant
-    sudo cp -f /vagrant/vendor/bin/chromedriver /usr/bin/chromedriver
+    cd /usr/share/schoolbox
+    sudo cp -f /usr/share/schoolbox/vendor/bin/chromedriver /usr/bin/chromedriver
 
 ### Configuration
 
@@ -49,7 +49,7 @@ file is in `.gitignore`, so should not be committed to the base repository.
 To run the Codeception tests:
 
     vagrant ssh
-    cd /vagrant
+    cd /usr/share/schoolbox
     ./vendor/bin/codecept run --steps
 
 To run a single test, provide the suite (`acceptance`) and the test file name,

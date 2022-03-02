@@ -242,7 +242,7 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function weaponsToMaximum()
     {
-        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        `mysql schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1`;
         $this->log->notice('Weapons to maximum');
     }
 

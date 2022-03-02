@@ -27,7 +27,7 @@ The tests require you to have provisioned the `sales` dataset.
 So to run all the smoke tests:
 
     vagrant ssh
-    cd /vagrant
+    cd /usr/share/schoolbox
     ./vendor/bin/codecept run --steps smoketests
 
 To run a specific test:

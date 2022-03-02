@@ -1,6 +1,6 @@
 #!/bin/bash
 # Pass any shell command from vagrant host to vagrant guest command line.
-# Command runs in /vagrant/ directory.
+# Command runs in /usr/share/schoolbox/ directory.
 #
 # Usage:
 #       tools/passthru.sh [command]
@@ -12,7 +12,7 @@ ssh_config=`vagrant ssh-config 2>/dev/null`
 if [ -n "$ssh_config" ]
 then
 	echo "Passing command \"$*\" through to Vagrant box."
-	vagrant ssh-config | ssh default -q -F /dev/stdin "cd /vagrant/; $*"
+	vagrant ssh-config | ssh default -q -F /dev/stdin "cd /usr/share/schoolbox/; $*"
 else
 	echo "This is either inside a Vagrant box, or no Vagrant box is available in this directory." >&2
 	exit 1

@@ -19,7 +19,7 @@ readonly L_ERROR=400
 # Global vars
 declare verbose=0
 declare single_instance_mode=0
-declare site_root              # No trailing slash, eg '/vagrant'
+declare site_root              # No trailing slash, eg '/usr/share/schoolbox'
 declare is_primary_host        # One of [0|1]
 declare instance_list          # Set of instances for this host
 declare socketd_ports          # Use these if provided, otherwise fetch from IR. Eg '--socketd-ports vagrantx:9081'

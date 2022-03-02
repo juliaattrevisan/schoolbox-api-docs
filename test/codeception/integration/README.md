@@ -5,22 +5,22 @@ All Codeception integration tests go in this folder. Smoke tests also live here 
 
 ## Structure
 
-Same as the structure in acceptance tests, you can see it here: 
+Same as the structure in acceptance tests, you can see it here:
 [Acceptance Tests](../acceptance/README.md).
 
 Smoke tests currently live in SmokeTests/
 
 ## Running tests
 
-All tests run with a PHP browser, CLI module and DB connection modules. 
+All tests run with a PHP browser, CLI module and DB connection modules.
 The PHPbrowser is basically a webdriver without the front end. So it cannot test java.
 
-The smoke tests do not even hit the PHP browser interface they instead use the curl client underneath. 
+The smoke tests do not even hit the PHP browser interface they instead use the curl client underneath.
 This is to increase the speed of tests.
 
 ### Configuration
 
-Same as acceptance tests as they are all based on the same framework. 
+Same as acceptance tests as they are all based on the same framework.
 Found in documentation here: [Acceptance Tests](../acceptance/README.md).
 
 
@@ -31,12 +31,12 @@ Currently at the moment (13/11/2019) this is what is covered by the tests. For t
 * Get requests
     * full list of URLs being tested and combinations are in this csv: [./_data/SmokeTests/GetSmokeTestList.csv](../_data/SmokeTests/GetSmokeTestList.csv)
 * Group and Homepage Assessment
-    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric true 
+    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric true
        * Create
        * Update
        * Submit on behalf of student
        * Mark
-    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric false 
+    * Create assessment with no self reflection, no online submission, published, weight >0, use rubric false
        * Create
        * Update
        * Submit on behalf of student
@@ -88,17 +88,17 @@ Currently at the moment (13/11/2019) this is what is covered by the tests. For t
        * Modify
        * Duplicate
        * Comment Private
-       * Comment Public 
+       * Comment Public
 
 ### Codeception test
 
-To run integration tests, like acceptance tests, you call codeception, 
+To run integration tests, like acceptance tests, you call codeception,
 select the suite to be integration and then select the test you are after.
 
 So to run all the integration tests:
 
     vagrant ssh
-    cd /vagrant
+    cd /usr/share/schoolbox
     ./vendor/bin/codecept run --steps integration
 
 To run a specific test:
@@ -149,4 +149,4 @@ eg.
         $loginPayload->setUsername("fred");
         $loginPayload->setPassword("fredHasAPassword");
         $i->sendCurlRequest($loginPayload, false, "Some message about the action we just took");
-        
+

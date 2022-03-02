@@ -25,7 +25,7 @@ then
 		# Output nothing if passing thru, we just want to get the school name.
 		echo "Passing command through to Vagrant box"
 	fi
-	vagrant ssh-config | ssh default -q -F /dev/stdin "/vagrant/tools/school.sh $*"
+	vagrant ssh-config | ssh default -q -F /dev/stdin "/usr/share/schoolbox/tools/school.sh $*"
 else
 	# Yoinked out of update-sql.sh, thanks Sam
 	filepath=`readlink -f $0`;
