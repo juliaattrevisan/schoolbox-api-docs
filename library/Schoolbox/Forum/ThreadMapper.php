@@ -263,16 +263,31 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
          * where this checks if there actually are results
          */
         $statement = $this->database->prepare("
-        SELECT ci.id
-        FROM component_instance ci
-            JOIN component_definition cd
-                ON ci.`component_definition_id`=cd.`id`
-        WHERE class = 'Component_Homepage_ForumListController'
-          AND ci.module = 'homepage'
-          AND identifier = ?
+
+SELECT
+    `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
+FROM        `component_instance`
+                INNER JOIN  `component_definition` `cd` ON
+        `component_instance`.`component_definition_id` = `cd`.`id`
+                LEFT JOIN   `component_config_definition` `ccd` ON
+        `cd`.`id` = `ccd`.`component_definition_id`
+                LEFT JOIN   `component_config_instance` `cci` ON
+            `ccd`.`id` = `cci`.`component_config_definition_id` AND
+            `cci`.`component_instance_id` = `component_instance`.`id`
+
+WHERE
+      `ccd`.`label` = 'Source'
+AND
+        (`component_instance`.`identifier` = :id1 AND `cci`.`value` is null)
+OR
+        (`component_instance`.`identifier` != :id2 AND `cci`.`value` = :id3)
         ");
 
-        $statement->execute(array($folderID));
+        $statement->execute(array(
+            'id1' => $folderID,
+            'id2' => $folderID,
+            'id3' => $folderID,
+                            ));
 
         if (($row = $statement->fetch()) !== false) {
             return true;
