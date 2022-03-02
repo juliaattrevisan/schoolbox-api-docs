@@ -103,19 +103,23 @@ class Mapper extends BaseMapper
             $viewerEmail = empty($viewer->getEmail()) ? '' : $viewer->getEmail();
             $vieweeExternalId = empty($viewee->getExternalId()) ? '' : $viewee->getExternalId();
             $viewerExternalId = empty($viewer->getExternalId()) ? '' : $viewer->getExternalId();
+            $vieweeLastName = empty($viewee->getLastName()) ? '' : $viewee->getLastName();
+            $viewerLastName = empty($viewer->getLastName()) ? '' : $viewer->getLastName();
+            $vieweeFirstName = empty($viewee->getFirstName()) ? '' : $viewee->getFirstName();
+            $viewerFirstName = empty($viewer->getFirstName()) ? '' : $viewer->getFirstName();
 
             $array_replace = [
                 \urlencode((string)$viewee->getId()),
                 \urlencode($vieweeExternalId),
                 \urlencode($viewee->getUsername()),
-                \urlencode($viewee->getFirstname()),
-                \urlencode($viewee->getLastname()),
+                \urlencode($vieweeFirstName),
+                \urlencode($vieweeLastName),
                 \urlencode($vieweeEmail),
                 \urlencode((string)$viewer->getId()),
                 \urlencode($viewerExternalId),
                 \urlencode($viewer->getUsername()),
-                \urlencode($viewer->getFirstname()),
-                \urlencode($viewer->getLastname()),
+                \urlencode($viewerFirstName),
+                \urlencode($viewerLastName),
                 \urlencode($viewerEmail)
             ];
 
