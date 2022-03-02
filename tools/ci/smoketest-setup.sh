@@ -1,17 +1,17 @@
 #!/bin/bash
 
 ## Initial directory is where all the resources that are linked are included so save it for later use.
-initialdir=`pwd`;                       # eg "/tmp/build/6963e648"
-filepath=`readlink -f $0`;              # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci/smoketest-setup.sh"
+initialdir=$(pwd);                      # eg "/tmp/build/6963e648"
+filepath=$(readlink -f "$0");           # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci/smoketest-setup.sh"
 fullpath=${filepath%/*}                 # eg "/tmp/build/6963e648/schoolbox-pr/tools/ci"
 repo_dir=$(realpath "$fullpath"/../..)  # eg "/tmp/build/6963e648/schoolbox-pr"
 
 readonly instance_id="smoketest"
-PHP_VERSION=$1
+readonly instance_data_dir=/var/lib/schoolbox/$instance_id
 
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
-tar xzfv qa-container-config/qa-container-config.tar.gz
+tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
@@ -22,13 +22,13 @@ PHP_SERVICE="php7.4-fpm"
 service mariadb start
 
 ## Initialise database
-mariadb -e "create database schoolbox;"
-mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
-mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
+mariadb -e "CREATE DATABASE schoolbox;"
+mariadb -e "CREATE USER 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
+mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
-mysql schoolbox < $initialdir/data/schoolbox.sql
+mysql schoolbox < "$initialdir"/data/schoolbox.sql
 mysql schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
 mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
 
@@ -37,28 +37,18 @@ mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('
 mkdir -p /usr/share/schoolbox
 mkdir -p /mnt/data/php_tmp
 mkdir -p /var/log/schoolbox/"$instance_id"
-mkdir -p /var/lib/schoolbox/"$instance_id"
+mkdir -p $instance_data_dir
 chmod 777 /mnt/data/php_tmp
-
-# TODO Remove debugging
-echo "initialdir: $initialdir"
-echo "filepath: $filepath"
-echo "fullpath: $fullpath"
-echo "repo_dir: $repo_dir"
-ls -la /usr/share/schoolbox
-ls -la "$initialdir"
-ls -la "$initialdir"/qa-container-config/configfiles
-# TODO end debugging
 
 ## Move our specific config items into the correct folders
 cp -rf "$repo_dir"/* /usr/share/schoolbox
-cp -f "$initialdir"/qa-container-config/configfiles/dhparams.pem /etc/dhparams.pem
-cp -rf "$initialdir"/qa-container-config/configfiles/nginx/* /etc/nginx
-cp -f "$initialdir"/qa-container-config/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
-cp -rf "$initialdir"/qa-container-config/configfiles/php/7.4/fpm/* $CONFIG_DIR
-cp -f "$initialdir"/qa-container-config/configfiles/redis/redis.conf /etc/redis/redis.conf
-cp -rf "$initialdir"/data/* /var/lib/schoolbox/$instance_id
-cp -rf "$initialdir"/qa-container-config/configfiles/bin/* /usr/local/bin
+cp -f "$initialdir"/configfiles/dhparams.pem /etc/dhparams.pem
+cp -rf "$initialdir"/configfiles/nginx/* /etc/nginx
+cp -f "$initialdir"/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
+cp -rf "$initialdir"/configfiles/php/7.4/fpm/* $CONFIG_DIR
+cp -f "$initialdir"/configfiles/redis/redis.conf /etc/redis/redis.conf
+cp -rf "$initialdir"/data/* $instance_data_dir
+cp -rf "$initialdir"/configfiles/bin/* /usr/local/bin
 
 ## Go to repository to initialise npm and composer
 cd /usr/share/schoolbox
@@ -70,13 +60,13 @@ cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
 export INSTANCE_ID="$instance_id"
 
 ## Extract the NPM build
-tar xzf $initialdir/assets-artifact/*-assets.tar.gz;
+tar xzf "$initialdir"/assets-artifact/*-assets.tar.gz;
 
 ## Extract the develop vendor build
-tar xzf $initialdir/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
+tar xzf "$initialdir"/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
-chmod 777 -R /var/lib/schoolbox/*
+chmod 777 -R $instance_data_dir
 
 ## Push out a dns record to the hosts file to ensure all the linkage works properly
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
@@ -94,15 +84,13 @@ echo 'started redis-server'
 service mariadb start
 echo 'started mariadb'
 
-## Go to the tools and update the db to be the latest version.
-cd /usr/share/schoolbox/tools
-
-./build-sql-update.sh
-./update-sql-nocheck.sh
+# Set data dirs in config table + run upgrade scripts
+tools/generate-dir-sql-dynamically.sh $instance_data_dir | mysql schoolbox
+tools/update-sql-nocheck.sh
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance
 # (ensure this happens after all updates happen)
 mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 
 ## Finish where we started.
-cd $initialdir
+cd "$initialdir"
