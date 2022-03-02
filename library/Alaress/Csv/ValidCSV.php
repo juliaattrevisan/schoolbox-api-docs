@@ -64,10 +64,10 @@ class ValidCSV
     {
         try {
             $this->hasBOM();
+            //if it has bom, it will error, if it does not, rewind...
+            rewind($this->fp);
             return $this->fp;
         } catch (\UnexpectedValueException $e) {
-            rewind($this->fp);
-
             return $this->fp;
         }
     }

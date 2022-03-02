@@ -173,10 +173,8 @@ class Reader implements \Iterator
     {
         $this->cleanup();
         if (!is_resource($this->fp)) {
-            $this->fp = fopen($this->filename, 'r');
-            $this->validCSVHelper = new ValidCSV($this->fp);
+            $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
         }
-        $this->fp = $this->validCSVHelper->skipBom();
 
         // Am I loading the column list from the first column?
         // If so, load that and set it as the column list.
