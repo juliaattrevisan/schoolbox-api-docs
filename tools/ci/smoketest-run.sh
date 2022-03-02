@@ -24,6 +24,8 @@ smokeTestResult=$?;
 
 # TODO remove debug. Dump first 10 failures
 echo "TODO. remove debug."
+tree /var/log
+cat /var/log/php-fpm/schoolbox_php_error.log
 ls -la /usr/share/schoolbox/test/codeception/_output/*.fail.html | head -n 10
 for file in $(find /usr/share/schoolbox/test/codeception/_output/ -name '*fail.html' | head -n 10); do cat "$file"; done
 
