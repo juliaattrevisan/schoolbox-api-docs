@@ -5,7 +5,7 @@
 #   the locations of the template and data directories.
 #   The result is sent to STDOUT
 # Usage:
-#   generate-data-dir-sql.sh [INSTANCE_DATA_DIR]
+#   generate-dir-sql.sh [INSTANCE_DATA_DIR]
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2020, Schoolbox Pty Ltd
