@@ -3,19 +3,18 @@
  * contains common code that can be shared between all implementations.
  */
 
-import { mapState } from 'vuex';
-import { ADD_ROW } from '../store/adminListMutationTypes';
+ import { mapState, mapActions } from 'pinia';
+ import { useAdminListStore } from '../store/adminListStore';
 
 export default {
 
     computed: {
-        ...mapState({
-            loadedData: state => state.loadedData,
-            rows: state => state.rows,
-        }),
+        ...mapState(useAdminListStore, ['loadedData', 'rows']),
     },
  
     methods: {
+
+        ...mapActions(useAdminListStore, ['addRow']),
 
         /**
          * Push in a new row, retrieving the default value for each property and 
@@ -35,7 +34,7 @@ export default {
             newRow.sequence = this.getNextSequence();
             newRow.id = this.getNextId(),
             newRow.isNew = true;
-            this.$store.commit(ADD_ROW, newRow);
+            this.addRow(newRow);
         },
 
         /**

@@ -1,9 +1,9 @@
 import { createApp } from 'vue';
-import store from './store/adminListStore'
+import { createPinia } from 'pinia'
 import AdminList from './admin-list';
 
 createApp({
 	components: {
 		AdminList
     }
-}).use(store).mount('#admin-list');
+}).use(createPinia()).mount('#admin-list');

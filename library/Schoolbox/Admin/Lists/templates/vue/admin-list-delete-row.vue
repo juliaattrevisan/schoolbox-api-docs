@@ -5,10 +5,10 @@
  * or via a confirmation modal when the row is already in the DB
  */
 
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from './store/adminListStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import Toast from '@schoolboxVue/components/toast';
-import { DELETE_ROW_CONFIRMED, DELETE_ROW_CANCELLED } from './store/adminListMutationTypes';
 
 export default {
     
@@ -26,11 +26,7 @@ export default {
 
     computed: {
 
-        ...mapState({
-            loadedData: state => state.loadedData,
-            rows: state => state.rows,
-            rowToDelete: state => state.rowToDelete,
-        }),
+        ...mapState(useAdminListStore, ['loadedData', 'rows', 'rowToDelete']),
 
     },
 
@@ -39,7 +35,7 @@ export default {
         rowToDelete (newValue) {
             if (newValue && newValue.isNew) { //hasn't been placed in the DB yet, so no need to confirm its removal
                 const rowToRemove = this.rows.find((row) => row.id === newValue.id);
-                this.$store.commit(DELETE_ROW_CONFIRMED, rowToRemove);
+                this.deleteRowConfirmed(rowToRemove);
             } else if (newValue) { //otherwise open up the modal to confirm or cancel
                 this.$refs.deleteModal.open();
             }
@@ -48,6 +44,8 @@ export default {
     },
 
     methods: {
+
+        ...mapActions(useAdminListStore, ['deleteRowConfirmed', 'deleteRowCancelled']),
 
         /**
          * Notify the DB and pull out the selectedRow
@@ -63,7 +61,7 @@ export default {
                 const responseData = await response.json();
                 if (responseData.result !== false) {
                     const deletedRow = this.rows.find((row) => row.id === this.rowToDelete.id);
-                    this.$store.commit(DELETE_ROW_CONFIRMED, deletedRow);
+                    this.deleteRowConfirmed(deletedRow);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to delete', false, 2000);
@@ -93,7 +91,7 @@ export default {
          */
         onCancelDeleteRowSelected () {
             this.$refs.deleteModal.close();
-            this.$store.commit(DELETE_ROW_CANCELLED, this.row);
+            this.deleteRowCancelled();
         },
 
     }

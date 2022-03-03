@@ -5,15 +5,15 @@
  *
  */
 
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useAdminListStore } from './store/adminListStore';
 import addRow from './mixins/mixinAdminListAddRow';
+
 
 export default {
 
     computed: {
-        ...mapState({
-            isProcessing: state => state.isProcessing,
-        })
+        ...mapState(useAdminListStore, ['isProcessing'])
     },
 
     mixins: [

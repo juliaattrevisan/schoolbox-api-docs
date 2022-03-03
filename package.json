@@ -37,6 +37,7 @@
     "lodash": "4.17.21",
     "magnific-popup": "1.0.0",
     "mediaelement": "4.2.16",
+    "pinia": "^2.0.11",
     "qrcode.vue": "^3.3.3",
     "qs": "^6.9.6",
     "spectrum-colorpicker": "1.6.0",
@@ -48,8 +49,7 @@
     "vue": "^3.2.31",
     "vue-select": "^4.0.0-beta.3",
     "vue3-resize": "^0.2.0",
-    "vuejs-paginate": "^2.1.0",
-    "vuex": "^4.0.2"
+    "vuejs-paginate": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

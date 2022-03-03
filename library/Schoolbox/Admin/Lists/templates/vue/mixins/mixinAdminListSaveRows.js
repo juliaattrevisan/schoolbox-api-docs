@@ -2,8 +2,8 @@
  * To save the rows data to the db, used by both admin-list.vue and admin-list-pop-out.vue
  */
 
-import { mapState } from 'vuex';
-import { UPDATE_SEQUENCE } from '../store/adminListMutationTypes';
+ import { mapState, mapActions } from 'pinia';
+ import { useAdminListStore } from '../store/adminListStore';
  
 export default {
     
@@ -15,13 +15,12 @@ export default {
     },
 
     computed: {
-        ...mapState({
-            loadedData: state => state.loadedData,
-            rows: state => state.rows
-        }),
+        ...mapState(useAdminListStore, ['loadedData', 'rows']),
     },
   
     methods: {
+
+        ...mapActions(useAdminListStore, ['updateSequence', 'deleteRowCancelled']),
 
         /**
          * Save all data
@@ -66,7 +65,7 @@ export default {
             Array.from(allRowElements).forEach((rowElement) => { //loop through each row in order to set the latest correct sequence
                 newSequenceList.push(rowElement.dataset.rowId);
             });
-            this.$store.commit(UPDATE_SEQUENCE, newSequenceList);
+            this.updateSequence(newSequenceList);
         },
 
         /**

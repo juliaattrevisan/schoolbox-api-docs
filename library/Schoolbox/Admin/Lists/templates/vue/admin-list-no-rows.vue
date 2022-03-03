@@ -5,7 +5,8 @@
  *
  */
 
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useAdminListStore } from './store/adminListStore'
 import mixinAddRow from './mixins/mixinAdminListAddRow';
 
 export default {
@@ -15,9 +16,7 @@ export default {
     ],
 
     computed: {
-        ...mapState({
-            loadedData: state => state.loadedData,
-        }),
+        ...mapState(useAdminListStore, ['loadedData']),
     }
 
 }

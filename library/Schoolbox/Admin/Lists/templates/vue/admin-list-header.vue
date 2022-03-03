@@ -5,20 +5,18 @@
  *
  */
 
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'pinia';
+import { useAdminListStore } from './store/adminListStore'
 
 export default {
 
     computed: {
 
-        ...mapState({
+        ...mapState(useAdminListStore, {
             isSortable: state => state.loadedData.isSortable, //allows space for the drag/n drop UI
             canDelete: state => state.loadedData.canDelete, //allows space for the delete UI
+            headerFields: state => state.headerFields, //allows space for the delete UI
         }),
-        
-        ...mapGetters([
-            'headerFields'
-        ])
         
     }
 

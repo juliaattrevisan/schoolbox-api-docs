@@ -1,21 +1,18 @@
 
-import { createStore } from 'vuex'
+import { defineStore } from 'pinia'
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
-import { UPDATE_LOADED_DATA, UPDATE_SELECTED_ROW, UPDATE_SELECTED_POP_OUT_NAME,
-         ADD_ROW, DELETE_ROW_PROMPT, DELETE_ROW_CONFIRMED, DELETE_ROW_CANCELLED,
-         OPEN_POP_UP, CLOSE_POP_UP, UPDATE_SEQUENCE } from './adminListMutationTypes';
 
-export default createStore({
+export const useAdminListStore = defineStore('main', {
 
-    state: {
+    state: () => ({
         loadedData: null, //contains the loaded data
         rows: [], //to display and possibly edit the rows 
         selectedRow: {}, //to track which row is selected
         rowToDelete: {}, //to track which row could be deleted
         isPopOutOpen: false, //to open and close the list
         selectedPopOutName: '', //to highlight all other rows that have that permission
-    },
+    }),
 
     getters: {
 
@@ -24,7 +21,7 @@ export default createStore({
          * 
          * @returns { Array of Objects }
          */
-        headerFields: (state) => {
+        headerFields (state) {
             return state.loadedData.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
         },
 
@@ -34,108 +31,108 @@ export default createStore({
          * 
          * @returns { Object }
          */
-        popOutHeaderField: (state, getters) => {
-            const popOutHeaderField = getters.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
+        popOutHeaderField () {
+            const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
             if (typeof popOutHeaderField !== 'undefined') {
                 return popOutHeaderField;
             } 
             return {};
-        }, 
+        },
         
         /**
          * Just those fields that are used in a popoutList
          * 
          * @returns { Array of Objects }
          */
-        popOutFields: (state) => {
+        popOutFields (state) {
             return state.loadedData.fields.filter((field) => field.popOutList);
         }, 
 
     },
 
-    mutations: {
+    actions: {
 
         /**
          * The requested data is loaded from the backend
          */
-        [UPDATE_LOADED_DATA] (state, loadedData) {
-            state.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
-            const loadedRows = cloneDeep(state.loadedData.rows); //cloneDeep is from underscore.js
+        updateLoadedData (loadedData) {
+            this.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
+            const loadedRows = cloneDeep(this.loadedData.rows); //cloneDeep is from underscore.js
             const sortedRows = orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
             sortedRows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
-            state.rows = sortedRows;
+            this.rows = sortedRows;
         },
 
         /**
          * Can be choosen by opening the pop out
          */
-        [UPDATE_SELECTED_ROW] (state, row) {
-            state.selectedRow = row;
-            state.selectedPopOutName = '';
+        updateSelectedRow (row) {
+            this.selectedRow = row;
+            this.selectedPopOutName = '';
         },
 
         /**
          * To highlight all rows which also have the same pop out option
          * for an easier visual way to check which rows have the same pop out option
          */
-         [UPDATE_SELECTED_POP_OUT_NAME] (state, popOutName) {
-            if (state.selectedPopOutName === popOutName) { //so can toggle on/off
-                state.selectedPopOutName = '';
+         updateSelectedPopOutName (popOutName) {
+            if (this.selectedPopOutName === popOutName) { //so can toggle on/off
+                this.selectedPopOutName = '';
             } else {
-                state.selectedPopOutName = popOutName;
+                this.selectedPopOutName = popOutName;
             }
         },
 
         /**
          * Add a row
          */
-        [ADD_ROW] (state, row) {
-            state.rows = [...state.rows, row];
+        addRow (row) {
+            this.rows = [...this.rows, row];
         },
 
         /**
          * Provide a prompt to confirm deletion of row
          */
-        [DELETE_ROW_PROMPT] (state, rowToDelete) {
-            state.rowToDelete = rowToDelete;
+        deleteRowPrompt (rowToDelete) {
+            this.rowToDelete = rowToDelete;
         },
 
         /**
          * Now the row is deleted, remove it from the rows list
          */
-        [DELETE_ROW_CONFIRMED] (state, rowToDelete) {
-            state.rows = state.rows.filter((row) => row.id !== rowToDelete.id);
+        deleteRowConfirmed (rowToDelete) {
+            this.rows = this.rows.filter((row) => row.id !== rowToDelete.id);
         },
 
         /**
          * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete 
          */
-        [DELETE_ROW_CANCELLED] (state, rowToDelete) {
-            state.rowToDelete = null;
+        deleteRowCancelled () {
+            this.rowToDelete = null;
         },
 
         /**
          * Display the options within the pop out
          */
-        [OPEN_POP_UP] (state, row) {
-            state.selectedRow = row;
-            state.isPopOutOpen = true;
-            state.selectedPopOutName = '';
+        openPopUp (row) {
+            this.selectedRow = row;
+            this.isPopOutOpen = true;
+            this.selectedPopOutName = '';
         },
 
         /**
          * Close the pop out
          */
-        [CLOSE_POP_UP] (state) {
-            state.isPopOutOpen = false;
+        closePopUp () {
+            this.isPopOutOpen = false;
         },
 
         /**
          * Ensure the latest sorted order is saved to the DB
          */
-         [UPDATE_SEQUENCE] (state, sequenceList) {
+        updateSequence (sequenceList) {
             sequenceList.forEach((item, index) => {
-                const matchingRowData = state.rows.find((row) => Number(row.id) === Number(item)); //get the row data matched to the current row DOM element
+                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(item)); //get the row data matched to the current row DOM element
                 matchingRowData.sequence = ++index;
             });
         },

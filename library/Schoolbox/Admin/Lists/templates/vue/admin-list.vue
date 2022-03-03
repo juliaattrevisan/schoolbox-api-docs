@@ -5,7 +5,8 @@
  *
  */
 
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from './store/adminListStore'
 import { gsap } from 'gsap/all'
 import AdminListHeader from './admin-list-header';
 import AdminListPopOut from './admin-list-pop-out';
@@ -15,7 +16,6 @@ import AdminListAddRow from './admin-list-add-row';
 import AdminListDeleteRow from './admin-list-delete-row';
 import saveRows from './mixins/mixinAdminListSaveRows';
 import Toast from '@schoolboxVue/components/toast';
-import { UPDATE_LOADED_DATA } from './store/adminListMutationTypes';
 
 
 export default {
@@ -51,16 +51,7 @@ export default {
 
     computed: {
 
-        ...mapState({
-            loadedData: state => state.loadedData,
-            rows: state => state.rows,
-            selectedRow: state => state.selectedRow,
-            isPopOutOpen: state => state.isPopOutOpen,
-        }),
-
-        ...mapGetters([
-            'headerFields'
-        ]), 
+        ...mapState(useAdminListStore, ['loadedData', 'rows', 'selectedRow', 'isPopOutOpen', 'headerFields']),
 
         /**
          * Whether the admin-list-pop-out.vue is requred
@@ -91,6 +82,8 @@ export default {
 
     methods: {
 
+        ...mapActions(useAdminListStore, ['updateLoadedData']),
+
         /**
          * Load the list data relevant to the current list
          */
@@ -98,7 +91,7 @@ export default {
             try {
                 const response = await fetch(`/adminv2/lists/data/${this.tableName}`);
                 const responseData = await response.json();
-                this.$store.commit(UPDATE_LOADED_DATA, responseData);
+                this.updateLoadedData(responseData);
             } catch (error) {
                 console.warn(error);
                 this.hasDataLoadError = true; //show load error
@@ -232,7 +225,7 @@ export default {
 
                 </transition>    
 
-            </div><!-- small-12 island -->  
+            </div>  
 
             <toast ref="toast"></toast>
 
@@ -241,7 +234,7 @@ export default {
                 :table-name="tableName" 
             />
 
-        </div><!-- v-if="isDataLoaded" -->
+        </div>
 
         <div v-else-if="hasDataLoadError">
             <div class="small-12 island">

@@ -4,11 +4,11 @@
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from '../store/adminListStore';
 import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
 import AdminListRowPopOut from './admin-list-row-pop-out';
-import { DELETE_ROW_PROMPT } from '../store/adminListMutationTypes';
 
 export default {
 
@@ -27,19 +27,16 @@ export default {
 
     computed: {
 
-        ...mapState({
+        ...mapState(useAdminListStore, {
             isSortable: state => state.loadedData.isSortable,
             canDelete: state => state.loadedData.canDelete,
             selectedRow: state => state.selectedRow,
             isPopOutOpen: state => state.isPopOutOpen,
             selectedPopOutName: state => state.selectedPopOutName,
+            headerFields: state => state.headerFields, //the headerFields to display within the list item
+            popOutHeaderField: state => state.popOutHeaderField,  //the title field of the pop out
+            popOutFields: state => state.popOutFields, //when a #admin-list-pop-out.vue is in use
         }),
-
-        ...mapGetters([
-            'headerFields', //the headerFields to display within the list item
-            'popOutHeaderField', //the title field of the pop out
-            'popOutFields', //when a #admin-list-pop-out.vue is in use
-        ]),
 
         /**
          * To retrieve a list of key/value pairs contained within the row object
@@ -63,25 +60,18 @@ export default {
             return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-        message: {
-            get () {
-                return this.$store.state.obj.message
-            },
-            set (value) {
-                this.$store.commit('updateMessage', value)
-            }
-        }
-
     },
 
     methods: {
+
+        ...mapActions(useAdminListStore, ['deleteRowPrompt']),
 
         /**
          * To confirm whether should delete the row
          */
         onDeleteRowSelected () {
-            this.$store.commit(DELETE_ROW_PROMPT, this.row);
-        }
+            this.deleteRowPrompt(this.row);
+        },
 
     }
 
