@@ -32,9 +32,17 @@ class Scrub
     /**
      * Singleton CommonMark instance used by this class in `linkifyText`.
      *
-     * @var CommonMark\MarkdownConverterInterface
+     * @var CommonMark\MarkdownConverterInterface|null
      */
-    private static $markdownConverter;
+    private static ?CommonMark\MarkdownConverterInterface $linkifyConverter = null;
+
+
+    /**
+     * Singleton CommonMark instance used by this class in `markdown`.
+     *
+     * @var CommonMark\MarkdownConverterInterface|null
+     */
+    private static ?CommonMark\MarkdownConverterInterface $markdownConverter = null;
 
 
     /**
@@ -372,7 +380,7 @@ class Scrub
      */
     private static function getLinkifyingMarkdownConverter(): CommonMark\MarkdownConverterInterface
     {
-        if (!self::$markdownConverter instanceof CommonMark\MarkdownConverterInterface) {
+        if (!self::$linkifyConverter instanceof CommonMark\MarkdownConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
@@ -383,9 +391,9 @@ class Scrub
             // Need to add InlinesOnly, as adding only Autolink causes an error
             $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
             $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
-            self::$markdownConverter = new CommonMark\MarkdownConverter($environment);
+            self::$linkifyConverter = new CommonMark\MarkdownConverter($environment);
         }
-        return self::$markdownConverter;
+        return self::$linkifyConverter;
     }
 
 
