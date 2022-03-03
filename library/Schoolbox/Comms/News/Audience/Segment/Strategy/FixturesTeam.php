@@ -152,7 +152,7 @@ class FixturesTeam extends SimpleStrategy
             AND st.deleted_at IS NULL
         ";
 
-        return $this->db->executeQuery($query)->fetchAll(\PDO::FETCH_COLUMN);
+        return $this->db->executeQuery($query, $bindings->getParams())->fetchAll(\PDO::FETCH_COLUMN);
     }
 
 
