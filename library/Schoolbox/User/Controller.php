@@ -211,11 +211,30 @@ class Controller extends Base
             return; //exit early the user is part of the group.
         }
 
-        $users_groups = $this->groupsHelper->getAllGroups($user);
+        $users_groups = $this->groupsHelper->getCurrentGroups($user);
+        $apiGroups = [];
+        foreach ($users_groups as $group) {
+            $membership = 'read';
+            if ($group['isAccessWrite']) {
+                $membership = 'write';
+            } elseif ($group['isAccessAdmin']) {
+                $membership = 'admin';
+            }
+            $apiGroups[] = [
+                'id'                => $group['id'],
+                'name'              => $group['name'],
+                'type'              => $group['type'],
+                'isForceFollow'     => $group['isForceFollow'],
+                'isNotificationsOn' => $group['isNotificationsOn'],
+                'isPrivate'         => $group['isPrivate'],
+                'enrolmentStatus'   => $group['enrolmentStatus'],
+                'membership'        => $membership,
+            ];
+        }
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
-                $users_groups
+                $apiGroups
             )
         );
     }
