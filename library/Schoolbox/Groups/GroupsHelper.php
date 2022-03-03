@@ -368,4 +368,18 @@ class GroupsHelper
         $userPerms->setFavourite($isFavourite);
         $this->userAccessMapper->save($userPerms);
     }
+
+    /**
+     * gets the standard group output for a single user/group
+     */
+    public function getGroup(User $user, Group $group)
+    {
+        // Get the group the user is currently a member, their enrolment type and favourite status
+        $userPerms = $this->userAccessMapper->findByColumnList([
+                                                                   'uid'     => $user->getId(),
+                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
+                                                                   'sid'     => $group->getFolder()->getId()
+                                                               ])->indexBy('serviceIdentifier');
+        return $this->buildGroups($user, $userPerms->keys(), $userPerms);
+    }
 }
