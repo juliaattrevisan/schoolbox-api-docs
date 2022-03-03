@@ -223,6 +223,7 @@ module.exports = {
         //Most functionality for a home page
         updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
+        //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
         //Sass
