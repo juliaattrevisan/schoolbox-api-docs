@@ -273,8 +273,8 @@ class StrategyFactory
                 );
             case Strategy\FixturesTeam::getEntityType():
                 return new Strategy\FixturesTeam($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired, $this->db);
-
         }
+
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");
     }
 
