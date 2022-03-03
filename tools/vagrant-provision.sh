@@ -194,12 +194,12 @@ then
         else
             # Still no luck, build from scratch with composer
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-            "$SITE_ROOT"/tools/composer.sh 2>&1;
+            su -s /bin/bash -c "cd $SITE_ROOT && tools/composer.sh" vagrant 2>&1
         fi
     else
         # Still no luck, build from scratch with composer
         echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
-        "$SITE_ROOT"/tools/composer.sh 2>&1;
+        su -s /bin/bash -c "cd $SITE_ROOT && tools/composer.sh" vagrant 2>&1
     fi
 fi
 cd "$SITE_ROOT" || exit;
