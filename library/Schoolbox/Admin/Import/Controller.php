@@ -19,6 +19,7 @@ use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
@@ -76,7 +77,7 @@ class Controller extends ConfigController
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
             $this->router->generate('adminImportIndex.postSchoolDataOptions'),
-            ['useBottomDrawer' => false,],
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
