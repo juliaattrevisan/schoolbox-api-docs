@@ -153,8 +153,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
 
-  # Mount package files with ownership that simulates real deployments
-  config.vm.synced_folder ".", "/usr/share/schoolbox", owner: "alaress", group: "alaress"
+  # We cannot mount package files with ownership that simulates real deployments because we want to be able to run
+  # composer which needs to write to this path. And we don't want to run composer as root.
+  config.vm.synced_folder ".", "/usr/share/schoolbox"
 
 
   # Mount the puppet directory and execute the puppet hook.
