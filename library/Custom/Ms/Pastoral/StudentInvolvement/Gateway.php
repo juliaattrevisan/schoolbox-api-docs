@@ -48,6 +48,24 @@ class Gateway
     private const REASON_CODES_ENDORSED_LEAVE = ['M'];
 
     /**
+     * Hardcoded mappings from a subject code to its continuation in the
+     * following year.
+     *
+     * `getNextYearSubjectCode` can determine the subject code if the two
+     * subjects have the same name. The cases here however do not.
+     */
+    private const REPORT_SENIOR_SUBJECT_MAPPING = [
+        // Mathematics Standard:
+        // Year 11: Mathematics Standard (subject code 2116)
+        // Year 12: Mathematics Standard 2 (subject code 2126)
+        2116 => 2126,
+        // English Extension:
+        // Year 11: English Extension (subject code 1118)
+        // Year 12: English Extension 1 (subject code 1125)
+        1118 => 1125,
+    ];
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -688,12 +706,16 @@ class Gateway
         ";
 
         $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
-        $pb = $pb->equals('st.sub_desc', $thisYearSubject['sub_desc'])
-                 ->equals('st.year_grp', $thisYearSubject['year_grp'] + 1)
+        $pb = $pb->equals('st.year_grp', $thisYearSubject['year_grp'] + 1)
                  ->equals('ts.class', $class)
                  ->notEquals('ts.sub_code', $code)
                  ->equals('so.cmpy_code', self::COMPANY_CODE)
                  ->equals('ts.year_num', $year + 1);
+
+        $nextYearCode = self::REPORT_SENIOR_SUBJECT_MAPPING[$code] ?? null;
+        $pb = isset($nextYearCode)
+            ? $pb->equals('st.sub_code', $nextYearCode)
+            : $pb->equals('st.sub_desc', $thisYearSubject['sub_desc']);
 
         $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
         $query = $this->database->prepareQuery($sql, $pb->getParams());
