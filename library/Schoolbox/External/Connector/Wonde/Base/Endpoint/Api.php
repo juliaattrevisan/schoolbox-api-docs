@@ -60,13 +60,13 @@ class Api implements IApi
      * Constructor.
      *
      * @param string $host
-     * @param string $authorizationToken
+     * @param string $apiKey
      * @param int    $timeout
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    public function __construct(string $host, string $authorizationToken, int $timeout = self::DEFAULT_TIMEOUT)
+    public function __construct(string $host, string $apiKey, int $timeout = self::DEFAULT_TIMEOUT)
     {
-        $this->client = $this->initClient($host, $authorizationToken, $timeout);
+        $this->client = $this->initClient($host, $apiKey, $timeout);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -79,21 +79,32 @@ class Api implements IApi
      * Set up guzzle client
      *
      * @param string $host
-     * @param string $authorizationToken
+     * @param string $dsn
      * @param int    $timeout
      * @return Client
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
-    private function initClient(string $host, string $authorizationToken, int $timeout): Client
+    private function initClient(string $host, string $dsn, int $timeout): Client
     {
+        $credentials = (new Codec\DSN())->decode($dsn);
+
+        /* Enforce slash in the endpoint prefix
+         */
+        $baseUri = sprintf(
+            '%s/schools/%s/',
+            rtrim($host, '/'),
+            $credentials['school']
+        );
+
         $headers = [
-            'Authorization' => "Bearer {$authorizationToken}",
-//            'Content-Type' => 'application/json'
+            'Authorization' => "Bearer {$credentials['token']}",
+            'Content-Type' => 'application/json'
         ];
 
         return new Client([
             'headers' => $headers,
-            'base_uri' => $host,
+            'base_uri' => $baseUri,
             'timeout' => $timeout,
             'http_errors' => false,
         ]);
