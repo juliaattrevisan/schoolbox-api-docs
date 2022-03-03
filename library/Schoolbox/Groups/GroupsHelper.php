@@ -355,4 +355,17 @@ class GroupsHelper
          */
         $this->setNotification($group->getFolder()->getId(), $user, true);
     }
+
+    /**
+     * sets Favourite
+     */
+    public function setFavourite(User $user, Group $group, bool $isFavourite)
+    {
+        $userPerms = $this->userAccessMapper->findOneByColumnList([
+                                                                   'uid'     => $user->getId(),
+                                                                   'sid'     => $group->getFolder()->getId()
+                                                               ]);
+        $userPerms->setFavourite($isFavourite);
+        $this->userAccessMapper->save($userPerms);
+    }
 }
