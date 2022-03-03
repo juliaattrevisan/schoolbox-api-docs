@@ -198,11 +198,7 @@ module.exports = {
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
         usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
-
-        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
-        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
-        usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
-        usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
+        usageSpecific: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js',
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
