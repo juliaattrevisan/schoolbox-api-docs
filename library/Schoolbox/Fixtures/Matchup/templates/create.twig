@@ -11,6 +11,9 @@
                 startAtDate: {
                     datepickerDate: true
                 },
+                finishAtDate: {
+                    datepickerDate: true
+                },
                 seasonId: {
                     required: true
                 },
@@ -29,6 +32,9 @@
                 'name': 'Please enter a match name.',
                 'seasonId': 'Please choose a season',
                 'startAtDate': {
+                    required: 'Please choose a date.'
+                },
+                'finishAtDate': {
                     required: 'Please choose a date.'
                 }
             },
@@ -213,14 +219,19 @@
                         <input type="text" name="name" id="name" value="{{ match.name }}" required />
                     </div>
 
-                    <div class="column small-12 medium-6">
+                    <div class="column small-12 medium-4">
                         <label for="season" class="required">Season</label>
                         <input id="season" name="seasonId" type="text" value='' placeholder="Search Seasons" required/>
                     </div>
 
-                    <div class="column small-12 medium-6">
-                        <label for="startAtDate" class="required">Date</label>
+                    <div class="column small-12 medium-4">
+                        <label for="startAtDate" class="required">Start Date</label>
                         <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.startAt ? match.startAt.local : '' }}" required />
+                    </div>
+
+                    <div class="column small-12 medium-4">
+                        <label for="finishAtDate" class="required">Finish Date</label>
+                        <input type="text" id="finishAtDate" name="finishAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.finishAt ? match.finishAt.local : '' }}" required />
                     </div>
 
                     <div class="small-12 columns">
