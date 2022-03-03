@@ -38,3 +38,9 @@ VALUES (
 
 ALTER TABLE `sportsfixtures_match`
 ADD COLUMN `finish_at` DATETIME NULL DEFAULT NULL AFTER `start_at`;
+
+-- Set a default finish time where we previously had no idea
+
+UPDATE `sportsfixtures_match`
+SET finish_at = DATE_ADD(start_at, INTERVAL 1 HOUR)
+WHERE finish_at IS NULL;
