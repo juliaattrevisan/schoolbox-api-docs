@@ -189,6 +189,7 @@ class StrategyFactory
     {
         return [
             Strategy\Campus::class,
+            Strategy\FixturesTeam::class,
             Strategy\Folder::class,
             Strategy\PastoralGroup::class,
             Strategy\ResHouse::class,
@@ -273,6 +274,9 @@ class StrategyFactory
                     $this->externalUser,
                     $this->knownUserSubjects
                 );
+            case Strategy\FixturesTeam::getEntityType():
+                return new Strategy\FixturesTeam($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired, $this->db);
+
         }
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");
     }
