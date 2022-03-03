@@ -49,16 +49,21 @@ class FixturesTeam extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND st.`name` LIKE :{$searchPlaceholder}";
+
         $entityType = self::getEntityType();
 
         return "
             SELECT 
-                id, name, 
+                st.id, 
+                CONCAT(st.name, ' (', sd.name, ', ', ss.name, ')') AS name, 
                 '{$entityType}' AS entity_type, 
                 NULL as entity_meta
-            FROM sportsfixtures_team
-            WHERE deleted_at IS NULL
-            AND name LIKE :{$searchPlaceholder}
+            FROM sportsfixtures_team st
+            INNER JOIN sportsfixtures_division sd ON st.division_id = sd.id
+            INNER JOIN sportsfixtures_sport ss ON sd.sport_id = ss.id
+            WHERE st.deleted_at IS NULL
+            {$keywordFilter}
         ";
     }
 

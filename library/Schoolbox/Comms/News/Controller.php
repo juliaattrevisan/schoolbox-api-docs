@@ -1398,6 +1398,14 @@ class Controller extends Base
                 'hideFromModal' =>  true,
                 'isMulti'       =>  false,
             ],
+            'fixturesteam' => [
+                'name'          =>  'Fixtures Team',
+                'namePlural'    =>  'Fixtures Teams',
+                'icon'          =>  'sport',
+                'selfModifier'  =>  'Users in fixtures team',
+                'hideFromModal' =>  false,
+                'isMulti'       =>  true,
+            ],
         ];
         if ($generateAjaxRoutes) {
             foreach ($entityTypes as $type => $entityType) {
