@@ -80,22 +80,17 @@ class FixturesTeam extends SimpleStrategy
             return $this->buildImpossibleUserResolution($userTableAlias, $paramPrefix);
         }
 
-        $pgmAlias = "stu_$paramPrefix";
-        $joinType = $targetNull ? "LEFT" : "";
+        $teamAlias = "stu_{$paramPrefix}";
 
-        $join     = "$joinType JOIN sportsfixtures_team_user {$pgmAlias} ON {$pgmAlias}.user_id = {$userTableAlias}.id";
+        /* This connects up to sql pieces in UserResolver.php
+         */
+        $join = "
+            INNER JOIN sportsfixtures_team_user {$teamAlias} 
+            ON {$teamAlias}.user_id = {$userTableAlias}.id
+        ";
 
-        $pb = $this->newPb($paramPrefix);
-
-        if ($targetNull) {
-            $pb->isNull("$pgmAlias.user_id");
-        }
-
-        if (count($filtered)) {
-            $pb->in("$pgmAlias.group_id", $filtered);
-        }
-
-        $pb = $this->newPb($paramPrefix)->any($pb);
+        $pb = $this->newPb($paramPrefix)
+            ->in("{$teamAlias}.team_id", $filtered);
 
         return new UserResolutionSql($join, $pb);
     }
