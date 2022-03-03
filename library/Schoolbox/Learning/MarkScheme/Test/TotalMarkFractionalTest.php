@@ -458,12 +458,22 @@ class TotalMarkFractionalTest extends TestCase
     public function getConvertFormInputToHumanReadableMarkData(): iterable
     {
         $total = new TotalMarkFractional(12);
-        yield 'null form input' => [$total, null, null];
-        yield 'numeric form input' => [$total, '6', '6 / 12'];
-        yield 'fraction form input, space' => [$total, '6 / 12', '6 / 12'];
-        yield 'fraction form input, no space' => [$total, '6/12', '6 / 12'];
-        yield 'fraction form input, < 0' => [$total, '-1', '-1 / 12'];
-        yield 'fraction form input, > 100' => [$total, '13', '13 / 12'];
+        yield 'total mark 12: null form input' => [$total, null, null];
+        yield 'total mark 12: numeric form input' => [$total, '6', '6 / 12'];
+        yield 'total mark 12: fraction form input, space' => [$total, '6 / 12', '6 / 12'];
+        yield 'total mark 12: fraction form input, no space' => [$total, '6/12', '6 / 12'];
+        yield 'total mark 12: numeric form input, < 0%' => [$total, '-1', '-1 / 12'];
+        yield 'total mark 12: numeric form input, > 100%' => [$total, '13', '13 / 12'];
+
+        $total2 = new TotalMarkFractional(0.5);
+        yield 'total mark < 1: null form input' => [$total2, null, null];
+        yield 'total mark < 1: numeric form input' => [$total2, '.2', '0.2 / 0.5'];
+        yield 'total mark < 1: fraction w/ leading zero form input, space' => [$total2, '0.3 / 0.5', '0.3 / 0.5'];
+        yield 'total mark < 1: fraction w/ leading zero form input, no space' => [$total2, '0.3/0.5', '0.3 / 0.5'];
+        yield 'total mark < 1: fraction w/o leading zero form input, space' => [$total2, '.3 / .5', '0.3 / 0.5'];
+        yield 'total mark < 1: fraction w/o leading zero form input, no space' => [$total2, '.3/.5', '0.3 / 0.5'];
+        yield 'total mark < 1: numeric form input, < 0%' => [$total2, '-1', '-1 / 0.5'];
+        yield 'total mark < 1: numeric form input, > 100%' => [$total2, '1', '1 / 0.5'];
     }
 
 
