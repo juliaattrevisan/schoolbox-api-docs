@@ -204,8 +204,7 @@ fi
 cd /usr/share/schoolbox || exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
-composer dump-autoload -o --no-interaction;
-
+su -s /bin/bash -c "cd $SITE_ROOT && composer dump-autoload -o --no-interaction" vagrant
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
 
