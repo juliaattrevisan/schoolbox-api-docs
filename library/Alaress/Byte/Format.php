@@ -19,24 +19,33 @@ class Alaress_Byte_Format
 {
 
     /**
-     * Converts a size in bytes to human readable size
+     * Converts a size in bytes to human-readable size.
      *
-     * @param int|float|string $size
-     * @param int              $precision
-     * @param bool             $useIEC               Use SI or IEC multiplier
-     * @param bool             $renderIecExplicitly  If using IEC, should we generate this explicitly
+     * @param int|float|string $size      The number of bytes. This needs to be
+     *                                    a numeric string: this may have a byte
+     *                                    suffix (e.g. "200B"), but not any
+     *                                    other suffix.
+     * @param int              $precision The number of decimal places to round
+     *                                    the size to.
+     * @param bool             $useIec    Use SI or IEC multiplier?
+     *                                    (1KB = SI: 1000B, IEC: 1024B)
+     * @param bool             $renderIec If using IEC: should this render the
+     *                                    correct IEC units (KiB, MiB, etc.)?
+     *                                    If not, will pretend that 1024B = 1KB.
      * @return string
      */
-    public static function bytesToString($size, int $precision = 2, bool $useIEC = true, bool $renderIecExplicitly = false): string
+    public static function bytesToString($size, int $precision = 2, bool $useIec = true, bool $renderIec = false): string
     {
+        // Need the numeric component only
+        $size = floatval($size);
         $sign = $size < 0 ? '-' : '';
         $size = abs((int)$size);
 
         // IEC uses 2^X, SI uses 10^X
-        $multiplier = $useIEC ? 1024 : 1000;
+        $multiplier = $useIec ? 1024 : 1000;
 
         // If using IEC and explicit notation, do render 'i' car
-        $a = $useIEC && $renderIecExplicitly
+        $a = $useIec && $renderIec
             ? ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']
             : ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
