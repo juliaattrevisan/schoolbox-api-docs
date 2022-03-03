@@ -5,11 +5,11 @@
  * Can be accessed at /adminv2/usage
  */
 
-import UsageGlobalTotal from './total';
-import UsageGlobalSystem from './system';
-import UsageGlobalFiletype from './filetype';
-import UsageGlobalRole from './role';
-import UsageGlobalUser from './user';
+import UsageGlobalTotal from './usage-global-total';
+import UsageGlobalSystem from './usage-global-system';
+import UsageGlobalFiletype from './usage-global-filetype';
+import UsageGlobalRole from './usage-global-role';
+import UsageGlobalUser from './usage-global-user';
 
 
 export default {
