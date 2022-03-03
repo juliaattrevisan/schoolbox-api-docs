@@ -754,7 +754,7 @@
                                 <div class="v-card">
 
                                     {% if subject.linkedToFolder %}
-                                     <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                     <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
                                     {% endif %}
                                         <div class="card-class-image"
                                              style="border-bottom-width: 10px;
@@ -810,7 +810,7 @@
                                             {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
 
                                             {% if subject.linkedToFolder %}
-                                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url') }}">
                                                     <h3>{{ subject.name }}</h3>
                                                     {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
                                                 </a>
