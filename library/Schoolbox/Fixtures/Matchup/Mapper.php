@@ -43,17 +43,6 @@ class Mapper extends BaseMapper
 {
 
     /**
-     * For the calendar subscription we find previous matchups and
-     * future matchups - but for performance reasons we can limit
-     * how far in the past, and how far in the future, to look
-     *
-     * Measured in weeks
-     */
-    public const CALENDAR_MATCHUP_THRESHOLD_PAST = 2;
-    public const CALENDAR_MATCHUP_THRESHOLD_FUTURE = 4;
-
-
-    /**
      * Setup mapping
      */
     protected function mapping()
@@ -156,8 +145,6 @@ class Mapper extends BaseMapper
      * within the date range specified
      *
      * @param \Schoolbox\User           $user
-     * @param \Alaress_Date_Format|null $from
-     * @param \Alaress_Date_Format|null $to
      * @return GenericCollection
      * @throws BaseMapper\DefinitionException
      * @throws Exception
@@ -165,20 +152,8 @@ class Mapper extends BaseMapper
      * @throws \UnexpectedValueException
      */
     public function findInvolvedMatchups(
-        \Schoolbox\User $user,
-        ?\Alaress_Date_Format $from = null,
-        ?\Alaress_Date_Format $to = null
+        \Schoolbox\User $user
     ): GenericCollection {
-
-        /* Use arbitrarily-defined date range if not specified
-         */
-        if (null === $from) {
-            $from = \Alaress_Date_Format::now()->addWeeks(-1 * self::CALENDAR_MATCHUP_THRESHOLD_PAST)->startOfDay()->getDatabase();
-        }
-
-        if (null === $to) {
-            $to = \Alaress_Date_Format::now()->addWeeks(self::CALENDAR_MATCHUP_THRESHOLD_FUTURE)->endOfDay()->getDatabase();
-        }
 
         /* Make a pretty significant assumption here:
 
@@ -198,8 +173,6 @@ class Mapper extends BaseMapper
             LEFT JOIN sportsfixtures_team st ON sm.home_team_id = st.id
             LEFT JOIN sportsfixtures_team_user stu ON st.id = stu.team_id
             WHERE stu.user_id = :userId
-            AND sm.start_at > :from
-            AND sm.start_at < :to
             AND sm.deleted_at IS NULL
             AND st.deleted_at IS NULL
             ORDER BY sm.start_at
@@ -208,8 +181,6 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
             'userId' => $user->getId(),
-            'from' => $from,
-            'to' => $to
         ]);
 
         /** @var GenericCollection|Matchup[] $matches */
