@@ -50,13 +50,10 @@ class GroupsHelper
     }
 
     /**
-     *
+     * get all groups a user is in, and could request or enroll.
      */
     public function getAllGroups(User $user)
     {
-        //folder colours helper
-        $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
-
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->userAccessMapper->findByColumnList([
@@ -71,83 +68,22 @@ class GroupsHelper
         //combine to show list of all groups, both available to the user, and those they are enrolled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
 
-        //build notifications (will notify by default, the user will have to opt out)
-        $notificationsList = $this->getNotifications($user);
+        return $this->buildGroups($user, $groupIds, $userPerms);
+    }
 
-        //build the folder list object with hydration
-        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds]);
+    /**
+     * get all groups a user is currently enrolled in
+     */
+    public function getCurrentGroups(User $user)
+    {
+        //check if user is currently member
+        // Get the groups the user is currently a member, their enrolment type and favourite status
+        $userPerms = $this->userAccessMapper->findByColumnList([
+                                                                   'uid'     => $user->getId(),
+                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
+                                                               ])->indexBy('serviceIdentifier');
 
-        // build output array
-        $possibleGroups = [];
-        foreach ($folders as $folder) {
-            /**
-             * some folders/groups may be broken
-             * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
-             * so lets check if the group object / settings exist and if not ignore that folder
-             */
-            if (null === $folder->getGroup()) {
-                continue;
-            }
-            /**
-             * default favourite to false, as the use is not a member of the group
-             * then confirm with the $userPerms array to see if the user has that group as a favourite
-             */
-            $isFavourite = false;
-            if ($userPerms[$folder->getId()]) {
-                $isFavourite = $userPerms[$folder->getId()]->getFavourite();
-            }
-
-            //nullable image cause something to have no defaults...
-            $imageHash = null;
-            if ($folder->getCoverImage()) {
-                $imageHash = $folder->getCoverImage()->getHash();
-            }
-            if (!$folder->getColour()) {
-                $folder->setColour($folderColours->getNewColour());
-            }
-
-            $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
-            /**
-             * check if admin
-             * admin will have $userPerm[folderID] ACCESS_FULL
-             * Superuser will not.
-             */
-            $isAdmin = false;
-            if ($userPerms[$folder->getId()]) {
-                $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
-            }
-
-
-            //get group edit access, for the edit link
-            if (UserAccess::ACCESS_WRITE <= $access) {
-                /**
-                $modifyLink = $this->router->generate(
-                    'folder.getFolderModify',
-                    ['id' => $folder->getId(), 'folder' => $folder]
-                );
-                 */
-                $modifyLink = sprintf('/resource/folder/%d/modify', $folder->getId());
-            } else {
-                $modifyLink = false;
-            }
-            $possibleGroups[] = [
-                'id'                => $folder->getId(),
-                'name'              => $folder->getName(),
-                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
-                'colour'            => $folder->getColour()->getAsHex(),
-                'coverImageHash'    => $imageHash,
-                'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?: false,
-                'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?: false,
-                'isFavourite'       => $isFavourite,
-                'type'              => $folder->getGroup()->getTypeString(),
-                'isAccessAdmin'     => $isAdmin,
-                'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
-                'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
-                'isPrivate'         => $folder->getGroup()->isPrivate(),
-                'modifyLink'        => $modifyLink,
-            ];
-        }
-        return $possibleGroups;
+        return $this->buildGroups($user, $userPerms->keys(), $userPerms);
     }
 
     /**
@@ -297,5 +233,91 @@ class GroupsHelper
          * to help php stan with is return issue, and to catch any failures of the above
          */
         return self::NOTENROLLED;
+    }
+
+    /**
+     * build groups object
+     */
+    private function buildGroups(User $user, array $groupIds, $userPerms = []): array
+    {
+        //folder colours helper
+        $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
+        //build notifications (will notify by default, the user will have to opt out)
+        $notificationsList = $this->getNotifications($user);
+
+        //build the folder list object with hydration
+        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds]);
+
+        // build output array
+        $possibleGroups = [];
+        foreach ($folders as $folder) {
+            /**
+             * some folders/groups may be broken
+             * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
+             * so lets check if the group object / settings exist and if not ignore that folder
+             */
+            if (null === $folder->getGroup()) {
+                continue;
+            }
+            /**
+             * default favourite to false, as the use is not a member of the group
+             * then confirm with the $userPerms array to see if the user has that group as a favourite
+             */
+            $isFavourite = false;
+            if ($userPerms[$folder->getId()]) {
+                $isFavourite = $userPerms[$folder->getId()]->getFavourite();
+            }
+
+            //nullable image cause something to have no defaults...
+            $imageHash = null;
+            if ($folder->getCoverImage()) {
+                $imageHash = $folder->getCoverImage()->getHash();
+            }
+            if (!$folder->getColour()) {
+                $folder->setColour($folderColours->getNewColour());
+            }
+
+            $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+            /**
+             * check if admin
+             * admin will have $userPerm[folderID] ACCESS_FULL
+             * Superuser will not.
+             */
+            $isAdmin = false;
+            if ($userPerms[$folder->getId()]) {
+                $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
+            }
+
+
+            //get group edit access, for the edit link
+            if (UserAccess::ACCESS_WRITE <= $access) {
+                /**
+                $modifyLink = $this->router->generate(
+                'folder.getFolderModify',
+                ['id' => $folder->getId(), 'folder' => $folder]
+                );
+                 */
+                $modifyLink = sprintf('/resource/folder/%d/modify', $folder->getId());
+            } else {
+                $modifyLink = false;
+            }
+            $possibleGroups[] = [
+                'id'                => $folder->getId(),
+                'name'              => $folder->getName(),
+                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
+                'colour'            => $folder->getColour()->getAsHex(),
+                'coverImageHash'    => $imageHash,
+                'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?: false,
+                'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?: false,
+                'isFavourite'       => $isFavourite,
+                'type'              => $folder->getGroup()->getTypeString(),
+                'isAccessAdmin'     => $isAdmin,
+                'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
+                'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
+                'isPrivate'         => $folder->getGroup()->isPrivate(),
+                'modifyLink'        => $modifyLink,
+            ];
+        }
+        return $possibleGroups;
     }
 }
