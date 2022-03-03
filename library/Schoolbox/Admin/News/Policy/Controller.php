@@ -63,6 +63,7 @@ class Controller extends ConfigController
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
             $this->router->generate('commsNewsPolicy.postPolicies'),
+            ['useBottomDrawer' => false,],
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
