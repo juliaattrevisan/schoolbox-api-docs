@@ -152,7 +152,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         $denominator = round($this->deriveDenominator(), AbstractMarkScheme::PRECISION);
 
         // Prevent divide by 0 Errors
-        if (0 === (int)$denominator) {
+        if ($denominator === 0.0) {
             return null;
         }
 
