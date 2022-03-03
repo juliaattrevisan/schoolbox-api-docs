@@ -11,6 +11,8 @@ namespace Schoolbox\User;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Normalise\TupleStack;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -153,6 +155,84 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
                 $result
+            )
+        );
+    }
+
+    /**
+     * adds a user into a group
+     * @api POST /user/{userId}/groupMembership/{groupId}
+     */
+    public function apiMembershipAdd(string $userId, string $groupId)
+    {
+        //check for invalid / deleted users?
+        try {
+            /* Check that the selected user exists in schoolbox
+             */
+            $user = $this->userMapper->findById($userId);
+        } catch (MapperException $e) {
+            /* If they weren't found in either, exit
+             */
+            $problem = (new ApiProblem('User does not exist'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+        //check for invalid / deleted groups?
+        try {
+            /* Check that the selected user exists in schoolbox
+             */
+            $group = $this->groupsMapper->findById($groupId);
+        } catch (Deleted $e) {
+            /* if the group was deleted, exit
+             */
+            $problem = (new ApiProblem('Group has been deleted'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        } catch (NotFound $e) {
+            /* group was not found, exit
+             */
+            $problem = (new ApiProblem('Group does not exist'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        $this->groupsHelper->addToGroup($user, $group);
+        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $apiGroups = [];
+        foreach ($users_groups as $group) {
+            $membership = 'read';
+            if ($group['isAccessWrite']) {
+                $membership = 'write';
+            } elseif ($group['isAccessAdmin']) {
+                $membership = 'admin';
+            }
+            $apiGroups[] = [
+                'id'                => $group['id'],
+                'name'              => $group['name'],
+                'type'              => $group['type'],
+                'isForceFollow'     => $group['isForceFollow'],
+                'isNotificationsOn' => $group['isNotificationsOn'],
+                'isPrivate'         => $group['isPrivate'],
+                'enrolmentStatus'   => $group['enrolmentStatus'],
+                'membership'        => $membership,
+                '_links'            => [
+                    'homepage'      => sprintf('/homepage/%d', $group['id'])
+                ]
+            ];
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                $apiGroups
             )
         );
     }

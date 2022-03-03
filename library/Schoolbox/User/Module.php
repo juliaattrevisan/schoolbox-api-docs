@@ -48,6 +48,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
         $this->register('GET', '/search', 'search', $loggedIn);
+        $this->register('POST', '/{userId}/groupMembership/{groupId}', 'apiMembershipAdd', $loggedIn);
     }
 
     /**
