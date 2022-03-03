@@ -198,6 +198,7 @@ module.exports = {
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
 
+        usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
         usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
