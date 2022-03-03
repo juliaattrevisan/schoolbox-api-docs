@@ -191,10 +191,6 @@ class Controller extends Base
      */
     public function apiMembership(string $userId)
     {
-        //check perms, if none exit
-        if (!$this->hasApiAccess()) {
-            return;
-        }
         //check for invalid / deleted users?
         try {
             /* Check that the selected user exists in schoolbox
@@ -229,6 +225,9 @@ class Controller extends Base
                 'isPrivate'         => $group['isPrivate'],
                 'enrolmentStatus'   => $group['enrolmentStatus'],
                 'membership'        => $membership,
+                '_links'            => [
+                    'homepage'      => sprintf('/homepage/%d', $group['id'])
+                ]
             ];
         }
 
@@ -237,22 +236,5 @@ class Controller extends Base
                 $apiGroups
             )
         );
-    }
-
-    /**
-     * check requesting user has correct perms, and return API error if not
-     */
-    private function hasApiAccess(): bool
-    {
-        if ($this->getUser()->isSuperuser()) {
-            return true;
-        } else {
-            $problem = (new ApiProblem('User does not have permissions to view the requested user'))
-                ->setStatus(403)
-                ->asArray();
-            $this->getResponse()->status->setCode(403);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return false; //exit early the user is part of the group.
-        }
     }
 }

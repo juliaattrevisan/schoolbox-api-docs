@@ -52,9 +52,11 @@ class Module extends BaseModule
             );
         });
 
+        $hasApiAccess = new Rule\IsSuperuser();
+
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
         $this->register('GET', '/search', 'search', $loggedIn);
-        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $loggedIn);
+        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess);
     }
 
     /**
