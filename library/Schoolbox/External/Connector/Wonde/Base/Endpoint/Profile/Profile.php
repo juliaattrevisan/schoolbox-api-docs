@@ -182,7 +182,7 @@ class Profile implements IStrategy
             $title = '';
             $tutor = '';
             $tutorGroup = '';
-            $username = '';
+            $username = $externalId;
             $yearLevel = '';
 
             $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
@@ -217,7 +217,7 @@ class Profile implements IStrategy
             /* Fish out special needs
              */
             /* FIXME Colin
-             *  sen_needs does not produce a sen_needs node
+             *  sen_needs does not produce a sen_needs node - am I missing perms?
              */
             $specialNeeds = $this->findSpecialNeeds();
 
@@ -355,7 +355,7 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($externalId, $studentBaseProfile, $student['contacts']);
+            $this->importParentsOfStudent($studentBaseProfile, $student['contacts']);
         }
     }
 
@@ -538,7 +538,6 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $parents
      * @throws Exception
@@ -547,7 +546,6 @@ class Profile implements IStrategy
      * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(
-        string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
         array $parents
     ): void {
@@ -556,19 +554,23 @@ class Profile implements IStrategy
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
-        foreach ($parents as $parent) {
-            /* TODO Fill in these basic parent vars
+        foreach ($parents['data'] as $parent) {
+            $externalId = trim((string)$parent['mis_id']);
+
+            /* Note that this node contains the keys 'email, primary, home, work'
+             * There are no definnitions for the 'email' and 'primary' usages
+             * I assume that they kind of alias each other somehow, based on wording
              */
-            $externalId = '';
-            $email = '';
-            $firstname = '';
-            $lastname = '';
-            $phoneHome = '';
-            $phoneMobile = '';
-            $phoneWork = '';
-            $relationship = '';
-            $title = '';
-            $username = '';
+            $email = trim((string)$parent['contact_details']['data']['emails']['email']);
+
+            $firstname = trim((string)$parent['forename']);
+            $lastname = trim((string)$parent['surname']);
+            $phoneHome = trim((string)$parent['contact_details']['data']['phones']['home']);
+            $phoneMobile = trim((string)$parent['contact_details']['data']['phones']['mobile']);
+            $phoneWork = trim((string)$parent['contact_details']['data']['phones']['work']);
+            $relationship = trim((string)$parent['relationship']['relationship']);
+            $title = trim((string)$parent['contact_details']['data']['salutation']);
+            $username = $externalId;
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
