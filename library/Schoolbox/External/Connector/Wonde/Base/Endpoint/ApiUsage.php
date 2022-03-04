@@ -43,15 +43,19 @@ class ApiUsage
      */
     public function record(string $endpoint): void
     {
+        /* Remove querystring params
+         */
+        $baseEndpoint = explode('?', $endpoint)[0];
+
         /* Initialise counter if needed
          */
-        if (!isset($this->usage[$endpoint])) {
-            $this->usage[$endpoint] = 0;
+        if (!isset($this->usage[$baseEndpoint])) {
+            $this->usage[$baseEndpoint] = 0;
         }
 
         /* Increment count of $endpoint usage
          */
-        $this->usage[$endpoint]++;
+        $this->usage[$baseEndpoint]++;
     }
 
 
