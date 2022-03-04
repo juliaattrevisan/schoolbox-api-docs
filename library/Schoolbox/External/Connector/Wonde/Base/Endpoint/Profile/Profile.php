@@ -792,6 +792,8 @@ class Profile implements IStrategy
             ])
         );
 
+        $now = \Alaress_Date_Format::now();
+
         /* Collate a list of staff role codes for debug
          * Can't tell if this is a configurable lookup
          *
@@ -806,6 +808,50 @@ class Profile implements IStrategy
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
                 $campusName = '';
+
+                /* Check their employment dates and skip them if we perhaps should
+                 */
+                $employmentStart = $this->findDate($staff['employment_details']['data']['employment_start_date']['date'] ?? null);
+                $employmentEnd = $this->findDate($staff['employment_details']['data']['employment_end_date']['date'] ?? null);
+
+                /* Unknown start date? skip
+                 */
+                if (null === $employmentStart) {
+                    $this->log->debug(sprintf(
+                        'Staff %s %s (%s) has null employment start; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
+
+                /* Not employed yet? skip
+                 */
+                if ($now->lt($employmentStart)) {
+                    $this->log->debug(sprintf(
+                        'Staff %s %s (%s) employment has not commenced yet; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
+
+                /* Employment ended? skip
+                 */
+                if (null !== $employmentEnd && $now->gt($employmentEnd)) {
+                    $this->log->debug(sprintf(
+                        'Staff %s %s (%s) employment has concluded; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
 
                 /* role_code apparently determines teaching vs non-teaching staff
                  * but I can't tell whether this const is configurable or not
