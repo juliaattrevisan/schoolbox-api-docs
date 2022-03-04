@@ -130,15 +130,15 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+//        $this->log->info('Processing students and their parents.');
+//
+//        $this->importStudents();
 
-        $this->importStudents();
-//
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
     }
 
 
@@ -661,25 +661,41 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = [];
+        $staffs = $this->api->retrieve('GET', 'employees', [
+            'include' => implode(',', [
+                'contact_details',
+                'employment_details',
+                'roles'
+            ])
+        ]);
 
-        foreach ($staffs as $staff) {
-            /* TODO Fill in basic staff vars
-             */
-            $externalId = '';
+        foreach ($staffs['data'] as $staff) {
+            $externalId = trim((string)$staff['mis_id']);
 
-            $firstname = '';
-            $lastname = '';
+            $firstname = trim((string)$staff['forename']);
+            $lastname = trim((string)$staff['surname']);
             $building = '';
             $campusName = '';
             $category = '';
+
+            /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
+             *  but it meant having to find out about their salaries and stuff. There isn't a Salary
+             *  object in the Permissions screen, so maybe it comes under Contracts > Salary somehow
+             */
             $department = '';
-            $email = '';
-            $phone = '';
-            $positionTitle = '';
+
+            /* FIXME Still can't tell the difference between 'email' and 'primary' usages
+             */
+            $email = trim((string)$staff['contact_details']['data']['emails']['email']);
+
+            /* FIXME Controversial - maybe never include phone numbers at all?
+             */
+            $phone = trim((string)$staff['contact_details']['data']['phones']['work']);
+
+            $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
             $room = '';
-            $title = '';
-            $username = '';
+            $title = trim((string)$staff['contact_details']['data']['salutation']);
+            $username = trim((string)$staff['employment_details']['data']['staff_code']);
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
