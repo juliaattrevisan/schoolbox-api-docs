@@ -853,6 +853,11 @@ class Profile implements IStrategy
                     continue;
                 }
 
+                /* FIXME employment_details has the nodes containing booleans: [current, teaching_staff]
+                 *  but in the test data, teaching_staff is always empty so I have
+                 *  to infer teaching vs non-teaching staff via role_codes
+                 */
+
                 /* role_code apparently determines teaching vs non-teaching staff
                  * but I can't tell whether this const is configurable or not
                  * The docs don't really elucidate how this is used in their app
