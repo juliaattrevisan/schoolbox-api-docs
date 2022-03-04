@@ -130,9 +130,9 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 
         /* Import staff profile data
          */
@@ -671,7 +671,6 @@ class Profile implements IStrategy
 
         foreach ($staffs['data'] as $staff) {
             $externalId = trim((string)$staff['mis_id']);
-
             $firstname = trim((string)$staff['forename']);
             $lastname = trim((string)$staff['surname']);
             $building = '';
