@@ -51,6 +51,44 @@ class Profile implements IStrategy
 
 
     /**
+     * Decide between teaching and non-teaching staff
+     * This goes into sis_user_profile_staff.category
+     */
+    private const EMPLOYEE = 'employee';
+    private const TEACHER = 'teacher';
+
+
+    /**
+     * This const identifies Teaching Staff in a Wonde payload
+     * We saw these from test data (not sure if they are universal)
+     *
+        [ASHT] => Assistant Head
+        [] => Other Premises Staff
+        [CLNR] => Cleaner
+        [DPHT] => Deputy Head
+        [TCHR] => Classroom Teacher
+        [CATR] => Other Catering Staff
+        [MIDS] => Midday Supervisor
+        [STCH] => Science Technician
+        [COOK] => Cook
+        [ICTT] => ICT Technician
+        [HDPT] => Head of Department
+        [LIBR] => Librarian
+        [MIDA] => Midday Assistant
+        [FINC] => Finance Officer
+        [TASS] => Teaching Assistant
+        [SSEC] => School Secretary
+        [ADMC] => Administrator / Clerk
+        [HLTA] => Higher Level Teaching Assistant
+        [HDTR] => Head Teacher
+     */
+    private const WONDE_TEACHER_ROLE_CODES = [
+        'TCHR',
+        'HDTR',
+    ];
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -754,6 +792,11 @@ class Profile implements IStrategy
             ])
         );
 
+        /* Collate a list of staff role codes for debug
+         * Can't tell if this is a configurable lookup
+         *
+         * $seenRoleCodes = [];
+         */
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $staffs = $this->api->retrieve('GET', $nextUrl, []);
 
@@ -763,7 +806,31 @@ class Profile implements IStrategy
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
                 $campusName = '';
-                $category = '';
+
+                /* role_code apparently determines teaching vs non-teaching staff
+                 * but I can't tell whether this const is configurable or not
+                 * The docs don't really elucidate how this is used in their app
+                 *
+                 * If they teach anything, they're Teaching Staff
+                 * Otherwise, they're Non-Teaching Staff
+                 *
+                 * https://docs.wonde.com/docs/api/sync#role-object
+                 */
+                $category = self::EMPLOYEE;
+
+                if (isset($staff['roles']) && \count($staff['roles']['data'])) {
+                    foreach ($staff['roles']['data'] as $staffRole) {
+                        /* Get a list of (role code, role name) tuples to see what
+                         * might be universal and what might be configurable
+                         *
+                         * $seenRoleCodes[$staffRole['role_code']] = $staffRole['role'];
+                         */
+                        if (in_array(trim((string)$staffRole['role_code']), self::WONDE_TEACHER_ROLE_CODES, true)) {
+                            $category = self::TEACHER;
+                            break;
+                        }
+                    }
+                }
 
                 /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
                  *  but it meant having to find out about their salaries and stuff. There isn't a Salary
@@ -850,5 +917,9 @@ class Profile implements IStrategy
                 $nextUrl = $staffs['meta']['pagination']['next'] ?? false;
             }
         }
+
+        /* Diagnose the lookup
+         * print_r($seenRoleCodes);
+         */
     }
 }
