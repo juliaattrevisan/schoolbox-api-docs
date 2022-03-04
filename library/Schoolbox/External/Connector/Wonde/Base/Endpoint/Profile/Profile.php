@@ -173,6 +173,7 @@ class Profile implements IStrategy
             self::NUM_PER_PAGE,
             implode(',', [
                 'house',
+                'house.employees',
                 'medical_conditions',
                 'education_details',
                 'sen_needs',
@@ -231,7 +232,7 @@ class Profile implements IStrategy
 
                 /* Fish out a staff member via their user code
                  */
-                $housemaster = $this->findHousemaster();
+                $housemaster = $this->findHousemaster($student['house'] ?? []);
 
                 /* Fish out special needs
                  */
@@ -496,12 +497,30 @@ class Profile implements IStrategy
     /**
      * Find a housemaster from their house name
      *
+     * @param array $studentHouse
      * @return array
      */
-    private function findHousemaster(): array
+    private function findHousemaster(array $studentHouse): array
     {
-        /* TODO Fill in these housemaster vars
+        /* If this house has any employees, dig out the first one
          */
+        if (array_key_exists('data', $studentHouse) && \count($studentHouse['data']['employees']['data'])) {
+            /* FIXME Not sure if "Head of House" meta.role is hardcoded into wonde or not
+             *  For now just grab the first human off the stack
+             */
+            $housemaster = $studentHouse['data']['employees']['data'][0];
+
+            return [
+                'id' => trim((string)$housemaster['mis_id']),
+                'name' => trim(sprintf(
+                    '%s %s %s',
+                    trim((string)$housemaster['title']),
+                    trim((string)$housemaster['forename']),
+                    trim((string)$housemaster['surname'])
+                ))
+            ];
+        }
+
         return [
             'id' => null,
             'name' => null
