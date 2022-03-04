@@ -210,8 +210,10 @@ class Controller extends Base
         $users_groups = $this->groupsHelper->getCurrentGroups($user);
         $apiGroups = [];
         foreach ($users_groups as $group) {
-            $membership = 'read';
-            if ($group['isAccessWrite']) {
+            $membership = 'none';
+            if ($group['isAccessRead']) {
+                $membership = 'read';
+            } elseif ($group['isAccessWrite']) {
                 $membership = 'write';
             } elseif ($group['isAccessAdmin']) {
                 $membership = 'admin';
@@ -222,8 +224,7 @@ class Controller extends Base
                 'type'              => $group['type'],
                 'isForceFollow'     => $group['isForceFollow'],
                 'isNotificationsOn' => $group['isNotificationsOn'],
-                'isPrivate'         => $group['isPrivate'],
-                'enrolmentStatus'   => $group['enrolmentStatus'],
+                'enrollmentStatus'   => $group['enrolmentStatus'],
                 'membership'        => $membership,
                 '_links'            => [
                     'homepage'      => sprintf('/homepage/%d', $group['id'])
