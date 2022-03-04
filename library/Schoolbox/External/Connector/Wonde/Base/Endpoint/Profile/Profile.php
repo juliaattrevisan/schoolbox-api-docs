@@ -640,7 +640,7 @@ class Profile implements IStrategy
             $externalId = trim((string)$parent['mis_id']);
 
             /* Note that this node contains the keys 'email, primary, home, work'
-             * There are no definnitions for the 'email' and 'primary' usages
+             * There are no definitions for the 'email' and 'primary' usages
              * I assume that they kind of alias each other somehow, based on wording
              */
             $email = trim((string)$parent['contact_details']['data']['emails']['email']);
