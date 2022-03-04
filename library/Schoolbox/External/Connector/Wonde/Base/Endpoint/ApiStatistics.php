@@ -10,13 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Wonde\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
  * Class ApiStatistics
  *
  * Report a summary of the endpoints accessed by our import
  *
- * @package Schoolbox\Clipboard
+ * @package Schoolbox\External\Connector\Wonde\Base\Endpoint
  */
 class ApiStatistics implements IStrategy
 {
@@ -34,7 +35,7 @@ class ApiStatistics implements IStrategy
 
 
     /**
-     * ApiCertification constructor.
+     * ApiStatistics constructor.
      *
      * @param LoggerInterface $log
      * @param IApi            $api

@@ -197,6 +197,10 @@ class Factory
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
+        /* Spawn an Api instance
+         */
+        $api = null;
+
         return (new GenericCollection(IStrategy::class))
 
             /* Purge previously-imported profile relationships and classes
@@ -249,6 +253,10 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
+            ))
+            ->add(new ApiStatistics(
+                $this->log,
+                $api
             ));
     }
 }

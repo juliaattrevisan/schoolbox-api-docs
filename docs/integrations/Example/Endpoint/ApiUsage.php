@@ -14,7 +14,7 @@ namespace Schoolbox\External\Connector\Example\Base\Endpoint;
  *
  * Record a tally of endpoint accesses in this api
  *
- * @package Schoolbox\External\Connector\Compass\Base\Endpoint
+ * @package Schoolbox\External\Connector\Example\Base\Endpoint
  */
 class ApiUsage
 {
