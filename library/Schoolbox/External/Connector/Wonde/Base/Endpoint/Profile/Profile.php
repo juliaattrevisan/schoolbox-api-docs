@@ -202,7 +202,7 @@ class Profile implements IStrategy
                 $tutor       = '';
                 $tutorGroup  = '';
                 $username    = $externalId;
-                $yearLevel   = '';
+                $yearLevel   = trim((string)$student['education_details']['data']['current_nc_year']);
 
                 $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
                 $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
