@@ -175,7 +175,6 @@ class Profile implements IStrategy
             $esl = false;
             $ib = false;
             $ilp = false;
-            $specialNeeds = false;
 
             /* Alerts
              * TODO Define the mechanism to find these alert contents

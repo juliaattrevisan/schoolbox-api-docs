@@ -147,26 +147,36 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-
         /* Get a set of students that we need to process
+         *
+         * Includes:
+         * Trailing commas leaves you with http 400 from them, because
+         * the forgot to do that for you - implode() to dodge around it.
+         * Plus, it's easier to add more includes like this
          */
-        $students = $this->api->retrieve('GET', 'students', []);
+        $students = $this->api->retrieve('GET', 'students', [
+            'include' => implode(',', [
+                'house',
+                'medical_conditions',
+                'education_details',
+                'sen_needs',
+                'contacts',
+                'contacts.contact_details'
+            ])
+        ]);
 
-        foreach ($students as $student) {
-            print_r($student); continue;
-            /* TODO Fill in these basic student vars
-             */
-            $externalId = '';
-            $academicHouse = '';
+        foreach ($students['data'] as $student) {
+            $externalId = trim((string)$student['mis_id']);
+            $academicHouse = trim((string)$student['house']['data']['name']);
             $boardingStatus = false;
             $campusName = '';
 
-            $dob = '';
+            $dob = $this->findDate((string)$student['date_of_birth']['date']);
             $email = '';
-            $firstname = '';
+            $firstname = trim((string)$student['forename']);
             $form = '';
-            $gender = '';
-            $lastname = '';
+            $gender = trim((string)$student['gender']);
+            $lastname = trim((string)$student['surname']);
             $mobile = '';
             $studiesCode = '';
             $title = '';
@@ -175,10 +185,8 @@ class Profile implements IStrategy
             $username = '';
             $yearLevel = '';
 
-            /* TODO Fill in these dates
-             */
-            $enrolmentDate = '';
-            $leavingDate = '';
+            $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
+            $leavingDate = $this->findDate((string)$student['education_details']['data']['leaving_date']);
 
             /* Flags
              * TODO Fill in these flag vars
@@ -186,20 +194,13 @@ class Profile implements IStrategy
             $esl = false;
             $ib = false;
             $ilp = false;
-            $specialNeeds = false;
 
             /* Alerts
-             * TODO Define the mechanism to find these alert contents
              */
             $comments = $this->findComments();
             $legal = $this->findLegal();
-            $medical = $this->findMedicalAlert();
+            $medical = $this->findMedicalAlert($student['medical_conditions']);
             $messages = '';
-
-            /* TODO Customise these find* methods to suit your implementation
-             *  Maintain the methods' return signature for easiest resolution
-             *  though you are free to customise it as you see fit
-             */
 
             /* Emergency Contacts
              */
@@ -214,6 +215,9 @@ class Profile implements IStrategy
             $housemaster = $this->findHousemaster();
 
             /* Fish out special needs
+             */
+            /* FIXME Colin
+             *  sen_needs does not produce a sen_needs node
              */
             $specialNeeds = $this->findSpecialNeeds();
 
@@ -351,7 +355,7 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($externalId, $studentBaseProfile);
+            $this->importParentsOfStudent($externalId, $studentBaseProfile, $student['contacts']);
         }
     }
 
@@ -473,12 +477,15 @@ class Profile implements IStrategy
     /**
      * Find medical data for student
      *
+     * @param array $medicalConditions
      * @return string|null
      */
-    private function findMedicalAlert(): ?string
+    private function findMedicalAlert(array $medicalConditions): ?string
     {
-        /* TODO Fill in these medical alert vars
-         */
+        if (\count($medicalConditions)) {
+            return 'This student has medical conditions.';
+        }
+
         return null;
     }
 
@@ -533,15 +540,17 @@ class Profile implements IStrategy
      *
      * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
+     * @param array             $parents
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
-     * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
-    {
-        $parents = [];
+    private function importParentsOfStudent(
+        string $studentExternalId,
+        UserProfile\Model $studentBaseProfile,
+        array $parents
+    ): void {
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
