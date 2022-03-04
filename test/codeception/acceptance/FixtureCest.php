@@ -5,6 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace acceptance;
+
 /**
  * Steps:
  * 1. Provision legacy.tar.gz data
@@ -58,13 +60,13 @@ class FixtureCest
                 Fixture::SELECTOR_START_AT => $start
             ],
             [
-                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
-                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
-                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_WARRIORS,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_RAIDERS
             ]
         );
 
-        $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
+        $fixturePage->assertNotifNotExists('You have an upcoming Basketball match ' . $matchName1);
 
         //== Match in 24 hrs - no change and save - No notification ==
         $matchName2 = 'Second Cest Match';
@@ -77,25 +79,25 @@ class FixtureCest
                 Fixture::SELECTOR_START_AT => $start
             ],
             [
-                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
-                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
-                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_WARRIORS,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_RAIDERS
             ]
         );
 
-        $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
+        $fixturePage->assertNotifExists('You have an upcoming Basketball match ' . $matchName2);
 
         $fixturePage->updateMatch($matchId, [], []);
-        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
+        $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName2 . ' has been updated');
 
         //== Match in 24 hrs - change title and save - Updated notification ==
         $matchName3 = 'Third Cest Match';
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_NAME => $matchName3], []);
-        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName3 . ' has been updated');
+        $fixturePage->assertNotifExists('Your upcoming Basketball match ' . $matchName3 . ' has been updated');
 
         //== Match in 24 hrs - change date - Updated notification ==
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_START_AT => $start->modify('+45 minutes')], []);
-        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName3 . ' has a new start time');
+        $fixturePage->assertNotifExists('Your upcoming Basketball match ' . $matchName3 . ' has a new start time');
 
         //== Match in 24 hrs - add itinerary and save
         $matchName4 = 'Fourth Cest Match';
@@ -108,13 +110,13 @@ class FixtureCest
                 Fixture::SELECTOR_START_AT => $start
             ],
             [
-                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
-                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
-                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_WARRIORS,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_RAIDERS
             ]
         );
         $fixturePage->addItinerary($matchId4);
-        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName4 . ' itinerary has been changed');
+        $fixturePage->assertNotifExists('Your upcoming Basketball match ' . $matchName4 . ' itinerary has been changed');
 
         //== Match in 24 hrs - remove itinerary and save
         $matchName5 = 'Fifth Cest Match';
@@ -127,13 +129,13 @@ class FixtureCest
                 Fixture::SELECTOR_START_AT => $start
             ],
             [
-                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
-                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
-                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_WARRIORS,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_RAIDERS
             ]
         );
         $fixturePage->deleteItinerary($matchId5);
-        $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName5 . ' itinerary has been changed');
+        $fixturePage->assertNotifExists('Your upcoming Basketball match ' . $matchName5 . ' itinerary has been changed');
 
         //== Match in future - No instant notification ==
         $matchName1 = 'Sixth Cest Match';
@@ -145,25 +147,25 @@ class FixtureCest
                 Fixture::SELECTOR_START_AT => $start
             ],
             [
-                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
-                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
-                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
+                Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
+                Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_WARRIORS,
+                Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_RAIDERS
             ]
         );
 
-        $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
+        $fixturePage->assertNotifNotExists('You have an upcoming Basketball match ' . $matchName1);
 
         $fixturePage->updateMatch($matchId, [], []);
-        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName1 . ' has been updated');
+        $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName1 . ' has been updated');
 
         //Change title and save - Updated notification ==
         $matchName2 = 'Third Cest Modified Sixth';
         $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_NAME => $matchName2], []);
-        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
+        $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName2 . ' has been updated');
 
         // wait 2 minutes and should receive upcoming notification
         $i->wait(120);
-        $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
-        $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
+        $fixturePage->assertNotifExists('You have an upcoming Basketball match ' . $matchName2);
+        $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName2 . ' has been updated');
     }
 }
