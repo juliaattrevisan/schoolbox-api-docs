@@ -146,11 +146,11 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
     }
 
 
@@ -688,95 +688,111 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = $this->api->retrieve('GET', 'employees', [
-            'include' => implode(',', [
+        $nextUrl = sprintf(
+            'employees?page=%s&per_page=%s&include=%s',
+            1,
+            self::NUM_PER_PAGE,
+            implode(',', [
                 'contact_details',
                 'employment_details',
                 'roles'
             ])
-        ]);
+        );
 
-        foreach ($staffs['data'] as $staff) {
-            $externalId = trim((string)$staff['mis_id']);
-            $firstname = trim((string)$staff['forename']);
-            $lastname = trim((string)$staff['surname']);
-            $building = '';
-            $campusName = '';
-            $category = '';
+        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
+            $staffs = $this->api->retrieve('GET', $nextUrl, []);
 
-            /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
-             *  but it meant having to find out about their salaries and stuff. There isn't a Salary
-             *  object in the Permissions screen, so maybe it comes under Contracts > Salary somehow
-             */
-            $department = '';
+            foreach ($staffs['data'] as $staff) {
+                $externalId = trim((string)$staff['mis_id']);
+                $firstname = trim((string)$staff['forename']);
+                $lastname = trim((string)$staff['surname']);
+                $building = '';
+                $campusName = '';
+                $category = '';
 
-            /* FIXME Still can't tell the difference between 'email' and 'primary' usages
-             */
-            $email = trim((string)$staff['contact_details']['data']['emails']['email']);
+                /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
+                 *  but it meant having to find out about their salaries and stuff. There isn't a Salary
+                 *  object in the Permissions screen, so maybe it comes under Contracts > Salary somehow
+                 */
+                $department = '';
 
-            /* FIXME Controversial - maybe never include phone numbers at all?
-             */
-            $phone = trim((string)$staff['contact_details']['data']['phones']['work']);
+                /* FIXME Still can't tell the difference between 'email' and 'primary' usages
+                 */
+                $email = trim((string)$staff['contact_details']['data']['emails']['email']);
 
-            $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
-            $room = '';
-            $title = trim((string)$staff['contact_details']['data']['salutation']);
-            $username = trim((string)$staff['employment_details']['data']['staff_code']);
+                /* FIXME Controversial - maybe never include phone numbers at all?
+                 */
+                $phone = trim((string)$staff['contact_details']['data']['phones']['work']);
 
-            /* Find out if this externalId already has a staff profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
-             */
-            try {
-                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
-                $staffBaseProfile = $staffProfile->getBaseProfile();
-            } catch (Exception $e) {
-                $staffProfile = $this->staffProfileMapper->createModel();
+                $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
+                $room = '';
+                $title = trim((string)$staff['contact_details']['data']['salutation']);
+                $username = trim((string)$staff['employment_details']['data']['staff_code']);
 
+                /* Find out if this externalId already has a staff profile
+                 * If one already exists, load it, update it, then save it
+                 * Otherwise make a new one for the given id
+                 */
                 try {
-                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                    $staffBaseProfile = $staffProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    $staffProfile = $this->staffProfileMapper->createModel();
+
+                    try {
+                        $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    } catch (Exception $e) {
+                        $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    }
+
+                    $staffProfile->setBaseProfile($staffBaseProfile);
                 }
 
-                $staffProfile->setBaseProfile($staffBaseProfile);
+                $staffBaseProfile
+                    ->setExternalId($externalId)
+                    ->setTitle($title)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname);
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
+
+                $staffProfile
+                    ->setBuilding($building)
+                    ->setCampusName($campusName)
+                    ->setCategory($category)
+                    ->setDepartment($department)
+                    ->setEmail($email)
+                    ->setPhone($phone)
+                    ->setPositionTitle($positionTitle)
+                    ->setRoom($room)
+                    ->setUsername($username);
+
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding staff profile for %s (%s)',
+                    trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                    $externalId
+                ));
+
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->staffProfileMapper->save($staffProfile);
+                }
             }
 
-            $staffBaseProfile
-                ->setExternalId($externalId)
-                ->setTitle($title)
-                ->setFirstname($firstname)
-                ->setLastname($lastname);
-
-            /* Then save it
+            /* If there's a pagination struct, there's more data to come...
+             * But make sure that the 'next' element exists before trying to go there
              */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
-            }
+            $nextUrl = false;
 
-            $staffProfile
-                ->setBuilding($building)
-                ->setCampusName($campusName)
-                ->setCategory($category)
-                ->setDepartment($department)
-                ->setEmail($email)
-                ->setPhone($phone)
-                ->setPositionTitle($positionTitle)
-                ->setRoom($room)
-                ->setUsername($username);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding staff profile for %s (%s)',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
-                $externalId
-            ));
-
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->staffProfileMapper->save($staffProfile);
+            if (array_key_exists('pagination', $staffs['meta'])) {
+                $nextUrl = $staffs['meta']['pagination']['next'] ?? false;
             }
         }
     }
