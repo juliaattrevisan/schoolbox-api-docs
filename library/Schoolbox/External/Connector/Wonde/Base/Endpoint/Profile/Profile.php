@@ -510,7 +510,7 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(array $medicalConditions): ?string
     {
-        if (\count($medicalConditions)) {
+        if (\count($medicalConditions['data'])) {
             return 'This student has medical conditions.';
         }
 
