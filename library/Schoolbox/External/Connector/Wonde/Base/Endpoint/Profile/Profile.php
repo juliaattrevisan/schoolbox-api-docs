@@ -198,7 +198,7 @@ class Profile implements IStrategy
                 $gender      = trim((string)$student['gender']);
                 $lastname    = trim((string)$student['surname']);
                 $mobile      = '';
-                $studiesCode = '';
+                $studiesCode = trim((string)$student['education_details']['data']['learner_number']);
                 $title       = '';
                 $tutor       = '';
                 $tutorGroup  = '';
