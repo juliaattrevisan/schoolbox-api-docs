@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -177,6 +178,7 @@ class Profile implements IStrategy
                 'medical_conditions',
                 'education_details',
                 'sen_needs',
+                'identifiers',
                 'contacts',
                 'contacts.contact_details'
             ])
@@ -185,7 +187,7 @@ class Profile implements IStrategy
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $students = $this->api->retrieve('GET', $nextUrl, []);
 
-            foreach ($students['data'] as $student) {
+            foreach ($students['data'] as $student) {print_r($student);die();
                 $externalId     = trim((string)$student['mis_id']);
                 $academicHouse  = trim((string)($student['house']['data']['name'] ?? ''));
                 $boardingStatus = false;
@@ -202,7 +204,19 @@ class Profile implements IStrategy
                 $title       = '';
                 $tutor       = '';
                 $tutorGroup  = '';
-                $username    = $externalId;
+
+                /* There's a Username in the identifiers object, but it's not always set
+                 * I guess we take a punt about meaningful values, though there's this other
+                 * field active_directory_username (surprise, also not mandatory)
+                 *
+                 * https://docs.wonde.com/docs/api/sync#student-identifiers-object
+                 */
+                $username    = (new FirstMeaningfulValue())->find([
+                    $student['identifiers']['data']['username'] ?? null,
+                    $student['identifiers']['data']['active_directory_username'] ?? null,
+                    $externalId
+                ]);
+
                 $yearLevel   = trim((string)$student['education_details']['data']['current_nc_year']);
 
                 $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
