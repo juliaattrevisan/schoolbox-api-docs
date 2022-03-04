@@ -185,7 +185,7 @@ class Profile implements IStrategy
 
             foreach ($students['data'] as $student) {
                 $externalId     = trim((string)$student['mis_id']);
-                $academicHouse  = trim((string)$student['house']['data']['name']);
+                $academicHouse  = trim((string)($student['house']['data']['name'] ?? ''));
                 $boardingStatus = false;
                 $campusName     = '';
 
