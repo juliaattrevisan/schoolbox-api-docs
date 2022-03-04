@@ -355,6 +355,17 @@ class Profile implements IStrategy
                             ->setEmergencyContactName3($emergencyContacts[2]['name'])
                             ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
                     }
+                } else {
+                    /* This student doesn't have any emergency contacts anymore
+                     * Clear whatever was there
+                     */
+                    $studentProfile
+                        ->setEmergencyContactName1(null)
+                        ->setEmergencyContactPhone1(null)
+                        ->setEmergencyContactName2(null)
+                        ->setEmergencyContactPhone2(null)
+                        ->setEmergencyContactName2(null)
+                        ->setEmergencyContactPhone2(null);
                 }
 
                 /* Log it
