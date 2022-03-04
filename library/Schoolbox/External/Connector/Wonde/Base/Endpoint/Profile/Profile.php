@@ -45,8 +45,9 @@ class Profile implements IStrategy
 
     /**
      * Number of records per page
+     * The maximum is an unwritten 200 or so, apparently
      */
-    private const NUM_PER_PAGE = 50;
+    private const NUM_PER_PAGE = 200;
 
 
     /**
