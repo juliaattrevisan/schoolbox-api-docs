@@ -1,12 +1,12 @@
 <script>
 
 import axios  from 'axios';
-import MediaArticle from '@vue/components/media-article';
-import Storage from '@vue/components/storage';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
-import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
-import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Storage from '@schoolboxVue/components/storage';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import AddCommentInput from '@schoolboxVue/components/ckeditor/add-comment-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 
 export default {
@@ -312,14 +312,12 @@ export default {
 
                 <toast ref="toast"></toast>
                 <reveal-modal ref="deleteModal">
-                    <template>
-                        <h2>Please confirm</h2>
-                        <p>Are you sure you want to delete this comment?</p>
-                        <ul class="flex-list buttons">
-                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Delete</a></li>
-                            <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
-                        </ul>
-                    </template>
+                    <h2>Please confirm</h2>
+                    <p>Are you sure you want to delete this comment?</p>
+                    <ul class="flex-list buttons">
+                        <li><button @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Delete</button></li>
+                        <li><button @click.prevent="$refs.deleteModal.close" class="button">Cancel</button></li>
+                    </ul>
                 </reveal-modal>
             </div>
         </section>

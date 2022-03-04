@@ -1,25 +1,22 @@
-import Vue from 'vue';
-import ActivityFeed from '../../Moment/Evidence/vue/feed.vue';
-import GoalFeed from '../../Badge/Award/vue/goal-feed.vue';
-import AchievementFeed from '../../Badge/Award/vue/achievement-feed.vue';
+import { createApp } from 'vue';
+import ActivityFeed from '../../Moment/Evidence/vue/feed';
+import GoalFeed from '../../Badge/Award/vue/goal-feed';
+import AchievementFeed from '../../Badge/Award/vue/achievement-feed';
 
-new Vue({
-    el: '#activity-feed',
+createApp({
     components: {
-        'activity-feed': ActivityFeed
+        ActivityFeed
     }
-});
+}).mount('#activity-feed');
 
-new Vue({
-    el: '#goal-feed',
+createApp({
     components: {
-        'goal-feed': GoalFeed
+        GoalFeed
     }
-});
+}).mount('#goal-feed');
 
-new Vue({
-    el: '#achievement-feed',
+createApp({
     components: {
-        'achievement-feed': AchievementFeed
+        AchievementFeed
     }
-});
+}).mount('#achievement-feed');

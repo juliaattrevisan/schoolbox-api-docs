@@ -26,7 +26,7 @@ export default {
          * @returns { Boolean }
          */
         isEventInListComponent () {
-            return this.$el.parentElement.className.includes('list');
+            return this.$el.parentElement.parentElement.className.includes('fc-list-event-title');
         },
 
         /**
@@ -35,7 +35,7 @@ export default {
          * @returns { String }
          */
         eventBackgroundColor () {
-            return this.$el.parentElement.parentElement.style.backgroundColor;
+            return this.$el.parentElement.parentElement.parentElement.style.backgroundColor;
         },
 
         /**

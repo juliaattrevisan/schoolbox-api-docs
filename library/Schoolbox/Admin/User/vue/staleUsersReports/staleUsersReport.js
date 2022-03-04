@@ -1,12 +1,11 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import StaleUsersReport from './stale-users-report';
-import { ClientTable } from 'vue-tables-2-premium';
+import { ClientTable } from 'v-tables-3-select-rows';
 
-Vue.use(ClientTable);
-
-new Vue({
-	el: '#stale-users-report',
-	components: {
-		'stale-users-report': StaleUsersReport
+const app = createApp({
+    components: {
+        StaleUsersReport
     }
 });
+app.use(ClientTable)
+app.mount('#stale-users-report');

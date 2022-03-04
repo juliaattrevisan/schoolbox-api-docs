@@ -6,8 +6,8 @@
 
 // import HorizontalScroller from '@js/scroll/HorizontalScroller';
 import { gsap, Draggable, InertiaPlugin } from 'gsap/all';
-import { ResizeObserver } from 'vue-resize';
-import 'vue-resize/dist/vue-resize.css';
+import { ResizeObserver } from 'vue3-resize';
+import 'vue3-resize/dist/vue3-resize.css';
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 

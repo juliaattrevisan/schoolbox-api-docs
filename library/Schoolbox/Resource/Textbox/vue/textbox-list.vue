@@ -1,8 +1,8 @@
 <script>
 
 import axios from 'axios';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
 
 const EVENT_ADD_TEXTBOX = 'textbox-list-add';
 const EVENT_BEFORE_UNLOAD = 'beforeunload';
@@ -309,7 +309,7 @@ export default {
          * @param {Number} index The index to mark as dirty in `this.textboxes`
          */
         markAsDirty(index) {
-            this.$set(this.textboxes[index], 'dirty', true);
+            this.textboxes[index]['dirty'] = true;
         },
 
         /**
@@ -318,7 +318,7 @@ export default {
          * @param {Number} index The index to mark as clean in `this.textboxes`
          */
         markAsClean(index) {
-            this.$set(this.textboxes[index], 'dirty', false);
+            this.textboxes[index]['dirty'] = false;
         },
 
         /**
@@ -330,7 +330,7 @@ export default {
          * @param {Number} index The index to remove from `this.textboxes`
          */
         markAsDeleted(index) {
-            this.$set(this.textboxes[index], 'deleted', true);
+            this.textboxes[index]['deleted'] = true;
 
             // This textbox's state has been persisted, thus it is not dirty
             this.markAsClean(index);
@@ -451,7 +451,7 @@ export default {
             <section>
                 <ul class="information-list unsortable expandable-card">
                     <template v-for="(usage, index) in textboxes">
-                        <li v-if="usage.deleted !== true">
+                        <li v-if="usage.deleted !== true" :key="index">
                             <div class="actions-small-1">
                                 <div :class="{'expander': true, 'icon-up-arrow': Boolean(usage.textbox.id)}"
                                      :data-collapser="'collapser-textbox-' + String(index)"></div>
@@ -470,9 +470,7 @@ export default {
                                             <template v-if="inUseOnThisFolder(usage)">
                                                 this page<template v-if="otherFolders(usage).length > 0">, </template>
                                             </template>
-                                            <template v-for="(folder, index) in otherFolders(usage)">
-                                                <a :href="folder._links.view">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
-                                            </template>
+                                            <a v-for="(folder, index) in otherFolders(usage)" :href="folder._links.view" :key="index">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
                                         </p>
 
                                         <p class="meta" v-if="usage.dashboards.length > 0">
@@ -514,8 +512,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this text box?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="sendDeleteTextboxRequest" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+                <li><button @click.prevent="sendDeleteTextboxRequest" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</button></li>
+                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</button></li>
             </ul>
         </reveal-modal>
     </form>

@@ -1,6 +1,6 @@
 <script>
 
-import RevealModal    from '@vue/components/reveal-modal'
+import RevealModal    from '@schoolboxVue/components/reveal-modal'
 import ExportUrlModal from './export-url-modal';
 import qs             from 'qs';
 

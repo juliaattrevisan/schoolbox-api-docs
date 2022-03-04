@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import BadgeImage from '../../vue/badge-image';
-import Toast from "@vue/components/toast";
+import Toast from "@schoolboxVue/components/toast";
 
 // Vue-select boilerplate
 // TODO consider wrapping in our own component
@@ -12,7 +12,7 @@ import "vue-select/dist/vue-select.css";
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from '@vue/components/selectize/Deselect';
+import Deselect from '@schoolboxVue/components/selectize/Deselect';
 vSelect.props.components.default = () => ({ Deselect });
 
 import {calculateExpiryDate} from '../../vue/expiry-helper'
@@ -276,12 +276,12 @@ export default {
                   label="name"
                   :placeholder="placeholder"
                   v-model="selected">
-            <template slot="option" slot-scope="option">
+            <template #option="option">
                 <span class="d-center">
                     {{ option.name }}
                 </span>
             </template>
-            <template slot="selected-option" slot-scope="option">
+            <template #selected-option="option">
                 <span class="selected d-center">
                     {{ option.name }}
                 </span>

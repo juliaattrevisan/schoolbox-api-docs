@@ -6,13 +6,9 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
-import Toast from '@vue/components/toast';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import Toast from '@schoolboxVue/components/toast';
 import FilterEvents from './similarityReportFilterEvents';
-import SimilarityReportRowStudent from './similarity-report-row-student';
-import SimilarityReportRowSubmissionDate from './similarity-report-row-submission-date';
-import SimilarityReportRowSimilarity from './similarity-report-row-similiarity';
-import SimilarityReportRowStatus from './similarity-report-row-status';
 
 
 export default {
@@ -115,13 +111,8 @@ export default {
                     down: 'glyphicon-chevron-down'
                 },
                 tabbable: false,
-                templates: { //refer to https://matanya.gitbook.io/vue-tables-2/templates for further info
-                    student: SimilarityReportRowStudent,
-                    submissionDate: SimilarityReportRowSubmissionDate,
-                    similarity: SimilarityReportRowSimilarity,
-                    status: SimilarityReportRowStatus,
-                },
             },
+            currentSimilartyScoreSelection: 0, //to be able to show only those files above the currently selected similarity score
             comment: '', //the message coupled with the mark as requiring resubmission
             singleRowName: 'submission',
             pluralRowName: 'submissions',
@@ -225,10 +216,20 @@ export default {
          * So we can ensure that rows that are removed through filters are also removed from the selected rows
          */
         initFilterListeners () {
-            document.addEventListener(FilterEvents.SIMILARITY_SCORE, () => this.onFilterChanged());
+            document.addEventListener(FilterEvents.SIMILARITY_SCORE, (event) => this.onSimilarityScoreChanged(event));
             document.addEventListener(FilterEvents.RESUBMISSION_REQUIRED, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.MARKING_REQUIRED, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.REVIEWED, () => this.onFilterChanged());
+        },
+
+        /**
+         * Show only the files within selected similarity range
+         * 
+         * @param { Object }
+         */
+        onSimilarityScoreChanged (event) {
+            this.currentSimilartyScoreSelection = parseInt(event.detail.score);
+            this.onFilterChanged();
         },
 
         /**
@@ -240,6 +241,72 @@ export default {
             const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
             this.$refs.table.unselectRows(rowsToUnselect);
             this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
+        },
+
+        /**
+         * Only show those files that are above the currently selected
+         * similarity score
+         *
+         * @param { Array }
+         * 
+         * @returns { Array }
+         */
+        matchedFiles (files) {
+            return files.filter((file) => {
+                return parseInt(file.turnitin.percentage.overall) >= parseInt(this.currentSimilartyScoreSelection);
+            });
+        },
+
+        /**
+         * Add a colour to represent the similarity score
+         * A low score starting with green to high score red is used
+         *
+         * @param { Object }
+         *
+         * @returns { String }
+         */
+        getFileColour (file) {
+            const percentageRounded = Math.round(file.turnitin.percentage.overall);
+            if (percentageRounded == 0) {
+                return '#0c78cf'; //blue 
+            } else if (this.isBetween(percentageRounded, 1, 24)) {
+                return '#278829'; //green
+            } else if (this.isBetween(percentageRounded, 25, 49)) {
+                return '#eab42c'; //yellow
+            } else if (this.isBetween(percentageRounded, 50, 74)) {
+                return '#e27600'; //orange
+            } else if (this.isBetween(percentageRounded, 75, 100)) {
+                return '#ff0000'; //red
+            } 
+        },
+
+        /**
+         * Check if x is between a min and max
+         *
+         * @param { Number }
+         * @param { Number }
+         * @param { Number }
+         *
+         * @returns { Boolean }
+         */
+        isBetween (x, min, max) {
+            return x >= min && x <= max;
+        },
+
+        /**
+         * Format the submission status display label
+         *
+         * @param { String }
+         *
+         * @return { String }
+         */
+        getFormattedStatus (status) {
+            const statusOptions = {
+                'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
+                'pending': '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
+                'reviewed': '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
+            }
+            return statusOptions[status];
         },
 
         /**
@@ -354,9 +421,53 @@ export default {
                 :options="tableOptions"
                 @select="onRowSelected"
             >
-                <div slot="beforeTable">
+                <template #beforeTable>
                     <similarity-report-filters />
-                </div>
+                </template>
+                <template #student="props">
+                    <div class="student title-on-single-column" data-title="Student">
+                        <div class="student__portrait">
+                            <img :src="`/portrait.php?id=${props.row.user.id}&size=square32`" :alt="`profile photo of ${props.row.user.fullname}`" class="portrait">
+                        </div>
+                        <div class="student__name">
+                            <template v-if="props.row.user.id">
+                                <a :href="`/search/user/${props.row.user.id}`" title="View profile" class="name">
+                                    <h3>{{ props.row.user.lastname + ', ' + props.row.user.firstname }}</h3>
+                                </a>
+                            </template>
+                            <template v-else>
+                                <h3>{{ props.row.user.lastname + ', ' + props.row.user.firstname }}</h3>
+                            </template> 
+                        </div>
+                    </div>
+                </template>
+                <template #submissionDate="props">
+                    <div class="submission-date title-on-single-column" data-title="Submission date"> 
+                        <span :title="props.row.submission.submitted_at.relative">{{ props.row.submission.submitted_at.nice }}</span>
+                    </div>
+                </template>
+                <template #similarity="props">
+                    <div class="similarity title-on-single-column" data-title="Similarity %">
+                        <ul class="list">
+                            <li v-for="file in matchedFiles(props.row.files)" :key="file.id">
+                                <a class="file" :href="file._links.turnitin_report"  title="View similarity check">
+                                    <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
+                                    <span>{{ file.name + '.' + file.ext }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+                <template #status="props">
+                    <div class="status title-on-single-column" data-title="Status">
+                        <div class="status__column">
+                            <p class="meta" v-html="getFormattedStatus(props.row.submission.status)"></p>
+                        </div>
+                        <div class="status__column">
+                            <a class="button button-status icon-approve" :href="props.row.submission._links.inline_grader" title="Review submission">Review submission</a>
+                        </div>
+                    </div>
+                </template>
             </v-client-table>
 
             <div v-else-if="hasNoSubmissions" class="empty-state">
@@ -408,7 +519,7 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 @import './similarity-report';
 
 .VuePagination {
@@ -439,6 +550,67 @@ export default {
         padding: 0.5rem 0;
         width: 100%;
     }
+}
+
+.student {
+    display: flex;
+    @media (max-width: $tableToDoubleColumn) {
+        flex-wrap: wrap; //so .title-on-single-column can be on its own row
+    }
+}
+
+.student__portrait {
+    flex: 0 0 32px; //32px is the size of the image, so only need occupy this space
+    margin: 0 1rem 0.5rem 0;
+}
+
+.student__name {
+    h3 {
+        margin-bottom: 0rem; //prevent any extra space at the bottom of rows
+        margin-top: 0.25rem;
+    }
+}
+
+.list {
+    list-style-type: none;
+    margin: 0;
+    li {
+        margin-bottom: 0.25rem;
+    }
+}
+
+.file {
+    display: flex; //so when filenames are long, they don't sit under the percentage, rather +1 lines stay under the filename 'column' 
+}
+
+.percentage { //block percentages so files names line up
+    flex: 0 0 40px;
+    margin-right: 0.5rem;
+    text-align: right;
+    width: 40px;
+}
+
+.status {
+    display: flex;
+    justify-content: space-between; //the status and review buttons on either ends of column
+    @media (max-width: $tableToDoubleColumn) {
+        flex-direction: column;
+    }
+}
+
+    .status__column {
+        @media (max-width: $tableToDoubleColumn) {
+            margin-bottom: 0.5rem; //so there's a gap to .button
+        }
+    }
+
+.meta .progress-tick {
+    margin-right: 0.5rem; //bit of extra gap
+}
+
+.button-status {
+    min-height: 0; //no need for min height in this instance
+    padding: 0.5rem 1rem; //add a bit more space left and right of the button
 }
 
 .selected-count {

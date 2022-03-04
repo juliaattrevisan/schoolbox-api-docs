@@ -7,7 +7,7 @@
 import { gsap } from 'gsap/all';
 import BadgeImage from '../../vue/badge-image';
 import { getIndex } from '@js/util/domUtils';
-import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
+import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 
 const BADGE_ANIMATE_DURATION = 0.3;
 
@@ -299,7 +299,7 @@ $collapseStudent: 1000px;
         height: 100%;
     }
 
-    .award__image-container::v-deep { //v-deep is used so can target the img succesfully
+    :deep(.award__image-container) { //v-deep is used so can target the img succesfully
         position: relative;
         flex: 0 0 50px;
         padding: 0.25rem 0.5rem;

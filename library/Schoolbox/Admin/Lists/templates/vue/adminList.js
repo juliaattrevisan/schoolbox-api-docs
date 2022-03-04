@@ -1,11 +1,9 @@
-import Vue from 'vue';
-import store from './store/adminListStore'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia'
 import AdminList from './admin-list';
 
-new Vue({
-	el: '#admin-list',
-    store,
+createApp({
 	components: {
 		AdminList
     }
-});
+}).use(createPinia()).mount('#admin-list');

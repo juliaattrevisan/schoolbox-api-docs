@@ -6,8 +6,8 @@
  *
  */
 
-import RecordedMedia from '@vue/components/videojs-record/recorded-media';
-import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
+import RecordedMedia from '@schoolboxVue/components/videojs-record/recorded-media';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
 import { blobToDataURL } from '@js/util/fileUtils';
@@ -187,7 +187,7 @@ export default {
     text-align: center;
 }    
 
-.dzone::v-deep { //piggy back on the existing dropzone styles, and update as needed
+:deep(.dzone) { //piggy back on the existing dropzone styles, and update as needed
     position: absolute;
     z-index: 1;
     width: 100%;

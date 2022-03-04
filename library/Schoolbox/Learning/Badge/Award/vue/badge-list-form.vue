@@ -1,12 +1,12 @@
 <script>
 
 import axios from 'axios';
-import RevealModal from "@vue/components/reveal-modal";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
-import toastMixin from '@vue/components/toast-mixin';
-import HorizontalScoller from '@vue/components/scroll/horizontal-scoller';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
+import toastMixin from '@schoolboxVue/components/toast-mixin';
+import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 
 
 /**
@@ -282,6 +282,9 @@ export default {
         }
 
     },
+    mounted () {
+        document.addEventListener('badge-list-form__onFilterChange', this.onFilterChange);
+    },
     methods: {
 
         /**
@@ -292,8 +295,8 @@ export default {
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange(selectedFilters) {
-            this.$refs.badgeList.onFilterChange(selectedFilters);
+        onFilterChange(event) {
+            this.$refs.badgeList.changeFilters(event.detail.selectedFilters);
         },
 
         /**

@@ -5,7 +5,7 @@
  *
  */
 
-import RecordAudioOnlyBrowser from '@vue/components/videojs-record/record-audio-only-browser';
+import RecordAudioOnlyBrowser from '@schoolboxVue/components/videojs-record/record-audio-only-browser';
 
 
 export default {
@@ -28,7 +28,7 @@ export default {
         
     <record-audio-only-browser
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
 
 </template>

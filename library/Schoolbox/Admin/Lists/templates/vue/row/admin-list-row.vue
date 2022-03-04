@@ -4,11 +4,11 @@
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from '../store/adminListStore';
 import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
 import AdminListRowPopOut from './admin-list-row-pop-out';
-import { DELETE_ROW_PROMPT } from '../store/adminListMutationTypes';
 
 export default {
 
@@ -27,19 +27,16 @@ export default {
 
     computed: {
 
-        ...mapState({
+        ...mapState(useAdminListStore, {
             isSortable: state => state.loadedData.isSortable,
             canDelete: state => state.loadedData.canDelete,
             selectedRow: state => state.selectedRow,
             isPopOutOpen: state => state.isPopOutOpen,
             selectedPopOutName: state => state.selectedPopOutName,
+            headerFields: state => state.headerFields, //the headerFields to display within the list item
+            popOutHeaderField: state => state.popOutHeaderField,  //the title field of the pop out
+            popOutFields: state => state.popOutFields, //when a #admin-list-pop-out.vue is in use
         }),
-
-        ...mapGetters([
-            'headerFields', //the headerFields to display within the list item
-            'popOutHeaderField', //the title field of the pop out
-            'popOutFields', //when a #admin-list-pop-out.vue is in use
-        ]),
 
         /**
          * To retrieve a list of key/value pairs contained within the row object
@@ -63,25 +60,18 @@ export default {
             return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-        message: {
-            get () {
-                return this.$store.state.obj.message
-            },
-            set (value) {
-                this.$store.commit('updateMessage', value)
-            }
-        }
-
     },
 
     methods: {
+
+        ...mapActions(useAdminListStore, ['deleteRowPrompt']),
 
         /**
          * To confirm whether should delete the row
          */
         onDeleteRowSelected () {
-            this.$store.commit(DELETE_ROW_PROMPT, this.row);
-        }
+            this.deleteRowPrompt(this.row);
+        },
 
     }
 
@@ -97,66 +87,53 @@ export default {
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
             <div class="list-item">
-                <template v-for="(field, index) in headerFields">
-                    <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
-                       
-                        <span class="hide-for-medium-up">{{ field.caption }}</span>
-                        
-                        <template v-if="field.readonly">
-                            <p>{{ row[field.id] }}</p>
-                        </template>
 
-                        <template v-else-if="field.checkbox">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    type="checkbox"
-                                    v-model="row[field.id]"
-                                />
-                                <label :for="`${row.id}-${field.caption}`"></label>
-                            </div>
-                        </template>
+                <div v-for="(field) in headerFields" :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="field.id">
+                    
+                    <span class="hide-for-medium-up">{{ field.caption }}</span>
+                    
+                    <template v-if="field.readonly">
+                        <p>{{ row[field.id] }}</p>
+                    </template>
 
-                        <template v-else-if="field.lookup">
-                            <admin-list-row-lookup
-                                :field="field"
-                                :row="row"
+                    <template v-else-if="field.checkbox">
+                        <div class="checklist">
+                            <input 
+                                :id="`${row.id}-${field.caption}`"
+                                type="checkbox"
+                                v-model="row[field.id]"
                             />
-                        </template>
+                            <label :for="`${row.id}-${field.caption}`"></label>
+                        </div>
+                    </template>
 
-                        <template v-else-if="field.colour">
-                            <admin-list-row-colour
-                                :caption="field.caption"
-                                :colour="row[field.id]"
-                                @input="row[field.id] = $event"
-                            />
-                        </template>
+                    <template v-else-if="field.lookup">
+                        <admin-list-row-lookup
+                            :field="field"
+                            :row="row"
+                        />
+                    </template>
 
-                        <template v-else-if="field.isPopOutList">
-                            <admin-list-row-pop-out
-                                :row="row"
-                            />
-                        </template>
+                    <template v-else-if="field.colour">
+                        <admin-list-row-colour
+                            :caption="field.caption"
+                            :colour="row[field.id]"
+                            @input="row[field.id] = $event"
+                        />
+                    </template>
 
-                        <template v-else>
-                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
-                        </template>
+                    <template v-else-if="field.isPopOutList">
+                        <admin-list-row-pop-out
+                            :row="row"
+                        />
+                    </template>
 
-                        <!-- <template v-if="field.nullable">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    v-model="row[field.id]"
-                                    type="checkbox"
-                                />
-                                <label :for="`${row.id}-${field.caption}`">
-                                    {{ field.nullable_label }}
-                                </label>
-                            </div>
-                        </template> -->
-                        
-                    </div>
-                </template>
+                    <template v-else>
+                        <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
+                    </template>
+                    
+                </div>
+
             </div><!-- .list-item -->
 
             <nav v-if="canDelete">

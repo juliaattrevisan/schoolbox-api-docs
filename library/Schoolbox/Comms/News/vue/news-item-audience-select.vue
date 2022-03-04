@@ -10,9 +10,6 @@
  *
  */
 
-import Vue from 'vue';
-
-
 export default {
 
     props: {
@@ -613,8 +610,7 @@ export default {
             // Remove this option from the other dropdown if it is not a 1:N relationship
             this.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
             if (!audienceOption.isMulti) {
-                //console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
-                Vue.delete(this.audienceOptions.intersect[otherList], audienceOption.entityType);
+                delete this.audienceOptions.intersect[otherList][audienceOption.entityType];
             }
 
             // Try for cached list
@@ -767,26 +763,24 @@ export default {
                     </div>
                 </div>
                 <div class="row">
-                    <template v-for="(item, key, index) in intersect">
-                        <div class="small-12 medium-6 columns checklist" :key="index">
-                            <legend>
-                                <label for="">Audience Type {{ index + 1 }}:</label>
-                                <select @change="updateIntersectList(key)" v-model="intersect[key]">
-                                    <template v-for="(audienceOption, index) in audienceOptions.intersect[key]">
-                                    <option :value="audienceOption" v-if="!audienceOption.hideFromModal" :key="index">
-                                        {{ audienceOption.name }}
-                                    </option>
-                                    </template>
-                                </select>
-                            </legend>
-                            <ul class="option-list" v-for="(item, key2) in audienceListItemsIntersect[key]" :key="key2">
-                                <li>
-                                    <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2 + '-input'">
-                                    <label :for="key + '-' + key2" class="checkbox-label" :key="key2 + '-label'">{{ item }}</label>
-                                </li>
-                            </ul>
-                        </div>
-                    </template>
+                    <div v-for="(item, key, index) in intersect" class="small-12 medium-6 columns checklist" :key="index">
+                        <legend>
+                            <label for="">Audience Type {{ index + 1 }}:</label>
+                            <select @change="updateIntersectList(key)" v-model="intersect[key]">
+                                <template v-for="(audienceOption, index) in audienceOptions.intersect[key]">
+                                <option :value="audienceOption" v-if="!audienceOption.hideFromModal" :key="index">
+                                    {{ audienceOption.name }}
+                                </option>
+                                </template>
+                            </select>
+                        </legend>
+                        <ul class="option-list" v-for="(item, key2) in audienceListItemsIntersect[key]" :key="key2">
+                            <li>
+                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2 + '-input'">
+                                <label :for="key + '-' + key2" class="checkbox-label" :key="key2 + '-label'">{{ item }}</label>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="small-12 columns">
@@ -810,9 +804,7 @@ export default {
                 <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="(dimensionData, index) in selectedCompositeBrick.modalData" :key="index">
                     <p><strong>{{ dimensionData.typeLabel.plural }}</strong></p>
                     <ul>
-                        <template v-for="(label, index) in dimensionData.valueLabels">
-                            <li :key="index">{{ label }}</li>
-                        </template>
+                        <li v-for="(label, index) in dimensionData.valueLabels" :key="index">{{ label }}</li>
                     </ul>
                 </div>
             </div>

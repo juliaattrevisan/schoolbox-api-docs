@@ -11,8 +11,8 @@ import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
-import RecordedMedia from '@vue/components/videojs-record/recorded-media';
-import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
+import RecordedMedia from '@schoolboxVue/components/videojs-record/recorded-media';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import { getAudioOnlyRecordOptions } from '@js/videojs/videojsOptions';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import recordMediaEvents from '@js/record-media/recordMediaEvents';
@@ -62,7 +62,7 @@ export default {
         }
     },
 
-    beforeDestroy () {
+    beforeUnmount () {
         this.destroyVideojs();
     },
 
@@ -310,6 +310,6 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@vue/components/videojs-record/videojs-record';
+@import '@schoolboxVue/components/videojs-record/videojs-record';
 
 </style>

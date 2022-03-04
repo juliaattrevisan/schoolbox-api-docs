@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import CalendarEventDetails from './calendar-event-details';
 
-new Vue({
-    el: '#event-details',
+createApp({
     components: {
-        'calendar-event-details': CalendarEventDetails
+        CalendarEventDetails
     }
-});
+}).mount('#event-details');

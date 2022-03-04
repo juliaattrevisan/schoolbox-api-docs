@@ -1,9 +1,8 @@
-import Vue from "vue";
-import TextboxList from "./textbox-list";
+import { createApp } from 'vue';
+import TextboxList from './textbox-list';
 
-new Vue({
-    el: '#textbox-list',
+createApp({
     components: {
-        'textbox-list': TextboxList
+        TextboxList
     }
-});
+}).mount('#textbox-list');

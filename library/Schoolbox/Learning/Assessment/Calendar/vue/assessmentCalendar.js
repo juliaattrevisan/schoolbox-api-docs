@@ -1,9 +1,8 @@
-import Vue from "vue";
-import AssessmentCalendar from "./assessment-calendar";
+import { createApp } from 'vue';
+import AssessmentCalendar from './assessment-calendar';
 
-window.assessmentCalendar = new Vue({
-    el: '#calendar',
+createApp({
     components: {
-        'assessment-calendar': AssessmentCalendar
+        AssessmentCalendar
     }
-});
+}).mount('#calendar');

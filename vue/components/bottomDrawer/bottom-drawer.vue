@@ -1,7 +1,7 @@
 <script>
 
-import { ResizeObserver } from 'vue-resize';
-import 'vue-resize/dist/vue-resize.css';
+import { ResizeObserver } from 'vue3-resize';
+import 'vue3-resize/dist/vue3-resize.css';
 
 /**
  * To display content that appears when requested from the bottom of the window.

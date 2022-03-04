@@ -5,11 +5,12 @@
  * Currently only checkboxes are being considered, can be extended as required
  */
 
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from './store/adminListStore'
 import { gsap } from 'gsap/all';
 import saveRows from './mixins/mixinAdminListSaveRows';
-import { CLOSE_POP_UP } from './store/adminListMutationTypes'
-import Toast from '@vue/components/toast';
+import Toast from '@schoolboxVue/components/toast';
+
 
 export default {
 
@@ -36,14 +37,11 @@ export default {
 
     computed: {
 
-        ...mapState({
+        ...mapState(useAdminListStore, {
             selectedRow: state => state.selectedRow,
-            isOpen: state => state.isPopOutOpen
-        }),
-
-        ...mapGetters({
-            headerField: 'popOutHeaderField', //the header field object
-            fields: 'popOutFields' //the fields to display within the pop out
+            isOpen: state => state.isPopOutOpen,
+            headerField: state => state.popOutHeaderField, //the header field object
+            fields: state => state.popOutFields, //the fields to display within the pop out
         }),
 
         /**
@@ -125,6 +123,8 @@ export default {
 
     methods: {
 
+        ...mapActions(useAdminListStore, ['closePopUp']),
+
         /**
          * Animate the view on
          */
@@ -168,7 +168,7 @@ export default {
          * Close the pop out
          */
         onCloseSelected () {
-            this.$store.commit(CLOSE_POP_UP);
+            this.closePopUp();
         },
 
     }
@@ -180,7 +180,7 @@ export default {
     <div class="outer-container" :style="`display: ${ isActive ? 'block' : 'none' };`">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" @keyup.enter="onCloseSelected"  :disabled="saveRows_isProcessing" title="close pop out"></a>
+            <button href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" @keyup.enter="onCloseSelected"  :disabled="saveRows_isProcessing" title="close pop out"></button>
             <ul class="option-list" data-option-list>
                 <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
                     <input
@@ -231,8 +231,8 @@ export default {
 
 .close-button {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 10px;
+    right: 10px;
     padding: 2px 2px 2px 10px;
     font-size: 1.5rem;
 }

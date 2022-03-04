@@ -5,11 +5,11 @@
  * This component manages both 'public' and 'private' recordTypes
  */
 
-import AddCommentInput from '@vue/components/ckeditor/add-comment-input';
-import MediaArticle from '@vue/components/media-article';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
-import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import AddCommentInput from '@schoolboxVue/components/ckeditor/add-comment-input';
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 
 export default {
@@ -218,8 +218,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteComment" class="button submit">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+                <li><button @click.prevent="deleteComment" class="button submit">Delete</button></li>
+                <li><button @click.prevent="$refs.deleteModal.close" class="button">Cancel</button></li>
             </ul>
         </reveal-modal>
 

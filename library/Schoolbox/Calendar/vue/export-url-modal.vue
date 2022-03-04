@@ -1,5 +1,5 @@
 <script>
-    import RevealModal from '@vue/components/reveal-modal';
+    import RevealModal from '@schoolboxVue/components/reveal-modal';
     import ClipboardJs from 'clipboard/dist/clipboard';
 
     export default {
@@ -34,7 +34,7 @@
         /**
          * On destroy: clean up the clipboardJS object
          */
-        beforeDestroy() {
+        beforeUnmount() {
             this.clipboardJs.destroy();
         },
 

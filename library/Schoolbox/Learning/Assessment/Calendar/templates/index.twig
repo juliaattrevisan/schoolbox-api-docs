@@ -14,8 +14,12 @@ Usage:
         // Filtered content has been [re]loaded
         // (Shouldn't this trigger contain the filters that are selected?)
         $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-            // Somehow pass the list of filters into the Vue calendar
-            window.assessmentCalendar.$children[0].onFilterChange(selectedFilters);
+            // Pass the list of filters into the Vue calendar
+            document.dispatchEvent(new CustomEvent('assessment-calendar__onFilterChange', {
+                detail: {
+                    selectedFilters
+                }
+            }));
         });
     });
 

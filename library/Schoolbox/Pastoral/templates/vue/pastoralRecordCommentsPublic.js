@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import PastoralRecordComments from './pastoral-record-comments';
 
-new Vue({
-    el: '#pastoral-record-comments-container-public',
+createApp({
     components: {
         PastoralRecordComments,
     }
-});
+}).mount('#pastoral-record-comments-container-public');

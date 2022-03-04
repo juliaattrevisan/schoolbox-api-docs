@@ -1,9 +1,8 @@
-import Vue from "vue";
-import UpcomingDueWorkCalendar from "./upcoming-due-work-calendar";
+import { createApp } from 'vue';
+import UpcomingDueWorkCalendar from './upcoming-due-work-calendar';
 
-window.upcomingDueworkCalendar = new Vue({
-    el: '#calendar',
+createApp({
     components: {
-        'upcoming-due-work-calendar': UpcomingDueWorkCalendar
+        UpcomingDueWorkCalendar
     }
-});
+}).mount('#calendar');

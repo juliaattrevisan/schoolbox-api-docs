@@ -1,7 +1,8 @@
-import Vue from "vue";
+import { createApp } from 'vue';
 import BadgeList from './badge-list';
 
-Vue.component('badge-list', BadgeList);
-window.badgeList = new Vue({
-    el: '#badge-list-container'
-});
+createApp({
+    components: {
+        BadgeList
+    }
+}).mount('#badge-list-container');

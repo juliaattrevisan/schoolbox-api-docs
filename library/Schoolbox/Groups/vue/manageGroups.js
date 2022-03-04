@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import ManageGroups from './manage-groups';
 
-new Vue({
-    el: '#manage-groups-container',
+createApp({
     components: {
         ManageGroups
     }
-});
+}).mount('#manage-groups-container');

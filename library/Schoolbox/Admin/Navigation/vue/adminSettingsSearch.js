@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import AdminSettingsSearch from './admin-settings-search';
 
-new Vue({
-	el: '#admin-settings-search',
+createApp({
 	components: {
-		'admin-settings-search': AdminSettingsSearch
+		AdminSettingsSearch
     }
-});
+}).mount('#admin-settings-search');

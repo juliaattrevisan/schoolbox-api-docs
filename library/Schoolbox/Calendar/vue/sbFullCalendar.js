@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import SbFullCalendar from './sb-full-calendar';
 
-new Vue({
-    el: '#calendar',
+createApp({
     components: {
-        'sb-full-calendar': SbFullCalendar
+        SbFullCalendar
     }
-});
+}).mount('#calendar');

@@ -1,12 +1,11 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import VisitationListFull from './visitation-list-full';
-import { ClientTable } from 'vue-tables-2-premium';
+import { ClientTable } from 'v-tables-3-select-rows';
 
-Vue.use(ClientTable);
-
-new Vue({
-    el: '#visitation-list-full-container',
+const app = createApp({
     components: {
-        'visitation-list-full': VisitationListFull
+        VisitationListFull
     }
 });
+app.use(ClientTable)
+app.mount('#visitation-list-full-container');

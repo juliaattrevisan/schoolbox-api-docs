@@ -5,10 +5,10 @@
  *
  */
 
-import RecordPhoto from '@vue/components/record/record-photo';
-import RecordCamera from '@vue/components/record/record-camera';
-import RecordAudioOnly from '@vue/components/record/record-audio-only';
-import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
+import RecordPhoto from '@schoolboxVue/components/record/record-photo';
+import RecordCamera from '@schoolboxVue/components/record/record-camera';
+import RecordAudioOnly from '@schoolboxVue/components/record/record-audio-only';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import axios from 'axios';
 import filesize from 'filesize';
@@ -395,13 +395,6 @@ export default {
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
     h2, h3 {
         max-width: none;
-    }
-}
-
-.modal-actions {
-    display: flex;
-    button {
-        margin: 0px 2px; 
     }
 }
 

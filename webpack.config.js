@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
@@ -196,17 +197,8 @@ module.exports = {
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
-
-        usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalTotal.js',
-        usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalRole.js',
-        usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalSystem.js',
-        usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalFiletype.js',
-        usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/usageGlobalUser.js',
-
-        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificTotal.js',
-        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificSystem.js',
-        usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFiletype.js',
-        usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecificFile.js',
+        usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
+        usageSpecific: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js',
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
@@ -221,7 +213,6 @@ module.exports = {
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
 
         // Pastoral
-        pastoralCountBadge: './library/Schoolbox/Pastoral/Count/vue/pastoralCountBadge.js',
         pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
         pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
 
@@ -232,6 +223,7 @@ module.exports = {
         //Most functionality for a home page
         updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
+        //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
         //Sass
@@ -317,7 +309,7 @@ module.exports = {
                 test: /\.vue$/,
                 loader: 'vue-loader', //to handle .vue files
                 options: {
-                    appendTsSuffixTo: [/\.vue$/]
+                    appendTsSuffixTo: [/\.vue$/],
                 }
             },
             {
@@ -369,19 +361,23 @@ module.exports = {
     },
     resolve: { //https://webpack.js.org/configuration/resolve/
         alias: {
-            'vue$': 'vue/dist/vue.esm.js',
+            'vue$': 'vue/dist/vue.esm-bundler.js',
             '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
-            '@vue': path.resolve(__dirname, 'vue'),
+            '@schoolboxVue': path.resolve(__dirname, 'vue'),
             '@js': path.resolve(__dirname, 'www/static/js'),
             '@css': path.resolve(__dirname, 'www/static/css'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
-        new VueLoaderPlugin(),
+        new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production: 
+            __VUE_OPTIONS_API__: true,
+            __VUE_PROD_DEVTOOLS__: false,
+        }),
+        new VueLoaderPlugin(), //to handle .vue files
         new RemoveEmptyScriptsPlugin(),
     ]
 };

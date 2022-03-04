@@ -1,21 +1,21 @@
 <script>
 
-import FullCalendar               from '@fullcalendar/vue'
+import FullCalendar               from '@fullcalendar/vue3'
 import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
 import adaptivePlugin             from '@fullcalendar/adaptive'
-import ViewEventModal             from '@vue/components/fullcalendar/view-event-modal';
+import ViewEventModal             from '@schoolboxVue/components/fullcalendar/view-event-modal';
 import CreateEventModal           from './create-event-modal';
 import ExportModal                from "./export-modal";
 import FilterModal                from "./filter-modal";
-import FlatPickr                  from '@vue/components/fullcalendar/flat-pickr';
+import FlatPickr                  from '@schoolboxVue/components/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import qs                         from "qs";
-import fullCalendarHelper         from "@vue/components/fullcalendar/mixinFullCalendarHelper";
+import fullCalendarHelper         from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -791,7 +791,7 @@ export default {
             ref="fullCalendar"
             :options="calendarOptions"
         >
-            <template v-slot:eventContent="arg">
+            <template #eventContent="arg">
                 <customised-calendar-event :content="arg" />
             </template>
         </full-calendar>
@@ -810,5 +810,5 @@ export default {
 </template>
 
 <style lang="scss">
-@import "@vue/components/fullcalendar/styles/calendar";
+@import "@schoolboxVue/components/fullcalendar/styles/calendar";
 </style>

@@ -8,7 +8,7 @@ import ManageGroupsHeading from './manage-groups-heading';
 import ManageGroupsEmpty from './manage-groups-empty';
 import ManageGroupsItem from './manage-groups-item';
 import selectionTypes from '../js/manageGroupsSelectionTypes';
-import Toast from '@vue/components/toast';
+import Toast from '@schoolboxVue/components/toast';
 
 
 export default {

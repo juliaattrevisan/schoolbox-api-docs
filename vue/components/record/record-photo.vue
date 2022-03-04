@@ -5,8 +5,8 @@
  *
  */
 
-import RecordPhotoDevice from '@vue/components/inputCapture/record-photo-device';
-import RecordPhotoBrowser from '@vue/components/videojs-record/record-photo-browser';
+import RecordPhotoDevice from '@schoolboxVue/components/inputCapture/record-photo-device';
+import RecordPhotoBrowser from '@schoolboxVue/components/videojs-record/record-photo-browser';
 import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 
@@ -36,12 +36,12 @@ export default {
     <record-photo-device
         v-if="hasDeviceCapture"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
     <record-photo-browser
         v-else
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
 
 </template>

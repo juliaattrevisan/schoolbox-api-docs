@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import RevealModal from "@vue/components/reveal-modal";
+    import RevealModal from "@schoolboxVue/components/reveal-modal";
 
     export default {
 

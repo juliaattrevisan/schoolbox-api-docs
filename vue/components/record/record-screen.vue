@@ -5,8 +5,8 @@
  *
  */
 
-import RecordScreenDevice from '@vue/components/inputCapture/record-screen-device';
-import RecordScreenBrowser from '@vue/components/videojs-record/record-screen-browser';
+import RecordScreenDevice from '@schoolboxVue/components/inputCapture/record-screen-device';
+import RecordScreenBrowser from '@schoolboxVue/components/videojs-record/record-screen-browser';
 import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 
@@ -35,12 +35,12 @@ export default {
         
     <record-screen-device
         v-if="hasDeviceCapture"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
     <record-screen-browser
         v-else
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
 
 </template>

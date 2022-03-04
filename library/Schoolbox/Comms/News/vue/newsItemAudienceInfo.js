@@ -1,9 +1,8 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import NewsItemAudienceInfo from './news-item-audience-info';
 
-new Vue({
-	el: '#audience-info-container',
+createApp({
 	components: {
 		NewsItemAudienceInfo
     }
-});
+}).mount('#audience-info-container');

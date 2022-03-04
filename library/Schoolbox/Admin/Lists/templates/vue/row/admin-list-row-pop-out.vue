@@ -6,8 +6,9 @@
  * Its current intent is to minimise the clutter of a checkbox farm that can become pretty messy UI wise. 
  */
 
-import { mapState, mapGetters } from 'vuex';
-import { UPDATE_SELECTED_POP_OUT_NAME, OPEN_POP_UP } from '../store/adminListMutationTypes'
+import { mapState, mapActions } from 'pinia';
+import { useAdminListStore } from '../store/adminListStore';
+
 
 export default {
 
@@ -26,13 +27,10 @@ export default {
 
     computed: {
         
-        ...mapState({
+        ...mapState(useAdminListStore, {
             selectedPopOutName: state => state.selectedPopOutName, //to show all rows with the same pop out option active
-        }),
-
-        ...mapGetters({
-            headerField: 'popOutHeaderField', //the header field object
-            fields: 'popOutFields' //the fields to display within the pop out
+            headerField: state => state.popOutHeaderField, //the header field object
+            fields: state => state.popOutFields, //the fields to display within the pop out
         }),
 
         /**
@@ -66,6 +64,8 @@ export default {
     },
 
     methods: {
+
+        ...mapActions(useAdminListStore, ['updateSelectedPopOutName', 'openPopUp']),
 
         /**
          * If changePopOut exists, there's a field on the row that will impact the status of what's in the pop out
@@ -138,15 +138,15 @@ export default {
          * @param { String }
          */
         onPopOutNameSelected (popOutName) {
-            this.$store.commit(UPDATE_SELECTED_POP_OUT_NAME, popOutName)
+            this.updateSelectedPopOutName(popOutName);
         },
 
         /**
          * Display the options within the pop out
          */
         onOpenPopUpSelected () {
-            this.$store.commit(OPEN_POP_UP, this.row);
-        }
+            this.openPopUp(this.row);
+        },
 
     }
 

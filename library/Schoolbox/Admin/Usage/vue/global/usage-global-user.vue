@@ -1,7 +1,7 @@
 <script>
 
 import filesize from 'filesize';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 
 export default {
@@ -64,7 +64,7 @@ export default {
              */
             columns: [ 'firstname', 'lastname', 'role', 'size' ],
 
-            /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
+            /* v-tables-3 options, see https://matanya.gitbook.io/vue-tables-2/options-api
              */
             options: {
                 headings: {
@@ -195,18 +195,18 @@ export default {
                 :options="options" 
                 @loaded="onLoaded"
             >
-                <template v-slot:firstname="props"> 
+                <template #firstname="props"> 
                     <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
                 </template>
-                <template v-slot:lastname="props"> 
+                <template #lastname="props"> 
                     <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
                 </template>
-                <template v-slot:size="props"> 
+                <template #size="props"> 
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
-                <div slot="afterTable">
+                <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
-                </div>
+                </template>
             </v-client-table>
             
         </template>
@@ -215,6 +215,6 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 </style>

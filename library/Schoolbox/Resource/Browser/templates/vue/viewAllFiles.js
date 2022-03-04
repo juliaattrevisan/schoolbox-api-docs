@@ -1,12 +1,11 @@
-import Vue from 'vue';
-import { ClientTable } from 'vue-tables-2-premium';
+import { createApp } from 'vue';
 import ViewAllFiles from './view-all-files';
+import { ClientTable } from 'v-tables-3-select-rows';
 
-Vue.use(ClientTable);
-
-new Vue({
-    el: '#view-all-files-container',
+const app = createApp({
     components: {
         ViewAllFiles
     }
 });
+app.use(ClientTable)
+app.mount('#view-all-files-container');

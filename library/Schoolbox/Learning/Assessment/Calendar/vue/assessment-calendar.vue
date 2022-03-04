@@ -1,18 +1,18 @@
 <script>
 
-import FullCalendar       from '@fullcalendar/vue'
+import FullCalendar       from '@fullcalendar/vue3'
 import interactionPlugin  from '@fullcalendar/interaction'
 import dayGridPlugin      from '@fullcalendar/daygrid'
 import timeGridPlugin     from '@fullcalendar/timegrid'
 import adaptivePlugin     from '@fullcalendar/adaptive'
-import RevealModal        from '@vue/components/reveal-modal'
-import ViewEventModal     from '@vue/components/fullcalendar/view-event-modal';
+import RevealModal        from '@schoolboxVue/components/reveal-modal'
+import ViewEventModal     from '@schoolboxVue/components/fullcalendar/view-event-modal';
 import axios              from 'axios'
-import fullCalendarHelper from '@vue/components/fullcalendar/mixinFullCalendarHelper';
+import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent    from '@vue/components/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -237,6 +237,7 @@ export default {
             this.calendarApi = this.$refs.fullCalendar.getApi();
             this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
         });
+        document.addEventListener('assessment-calendar__onFilterChange', this.onFilterChange);
     },
 
     methods: {
@@ -436,12 +437,12 @@ export default {
         /**
          * Callback for when the filters for this calendar are updated.
          *
-         * Fired from outer space (i.e. from the outside window).
+         * Fired from outer space, currently from: library/Schoolbox/Learning/Assessment/Calendar/templates/index.twig
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange(selectedFilters) {
-            this.selectedFilters = selectedFilters;
+        onFilterChange(event) {
+            this.selectedFilters = event.detail.selectedFilters;
             this.calendarApi.refetchEvents();
             this.inContext = false;
         },
@@ -989,7 +990,7 @@ export default {
 
 <style lang="scss">
 
-@import "@vue/components/fullcalendar/styles/calendar";
+@import "@schoolboxVue/components/fullcalendar/styles/calendar";
 
 // Please forgive me...
 

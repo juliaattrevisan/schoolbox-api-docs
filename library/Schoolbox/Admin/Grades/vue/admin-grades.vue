@@ -1,7 +1,7 @@
 <script>
 
-import RevealModal from "@vue/components/reveal-modal";
-import Toast from "@vue/components/toast";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import Toast from "@schoolboxVue/components/toast";
 
 export default {
     components: {
@@ -24,7 +24,6 @@ export default {
         this.applyValidator();
     },
     computed: {
-        jQuery: () => window.jQuery,
         config: () => window.adminGradesConfig,
     },
     methods: {
@@ -54,7 +53,7 @@ export default {
              * not yet persisted, so removing from the UI is enough
              */
             if (currentGradeGroup.id == null) {
-                this.$refs.toast.timeout('Group `' + currentGradeGroup.name + '` successfully removed', true);
+                this.$refs.toast.timeout(`Group ${currentGradeGroup.name} successfully removed`, true);
 
                 this.gradeGroups = this.gradeGroups.filter((g, i) => i !== groupIndex);
                 this.closeDeleteGradeGroupModal();
@@ -134,7 +133,7 @@ export default {
              * not yet persisted, so removing from the UI is enough
              */
             if (currentGradeLevel.id == null) {
-                this.$refs.toast.timeout('Grade `' + currentGradeLevel.caption + '` successfully removed', true);
+                this.$refs.toast.timeout(`Group ${currentGradeLevel.caption} successfully removed`, true);
 
                 this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
                 this.closeDeleteGradeGroupModal();
@@ -176,7 +175,7 @@ export default {
             if (this?.validator?.destroy) {
                 this.validator.destroy();
             }
-            this.validator = this.jQuery(this.$refs.form).alaressValidate({
+            this.validator = $(this.$refs.form).alaressValidate({
                 submitHandler(form, event) {
                     // Don't do anything in the submit handler:
                     // allow Vue to handle saving.
@@ -217,7 +216,7 @@ export default {
 
 <template>
     <form method="POST" :action="config.postUrl" ref="form">
-        <section v-for="(group, groupIndex) in gradeGroups">
+        <section v-for="(group, groupIndex) in gradeGroups" :key="groupIndex">
             <div class="content">
                 <label :for="'groupName-' + String(groupIndex)">
                     {{ config.terms.grade.properSingular }} Group
@@ -251,7 +250,7 @@ export default {
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="(level, levelIndex) in group.levels">
+                <tr v-for="(level, levelIndex) in group.levels" :key="levelIndex">
                     <td>
                         <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.lowerBound'"
                                type="number"

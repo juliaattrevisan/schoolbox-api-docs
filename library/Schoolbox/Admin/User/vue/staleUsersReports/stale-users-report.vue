@@ -6,10 +6,10 @@
  *
  */
 
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
-import BottomDrawer from '@vue/components/bottomDrawer/bottom-drawer';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import Toast from '@schoolboxVue/components/toast';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -288,9 +288,9 @@ export default {
             @loaded="onLoaded"
             @select="onRowSelected"
         >
-            <div slot="afterTable">
+            <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
-            </div>
+            </template>
         </v-client-table>
 
         <toast ref="toast"></toast>
@@ -305,8 +305,8 @@ export default {
                     available.
             </div>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
-                <li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
+                <li><button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</button></li>
+                <li><button @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</button></li>
             </ul>
         </reveal-modal>
 
@@ -322,7 +322,7 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 #stale-users-report {
     position: relative;

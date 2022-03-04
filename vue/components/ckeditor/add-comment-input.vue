@@ -8,7 +8,7 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
 
-import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin'
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin'
 import { injectScript } from '@js/util/domUtils';
 import { EDITOR_DEFAULT_CONFIG, EDITOR_CONFIG_FOR_COMMENTS, EDITOR_CONFIG_WITH_USER_TOKENS } from '@js/editor/editorConfigTypes';
 
@@ -176,9 +176,9 @@ export default {
        <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">{{ getAddCommentButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="`comment-${uniqueId}`" rows="4"></textarea>
-            <a class="button submit"
+            <button class="button submit"
                 @click="postComment"
-                :disabled="isPostCommentDisabled">Post comment</a>
+                :disabled="isPostCommentDisabled">Post comment</button>
         </div>
    </div>
 </template>

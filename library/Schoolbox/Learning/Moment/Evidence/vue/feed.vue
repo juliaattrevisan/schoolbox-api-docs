@@ -1,15 +1,15 @@
 <script>
 
-import MediaArticle from '@vue/components/media-article';
-import Storage from '@vue/components/storage';
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Storage from '@schoolboxVue/components/storage';
 import CommentThread from './comment-thread';
-import RevealModal from "@vue/components/reveal-modal";
-import Toast from "@vue/components/toast";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
-import foundationMixin from "@vue/components/foundation-mixin";
+import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
-import cdnPrefixMixin from '@vue/components/cdn-prefix-mixin';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 
 export default {
@@ -318,13 +318,13 @@ export default {
                                 <div class="tags">
                                   <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
-                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
+                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes" :key="`${index}-${curriculumNode.code}`"> 
                                           <template v-if="index !== 0">, </template>
-                                          <span :title="curriculumNode.name" :key="`${index}-${curriculumNode.code}`">{{ curriculumNode.code }}</span>
+                                          <span :title="curriculumNode.name">{{ curriculumNode.code }}</span>
                                       </template>
                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
-                                      <template v-for="(tag, index) in evidence.object.tags">
-                                          <template v-if="index !== 0">, </template><span :key="`${index}-${tag.name}`">{{ tag.name }}</span>
+                                      <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
+                                          <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
                                       </template>
                                   </p>
                                 </div>

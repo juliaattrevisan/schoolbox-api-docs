@@ -5,11 +5,11 @@
  */
 
 import RecordMediaModalMenu from './record-media-modal-menu';
-import RecordAudioOnly from '@vue/components/record/record-audio-only';
-import RecordPhoto from '@vue/components/record/record-photo';
-import RecordCamera from '@vue/components/record/record-camera';
-import RecordScreen from '@vue/components/record/record-screen';
-import OverMediaModal from '@vue/components/videojs-record/over-media-modal';
+import RecordAudioOnly from '@schoolboxVue/components/record/record-audio-only';
+import RecordPhoto from '@schoolboxVue/components/record/record-photo';
+import RecordCamera from '@schoolboxVue/components/record/record-camera';
+import RecordScreen from '@schoolboxVue/components/record/record-screen';
+import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import axios from 'axios';
 import filesize from 'filesize';
@@ -46,7 +46,7 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            hasClosed: false, //to allow any active vue to cleanup on beforeDestroy,
+            hasClosed: false, //to allow any active vue to cleanup on beforeUnmount,
             deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
             deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
         }
@@ -441,7 +441,7 @@ export default {
                     <label for="filename" class="required" aria-required="true">Filename</label>
                     <input type="text" id="filename" name="filename" v-model="newFilename" @input="$event.target.composing = false" ref="filenameInput">
                     <div class="modal-actions">
-                        <button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
+                        <button class="submit" @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
                         <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
                     </div>	
                 </over-media-modal>
@@ -497,6 +497,7 @@ export default {
 	display: flex;
 	button {
 		margin: 0 2px;
+        width: 100%;
 	}
 }
 

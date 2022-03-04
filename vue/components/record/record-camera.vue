@@ -5,8 +5,8 @@
  *
  */
 
-import RecordCameraDevice from '@vue/components/inputCapture/record-camera-device';
-import RecordCameraBrowser from '@vue/components/videojs-record/record-camera-browser';
+import RecordCameraDevice from '@schoolboxVue/components/inputCapture/record-camera-device';
+import RecordCameraBrowser from '@schoolboxVue/components/videojs-record/record-camera-browser';
 import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 
@@ -36,12 +36,12 @@ export default {
     <record-camera-device
         v-if="hasDeviceCapture"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
     <record-camera-browser
         v-else
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
+        v-bind="$attrs"
     />
 
 </template>

@@ -516,17 +516,6 @@ export default {
             return this.selectedGroups.length > 0 && !this.emailFormBeingSubmitted;
         },
     },
-    filters: {
-        capitalise: function (val) {
-            if (!val) {
-                return '';
-            }
-
-            return val.replace(/(?:^|\s)\S/g, function (a) {
-                return a.toUpperCase();
-            });
-        }
-    }
 }
 </script>
 <template>
@@ -573,8 +562,8 @@ export default {
                 </ul>
             </section>
 
-            <template v-if="showSkeletonLoader" v-for="n in 3">
-                <div class="list-item">
+            <template v-if="showSkeletonLoader">
+                <div v-for="n in 3" class="list-item" :key="n">
                     <div class="small-12 card skeleton">
                         <div class="img"></div>
                         <h3></h3>
@@ -602,7 +591,7 @@ export default {
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="(student, index) in studentsForCurrentClassCode">
+                    <tr v-for="(student, index) in studentsForCurrentClassCode" :key="index">
                         <td v-if="showCheckboxes">
                             <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked"/>
                             <label :for="'id-' + index" class="checkbox-label"></label>
@@ -651,7 +640,7 @@ export default {
                             <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id"
                                 v-if="student.id && Object.keys(student.routes).length">
                                 <slot name="student-menu-items" v-bind:student="student">
-                                    <li v-for="element in student.routes">
+                                    <li v-for="(element, index) in student.routes" :key="index">
                                         <a :href="element.href" :class="element.class" :title="element.title">
                                             {{ element.label }}
                                         </a>

@@ -8,50 +8,18 @@
 
     <div class="admin-content">
 
-        {# This chart doesn't display anything if you're using S3 adapter because
-         # you've technically got a scalable and unrestricted storage space that
-         # you can expand on demand - though you might want to change how that
-         # is represented visually inside the vue component itself
-         #
-         # Also it's a kind of obscure notion so this brings it front and center
-         #}
-        {% if isS3Adapter %}
-        <div class="small-12 island">
-            <div id="usage-global-total-container" class="usage-chart">
-                <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-total>
-            </div>
+        <div id="usage-global-container">
+            <usage-global 
+                :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" 
+                :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'" 
+                :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'" 
+                :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'" 
+                :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'" 
+                :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
+            />
         </div>
-        {% endif %}
+        <script src="{{ CDN_PREFIX }}/js/bundle/usageGlobal.js?v={{ config.site_version }}"></script>
 
-        <div class="small-12 large-6 island">
-            <div id="usage-global-system-container" class="usage-chart">
-                <usage-global-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-system>
-            </div>
-        </div>
-
-        <div class="small-12 large-6 island">
-            <div id="usage-global-filetype-container" class="usage-chart">
-                <usage-global-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-filetype>
-            </div>
-        </div>
-
-        <div class="small-12 island">
-            <div id="usage-global-role-container" class="usage-chart">
-                <usage-global-role :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-role>
-            </div>
-        </div>
-
-        <div class="small-12 columns">
-            <div id="usage-global-user-container">
-                <h2 class="subheader">CMS Usage by User</h2>
-                <usage-global-user :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"></usage-global-user>
-            </div>
-        </div>
     </div>
-</div>
 
-{% if isS3Adapter %}<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalTotal.js?v={{ config.site_version }}"></script>{% endif %}
-<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalRole.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalSystem.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalFiletype.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalUser.js?v={{ config.site_version }}"></script>
+</div>

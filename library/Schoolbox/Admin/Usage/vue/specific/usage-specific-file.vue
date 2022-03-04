@@ -1,8 +1,8 @@
 <script>
 import filesize from 'filesize';
-import RevealModal from '@vue/components/reveal-modal';
-import Toast from '@vue/components/toast';
-import footerUI from '@vue/components/vueTables2/mixinFooterUI';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -245,21 +245,21 @@ export default {
                 :options="options" 
                 @loaded="onLoaded"
             >
-                <template v-slot:name="props"> 
+                <template #name="props"> 
                     <a :href="props.row._links.send">{{ props.row.name }}</a>
                 </template>
-                <template v-slot:size="props"> 
+                <template #size="props"> 
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
-                <template v-slot:folder="props"> 
+                <template #folder="props"> 
                     <a :href="`/homepage/${props.row.folderId}`">{{ props.row.folder }}</a>
                 </template>
-                <template v-slot:id="props"> 
+                <template #id="props"> 
                     <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                 </template>
-                <div slot="afterTable">
+                <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
-                </div>
+                </template>
             </v-client-table>
         </template>
         <toast ref="toast"></toast>
@@ -267,8 +267,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this file?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteFile" class="button submit" id="usage-file-delete-button" :disabled="isProcessActive">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-file-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+                <li><button @click.prevent="deleteFile" class="button submit" id="usage-file-delete-button" :disabled="isProcessActive">Delete</button></li>
+                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="usage-file-cancel-button" :disabled="isProcessActive">Cancel</button></li>
             </ul>
         </reveal-modal>
     </div>
@@ -276,6 +276,6 @@ export default {
 
 <style lang="scss">
 
-@import '@vue/components/vueTables2/vueTables2';
+@import '@schoolboxVue/components/vueTables2/vueTables2';
 
 </style>

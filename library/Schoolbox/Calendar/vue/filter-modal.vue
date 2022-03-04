@@ -1,6 +1,6 @@
 <script>
 import tinycolor from 'tinycolor2';
-import RevealModal from "@vue/components/reveal-modal";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 const FILTER_CHANGED = "filterChanged";
 
@@ -249,7 +249,7 @@ ul {
   margin: 0px;
   list-style: none;
 }
-label::v-deep {
+:deep(label) {
   padding-right: 1rem !important;
 }
 </style>

@@ -49,8 +49,9 @@
             </section>
         </div>
         <div class="small-12 island">
-            {# Vue component goes here #}
-            <div id="admin-grades"></div>
+            <div id="admin-grades-container">
+                <admin-grades />
+            </div>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/adminGrades.js?v={{ config.site_version }}"></script>
         </div>
     </div>

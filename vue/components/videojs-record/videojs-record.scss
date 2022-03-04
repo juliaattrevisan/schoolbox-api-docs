@@ -28,7 +28,7 @@
     z-index: 2;
 }
 
-.vjs-record-skin::v-deep {
+:deep(.vjs-record-skin) {
     .vjs-device-button.vjs-control {
         //not in the centre of the frame, something from SB css is probably getting in the way
         top: 42%;

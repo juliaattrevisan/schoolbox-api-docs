@@ -13,8 +13,12 @@
             // Filtered content has been [re]loaded
             // (Shouldn't this trigger contain the filters that are selected?)
             $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-                // Pass the list of filters into the badge list
-                window.badgeList.$children[0].onFilterChange(selectedFilters);
+                // Pass the list of filters into the badge-list-form.vue
+                document.dispatchEvent(new CustomEvent('badge-list-form__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
             });
         });
     </script>

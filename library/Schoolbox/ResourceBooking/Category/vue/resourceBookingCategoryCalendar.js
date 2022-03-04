@@ -1,9 +1,8 @@
-import Vue from "vue";
-import ResourceBookingCategoryCalendar from "./resource-booking-category-calendar";
+import { createApp } from 'vue';
+import ResourceBookingCategoryCalendar from './resource-booking-category-calendar';
 
-window.resourceBookingICategoryCalendar = new Vue({
-    el: '#calendar',
+createApp({
     components: {
-        'resource-booking-category-calendar': ResourceBookingCategoryCalendar
+        ResourceBookingCategoryCalendar
     }
-});
+}).mount('#calendar');
