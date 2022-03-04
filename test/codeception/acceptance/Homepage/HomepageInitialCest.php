@@ -16,7 +16,11 @@ use Codeception\Util\Locator;
 class HomepageInitialCest
 {
 
-    var $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
+    /**
+     * @var mixed
+     */
+    public $createFolderUrl;
+    public $resourcesPageUrl;
 
     /**
      * @param AcceptanceTester $i
@@ -24,7 +28,8 @@ class HomepageInitialCest
     public function createHomepageFail(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl($this->createFolderUrl);
+        $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/resource/folder/0/create');
+        $this->createFolderUrl = $i->getCurrentUrl();
         $i->selectOption("template", "Blank");
         $i->fillField(['name' => 'name'], 'Test Homepage');
         $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
@@ -35,6 +40,7 @@ class HomepageInitialCest
         $i->click(['css' => 'label[class=radio-label][for=groupRead6]']);
         echo "Forget to submit \n";
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $this->resourcesPageUrl = $i->getCurrentUrl();
         $i->cantSee("Test Homepage");
     }
 
@@ -44,6 +50,7 @@ class HomepageInitialCest
     public function createHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
+        var_dump($this->createFolderUrl);
         $i->amOnUrl($this->createFolderUrl);
         $i->selectOption("template", "Blank");
         $i->fillField(['name' => 'name'], 'Test Homepage');
@@ -54,7 +61,7 @@ class HomepageInitialCest
         $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
         $i->click(['css' => 'label[class=radio-label][for=groupRead6]']);
         $i->click(['css' => 'input[type=submit]']);
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
     }
 
@@ -66,7 +73,7 @@ class HomepageInitialCest
     public function createElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
         $i->click($testHomepage);
@@ -81,19 +88,19 @@ class HomepageInitialCest
         #Blog Test
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
-        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[1]", "//div[@data-position='top']");
+        $i->click("//*[@id='tabs-sub-1']/li[1]");
         sleep(1);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         #News Test
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
-        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[4]", "//div[@data-position='top']");
+        $i->click("//*[@id='tabs-sub-1']/li[4]");
         sleep(1);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
         #Text box Test
         $i->click(['css' => 'a[href=\#tabs-sub-1]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
-        $i->dragAndDrop("//*[@id='tabs-sub-1']/li[6]", "//div[@data-position='top']");
+        $i->click("//*[@id='tabs-sub-1']/li[6]");
         sleep(1);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
     }
@@ -107,7 +114,7 @@ class HomepageInitialCest
     public function useElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
         $i->click($testHomepage);
@@ -156,7 +163,7 @@ class HomepageInitialCest
     public function viewElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
         $i->click($testHomepage);
@@ -186,7 +193,7 @@ class HomepageInitialCest
     public function deleteElement(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $testHomepage = Locator::contains('a.jstree-anchor', 'Test Homepage');
         $i->click($testHomepage);
@@ -227,7 +234,7 @@ class HomepageInitialCest
     public function deleteHomepageFail(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $i->click("Test Homepage");
         $i->waitForText("Delete", 5);
@@ -235,7 +242,7 @@ class HomepageInitialCest
         $i->waitForText("Please Confirm", 5);
         $i->click("Cancel");
         sleep(1);
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
     }
 
@@ -248,7 +255,7 @@ class HomepageInitialCest
     public function deleteHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->canSee("Test Homepage");
         $i->click("Test Homepage");
         $i->waitForText("Delete", 5);
@@ -256,7 +263,7 @@ class HomepageInitialCest
         $i->waitForText("Please Confirm", 5);
         $i->click("a#confirm-dialog-confirm-button.button.submit");
         sleep(1);
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->amOnUrl($this->resourcesPageUrl);
         $i->cantSee("Test Homepage");
     }
 }
