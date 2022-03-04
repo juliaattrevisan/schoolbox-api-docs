@@ -223,7 +223,7 @@ class Profile implements IStrategy
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts();
+                $emergencyContacts = $this->findEmergencyContacts($student['contacts']);
 
                 /* Find out a staff member via their user code
                  */
@@ -418,21 +418,30 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
+     * @param array $studentContacts
      * @return array
      */
-    public function findEmergencyContacts(): array
+    public function findEmergencyContacts(array $studentContacts): array
     {
-        $emergencyContacts = [];
         $contacts = [];
         $n = 0;
 
-        foreach ($emergencyContacts as $emergencyContact) {
+        foreach ($studentContacts['data'] as $contact) {
+            /* If $contact is not an emergency contact, skip over them
+             */
+            if (!$contact['relationship']['emergency_contact']) {
+                continue;
+            }
+
+            /* Otherwise process them as usual
+             */
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
-                /* TODO Fill in these emergency contact vars
+                $fullname = "{$contact['forename']} {$contact['surname']}";
+                $relation = $contact['relationship']['relationship'];
+
+                /* FIXME What's the difference between 'phone' and 'primary'
                  */
-                $fullname = '';
-                $relation = '';
-                $phone = '';
+                $phone = $contact['contact_details']['data']['phones']['phone'];
 
                 /* Suffix the $relation if provided
                  */
@@ -583,6 +592,13 @@ class Profile implements IStrategy
          * Otherwise make a new one for the given id
          */
         foreach ($parents['data'] as $parent) {
+            /* If $parent is an emergency contact of the student,
+             * just skip over them - we're processing those elsewhere
+             */
+            if ($parent['relationship']['emergency_contact']) {
+                continue;
+            }
+
             $externalId = trim((string)$parent['mis_id']);
 
             /* Note that this node contains the keys 'email, primary, home, work'
