@@ -13,7 +13,6 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -202,7 +201,6 @@ class Profile implements IStrategy
                 $mobile      = '';
                 $studiesCode = trim((string)$student['education_details']['data']['learner_number']);
                 $title       = '';
-                $tutor       = '';
                 $tutorGroup  = '';
 
                 /* There's a Username in the identifiers object, but it's not always set
