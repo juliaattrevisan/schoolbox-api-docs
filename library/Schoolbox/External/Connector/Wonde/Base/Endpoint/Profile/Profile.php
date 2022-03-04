@@ -187,7 +187,7 @@ class Profile implements IStrategy
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $students = $this->api->retrieve('GET', $nextUrl, []);
 
-            foreach ($students['data'] as $student) {print_r($student);die();
+            foreach ($students['data'] as $student) {
                 $externalId     = trim((string)$student['mis_id']);
                 $academicHouse  = trim((string)($student['house']['data']['name'] ?? ''));
                 $boardingStatus = false;
@@ -250,10 +250,7 @@ class Profile implements IStrategy
 
                 /* Fish out special needs
                  */
-                /* FIXME Colin
-                 *  sen_needs does not produce a sen_needs node - am I missing perms?
-                 */
-                $specialNeeds = $this->findSpecialNeeds();
+                $specialNeeds = $this->findSpecialNeeds($student['sen_needs'] ?? []);
 
                 /* Fish out a staff member via their user code
                  */
@@ -407,7 +404,7 @@ class Profile implements IStrategy
              */
             $nextUrl = false;
 
-            if (array_key_exists('pagination', $students['meta'])) {
+            if (isset($students['meta']['pagination'])) {
                 $nextUrl = $students['meta']['pagination']['next'] ?? false;
             }
         }
@@ -518,7 +515,7 @@ class Profile implements IStrategy
     {
         /* If this house has any employees, dig out the first one
          */
-        if (array_key_exists('data', $studentHouse) && \count($studentHouse['data']['employees']['data'])) {
+        if (isset($studentHouse['data']) && \count($studentHouse['data']['employees']['data'])) {
             /* FIXME Not sure if "Head of House" meta.role is hardcoded into wonde or not
              *  For now just grab the first human off the stack
              */
@@ -574,13 +571,12 @@ class Profile implements IStrategy
     /**
      * Find out if this student has special needs
      *
+     * @param array $studentSpecialNeeds
      * @return bool
      */
-    private function findSpecialNeeds(): bool
+    private function findSpecialNeeds(array $studentSpecialNeeds): bool
     {
-        /* TODO Fill in these special needs vars
-         */
-        return false;
+        return isset($studentSpecialNeeds['data']) && \count($studentSpecialNeeds['data']);
     }
 
 
@@ -852,7 +848,7 @@ class Profile implements IStrategy
              */
             $nextUrl = false;
 
-            if (array_key_exists('pagination', $staffs['meta'])) {
+            if (isset($staffs['meta']['pagination'])) {
                 $nextUrl = $staffs['meta']['pagination']['next'] ?? false;
             }
         }
