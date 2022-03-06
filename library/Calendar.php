@@ -558,7 +558,7 @@ class Calendar extends DeprecatedModel
         /* Filter to specific event types
          * TODO: Replace injections with something less injecty (rewrite in prepared statements)
          */
-        if (isset($filter['typeSet'])) {
+        if (isset($filter['typeSet']) && is_array($filter['typeSet']) && count($filter['typeSet']) > 0) {
             $filter_query[] = 'type IN (' . implode(',', array_map('intval', $filter['typeSet'])) . ')';
         }
 
