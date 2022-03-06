@@ -60,7 +60,7 @@ class DueWorkInitialCest
         $i->click(['css' => 'a[href=\#tabs-sub-3]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-3']);
         //add due work component into the homepage
-        $i->dragAndDrop("//*[@id='tabs-sub-3']/li[7]", "//div[@data-position='top']");
+        $i->click("//*[@id='tabs-sub-3']/li[7]");
         sleep(5);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
         $i->impersonate($teacher);
