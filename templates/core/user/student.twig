@@ -954,6 +954,7 @@
                                 {% endif %}
                             {% endif %}
 
+                            {% if showContacts %}
                             <section>
                                 <ul class="information-list expandable-card">
                                     {% for contact in contacts %}
@@ -1102,6 +1103,7 @@
                                     {% endfor %}
                                 </ul>
                             </section>
+                            {% endif %}
                         {% endblock contacts %}
                     {% endblock contacts_island %}
 
