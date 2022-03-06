@@ -201,7 +201,8 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if (Config::get('lms_enabled')
+    if (
+        Config::get('lms_enabled')
         && (!$hasCourseSpec && !$hasUnitSpec)
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {

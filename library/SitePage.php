@@ -384,7 +384,7 @@ class SitePage extends Page
         $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
-        if ( !( isset($_SESSION['history'][0]) && $_SESSION['history'][0] == $requestUri)) {
+        if (!( isset($_SESSION['history'][0]) && $_SESSION['history'][0] == $requestUri)) {
             array_unshift($_SESSION['history'], $requestUri);
 
             if (count($_SESSION['history']) > 3) {
