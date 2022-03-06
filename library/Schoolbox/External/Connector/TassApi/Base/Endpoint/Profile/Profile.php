@@ -327,7 +327,15 @@ class Profile implements IStrategy
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
-            $username = trim((string)$student['general_details']['portal_user_code']);
+
+            /* Usernames are found in portal_user_code or, if that's empty,
+             * try looking in alternate_id because that's what we used to do
+             */
+            $username = (new FirstMeaningfulValue())->find([
+                $student['general_details']['portal_user_code'],
+                $student['general_details']['alternate_id'],
+            ]);
+
             $yearLevel = trim((string)$student['school_details']['year_group']);
 
             /* Dates
