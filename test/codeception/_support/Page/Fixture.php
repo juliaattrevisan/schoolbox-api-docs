@@ -23,9 +23,9 @@ class Fixture
     public const SELECTOR_JS_HOME_TEAM = '#homeTeam';
     public const SELECTOR_JS_AWAY_TEAM = '#awayTeam';
 
-    public const VENUE_HAILEYBURY = 2;
-    public const TEAM_FIRST_XVIII = 8;
-    public const TEAM_SECOND_XVIII = 9;
+    public const VENUE_OAKLEIGH_RECREATION = 2;
+    public const TEAM_WARRIORS = 1;
+    public const TEAM_RAIDERS = 2;
 
     /**
      * @var AcceptanceTester
@@ -72,7 +72,7 @@ class Fixture
     {
         $i = $this->tester;
         // AFL - Open AFL
-        $i->amOnPage(self::getCreateMatchUrl(4, 4));
+        $i->amOnPage(self::getCreateMatchUrl(1, 4));
         $i->see('CREATE MATCH');
 
         $startAt = '';
@@ -174,7 +174,7 @@ class Fixture
         $i = $this->tester;
         $i->amOnPage('/messages');
         $i->dontSee($notif);
-        $i->impersonate('Rachel Rhodes');
+        $i->impersonate('Jana Reed');
         $i->amOnPage('/messages');
         $i->see($notif);
         $i->impersonateAnyUser('Schoolbox Admin');
@@ -189,7 +189,7 @@ class Fixture
         $i = $this->tester;
         $i->amOnPage('/messages');
         $i->dontSee($notif);
-        $i->impersonate('Rachel Rhodes');
+        $i->impersonate('Jana Reed');
         $i->amOnPage('/messages');
         $i->dontSee($notif);
         $i->impersonateAnyUser('Schoolbox Admin');
