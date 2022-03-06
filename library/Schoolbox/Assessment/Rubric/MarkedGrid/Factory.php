@@ -47,7 +47,7 @@ class Factory
                     $capabilityUsage,
                     $markSchemeFactory->spawnForCapability(
                         $markedGrid->getGrid()->getAssessment(),
-                        $capabilityUsage->calculateMaxValueFromIndicators()
+                        $capabilityUsage->getMaxValue(),
                     )
                 );
                 $markedGrid->getCapabilityMarks()->add($capabilityMark);
