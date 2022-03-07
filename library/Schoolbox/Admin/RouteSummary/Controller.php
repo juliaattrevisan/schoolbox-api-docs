@@ -10,6 +10,8 @@ namespace Schoolbox\Admin\RouteSummary;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
+use Schoolbox\Admin\Navigation\Subnav;
+
 
 /**
  * A controller for viewing a list of routes defined within Schoolbox.
@@ -63,7 +65,14 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@adminRouteSummary/index.twig',
-                ['routes' => $routeSummaries],
+                [
+                    'pageCurrent'    => $this->router->generate('adminRouteSummary.getRouteList'),
+                    'allBreadcrumbs' => [
+                        ['Administration', '/adminv2/home'],
+                        ['Route Summary', '/adminv2/routes'],
+                    ],
+                    'routes' => $routeSummaries
+                ],
                 'Routes'
             )
         );
