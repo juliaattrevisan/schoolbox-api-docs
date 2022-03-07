@@ -14,10 +14,10 @@ namespace External\Liss\Helper;
 
 use Event\Source\Model as EventSource;
 use Event\Source\Mapper as EventSourceMapper;
+use PhpXmlRpc\Value;
 use Schoolbox\Calendar\Event;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
-use xmlrpcval;
 
 class PublishDailyData
 {
@@ -70,7 +70,7 @@ class PublishDailyData
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *
-     * @param xmlrpcval $currentEvent
+     * @param Value $currentEvent
      * @return array
      */
     private function reformatEvent($currentEvent)
