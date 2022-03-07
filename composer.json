@@ -90,7 +90,7 @@
         "symfony/yaml": "^5.2",
         "maennchen/zipstream-php": "^2.1",
         "ext-mbstring": "*",
-        "ext-intl": "^7.4",
+        "ext-intl": "*",
         "guzzlehttp/guzzle": "^7.3",
         "thecodingmachine/gotenberg-php-client": "^6.3",
         "phpoffice/phpspreadsheet": "^1.17",
