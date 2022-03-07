@@ -213,10 +213,10 @@ class Profile implements IStrategy
                 'contact_details',
                 'house',
                 'house.employees',
+                'year',
                 'medical_conditions',
                 'education_details',
                 'extended_details',
-                'groups',
                 'sen_needs',
                 'identifiers',
                 'contacts',
@@ -233,7 +233,7 @@ class Profile implements IStrategy
                 $boardingStatus = false;
                 $campusName     = '';
 
-                $dob         = $this->findDate((string)$student['date_of_birth']['date']);
+                $dob  = $this->findDate((string)$student['date_of_birth']['date']);
 
                 /* Work Email takes precedence since that's typically their school email
                  * Then Email, I guess
@@ -274,7 +274,7 @@ class Profile implements IStrategy
 
                 /* Hmm. It turns out that Year Level is a kind of Wonde "Group"
                  */
-                $yearLevel = $this->findYearLevel($student['groups']);
+                $yearLevel = trim((string)$student['year']['data']['name']);
 
                 $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
                 $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
@@ -654,32 +654,6 @@ class Profile implements IStrategy
             'id' => null,
             'name' => null
         ];
-    }
-
-
-    /**
-     * Find a year level for a student (it's stored as a Wonde Group)
-     *
-     * @param array $groups
-     * @return string|null
-     */
-    private function findYearLevel(array $groups): ?string
-    {
-        /* No groups? No year
-         */
-        if (!\count($groups['data'])) {
-            return null;
-        }
-
-        /* Find the YEAR group in the pile
-         */
-        foreach ($groups['data'] as $group) {
-            if ('YEAR' === $group['type']) {
-                return (string)$group['name'];
-            }
-        }
-
-        return null;
     }
 
 
