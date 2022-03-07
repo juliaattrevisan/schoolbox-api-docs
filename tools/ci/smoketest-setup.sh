@@ -18,8 +18,9 @@ tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
-CONFIG_DIR="/etc/php/7.4/fpm"
-PHP_SERVICE="php7.4-fpm"
+PHP_VERSION=$1
+CONFIG_DIR="/etc/php/${PHP_VERSION}/fpm"
+PHP_SERVICE="php${PHP_VERSION}-fpm"
 
 ## Start database to initialise with a username and password
 service mariadb start
@@ -48,7 +49,7 @@ cp -rf "$repo_dir"/* /usr/share/schoolbox
 cp -f "$initialdir"/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf "$initialdir"/configfiles/nginx/* /etc/nginx
 cp -f "$initialdir"/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
-cp -rf "$initialdir"/configfiles/php/7.4/fpm/* $CONFIG_DIR
+cp -rf "$initialdir"/configfiles/php/${PHP_VERSION}/fpm/* $CONFIG_DIR
 cp -f "$initialdir"/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -rf "$initialdir"/data/* $instance_data_dir
 cp -rf "$initialdir"/configfiles/bin/* /usr/local/bin

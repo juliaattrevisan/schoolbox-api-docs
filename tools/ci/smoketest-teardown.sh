@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ## After the test is run we need to shut down the services
-PHP_SERVICE="php7.4-fpm"
+PHP_VERSION=$1
+PHP_SERVICE="php${PHP_VERSION}-fpm"
 
 service $PHP_SERVICE stop
 echo 'stopped php'
