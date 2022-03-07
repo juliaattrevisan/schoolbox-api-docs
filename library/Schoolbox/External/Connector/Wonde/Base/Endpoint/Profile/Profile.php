@@ -210,6 +210,7 @@ class Profile implements IStrategy
             1,
             self::NUM_PER_PAGE,
             implode(',', [
+                'contact_details',
                 'house',
                 'house.employees',
                 'medical_conditions',
@@ -233,7 +234,23 @@ class Profile implements IStrategy
                 $campusName     = '';
 
                 $dob         = $this->findDate((string)$student['date_of_birth']['date']);
-                $email       = '';
+
+                /* Work Email takes precedence since that's typically their school email
+                 * Then Email, I guess
+                 *
+                 * From Colin 7/3/22:
+                 * Primary email vs email. Apologies, the emails can be a bit confusing.
+                 * In Australia, the primary email field is the main email field if the SIS
+                 * specifies this is the primary email above others that should be used.
+                 * The email field is one we populate when either they only supply one email
+                 * address field or from work or home emails (home > email). Important to
+                 * note that the "work" email field represents the student's school email.
+                 */
+                $email = (new FirstMeaningfulValue())->find([
+                    $student['contact_details']['data']['emails']['work'],
+                    $student['contact_details']['data']['emails']['email'],
+                ]);
+
                 $firstname   = trim((string)$student['forename']);
                 $form        = '';
                 $gender      = trim((string)$student['gender']);
@@ -501,9 +518,14 @@ class Profile implements IStrategy
                 $fullname = "{$contact['forename']} {$contact['surname']}";
                 $relation = $contact['relationship']['relationship'];
 
-                /* FIXME What's the difference between 'phone' and 'primary'
+                /* Find something meaningful eventually
                  */
-                $phone = $contact['contact_details']['data']['phones']['phone'];
+                $phone = (new FirstMeaningfulValue())->find([
+                    $contact['contact_details']['data']['phones']['mobile'],
+                    $contact['contact_details']['data']['phones']['work'],
+                    $contact['contact_details']['data']['phones']['home'],
+                    $contact['contact_details']['data']['phones']['phone'],
+                ]);
 
                 /* Suffix the $relation if provided
                  */
