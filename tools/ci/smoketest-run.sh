@@ -1,10 +1,16 @@
 #!/bin/bash
 
-if [ -f tools/ci/php_version_whitelist.txt ];
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
+
+initialdir=`pwd`;
+
+## Is the PHP version valid?
+if [ -f ${fullpath}/php_version_whitelist.txt ];
 then
     echo "Checking PHP version";
     phpver=`php -v | head -n1 | cut -d' ' -f2 | cut -d'.' -f1-2`;
-    if [ `grep $phpver tools/ci/php_version_whitelist.txt | wc -l` -eq 0 ];
+    if [ `grep $phpver ${fullpath}/php_version_whitelist.txt | wc -l` -eq 0 ];
     then
         echo "PHP Version '$phpver' is not valid for this test";
         exit 0;
@@ -12,14 +18,10 @@ then
         echo "Running PHP Version: '$phpver'";
     fi
 else
-    echo "No tools/ci/php_version_whitelist.txt exists: exiting";
+    echo "No ${fullpath}/php_version_whitelist.txt exists: exiting";
     exit 1;
 fi
 
-filepath=`readlink -f $0`;
-fullpath=${filepath%/*}
-
-initialdir=`pwd`;
 
 ## Smoke test runs a setup script first
 "$fullpath"/smoketest-setup.sh phpver
