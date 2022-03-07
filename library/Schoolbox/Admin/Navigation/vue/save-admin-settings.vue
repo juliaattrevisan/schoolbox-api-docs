@@ -76,9 +76,10 @@ function initFormChangeListeners () {
             onFormDataChange()
         }, 350));
     });
-    /* Polling is required for dropzones and colorpickers since they don't
-        * trigger onchange events normally (probably because jquery plugins)
-        */
+    /**
+     * Polling is required for dropzones and colorpickers since they don't
+     * trigger onchange events normally (probably because jquery plugins)
+     */ 
     if (props.usePolling) {
         setInterval(onFormDataChange, 500);
     } else {
