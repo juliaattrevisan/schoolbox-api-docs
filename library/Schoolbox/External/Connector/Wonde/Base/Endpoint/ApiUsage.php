@@ -26,26 +26,44 @@ class ApiUsage
      */
     private array $usage = [];
 
+    /**
+     * The base uri that consists of host and school identifier
+     * Paginated data can appear separately in ApiUsage
+     *
+     * The first page accesses an endpoint like 'students'
+     * But paginated data goes to absolute url, 'http://api.wonde.com/v1.0/students'
+     *
+     * They appear as two separate line items under Api Endpoint Usage
+     * unless we condense them together.
+     *
+     * @var string
+     */
+    private string $baseUri;
+
 
     /**
      * ApiUsage constructor.
      *
+     * @param string $baseUri
      */
-    public function __construct()
+    public function __construct(string $baseUri)
     {
+        $this->baseUri = $baseUri;
     }
 
 
     /**
      * Increment count
      *
+     *
      * @param string $endpoint
      */
     public function record(string $endpoint): void
     {
         /* Remove querystring params
+         * Remove prefix
          */
-        $baseEndpoint = explode('?', $endpoint)[0];
+        $baseEndpoint = str_replace($this->baseUri, '', explode('?', $endpoint)[0]);
 
         /* Initialise counter if needed
          */
