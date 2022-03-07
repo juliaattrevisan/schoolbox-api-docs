@@ -48,6 +48,9 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
         $this->addGetRoute($router, 'getStaleReport', $basePath, "/stale");
         $this->addGetRoute($router, 'getStaleUsers', $basePath, "/stale/list");
+        $this->addGetRoute($router, 'getBulkModify', $basePath, "/bulk/modify");
+        $this->addPostRoute($router, 'getBulkModifyUserList', $basePath, "/bulk/modify/list");
+        $this->addPostRoute($router, 'postBulkModify', $basePath, "/bulk/modifyForm");
 
 
         // CRUD Actions

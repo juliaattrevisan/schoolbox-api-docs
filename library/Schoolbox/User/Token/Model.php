@@ -13,12 +13,14 @@ namespace Schoolbox\User\Token;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
     use DeletedAtDate;
+    use CreatedAtDate;
 
     /**
      * @var string|null
@@ -29,6 +31,16 @@ class Model implements ISoftDeletable
      * @var User|null
      */
     protected ?User $user = null;
+    /**
+     * @var User|null
+     */
+    protected ?User $createdBy = null;
+
+    /**
+     * @var User|null
+     */
+    protected ?User $deletedBy = null;
+
 
     /**
      * @return User|null
@@ -86,6 +98,44 @@ class Model implements ISoftDeletable
     public function setExpiry(?Alaress_Date_Format $expiry): self
     {
         $this->expiry = $expiry;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * @param User|null $createdBy
+     *
+     * @return $this
+     */
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getDeletedBy(): ?User
+    {
+        return $this->deletedBy;
+    }
+
+    /**
+     * @param User|null $deletedBy
+     *
+     * @return $this
+     */
+    public function setDeletedBy(?User $deletedBy): self
+    {
+        $this->deletedBy = $deletedBy;
         return $this;
     }
 }
