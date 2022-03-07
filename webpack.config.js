@@ -195,6 +195,7 @@ module.exports = {
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
+        userBulkModify:  './library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js',
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
         usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
@@ -373,7 +374,7 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
-        new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production: 
+        new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production:
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_DEVTOOLS__: false,
         }),

@@ -1,0 +1,23 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div id='user-bulk-modify'>
+                <user-bulk-modify
+                        src-user-list="{{ routeLookupIfAuthorized('adminUser.getBulkModifyUserList') }}"
+                        src-user-modify="{{ routeLookupIfAuthorized('adminUser.postBulkModify') }}"
+                        :campuses="{{ campuses | json_encode }}"
+                        :roles="{{ roles | json_encode }}"
+                        :year-levels="{{ yearLevels | json_encode }}"
+                        :eportfolio-enabled="Boolean({{ config.eportfolio_enabled }})"
+                        :houses="{{ houses | json_encode }}"
+                />
+            </div>
+            <script type="text/javascript"
+                    src="{{ CDN_PREFIX }}/js/bundle/userBulkModify.js?v={{ config.site_version }}"></script>
+        </div>
+    </div>
+</div>
