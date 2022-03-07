@@ -263,7 +263,6 @@ class Profile implements IStrategy
                 $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
 
                 /* Flags
-                 * TODO Fill in these flag vars
                  */
                 $esl = (bool)$student['extended_details']['data']['english_as_additional_language'];
                 $ib  = false;
