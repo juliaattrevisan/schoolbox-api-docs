@@ -282,7 +282,7 @@ export default {
                 });
             } catch (error) {
                 console.warn(error);
-            } 
+            }
 
             /**
              * immediately check to see if we need to grab pastoral count information
@@ -292,7 +292,7 @@ export default {
                 this.showSkeletonLoader = false;
                 return;
             }
-            
+
             try {
                 const pastoralCountsResponse = await fetch(this.getStudentsPastoralCountsEndpoint());
                 this.studentPastoralCounts = await pastoralCountsResponse.json();
@@ -300,7 +300,7 @@ export default {
                 console.warn(error);
             } finally {
                 this.showSkeletonLoader = false; // Hide skeleton loader and show class list table
-            }    
+            }
 
             setTimeout(() => {
                 this.studentsCheckboxElements = document.getElementsByName('students[]');
@@ -622,7 +622,7 @@ export default {
 
                             <p class="meta">
                                 <slot name="student-meta" v-bind:student="student">
-                                    <span v-if="Number(student.EnglishSecondFlag) === 1"
+                                    <span v-if="showMedicalAlerts && Number(student.EnglishSecondFlag) === 1"
                                           class="icon-eng-second-lang highlight"
                                           title="English as an Additional Language">
                                     </span>
