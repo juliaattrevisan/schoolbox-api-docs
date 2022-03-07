@@ -35,7 +35,7 @@ mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
 echo "... setting up tzdata"
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
+mariadb-tzinfo-to-sql /usr/share/zoneinfo/Australia/ | mariadb -u root mysql -pPassw0rd!
 
 echo "... setting up instance data"
 mariadb schoolbox < "$initialdir"/data/schoolbox.sql
