@@ -59,36 +59,6 @@ class Profile implements IStrategy
 
 
     /**
-     * This const identifies Teaching Staff in a Wonde payload
-     * We saw these from test data (not sure if they are universal)
-     *
-        [ASHT] => Assistant Head
-        [] => Other Premises Staff
-        [CLNR] => Cleaner
-        [DPHT] => Deputy Head
-        [TCHR] => Classroom Teacher
-        [CATR] => Other Catering Staff
-        [MIDS] => Midday Supervisor
-        [STCH] => Science Technician
-        [COOK] => Cook
-        [ICTT] => ICT Technician
-        [HDPT] => Head of Department
-        [LIBR] => Librarian
-        [MIDA] => Midday Assistant
-        [FINC] => Finance Officer
-        [TASS] => Teaching Assistant
-        [SSEC] => School Secretary
-        [ADMC] => Administrator / Clerk
-        [HLTA] => Higher Level Teaching Assistant
-        [HDTR] => Head Teacher
-     */
-    private const WONDE_TEACHER_ROLE_CODES = [
-        'TCHR',
-        'HDTR',
-    ];
-
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -878,34 +848,16 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                /* FIXME employment_details has the nodes containing booleans: [current, teaching_staff]
-                 *  but in the test data, teaching_staff is always empty so I have
-                 *  to infer teaching vs non-teaching staff via role_codes
-                 */
-
-                /* role_code apparently determines teaching vs non-teaching staff
-                 * but I can't tell whether this const is configurable or not
-                 * The docs don't really elucidate how this is used in their app
-                 *
-                 * If they teach anything, they're Teaching Staff
-                 * Otherwise, they're Non-Teaching Staff
-                 *
-                 * https://docs.wonde.com/docs/api/sync#role-object
+                /* employment_details has the nodes containing booleans: [current, teaching_staff]
+                 * to infer teaching vs non-teaching staff, but you need to turn on the permission
+                 * to read that value (otherwise it will always be null/empty/false)
                  */
                 $category = self::EMPLOYEE;
 
-                if (isset($staff['roles']) && \count($staff['roles']['data'])) {
-                    foreach ($staff['roles']['data'] as $staffRole) {
-                        /* Get a list of (role code, role name) tuples to see what
-                         * might be universal and what might be configurable
-                         *
-                         * $seenRoleCodes[$staffRole['role_code']] = $staffRole['role'];
-                         */
-                        if (in_array(trim((string)$staffRole['role_code']), self::WONDE_TEACHER_ROLE_CODES, true)) {
-                            $category = self::TEACHER;
-                            break;
-                        }
-                    }
+                /* All staff are Employees unless proven otherwise
+                 */
+                if ($staff['employment_details']['data']['teaching_staff']) {
+                    $category = self::TEACHER;
                 }
 
                 /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
