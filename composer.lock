@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92bb07490358400383f1e51736b718e2",
+    "content-hash": "b73f12b3d0969c14d6243eb4b1df4a79",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -1935,21 +1935,6 @@
                 "source": "https://github.com/firebase/php-jwt/tree/v5.5.1"
             },
             "time": "2021-11-08T20:18:51+00:00"
-        },
-        {
-            "name": "gggeek/phpxmlrpc",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/gggeek/phpxmlrpc",
-                "reference": "f9dbab373a5ed33f7246daf2865ea2e2231a362e"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "lib/"
-                ]
-            }
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -5973,6 +5958,65 @@
                 }
             ],
             "time": "2021-11-28T23:30:39+00:00"
+        },
+        {
+            "name": "phpxmlrpc/phpxmlrpc",
+            "version": "4.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gggeek/phpxmlrpc.git",
+                "reference": "5f47934cdf3c7d989ab4c5a11d9c08d1d55a8380"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gggeek/phpxmlrpc/zipball/5f47934cdf3c7d989ab4c5a11d9c08d1d55a8380",
+                "reference": "5f47934cdf3c7d989ab4c5a11d9c08d1d55a8380",
+                "shasum": ""
+            },
+            "require": {
+                "ext-xml": "*",
+                "php": "^5.3.0 || ^7.0 || ^8.0"
+            },
+            "conflict": {
+                "phpxmlrpc/extras": "<= 0.6.3"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "phpunit/phpunit": "^5.0 || ^8.5.14",
+                "phpunit/phpunit-selenium": "*",
+                "yoast/phpunit-polyfills": "*"
+            },
+            "suggest": {
+                "ext-curl": "Needed for HTTPS and HTTP 1.1 support, NTLM Auth etc...",
+                "ext-mbstring": "Needed to allow reception of requests/responses in character sets other than ASCII,LATIN-1,UTF-8",
+                "ext-zlib": "Needed for sending compressed requests and receiving compressed responses, if cURL is not available",
+                "phpxmlrpc/extras": "Adds more featured Server classes and other useful bits",
+                "phpxmlrpc/jsonrpc": "Adds support for the JSON-RPC protocol"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpXmlRpc\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "A php library for building xmlrpc clients and servers",
+            "homepage": "https://gggeek.github.io/phpxmlrpc/",
+            "keywords": [
+                "webservices",
+                "xml-rpc",
+                "xmlrpc"
+            ],
+            "support": {
+                "issues": "https://github.com/gggeek/phpxmlrpc/issues",
+                "source": "https://github.com/gggeek/phpxmlrpc/tree/4.6.1"
+            },
+            "time": "2022-02-15T17:51:11+00:00"
         },
         {
             "name": "predis/predis",

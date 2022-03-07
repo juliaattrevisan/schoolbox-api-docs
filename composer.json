@@ -49,7 +49,6 @@
     },
     "require": {
         "php": "7.4.* || 8.0.*",
-        "gggeek/phpxmlrpc": "0.1.0",
         "symfony/http-foundation": "~5.2",
         "league/oauth2-client": "^2.4",
         "sabre/dav": "^4.2.1",
@@ -125,7 +124,8 @@
         "intelliscl/sdk": "0.2.0.4-beta",
         "apple/apn-push": "^3.1",
         "symfony/mime": "^5.4",
-        "symfony/mailer": "^5.4"
+        "symfony/mailer": "^5.4",
+        "phpxmlrpc/phpxmlrpc": "^4.6"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
