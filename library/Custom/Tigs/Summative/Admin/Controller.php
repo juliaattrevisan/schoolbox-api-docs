@@ -49,7 +49,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->getRouter()->generate('tigsSummativeAdmin.postAdmin')
+            $this->getRouter()->generate('tigsSummativeAdmin.postAdmin'),
         );
 
         $data = ['configContext' => $configContext,];

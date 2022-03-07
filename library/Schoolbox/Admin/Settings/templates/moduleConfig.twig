@@ -141,14 +141,17 @@
             {% if hasColourPicker or hasAttachzone %}
                 {% set usePolling = 1 %}
             {% endif %}
-
+            {% if useBottomDrawer %}
             <div id="save-admin-settings-container">
                 <save-admin-settings
-                        form-id="settings"
-                        :polling="{{ usePolling }}"
+                    form-id="settings"
+                    :use-polling="{{ usePolling ? 'true' : 'false' }}"
                 />
             </div>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
+            {% else %}
+            <input type="submit" value="Save" />
+            {% endif %}
         {% endif %}
     </form>
 </div>

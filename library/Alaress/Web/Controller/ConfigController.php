@@ -43,12 +43,16 @@ abstract class ConfigController extends Base
     /**
      * Returns data suitable for injecting into standard config twig template
      *
-     * @param Predicate\Builder $pb        A PB for finding the config for this module
-     * @param string            $postRoute Where should the config be posted to
+     * @param Predicate\Builder $pb                A PB for finding the config for this module
+     * @param string            $postRoute         Where should the config be posted to
+     * @param array             $additionalContext Any additional context to add
      * @return array
      */
-    protected function buildConfigContext(Predicate\Builder $pb, string $postRoute): array
-    {
+    protected function buildConfigContext(
+        Predicate\Builder $pb,
+        string $postRoute,
+        array $additionalContext = []
+    ): array {
         return (new ModuleConfig($this->fieldStrategyFactory))->getContext(
             $this->getConfigLoader()->get('site_version'),
             $this->configMapper->findByPredicates($pb, [
@@ -57,7 +61,8 @@ abstract class ConfigController extends Base
                     ConfigMapper::COL_ID => 'ASC'
                 ]
             ]),
-            $postRoute
+            $postRoute,
+            $additionalContext,
         );
     }
 

@@ -12,6 +12,7 @@ use Alaress\Database\Predicate;
 use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -62,7 +63,8 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('commsNewsPolicy.postPolicies')
+            $this->router->generate('commsNewsPolicy.postPolicies'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [

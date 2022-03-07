@@ -15,6 +15,7 @@ use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
@@ -70,7 +71,8 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->router->generate('adminLti.postConfig')
+            $this->router->generate('adminLti.postConfig'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();

@@ -50,7 +50,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->getRouter()->generate(Module::BASE_NAME . '.postAdmin')
+            $this->getRouter()->generate(Module::BASE_NAME . '.postAdmin'),
         );
 
         $data = [
