@@ -547,7 +547,7 @@ class Profile implements IStrategy
         /* If this house has any employees, dig out the first one
          */
         if (isset($studentHouse['data']) && \count($studentHouse['data']['employees']['data'])) {
-            /* FIXME Not sure if "Head of House" meta.role is hardcoded into wonde or not
+            /* "Head of House" meta.role is not hardcoded into wonde
              *  For now just grab the first human off the stack
              */
             $housemaster = $studentHouse['data']['employees']['data'][0];
