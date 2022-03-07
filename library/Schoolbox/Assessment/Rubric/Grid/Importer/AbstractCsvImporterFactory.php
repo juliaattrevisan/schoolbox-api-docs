@@ -217,22 +217,17 @@ abstract class AbstractCsvImporterFactory
     {
         $line = fgetcsv($fp);
 
-        if ($line === null) {
+        if ($line === false) {
             // EOF
             return null;
         }
 
-        if (is_array($line)) {
-            // normal data
-            // Normalize line values
-            return array_map(
-                [$this, 'normalizeEncoding'],
-                array_slice($line, 0, $maxLevels + 2)
-            );
-        }
-
-        // bad data, but not EOF
-        return [];
+        // normal data
+        // Normalize line values
+        return array_map(
+            [$this, 'normalizeEncoding'],
+            array_slice($line, 0, $maxLevels + 2)
+        );
     }
 
 
