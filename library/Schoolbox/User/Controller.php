@@ -187,26 +187,10 @@ class Controller extends Base
 
     /**
      * @api /user/{userId}/groupMembership
-     * @param string $userId
+     * @param User $user
      */
-    public function apiMembership(string $userId)
+    public function apiMembership(User $user)
     {
-        //check for invalid / deleted users?
-        try {
-            /* Check that the selected user exists in schoolbox
-             */
-            $user = $this->userMapper->findById($userId);
-        } catch (MapperException $e) {
-            /* If they weren't found in either, exit
-             */
-            $problem = (new ApiProblem('User does not exist'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
-        }
-
         $users_groups = $this->groupsHelper->getCurrentGroups($user);
         $apiGroups = [];
         foreach ($users_groups as $group) {

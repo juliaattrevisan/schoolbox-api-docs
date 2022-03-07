@@ -26,6 +26,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
@@ -54,9 +55,17 @@ class Module extends BaseModule
 
         $hasApiAccess = new Rule\IsSuperuser();
 
+        $preloadUser = function ($params) {
+            return $this->preloadUser($params);
+        };
+
+        $preloadUserGroup = function ($params) {
+            return $this->preloadUserGroup($params);
+        };
+
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
         $this->register('GET', '/search', 'search', $loggedIn);
-        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess);
+        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess, $preloadUser);
     }
 
     /**
@@ -150,6 +159,51 @@ class Module extends BaseModule
         );
     }
 
+    /**
+     * Preload a User instance
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUser(array $params): array
+    {
+        try {
+            $user = $this->getUserMapper()->findById($params['userId']);
+        } catch (MapperException $e) {
+            throw new SchoolboxException('User Does not Exist');
+        }
+
+        return [
+            'user' => $user,
+        ];
+    }
+
+    /**
+     * Preload a User and Group instances
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUserGroup(array $params): array
+    {
+        $user = $this->preloadUser($params);
+
+        try {
+            $group = $this->getGroupMapper()->findOneByColumn('cid', $params['groupId']);
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Group Does not Exist');
+        }
+
+        return [
+            'user' => $user,
+            'group' => $group,
+        ];
+    }
+
     /* Getters / Setters
      */
 
@@ -175,5 +229,13 @@ class Module extends BaseModule
     public function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @return GroupMapper
+     */
+    protected function getGroupMapper()
+    {
+        return $this->getMapperFactory()->get(GroupMapper::class);
     }
 }
