@@ -1,42 +1,47 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent ?? 'home', null) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-{# show each term #}
-<div class="row">
-    <div class="small-12 island">
-        {% for basename, controllerRoutes in routes %}
-            <h2 class="subheader">{{ basename }}</h2>
-            <table data-sortable style="table-layout: fixed;">
-                <colgroup>
-                    <col />
-                    <col />
-                    <col />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Route</th>
-                    <th>Path</th>
-                    <th>Endpoint</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for route in controllerRoutes %}
-                    <tr {% if route.error %}class="alert"{% endif %}>
-                        <td>
-                            {% if route.error %}
-                                <span data-tooltip
-                                      class="has-tip tip-top hint"
-                                      title="An error was raised whilst building this controller: &quot;{{ route.error.message }}&quot;">?</span>
-                            {% endif %}
-                            {{ route.name }}
-                        </td>
-                        <td>{{ route.method }} {{ route.path }}</td>
-                        <td>{{ route.controller }}::{{ route.action }}</td>
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            {% for basename, controllerRoutes in routes %}
+                <h2 class="subheader">{{ basename }}</h2>
+                <table data-sortable style="table-layout: fixed;">
+                    <colgroup>
+                        <col />
+                        <col />
+                        <col />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Path</th>
+                        <th>Endpoint</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
+                    </thead>
+                    <tbody>
+                    {% for route in controllerRoutes %}
+                        <tr {% if route.error %}class="alert"{% endif %}>
+                            <td>
+                                {% if route.error %}
+                                    <span data-tooltip
+                                          class="has-tip tip-top hint"
+                                          title="An error was raised whilst building this controller: &quot;{{ route.error.message }}&quot;">?</span>
+                                {% endif %}
+                                {{ route.name }}
+                            </td>
+                            <td>{{ route.method }} {{ route.path }}</td>
+                            <td>{{ route.controller }}::{{ route.action }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
