@@ -1,4 +1,4 @@
-# Testing this thing
+# Kamar
 
 You'll need a set of Kamar xml files. You can download a bunch from a dev server in /mnt/data/cache/stream/kamar, or if they've already been processed, in a subfolder there called `archive`.
 
@@ -6,7 +6,7 @@ The Kamar importer absorbs a set of xml files that the Kamar software randomly v
 
 It's pretty convenient to keep a bunch on standby in a safe location so you can inspect contents and structure on-demand without having to do the rigmarole of shanking down files somewhere.
 
-## 1. Purge Legacy Data
+## 1 Purge Legacy Data
 You'll have to purge legacy data's profile first. It contains broken data which is now strictly disallowed from existing. In isams, there's a user with external id 71 which clashes with someone in legacy data who is broken. Base Profiles can't exist on their own.
 
 To prepare a realistic scenario,
@@ -24,7 +24,7 @@ delete from sis_timetable_period;
 delete from sis_timetable_cycle;
 ```
 
-## 2. Connector Setup
+## 2 Connector Setup
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import and set the `Data Source` to `CSV Files`. Import the `Wang` timetable definition in Jira; it contains a sample setup.
 
@@ -39,7 +39,7 @@ Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and se
 
 The Endpoint Key is a colon-separated username/password tuple. Kamar instance sends it and is supposed to match something we're expecting; if it doesn't match, we can reject data.
 
-## 3. Importing
+## 3 Importing
 
 Then run the sisImporter. The easiest way is to shank down a set of xml from a Schoolbox instance which already uses Kamar
 (e.g. WCS):
@@ -74,13 +74,13 @@ $weekOffsetCalculator = new WeekOffset(
 );
 ```
 
-## 4. Cycle Assignation
+## 4 Cycle Assignation
 
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/lists/campus
 
 The two campuses `Senior` and `Junior` have a `Cycle` column currently set to `N/A`. Untick the one for `Senior` then choose a Cycle in the dropdown and hit `Save`. This assigns a Cycle to a Campus.
 
-## 5. Assimilate Profile
+## 5 Assimilate Profile
 
 Have a look in `sis_class_user` to find the external identifier for a student that is in at least one class.
 
@@ -88,7 +88,7 @@ Assign that external identifier to David Rhodes' user, then visit his Timetable 
 
 All his stuff should display.
 
-## 6. Reimport
+## 6 Reimport
 
 Repeat step 3 to simulate what a crontab might do. The cycle assignation and timetable contents shouldn't change, nor should it arbitrarily create new Cycles for no apparent reason.
 
