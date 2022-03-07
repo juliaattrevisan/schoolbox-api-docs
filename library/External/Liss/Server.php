@@ -10,8 +10,8 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
-use PhpXmlRpc\Request as xmlrpcmsg;
-use PhpXmlRpc\Response as xmlrpcresp;
+use PhpXmlRpc\Request;
+use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
@@ -268,10 +268,10 @@ class External_Liss_Server
      *
      * Discovered via apache mod_dumpio
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function getRooms(xmlrpcmsg $message): xmlrpcresp
+    public function getRooms(Request $message): Response
     {
         $this->log()->info('getRooms: unable to process request, not implemented');
 
@@ -282,10 +282,10 @@ class External_Liss_Server
     /**
      * Publish students to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishClassMemberships(xmlrpcmsg $message): xmlrpcresp
+    public function publishClassMemberships(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -339,10 +339,10 @@ class External_Liss_Server
     /**
      * Publish Teachers to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishTeachers(xmlrpcmsg $message): xmlrpcresp
+    public function publishTeachers(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -372,10 +372,10 @@ class External_Liss_Server
     /**
      * Publish students to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishStudents(xmlrpcmsg $message): xmlrpcresp
+    public function publishStudents(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -405,10 +405,10 @@ class External_Liss_Server
     /**
      * Publish Calendar to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishCalendar(xmlrpcmsg $message): xmlrpcresp
+    public function publishCalendar(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -438,10 +438,10 @@ class External_Liss_Server
     /**
      * Publish Rooms to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishRooms(xmlrpcmsg $message)
+    public function publishRooms(Request $message)
     {
 
         /* Requires schoolbox connector
@@ -473,13 +473,13 @@ class External_Liss_Server
     /**
      * Publish classes to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function publishClasses(xmlrpcmsg $message): xmlrpcresp
+    public function publishClasses(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -525,13 +525,13 @@ class External_Liss_Server
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws PDOException
      * @throws MapperException
      * @throws UnexpectedValueException
      */
-    public function publishTimetable(xmlrpcmsg $message): xmlrpcresp
+    public function publishTimetable(Request $message): Response
     {
 
         /* Requires schoolbox connector
@@ -604,15 +604,15 @@ class External_Liss_Server
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function publishBellTimes(xmlrpcmsg $message): xmlrpcresp
+    public function publishBellTimes(Request $message): Response
     {
 
         /* Requires schoolbox connector
@@ -715,14 +715,14 @@ class External_Liss_Server
      * Not in use yet, but causes errors if schools try to send
      * this data. Separated from getRooms() to allow for future use.
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws InvalidColumnException
      */
-    public function publishDailyData(xmlrpcmsg $message): xmlrpcresp
+    public function publishDailyData(Request $message): Response
     {
         $configLoader = $this->config;
         $helper = new PublishDailyDataHelper($configLoader);
@@ -996,10 +996,10 @@ class External_Liss_Server
      * A xmlrpcresp factory
      *
      * @param string $message
-     * @return xmlrpcresp
+     * @return Response
      */
-    private function generateResponse($message): xmlrpcresp
+    private function generateResponse($message): Response
     {
-        return new xmlrpcresp(new xmlrpcval($message, 'string'));
+        return new Response(new xmlrpcval($message, 'string'));
     }
 }
