@@ -290,9 +290,6 @@ class Provisioner
                         continue;
                     }
 
-                    // sort campus list to get diff properly. campus is the only collection in user properties for now
-                    $originalUser->getCampusCollection()->sortBy('id', 'ASC');
-                    $internalUser->getCampusCollection()->sortBy('id', 'ASC');
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
