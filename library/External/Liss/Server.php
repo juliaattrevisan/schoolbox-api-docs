@@ -294,7 +294,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishClassMemberships: processing request');
@@ -303,7 +303,7 @@ class External_Liss_Server
 
             $classInvolvementMapper->truncate();
 
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $classAll = $classEntryMapper->findAll();
             $classAll->indexBy('code');
 
@@ -351,7 +351,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -359,7 +359,7 @@ class External_Liss_Server
             $this->log()->info('publishTeachers: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishTeachers: ' . json_encode($allData));
 
             return $this->generateResponse('Teachers Imported');
@@ -384,7 +384,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -392,7 +392,7 @@ class External_Liss_Server
             $this->log()->info('publishStudents: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishStudents: ' . json_encode($allData));
 
             return $this->generateResponse('Students Imported');
@@ -417,7 +417,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -425,7 +425,7 @@ class External_Liss_Server
             $this->log()->info('publishCalendar: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishCalendar: ' . json_encode($allData));
 
             return $this->generateResponse('Calendar Imported');
@@ -451,7 +451,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -460,7 +460,7 @@ class External_Liss_Server
             $this->log()->info('publishRooms: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishRooms: ' . json_encode($allData));
 
             return $this->generateResponse('Rooms Imported');
@@ -488,7 +488,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishClasses: processing request');
@@ -498,7 +498,7 @@ class External_Liss_Server
             $classEntryMapper = new ClassEntryMapper();
             $classEntryMapper->truncate();
 
-            $allData = $message->params[2]->me['array'];
+            $allData = $message->getParam(2)->me['array'];
             $classCount = 0;
 
             foreach ($allData as $currentData) {
@@ -541,7 +541,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishTimetable: processing request');
@@ -554,7 +554,7 @@ class External_Liss_Server
             $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
@@ -622,7 +622,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
@@ -632,7 +632,7 @@ class External_Liss_Server
 
             $this->log()->info('publishBellTimes: processing request');
 
-            $allData = $message->params[2]->me['array'];
+            $allData = $message->getParam(2)->me['array'];
 
             /* Truncate everything before re-adding */
             $timetablePeriodMapper = new TimetablePeriodMapper();
@@ -751,7 +751,7 @@ class External_Liss_Server
 
         /* Have an owner - continue normally
          */
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $configLoader);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
             /* Delete all previous versions of events using the same source
@@ -780,7 +780,7 @@ class External_Liss_Server
 
             /* Set up all events in a nicer format
              */
-            $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
+            $allEvents = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
