@@ -568,8 +568,6 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             $timetableDate['TimetableDay'] = isset($timetableDate['TimetableDayID'])
                 ? $timetableDay
                 : null;
-
-            // @phpstan-ignore-next-line: I can unset this
             unset($timetableDate['TimetableDayID']);
         }
         unset($timetableDate);
