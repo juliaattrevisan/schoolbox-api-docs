@@ -2866,26 +2866,6 @@ parameters:
 			path: library/Schoolbox/Admin/Home/Controller.php
 
 		-
-			message: "#^Cannot access offset int on true\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Cannot access offset mixed on true\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Import\\\\Profile\\\\Reader\\:\\:\\$previousRow \\(bool\\) does not accept array\\<int\\|string, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Import\\\\Profile\\\\Reader\\:\\:\\$previousRow \\(bool\\) does not accept array\\<string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
 			message: "#^Access to protected property Aura\\\\Router\\\\Route\\:\\:\\$method\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/RouteSummary/Controller.php
