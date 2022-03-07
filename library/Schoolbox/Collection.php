@@ -1087,7 +1087,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         $i = 0;
         foreach ($this as $value) {
             foreach ($decorators as $decorator) {
-                $json[$i] = $decorator->decorate($json[$i] ?: [], $value);
+                $json[$i] = $decorator->decorate($json[$i] ?? [], $value);
             }
             $i++;
         }
