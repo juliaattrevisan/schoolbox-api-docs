@@ -13,6 +13,7 @@ use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
+use PhpXmlRpc\Value;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -1000,6 +1001,6 @@ class External_Liss_Server
      */
     private function generateResponse($message): Response
     {
-        return new Response(new xmlrpcval($message, 'string'));
+        return new Response(new Value($message, 'string'));
     }
 }
