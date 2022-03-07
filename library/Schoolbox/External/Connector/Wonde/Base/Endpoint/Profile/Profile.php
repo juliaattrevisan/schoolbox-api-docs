@@ -274,7 +274,7 @@ class Profile implements IStrategy
 
                 /* Hmm. It turns out that Year Level is a kind of Wonde "Group"
                  */
-                $yearLevel = trim((string)$student['year']['data']['name']);
+                $yearLevel = trim((string)($student['year']['data']['name'] ?? ''));
 
                 $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
                 $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
