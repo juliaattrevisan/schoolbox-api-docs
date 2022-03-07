@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Group;
 use Schoolbox\Role;
 use Schoolbox\User;
 use User\Logger;
@@ -161,49 +162,11 @@ class Controller extends Base
 
     /**
      * adds a user into a group
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
      * @api POST /user/{userId}/groupMembership/{groupId}
      */
-    public function apiMembershipAdd(string $userId, string $groupId)
+    public function apiMembershipAdd(User $user, Group $group)
     {
-        //check for invalid / deleted users?
-        try {
-            /* Check that the selected user exists in schoolbox
-             */
-            $user = $this->userMapper->findById($userId);
-        } catch (MapperException $e) {
-            /* If they weren't found in either, exit
-             */
-            $problem = (new ApiProblem('User does not exist'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
-        }
-        //check for invalid / deleted groups?
-        try {
-            /* Check that the selected user exists in schoolbox
-             */
-            $group = $this->groupsMapper->findById($groupId);
-        } catch (Deleted $e) {
-            /* if the group was deleted, exit
-             */
-            $problem = (new ApiProblem('Group has been deleted'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
-        } catch (NotFound $e) {
-            /* group was not found, exit
-             */
-            $problem = (new ApiProblem('Group does not exist'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
-        }
 
         $this->groupsHelper->addToGroup($user, $group);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
