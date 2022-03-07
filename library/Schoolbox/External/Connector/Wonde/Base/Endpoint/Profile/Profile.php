@@ -214,6 +214,7 @@ class Profile implements IStrategy
                 'house.employees',
                 'medical_conditions',
                 'education_details',
+                'extended_details',
                 'groups',
                 'sen_needs',
                 'identifiers',
@@ -248,13 +249,13 @@ class Profile implements IStrategy
                  *
                  * https://docs.wonde.com/docs/api/sync#student-identifiers-object
                  */
-                $username    = (new FirstMeaningfulValue())->find([
+                $username = (new FirstMeaningfulValue())->find([
                     $student['identifiers']['data']['username'] ?? null,
                     $student['identifiers']['data']['active_directory_username'] ?? null,
                     $externalId
                 ]);
 
-                /* Hmm. It turns out taht Year Level is a kind of Wonde "Group"
+                /* Hmm. It turns out that Year Level is a kind of Wonde "Group"
                  */
                 $yearLevel = $this->findYearLevel($student['groups']);
 
@@ -264,7 +265,7 @@ class Profile implements IStrategy
                 /* Flags
                  * TODO Fill in these flag vars
                  */
-                $esl = false;
+                $esl = (bool)$student['extended_details']['data']['english_as_additional_language'];
                 $ib  = false;
                 $ilp = false;
 
@@ -653,7 +654,6 @@ class Profile implements IStrategy
          */
         foreach ($groups['data'] as $group) {
             if ('YEAR' === $group['type']) {
-                $this->log->warning($group['name']);
                 return (string)$group['name'];
             }
         }
