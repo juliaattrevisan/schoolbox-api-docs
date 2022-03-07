@@ -171,8 +171,9 @@ class Controller extends Base
         $post['membership'] = $post['membership'] ?: false;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
         $post['isFavourite'] = $post['isFavourite'] ?: false;
+        $post['enrollmentStatus'] = $post['enrollmentStatus'] ?: false;
 
-        $this->groupsHelper->addToGroup($user, $group, $post['membership'], $post['isNotificationsOn'], $post['isFavourite']);
+        $this->groupsHelper->addToGroup($user, $group, $post['enrollmentStatus'], $post['membership'], $post['isNotificationsOn'], $post['isFavourite']);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
         $apiGroups = [];
         foreach ($users_groups as $group) {
