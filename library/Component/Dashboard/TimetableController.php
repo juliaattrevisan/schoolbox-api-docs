@@ -78,7 +78,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             return false;
         }
 
-        if (!($_SESSION['timetable'] && $this->getConfigLoader()->get('external_enable'))) {
+        if (!(!empty($_SESSION['timetable']) && $this->getConfigLoader()->get('external_enable'))) {
             return false;
         }
 
@@ -267,11 +267,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             'url'       => $classLink,
             'colour'    => $this->getSubjectColour((string)$class['code']),
             'desc'      => $classDescription,
-            'cancelled' => (bool)$class['ClassCancelled'],
+            'cancelled' => !empty($class['ClassCancelled']),
         ];
 
         // Optionally link to Attendance Records
-        if ($this->externalAttendanceLink->isEnabled($class['code'], $class['AttendanceEnabled'], $now)) {
+        if ($this->externalAttendanceLink->isEnabled($class['code'], !empty($class['AttendanceEnabled']), $now)) {
             $classContext['attendance'] = [
                 'link'   => $this->externalAttendanceLink->getAttendanceLink(
                     $class['code'],

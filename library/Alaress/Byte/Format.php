@@ -30,7 +30,7 @@ class Alaress_Byte_Format
     public static function bytesToString($size, int $precision = 2, bool $useIEC = true, bool $renderIecExplicitly = false): string
     {
         $sign = $size < 0 ? '-' : '';
-        $size = abs($size);
+        $size = abs((int)$size);
 
         // IEC uses 2^X, SI uses 10^X
         $multiplier = $useIEC ? 1024 : 1000;

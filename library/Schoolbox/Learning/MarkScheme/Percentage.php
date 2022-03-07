@@ -100,7 +100,7 @@ class Percentage extends AbstractMarkScheme
     public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
         return isset($humanReadableMark)
-            ? (string)round($humanReadableMark, 2)
+            ? (string)round((float)$humanReadableMark, 2)
             : null;
     }
 

@@ -97,7 +97,11 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
         foreach ($userCampuses as $campus) {
             $campusName = $campus->getName();
             $campusCode = $campus->getExtTimetableCode();
-            $campusTitles[$campusCode] = $campusTitles[$campusCode] . '/' . $campusName;
+            if (isset($campusTitles[$campusCode])) {
+                $campusTitles[$campusCode] .= '/' . $campusName;
+            } else {
+                $campusTitles[$campusCode] = $campusName;
+            }
         }
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring

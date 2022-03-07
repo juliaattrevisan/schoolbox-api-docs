@@ -111,8 +111,10 @@ if (($actualPermission = $access->getFolderAccess($sessionUser, $folder->getId()
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
+$readonly = !empty($_GET['readonly']);
+
 // If I'm a write level user, I can downgrade myself to read access
-if ($actualPermission > UserAccess::ACCESS_READ && $_GET['readonly']) {
+if ($actualPermission > UserAccess::ACCESS_READ && $readonly) {
     $virtualPermission = UserAccess::ACCESS_READ;
 } else {
     $virtualPermission = $actualPermission;
@@ -170,7 +172,7 @@ $this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory($sessionUser, $this);
-if ($_GET['readonly']) {
+if ($readonly) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }
 $componentCollection = $componentFactory->buildComponentList($folder->getId());
@@ -179,7 +181,7 @@ $componentCollection = $componentFactory->buildComponentList($folder->getId());
 $this->setVar('readonly_switch_on_block', '');
 $this->setVar('readonly_switch_off_block', '');
 if ($actualPermission >= UserAccess::ACCESS_WRITE) {
-    if ($_GET['readonly']) {
+    if ($readonly) {
         $this->parse('readonly_switch_off_block', 'readonly_switch_off');
     } else {
         $this->parse('readonly_switch_on_block', 'readonly_switch_on');
@@ -296,7 +298,11 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
             //
             // This was set to $component->componentCategoryName - a non-existent value
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
-            $tabList[$component->getComponentCategory()]['count']++;
+            if (isset($tabList[$component->getComponentCategory()]['count'])) {
+                $tabList[$component->getComponentCategory()]['count']++;
+            } else {
+                $tabList[$component->getComponentCategory()]['count'] = 0;
+            }
         }
     } else {
         $this->setVar([

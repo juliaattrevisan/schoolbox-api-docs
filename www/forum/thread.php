@@ -128,11 +128,7 @@ $threadMapper->save($thread);
 /* output pagination
  */
 $postList = $thread->getPosts();
-$pageNum = $this->arg[1];
-
-if (!$pageNum) {
-    $pageNum = 1;
-}
+$pageNum = $this->arg[1] ?? 1;
 
 $postPerPage = PostMapper::FORUM_POSTS_PER_PAGE;
 $totalPages = ceil(count($postList) / $postPerPage);

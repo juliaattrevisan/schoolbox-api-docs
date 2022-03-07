@@ -377,14 +377,14 @@ class SitePage extends Page
     public static function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
-        if (!is_array($_SESSION['history'])) {
+        if (!(isset($_SESSION['history']) && is_array($_SESSION['history']))) {
             $_SESSION['history'] = array();
         }
 
         $requestUri = $override ? $override : $_SERVER['REQUEST_URI'];
 
         /* Dont handle duplicates (page refreshes) */
-        if ($_SESSION['history'][0] != $requestUri) {
+        if (!( isset($_SESSION['history'][0]) && $_SESSION['history'][0] == $requestUri)) {
             array_unshift($_SESSION['history'], $requestUri);
 
             if (count($_SESSION['history']) > 3) {

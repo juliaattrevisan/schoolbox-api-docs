@@ -49,7 +49,7 @@ $colourList = Timetable_ColourMapper::getInstance()->findAll();
 /** @var Schoolbox\User[] $userList */
 $userList      = [];
 $numTimetables = 0;
-$child_id      = $this->arg[0];
+$child_id      = $this->arg[0] ?? 0;
 
 if ($_SESSION['user']->getRole()->isParent()) {
     if (is_array($_SESSION['children'])) {
@@ -168,7 +168,8 @@ foreach ($userList as $user) {
                 foreach ($timetable as $row) {
                     if ($row['periodSequence'] == 1) {
                         $is_current_period =
-                            $row['periodNumber'] == $periodCurrent['PeriodNumber']
+                            (isset($periodCurrent['PeriodNumber']) && isset($periodCurrent['PeriodNumberSeq']))
+                            && $row['periodNumber'] == $periodCurrent['PeriodNumber']
                             && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq'];
                         $outputPeriodDefinition = [
                             'PERIOD_NAME'  => $row['periodName'],
