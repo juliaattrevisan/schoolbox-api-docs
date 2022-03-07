@@ -186,8 +186,11 @@ class Controller extends Base
     }
 
     /**
-     * @api /user/{userId}/groupMembership
+     * Returns group memberships for a user
+     *
      * @param User $user
+     * @api /user/{userId}/groupMembership
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipSearch
      */
     public function apiMembership(User $user)
     {

@@ -165,7 +165,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws \InvalidArgumentException
-     * @throws NotFound
+     * @throws SchoolboxException
      */
     private function preloadUser(array $params): array
     {
@@ -186,7 +186,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws \InvalidArgumentException
-     * @throws NotFound
+     * @throws SchoolboxException
      */
     private function preloadUserGroup(array $params): array
     {
@@ -234,7 +234,7 @@ class Module extends BaseModule
     /**
      * @return GroupMapper
      */
-    protected function getGroupMapper()
+    protected function getGroupMapper(): GroupMapper
     {
         return $this->getMapperFactory()->get(GroupMapper::class);
     }
