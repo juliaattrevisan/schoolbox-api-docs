@@ -214,6 +214,7 @@ class Profile implements IStrategy
                 'house.employees',
                 'medical_conditions',
                 'education_details',
+                'groups',
                 'sen_needs',
                 'identifiers',
                 'contacts',
@@ -253,7 +254,9 @@ class Profile implements IStrategy
                     $externalId
                 ]);
 
-                $yearLevel   = trim((string)$student['education_details']['data']['current_nc_year']);
+                /* Hmm. It turns out taht Year Level is a kind of Wonde "Group"
+                 */
+                $yearLevel = $this->findYearLevel($student['groups']);
 
                 $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
                 $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
@@ -629,6 +632,33 @@ class Profile implements IStrategy
             'id' => null,
             'name' => null
         ];
+    }
+
+
+    /**
+     * Find a year level for a student (it's stored as a Wonde Group)
+     *
+     * @param array $groups
+     * @return string|null
+     */
+    private function findYearLevel(array $groups): ?string
+    {
+        /* No groups? No year
+         */
+        if (!\count($groups['data'])) {
+            return null;
+        }
+
+        /* Find the YEAR group in the pile
+         */
+        foreach ($groups['data'] as $group) {
+            if ('YEAR' === $group['type']) {
+                $this->log->warning($group['name']);
+                return (string)$group['name'];
+            }
+        }
+
+        return null;
     }
 
 
