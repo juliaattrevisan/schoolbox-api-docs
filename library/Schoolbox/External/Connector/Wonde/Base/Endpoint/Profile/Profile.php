@@ -940,9 +940,12 @@ class Profile implements IStrategy
                  */
                 $department = '';
 
-                /* FIXME Still can't tell the difference between 'email' and 'primary' usages
+                /* Follows the same precedence scheme as student emails
                  */
-                $email = trim((string)$staff['contact_details']['data']['emails']['email']);
+                $email = (new FirstMeaningfulValue())->find([
+                    $staff['contact_details']['data']['emails']['work'],
+                    $staff['contact_details']['data']['emails']['email'],
+                ]);
 
                 /* FIXME Controversial - maybe never include phone numbers at all?
                  */
