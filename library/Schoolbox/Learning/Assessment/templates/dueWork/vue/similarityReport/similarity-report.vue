@@ -259,7 +259,7 @@ export default {
 
         /**
          * Add a colour to represent the similarity score
-         * A low score starting with green to high score red is used
+         * Colours are determined by turnitin
          *
          * @param { Object }
          *
@@ -267,30 +267,17 @@ export default {
          */
         getFileColour (file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
-            if (percentageRounded == 0) {
-                return '#0c78cf'; //blue 
-            } else if (this.isBetween(percentageRounded, 1, 24)) {
-                return '#278829'; //green
-            } else if (this.isBetween(percentageRounded, 25, 49)) {
-                return '#eab42c'; //yellow
-            } else if (this.isBetween(percentageRounded, 50, 74)) {
-                return '#e27600'; //orange
-            } else if (this.isBetween(percentageRounded, 75, 100)) {
-                return '#ff0000'; //red
+            if (percentageRounded >= 75) {
+                return 'turnitin-red'; 
+            } else if (percentageRounded >= 50) {
+                return 'turnitin-orange'; 
+            } else if (percentageRounded >= 25) {
+                return 'turnitin-yellow'; 
+            } else if (percentageRounded >= 1) {
+                return 'turnitin-green'; 
+            } else if (percentageRounded === 0) {
+                return 'turnitin-blue'; 
             } 
-        },
-
-        /**
-         * Check if x is between a min and max
-         *
-         * @param { Number }
-         * @param { Number }
-         * @param { Number }
-         *
-         * @returns { Boolean }
-         */
-        isBetween (x, min, max) {
-            return x >= min && x <= max;
         },
 
         /**
@@ -451,7 +438,7 @@ export default {
                         <ul class="list">
                             <li v-for="file in matchedFiles(props.row.files)" :key="file.id">
                                 <a class="file" :href="file._links.turnitin_report"  title="View similarity check">
-                                    <span class="percentage" :style="{ color: getFileColour(file) }">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
+                                    <span :class="`percentage ${getFileColour(file)}`">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
                                     <span>{{ file.name + '.' + file.ext }}</span>
                                 </a>
                             </li>
