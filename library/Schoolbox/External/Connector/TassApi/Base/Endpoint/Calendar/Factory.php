@@ -113,7 +113,6 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
-
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
@@ -190,6 +189,16 @@ class Factory
          */
         $owner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
 
+        /* Remember statistics generated procedurally from all the tass products
+         * and dump them all at the very end, together - people weren't reading
+         * the logs properly and assumed incorrectly when the last product
+         * (typically getTeacherNotices) had 0 events in it. People presumed that
+         * to be attributable to the entire import which isn't always true.
+         *
+         * Therefore collect all those notes and put them all together here
+         */
+        $registry = new Registry();
+
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
@@ -203,6 +212,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
             ))
@@ -216,6 +226,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
             ))
@@ -229,6 +240,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
             ))
@@ -242,6 +254,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
             ))
@@ -255,6 +268,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
             ))
@@ -268,8 +282,13 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $registry,
                 $from,
                 $to
+            ))
+            ->add(new Summary(
+                $this->log,
+                $registry
             ))
             ->add(new ApiCertification(
                 $this->log,

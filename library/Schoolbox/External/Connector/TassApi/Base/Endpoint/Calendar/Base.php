@@ -142,6 +142,12 @@ class Base
 
 
     /**
+     * @var Registry
+     */
+    private Registry $registry;
+
+
+    /**
      * Base constructor.
      *
      * @param LoggerInterface      $log
@@ -153,6 +159,7 @@ class Base
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
+     * @param Registry             $registry
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
      */
@@ -166,6 +173,7 @@ class Base
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
+        Registry $registry,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
     ) {
@@ -190,6 +198,16 @@ class Base
         $className = explode('\\', get_class($this));
 
         $this->source = (string)array_pop($className);
+
+        /* Remember statistics generated procedurally from all the tass products
+         * and dump them all at the very end, together - people weren't reading
+         * the logs properly and assumed incorrectly when the last product
+         * (typically getTeacherNotices) had 0 events in it. People presumed that
+         * to be attributable to the entire import which isn't always true.
+         *
+         * Therefore collect all those notes and put them all together here
+         */
+        $this->registry = $registry;
     }
 
 
@@ -297,13 +315,19 @@ class Base
             return;
         }
 
-        $this->log->info(sprintf(
+        /* Message to log to cli, and also to remember for the summary
+         */
+        $summaryTass = sprintf(
             'Found %s events at endpoint %s between %s and %s',
             \count($tassEvents['events']),
             $this->endpoint,
             $this->from->getUsingFormat('d/m/Y'),
             $this->to->getUsingFormat('d/m/Y')
-        ));
+        );
+
+        $this->log->info($summaryTass);
+
+        $n = 0;
 
         foreach ($tassEvents['events'] as $tassEvent) {
             /* Spawn a new Event instance and ensure that we tell it where it came from
@@ -458,18 +482,42 @@ class Base
                     $eventSource->getGuid()
                 ));
             }
+
+            /* Increase the count
+             */
+            $n++;
         }
 
         /* Tell someone these need to be configured in admin
          */
+        $brokenEventTypes = [];
+
         if (\count($missingEventTypes)) {
             foreach ($missingEventTypes as $missingEventType) {
-                $this->log->warning(sprintf(
+                $brokenEventTypeMessage = sprintf(
                     'Add this event type in admin: %s',
                     $missingEventType
-                ));
+                );
+
+                $this->log->warning($brokenEventTypeMessage);
+                $brokenEventTypes[] = $brokenEventTypeMessage;
             }
         }
+
+        /* Remember for the summary
+         */
+        $summarySchoolbox = sprintf(
+            'Imported %s events into schoolbox',
+            $n
+        );
+
+        $summaryData = [
+            $summaryTass,
+            $summarySchoolbox,
+            $brokenEventTypes
+        ];
+
+        $this->registry->remember($this->endpoint, $summaryData);
     }
 
 
