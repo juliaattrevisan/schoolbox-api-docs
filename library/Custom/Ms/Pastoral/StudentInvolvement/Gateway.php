@@ -49,20 +49,35 @@ class Gateway
 
     /**
      * Hardcoded mappings from a subject code to its continuation in the
-     * following year.
+     * following year. (If no class is provided, then it's assumed the class
+     * letter has not changed.)
      *
      * `getNextYearSubjectCode` can determine the subject code if the two
-     * subjects have the same name. The cases here however do not.
+     * subjects have the same name and class code. The cases here however do
+     * not, so a manual mapping is required.
      */
     private const REPORT_SENIOR_SUBJECT_MAPPING = [
         // Mathematics Standard:
         // Year 11: Mathematics Standard (subject code 2116)
         // Year 12: Mathematics Standard 2 (subject code 2126)
-        2116 => 2126,
+        [
+            'from' => ['code' => '2116'],
+            'to'   => ['code' => '2126'],
+        ],
         // English Extension:
         // Year 11: English Extension (subject code 1118)
         // Year 12: English Extension 1 (subject code 1125)
-        1118 => 1125,
+        [
+            'from' => ['code' => '1118'],
+            'to'   => ['code' => '1125'],
+        ],
+        // Latin Continuers:
+        // Year 11: subject code 5113, class code "I"
+        // Year 12: subject code 5123, class code "A"
+        [
+            'from' => ['code' => '5113', 'class' => 'I'],
+            'to'   => ['code' => '5123', 'class' => 'A'],
+        ],
     ];
 
     /**
@@ -707,15 +722,31 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
         $pb = $pb->equals('st.year_grp', $thisYearSubject['year_grp'] + 1)
-                 ->equals('ts.class', $class)
                  ->notEquals('ts.sub_code', $code)
                  ->equals('so.cmpy_code', self::COMPANY_CODE)
                  ->equals('ts.year_num', $year + 1);
 
-        $nextYearCode = self::REPORT_SENIOR_SUBJECT_MAPPING[$code] ?? null;
+        // Search within hardcoded mappings
+        $nextYearCode  = null;
+        $nextYearClass = $class;
+        foreach (self::REPORT_SENIOR_SUBJECT_MAPPING as $mapping) {
+            // If subject code matches:
+            // check class code matches, if one is provided in the mapping
+            if ($mapping['from']['code'] === $code) {
+                if (!isset($mapping['from']['class']) || $mapping['from']['class'] === $class) {
+                    $nextYearCode = $mapping['to']['code'];
+                    if (isset($mapping['to']['class'])) {
+                        $nextYearClass = $mapping['to']['class'];
+                    }
+                    break;
+                }
+            }
+        }
         $pb = isset($nextYearCode)
             ? $pb->equals('st.sub_code', $nextYearCode)
             : $pb->equals('st.sub_desc', $thisYearSubject['sub_desc']);
+
+        $pb = $pb->equals('ts.class', $nextYearClass);
 
         $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
         $query = $this->database->prepareQuery($sql, $pb->getParams());
