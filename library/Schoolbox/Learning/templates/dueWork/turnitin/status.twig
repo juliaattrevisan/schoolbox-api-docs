@@ -6,7 +6,29 @@
  # @param Participant $participant              The participating student
  # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
  #}
-{% import '@learning/macro/urgency.twig' as urgency %}
+ 
+{##
+ # Decide Urgency of a Similarity Check percentage
+ #
+ # $value represents how much of the document was plagiarised
+ # so a high percentage means a lot was copied from somewhere
+ #}
+{% macro similarity(value) %}
+{% apply spaceless %}
+    {% set numericValue = value|replace({'%': ''})|round %}
+    {% if numericValue >= 75 %}
+        turnitin-red
+    {% elseif numericValue >= 50 %}
+        turnitin-orange
+    {% elseif numericValue >= 25 %}
+        turnitin-yellow
+    {% elseif numericValue >= 1 %}
+        turnitin-green
+    {% elseif numericValue == 0 %}
+        turnitin-blue
+    {% endif %}
+{% endapply %}
+{% endmacro %}
 
 {% if currentFile.turnitin %}
 <p class="meta">
@@ -21,11 +43,11 @@
         %}
         {% if reportRoute %}
             <a href="{{ reportRoute }}">
-                <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+                <span class="{{ _self.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
                 <span title="Similarity check completed.">similar content</span>
             </a>
         {% else %}
-            <span class="{{ urgency.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
+            <span class="{{ _self.similarity(currentFile.turnitin.overallMatchPercentage|purify) }}">{{ currentFile.turnitin.overallMatchPercentage|purify }}% </span>
             <span title="Similarity check completed.">similar content</span>
         {%  endif %}
     {% elseif currentFile.turnitin.isProcessing %}

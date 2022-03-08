@@ -26,31 +26,6 @@
     {% endapply %}
 {% endmacro %}
 
-
-{##
- # Decide Urgency of a Similarity Check percentage
- #
- # $value represents how much of the document was plagiarised
- # so a high percentage means a lot was copied from somewhere
- #
- # Status of -1 should be hidden entirely, and the default
- # thresholds are 60, 20 and 0 (represented in red, orange,
- # and green respectively)
- #}
-{% macro similarity(value) %}
-{% apply spaceless %}
-    {% set numericValue = value|replace({'%': ''}) %}
-    {% if numericValue > 60 %}
-        similarity-critical
-    {% elseif numericValue > 20 %}
-        similarity-warning
-    {% elseif numericValue > 0 %}
-        similarity-ok
-    {% endif %}
-{% endapply %}
-{% endmacro %}
-
-
 {##
  # Decide urgency of normalised marks
  #}
