@@ -154,7 +154,7 @@ class LearningMomentPhotoCest
         sleep(2);
         //commenting clickConfirmDeleteButton as I need an id to be added - clicking the third button that appears in the screen
 //        $learningMoments->clickConfirmDeleteButton();
-        $i->click(Locator::lastElement('a.button.submit'));
+        $i->click(Locator::lastElement('button.button.submit'));
         //checking the text is no longer presented and the count is zero
         $i->cantSee('Well done. This is my first comment in this learning moment!');
         $i->canSee('Comments (0)');
