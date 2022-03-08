@@ -9,3 +9,14 @@ WHERE source_name IN (
 	'TeacherNotices',
 	'StudentNotices'
 )
+
+UPDATE event_source
+SET deleted_at = NOW()
+WHERE source_name IN (
+	'ParentCalendar',
+	'TeacherCalendar',
+	'StudentCalendar',
+	'ParentNotices',
+	'TeacherNotices',
+	'StudentNotices'
+ )
