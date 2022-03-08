@@ -226,6 +226,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -240,6 +241,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -254,6 +256,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -268,6 +271,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -282,6 +286,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+               self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -296,6 +301,7 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+               self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to

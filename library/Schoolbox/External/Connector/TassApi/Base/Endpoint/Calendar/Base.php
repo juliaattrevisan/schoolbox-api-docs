@@ -159,6 +159,7 @@ class Base
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
+     * @param string               $source
      * @param Registry             $registry
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
@@ -173,6 +174,7 @@ class Base
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
+        string $source,
         Registry $registry,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
@@ -195,7 +197,7 @@ class Base
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
          */
-        $this->source = 'suds_tass';
+        $this->source = $source;
 
         /* Remember statistics generated procedurally from all the tass products
          * and dump them all at the very end, together - people weren't reading
