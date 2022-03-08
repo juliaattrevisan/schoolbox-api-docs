@@ -13,6 +13,8 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\ApiCertification;
@@ -97,6 +99,18 @@ class Factory
 
 
     /**
+     * @var PersonalMapper
+     */
+    protected PersonalMapper $personalRelationshipMapper;
+
+
+    /**
+     * @var CategoryMapper
+     */
+    protected CategoryMapper $folderRelationshipMapper;
+
+
+    /**
      * Factory constructor.
      *
      * @param LoggerInterface   $log
@@ -106,6 +120,8 @@ class Factory
      * @param EventMapper       $eventMapper
      * @param EventSourceMapper $eventSourceMapper
      * @param RoleMapper        $roleMapper
+     * @param PersonalMapper    $personalRelationshipMapper
+     * @param CategoryMapper    $folderRelationshipMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -114,7 +130,9 @@ class Factory
         string $key,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
-        RoleMapper $roleMapper
+        RoleMapper $roleMapper,
+        PersonalMapper $personalRelationshipMapper,
+        CategoryMapper $folderRelationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -123,6 +141,11 @@ class Factory
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
+
+        /* These are relationships to events via event_user and event_folder tables
+         */
+        $this->personalRelationshipMapper = $personalRelationshipMapper;
+        $this->folderRelationshipMapper = $folderRelationshipMapper;
     }
 
 
@@ -226,6 +249,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -241,6 +266,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -256,6 +283,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -271,6 +300,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -286,6 +317,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -301,6 +334,8 @@ class Factory
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
+                $this->personalRelationshipMapper,
+                $this->folderRelationshipMapper,
                self::SOURCE_NAME,
                 $registry,
                 $from,

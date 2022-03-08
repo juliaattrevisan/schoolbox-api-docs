@@ -13,6 +13,8 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
@@ -101,6 +103,18 @@ class Base
 
 
     /**
+     * @var PersonalMapper
+     */
+    protected PersonalMapper $personalRelationshipMapper;
+
+
+    /**
+     * @var CategoryMapper
+     */
+    protected CategoryMapper $folderRelationshipMapper;
+
+
+    /**
      * Obtain events that started after this datetime
      *
      * @var \Alaress_Date_Format
@@ -159,6 +173,8 @@ class Base
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
+     * @param PersonalMapper       $personalRelationshipMapper
+     * @param CategoryMapper       $folderRelationshipMapper
      * @param string               $source
      * @param Registry             $registry
      * @param \Alaress_Date_Format $from
@@ -174,6 +190,8 @@ class Base
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
+        PersonalMapper $personalRelationshipMapper,
+        CategoryMapper $folderRelationshipMapper,
         string $source,
         Registry $registry,
         \Alaress_Date_Format $from,
@@ -188,6 +206,11 @@ class Base
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
+
+        /* These are relationships to events via event_user and event_folder tables
+         */
+        $this->personalRelationshipMapper = $personalRelationshipMapper;
+        $this->folderRelationshipMapper = $folderRelationshipMapper;
 
         /* Obtain events between these two datetimes
          */
@@ -413,6 +436,16 @@ class Base
             if ($this->perform) {
                 $this->eventMapper->save($event);
                 $this->eventSourceMapper->save($eventSource);
+
+                /* Clear event_user and event_folder relationships,
+                 * if any existed previously somehow (tass events
+                 * are associated with roles and campuses only)
+                 *
+                 * I know it's a db-in-a-loop, but need to be surgical
+                 * cos there's some busted data out in the wild
+                 */
+                $this->personalRelationshipMapper->deleteByColumn('event_id', $event->getId());
+                $this->folderRelationshipMapper->deleteByColumn('event_id', $event->getId());
 
                 $this->log->info(sprintf(
                     'Saved %s event "%s" with event_source.guid %s',
