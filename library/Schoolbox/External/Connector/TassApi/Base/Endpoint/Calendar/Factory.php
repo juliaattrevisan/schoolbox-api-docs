@@ -34,6 +34,13 @@ class Factory
 {
 
     /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    private const SOURCE_NAME = 'suds_tass';
+
+
+    /**
      * Collect events from this many months in the past (a negative int)
      */
     private const FROM = -1;
@@ -202,6 +209,13 @@ class Factory
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
+            ->add(new Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                self::SOURCE_NAME
+            ))
             ->add(new ParentCalendar(
                 $this->log,
                 $this->perform,
@@ -285,6 +299,12 @@ class Factory
                 $registry,
                 $from,
                 $to
+            ))
+            ->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                self::SOURCE_NAME
             ))
             ->add(new Summary(
                 $this->log,

@@ -195,9 +195,7 @@ class Base
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
          */
-        $className = explode('\\', get_class($this));
-
-        $this->source = (string)array_pop($className);
+        $this->source = 'suds_tass';
 
         /* Remember statistics generated procedurally from all the tass products
          * and dump them all at the very end, together - people weren't reading
@@ -212,61 +210,6 @@ class Base
 
 
     /**
-     * Import events from this source
-     *
-     * Facade method for Prepare/Import/Cleanup
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
-     */
-    public function import(): void
-    {
-        $this->prepare();
-        $this->importEvents();
-        $this->cleanup();
-    }
-
-
-    /**
-     * Purge existing events so we don't have to worry about diffing their
-     * relationships and stuff. It's going to be wrapped in a transaction
-     * anyway, so if anything dies we roll back.
-     *
-     * @throws \Schoolbox\Mapper\DefinitionException
-     */
-    protected function prepare(): void
-    {
-        /* Set Events and Event Sources updated_at to something obvious
-         * Anything that updates them will be safe from cleanup later
-         */
-        if ($this->perform) {
-            $query = "
-                UPDATE
-                {$this->eventSourceMapper->getTable()}
-                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')}
-                AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
-                {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
-            ";
-
-            $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
-            $statement->execute([
-                'sourceName' => $this->source
-            ]);
-
-            $this->log->debug(sprintf(
-                'Marking all %s events for deletion',
-                $this->source
-            ));
-        }
-    }
-
-
-    /**
      * Perform the import of these events
      *
      * @throws \InvalidArgumentException
@@ -275,7 +218,7 @@ class Base
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
-    protected function importEvents(): void
+    public function import(): void
     {
 
         /* A list of missing event types which the admin needs to configure in schoolbox
@@ -297,7 +240,10 @@ class Base
 
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $this->endpoint,
-            ['start_date' => $this->from->getUsingFormat('d/m/Y'), 'end_date' => $this->to->getUsingFormat('d/m/Y')],
+            [
+                'start_date' => $this->from->getUsingFormat('d/m/Y'),
+                'end_date' => $this->to->getUsingFormat('d/m/Y')
+            ],
             Api::VERSION_2
         );
 
@@ -516,27 +462,6 @@ class Base
         ];
 
         $this->registry->remember($this->endpoint, $summaryData);
-    }
-
-
-    /**
-     * Blow away all the Event and Event Sources that never got updated during the import process
-     */
-    protected function cleanup(): void
-    {
-        if ($this->perform) {
-            $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
-
-            foreach ($deadEvents as $deadEvent) {
-                $this->log->debug(sprintf(
-                    'Deleting %s event "%s"; it was never updated during import',
-                    $this->source,
-                    $deadEvent->getTitle()
-                ));
-
-                $this->eventMapper->delete($deadEvent);
-            }
-        }
     }
 
 
