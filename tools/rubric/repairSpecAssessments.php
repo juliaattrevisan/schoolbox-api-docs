@@ -374,7 +374,7 @@ $kernel->run(new class extends App {
         // Install logger and DB
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
-        $this->now     = Alaress_Date_Format::now();
+        $this->now     = Alaress_Date_Format::now()->getDatabase();
         $this->perform = isset($opts['p']) || isset($opts['perform']);
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
