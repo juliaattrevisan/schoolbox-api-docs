@@ -57,6 +57,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'impersonate', $basePath, '/switch/{userId}');
         $this->addGetRoute($router, 'recoverSession', $basePath, '/recoverSession');
+        $this->register('DELETE', '/{userId}/groupMembership/{groupId}', 'apiMembershipDelete', $hasApiAccess, $preloadUserGroup);
     }
 
     /**
