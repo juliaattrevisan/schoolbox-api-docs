@@ -378,7 +378,7 @@ class Base
             }
 
             try {
-                $event = $this->eventMapper->findById($eventSource->getId());
+                $event = $this->eventMapper->findById($eventSource->getEvent()->getId());
 
                 $this->log->debug(sprintf(
                     'Found an existing %s event "%s" (schoolbox eventId %s) using guid %s',
