@@ -370,14 +370,7 @@ class Base
                     'source_name' => $this->source,
                     'guid' => $guid
                 ]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                /* Couldn't find any event matching $guid so it's a new event
-                 * Make a new source and make a new event instance
-                 */
-                $eventSource = $this->eventSourceMapper->createModel();
-            }
 
-            try {
                 $event = $this->eventMapper->findById($eventSource->getEvent()->getId());
 
                 $this->log->debug(sprintf(
@@ -388,6 +381,11 @@ class Base
                     $guid
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Couldn't find any event matching $guid so it's a new event
+                 * Make a new source and make a new event instance
+                 */
+                $eventSource = $this->eventSourceMapper->createModel();
+
                 $event = $this->eventMapper->createModel();
 
                 $this->log->debug(sprintf(
