@@ -317,16 +317,27 @@ class GroupsHelper
 
     /**
      * add user to group
+     * @param User  $user
+     * @param Group $group
+     * @param int   $enrollmentStatus (default: ACCESS_AWAITING_AUTHORISATION)
+     * @param int   $membership (default: ACCESS_READ, only has effect if $enrolmentStatus is GroupsHelper::ENROLLED)
+     * @param bool  $isFavourite (default: false)
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function addToGroup(User $user, Group $group)
+    public function addToGroup(User $user, Group $group, int $enrollmentStatus = UserAccess::ACCESS_AWAITING_AUTHORISATION, int $membership = UserAccess::ACCESS_READ, bool $isFavourite = false)
     {
+        //is awaiting Auth?
+        $accessLevel = $enrollmentStatus;
+        if (UserAccess::ACCESS_AWAITING_AUTHORISATION !== $accessLevel && UserAccess::ACCESS_DENY !== $accessLevel) {
+            $accessLevel = $membership;
+        }
         //add the user to the group
         $userGroup = $this->userAccessMapper->createModel();
         $userGroup->setServiceIdentifier($group->getFolder()->getId())
                   ->setUser($user)
                   ->setService(UserAccess::SERVICE_HOMEPAGE)
-                  ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
-                  ->setFavourite(false); //default to no favourite groups.
+                  ->setAccessLevel($accessLevel)
+                  ->setFavourite($isFavourite); //default to no favourite groups.
         //save group object
         $this->userAccessMapper->save($userGroup);
     }

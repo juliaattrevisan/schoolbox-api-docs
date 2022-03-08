@@ -11,8 +11,10 @@ namespace Schoolbox\User;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Normalise\TupleStack;
+use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Group;
@@ -168,12 +170,13 @@ class Controller extends Base
     public function apiMembershipAdd(User $user, Group $group)
     {
         $post = $this->getRequest()->post->getArrayCopy();
-        $post['membership'] = $post['membership'] ?: false;
+        $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
         $post['isFavourite'] = $post['isFavourite'] ?: false;
-        $post['enrollmentStatus'] = $post['enrollmentStatus'] ?: false;
+        $post['enrollmentStatus'] = $post['enrollmentStatus'] ?: UserAccess::ACCESS_AWAITING_AUTHORISATION;
 
-        $this->groupsHelper->addToGroup($user, $group, $post['enrollmentStatus'], $post['membership'], $post['isNotificationsOn'], $post['isFavourite']);
+        $this->groupsHelper->addToGroup($user, $group, $post['enrollmentStatus'], $post['membership'], $post['isFavourite']);
+        $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
         $apiGroups = [];
         foreach ($users_groups as $group) {
