@@ -170,7 +170,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Team
+     * @return Team|null
      */
     public function getHomeTeam()
     {
@@ -188,7 +188,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Team
+     * @return Team|null
      */
     public function getAwayTeam()
     {
@@ -206,7 +206,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return School
+     * @return School|null
      */
     public function getAwaySchool()
     {
@@ -224,7 +224,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return School
+     * @return School|null
      */
     public function getHomeSchool()
     {
