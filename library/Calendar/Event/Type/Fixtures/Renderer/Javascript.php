@@ -97,7 +97,7 @@ class Javascript extends Base
                     'editable'    => false,
                     'eventId'     => $this->event->getEventId(),
                     'time'        => $this->event->getTime(),
-                    'detail'      => '',
+                    'detail'      => $this->event->getDetail(),
                     'location'    => $this->event->getLocation(),
                     'eventTypeId' => $this->event->getType(),
                     'eventType'   => 'type' . $this->event->getType(),

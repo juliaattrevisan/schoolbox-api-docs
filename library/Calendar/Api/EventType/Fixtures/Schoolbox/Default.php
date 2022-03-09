@@ -127,6 +127,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setColour($eventColor);
             $instance->setType($eventType);
             $instance->setMatchup($matchup);
+            $instance->setDetail($matchup->getNotes());
             $instance->setInvolvedTeamIds($involvedTeamIds);
 
             $stack->add($instance);
