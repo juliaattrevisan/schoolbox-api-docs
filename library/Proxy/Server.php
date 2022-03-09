@@ -183,7 +183,7 @@ class Server
      * and enables `CURLOPT_RETURNTRANSFER` and `CURLOPT_HEADER`.
      *
      * @param null $hostname
-     * @return resource
+     * @return \CurlHandle|false No longer returns a resource as of PHP8
      */
     public function curlInit($hostname = null)
     {

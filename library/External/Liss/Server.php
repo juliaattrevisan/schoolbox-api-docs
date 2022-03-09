@@ -10,6 +10,10 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
 use External\Liss\Helper\PublishDailyData as PublishDailyDataHelper;
+use PhpXmlRpc\Request;
+use PhpXmlRpc\Response;
+use PhpXmlRpc\Server;
+use PhpXmlRpc\Value;
 use Schoolbox\Collection;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
@@ -205,7 +209,7 @@ class External_Liss_Server
      */
     public function start()
     {
-        new xmlrpc_server(
+        new Server(
             [
                 'liss.getRooms' => [
                     'function' => [$this,'getRooms'],
@@ -265,10 +269,10 @@ class External_Liss_Server
      *
      * Discovered via apache mod_dumpio
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function getRooms(xmlrpcmsg $message): \xmlrpcresp
+    public function getRooms(Request $message): Response
     {
         $this->log()->info('getRooms: unable to process request, not implemented');
 
@@ -279,10 +283,10 @@ class External_Liss_Server
     /**
      * Publish students to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishClassMemberships(xmlrpcmsg $message): \xmlrpcresp
+    public function publishClassMemberships(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -291,7 +295,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishClassMemberships: processing request');
@@ -300,7 +304,7 @@ class External_Liss_Server
 
             $classInvolvementMapper->truncate();
 
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $classAll = $classEntryMapper->findAll();
             $classAll->indexBy('code');
 
@@ -336,10 +340,10 @@ class External_Liss_Server
     /**
      * Publish Teachers to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishTeachers(xmlrpcmsg $message): \xmlrpcresp
+    public function publishTeachers(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -348,7 +352,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -356,7 +360,7 @@ class External_Liss_Server
             $this->log()->info('publishTeachers: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishTeachers: ' . json_encode($allData));
 
             return $this->generateResponse('Teachers Imported');
@@ -369,10 +373,10 @@ class External_Liss_Server
     /**
      * Publish students to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishStudents(xmlrpcmsg $message): \xmlrpcresp
+    public function publishStudents(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -381,7 +385,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -389,7 +393,7 @@ class External_Liss_Server
             $this->log()->info('publishStudents: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishStudents: ' . json_encode($allData));
 
             return $this->generateResponse('Students Imported');
@@ -402,10 +406,10 @@ class External_Liss_Server
     /**
      * Publish Calendar to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishCalendar(xmlrpcmsg $message): \xmlrpcresp
+    public function publishCalendar(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -414,7 +418,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -422,7 +426,7 @@ class External_Liss_Server
             $this->log()->info('publishCalendar: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishCalendar: ' . json_encode($allData));
 
             return $this->generateResponse('Calendar Imported');
@@ -435,10 +439,10 @@ class External_Liss_Server
     /**
      * Publish Rooms to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      */
-    public function publishRooms(xmlrpcmsg $message)
+    public function publishRooms(Request $message)
     {
 
         /* Requires schoolbox connector
@@ -448,7 +452,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Respond without doing anything to avoid errors
@@ -457,7 +461,7 @@ class External_Liss_Server
             $this->log()->info('publishRooms: unable to process request, not implemented');
 
             /* Log data for use */
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
             $this->log()->info('publishRooms: ' . json_encode($allData));
 
             return $this->generateResponse('Rooms Imported');
@@ -470,13 +474,13 @@ class External_Liss_Server
     /**
      * Publish classes to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function publishClasses(xmlrpcmsg $message): \xmlrpcresp
+    public function publishClasses(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -485,7 +489,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishClasses: processing request');
@@ -495,7 +499,7 @@ class External_Liss_Server
             $classEntryMapper = new ClassEntryMapper();
             $classEntryMapper->truncate();
 
-            $allData = $message->params[2]->me['array'];
+            $allData = $message->getParam(2)->me['array'];
             $classCount = 0;
 
             foreach ($allData as $currentData) {
@@ -522,13 +526,13 @@ class External_Liss_Server
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws PDOException
      * @throws MapperException
      * @throws UnexpectedValueException
      */
-    public function publishTimetable(xmlrpcmsg $message): \xmlrpcresp
+    public function publishTimetable(Request $message): Response
     {
 
         /* Requires schoolbox connector
@@ -538,7 +542,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             $this->log()->info('publishTimetable: processing request');
@@ -551,7 +555,7 @@ class External_Liss_Server
             $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
-            $allData = $message->params[1]->me['array'];
+            $allData = $message->getParam(1)->me['array'];
 
             foreach ($allData as $currentData) {
                 $struct = $currentData->me['struct'];
@@ -601,15 +605,15 @@ class External_Liss_Server
     /**
      * Publish timetable to the Schoolbox
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws MapperException\Deleted
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function publishBellTimes(xmlrpcmsg $message): \xmlrpcresp
+    public function publishBellTimes(Request $message): Response
     {
 
         /* Requires schoolbox connector
@@ -619,7 +623,7 @@ class External_Liss_Server
             return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
         }
 
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
             /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
@@ -629,7 +633,7 @@ class External_Liss_Server
 
             $this->log()->info('publishBellTimes: processing request');
 
-            $allData = $message->params[2]->me['array'];
+            $allData = $message->getParam(2)->me['array'];
 
             /* Truncate everything before re-adding */
             $timetablePeriodMapper = new TimetablePeriodMapper();
@@ -712,14 +716,14 @@ class External_Liss_Server
      * Not in use yet, but causes errors if schools try to send
      * this data. Separated from getRooms() to allow for future use.
      *
-     * @param xmlrpcmsg $message
-     * @return xmlrpcresp
+     * @param Request $message
+     * @return Response
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws InvalidColumnException
      */
-    public function publishDailyData(xmlrpcmsg $message): \xmlrpcresp
+    public function publishDailyData(Request $message): Response
     {
         $configLoader = $this->config;
         $helper = new PublishDailyDataHelper($configLoader);
@@ -748,7 +752,7 @@ class External_Liss_Server
 
         /* Have an owner - continue normally
          */
-        $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $configLoader);
+        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
             /* Delete all previous versions of events using the same source
@@ -777,7 +781,7 @@ class External_Liss_Server
 
             /* Set up all events in a nicer format
              */
-            $allEvents = $helper->reformatAllEvents($message->params[3]->me['array']);
+            $allEvents = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
             /* Now do it in a way that makes sense
              * Map everything together and persist it to the db
@@ -993,10 +997,10 @@ class External_Liss_Server
      * A xmlrpcresp factory
      *
      * @param string $message
-     * @return xmlrpcresp
+     * @return Response
      */
-    private function generateResponse($message): \xmlrpcresp
+    private function generateResponse($message): Response
     {
-        return new xmlrpcresp(new xmlrpcval($message, 'string'));
+        return new Response(new Value($message, 'string'));
     }
 }

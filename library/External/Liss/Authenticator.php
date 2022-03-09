@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Lumberjack\Logger;
+use PhpXmlRpc\Value;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -16,9 +17,9 @@ class External_Liss_Authenticator
     /**
      * An object containing username/password sent to us
      *
-     * @var null
+     * @var Value
      */
-    private $dataObject = null;
+    private Value $dataObject;
 
     /**
      * Username
@@ -55,11 +56,11 @@ class External_Liss_Authenticator
     /**
      * External_Liss_Authenticator constructor.
      *
-     * @param xmlrpcval     $dataObject
+     * @param Value         $dataObject
      * @param Logger        $log
      * @param IConfigLoader $configLoader
      */
-    public function __construct(xmlrpcval $dataObject, Logger $log, IConfigLoader $configLoader)
+    public function __construct(Value $dataObject, Logger $log, IConfigLoader $configLoader)
     {
         $this->dataObject   = $dataObject;
         $this->log          = $log;

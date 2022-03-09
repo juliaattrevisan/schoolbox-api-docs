@@ -64,7 +64,7 @@ class Reader implements \Iterator
     /**
      * The previous row that came from the csv
      *
-     * @var bool
+     * @var bool|array
      */
     private $previousRow = false;
 
@@ -240,7 +240,7 @@ class Reader implements \Iterator
      *
      * Loads the next row from the CSV file.
      *
-     * @return null|array|bool
+     * @return array|false
      */
     private function loadRow()
     {

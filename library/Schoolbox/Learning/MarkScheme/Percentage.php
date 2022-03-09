@@ -80,13 +80,7 @@ class Percentage extends AbstractMarkScheme
         if (!isset($formInput)) {
             return null;
         }
-        $matches = [];
-        $pattern = '/^\s*(-?[0-9.]+)/';
-        if (!preg_match($pattern, $formInput, $matches)) {
-            throw new InvalidArgumentException("Unable to parse percentage value: $formInput");
-        }
-
-        $floatVal = round(floatval($matches[1]), 2);
+        $floatVal = round($this->extractNumericComponent($formInput), self::PRECISION);
         return sprintf("%s %%", $floatVal);
     }
 
@@ -99,9 +93,10 @@ class Percentage extends AbstractMarkScheme
      */
     public function convertHumanReadableMarkToFormInput(?string $humanReadableMark): ?string
     {
-        return isset($humanReadableMark)
-            ? (string)round((float)$humanReadableMark, 2)
-            : null;
+        if (!isset($humanReadableMark)) {
+            return null;
+        }
+        return (string)round($this->extractNumericComponent($humanReadableMark), self::PRECISION);
     }
 
     /**
@@ -112,5 +107,26 @@ class Percentage extends AbstractMarkScheme
         $max      = $rowMaxSum ?: $maxValue;
         $normMark = $max ? ($mark / $max) * 100 : 0;
         return $this->getHumanReadableMark($normMark);
+    }
+
+    /**
+     * Extract a numeric component out of `$input`.
+     *
+     * `$input` must start with a numeric component in order for it to be
+     * extraced.
+     *
+     * @param string $input
+     * @return float
+     * @throws InvalidArgumentException if there's no numeric component to
+     *                                  `$input`
+     */
+    private function extractNumericComponent(string $input): float
+    {
+        $matches = [];
+        $pattern = '/^\s*(-?[0-9.]+)/';
+        if (!preg_match($pattern, $input, $matches)) {
+            throw new InvalidArgumentException("Unable to parse percentage value: $input");
+        }
+        return floatval($matches[1]);
     }
 }

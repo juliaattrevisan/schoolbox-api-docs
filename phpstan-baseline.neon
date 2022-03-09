@@ -2301,16 +2301,6 @@ parameters:
 			path: library/External/Isams/User.php
 
 		-
-			message: "#^Cannot access property \\$me on null\\.$#"
-			count: 1
-			path: library/External/Liss/Authenticator.php
-
-		-
-			message: "#^Property External_Liss_Authenticator\\:\\:\\$dataObject \\(null\\) does not accept xmlrpcval\\.$#"
-			count: 1
-			path: library/External/Liss/Authenticator.php
-
-		-
 			message: "#^Property External_Liss_Authenticator\\:\\:\\$schoolCode is never read, only written\\.$#"
 			count: 1
 			path: library/External/Liss/Authenticator.php
@@ -2874,26 +2864,6 @@ parameters:
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php
-
-		-
-			message: "#^Cannot access offset int on true\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Cannot access offset mixed on true\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Import\\\\Profile\\\\Reader\\:\\:\\$previousRow \\(bool\\) does not accept array\\<int\\|string, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
-
-		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Import\\\\Profile\\\\Reader\\:\\:\\$previousRow \\(bool\\) does not accept array\\<string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Reader.php
 
 		-
 			message: "#^Access to protected property Aura\\\\Router\\\\Route\\:\\:\\$method\\.$#"
