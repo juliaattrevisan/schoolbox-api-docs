@@ -57,8 +57,7 @@ class Javascript extends Base
          */
         foreach ([$homeTeamId, $awayTeamId] as $teamId) {
             if (isset($involvedTeamIds[$teamId])) {
-                $path = $this->getRouteIfAuthorized(
-                    'sportsfixturesResult.getResultForTeam', [
+                $path = $this->getRouteIfAuthorized('sportsfixturesResult.getResultForTeam', [
                     'contextId' => $this->event->getMatchup()->getId(),
                     'teamId' => $teamId,
                 ]);
