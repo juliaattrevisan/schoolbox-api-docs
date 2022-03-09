@@ -44,8 +44,8 @@ class Javascript extends Base
 
         /* Later on, can replace this with a null safe operator in php8
          */
-        $homeTeamId = null === $this->event->getMatchup()->getHomeTeam() ? $this->event->getMatchup()->getHomeTeam()->getId() : null;
-        $awayTeamId = null === $this->event->getMatchup()->getAwayTeam() ? $this->event->getMatchup()->getAwayTeam()->getId() : null;
+        $homeTeamId = null !== $this->event->getMatchup()->getHomeTeam() ? $this->event->getMatchup()->getHomeTeam()->getId() : null;
+        $awayTeamId = null !== $this->event->getMatchup()->getAwayTeam() ? $this->event->getMatchup()->getAwayTeam()->getId() : null;
 
         $path = null;
 
