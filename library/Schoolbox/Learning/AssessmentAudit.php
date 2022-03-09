@@ -118,7 +118,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'Publish Date', 'Due Date', 'Self Reviewability', 'Mark Visibility'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
