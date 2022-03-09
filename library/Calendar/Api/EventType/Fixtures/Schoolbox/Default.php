@@ -119,7 +119,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance = new \Calendar\Event\Type\Fixtures\Event();
 
             $instance->setConnectorId($this->getConnectorId());
-            $instance->setTitle($matchup->getName());
+            $instance->setTitle($matchup->getDisplayName());
             $instance->setStartTime($matchup->getStartAt());
             $instance->setEndTime($matchup->getFinishAt());
             $instance->setAllDay(false);
