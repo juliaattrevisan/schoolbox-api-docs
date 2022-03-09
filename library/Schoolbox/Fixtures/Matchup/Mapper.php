@@ -35,6 +35,7 @@ use Schoolbox\Collection;
 
 /**
  * Class Mapper
+ *
  * @method Model createModel()
  * @method Model findById($identifierValue)
  * @package Schoolbox\Fixtures\Match
@@ -156,7 +157,7 @@ class Mapper extends BaseMapper
     ): GenericCollection {
 
         /* Make a pretty significant assumption here:
-
+         *
          * Teams from Clipboard always import as the Home Team
          *
          * There used to be support for a person being in either the Home
@@ -166,15 +167,18 @@ class Mapper extends BaseMapper
          */
         $query = "
             SELECT
-                sm.*,
+                sm.*,  
                 {$this->getJoinColumnString('venue', 'sv')}
             FROM sportsfixtures_match sm
             LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}            
-            LEFT JOIN sportsfixtures_team st ON sm.home_team_id = st.id
-            LEFT JOIN sportsfixtures_team_user stu ON st.id = stu.team_id
-            WHERE stu.user_id = :userId
+            LEFT JOIN sportsfixtures_team st1 ON sm.home_team_id = st1.id
+            LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
+            LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
+            LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
+            WHERE (stu1.user_id = :userId OR stu2.user_id = :userId)
             AND sm.deleted_at IS NULL
-            AND st.deleted_at IS NULL
+            AND st1.deleted_at IS NULL
+            AND st2.deleted_at IS NULL
             ORDER BY sm.start_at
         ";
 

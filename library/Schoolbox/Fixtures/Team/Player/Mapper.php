@@ -100,6 +100,37 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+
+    /**
+     * Find a list of teams that $user is involved with
+     *
+     * @param \Schoolbox\User $user
+     * @return array
+     * @throws \PDOException
+     */
+    public function findInvolvedTeamIds(\Schoolbox\User $user): array
+    {
+        $query = "
+            SELECT DISTINCT team_id
+            FROM {$this->getTable()}
+            WHERE user_id = :userId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'userId' => $user->getId(),
+        ]);
+
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[$row['team_id']] = $row['team_id'];
+        }
+
+        return $ids;
+    }
+
+
     /**
      * Finds all team memberships for a user in a division.
      *

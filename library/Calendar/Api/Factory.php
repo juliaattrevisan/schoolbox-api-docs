@@ -229,7 +229,14 @@ class Calendar_Api_Factory
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
                 return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             case Calendar_Api_EventType_Fixtures_Schoolbox_Default::class:
-                return new Calendar_Api_EventType_Fixtures_Schoolbox_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance());
+                return new Calendar_Api_EventType_Fixtures_Schoolbox_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
+                    \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
+                );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }

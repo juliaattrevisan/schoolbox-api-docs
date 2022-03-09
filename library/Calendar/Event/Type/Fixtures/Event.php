@@ -24,6 +24,14 @@ class Event extends Day\Event
 
 
     /**
+     * A list of team identifiers that a user is involved with
+     *
+     * @var array
+     */
+    private array $involvedTeamIds = [];
+
+
+    /**
      * @return string[]
      */
     protected function getRenderClasses(): array
@@ -52,6 +60,26 @@ class Event extends Day\Event
     public function setMatchup(?\Schoolbox\Fixtures\Matchup\Model $matchup): self
     {
         $this->matchup = $matchup;
+        return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getInvolvedTeamIds(): array
+    {
+        return $this->involvedTeamIds;
+    }
+
+
+    /**
+     * @param array $involvedTeamIds
+     * @return Event
+     */
+    public function setInvolvedTeamIds(array $involvedTeamIds): self
+    {
+        $this->involvedTeamIds = $involvedTeamIds;
         return $this;
     }
 }

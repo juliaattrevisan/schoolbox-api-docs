@@ -26,6 +26,12 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 
 
     /**
+     * @var \Schoolbox\Fixtures\Team\Player\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper;
+
+
+    /**
      * @inheritdoc
      */
     public function __construct(
@@ -33,12 +39,14 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
         User $user,
         User $viewer,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
-        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
+        \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
         $this->eventTypeMapper = $eventTypeMapper;
         $this->matchupMapper = $matchupMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
     }
 
 
@@ -97,9 +105,14 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             // noop
         }
 
-        /* Skim the list
+        /* Find the list of matches that $user is somehow involved in,
+         * and also get a list of teams that $user is somehow involved in
+         * This is used to cross reference, sow e can generate a link to a
+         * results screen which is team-specific (findInvolvedMatchups()
+         * won't tell you which team you're involved with specifically)
          */
         $matchups = $this->matchupMapper->findInvolvedMatchups($this->getUser());
+        $involvedTeamIds = $this->teamPlayerMapper->findInvolvedTeamIds($this->getUser());
 
         /** @var \Schoolbox\Fixtures\Matchup\Model $matchup */
         foreach ($matchups as $matchup) {
@@ -114,6 +127,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setColour($eventColor);
             $instance->setType($eventType);
             $instance->setMatchup($matchup);
+            $instance->setInvolvedTeamIds($involvedTeamIds);
 
             $stack->add($instance);
         }

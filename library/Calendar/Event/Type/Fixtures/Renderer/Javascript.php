@@ -36,14 +36,36 @@ class Javascript extends Base
         /* Apparently this is a place to put a link to More Details
          * which spawns in the frontend under custom > moreDetailsLink...
          * ...I think?
+         *
+         * Also figure out which team you were involved with, to generate
+         * the link in the calendar modal
          */
-        $path = $this->getRouteIfAuthorized(
-            'sportsfixturesResult.getResultForTeam',
-            [
-                'contextId' => $this->event->getMatchup()->getId(),
-                'teamId' => $this->event->getMatchup()->getHomeTeam()->getId(),
-            ]
-        );
+        $involvedTeamIds = $this->event->getInvolvedTeamIds();
+
+        /* Later on, can replace this with a null safe operator in php8
+         */
+        $homeTeamId = $this->event->getMatchup()->getHomeTeam() ? $this->event->getMatchup()->getHomeTeam()->getId() : null;
+        $awayTeamId = $this->event->getMatchup()->getAwayTeam() ? $this->event->getMatchup()->getAwayTeam()->getId() : null;
+
+        $path = null;
+
+        /* Check both the home team and the away team to see which one you're
+         * involved with, then spawn a link to that
+         *
+         * If you were somehow involved with both teams, just pick one arbitrarily
+         * (not that I can perceive this to be a common scenario in actual practice)
+         */
+        foreach ([$homeTeamId, $awayTeamId] as $teamId) {
+            if (isset($involvedTeamIds[$teamId])) {
+                $path = $this->getRouteIfAuthorized(
+                    'sportsfixturesResult.getResultForTeam', [
+                    'contextId' => $this->event->getMatchup()->getId(),
+                    'teamId' => $teamId,
+                ]);
+
+                break;
+            }
+        }
 
         /* Flatten the representation into a standardised structure
          */

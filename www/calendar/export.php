@@ -386,7 +386,13 @@ try {
              */
             $api->add(buildApiClass(
                 Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
-                [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance()],
+                [
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
+                    \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
+                ],
                 true,
                 $sentry
             ));
@@ -490,7 +496,13 @@ try {
                  */
                 $api->add(buildApiClass(
                     Calendar_Api_EventType_Fixtures_Schoolbox_Default::class,
-                    [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance(), \Schoolbox\Fixtures\Matchup\Mapper::getInstance()],
+                    [
+                        $user,
+                        $viewer,
+                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                        \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
+                        \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
+                    ],
                     true,
                     $sentry
                 ));
