@@ -35,7 +35,6 @@ use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -1399,6 +1398,20 @@ class Controller extends Base
                 'isMulti'       =>  false,
             ],
         ];
+
+        /* This is optional and plan-based
+         */
+        if ($this->getConfigLoader()->get('fixtures_enabled')) {
+            $entityTypes['fixturesteam'] = [
+                'name' => 'Team',
+                'namePlural' => 'Teams',
+                'icon' => 'sport',
+                'selfModifier' => 'Users in fixtures team',
+                'hideFromModal' => false,
+                'isMulti' => true,
+            ];
+        }
+
         if ($generateAjaxRoutes) {
             foreach ($entityTypes as $type => $entityType) {
                 $entityTypes[$type]['ajaxRoute'] = $this->router->generate('commsNewsAudienceBrowser.getList', ['entityType' => $type]);

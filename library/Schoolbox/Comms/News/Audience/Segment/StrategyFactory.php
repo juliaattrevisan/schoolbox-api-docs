@@ -189,8 +189,8 @@ class StrategyFactory
     {
         return [
             Strategy\Campus::class,
+            Strategy\FixturesTeam::class,
             Strategy\Folder::class,
-            Strategy\PastoralGroup::class,
             Strategy\ResHouse::class,
             Strategy\Role::class,
             Strategy\RoleType::class,
@@ -259,8 +259,6 @@ class StrategyFactory
                 return new Strategy\Year($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
             case Strategy\Service::getEntityType():
                 return new Strategy\Service($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
-            case Strategy\PastoralGroup::getEntityType():
-                return new Strategy\PastoralGroup($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired, $this->db);
             case Strategy\Folder::getEntityType():
                 return new Strategy\Folder(
                     $this->userAccessMapper,
@@ -273,7 +271,10 @@ class StrategyFactory
                     $this->externalUser,
                     $this->knownUserSubjects
                 );
+            case Strategy\FixturesTeam::getEntityType():
+                return new Strategy\FixturesTeam($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired, $this->db);
         }
+
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");
     }
 
