@@ -480,11 +480,13 @@ class Transmit
          */
         try {
             $owner = $this->userMapper->findById($ssf->getOwner()->getId());
+        } catch (Deleted $e) {
+            $owner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Student Submission File Owner Not Found')
-                ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted'));
+                ->setErrorMessage('Student Submission File owner not found'));
 
             return null;
         }
