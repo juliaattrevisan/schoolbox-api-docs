@@ -123,7 +123,8 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setStartTime($matchup->getStartAt());
             $instance->setEndTime($matchup->getFinishAt());
             $instance->setAllDay(false);
-            $instance->setLocation($matchup->getVenue()->getName());
+            $location = $matchup->getVenue()->getName()  . ( $matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress(). ')': '');
+            $instance->setLocation($location);
             $instance->setColour($eventColor);
             $instance->setType($eventType);
             $instance->setMatchup($matchup);
