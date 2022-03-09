@@ -46,9 +46,19 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     /**
      * Corresponds to the luEventType table
      *
-     * @var string
+     * This has historically been mixed usages when setting up the
+     * calendar config object which is serialized into the dbj
+     *
+     * Upon unpacking its vars into an instance, the instance
+     * needs to be particularly forgiving of the datatypes that
+     * were once there - it can be either string or int depending
+     * on when the calendar config was first manufactured.
+     *
+     * These should eventually be ints when you rebuild the calendar
+     * config schema into a json format, which should make this
+     * issue go away
      */
-    protected string $luEventType = '1';
+    protected $luEventType = '1';
 
     /**
      * Whether or not the current user can view these events
@@ -180,10 +190,10 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     /**
      * Set luEventType
      *
-     * @param string $luEventType
+     * @param $luEventType
      * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function setLuEventType(string $luEventType): self
+    public function setLuEventType($luEventType): self
     {
         $this->luEventType = $luEventType;
         return $this;
@@ -193,9 +203,9 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
     /**
      * Get luEventType
      *
-     * @return string
+     * @return mixed
      */
-    public function getLuEventType(): string
+    public function getLuEventType()
     {
         return $this->luEventType;
     }

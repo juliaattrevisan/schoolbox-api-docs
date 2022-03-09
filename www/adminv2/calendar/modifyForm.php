@@ -31,7 +31,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                  * For now, assume any config can have an event type.
                  * It's ignored for configs for which this is not set anyway.
                  */
-                $config->setLuEventType($attribs['luEventType']);
+                $config->setLuEventType((int)$attribs['luEventType']);
             }
 
             /* Process Duration for External DB connectors
