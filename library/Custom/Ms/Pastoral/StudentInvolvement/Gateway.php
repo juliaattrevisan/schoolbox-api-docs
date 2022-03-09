@@ -78,6 +78,32 @@ class Gateway
             'from' => ['code' => '5113', 'class' => 'I'],
             'to'   => ['code' => '5123', 'class' => 'A'],
         ],
+        // Extension classes:
+        // Latin Extension - 5125 – I/ Z (2021) -> 5125 – A (2022)
+        [
+            'from' => ['code' => '5125'],
+            'to'   => ['code' => '5125', 'class' => 'A'],
+        ],
+        // Chinese Extension – 5122 – Z -> 5122 - A
+        [
+            'from' => ['code' => '5122'],
+            'to'   => ['code' => '5122', 'class' => 'A'],
+        ],
+        // Science Extension – 3126 – Z -> 3126 – A
+        [
+            'from' => ['code' => '3126'],
+            'to'   => ['code' => '3126', 'class' => 'A'],
+        ],
+        // French Extension – 5129 – Z -> 5129 – A
+        [
+            'from' => ['code' => '5129'],
+            'to'   => ['code' => '5129', 'class' => 'A'],
+        ],
+        // History Extension – 4136 – X / Z -> 4136 - A
+        [
+            'from' => ['code' => '4136'],
+            'to'   => ['code' => '4136', 'class' => 'A'],
+        ],
     ];
 
     /**
