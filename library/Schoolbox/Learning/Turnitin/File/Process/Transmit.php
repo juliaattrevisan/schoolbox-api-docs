@@ -21,6 +21,7 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -481,6 +482,7 @@ class Transmit
         try {
             $owner = $this->userMapper->findById($ssf->getOwner()->getId());
         } catch (Deleted $e) {
+            /** @var User $owner */
             $owner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
@@ -499,6 +501,7 @@ class Transmit
         try {
             $boxOwner = $this->userMapper->findById($box->getOwner()->getId());
         } catch (Deleted $e) {
+            /** @var User $boxOwner */
             $boxOwner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
