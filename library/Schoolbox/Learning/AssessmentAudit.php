@@ -85,7 +85,13 @@ class AssessmentAudit
         assessment.course_managed AS commonAssessment,
         capabilityMarkTypeTable.hr_name AS capabilityMarkType,
         capabilityGradeGroupTable.name AS capabilityGradeGroup,
-        assessment.weight as weight
+        assessment.weight as weight,
+        submission_box.self_reviewability as selfReviewability,
+        submission_box.mark_visibility as markVisibility,
+        assessment.publish_date as publishDate,
+        assessment.due_date as dueDate,
+        unit_spec_folder.name as unitSpecName,
+        unit_imp_folder.name as unitImpName
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -102,6 +108,8 @@ class AssessmentAudit
         LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
         LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
         LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
+        LEFT JOIN folder as unit_spec_folder on course_unit_specification.folder_id = unit_spec_folder.id
+        LEFT JOIN folder as unit_imp_folder on v_assessment_relation.course_unit_implementation_id = unit_imp_folder.id
 
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
@@ -109,8 +117,8 @@ class AssessmentAudit
 
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
-                        'UnitFolderId', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation'];
+                        'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'Publish Date', 'Due Date', 'Self Reviewability', 'Mark Visibility'];
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
@@ -136,12 +144,15 @@ class AssessmentAudit
 
             //grab UNIT specificationId or implementationId
             $unitCourseFolderId = null;
+            $unitFolderName = null;
             if (null !== $row['course_unit_specification_folder_id']) {
                 $specImplem = 'Course';
                 $unitCourseFolderId = $row['course_unit_specification_folder_id'];
+                $unitFolderName = $row['unitSpecName'];
             } elseif (null !== $row['course_unit_implementation_folder_id']) {
                 $specImplem = 'Class Imported';
                 $unitCourseFolderId = $row['course_unit_implementation_folder_id'];
+                $unitFolderName = $row['unitImpName'];
             }
 
             //work out number of online submissions
@@ -162,6 +173,13 @@ class AssessmentAudit
                 $capabilityGradeSchemeScale = $row['capabilityGradeGroup'];
             }
 
+            //Mark Visibility strings
+            $markVisibility = [
+                0 => 'Staff Only',
+                1 => 'Staff & Student',
+                2 => 'Staff, Student & Parent',
+            ];
+
             //build the row and send
             fputcsv($fp, [
                 $row['assessmentId'],
@@ -172,6 +190,7 @@ class AssessmentAudit
                 $allFolders[$row['folderID']]->getCodeString(),
                 $courseFolderId,
                 $unitCourseFolderId,
+                $unitFolderName,
                 $row['assessmentWorkType'],
                 $this->boolToString($row['commonAssessment']),
                 $onlineSubs,
@@ -182,7 +201,11 @@ class AssessmentAudit
                 $row['capabilityMarkType'],
                 $capabilityGradeSchemeScale,
                 $row['weight'],
-                $specImplem
+                $specImplem,
+                $row['publishDate'],
+                $row['dueDate'],
+                $row['selfReviewability'],
+                $markVisibility[$row['markVisibility']],
             ]);
         }
 
