@@ -109,7 +109,7 @@ class AssessmentAudit
         LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
         LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
         LEFT JOIN folder as unit_spec_folder on course_unit_specification.folder_id = unit_spec_folder.id
-        LEFT JOIN folder as unit_imp_folder on v_assessment_relation.course_unit_implementation_id = unit_imp_folder.id
+        LEFT JOIN folder as unit_imp_folder on course_unit_implementation_out.folder_id = unit_imp_folder.id
 
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
