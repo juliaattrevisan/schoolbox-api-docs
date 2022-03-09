@@ -334,7 +334,7 @@
                 </section>
             </div>
         </section>
-        <Paginate
+        <!-- <Paginate
                 v-if="!this.data.disablePagination && this.currentArticles.length && this.pageCount > 1"
                 v-model="page"
                 :page-count="pageCount"
@@ -345,6 +345,6 @@
                 :next-link-class="'arrow'"
                 :disabled-class="'unavailable'"
                 :click-handler="onPaginate"
-        ></Paginate>
+        ></Paginate> -->
     </div>
 </template>
