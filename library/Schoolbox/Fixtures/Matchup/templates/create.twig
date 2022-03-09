@@ -226,12 +226,12 @@
 
                     <div class="column small-12 medium-4">
                         <label for="startAtDate" class="required">Start Date</label>
-                        <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.startAt ? match.startAt.local : '' }}" required />
+                        <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker data-datepicker-time data-datesync-enddate="#finishAtDate" value="{{ match.startAt ? match.startAt.local : '' }}" required />
                     </div>
 
                     <div class="column small-12 medium-4">
                         <label for="finishAtDate" class="required">Finish Date</label>
-                        <input type="text" id="finishAtDate" name="finishAtDate" placeholder="Date" data-datepicker data-datepicker-time value="{{ match.finishAt ? match.finishAt.local : '' }}" required />
+                        <input type="text" id="finishAtDate" name="finishAtDate" placeholder="Date" data-datepicker data-datepicker-time data-datesync-startdate="#startAtDate" value="{{ match.finishAt ? match.finishAt.local : '' }}" required />
                     </div>
 
                     <div class="small-12 columns">
