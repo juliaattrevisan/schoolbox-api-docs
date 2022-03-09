@@ -764,7 +764,12 @@ class Gateway
                     if (isset($mapping['to']['class'])) {
                         $nextYearClass = $mapping['to']['class'];
                     }
-                    break;
+
+                    // Just return the new class code directly, without going to
+                    // database.
+                    // It's not necessary to go to DB, and the record may not
+                    // exist anyway.
+                    return sprintf('-%s-%s', $nextYearCode, $nextYearClass);
                 }
             }
         }
