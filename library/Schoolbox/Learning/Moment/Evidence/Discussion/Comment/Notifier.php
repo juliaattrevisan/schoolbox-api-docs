@@ -31,6 +31,7 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -43,6 +44,8 @@ class Notifier extends AbstractModuleNotifier
     private ThreadMapper $threadMapper;
 
     private EvidenceMapper $evidenceMapper;
+
+    private UserMapper $userMapper;
 
     /**
      * @inheritdoc
@@ -57,6 +60,7 @@ class Notifier extends AbstractModuleNotifier
             'setMapper'         => $mf->get(CommentMapper::class),
             'setThreadMapper'   => $mf->get(ThreadMapper::class),
             'setEvidenceMapper' => $mf->get(EvidenceMapper::class),
+            'setUserMapper'     => $mf->getLazy(UserMapper::class),
         ];
     }
 
@@ -93,6 +97,15 @@ class Notifier extends AbstractModuleNotifier
     public function setEvidenceMapper(EvidenceMapper $evidenceMapper)
     {
         $this->evidenceMapper = $evidenceMapper;
+    }
+
+    /**
+     * Setter for UserMapper
+     * @param UserMapper $userMapper
+     */
+    public function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
     }
 
     /**
@@ -234,7 +247,12 @@ class Notifier extends AbstractModuleNotifier
             $instance = $bob->build();
             $envelope->targetToParent($student->getId(), $instance);
         } elseif ($roleType === Role::STAFF) {
-            $targetTo = $evidence->getCreator();
+            try {
+                // get hydrated creator
+                $targetTo = $this->userMapper->findById($evidence->getCreator()->getId());
+            } catch (Mapper\Exception $e) {
+                return new Envelope();
+            }
             if (!$targetTo->getRole()->getAccessEvidence()) {
                 return new Envelope();
             }
