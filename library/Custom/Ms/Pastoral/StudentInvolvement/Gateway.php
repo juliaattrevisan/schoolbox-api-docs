@@ -48,6 +48,65 @@ class Gateway
     private const REASON_CODES_ENDORSED_LEAVE = ['M'];
 
     /**
+     * Hardcoded mappings from a subject code to its continuation in the
+     * following year. (If no class is provided, then it's assumed the class
+     * letter has not changed.)
+     *
+     * `getNextYearSubjectCode` can determine the subject code if the two
+     * subjects have the same name and class code. The cases here however do
+     * not, so a manual mapping is required.
+     */
+    private const REPORT_SENIOR_SUBJECT_MAPPING = [
+        // Mathematics Standard:
+        // Year 11: Mathematics Standard (subject code 2116)
+        // Year 12: Mathematics Standard 2 (subject code 2126)
+        [
+            'from' => ['code' => '2116'],
+            'to'   => ['code' => '2126'],
+        ],
+        // English Extension:
+        // Year 11: English Extension (subject code 1118)
+        // Year 12: English Extension 1 (subject code 1125)
+        [
+            'from' => ['code' => '1118'],
+            'to'   => ['code' => '1125'],
+        ],
+        // Latin Continuers:
+        // Year 11: subject code 5113, class code "I"
+        // Year 12: subject code 5123, class code "A"
+        [
+            'from' => ['code' => '5113', 'class' => 'I'],
+            'to'   => ['code' => '5123', 'class' => 'A'],
+        ],
+        // Extension classes:
+        // Latin Extension - 5125 – I/ Z (2021) -> 5125 – A (2022)
+        [
+            'from' => ['code' => '5125'],
+            'to'   => ['code' => '5125', 'class' => 'A'],
+        ],
+        // Chinese Extension – 5122 – Z -> 5122 - A
+        [
+            'from' => ['code' => '5122'],
+            'to'   => ['code' => '5122', 'class' => 'A'],
+        ],
+        // Science Extension – 3126 – Z -> 3126 – A
+        [
+            'from' => ['code' => '3126'],
+            'to'   => ['code' => '3126', 'class' => 'A'],
+        ],
+        // French Extension – 5129 – Z -> 5129 – A
+        [
+            'from' => ['code' => '5129'],
+            'to'   => ['code' => '5129', 'class' => 'A'],
+        ],
+        // History Extension – 4136 – X / Z -> 4136 - A
+        [
+            'from' => ['code' => '4136'],
+            'to'   => ['code' => '4136', 'class' => 'A'],
+        ],
+    ];
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -623,7 +682,8 @@ class Gateway
                 st.sub_desc,
                 so.outline_text,
                 so.outline_url,
-                ts.tch_code
+                ts.tch_code,
+                st.year_grp
             FROM suboutline so
             INNER JOIN subtab st
                 ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
@@ -658,6 +718,70 @@ class Gateway
     }
 
     /**
+     * Find the subject code for the given subject in the following year.
+     *
+     * @param int    $year          The calendar year of the subject.
+     * @param string $subjectCode   The code of the subject, split into a code
+     *                              and class.
+     * @return string|null
+     */
+    public function getNextYearSubjectCode($year, $subjectCode): ?string
+    {
+        $thisYearSubject = $this->getSubject($year, $subjectCode, false);
+        if (empty($thisYearSubject)) {
+            return null;
+        }
+
+        // Find the subject code for next year's class.
+        // We know that the subject name and class do not change, so we can use
+        // that information to find the next year's class.
+        [, $code, $class] = explode('-', $subjectCode);
+        $sql = "
+            SELECT DISTINCT
+                ('-' + RTRIM(st.sub_code) + '-' + RTRIM(ts.class)) AS code
+            FROM suboutline so
+            INNER JOIN subtab st
+                ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            LEFT JOIN tchsub ts
+                ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
+        ";
+
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
+        $pb = $pb->equals('st.year_grp', $thisYearSubject['year_grp'] + 1)
+                 ->notEquals('ts.sub_code', $code)
+                 ->equals('so.cmpy_code', self::COMPANY_CODE)
+                 ->equals('ts.year_num', $year + 1);
+
+        // Search within hardcoded mappings
+        $nextYearClass = $class;
+        foreach (self::REPORT_SENIOR_SUBJECT_MAPPING as $mapping) {
+            // If subject code matches:
+            // check class code matches, if one is provided in the mapping
+            if ($mapping['from']['code'] === $code) {
+                if (!isset($mapping['from']['class']) || $mapping['from']['class'] === $class) {
+                    $nextYearCode = $mapping['to']['code'];
+                    if (isset($mapping['to']['class'])) {
+                        $nextYearClass = $mapping['to']['class'];
+                    }
+
+                    // Just return the new class code directly, without going to
+                    // database.
+                    // It's not necessary to go to DB, and the record may not
+                    // exist anyway.
+                    return sprintf('-%s-%s', $nextYearCode, $nextYearClass);
+                }
+            }
+        }
+        $pb = $pb->equals('st.sub_desc', $thisYearSubject['sub_desc'])
+                 ->equals('ts.class', $nextYearClass);
+
+        $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
+        $query = $this->database->prepareQuery($sql, $pb->getParams());
+        $query->execute();
+        return $query->fetchColumn();
+    }
+
+    /**
      * Gets the other possible class codes for related classes.
      *
      * @param string $subjectCode
@@ -666,7 +790,7 @@ class Gateway
      */
     public function getOtherSubjectClasses($subjectCode)
     {
-        list(, $code, $class) = explode('-', $subjectCode);
+        [, $code, $class] = explode('-', $subjectCode);
 
         $query = "
             SELECT DISTINCT

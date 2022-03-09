@@ -11,10 +11,12 @@ use Alaress\Statistics\Statistics;
 use Custom\Ms\Pastoral\StudentInvolvement\Gateway;
 use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -197,11 +199,23 @@ class Factory
                     continue;
                 }
 
+                // The senior school report cares about the year level that
+                // a folder's grades are due in.
+                // This is due to Meriden's class folder rollover process:
+                // * their Year 11 classes are rolled over and archived
+                // * these folders are then un-archived, and the year 12 class
+                //   code is added to these folders
+                // This is to preserve continuity between the Year 11 and 12
+                // class material: this is particularly necessary as Year 12
+                // starts for students in term 4 of Year 11.
+                // This ensures that endeavor grades given for year 11 don't
+                // show in the year 12 report.
                 $folderWithGrades = $this->getFolderWithGrades(
                     $subject->getSubjectCode(),
                     $student,
                     $publishedOnly,
-                    $roleTypeOverride
+                    $roleTypeOverride,
+                    $year
                 );
 
                 // Ensure folder actually exists
@@ -532,16 +546,24 @@ class Factory
      * @param User        $student
      * @param bool        $publishedOnly
      * @param string|null $roleTypeOverride
+     * @param int|null    $calendarYear     If provided: only fetch grades for
+     *                                      assessments due in this calendar
+     *                                      year.
      *
      * @return array{folder: Folder|null, grades: array}
      */
-    private function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
-    {
+    private function getFolderWithGrades(
+        $subjectCode,
+        User $student,
+        bool $publishedOnly,
+        ?string $roleTypeOverride,
+        ?int $calendarYear = null
+    ) {
         // Find by category code, and figure out if they're involved.
         $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
         if ($folder) {
-            $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly, $roleTypeOverride);
-            if ($involvement) {
+            $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
+            if (!empty($involvement['grades'])) {
                 return [
                     'folder' => $folder,
                     'grades' => $involvement['grades'],
@@ -555,12 +577,58 @@ class Factory
         // To do this, every matching category has to be checked.
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
-            $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride);
-            if ($involvement) {
+            $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
+            if (!empty($involvement['grades'])) {
                 return [
                     'folder' => $archivedFolder,
                     'grades' => $involvement['grades'],
                 ];
+            }
+        }
+
+        // Is a year level provided, and nothing found?
+        // Try finding next year's subject code: if one was found, find the
+        // involvement for this calendar year.
+        // This accounts for Meriden's class folder rollover process for year
+        // 11 subjects:
+        // * their Year 11 classes are rolled over and archived
+        // * these folders are then un-archived, and the year 12 class
+        //   code is added to these folders
+        // This means that Year 11 endeavor grades are associated with the
+        // student's current Year 12 class code: this change fetches only the
+        // Year 11 grades from that class code's folder.
+        if (isset($calendarYear)) {
+            $nextYearSubjectCode = $this->gateway->getNextYearSubjectCode($calendarYear, $subjectCode);
+            if ($nextYearSubjectCode) {
+                $folder = $this->folderMapper->findForCampusAndClass('', $nextYearSubjectCode);
+                if ($folder) {
+                    $involvement = $this->getStudentInvolvement(
+                        $folder,
+                        $student,
+                        $publishedOnly,
+                        $roleTypeOverride,
+                        $calendarYear
+                    );
+                    if (!empty($involvement['grades'])) {
+                        return [
+                            'folder' => $folder,
+                            'grades' => $involvement['grades'],
+                        ];
+                    }
+                }
+
+                // No current folder for next year's code?
+                // find an archived folder
+                $archivedFolders = $this->folderMapper->findAllByArchivedCode($nextYearSubjectCode);
+                foreach ($archivedFolders as $archivedFolder) {
+                    $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
+                    if (!empty($involvement['grades'])) {
+                        return [
+                            'folder' => $archivedFolder,
+                            'grades' => $involvement['grades'],
+                        ];
+                    }
+                }
             }
         }
 
@@ -582,16 +650,18 @@ class Factory
      * @param User        $student
      * @param bool        $publishedOnly
      * @param string|null $roleTypeOverride
+     * @param int|null    $calendarYear     If provided: only fetch grades for
+     *                                      assessments due in this calendar
+     *                                      year.
      *
-     * @return array {
-     *  grades: array (if the student is involved)
-     * }
+     * @return array{grades: array}
      */
     private function getStudentInvolvement(
         Folder $folder,
         User $student,
         bool $publishedOnly,
-        ?string $roleTypeOverride
+        ?string $roleTypeOverride,
+        ?int $calendarYear = null
     ) {
         // Is $student a member of $folder (by class code?)
         if ($folder->getCodes()) {
@@ -601,7 +671,7 @@ class Factory
                         // Student is involved, even if they have no grades.
                         // Try to get them anyway.
                         return [
-                            'grades' => $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride),
+                            'grades' => $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride, $calendarYear),
                         ];
                     }
                 }
@@ -609,13 +679,15 @@ class Factory
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride);
+        $grades = $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride, $calendarYear);
         if (!empty($grades)) {
             return [
                 'grades' => $grades,
             ];
         }
-        return [];
+
+        // Not involved in this folder at all? Return nothing
+        return ['grades' => [],];
     }
 
     /**
@@ -625,17 +697,19 @@ class Factory
      * @param User        $student
      * @param bool        $publishedOnly
      * @param string|null $roleTypeOverride
+     * @param int|null    $calendarYear     If provided: only fetch grades for
+     *                                      assessments due in this calendar
+     *                                      year.
      *
-     * @return array {
-     *  assessment:  IAssessable
-     *  rubric:      MarkedGrid|null
-     *  pretty_mark: string
-     *  mark:        float
-     *  comment:     string
-     * }
+     * @return array<string, array{assessment: IAssessable, rubric: MarkedGrid|null, pretty_mark: string, mark: float, comment: string}>
      */
-    private function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
-    {
+    private function getGrades(
+        Folder $folder,
+        User $student,
+        bool $publishedOnly,
+        ?string $roleTypeOverride,
+        ?int $calendarYear = null
+    ) {
         $allGrades = [];
 
         // Only due works are shown
@@ -647,6 +721,13 @@ class Factory
                 ['order' => ['due_date' => 'asc'],]
             ) as $assessment
         ) {
+            if (isset($calendarYear)) {
+                $assessmentYear = (int)$assessment->getDueAt()->getYear();
+                if ($assessmentYear !== $calendarYear) {
+                    continue;
+                }
+            }
+
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 // Filter this grade out if not visible to the current user.
