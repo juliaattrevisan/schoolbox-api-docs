@@ -1,5 +1,5 @@
 <script>
-    import VuejsPaginate from 'vuejs-paginate';
+    import Paginate from 'vuejs-paginate-next';
     import LayoutList from './layout-list.vue';
     import LayoutListReversed from './layout-list-reversed.vue';
     import LayoutCard from './layout-card.vue';
@@ -12,10 +12,10 @@
             'data'
         ],
         components: {
-            'Paginate': VuejsPaginate,
-            'LayoutList': LayoutList,
-            'LayoutListReversed': LayoutListReversed,
-            'LayoutCard': LayoutCard
+            Paginate,
+            LayoutList,
+            LayoutListReversed,
+            LayoutCard,
         },
         data() {
             return {
@@ -334,17 +334,17 @@
                 </section>
             </div>
         </section>
-        <!-- <Paginate
-                v-if="!this.data.disablePagination && this.currentArticles.length && this.pageCount > 1"
-                v-model="page"
-                :page-count="pageCount"
-                :container-class="'pagination'"
-                :prev-text="'‹'"
-                :next-text="'›'"
-                :prev-link-class="'arrow'"
-                :next-link-class="'arrow'"
-                :disabled-class="'unavailable'"
-                :click-handler="onPaginate"
-        ></Paginate> -->
+        <paginate
+            v-if="!this.data.disablePagination && this.currentArticles.length && this.pageCount > 1"
+            v-model="page"
+            :page-count="pageCount"
+            :container-class="'pagination'"
+            :prev-text="'‹'"
+            :next-text="'›'"
+            :prev-link-class="'arrow'"
+            :next-link-class="'arrow'"
+            :disabled-class="'unavailable'"
+            :click-handler="onPaginate"
+        ></paginate>
     </div>
 </template>
