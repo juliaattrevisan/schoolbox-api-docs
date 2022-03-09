@@ -21,7 +21,7 @@ abstract class Base extends RendererBase
 {
 
     /** @var External\Event */
-    private $event;
+    protected $event;
 
 
     /**

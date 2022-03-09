@@ -324,6 +324,14 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
         }
 
+        // Finish At
+        try {
+            $dateTime = $this->getRequest()->post['finishAtDate'];
+            $finishAt  = \Alaress_Date_Format::newLocal($dateTime);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
+        }
+
         // Venue
         try {
             $venue = $this->getVenueMapper()->findById($this->getRequest()->post['venueId']);
@@ -345,7 +353,7 @@ class Controller extends AbstractController
         // Itinerary
         $itinerary = $this->transposeItineraryPost($this->getRequest()->post['itinerary']);
 
-        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
+        $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
@@ -428,13 +436,27 @@ class Controller extends AbstractController
      * @param string $notes
      * @param Collection|ItineraryItem[] $itinerary
      */
-    private function saveMatch(Matchup $matchup, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, School $homeSchool, School $awaySchool, Venue $venue, $notes, Collection $itinerary)
-    {
+    private function saveMatch(
+        Matchup $matchup,
+        Division $division,
+        string $name,
+        Season $season,
+        Alaress_Date_Format $startAt,
+        Alaress_Date_Format $finishAt,
+        Team $homeTeam,
+        Team $awayTeam,
+        School $homeSchool,
+        School $awaySchool,
+        Venue $venue,
+        string $notes,
+        Collection $itinerary
+    ) {
         $matchup
             ->setDivision($division)
             ->setName($name)
             ->setSeason($season)
             ->setStartAt($startAt)
+            ->setFinishAt($finishAt)
             ->setHomeTeam($homeTeam)
             ->setAwayTeam($awayTeam)
             ->setHomeSchool($homeSchool)

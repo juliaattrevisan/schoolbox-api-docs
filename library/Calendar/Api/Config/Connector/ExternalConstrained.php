@@ -15,7 +15,7 @@ class Calendar_Api_Config_Connector_ExternalConstrained extends Calendar_Api_Con
      *
      * @var string
      */
-    protected $connectorClass = 'ExternalConstrained';
+    protected string $connectorClass = 'ExternalConstrained';
 
     /**
      * Maximum number of days to obtain, or something like that?
@@ -27,7 +27,7 @@ class Calendar_Api_Config_Connector_ExternalConstrained extends Calendar_Api_Con
     /**
      * {@inheritdoc}
      */
-    public function getDefaultLabel()
+    public function getDefaultLabel(): string
     {
         return 'External Database';
     }

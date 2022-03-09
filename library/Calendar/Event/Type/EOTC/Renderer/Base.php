@@ -19,7 +19,7 @@ use Schoolbox\User;
 abstract class Base extends RendererBase
 {
     /** @var EOTC\Event */
-    private $event;
+    protected $event;
 
     /**
      * Constructor

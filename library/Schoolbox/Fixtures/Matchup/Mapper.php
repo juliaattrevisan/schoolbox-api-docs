@@ -35,12 +35,14 @@ use Schoolbox\Collection;
 
 /**
  * Class Mapper
+ *
  * @method Model createModel()
  * @method Model findById($identifierValue)
  * @package Schoolbox\Fixtures\Match
  */
 class Mapper extends BaseMapper
 {
+
     /**
      * Setup mapping
      */
@@ -55,6 +57,7 @@ class Mapper extends BaseMapper
         $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
+        $this->uses('finish_at', self::TYPE_DATETIME);
         $this->joins('home_team_id', TeamMapper::class, 'id', null, null, 'homeTeam', 'home_team');
         $this->joins('away_team_id', TeamMapper::class, 'id', null, null, 'awayTeam', 'away_team');
         $this->joins('home_school_id', SchoolMapper::class, 'id', null, null, 'homeSchool', 'home_school');
@@ -136,6 +139,83 @@ class Mapper extends BaseMapper
             ResultMapper::getInstance()->delete($currentResult);
         }
     }
+
+
+    /**
+     * Find all the Matchup instances where $user is involved via their current Team,
+     * within the date range specified
+     *
+     * @param \Schoolbox\User           $user
+     * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function findInvolvedMatchups(
+        \Schoolbox\User $user
+    ): GenericCollection {
+
+        /* Make a pretty significant assumption here:
+         *
+         * Teams from Clipboard always import as the Home Team
+         *
+         * There used to be support for a person being in either the Home
+         * team or the Away team, but then you had to know which one of those
+         * caused this record to be included in the stack - because you need
+         * to link to a team id on the front end via the calendar modal
+         */
+        $query = "
+            SELECT
+                sm.*,  
+                {$this->getJoinColumnString('venue', 'sv')}
+            FROM sportsfixtures_match sm
+            LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}            
+            LEFT JOIN sportsfixtures_team st1 ON sm.home_team_id = st1.id
+            LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
+            LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
+            LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
+            WHERE (stu1.user_id = :userId OR stu2.user_id = :userId)
+            AND sm.deleted_at IS NULL
+            AND st1.deleted_at IS NULL
+            AND st2.deleted_at IS NULL
+            ORDER BY sm.start_at
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'userId' => $user->getId(),
+        ]);
+
+        /** @var GenericCollection|Matchup[] $matches */
+        $matches = $this->createCollection();
+
+        /** @var Collection|Venue[] $venues */
+        $venues = new Collection();
+
+        while ($row = $statement->fetch()) {
+            $matchId = $row['id'];
+
+            /* Set up us the match in the collection
+             * Only hydrate all this stuff if it never existed previously
+             */
+            if (!($matches->getOffset($matchId) instanceof Matchup)) {
+                /** @var Matchup $matchup */
+                $matchup = $this->hydrate($row);
+
+                if (!$venues->getOffset($row['venue_id']) instanceof Venue) {
+                    $venues->setOffset($row['venue_id'], $this->hydrateJoin($row, 'venue', 'sv'));
+                }
+
+                $matchup->setVenue($venues->getOffset($row['venue_id']));
+
+                $matches->setOffset($matchup->getId(), $matchup);
+            }
+        }
+
+        return $matches;
+    }
+
 
     /**
      * @return string
@@ -310,13 +390,16 @@ class Mapper extends BaseMapper
         return $matches;
     }
 
+
     /**
      * Find the next match for a team
      * The team can be either the home or away team
      *
      * @param Team $team
-     * @throws OutOfBoundsException
      * @return Matchup
+     * @throws Exception
+     * @throws OutOfBoundsException
+     * @throws \PDOException
      */
     public function findNextMatch(Team $team)
     {

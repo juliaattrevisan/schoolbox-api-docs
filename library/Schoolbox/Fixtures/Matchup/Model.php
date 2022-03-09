@@ -61,6 +61,9 @@ class Model implements ISoftDeletable
     /** @var Alaress_Date_Format */
     protected $startAt;
 
+    /** @var Alaress_Date_Format */
+    protected $finishAt;
+
     /** @var Result|null */
     protected $homeTeamResult;
 
@@ -167,7 +170,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Team
+     * @return Team|null
      */
     public function getHomeTeam()
     {
@@ -175,7 +178,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Team $homeTeam|null
+     * @param Team|null $homeTeam
      * @return static
      */
     public function setHomeTeam(Team $homeTeam = null)
@@ -185,7 +188,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Team
+     * @return Team|null
      */
     public function getAwayTeam()
     {
@@ -193,7 +196,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Team $awayTeam|null
+     * @param Team|null $awayTeam
      * @return static
      */
     public function setAwayTeam(Team $awayTeam = null)
@@ -203,7 +206,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return School
+     * @return School|null
      */
     public function getAwaySchool()
     {
@@ -211,7 +214,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param School $awaySchool|null
+     * @param School|null $awaySchool
      * @return static
      */
     public function setAwaySchool(School $awaySchool = null)
@@ -221,7 +224,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return School
+     * @return School|null
      */
     public function getHomeSchool()
     {
@@ -229,7 +232,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param School $homeSchool|null
+     * @param School|null $homeSchool
      * @return static
      */
     public function setHomeSchool(School $homeSchool = null)
@@ -412,6 +415,27 @@ class Model implements ISoftDeletable
         $this->startAt = $startAt;
         return $this;
     }
+
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getFinishAt(): ?Alaress_Date_Format
+    {
+        return $this->finishAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format $finishAt
+     * @return Model
+     */
+    public function setFinishAt(Alaress_Date_Format $finishAt): self
+    {
+        $this->finishAt = $finishAt;
+        return $this;
+    }
+
 
     /**
      * @return string

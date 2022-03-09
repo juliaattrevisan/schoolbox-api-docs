@@ -14,14 +14,13 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use Calendar\Event\Type\Day;
 use Calendar\Event\Type\RendererBase;
-use Schoolbox\Calendar\Event;
 use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
 
     /** @var Day\Event */
-    private $event;
+    protected $event;
 
     /**
      * @var \Calendar
