@@ -329,7 +329,7 @@ $kernel->run(new class extends App {
 
 
     /**
-     * @var Alaress_Date_Format
+     * @var string
      */
     private $now;
 
