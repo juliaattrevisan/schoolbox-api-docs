@@ -753,7 +753,6 @@ class Gateway
                  ->equals('ts.year_num', $year + 1);
 
         // Search within hardcoded mappings
-        $nextYearCode  = null;
         $nextYearClass = $class;
         foreach (self::REPORT_SENIOR_SUBJECT_MAPPING as $mapping) {
             // If subject code matches:
@@ -773,11 +772,8 @@ class Gateway
                 }
             }
         }
-        $pb = isset($nextYearCode)
-            ? $pb->equals('st.sub_code', $nextYearCode)
-            : $pb->equals('st.sub_desc', $thisYearSubject['sub_desc']);
-
-        $pb = $pb->equals('ts.class', $nextYearClass);
+        $pb = $pb->equals('st.sub_desc', $thisYearSubject['sub_desc'])
+                 ->equals('ts.class', $nextYearClass);
 
         $sql .= " WHERE " . implode(' AND ', $pb->getWhere());
         $query = $this->database->prepareQuery($sql, $pb->getParams());
