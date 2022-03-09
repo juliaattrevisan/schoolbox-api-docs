@@ -165,7 +165,7 @@ class FixturesTeam extends SimpleStrategy
      */
     public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        return [Model::RELATIONSHIP_SELF];
+        return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF];
     }
 
 
