@@ -35,7 +35,6 @@ use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -1404,8 +1403,8 @@ class Controller extends Base
          */
         if ($this->getConfigLoader()->get('fixtures_enabled')) {
             $entityTypes['fixturesteam'] = [
-                'name' => 'Fixtures Team',
-                'namePlural' => 'Fixtures Teams',
+                'name' => 'Team',
+                'namePlural' => 'Teams',
                 'icon' => 'sport',
                 'selfModifier' => 'Users in fixtures team',
                 'hideFromModal' => false,
