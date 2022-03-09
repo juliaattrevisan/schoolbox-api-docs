@@ -20,6 +20,7 @@ use Schoolbox\Learning\Turnitin\Exception\Conflict;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
 
 /**
@@ -495,11 +496,13 @@ class Transmit
          */
         try {
             $boxOwner = $this->userMapper->findById($box->getOwner()->getId());
+        } catch (Deleted $e) {
+            $boxOwner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Submission Box Owner Not Found')
-                ->setErrorMessage('Submission Box owner not found; maybe their record was deleted'));
+                ->setErrorMessage('Submission Box owner not found'));
 
             return null;
         }
