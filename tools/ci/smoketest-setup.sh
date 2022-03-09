@@ -18,22 +18,32 @@ tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
-CONFIG_DIR="/etc/php/7.4/fpm"
-PHP_SERVICE="php7.4-fpm"
+PHP_VERSION=$1
+CONFIG_DIR="/etc/php/${PHP_VERSION}/fpm"
+PHP_SERVICE="php${PHP_VERSION}-fpm"
 
 ## Start database to initialise with a username and password
+echo "Setting up MariaDB"
+echo "... starting MariaDB"
 service mariadb start
 
 ## Initialise database
+echo "... setting up users and privileges"
 mariadb -e "CREATE DATABASE schoolbox;"
 mariadb -e "CREATE USER 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
 mariadb -e "GRANT ALL PRIVILEGES ON schoolbox.* TO 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
-mysql schoolbox < "$initialdir"/data/schoolbox.sql
-mysql schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
-mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
+echo "... setting up tzdata"
+mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
+
+echo "... setting up instance data"
+mariadb schoolbox < "$initialdir"/data/schoolbox.sql
+
+echo "... updating instance data"
+mariadb schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
+mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
+echo "MariaDB setup complete"
 
 
 ## Make directories that will be used by our schoolbox instance
@@ -48,7 +58,7 @@ cp -rf "$repo_dir"/* /usr/share/schoolbox
 cp -f "$initialdir"/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf "$initialdir"/configfiles/nginx/* /etc/nginx
 cp -f "$initialdir"/configfiles/update-sql-no-prereq-test.sh /usr/share/schoolbox/tools/update-sql-nocheck.sh
-cp -rf "$initialdir"/configfiles/php/7.4/fpm/* $CONFIG_DIR
+cp -rf "$initialdir"/configfiles/php/${PHP_VERSION}/fpm/* $CONFIG_DIR
 cp -f "$initialdir"/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -rf "$initialdir"/data/* $instance_data_dir
 cp -rf "$initialdir"/configfiles/bin/* /usr/local/bin
@@ -89,13 +99,13 @@ echo 'started mariadb'
 
 # Set data dirs in config table + run upgrade scripts
 cd tools || exit 1
-./generate-dir-sql-dynamically.sh $instance_data_dir | mysql schoolbox
+./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance
 # (ensure this happens after all updates happen)
-mysql schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
+mariadb schoolbox -e "UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 
 ## Finish where we started.
 cd "$initialdir"
