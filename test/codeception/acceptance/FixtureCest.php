@@ -14,8 +14,10 @@ namespace acceptance;
  * 3. Execute cd /usr/share/schoolbox && ./vendor/codeception/codeception/codecept --steps run acceptance FixtureCest
  */
 
+use AcceptanceTester;
 use Page\Fixture;
 use Page\Common;
+use Exception;
 
 class FixtureCest
 {

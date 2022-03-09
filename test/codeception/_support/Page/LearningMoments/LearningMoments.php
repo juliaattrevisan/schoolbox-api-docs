@@ -22,7 +22,7 @@ class LearningMoments
     public const CONFIRM_BUTTON = 'Confirm';
     public const SUBMIT_BUTTON = '#evidence-submit';
     public const ADD_COMMENT_BUTTON = 'button.btn-show-ckeditor';
-    public const COMMENT_SUBMIT_BUTTON = 'a[class=button\ submit]';
+    public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
     public const DROPDOWN_MENU = 'a.icon-overflow';
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
     public const COMMENT_CONFIRM_DELETE_BUTTON = 'ID to be added and replaced here';
