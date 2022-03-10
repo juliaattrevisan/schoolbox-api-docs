@@ -544,24 +544,28 @@ class Profile implements IStrategy
      */
     private function findHousemaster(array $studentHouse): array
     {
-        /* If this house has any employees, dig out the first one
+        /* This is an assumption that Wonde can't abide at the moment
+         * I'm not certain when they'll map housemasters but this was
+         * one way we could potentially do it
          */
-        if (isset($studentHouse['data']) && \count($studentHouse['data']['employees']['data'])) {
-            /* "Head of House" meta.role is not hardcoded into wonde
-             *  For now just grab the first human off the stack
-             */
-            $housemaster = $studentHouse['data']['employees']['data'][0];
-
-            return [
-                'id' => trim((string)$housemaster['mis_id']),
-                'name' => trim(sprintf(
-                    '%s %s %s',
-                    trim((string)$housemaster['title']),
-                    trim((string)$housemaster['forename']),
-                    trim((string)$housemaster['surname'])
-                ))
-            ];
-        }
+//        /* If this house has any employees, dig out the first one
+//         */
+//        if (isset($studentHouse['data']) && \count($studentHouse['data']['employees']['data'])) {
+//            /* "Head of House" meta.role is not hardcoded into wonde
+//             *  For now just grab the first human off the stack
+//             */
+//            $housemaster = $studentHouse['data']['employees']['data'][0];
+//
+//            return [
+//                'id' => trim((string)$housemaster['mis_id']),
+//                'name' => trim(sprintf(
+//                    '%s %s %s',
+//                    trim((string)$housemaster['title']),
+//                    trim((string)$housemaster['forename']),
+//                    trim((string)$housemaster['surname'])
+//                ))
+//            ];
+//        }
 
         return [
             'id' => null,
