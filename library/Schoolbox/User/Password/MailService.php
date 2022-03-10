@@ -81,7 +81,7 @@ class MailService
         // If the user entered a validly formatted email address- search by email address as well
 
         if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-            $users = $users->merge($this->userMapper->findByEmail($emailAddress));
+            $users = $users->mergeUnique($this->userMapper->findByEmail($emailAddress), 'id');
         }
 
         $this->sendResetToUsers(
