@@ -7,8 +7,8 @@
         <div class="small-12 columns">
             <div id='user-bulk-modify'>
                 <user-bulk-modify
-                        src-user-list="{{ routeLookupIfAuthorized('adminUser.getBulkModifyUserList') }}"
-                        src-user-modify="{{ routeLookupIfAuthorized('adminUser.postBulkModify') }}"
+                        src-user-list="{{ routeLookupIfAuthorized('adminUserBulkModify.getUserList') }}"
+                        src-user-modify="{{ routeLookupIfAuthorized('adminUserBulkModify.postModify') }}"
                         :campuses="{{ campuses | json_encode }}"
                         :roles="{{ roles | json_encode }}"
                         :year-levels="{{ yearLevels | json_encode }}"

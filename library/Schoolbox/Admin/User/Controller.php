@@ -15,10 +15,7 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Role;
 use Scrub;
 use UnexpectedValueException;
@@ -131,7 +128,7 @@ class Controller extends Base
     private const IDENTIFIERS = [
         'none' => self::IDENTIFIER_NONE,
         'campus' => self::IDENTIFIER_CAMPUS,
-        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
+        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
     ];
 
     /**
@@ -140,7 +137,7 @@ class Controller extends Base
     private const ACCESS_LEVELS = [
         'read' => UserAccess::ACCESS_READ,
         'write' => UserAccess::ACCESS_WRITE,
-        'moderate' => UserAccess::ACCESS_FULL,
+        'moderate' => UserAccess::ACCESS_FULL
     ];
 
     /**
@@ -168,8 +165,8 @@ class Controller extends Base
             'availability' => [
                 'read' => true,
                 'write' => true,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_NEWS => [
             'name' => 'News',
@@ -177,8 +174,8 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => true,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_CMS => [
             'name' => 'CMS',
@@ -186,8 +183,8 @@ class Controller extends Base
             'availability' => [
                 'read' => true,
                 'write' => true,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_HOUSEMASTER => [
             'name' => 'Housemaster',
@@ -195,8 +192,8 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => false,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_RESOURCE_BOOKING => [
             'name' => 'Resource Booking',
@@ -204,8 +201,8 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => false,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_CURRICULUM => [
             'name' => 'Curriculum',
@@ -213,8 +210,8 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => true,
-                'moderate' => false,
-            ],
+                'moderate' => false
+            ]
         ],
         UserAccess::SERVICE_PASTORAL => [
             'name' => 'Pastoral Moderator',
@@ -222,8 +219,8 @@ class Controller extends Base
             'availability' => [
                 'read' => true,
                 'write' => true,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Fixtures',
@@ -231,8 +228,8 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => false,
-                'moderate' => true,
-            ],
+                'moderate' => true
+            ]
         ],
     ];
 
@@ -365,17 +362,17 @@ class Controller extends Base
                 'userPermissions' => $userPermissions,
                 'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), [
                     'order' => ['date' => 'desc'],
-                    'limit' => 10,
+                    'limit' => 10
                 ]),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
-                    'limit' => 10,
+                    'limit' => 10
                 ]),
                 'portraitZone' => $portraitZone,
                 'isSchoolboxAdmin' => $user->getUsername() === UserMapper::USERNAME_ALARESS_ADMIN,
                 'token' => $this->tokenMapper->findByColumn('user_id', $user->getId()),
             ],
-            'title' => 'Admin - Users',
+            'title' => 'Admin - Users'
         ]);
     }
 
@@ -470,7 +467,7 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
             ],
-            'title' => 'Admin - Users',
+            'title' => 'Admin - Users'
         ]);
     }
 
@@ -554,12 +551,12 @@ class Controller extends Base
         $this->userAccessMapper->deleteByColumnList([
             'service' => UserAccess::SERVICE_HOMEPAGE,
             'sid' => $folder->getId(),
-            'uid' => $user->getId(),
+            'uid' => $user->getId()
         ]);
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
     }
 
@@ -574,12 +571,12 @@ class Controller extends Base
         $this->userAccessMapper->deleteByColumnList([
             'service' => $service,
             'sid' => $sid,
-            'uid' => $user->getId(),
+            'uid' => $user->getId()
         ]);
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
     }
 
@@ -604,7 +601,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
     }
 
@@ -785,7 +782,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
     }
 
@@ -800,7 +797,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 [
                     'format' => 'json',
-                    'data'   => true,
+                    'data'   => true
                 ]
             );
         } else {
@@ -859,7 +856,7 @@ class Controller extends Base
                     'uid' => $user->getId(),
                     'sid' => $folder->getId(),
                     'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'type' => UserAccess::ACCESS_FULL,
+                    'type' => UserAccess::ACCESS_FULL
                 ]);
 
                 /** @var UserAccess $admin */
@@ -873,7 +870,7 @@ class Controller extends Base
             $userAccess = $this->userAccessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
                 'sid' => $folder->getId(),
-                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'service' => UserAccess::SERVICE_HOMEPAGE
             ]);
             $userAccess->setAccessLevel($post['type']);
             $this->userAccessMapper->save($userAccess);
@@ -882,7 +879,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
     }
 
@@ -898,7 +895,7 @@ class Controller extends Base
             $userAccess = $this->userAccessMapper->findOneByColumnList([
                 'uid' => $user->getId(),
                 'sid' => $post['sid'],
-                'service' => $post['service'],
+                'service' => $post['service']
             ]);
             $userAccess->setAccessLevel($post['type']);
             $this->userAccessMapper->save($userAccess);
@@ -907,155 +904,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => true,
+            'data'   => true
         ]);
-    }
-
-    /**
-     * Bulk user modify page
-     * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @api POST /adminv2/user/bulk/modify/list
-     */
-    public function getBulkModify(): void
-    {
-        $campusList = $this->campusMapper->findAll()->sortBy('sequence', 'ASC');
-        $campuses   = [];
-        foreach ($campusList as $campus) {
-            $campuses[] = [
-                'id'   => $campus->getId(),
-                'name' => $campus->getName(),
-            ];
-        }
-        $roleList = $this->roleMapper->findAll()->sortBy('sequence', 'ASC');
-        $roles    = [];
-        foreach ($roleList as $role) {
-            $roles[] = [
-                'id'   => $role->getId(),
-                'name' => $role->getName(),
-            ];
-        }
-        $yearLevelList = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
-        $yearLevels    = [];
-        foreach ($yearLevelList as $yearLevel) {
-            $yearLevels[] = [
-                'id'   => $yearLevel->getId(),
-                'name' => $yearLevel->getName(),
-            ];
-        }
-        $houseList = $this->houseMapper->findAll()->sortBy('sequence', 'ASC');
-        $houses    = [];
-        /** @var \House $house */
-        foreach ($houseList as $house) {
-            $houses[] = [
-                'id'   => $house->getId(),
-                'name' => $house->getHouse(),
-            ];
-        }
-
-        $this->getResponse()->content->set(
-            [
-                'template' => '@adminUser/bulkModify.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminUser.getBulkModify'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                        $this->router->generate('adminUser.getBulkModify'),
-                        'Bulk Modify'
-                    ),
-                    'campuses'       => $campuses,
-                    'roles'          => $roles,
-                    'yearLevels'     => $yearLevels,
-                    'houses'         => $houses,
-                ],
-                'title'    => 'Admin - User Management',
-            ]
-        );
-    }
-
-    /**
-     * Populate bulk modify page with users with selected conditions
-     * @api POST /adminv2/user/bulk/modify/list
-     */
-    public function getBulkModifyUserList()
-    {
-        $selected = json_decode($this->request->content->get(), true);
-        /* If there were any search results, display control options
-         */
-        $userMapper = \Schoolbox\UserBulkMapper::getInstance();
-        $userList   = $userMapper->bulkModifySearch(
-            $selected['campusId'],
-            $selected['roleId'],
-            $selected['ePortfolio'],
-            $selected['yearLevelId'],
-            $selected['token']
-        );
-        $this->getResponse()->content->set($this->buildJsonOutput($userList));
-    }
-
-    /**
-     * @api GET /adminv2/user/bulk/modifyForm
-     */
-    public function postBulkModify()
-    {
-        $params  = $this->request->post;
-        $userIds = $params->get('users');
-
-        if (!is_array($userIds) || count($userIds) === 0) {
-            error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
-        }
-
-        $this->extendExecutionTime();
-
-        $userMapper = \Schoolbox\UserBulkMapper::getInstance();
-
-        $modified = new \Schoolbox\Collection();
-
-//        if ($params->get('updateUsers')) {
-        $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk modify";
-        $userMapper->log($message);
-
-        $modified = (new \Schoolbox\Admin\User\BulkUpdater(
-            $this->getUser(),
-            $userMapper,
-            $userIds,
-            array_filter(explode(',', $params->get('campusIds'))),
-            (int)$params->get('roleId'),
-            (int)$params->get('yearLevelId'),
-            (int)$params->get('houseId'),
-            (int)$params->get('ePortfolio'),
-            (int)$params->get('emailFromUserName'),
-            (int)$params->get('externalMailClient'),
-            (int)$params->get('webmail'),
-            (int)$params->get('accountEnabled'),
-            (int)$params->get('hideContacts'),
-            (int)$params->get('hideTimetable'),
-            $params->get('positionTitle'),
-            (int)$params->get('displayGradeGraph'),
-            (int)$params->get('revokeToken')
-        ))->update();
-//        } else {
-//            if (isset($_POST['deleteUsers'])) {
-//                $userCollection = $userMapper->findByColumn('id', $userIds);
-//                $userMapper->bulkDelete($userCollection);
-//
-//                $modified = $userCollection;
-//            }
-//        }
-
-
-        // refresh subscription cache
-        try {
-            /** @var WritableCache $cache */
-            $cache = $this->getDi()->get('subscriptionCache');
-            $cache->cacheUsers(INSTANCE_ID, $userIds);
-        } catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            $userMapper->log($e->getMessage());
-        }
-
-        $jsonPayload = [
-            nl2br(Scrub::text($userMapper->getOutputMessage())),
-        ];
-
-        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
     }
 }

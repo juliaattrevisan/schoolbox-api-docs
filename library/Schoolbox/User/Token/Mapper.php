@@ -39,23 +39,23 @@ class Mapper extends BaseMapper
 
     /**
      * @param User $user
+     * @param User $effector
      * @return Model
      * @throws BaseMapper\Exception
      */
-    public function generateForUser(User $user): Model
+    public function generateForUser(User $user, User $effector): Model
     {
         // delete existing
-        $sessionUser = $this->getSessionUser();
         $existingJwtIds   = $this->findByColumn('user_id', $user->getId());
         /** @var Model $existing */
         foreach ($existingJwtIds as $existing) {
-            $existing->setDeletedBy($sessionUser)->setDeletedAt(\Alaress_Date_Format::now());
+            $existing->setDeletedBy($effector)->setDeletedAt(\Alaress_Date_Format::now());
             $this->save($existing);
         }
         // create new
         $userJwtId = $this->createModel()
                           ->setUser($user)
-                          ->setCreatedBy($sessionUser);
+                          ->setCreatedBy($effector);
         $this->save($userJwtId);
         // get the new one
         return $this->findOneByColumn('user_id', $user->getId());

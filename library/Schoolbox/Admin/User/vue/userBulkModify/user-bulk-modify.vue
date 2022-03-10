@@ -67,7 +67,7 @@ export default {
             },
             hasRowsLoaded: false,
             rows: [],
-            selectedRows: [], //keep track of which rows could be deleted
+            selectedRows: [], //keep track of which rows could be modified
             columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token'],
             options: {
                 headings: {
@@ -93,7 +93,7 @@ export default {
                 selectable: {
                     mode: 'multiple' //to enable multi-select
                 },
-                debounce: 100, //faster debouce as data is stored on the client side,
+                debounce: 100, //faster debounce as data is stored on the client side,
                 resizableColumns: false,
                 tabbable: false,
                 texts: {
@@ -130,6 +130,9 @@ export default {
             logData: [],
         }
     },
+    mounted() {
+        this.loadRows();
+    },
     methods: {
         /**
          * load users
@@ -150,7 +153,7 @@ export default {
         },
 
         /**
-         * Notify manage-groups.vue of state change
+         * Notify state change
          *
          * @param { Object }
          */
@@ -163,13 +166,10 @@ export default {
          */
         onRowSelected(event) {
             this.selectedRows = event;
-            // if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
-            //     this.hasSelectedShiftKey = true;
-            // }
         },
 
         /**
-         * clear the selection after deletion
+         * clear the selection
          */
         clearRows() {
             this.selectedRows = [];
@@ -199,7 +199,7 @@ export default {
         },
 
         /**
-         * Set up a deleted users array to POST
+         * Set up updating fields to POST
          *
          * @returns {FormData}
          */
