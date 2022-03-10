@@ -74,7 +74,7 @@ HELP;
             $this->getLogger()->error($e->getMessage());
         }
         try {
-            $valid->cleanHeaders();
+            $valid->hasAsciiHeaderRow();
             $this->getLogger()->info("Headers are clean of UTF8");
         } catch (\UnexpectedValueException $e) {
             $this->getLogger()->error($e->getMessage());

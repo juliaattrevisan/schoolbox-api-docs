@@ -14,11 +14,6 @@ class Reader implements \Iterator
 {
 
     /**
-     * @var ValidCSV
-     */
-    protected ValidCSV $validCSVHelper;
-
-    /**
      * The file name to read from.
      *
      * @var null|string
@@ -91,16 +86,19 @@ class Reader implements \Iterator
      */
     public function __construct($filename)
     {
-        if (is_resource($filename)) {
+        if (\is_resource($filename)) {
+            /* Check if it's a fopen'd resource
+             */
             $this->filename = null;
-            $this->fp       = $filename;
-            $this->validCSVHelper = new ValidCSV($this->fp);
-            $this->fp = $this->validCSVHelper->skipBom();
+            $this->fp = $filename;
         } elseif (is_readable($filename)) {
+            /* Otherwise maybe it's a path to a filename
+             */
             $this->filename = $filename;
-        } else {
-            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+            $this->fp = fopen($this->filename, 'r');
         }
+
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
     }
 
     /**

@@ -22,11 +22,6 @@ use Alaress\Csv\ValidCSV;
 class Reader implements \Iterator
 {
     /**
-     * @var ValidCSV
-     */
-    protected ValidCSV $validCSVHelper;
-
-    /**
      * Field delimiter for the CSV file
      *
      * @var string
@@ -166,8 +161,7 @@ class Reader implements \Iterator
             $this->fp = fopen($this->filename, 'r');
         }
 
-        $this->validCSVHelper = new ValidCSV($this->fp);
-        $this->fp = $this->validCSVHelper->skipBom();
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
 
         // Verify the file pointer is a seekable resource
         if (!is_resource($this->fp)) {
@@ -222,7 +216,7 @@ class Reader implements \Iterator
     {
         $currentLocation = ftell($this->fp);
 
-        $this->fp = $this->validCSVHelper->skipBom();
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
 
         $header = $this->loadRow();
 
@@ -431,11 +425,8 @@ class Reader implements \Iterator
 
         /* Reopen the file
          */
-        if (!\is_resource($this->fp)) {
-            $this->fp = fopen($this->filename, 'r');
-            $this->validCSVHelper->skipBom();
-        } else {
-            $this->validCSVHelper->skipBom();
+        if (!is_resource($this->fp)) {
+            $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
         }
 
         /* Read the header row
@@ -456,13 +447,12 @@ class Reader implements \Iterator
      */
     private function cleanup()
     {
-        if (\is_resource($this->fp) && $this->filename) {
+        if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
-            $this->fp = null;
+            unset($this->fp);
         }
-
         $this->currentKey = 0;
-        $this->currentRow = false;
+        $this->currentRow = array();
     }
 
     /**
