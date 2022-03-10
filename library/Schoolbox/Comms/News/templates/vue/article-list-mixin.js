@@ -66,10 +66,7 @@ export default {
                 console.log(error);
                 $toast.toastTimeout({text: toastFailMessage, duration: 2000, css: 'alert'});
             });
-        }
-    },
-
-    filters: {
+        },
 
         /**
          * Pluralise the comment count string
@@ -78,13 +75,10 @@ export default {
          * @returns {string}
          */
         formatCommentCountMeta: function (value) {
-            let suffix = ' comment';
-
-            if (value > 1) {
-                suffix += 's';
-            }
-
-            return value + suffix;
+            const suffix = value > 1 ? 'comments' : 'comment';
+            return `${value} ${suffix}`;
         }
-    }
+
+    },
+
 }

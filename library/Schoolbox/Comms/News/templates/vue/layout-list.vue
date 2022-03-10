@@ -39,29 +39,27 @@
         <li class="actions-small-1" v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
             <div class="list-item">
                 <div class="small-12 card wrap-down">
-                    <template>
-                        <template v-if="article.featureImage">
+                    <template v-if="article.featureImage">
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                            <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail" alt="feature image">
+                            <img v-else :src="article.featureImage._links.image.href + '&size=constrain200'" alt="feature image">
+                        </a>
+                    </template>
+                    <template v-else-if="fallbackImage === 'author'">
+                        <div v-if="!isCompactMode" class="card-feature-avatar">
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail">
-                                <img v-else :src="article.featureImage._links.image.href + '&size=constrain200'">
+                                <img :src="article.author._links.avatar.href + '&size=square64'" alt="feature image">
                             </a>
-                        </template>
-                        <template v-else-if="fallbackImage === 'author'">
-                            <div v-if="!isCompactMode" class="card-feature-avatar">
-                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                    <img :src="article.author._links.avatar.href + '&size=square64'">
-                                </a>
-                            </div>
-                            <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail">
-                            </a>
-                        </template>
-                        <template v-else-if="fallbackImage === 'school-logo'">
-                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail">
-                                <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'">
-                            </a>
-                        </template>
+                        </div>
+                        <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                            <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail" alt="feature image">
+                        </a>
+                    </template>
+                    <template v-else-if="fallbackImage === 'school-logo'">
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                            <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail" alt="feature image">
+                            <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'" alt="feature image">
+                        </a>
                     </template>
                     <h3>
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a>
@@ -85,7 +83,7 @@
                         </template>
                         </span>
                             <span v-if="article.metadata && article.metadata.commentCount > 0">
-                        | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
+                        | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ formatCommentCountMeta(article.metadata.commentCount) }}</a>
                         </span>
 
                         <!-- Attachment Count -->

@@ -44,7 +44,7 @@ export default {
     data() {
         return {
             event: {},
-
+            isProcessing: false, //to disable on form submission to prevent rapid fire
             /* Vue Select
                 */
             options: [],
@@ -61,7 +61,7 @@ export default {
          * @return {boolean}
          */
         isFormSubmittable() {
-            return this.event.title && this.event.title.length !== 0;
+            return this.event.title && this.event.title.length !== 0 && !this.isProcessing;
         },
 
         /**
@@ -161,24 +161,30 @@ export default {
         }, 350),
 
 
-        /* Post the event creation form.
-            *
-            * TODO consider whether this should be in the base FullCalendar component
-            *
-            * @param form The form that's being submitted
-            */
-        createNewEvent(form) {
-            let self = this;
-            self.$refs.modal.close();
-            axios.request({
-                url:          form.action,
-                data:         this.window.jQuery(form).serialize(),
-                method:       form.method,
-                responseType: 'json',
-            }).then(function (response) {
-                // Add this event to the calendar
-                self.$emit(EVENT_CREATED, response.data);
-            });
+        /**
+         * Post the event creation form.
+         * 
+         * TODO consider whether this should be in the base FullCalendar component
+         * 
+         * @param form The form that's being submitted
+         * 
+         */
+        async createNewEvent (form) {
+            this.isProcessing = true;
+            this.$refs.modal.close();
+            try {
+                const response = await axios.request({
+                    url:          form.action,
+                    data:         $(form).serialize(),
+                    method:       form.method,
+                    responseType: 'json',
+                });
+                this.$emit(EVENT_CREATED, response.data);
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -188,7 +194,7 @@ export default {
             // TODO don't use jQuery form serialize
             this.window.location.href = this.eventCreateFormUrl
                 + '?returnUrl=' + btoa(window.location.pathname)
-                + '&' + this.window.jQuery(this.$refs.createEventForm).serialize();
+                + '&' + $(this.$refs.createEventForm).serialize();
         },
 
     },

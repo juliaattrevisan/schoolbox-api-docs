@@ -370,8 +370,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessing">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessing">Cancel</a></li>
+                <li><button @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessing">Delete</button></li>
+                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessing">Cancel</button></li>
             </ul>
         </reveal-modal>
     </div>

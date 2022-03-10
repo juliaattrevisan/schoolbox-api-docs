@@ -1,11 +1,11 @@
 <script>
     
-    import VuejsPaginate from 'vuejs-paginate';
+    import Paginate from 'vuejs-paginate-next';
     import { fetchAsJson } from '@js/fetch/fetch';
     
     export default {
         components: {
-            'paginate': VuejsPaginate
+            Paginate,
         },
         props: {
             pageNumber: Number, // The start page on the pagination
@@ -212,7 +212,7 @@
                         <div class="list-item">
                             <div class="small-12 card">
                                 <a v-if="article.featureImage" :href="article._links.self.href">
-                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                    <img :src="article.featureImage._links.image.href + '&size=square64'" alt="featured image">
                                 </a>
                                 <h3>
                                     <a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
