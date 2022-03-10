@@ -371,7 +371,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Modify particular fields
          * This is accessed when you tick Skip Unsubmitted in the Inline Grader
          */
-        if ($this->getRequest()->server['HTTP_X_HTTP_METHOD_OVERRIDE']) {
+        if ($this->getRequest()->server->get('HTTP_X_HTTP_METHOD_OVERRIDE')) {
             $this->patchUpdateAssessment($assessment);
 
             return;

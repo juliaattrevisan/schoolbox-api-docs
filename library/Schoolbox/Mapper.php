@@ -1056,7 +1056,7 @@ abstract class Mapper implements IMapper, Serializable
         $set_method  = $this->getSetMethodName($property);
         $map         = $this->map->getOffset($property);
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
-        $hydrator    = $map['hydrator'];
+        $hydrator    = $map['hydrator'] ?? null;
         if ($hydrator instanceof IColumnType) {
             $value = $hydrator->hydrate($value, $join_mapper);
             // Attempting to set a model value to NULL will likely break,
