@@ -826,7 +826,8 @@ class Profile implements IStrategy
                 'contact_details',
                 'employment_details',
                 'groups',
-                'roles'
+                'roles',
+                'identifiers',
             ])
         );
 
@@ -883,8 +884,15 @@ class Profile implements IStrategy
                 $positionTitle = trim((string)$staff['employment_details']['data']['role_text']);
                 $room = '';
                 $title = trim((string)$staff['contact_details']['data']['salutation']);
-                $username = trim((string)$staff['employment_details']['data']['staff_code']);
 
+                /* Potentially use a third fallback option:
+                 * $staff['employment_details']['data']['staff_code']
+                 */
+                $username = (new FirstMeaningfulValue())->find([
+                    $staff['identifiers']['data']['active_directory_username'],
+                    $staff['identifiers']['data']['username'],
+                ]);
+                
                 /* Find out if this externalId already has a staff profile
                  * If one already exists, load it, update it, then save it
                  * Otherwise make a new one for the given id
