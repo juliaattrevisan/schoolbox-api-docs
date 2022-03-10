@@ -190,14 +190,6 @@
                                 [year], [house]
                             </p>
 
-                            <script type="text/javascript">
-                                {% autoescape 'js' %}
-                                $(function () {
-                                    $('#templatePrivate').alaressEditor($.alaressEditorConfigWithUserTokens());
-                                });
-                                {% endautoescape %}
-                            </script>
-
                             <textarea id="templatePrivate"
                                       name="templatePrivate">{% if subtype %}{{ subtype.templatePrivate }}{% elseif type %}{{ type.templatePrivate }}{% endif %}</textarea>
                         </div>
