@@ -38,8 +38,7 @@ abstract class AbstractCsvImporterFactory
      */
     public function build($fp, int $maxLevels, DueWorkModel $dueWork): CsvImporter
     {
-        $validCSV = new \Alaress\Csv\ValidCSV($fp);
-        $fp = $validCSV->skipBom();
+        $fp = (new \Alaress\Csv\ValidCSV($fp))->skipBom();
 
         $headerRow = $this->readCsvLine($fp, $maxLevels);
         if (!is_array($headerRow) || count($headerRow) < 3) {

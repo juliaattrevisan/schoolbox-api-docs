@@ -136,8 +136,7 @@ function processPost(WebRequest\Kernel $kernel, array $post): void
 function processDryRun(WebRequest\Kernel $kernel, int $yearLevel, int $year, int $semester, array $file)
 {
     $fp      = fopen($file['tmp_name'], 'rb');
-    $validCSV = new \Alaress\Csv\ValidCSV($fp);
-    $fp = $validCSV->skipBom();
+    $fp = (new \Alaress\Csv\ValidCSV($fp))->skipBom();
     $csvData = [];
     while ($row = fgetcsv($fp)) {
         $csvData[] = array_map('normalizeEncoding', $row);

@@ -89,8 +89,7 @@ class Bulk_Folder
         $this->templateID = $templateID;
         $this->rolePerms  = array_map('\intval', $rolePerms);
         $this->inherit    = $inherit;
-        $validCSV = new \Alaress\Csv\ValidCSV($file);
-        $this->fp         = $validCSV->skipBom();
+        $this->fp         = (new \Alaress\Csv\ValidCSV($file))->skipBom();
 
         // TODO inject dependencies
         $this->folderMapper         = Folder\Mapper::getInstance();
