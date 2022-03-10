@@ -54,9 +54,14 @@ class Profile implements IStrategy
     /**
      * Decide between teaching and non-teaching staff
      * This goes into sis_user_profile_staff.category
+     *
+     * These were originally used as values before we assigned
+     * the role_code csv instead.  The role_code csv isn't
+     * guaranteed to be populated, so you might have to fall
+     * back to this previous implementation
      */
-    private const EMPLOYEE = 'employee';
-    private const TEACHER = 'teacher';
+//    private const EMPLOYEE = 'employee';
+//    private const TEACHER = 'teacher';
 
 
     /**
