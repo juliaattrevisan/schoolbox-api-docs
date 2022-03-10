@@ -271,7 +271,7 @@ class Profile implements IStrategy
                 /* Alerts
                  */
                 $comments = $this->findComments();
-                $legal    = $this->findLegal();
+                $legal    = $this->findLegal($student['extended_details']);
                 $medical  = $this->findMedicalAlert($student['medical_conditions']);
                 $messages = '';
 
@@ -615,12 +615,18 @@ class Profile implements IStrategy
     /**
      * Find legal alerts
      *
+     * @param array $extendedDetails
      * @return string|null
      */
-    private function findLegal(): ?string
+    private function findLegal(array $extendedDetails): ?string
     {
-        /* TODO Fill in these legal alert vars
+        /* Somewhere in Extended Details, there's a thing
+         * custody_alert, custody_details
          */
+        if (isset($extendedDetails['custody_alert']) && $extendedDetails['custody_alert']) {
+            return $extendedDetails['custody_details'];
+        }
+
         return null;
     }
 
