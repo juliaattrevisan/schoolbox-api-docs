@@ -94,4 +94,7 @@ MAILTO="support@schoolbox.com.au"
 # Intellischool Sync - every 30min
 4,34 * * * *	www-data	/usr/local/bin/jitter 600 php /usr/share/schoolbox/tools/intellischool/dataSync.php --force >> /var/log/schoolbox/intellischool.log 2>&1
 
+# Login Log Prune - 1st day of month, 2am
+3 2 1 * * www-data php /usr/share/schoolbox/tools/schema/loginlog.php --perform
+
 # End of file - do not delete
