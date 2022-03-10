@@ -253,8 +253,8 @@ class Profile implements IStrategy
                  * https://docs.wonde.com/docs/api/sync#student-identifiers-object
                  */
                 $username = (new FirstMeaningfulValue())->find([
-                    $student['identifiers']['data']['username'] ?? null,
-                    $student['identifiers']['data']['active_directory_username'] ?? null,
+                    $student['identifiers']['data']['username'],
+                    $student['identifiers']['data']['active_directory_username'],
                     $externalId
                 ]);
 
