@@ -1,4 +1,9 @@
 module.exports = {
+  stories: [
+    '../stories/**/*.stories.mdx',
+    '../stories/**/*.stories.@(js|jsx|ts|tsx)',
+    '../vue/components/**/*.stories.@(js|jsx|ts|tsx)',
+  ],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials'
@@ -9,9 +14,5 @@ module.exports = {
   features: {
     postcss: false,
   },
-  stories: [
-    '../stories/**/*.stories.mdx',
-    '../stories/**/*.stories.@(js|jsx|ts|tsx)',
-    '../vue/components/**/*.stories.@(js|jsx|ts|tsx)',
-  ],
+  framework: '@storybook/vue3'
 }
