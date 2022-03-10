@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Wonde\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
+use DateTimeZone;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -209,7 +210,16 @@ class Profile implements IStrategy
                 $boardingStatus = false;
                 $campusName     = '';
 
-                $dob  = $this->findDate((string)$student['date_of_birth']['date']);
+                /* Dig out a date of birth if it was set properly
+                 */
+                $dob = null;
+
+                if (isset($student['date_of_birth']['date'])) {
+                    $dob = $this->findDate(
+                        (string)$student['date_of_birth']['date'],
+                        (string)$student['date_of_birth']['timezone']
+                    );
+                }
 
                 /* Work Email takes precedence since that's typically their school email
                  * Then Email, I guess
@@ -252,9 +262,6 @@ class Profile implements IStrategy
                  */
                 $yearLevel = trim((string)($student['year']['data']['name'] ?? ''));
 
-                $enrolmentDate = $this->findDate((string)$student['education_details']['data']['admission_date']);
-                $leavingDate   = $this->findDate((string)$student['education_details']['data']['leaving_date']);
-
                 /* Flags
                  */
                 $esl = (bool)$student['extended_details']['data']['english_as_additional_language'];
@@ -292,10 +299,25 @@ class Profile implements IStrategy
                  */
                 $yearLevelCoordinator = $this->findYearLevelCoordinator();
 
-                /* Dates
+                /* Haven't seen any data for these fields yet, but take a guess anyway
                  */
-                $enrolment = $this->findDate($enrolmentDate);
-                $leaving   = $this->findDate($leavingDate);
+                $enrolmentDate = null;
+
+                if (isset($student['education_details']['data']['admission_date']['date'])) {
+                    $enrolmentDate = $this->findDate(
+                        (string)$student['education_details']['data']['admission_date']['date'],
+                        (string)$student['education_details']['data']['admission_date']['timezone']
+                    );
+                }
+
+                $leavingDate = null;
+
+                if (isset($student['education_details']['data']['leaving_date']['date'])) {
+                    $enrolmentDate = $this->findDate(
+                        (string)$student['education_details']['data']['leaving_date']['date'],
+                        (string)$student['education_details']['data']['leaving_date']['timezone']
+                    );
+                }
 
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
@@ -344,7 +366,7 @@ class Profile implements IStrategy
                     ->setAlertMessage($messages)
                     ->setCampusName($campusName)
                     ->setEmail($email)
-                    ->setEnrolmentDate($enrolment)
+                    ->setEnrolmentDate($enrolmentDate)
                     ->setFormName($form)
                     ->setFormTeacherId($formTeacher['id'])
                     ->setFormTeacherName($formTeacher['name'])
@@ -352,7 +374,7 @@ class Profile implements IStrategy
                     ->setHeadOfHouseId($housemaster['id'])
                     ->setHeadOfHouseName($housemaster['name'])
                     ->setHouseName($academicHouse)
-                    ->setLeavingDate($leaving)
+                    ->setLeavingDate($leavingDate)
                     ->setMobile($mobile)
                     ->setStudiesCode($studiesCode)
                     ->setTutorGroup($tutorGroup)
@@ -457,13 +479,23 @@ class Profile implements IStrategy
     /**
      * Convert a date from possibly null/empty value
      *
-     * @param string|null $date
+     * @param string $date
+     * @param string $timezone
      * @return Alaress_Date_Format|null
      */
-    public function findDate(?string $date): ?Alaress_Date_Format
+    public function findDate(string $date, string $timezone): ?Alaress_Date_Format
     {
         if ($date) {
-            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
+            $datePart = explode('.', $date)[0];
+
+            /* You can pass $timezone as empty string if you don't want to use a timezone
+             * Wonde dates are typically going to come with date and timezone
+             */
+            if ($timezone) {
+                return Alaress_Date_Format::newDatabaseDate($datePart, new DateTimeZone($timezone));
+            }
+
+            return Alaress_Date_Format::newDatabaseDate($datePart);
         }
 
         return null;
