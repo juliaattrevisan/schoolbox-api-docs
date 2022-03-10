@@ -59,6 +59,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Departments are a kind of Wonde Group
+     */
+    private const STAFF_DEPARTMENT_TYPE = 'DEPARTMENT';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -787,6 +793,7 @@ class Profile implements IStrategy
             implode(',', [
                 'contact_details',
                 'employment_details',
+                'groups',
                 'roles'
             ])
         );
@@ -826,11 +833,9 @@ class Profile implements IStrategy
                     $category = self::TEACHER;
                 }
 
-                /* FIXME Controversial - node "service_term" suggests conceptual equivalence to Department
-                 *  but it meant having to find out about their salaries and stuff. There isn't a Salary
-                 *  object in the Permissions screen, so maybe it comes under Contracts > Salary somehow
+                /* Departments are a kind of Wonde Group
                  */
-                $department = '';
+                $department = $this->findGroupName($staff['groups'], self::STAFF_DEPARTMENT_TYPE);
 
                 /* Follows the same precedence scheme as student emails
                  */
@@ -918,5 +923,26 @@ class Profile implements IStrategy
         /* Diagnose the lookup
          * print_r($seenRoleCodes);
          */
+    }
+
+
+    /**
+     * Find the name of a Wonde Group, corresponding to a given $groupType
+     *
+     * (Departments are a kind of Wonde Group, for example)
+     *
+     * @param array  $groups
+     * @param string $groupType
+     * @return string|null
+     */
+    private function findGroupName(array $groups, string $groupType): ?string
+    {
+        foreach ($groups['data'] as $group) {
+            if ($groupType === $group['type']) {
+                return $group['name'];
+            }
+        }
+
+        return null;
     }
 }
