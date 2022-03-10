@@ -372,6 +372,7 @@ class Controller extends Base
                 $this->auth->createSession($user->getUsername(), $token);
                 return $user;
             }
+            throw new SchoolboxNotFoundException();
         }
 
         // TODO DI this once it starts being used in multiple places
