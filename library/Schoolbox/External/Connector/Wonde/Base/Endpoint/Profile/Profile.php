@@ -791,8 +791,6 @@ class Profile implements IStrategy
             ])
         );
 
-        $now = \Alaress_Date_Format::now();
-
         /* Collate a list of staff role codes for debug
          * Can't tell if this is a configurable lookup
          *
@@ -801,56 +799,20 @@ class Profile implements IStrategy
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
             $staffs = $this->api->retrieve('GET', $nextUrl, []);
 
+            /* Wonde apparently only gives us active current staff so we don't need to
+             * do much to filter out this result set:
+             *
+             * From Colin 8/3/22
+             * Wonde will only provide the active staff at the school. The only consideration needed
+             * is to periodically check if what you have stored is still present in the Wonde API
+             * calls and if not remove them.
+             */
             foreach ($staffs['data'] as $staff) {
                 $externalId = trim((string)$staff['mis_id']);
                 $firstname = trim((string)$staff['forename']);
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
                 $campusName = '';
-
-                /* Check their employment dates and skip them if we perhaps should
-                 */
-                $employmentStart = $this->findDate($staff['employment_details']['data']['employment_start_date']['date'] ?? null);
-                $employmentEnd = $this->findDate($staff['employment_details']['data']['employment_end_date']['date'] ?? null);
-
-                /* Unknown start date? skip
-                 */
-                if (null === $employmentStart) {
-                    $this->log->debug(sprintf(
-                        'Staff %s %s (%s) has null employment start; skipping',
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    continue;
-                }
-
-                /* Not employed yet? skip
-                 */
-                if ($now->lt($employmentStart)) {
-                    $this->log->debug(sprintf(
-                        'Staff %s %s (%s) employment has not commenced yet; skipping',
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    continue;
-                }
-
-                /* Employment ended? skip
-                 */
-                if (null !== $employmentEnd && $now->gt($employmentEnd)) {
-                    $this->log->debug(sprintf(
-                        'Staff %s %s (%s) employment has concluded; skipping',
-                        $firstname,
-                        $lastname,
-                        $externalId
-                    ));
-
-                    continue;
-                }
 
                 /* employment_details has the nodes containing booleans: [current, teaching_staff]
                  * to infer teaching vs non-teaching staff, but you need to turn on the permission
