@@ -23,6 +23,17 @@ class HomepageInitialCest
     public $resourcesPageUrl;
 
     /**
+     * Deleting news article when the test is completed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function _after(AcceptanceTester $i): void
+    {
+        // updating delete_at for the news article so it does not impact the news tests
+        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title' => "Test News Title"]);
+    }
+
+    /**
      * @param AcceptanceTester $i
      */
     public function createHomepageFail(AcceptanceTester $i): void

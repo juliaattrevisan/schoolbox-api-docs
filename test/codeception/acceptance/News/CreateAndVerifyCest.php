@@ -40,6 +40,19 @@ class CreateAndVerifyCest
      * ** in the article view, its article matches what I entered
      * ** when I modify it, everything I submitted is there
      *
+
+    /**
+     * Deleting news article when the test is completed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function _after(AcceptanceTester $i): void
+    {
+        // updating delete_at for the news article so it does not impact the news tests
+        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title' => "Random Headline"]);
+    }
+
+    /**
      * @param AcceptanceTester $i
      * @param Form             $formPage
      * @param Index            $indexPage
@@ -47,6 +60,7 @@ class CreateAndVerifyCest
      */
     public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
     {
+        $i->logout();
         $i->login('alaress', 'alaress');
         $i->amOnPage($formPage->generateCreateRoute());
 
