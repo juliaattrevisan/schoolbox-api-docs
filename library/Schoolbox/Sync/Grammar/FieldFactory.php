@@ -63,7 +63,7 @@ class FieldFactory
             case Role::STUDENT:
                 $augment = [
                     'year.level'         => 'Year Level',
-                    'form.level'         => 'Form Level',
+                    'form.description'   => 'Form Name',
                     'house.code'         => 'House Code',
                     'boardingHouse.code' => 'Boarding House Code',
                     'boardingStatus'     => 'Boarding Status',
@@ -74,6 +74,7 @@ class FieldFactory
                 $augment = [
                     'type'                     => 'Contact Type',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
+                    'students[].form.description' => 'Student Form Name',
                     'students[].year.level'    => 'Student Year',
                     'students[].house.code'    => 'Student House Code(s)',
                     'students[].gender'        => 'Student Gender',

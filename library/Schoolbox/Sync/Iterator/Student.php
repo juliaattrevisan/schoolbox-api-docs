@@ -55,6 +55,7 @@ class Student extends IteratorIterator
             ->setGender($currentResult['student_gender']);
 
         $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description']);
+        $student->getForm()->setDescription($currentResult['student_form_description']);
 
         $student->getHouse()->setCode($currentResult['student_house']);
 

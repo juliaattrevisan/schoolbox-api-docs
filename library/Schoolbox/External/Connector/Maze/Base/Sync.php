@@ -34,6 +34,7 @@ class Sync extends Base implements ISync
                 NULL       AS student_work_email,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                            AS student_year_level,
+                NULL       AS student_form_description,
                 HOUSE      AS student_house,
                 BOARDER    AS student_boarder,
                 NULL       AS student_boarding_house,
@@ -66,6 +67,7 @@ class Sync extends Base implements ISync
                 ST.STKEY      AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                               AS student_year_level,
+                NULL          AS student_form_description,
                 ST.CAMPUS     AS student_campus,
                 ST.HOUSE      AS student_house,
                 ST.FIRST_NAME AS student_preferred,
@@ -89,6 +91,7 @@ class Sync extends Base implements ISync
                 ST.STKEY       AS student_id,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                                AS student_year_level,
+                NULL           AS student_form_description,
                 ST.CAMPUS      AS student_campus,
                 ST.HOUSE       AS student_house,
                 ST.FIRST_NAME  AS student_preferred,
@@ -129,7 +132,7 @@ class Sync extends Base implements ISync
                 ''         AS staff_year_level,
                 ''         AS staff_year_level_description,
                 ''         AS staff_position_code,
-                ''         AS staff_position                
+                ''         AS staff_position
             FROM SF
             WHERE FINISH IS NULL
             AND STAFF_TYPE != 'L'

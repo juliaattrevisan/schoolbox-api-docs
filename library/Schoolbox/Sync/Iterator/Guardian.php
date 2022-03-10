@@ -94,6 +94,7 @@ class Guardian extends IteratorIterator
             ;
 
             $student->getYear()->setLevel($row['student_year_level']);
+            $student->getForm()->setDescription($row['student_form_description']);
 
             /* Campus
              */

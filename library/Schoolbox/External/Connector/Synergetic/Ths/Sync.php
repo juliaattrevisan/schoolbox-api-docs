@@ -20,7 +20,7 @@ class Sync extends BaseSync
     public function findAllStudents()
     {
         $studentIterator = $this->databaseExternal->getQueryIterator("
-            
+
             SELECT          uvStudents.StudentID                           AS student_id,
                             NetworkLogin                                  AS network_login,
                             uvStudents.StudentTitle                        AS student_title,
@@ -29,21 +29,22 @@ class Sync extends BaseSync
                             uvStudents.StudentSurname                      AS student_surname,
                             StudentGender                                 AS student_gender,
                             StudentEmail                                  AS student_home_email,
-                            
-                            CASE 
-                                WHEN Community.DefaultEmailCode = 'O' THEN Community.OccupEmail 
-                                ELSE Community.Email 
+
+                            CASE
+                                WHEN Community.DefaultEmailCode = 'O' THEN Community.OccupEmail
+                                ELSE Community.Email
                             END AS student_default_email,
-                            
+
                             StudentOccupEmail                             AS student_work_email,
                             uvStudents.StudentYearLevel                    AS student_year_level,
+                            ''                                             AS student_form_description,
                             uvStudents.StudentHouse                        AS student_house,
                             uvStudents.StudentBoarder                      AS student_boarder,
                             uvStudents.StudentBoardingHouse                AS student_boarding_house,
                             StudentCampus                                 AS student_campus
             FROM            dbo.uvStudents uvStudents
             LEFT JOIN       Community ON Community.ID = StudentID
-            WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND 
+            WHERE           FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
             ORDER BY        uvStudents.StudentID ASC
         ");

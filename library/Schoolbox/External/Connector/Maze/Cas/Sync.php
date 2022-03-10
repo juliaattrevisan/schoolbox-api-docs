@@ -33,6 +33,7 @@ class Sync extends BaseSync
                 NULL       AS student_work_email,
                 REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')
                            AS student_year_level,
+                NULL       AS student_form_description,
                 HOUSE      AS student_house,
                 BOARDER    AS student_boarder,
                 NULL       AS student_boarding_house,
