@@ -854,17 +854,16 @@ class Profile implements IStrategy
                 $building = '';
                 $campusName = '';
 
-                /* employment_details has the nodes containing booleans: [current, teaching_staff]
-                 * to infer teaching vs non-teaching staff, but you need to turn on the permission
-                 * to read that value (otherwise it will always be null/empty/false)
+                /* This is a csv of role_codes found in the roles array here
+                 * It used to check [current, teaching_staff] nodes to infer
+                 * whether someone was teaching vs non-teaching staff so if
+                 * you need to resurrect that idea, check previous commit
+                 * to this one
+                 *
+                 * $category manifests as meta.category.type in code
+                 * which corresponds to Category Type in the UPS ui
                  */
-                $category = self::EMPLOYEE;
-
-                /* All staff are Employees unless proven otherwise
-                 */
-                if ($staff['employment_details']['data']['teaching_staff']) {
-                    $category = self::TEACHER;
-                }
+                $category = $this->findRoleCodes($staff['roles']);
 
                 /* Departments are a kind of Wonde Group
                  */
@@ -963,6 +962,44 @@ class Profile implements IStrategy
         /* Diagnose the lookup
          * print_r($seenRoleCodes);
          */
+    }
+
+
+    /**
+     * Takes an array of roles, collects all their role_code values and returns them as a csv
+     * The csv will be trimmed, deduped, stringified, sorted
+     *
+     * UPS will then need to take this collapsed set of values and work its magic on them
+     *
+     * @param array $roles
+     * @return string
+     */
+    private function findRoleCodes(array $roles): string
+    {
+        $stack = [];
+
+        foreach ($roles['data'] as $role) {
+            $val = trim((string)$role['role_code']);
+
+            $stack[$val] = $val;
+        }
+
+        /* Ditch the keys
+         */
+        $stack = array_values($stack);
+
+        /* Filter out all the empty strings, null values
+         * Use a custom callback so 0 is a valid outcome
+         */
+        $stack = array_filter($stack, static function ($val) {
+            return '' !== $val;
+        });
+
+        /* That was a partial reimplementation of FirstMeaningfulValue
+         */
+        sort($stack);
+
+        return implode(', ', $stack);
     }
 
 
