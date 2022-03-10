@@ -449,7 +449,7 @@ class Reader implements \Iterator
     {
         if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
-            unset($this->fp);
+            $this->fp = null;
         }
         $this->currentKey = 0;
         $this->currentRow = array();
