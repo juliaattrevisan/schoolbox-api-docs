@@ -339,32 +339,40 @@ class Controller extends Base
         // Attempt to use Schoolbox's JWT decoder.
         // If that fails, use the configured oAuth provider's decoder instead.
         // TODO combine decoding of Schoolbox JWTs and oAuth provider JWTs into one class
-        $claims = $this->tokenValidator->decode($jwt);
-        $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
-        $token  = null;
-        if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI]) && $this->tokenValidator->issuedBySchoolbox($claims)) {
-            // if issued by schoolbox and jti is provided, validate the jti
-            try {
-                /** @var User\Token\Model $token */
-                $token = $this->tokenMapper->findOneByColumnList(
-                    [
-                        'user_id' => $user->getId(),
-                        'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
-                    ]
-                );
-                if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
-                    throw new JWT\ExpiredException();
-                }
-            } catch (MapperException $e) {
-                // could not find a token with user id and jwt id
-                throw new JWT\SignatureInvalidException($e);
-            }
+        $claims = null;
+        try {
+            $claims = $this->tokenValidator->decode($jwt);
+        } catch (\Throwable $e) {
+            // noop: try the oAuth provider's JWT instead
         }
 
-        if ($user) {
-            // TODO this used to remember the authenticated user: should it?
-            $this->auth->createSession($user->getUsername(), $token);
-            return $user;
+        if (isset($claims)) {
+            $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
+            $token  = null;
+            if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI]) && $this->tokenValidator->issuedBySchoolbox($claims)) {
+                // if issued by schoolbox and jti is provided, validate the jti
+                try {
+                    /** @var User\Token\Model $token */
+                    $token = $this->tokenMapper->findOneByColumnList(
+                        [
+                            'user_id' => $user->getId(),
+                            'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
+                        ]
+                    );
+                    if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
+                        throw new JWT\ExpiredException();
+                    }
+                } catch (MapperException $e) {
+                    // could not find a token with user id and jwt id
+                    throw new JWT\SignatureInvalidException($e);
+                }
+            }
+            if ($user) {
+                // TODO this used to remember the authenticated user: should it?
+                $this->auth->createSession($user->getUsername(), $token);
+                return $user;
+            }
+            throw new SchoolboxNotFoundException();
         }
 
         // TODO DI this once it starts being used in multiple places
