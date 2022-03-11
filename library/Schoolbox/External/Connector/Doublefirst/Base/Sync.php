@@ -42,6 +42,7 @@ class Sync extends Base implements ISync
                 p.EmailID                           AS student_default_email,
                 ''                                  AS student_work_email,
                 YearGroup                           AS student_year_level,
+                Form                                AS student_form_description,
                 House                               AS student_house_description,
                 HouseID                             AS student_house,
                 0                                   AS student_boarder,
@@ -81,6 +82,7 @@ class Sync extends Base implements ISync
                         p.ForeName                  AS student_preferred,
                         p.Surname                   AS student_surname,
                         p.YearGroupID               AS student_year_level,
+                        p.Form                      AS student_form_description,
                         p.YearGroup                 as student_year_level_description
             FROM        VLPupilContact              pc
             LEFT JOIN   VLContact                   c on c.ContactID = pc.ContactID

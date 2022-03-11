@@ -35,6 +35,7 @@ class Sync extends Base implements ISync
                 s.Email       AS student_default_email,
                 ''            AS student_work_email,
                 s.Year        AS student_year_level,
+                ''            AS student_form_description,
                 s.House       AS student_house,
                 ''            AS student_boarder,
                 s.BoarderType AS student_boarding_house,
@@ -71,6 +72,7 @@ class Sync extends Base implements ISync
                 ''          AS student_contact_work_email,
                 s.Code      AS student_id,
                 s.Year      AS student_year_level,
+                ''          AS student_form_description,
                 s.CampusID  AS student_campus,
                 s.House     AS student_house,
                 s.Sex       AS student_gender,
@@ -119,7 +121,7 @@ class Sync extends Base implements ISync
                 ''          AS staff_department,
                 ''          AS staff_year_level,
                 ''          AS staff_year_level_description,
-                ''          AS staff_position_code,                
+                ''          AS staff_position_code,
                 ''          AS staff_position
             FROM Staff t
             WHERE t.DateLeft IS NULL

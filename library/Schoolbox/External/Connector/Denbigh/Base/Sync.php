@@ -34,6 +34,7 @@ class Sync extends Base implements ISync
                 email          AS student_default_email,
                 ''             AS student_work_email,
                 academicYear   AS student_year_level,
+                ''             AS student_form_description,
                 house          AS student_house,
                 boardingStatus AS student_boarder,
                 cateringHouse  AS student_boarding_house,
@@ -65,6 +66,7 @@ class Sync extends Base implements ISync
                 ''               AS student_contact_work_email,
                 s.denbighID      AS student_id,
                 s.academicYear   AS student_year_level,
+                ''               AS student_form_description,
                 ''               AS student_campus,
                 s.house          AS student_house,
                 ''               AS student_gender,
@@ -109,7 +111,7 @@ class Sync extends Base implements ISync
                 ''               AS staff_year_level,
                 ''               AS staff_year_level_description,
                 ''               AS staff_position_code,
-                ''               AS staff_position   
+                ''               AS staff_position
             FROM Staff s
             JOIN People p ON s.peopleDenbighID = p.denbighID
         ";

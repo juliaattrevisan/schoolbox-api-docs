@@ -47,6 +47,7 @@ class Sync extends Base implements ISync
                 StudentEmail             AS student_default_email,
                 ''                       AS student_work_email,
                 Grade                    AS student_year_level,
+                ''                       AS student_form_description,
                 ''                       AS student_house_description,
                 ''                       AS student_house,
                 0                        AS student_boarder,
@@ -66,7 +67,7 @@ class Sync extends Base implements ISync
     {
         $query =
         "
-            SELECT DISTINCT 
+            SELECT DISTINCT
                         V_Parent.Username               AS student_contact_network_login,
                         ParentID                        AS student_contact_id,
                         V_Parent.Title                  AS student_contact_title,
@@ -76,14 +77,15 @@ class Sync extends Base implements ISync
                         PersonalEmail                   AS student_contact_home_email,
                         CISEmail                        AS student_contact_default_email,
                         ''                              AS student_contact_work_email,
-                        V_Student.campus                AS student_campus,                        
+                        V_Student.campus                AS student_campus,
                         ''                              AS student_campus,
                         ''                              AS student_house,
                         ''                              AS student_gender,
                         V_Student.StudentFirstname      AS student_preferred,
                         V_Student.StudentSurname        AS student_surname,
                         V_Student.Grade                 AS student_year_level,
-                        V_Student.Grade                 AS student_year_level_description            
+                        V_Student.Grade                 AS student_year_level_description,
+                        ''                              AS student_form_description
             FROM        V_Parent
             JOIN        V_Student ON V_Student.StudentID = V_Parent.StudentID
             WHERE       V_Parent.Relationship IN ('Caregiver', 'Father', 'Guardian', 'Legal Guardian', 'Mother', 'Primary Contact', 'Stepfather', 'Stepmother')
@@ -117,7 +119,7 @@ class Sync extends Base implements ISync
                         ''                                  AS staff_position,
                         ''                                  AS staff_department,
                         ''                                  AS staff_year_level,
-                        ''                                  AS staff_year_level_description                
+                        ''                                  AS staff_year_level_description
             FROM        V_Staff
             LEFT JOIN   V_StaffDirectory ON V_StaffDirectory.StaffID = V_Staff.StaffID
             ORDER BY    V_Staff.StaffID

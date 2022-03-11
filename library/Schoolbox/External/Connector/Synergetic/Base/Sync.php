@@ -59,7 +59,8 @@ class Sync extends Base implements ISync
      */
     public function findAllStudents()
     {
-        $studentIterator = $this->databaseExternal->getQueryIterator("
+        $studentIterator = $this->databaseExternal->getQueryIterator(
+            "
 
             SELECT          vStudentsAll.StudentID                           AS student_id,
                             NetworkLogin                                  AS network_login,
@@ -76,7 +77,11 @@ class Sync extends Base implements ISync
                             END AS student_default_email,
 
                             StudentOccupEmail                             AS student_work_email,
-                            vStudentsAll.StudentYearLevel                    AS student_year_level,
+                            vStudentsAll.StudentYearLevel                 AS student_year_level,
+                            CASE
+                                WHEN vStudentsAll.StudentForm = '' OR vStudentsAll.StudentForm IS NULL THEN ''
+                                ELSE vStudentsAll.StudentFormDescription
+                            END AS student_form_description,
                             vStudentsAll.StudentHouse                        AS student_house,
                             vStudentsAll.StudentBoarder                      AS student_boarder,
                             vStudentsAll.StudentBoardingHouse                AS student_boarding_house,
@@ -88,7 +93,8 @@ class Sync extends Base implements ISync
                             NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING')
 			                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
             ORDER BY        vStudentsAll.StudentID ASC
-        ");
+        "
+        );
 
         return new Iterator\Student($studentIterator);
     }
@@ -132,6 +138,10 @@ class Sync extends Base implements ISync
                             s.StudentContactType                          AS student_contact_type,
                             s.StudentId                                   AS student_id,
                             s.StudentYearLevel                            AS student_year_level,
+                            CASE
+                                WHEN s.StudentForm = '' OR s.StudentForm IS NULL THEN ''
+                                ELSE s.StudentFormDescription
+                            END AS student_form_description,
                             s.StudentCampus                               AS student_campus,
                             s.StudentHouse                                AS student_house,
                             s.StudentGender                               AS student_gender,
@@ -159,6 +169,10 @@ class Sync extends Base implements ISync
                             s.StudentContactType                          AS student_contact_type,
                             s.StudentId                                   AS student_id,
                             s.StudentYearLevel                            AS student_year_level,
+                            CASE
+                                WHEN s.StudentForm = '' OR s.StudentForm IS NULL THEN ''
+                                ELSE s.StudentFormDescription
+                            END AS student_form_description,
                             s.StudentCampus                               AS student_campus,
                             s.StudentHouse                                AS student_house,
                             s.StudentGender                               AS student_gender,

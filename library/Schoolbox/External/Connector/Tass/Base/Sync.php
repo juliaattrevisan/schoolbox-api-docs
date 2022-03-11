@@ -64,6 +64,7 @@ class Sync extends Base implements ISync
                     s.e_mail         AS student_default_email,
                     ''               AS student_work_email,
                     s.year_grp       AS student_year_level,
+                    ''               AS student_form_description,
                     s.house          AS student_house,
                     CASE
                         WHEN (sb.resid_code) IS NOT NULL THEN 'Y'
@@ -190,6 +191,7 @@ class Sync extends Base implements ISync
                     RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
                     s.year_grp       AS student_year_level,
+                    ''               AS student_form_description,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,
@@ -233,6 +235,7 @@ class Sync extends Base implements ISync
                     RTRIM(pa.e_mail) AS student_contact_default_email,
                     ''               AS student_contact_work_email,
                     s.year_grp       AS student_year_level,
+                    ''               AS student_form_description,
                     s.campus_code    AS student_campus,
                     s.house          AS student_house,
                     s.sex            AS student_gender,

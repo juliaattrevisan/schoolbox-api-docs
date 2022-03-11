@@ -113,6 +113,7 @@ class Sync extends BaseSync implements ISync
                     ''                       AS student_contact_work_email,
                     pa.add_num               AS student_contact_type,
                     s.year_grp               AS student_year_level,
+                    ''                       AS student_form_description,
                     s.campus_code            AS student_campus,
                     s.house                  AS student_house,
                     s.sex                    AS student_gender,
