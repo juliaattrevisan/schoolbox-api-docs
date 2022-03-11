@@ -36,6 +36,7 @@ class ParticipantCest
      */
     public function _before(AcceptanceTester $i)
     {
+        $i->logout();
         $i->loginAsAdmin();
         //adding a due work component into the homepage
         $i->amOnPage('/homepage/106');
