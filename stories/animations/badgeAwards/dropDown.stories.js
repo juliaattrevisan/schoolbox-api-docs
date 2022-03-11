@@ -14,7 +14,6 @@ export default {
 };
 
 const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
     components: { DropDown },
     template:
         `
