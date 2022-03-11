@@ -8,7 +8,7 @@ WHERE source_name IN (
 	'ParentNotices',
 	'TeacherNotices',
 	'StudentNotices'
-)
+);
 
 UPDATE event_source
 SET deleted_at = NOW()
@@ -19,4 +19,4 @@ WHERE source_name IN (
 	'ParentNotices',
 	'TeacherNotices',
 	'StudentNotices'
- )
+);
