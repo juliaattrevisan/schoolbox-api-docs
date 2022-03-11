@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\User;
 
+use Alaress\Database\Predicate\Bindings;
 use Alaress\Database\Predicate\Builder;
 use PDOException;
 use Schoolbox\Collection;
@@ -153,6 +154,7 @@ class BulkUpdater
      * @param int            $hideTimetable
      * @param string         $position
      * @param int            $displayGradeGraph
+     * @param int            $revokeToken
      */
     public function __construct(
         User $sessionUser,
@@ -271,8 +273,6 @@ class BulkUpdater
 
         if (\count($statements['token']['update']['params'])) {
             $statements['token']['update']['statement']->execute($statements['token']['update']['params']);
-            $updated = true;
-
             /* Log the users we brutally updated en-masse
              */
             foreach ($statements['token']['update']['params'] as $key => $userId) {
@@ -531,12 +531,22 @@ class BulkUpdater
         }
 
         if ($this->revokeToken === 1) {
-            $statements['token']['update']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
-                "UPDATE user_jwt_id SET deleted_at = now(), deleted_by = :userId
-                 WHERE user_id IN ({$bindings->getPlaceholder()})
-                   AND deleted_at IS NULL"
+            $toDelete        = $this->userBulkMapper->getDatabase()->query(
+                "SELECT user_id FROM user_jwt_id WHERE  user_id IN ({$bindings->getPlaceholder()}) AND deleted_at IS NULL",
+                $bindings->getParams()
             );
-            $statements['token']['update']['params']    = array_merge(['userId' => $this->sessionUser->getId()], $bindings->getParams());
+            $deletingUserIds = $toDelete->fetchAll(\PDO::FETCH_COLUMN);
+
+            if ($deletingUserIds) {
+                $revokeTokenBindings = Builder::getBindings($deletingUserIds, 'rvu');
+
+                $statements['token']['update']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                    "UPDATE user_jwt_id SET deleted_at = now(), deleted_by = :userId
+                     WHERE user_id IN ({$revokeTokenBindings->getPlaceholder()})
+                       AND deleted_at IS NULL"
+                );
+                $statements['token']['update']['params']    = array_merge(['userId' => $this->sessionUser->getId()], $revokeTokenBindings->getParams());
+            }
         }
 
         return $statements;
