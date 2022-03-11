@@ -319,7 +319,7 @@ class Factory
                 $this->roleMapper,
                 $this->personalRelationshipMapper,
                 $this->folderRelationshipMapper,
-               self::SOURCE_NAME,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
@@ -336,7 +336,7 @@ class Factory
                 $this->roleMapper,
                 $this->personalRelationshipMapper,
                 $this->folderRelationshipMapper,
-               self::SOURCE_NAME,
+                self::SOURCE_NAME,
                 $registry,
                 $from,
                 $to
