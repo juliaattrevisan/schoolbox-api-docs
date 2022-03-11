@@ -443,9 +443,12 @@ class Base
                  *
                  * I know it's a db-in-a-loop, but need to be surgical
                  * cos there's some busted data out in the wild
+                 *
+                 * SA-13403 explains why, but this deletion may be too heavy-handed.
+                 * Nobody is meant to edit the events to change their settings, but they could.
                  */
-                $this->personalRelationshipMapper->deleteByColumn('event_id', $event->getId());
-                $this->folderRelationshipMapper->deleteByColumn('event_id', $event->getId());
+//                $this->personalRelationshipMapper->deleteByColumn('event_id', $event->getId());
+//                $this->folderRelationshipMapper->deleteByColumn('event_id', $event->getId());
 
                 $this->log->info(sprintf(
                     'Saved %s event "%s" with event_source.guid %s',
