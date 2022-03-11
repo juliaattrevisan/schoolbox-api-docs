@@ -127,7 +127,7 @@
                             <script type="text/javascript">
                                 {% autoescape 'js' %}
                                 $(function () {
-                                    $('#template').alaressEditor($.alaressEditorConfigWithUserTokens());
+                                    $('#formPastoral').alaressEditor($.alaressEditorConfigWithUserTokens());
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
@@ -189,14 +189,6 @@
                                 substituted with the students details on creation: [firstname], [surname], [fullname],
                                 [year], [house]
                             </p>
-
-                            <script type="text/javascript">
-                                {% autoescape 'js' %}
-                                $(function () {
-                                    $('#templatePrivate').alaressEditor($.alaressEditorConfigWithUserTokens());
-                                });
-                                {% endautoescape %}
-                            </script>
 
                             <textarea id="templatePrivate"
                                       name="templatePrivate">{% if subtype %}{{ subtype.templatePrivate }}{% elseif type %}{{ type.templatePrivate }}{% endif %}</textarea>
