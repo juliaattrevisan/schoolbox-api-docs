@@ -68,7 +68,7 @@ class LatestView
          * check if use is either that student or the parents, then save
          */
         if (
-            (null !== $user->getChildren() & $user->getChildren()->getBy('id', $participant->getId())) ||
+            (null !== $user->getChildren() && $user->getChildren()->getBy('id', $participant->getId())) ||
              $participant->getId() === $user->getId()
         ) {
             /**
