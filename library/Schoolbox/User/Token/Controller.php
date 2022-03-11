@@ -65,7 +65,7 @@ class Controller extends Base
         $showExisting = false;
         switch ($jwtIdToUse) {
             case 'new':
-                $userJwtId = $this->tokenMapper->generateForUser($user);
+                $userJwtId = $this->tokenMapper->generateForUser($user, $this->getUser());
                 $showExisting = true;
                 break;
             case 'existing':

@@ -59,29 +59,31 @@ class UserBulkMapper extends UserMapper
      * @param int      $searchRole
      * @param string   $searchEportfolio
      * @param int|null $searchYear
-     * @return \Schoolbox\Collection
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @param int      $searchToken
+     * @return array
      */
-    public function bulkModifySearch($searchCampus, $searchRole, $searchEportfolio, $searchYear)
+    public function bulkModifySearch(int $searchCampus, int $searchRole, string $searchEportfolio, ?int $searchYear, int $searchToken): array
     {
-        $roleMapper = new RoleMapper();
-        $campusMapper = new CampusMapper();
         $params = array();
 
         /* Find search results
          */
         $query = "
             SELECT
-                {$this->getColumnString('u')},
-                {$roleMapper->getColumnString('g')},
-                {$campusMapper->getColumnString('c')}
+                u.id,
+                u.firstname,
+                u.lastname,
+                u.synergy_id as external_id,
+                g.name as role,
+                c.name as campus,
+                lyl.name as year,
+                jwt.jwt_id as token
             FROM {$this->getTable()} u
             LEFT JOIN `groups` g ON u.`group_id` = g.`id`
             LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`
             LEFT JOIN luCampus c ON c.id = uc.`campus`
             LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+            LEFT JOIN user_jwt_id jwt ON u.id = jwt.user_id AND jwt.deleted_at IS NULL
         ";
 
         /* Augmented where
@@ -116,37 +118,32 @@ class UserBulkMapper extends UserMapper
             }
         }
 
+        if ($searchToken != self::UNCHANGED) {
+            $query .= ' AND jwt.jwt_id IS ' . ($searchToken ? 'NOT' : '') . ' NULL';
+        }
+
         /* Always order by lastname
          */
         $query .= ' ORDER BY u.lastname';
 
         $statement = $this->getDatabase()->prepare($query);
+        $statement->setFetchMode(\PDO::FETCH_ASSOC);
         $statement->execute($params);
 
-        $userCollection = new Collection();
+        $users = [];
 
         foreach ($statement as $row) {
-            if ($userCollection->offsetExists($row['u.id'])) {
-                $user = $userCollection->offsetGet($row['u.id']);
+            if (key_exists($row['id'], $users)) {
+                $users[$row['id']]['campuses'][] = $row['campus'];
             } else {
-                $user = $this->hydrate($row, 'u');
-                $user->setCampusCollection($campusMapper->createCollection());
-                $userCollection->offsetSet($user->getId(), $user);
-            }
-            $user->setRole($roleMapper->hydrate($row, 'g'));
-
-            $campus = $campusMapper->hydrate($row, 'c');
-
-            /* If the campus object has no id, then it spawned a campus
-             * object from nonexistent data (e.g. a user with no campus)
-             * Don't add this non-existent campus to the user
-             */
-            if ($campus instanceof Campus) {
-                $user->getCampusCollection()->add($campus);
+                $user = $row;
+                $user['campuses'] = [$row['campus']];
+                unset($user['campus']);
+                $users[$row['id']] = $user;
             }
         }
 
-        return $userCollection;
+        return array_values($users);
     }
 
 

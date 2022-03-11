@@ -30,22 +30,32 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('jwt_id', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->uses('expiry', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
+        $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
     }
 
     /**
      * @param User $user
+     * @param User $effector
      * @return Model
      * @throws BaseMapper\Exception
      */
-    public function generateForUser(User $user): Model
+    public function generateForUser(User $user, User $effector): Model
     {
         // delete existing
-        $existing = $this->findByColumn('user_id', $user->getId());
-        $this->softDelete($existing);
+        $existingJwtIds   = $this->findByColumn('user_id', $user->getId());
+        /** @var Model $existing */
+        foreach ($existingJwtIds as $existing) {
+            $existing->setDeletedBy($effector)->setDeletedAt(\Alaress_Date_Format::now());
+            $this->save($existing);
+        }
         // create new
-        $userJwtId = $this->createModel()->setUser($user);
+        $userJwtId = $this->createModel()
+                          ->setUser($user)
+                          ->setCreatedBy($effector);
         $this->save($userJwtId);
         // get the new one
         return $this->findOneByColumn('user_id', $user->getId());

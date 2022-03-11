@@ -120,7 +120,7 @@ class Controller extends Base
                     continue;
                 }
                 try {
-                    $newToken = $this->tokenMapper->generateForUser($student);
+                    $newToken = $this->tokenMapper->generateForUser($student, $this->getUser());
                     $tokens->offsetSet($student->getId(), $newToken);
                 } catch (MapperException $e) {
                     // skip for now

@@ -85,6 +85,9 @@ class Admin implements ModuleConfigInterface
         // Admin Modify User
         (new \Schoolbox\Admin\User\Module($di))->init('/adminv2/user');
 
+        // Admin Bulk Modify User
+        (new \Schoolbox\Admin\User\BulkModify\Module($di))->init('/adminv2/user/bulk');
+
         // Video Queue
         (new \Schoolbox\Admin\Video\Module($di))->init('/adminv2/video');
 
