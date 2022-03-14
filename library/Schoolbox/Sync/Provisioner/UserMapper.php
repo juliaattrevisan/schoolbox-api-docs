@@ -103,4 +103,20 @@ class UserMapper extends SchoolboxMapper
             }
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function diff($objectA, $objectB = null, $keys = [0, 1])
+    {
+        // Sort campuses by id before comparing, as the difference of the campus order does not matter.
+        // Not ordering by sequence, as this may not be hydrated
+        if ($objectB) {
+            /** @var User $objectA */
+            $objectA->getCampusCollection()->sortBy('id', 'ASC');
+            /** @var User $objectB */
+            $objectB->getCampusCollection()->sortBy('id', 'ASC');
+        }
+        return parent::diff($objectA, $objectB, $keys);
+    }
 }
