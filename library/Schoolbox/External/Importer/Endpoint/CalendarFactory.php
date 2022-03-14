@@ -12,6 +12,8 @@ namespace Schoolbox\External\Importer\Endpoint;
 use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
@@ -103,7 +105,9 @@ class CalendarFactory implements IFactory
                     $this->key,
                     EventMapper::getInstance(),
                     EventSourceMapper::getInstance(),
-                    RoleMapper::getInstance()
+                    RoleMapper::getInstance(),
+                    PersonalMapper::getInstance(),
+                    CategoryMapper::getInstance()
                 ))->produce();
 
             default:

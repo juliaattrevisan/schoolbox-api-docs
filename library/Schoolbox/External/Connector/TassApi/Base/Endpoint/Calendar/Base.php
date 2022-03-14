@@ -13,6 +13,8 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
@@ -101,6 +103,18 @@ class Base
 
 
     /**
+     * @var PersonalMapper
+     */
+    protected PersonalMapper $personalRelationshipMapper;
+
+
+    /**
+     * @var CategoryMapper
+     */
+    protected CategoryMapper $folderRelationshipMapper;
+
+
+    /**
      * Obtain events that started after this datetime
      *
      * @var \Alaress_Date_Format
@@ -142,6 +156,12 @@ class Base
 
 
     /**
+     * @var Registry
+     */
+    private Registry $registry;
+
+
+    /**
      * Base constructor.
      *
      * @param LoggerInterface      $log
@@ -153,6 +173,10 @@ class Base
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
+     * @param PersonalMapper       $personalRelationshipMapper
+     * @param CategoryMapper       $folderRelationshipMapper
+     * @param string               $source
+     * @param Registry             $registry
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
      */
@@ -166,6 +190,10 @@ class Base
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
+        PersonalMapper $personalRelationshipMapper,
+        CategoryMapper $folderRelationshipMapper,
+        string $source,
+        Registry $registry,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
     ) {
@@ -179,6 +207,11 @@ class Base
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
 
+        /* These are relationships to events via event_user and event_folder tables
+         */
+        $this->personalRelationshipMapper = $personalRelationshipMapper;
+        $this->folderRelationshipMapper = $folderRelationshipMapper;
+
         /* Obtain events between these two datetimes
          */
         $this->from = $from;
@@ -187,64 +220,17 @@ class Base
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
          */
-        $className = explode('\\', get_class($this));
+        $this->source = $source;
 
-        $this->source = (string)array_pop($className);
-    }
-
-
-    /**
-     * Import events from this source
-     *
-     * Facade method for Prepare/Import/Cleanup
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \UnexpectedValueException
-     */
-    public function import(): void
-    {
-        $this->prepare();
-        $this->importEvents();
-        $this->cleanup();
-    }
-
-
-    /**
-     * Purge existing events so we don't have to worry about diffing their
-     * relationships and stuff. It's going to be wrapped in a transaction
-     * anyway, so if anything dies we roll back.
-     *
-     * @throws \Schoolbox\Mapper\DefinitionException
-     */
-    protected function prepare(): void
-    {
-        /* Set Events and Event Sources updated_at to something obvious
-         * Anything that updates them will be safe from cleanup later
+        /* Remember statistics generated procedurally from all the tass products
+         * and dump them all at the very end, together - people weren't reading
+         * the logs properly and assumed incorrectly when the last product
+         * (typically getTeacherNotices) had 0 events in it. People presumed that
+         * to be attributable to the entire import which isn't always true.
+         *
+         * Therefore collect all those notes and put them all together here
          */
-        if ($this->perform) {
-            $query = "
-                UPDATE
-                {$this->eventSourceMapper->getTable()}
-                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')}
-                AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
-                {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
-            ";
-
-            $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
-            $statement->execute([
-                'sourceName' => $this->source
-            ]);
-
-            $this->log->debug(sprintf(
-                'Marking all %s events for deletion',
-                $this->source
-            ));
-        }
+        $this->registry = $registry;
     }
 
 
@@ -257,7 +243,7 @@ class Base
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
-    protected function importEvents(): void
+    public function import(): void
     {
 
         /* A list of missing event types which the admin needs to configure in schoolbox
@@ -279,7 +265,10 @@ class Base
 
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $this->endpoint,
-            ['start_date' => $this->from->getUsingFormat('d/m/Y'), 'end_date' => $this->to->getUsingFormat('d/m/Y')],
+            [
+                'start_date' => $this->from->getUsingFormat('d/m/Y'),
+                'end_date' => $this->to->getUsingFormat('d/m/Y')
+            ],
             Api::VERSION_2
         );
 
@@ -297,13 +286,19 @@ class Base
             return;
         }
 
-        $this->log->info(sprintf(
+        /* Message to log to cli, and also to remember for the summary
+         */
+        $summaryTass = sprintf(
             'Found %s events at endpoint %s between %s and %s',
             \count($tassEvents['events']),
             $this->endpoint,
             $this->from->getUsingFormat('d/m/Y'),
             $this->to->getUsingFormat('d/m/Y')
-        ));
+        );
+
+        $this->log->info($summaryTass);
+
+        $n = 0;
 
         foreach ($tassEvents['events'] as $tassEvent) {
             /* Spawn a new Event instance and ensure that we tell it where it came from
@@ -346,15 +341,8 @@ class Base
                     'source_name' => $this->source,
                     'guid' => $guid
                 ]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                /* Couldn't find any event matching $guid so it's a new event
-                 * Make a new source and make a new event instance
-                 */
-                $eventSource = $this->eventSourceMapper->createModel();
-            }
 
-            try {
-                $event = $this->eventMapper->findById($eventSource->getId());
+                $event = $this->eventMapper->findById($eventSource->getEvent()->getId());
 
                 $this->log->debug(sprintf(
                     'Found an existing %s event "%s" (schoolbox eventId %s) using guid %s',
@@ -364,6 +352,11 @@ class Base
                     $guid
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Couldn't find any event matching $guid so it's a new event
+                 * Make a new source and make a new event instance
+                 */
+                $eventSource = $this->eventSourceMapper->createModel();
+
                 $event = $this->eventMapper->createModel();
 
                 $this->log->debug(sprintf(
@@ -444,6 +437,19 @@ class Base
                 $this->eventMapper->save($event);
                 $this->eventSourceMapper->save($eventSource);
 
+                /* Clear event_user and event_folder relationships,
+                 * if any existed previously somehow (tass events
+                 * are associated with roles and campuses only)
+                 *
+                 * I know it's a db-in-a-loop, but need to be surgical
+                 * cos there's some busted data out in the wild
+                 *
+                 * SA-13403 explains why, but this deletion may be too heavy-handed.
+                 * Nobody is meant to edit the events to change their settings, but they could.
+                 */
+//                $this->personalRelationshipMapper->deleteByColumn('event_id', $event->getId());
+//                $this->folderRelationshipMapper->deleteByColumn('event_id', $event->getId());
+
                 $this->log->info(sprintf(
                     'Saved %s event "%s" with event_source.guid %s',
                     $this->source,
@@ -458,39 +464,42 @@ class Base
                     $eventSource->getGuid()
                 ));
             }
+
+            /* Increase the count
+             */
+            $n++;
         }
 
         /* Tell someone these need to be configured in admin
          */
+        $brokenEventTypes = [];
+
         if (\count($missingEventTypes)) {
             foreach ($missingEventTypes as $missingEventType) {
-                $this->log->warning(sprintf(
+                $brokenEventTypeMessage = sprintf(
                     'Add this event type in admin: %s',
                     $missingEventType
-                ));
+                );
+
+                $this->log->warning($brokenEventTypeMessage);
+                $brokenEventTypes[] = $brokenEventTypeMessage;
             }
         }
-    }
 
+        /* Remember for the summary
+         */
+        $summarySchoolbox = sprintf(
+            'Imported %s events into schoolbox',
+            $n
+        );
 
-    /**
-     * Blow away all the Event and Event Sources that never got updated during the import process
-     */
-    protected function cleanup(): void
-    {
-        if ($this->perform) {
-            $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
+        $summaryData = [
+            $summaryTass,
+            $summarySchoolbox,
+            $brokenEventTypes
+        ];
 
-            foreach ($deadEvents as $deadEvent) {
-                $this->log->debug(sprintf(
-                    'Deleting %s event "%s"; it was never updated during import',
-                    $this->source,
-                    $deadEvent->getTitle()
-                ));
-
-                $this->eventMapper->delete($deadEvent);
-            }
-        }
+        $this->registry->remember($this->endpoint, $summaryData);
     }
 
 

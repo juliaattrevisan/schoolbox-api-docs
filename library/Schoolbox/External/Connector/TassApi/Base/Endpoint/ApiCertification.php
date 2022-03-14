@@ -60,11 +60,15 @@ class ApiCertification implements IStrategy
 
             foreach ($apiUsage as $module => $endpointUsage) {
                 $this->log->info('');
-                $this->log->info($module);
+
+                $this->log->info(sprintf(
+                    "    %s",
+                    $module
+                ));
 
                 foreach ($endpointUsage as $endpoint => $num) {
                     $this->log->info(sprintf(
-                        '    %s %s',
+                        '        %s %s',
                         $endpoint,
                         $num
                     ));
