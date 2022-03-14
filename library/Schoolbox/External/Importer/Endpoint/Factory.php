@@ -26,6 +26,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint as SentralEndpoint;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
+use Schoolbox\External\Connector\Wonde\Base\Endpoint as WondeEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -54,6 +55,7 @@ class Factory implements IFactory
     public const SENTRAL = 'sentral';
     public const TASS_API = 'tassapi';
     public const COMPASS = 'compass';
+    public const WONDE = 'wonde';
     public const CSV = 'csv';
 
 
@@ -251,6 +253,28 @@ class Factory implements IFactory
                     \Schoolbox\Resource\Folder\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance()
+                ))->produce();
+
+            case self::WONDE:
+                return (new WondeEndpoint\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    /* Profile pieces
+                     */
+                    UserProfile\Mapper::getInstance(),
+                    UserProfile\Student\Mapper::getInstance(),
+                    UserProfile\Parent\Mapper::getInstance(),
+                    UserProfile\Staff\Mapper::getInstance(),
+                    UserProfile\Relationship\Mapper::getInstance(),
+                    /* Timetable pieces
+                     */
+                    TimetableCycleMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance()
                 ))->produce();
 
             default:

@@ -57,11 +57,21 @@ class Api implements IApi
 
 
     /**
+     * The base uri that consists of host and school identifier
+     * Paginated data can appear separately in ApiUsage
+     *
+     * @var string
+     */
+    private string $baseUri = '';
+
+
+    /**
      * Constructor.
      *
      * @param string $host
      * @param string $apiKey
      * @param int    $timeout
+     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function __construct(string $host, string $apiKey, int $timeout = self::DEFAULT_TIMEOUT)
@@ -71,7 +81,7 @@ class Api implements IApi
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
          */
-        $this->apiUsage = new ApiUsage();
+        $this->apiUsage = new ApiUsage($this->baseUri);
     }
 
 
@@ -90,8 +100,11 @@ class Api implements IApi
         $credentials = (new Codec\DSN())->decode($dsn);
 
         /* Enforce slash in the endpoint prefix
+         *
+         * Remember this, because we need to remove it in ApiUsage
+         * for it to report unique endpoints properly
          */
-        $baseUri = sprintf(
+        $this->baseUri = sprintf(
             '%s/schools/%s/',
             rtrim($host, '/'),
             $credentials['school']
@@ -104,7 +117,7 @@ class Api implements IApi
 
         return new Client([
             'headers' => $headers,
-            'base_uri' => $baseUri,
+            'base_uri' => $this->baseUri,
             'timeout' => $timeout,
             'http_errors' => false,
         ]);

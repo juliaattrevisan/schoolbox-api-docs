@@ -183,4 +183,13 @@ class Api implements IApi
          */
         throw new DomainException('Could not access server, or bad json payload returned.');
     }
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage
+    {
+        return $this->apiUsage;
+    }
 }
