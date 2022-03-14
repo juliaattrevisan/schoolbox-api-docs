@@ -138,6 +138,16 @@ export default {
 
 <style lang="scss" scoped>
 
+//apply padding as .fc-event-title will lose its padding from display: inline
+.event-container { 
+    padding: 2px 0px;
+}
+
+//needs to be inline to ensure the .strike class works 
+.fc-event-title { 
+    display: inline;
+}
+
 //the task checkbox can be selected, but this change wont be reflected in the view-event-modal.vue that's opened
 //prevent this behaviour as it's a bit confusing - the checkbox can only be changed in the modal, not directly on the event
 //updating directly via the event might be a nice feature in future
