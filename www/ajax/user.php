@@ -30,15 +30,15 @@ $userMapper = UserMapper::getInstance();
 
 $result = $suggestions = $data = $return = [];
 
-$excludeID = $_GET['excludeID'];
-$keyword = $_GET['query'];
-$groupID = $_GET['groupID'];
-$roleTypeID = $_GET['roleTypeID'];
+$excludeID = $_GET['excludeID'] ?? null;
+$keyword = $_GET['query'] ?? null;
+$groupID = $_GET['groupID'] ?? null;
+$roleTypeID = $_GET['roleTypeID'] ?? null;
 // The showCampus parameter does nothing now default campuses are gone.
 // It may be restored later, but don't count on it.
 //$showCampus = !empty($_GET['showCampus']);
 $showCampus = false;
-$residentialHouseID = $_GET['residentialHouseID'];
+$residentialHouseID = $_GET['residentialHouseID'] ?? null;
 
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
@@ -98,7 +98,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     // If we are getting parents of a student, load the student and populate their parents
 
     if ($filterParents) {
-        $student = $userMapper->findById($_GET["studentId"]);
+        $student = $userMapper->findById($_GET["studentId"] ?? null);
         if ($student) {
             $student->loadParents();
         }
@@ -125,7 +125,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 }
             }
 
-            if ($_GET['email']) {
+            if ($_GET['email'] ?? null) {
                 $emailVisible ??= new ValidEmailVisible($kernel->get('externalUser'), $kernel->get('config'));
                 if ($emailVisible->isSatisfiedBy($userMapper->findById($user["uid"]), $_SESSION['user'])) {
                     $email = $emailObj->formatEmailFromArray($user);

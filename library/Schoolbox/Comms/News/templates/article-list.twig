@@ -103,7 +103,7 @@
 <script>
     'use strict';
 
-    var topicAll = '{{ topicAll }}';
+    var topicAll = {{ topicAll | json_encode | raw }};
 
     // Axios does not set the XHR header by default, so we have to do it manually.
     var getHeaders = {
