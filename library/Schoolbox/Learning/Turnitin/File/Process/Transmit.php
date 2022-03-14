@@ -20,6 +20,8 @@ use Schoolbox\Learning\Turnitin\Exception\Conflict;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -479,11 +481,14 @@ class Transmit
          */
         try {
             $owner = $this->userMapper->findById($ssf->getOwner()->getId());
+        } catch (Deleted $e) {
+            /** @var User $owner */
+            $owner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Student Submission File Owner Not Found')
-                ->setErrorMessage('Student Submission File owner not found; maybe their record was deleted'));
+                ->setErrorMessage('Student Submission File owner not found'));
 
             return null;
         }
@@ -495,11 +500,14 @@ class Transmit
          */
         try {
             $boxOwner = $this->userMapper->findById($box->getOwner()->getId());
+        } catch (Deleted $e) {
+            /** @var User $boxOwner */
+            $boxOwner = $e->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->turnitinMapper->save($model
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR)
                 ->setErrorCode('Submission Box Owner Not Found')
-                ->setErrorMessage('Submission Box owner not found; maybe their record was deleted'));
+                ->setErrorMessage('Submission Box owner not found'));
 
             return null;
         }
