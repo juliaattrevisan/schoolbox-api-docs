@@ -227,22 +227,22 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --sql-user 'schoolboxvagrant' \
 --sql-pass 'abc123' \
 --cache-dir '/usr/share/schoolbox/vagrantcache' \
---config amqp_host 'localhost' \
---config amqp_user 'guest' \
---config amqp_pass 'guest' \
---config amqp_vhost '/' \
---config external_type "$external_db" \
---config external_db_host "$external_db_host" \
---config external_db_db "$external_db_db" \
---config instance_registry_url "$instance_registry_url" \
---config redis_url 'tcp://127.0.0.1:6379' \
---config redis_ephemeral_url 'tcp://127.0.0.1:6380' \
---config site_domain 'dev.schoolbox.cloud' \
---config site_hostname 'vagrant' \
---config site_school_code "vagrant" \
---config site_environment "client-hosted" \
---config site_type "dev" \
---config title 'Schoolbox [vagrant]'; then
+--config amqp_host "'localhost'" \
+--config amqp_user "'guest'" \
+--config amqp_pass "'guest'" \
+--config amqp_vhost "'/'" \
+--config external_type "'$external_db'" \
+--config external_db_host "'$external_db_host'" \
+--config external_db_db "'$external_db_db'" \
+--config instance_registry_url "'$instance_registry_url'" \
+--config redis_url "'tcp://127.0.0.1:6379'" \
+--config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
+--config site_domain "'dev.schoolbox.cloud'" \
+--config site_hostname "'vagrant'" \
+--config site_school_code "'vagrant'" \
+--config site_environment "'client-hosted'" \
+--config site_type "'dev'" \
+--config title "'Schoolbox [vagrant]'"; then
   error "Unable to install instance. Exiting."
   exit 1
 fi
