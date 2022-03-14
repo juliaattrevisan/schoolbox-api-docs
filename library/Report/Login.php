@@ -154,7 +154,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             }
         }
 
-        $resultFilter['after'] = $resultFilter['after'] ?: date('Y-m-d', strtotime('-30 days'));
+        $resultFilter['after'] = $resultFilter['after'] ?? date('Y-m-d', strtotime('-30 days'));
 
         $this->filter = $resultFilter;
 
@@ -342,7 +342,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                 'FILTER_ID'          => $field,
                 'FILTER_NAME'        => ucwords($field),
                 'FILTER_PLACEHOLDER' => $pholder,
-                'FILTER_VALUE'       => $this->filter[$field],
+                'FILTER_VALUE'       => $this->filter[$field] ?? '',
             );
 
             $page->setVar($output);

@@ -34,28 +34,28 @@ if (count($this->arg) < 2) {
 
 // url expected to be in the format:
 //   /adminv2/reports/reportType/reportVar/[sortBy/[sortDir/]][page|export]
-$reportType = $this->arg[0];
-$reportVar = urldecode($this->arg[1]);
+$reportType = $this->arg[0] ?? '';
+$reportVar = urldecode($this->arg[1] ?? '');
 $exportToCSV = false;
 
 // default sorting
-if ($this->arg[2] == "exportToCSV") {
+if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
     $page = 0; //export, so no pagination
     $orderBy = "";
     $exportToCSV = true;
 }
 // page number
-elseif (is_numeric($this->arg[2])) {
+elseif (isset($this->arg[2]) && is_numeric($this->arg[2])) {
     $page = $this->arg[2];
     $orderBy = "";
 }
 // sortBy
 else {
     $page = 1;
-    $orderBy = $this->arg[2];
+    $orderBy = $this->arg[2] ?? '';
 
     // if direction is unspecified, leave it to the report itself to decide its preference
-    switch (strtolower($this->arg[3])) {
+    switch (strtolower($this->arg[3] ?? '')) {
         case 'desc':
             $orderDir = "DESC";
             break;
@@ -67,12 +67,12 @@ else {
             break;
     }
 
-    if ($this->arg[4] == "exportToCSV") {
+    if (isset($this->arg[4]) && $this->arg[4] == "exportToCSV") {
         $page = 0; //export, so no pagination
         $exportToCSV = true;
     }
     // page number
-    elseif (is_numeric($this->arg[4])) {
+    elseif (isset($this->arg[4]) && is_numeric($this->arg[4])) {
         $page = $this->arg[4];
     }
 }

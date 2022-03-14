@@ -67,7 +67,7 @@ foreach ($componentFactory->buildComponentList($cid) as $component) {
     $position      = "position_{$position_no}";
     $defintionId   = $component->getInstance()->getDefinition()->getId();
     $defintionName = $component->getInstance()->getDefinition()->getName();
-    $componentCounts[$defintionId]++;
+    $componentCounts[$defintionId]  = !isset($componentCounts[$defintionId]) ? 0 : $componentCounts[$defintionId]++;
 
     if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -118,7 +118,7 @@ foreach ($groupedCollection as $category => $categoryDefinitions) {
     foreach ($categoryDefinitions as $definition) {
         /* @var $definition Component_Definition */
         $definitionId = $definition->getId();
-        $count        = $componentCounts[$definitionId] ?: 0;
+        $count        = $componentCounts[$definitionId] ?? 0;
         if ($firstComponent) {
             // First component in category: parse tab
             $this->setVar([
