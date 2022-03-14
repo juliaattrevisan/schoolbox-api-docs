@@ -15,6 +15,7 @@ use Authenticator;
 use Firebase\JWT;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
@@ -339,6 +340,13 @@ class Controller extends Base
         // Attempt to use Schoolbox's JWT decoder.
         // If that fails, use the configured oAuth provider's decoder instead.
         // TODO combine decoding of Schoolbox JWTs and oAuth provider JWTs into one class
+        // This should look something like:
+        // $user = $jwtParser->determineUserFromJwt($jwt);
+
+        $jwtParser = new JwtParser($this->tokenValidator, $this->userMapper, $this->tokenMapper, $config);
+        $jwtParser->determineUserFromJwt($jwt);
+
+
         $claims = null;
         try {
             $claims = $this->tokenValidator->decode($jwt);
