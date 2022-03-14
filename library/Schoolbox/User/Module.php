@@ -16,19 +16,12 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
-use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Resource\GroupMapper;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -53,19 +46,8 @@ class Module extends BaseModule
             );
         });
 
-        $hasApiAccess = new Rule\IsSuperuser();
-
-        $preloadUser = function ($params) {
-            return $this->preloadUser($params);
-        };
-
-        $preloadUserGroup = function ($params) {
-            return $this->preloadUserGroup($params);
-        };
-
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
         $this->register('GET', '/search', 'search', $loggedIn);
-        $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess, $preloadUser);
     }
 
     /**
@@ -149,60 +131,10 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->injector->get('externalUser'),
-            $this->getMapperFactory()->get(Logger\Mapper::class),
-            $this->getMapperFactory()->get(UserMapper::class),
-            $this->getMapperFactory()->get(GroupMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
-            $this->getMapperFactory()->get(Access::class),
-            $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
-            $this->getMapperFactory()->get(RerouteOverrideMapper::class),
+            $this->getMapperFactory()->get(Logger\Mapper::class)
         );
     }
 
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws SchoolboxException
-     */
-    private function preloadUser(array $params): array
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['userId']);
-        } catch (MapperException $e) {
-            throw new SchoolboxException('User Does not Exist');
-        }
-
-        return [
-            'user' => $user,
-        ];
-    }
-
-    /**
-     * Preload a User and Group instances
-     *
-     * @param array $params
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws SchoolboxException
-     */
-    private function preloadUserGroup(array $params): array
-    {
-        $user = $this->preloadUser($params);
-
-        try {
-            $group = $this->getGroupMapper()->findOneByColumn('cid', $params['groupId']);
-        } catch (MapperException $e) {
-            throw new SchoolboxException('Group Does not Exist');
-        }
-
-        return [
-            'user' => $user,
-            'group' => $group,
-        ];
-    }
 
     /* Getters / Setters
      */
@@ -229,13 +161,5 @@ class Module extends BaseModule
     public function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
-    }
-
-    /**
-     * @return GroupMapper
-     */
-    protected function getGroupMapper(): GroupMapper
-    {
-        return $this->getMapperFactory()->get(GroupMapper::class);
     }
 }

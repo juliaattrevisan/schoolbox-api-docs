@@ -10,29 +10,16 @@ namespace Schoolbox\User;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\External\Normalise\TupleStack;
-use Schoolbox\Groups\GroupsHelper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Message\RerouteOverrideMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Timetable_ColourMapper;
 use User\Logger;
 use External_User;
 
 class Controller extends Base
 {
-    private GroupsHelper $groupsHelper;
-    protected UserMapper $userMapper;
-
     /**
      * @var UserAccessMapper
      */
@@ -49,26 +36,11 @@ class Controller extends Base
     public function __construct(
         UserAccessMapper $userAccessMapper,
         External_User $externalHandler,
-        Logger\Mapper $assumeUserLogMapper,
-        UserMapper $userMapper,
-        GroupMapper $groupMapper,
-        FolderMapper $folderMapper,
-        Access $accessHelper,
-        Timetable_ColourMapper $timetableColourMapper,
-        RerouteOverrideMapper $reRouteOverrideMapper
+        Logger\Mapper $assumeUserLogMapper
     ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->externalHandler     = $externalHandler;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
-        $this->userMapper           = $userMapper;
-        $this->groupsHelper = new GroupsHelper(
-            $groupMapper,
-            $userAccessMapper,
-            $folderMapper,
-            $accessHelper,
-            $timetableColourMapper,
-            $reRouteOverrideMapper,
-        );
     }
 
 
@@ -185,44 +157,4 @@ class Controller extends Base
         );
     }
 
-    /**
-     * Returns group memberships for a user
-     *
-     * @param User $user
-     * @api /user/{userId}/groupMembership
-     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipSearch
-     */
-    public function apiMembership(User $user)
-    {
-        $users_groups = $this->groupsHelper->getCurrentGroups($user);
-        $apiGroups = [];
-        foreach ($users_groups as $group) {
-            $membership = 'none';
-            if ($group['isAccessRead']) {
-                $membership = 'read';
-            } elseif ($group['isAccessWrite']) {
-                $membership = 'write';
-            } elseif ($group['isAccessAdmin']) {
-                $membership = 'admin';
-            }
-            $apiGroups[] = [
-                'id'                => $group['id'],
-                'name'              => $group['name'],
-                'type'              => $group['type'],
-                'isForceFollow'     => $group['isForceFollow'],
-                'isNotificationsOn' => $group['isNotificationsOn'],
-                'enrollmentStatus'   => $group['enrolmentStatus'],
-                'membership'        => $membership,
-                '_links'            => [
-                    'homepage'      => sprintf('/homepage/%d', $group['id'])
-                ]
-            ];
-        }
-
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
-                $apiGroups
-            )
-        );
-    }
 }
