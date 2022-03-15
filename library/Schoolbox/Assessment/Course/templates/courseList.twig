@@ -63,7 +63,7 @@ Usage:
             {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
             {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
             {% if intellischoolCohortUrl %}
-                <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-curriculum-details"></a>
+                <a href="{{ intellischoolCohortUrl }}" title="Cohort Analytics" class="icon-intellischool"></a>
             {% endif %}
         </nav>
     {% endif %}
