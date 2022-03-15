@@ -248,7 +248,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         return "
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('thread', '', 'thread', false)}
-            INNER JOIN {$this->getJoinSql('owner', '', 'owner', false)}
+            INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
             LEFT JOIN {$this->getJoinSql('parent', '', 'parent', false)}
         ";
     }

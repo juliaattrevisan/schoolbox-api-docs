@@ -43,9 +43,11 @@ if (is_numeric($this->arg[0])) {
     } catch (Exception $e) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
+} else {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
-if ($thread->getCategory() === false ||  $thread->getCategory()->isDeleted() === true) {
+if (!($thread->getCategory() instanceof \Schoolbox\Resource\Folder\Model) || $thread->getCategory()->isDeleted()) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FOLDER_DELETED);
 } else {
     //$folder is (old)$category
@@ -169,7 +171,7 @@ $this->setVar($outputPagination);
 /* output posts */
 $postList = $postList->slice($postIndex, $postPerPage);
 
-if ($postList !== null) {
+if (count($postList) > 0) {
     $first = $postList->first();
     $j = 0;
 
@@ -188,7 +190,7 @@ if ($postList !== null) {
         $this->setVar($output);
 
         //Remove link for deleted user
-        if ($post->getOwner()->getEnabled()) {
+        if ($post->getOwner()->getEnabled() && !$post->getOwner()->isDeleted()) {
             $this->parse('link_start_block', 'link_start');
             $this->parse('link_end_block', 'link_end');
         } else {
