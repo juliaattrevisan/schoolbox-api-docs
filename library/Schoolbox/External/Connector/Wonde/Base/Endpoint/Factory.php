@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Wonde\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\ClassEntryMapper;
-use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
+//use Schoolbox\External\ClassEntryMapper;
+//use Schoolbox\External\ClassInvolvementMapper;
+//use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriodMapper;
+//use Schoolbox\External\TimetableCycleMapper;
+//use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
 
@@ -87,34 +87,34 @@ class Factory
     private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
-    /**
-     * @var TimetableCycleMapper
-     */
-    private TimetableCycleMapper $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $timetablePeriodMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var ClassPeriodMapper
-     */
-    private ClassPeriodMapper $classPeriodMapper;
+//    /**
+//     * @var TimetableCycleMapper
+//     */
+//    private TimetableCycleMapper $timetableCycleMapper;
+//
+//
+//    /**
+//     * @var TimetablePeriodMapper
+//     */
+//    private TimetablePeriodMapper $timetablePeriodMapper;
+//
+//
+//    /**
+//     * @var ClassEntryMapper
+//     */
+//    private ClassEntryMapper $classEntryMapper;
+//
+//
+//    /**
+//     * @var ClassInvolvementMapper
+//     */
+//    private ClassInvolvementMapper $classInvolvementMapper;
+//
+//
+//    /**
+//     * @var ClassPeriodMapper
+//     */
+//    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
@@ -129,11 +129,11 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
+//     * @param TimetableCycleMapper            $timetableCycleMapper
+//     * @param TimetablePeriodMapper           $timetablePeriodMapper
+//     * @param ClassEntryMapper                $classEntryMapper
+//     * @param ClassInvolvementMapper          $classInvolvementMapper
+//     * @param ClassPeriodMapper               $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -145,13 +145,13 @@ class Factory
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
+        UserProfile\Relationship\Mapper $relationshipMapper
         /* Timetable pieces */
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        // TimetableCycleMapper $timetableCycleMapper,
+        // TimetablePeriodMapper $timetablePeriodMapper,
+        // ClassEntryMapper $classEntryMapper,
+        // ClassInvolvementMapper $classInvolvementMapper,
+        // ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -166,19 +166,21 @@ class Factory
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
 
-        /* Timetable pieces
-         */
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
+//        /* Timetable pieces
+//         */
+//        $this->timetableCycleMapper = $timetableCycleMapper;
+//        $this->timetablePeriodMapper = $timetablePeriodMapper;
+//        $this->classEntryMapper = $classEntryMapper;
+//        $this->classInvolvementMapper = $classInvolvementMapper;
+//        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function produce(): GenericCollection
     {

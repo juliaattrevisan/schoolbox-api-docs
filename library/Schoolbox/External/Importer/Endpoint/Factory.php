@@ -267,14 +267,14 @@ class Factory implements IFactory
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
-                    /* Timetable pieces
-                     */
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    UserProfile\Relationship\Mapper::getInstance()
+                    // /* Timetable pieces
+                    //  */
+                    // TimetableCycleMapper::getInstance(),
+                    // TimetablePeriodMapper::getInstance(),
+                    // ClassEntryMapper::getInstance(),
+                    // ClassInvolvementMapper::getInstance(),
+                    // ClassPeriodMapper::getInstance()
                 ))->produce();
 
             default:
