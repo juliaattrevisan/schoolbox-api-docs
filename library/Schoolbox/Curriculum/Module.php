@@ -41,6 +41,7 @@ class Module extends BaseModule
     {
         $this->attachResourceRoutes($router, $basePath);
         $this->addGetRoute($router, 'search', $basePath, '/search');
+        $this->addGetRoute($router, 'browse', $basePath, '/browse');
     }
 
     /**
