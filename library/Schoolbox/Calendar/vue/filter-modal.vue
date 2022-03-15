@@ -85,6 +85,29 @@ export default {
     },
 
     /**
+     * 
+     *
+     * @param ids
+     * @return {Boolean}
+     */
+    isSourceChecked(ids) {
+      return this.selected?.source.some((source) => source.id === ids)
+    },
+
+    /**
+     * 
+     * @param $event
+     * @param ids
+     */
+    onSourceChanged($event, ids) {
+      if ($event.target.checked) {
+        this.selected[filterKey] = this.getAllIds(filterKey);
+      } else {
+        this.selected[filterKey] = [];
+      }
+    },
+
+    /**
      * Get all IDs available for the given filter key.
      *
      * @param filterKey
@@ -146,7 +169,8 @@ export default {
                       type="checkbox"
                       :id="`source-${source.ids}`"
                       :value="source.ids"
-                      v-model="selected.source"
+                      :checked="isSourceChecked(source)"
+                      @change="onSourceChanged($event, source.ids)"
                     />
                     <label :for="`source-${source.ids}`">{{ source.name }}</label>
                   </li>
