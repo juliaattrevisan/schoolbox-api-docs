@@ -119,7 +119,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (
             $classMarkbookLink
             && ($isGroupPage || $isClassPage || $wasClassPage)
-            && $this->getConfigLoader()->get('class_markbook_enable')
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
         ) {
             $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
             $this->parse('markbook_link_block', 'markbook_link');
@@ -332,7 +332,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             'folderId' => $this->getContext()->getId(),
         ];
         $route = 'learningMarkbook.getMarkbookForClass';
-        if (!$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())) {
+        if (
+            !$this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
+            || !$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())
+        ) {
             return null;
         }
         return $this->getRouter()->generate($route, $classArg);
