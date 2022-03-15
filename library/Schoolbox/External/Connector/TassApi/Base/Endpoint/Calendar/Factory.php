@@ -151,13 +151,13 @@ class Factory
 
 
     /**
-     * @return GenericCollection
+     * @return null|GenericCollection
      * @throws \DomainException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(): GenericCollection
+    public function produce(): ?GenericCollection
     {
         $this->log->info('Accessing api endpoint');
 
@@ -181,7 +181,7 @@ class Factory
                 $module
             ));
 
-            return (new GenericCollection(IStrategy::class));
+            return null;
         } catch (\DomainException $e) {
             /* schoolcalendarandnotices might not be enabled for a school who chooses to eschew
              * this feature; instead of catastrophically dying with a fatal, just accumulate quietly
