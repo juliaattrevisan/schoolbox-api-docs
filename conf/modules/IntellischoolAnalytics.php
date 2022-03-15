@@ -12,6 +12,7 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Intellischool\Module;
+use Schoolbox\Intellischool\Component\Dashboard\Module as DashboardModule;
 
 /**
  * Module configuration for Intellischool student and class analytics.
@@ -27,5 +28,6 @@ class IntellischoolAnalytics extends ModuleLoader
     public function configure($kernel)
     {
         $this->loadModule($kernel, Module::class, "/modules/analytics");
+        $this->loadModule($kernel, DashboardModule::class, 'intellischoolDashboard');
     }
 }

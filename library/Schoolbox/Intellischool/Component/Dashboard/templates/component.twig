@@ -1,0 +1,18 @@
+<div id='component-{{ componentInstanceId }}' class='component-container intellischool-launcher' data-component>
+    <div class="row">
+        <div class="small-12 island">
+            <div class="scroll-wrapper">
+                <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="intellischoolIframe">
+                    <input type="hidden" name="id_token" value="{{ jwt }}">
+                </form>
+                <script type="text/javascript">
+                    document.addEventListener("DOMContentLoaded", function() {
+                        document.getElementById('iframeForm').submit();
+                    });
+                </script>
+                <iframe class="fullscreen" name="intellischoolIframe" id="intellischoolIframe">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
