@@ -92,7 +92,7 @@ class Thread implements ISoftDeletable
 
 
     /**
-     * @return Folder
+     * @return Folder|null
      */
     public function getCategory()
     {
