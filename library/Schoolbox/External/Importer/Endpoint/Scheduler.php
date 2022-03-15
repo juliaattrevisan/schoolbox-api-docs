@@ -169,6 +169,14 @@ class Scheduler
                 exit;
             }
 
+            /* No composites produced; exit
+             * The corresponding Factory produced an empty set
+             * Nothing to do
+             */
+            if (!$composites->count()) {
+                exit;
+            }
+
             /* Always log the start of the run
              */
             $importLog = $this->importLogMapper->start($runId, $scriptName);
