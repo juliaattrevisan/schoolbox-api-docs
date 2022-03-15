@@ -107,12 +107,12 @@ class Installer implements IPackageInstall
             $graph[$row['id']] = $row;
         }
 
-        /* A pretty-bad-use-case is when:
+        /* A pretty-bad usecase is when:
          * csv row 1 is the root node
          * csv row 2 is some distant grandchild node (call it "Alice")
          * csv row 3000 is the actual parent node for csv row 2 (call it "Frank")
          *
-         * Importing the Alice node will cause importStrand() to build the entire
+         * Importing the Alice node will cause importAncestors() to build the entire
          * ancestry, up to and including Frank
          *
          * When Frank is finally encountered, it'll create a new $node unless
@@ -195,7 +195,7 @@ class Installer implements IPackageInstall
      */
     private function importNode(array $row): void
     {
-        /* $row might have been imported by importStrand()
+        /* $row might have been imported by importAncestors()
          *
          * This predominantly affects immediate descendents of root node
          * if they appear in the csv at the very end, but the first few
