@@ -25,6 +25,32 @@ class Installer implements IPackageInstall
 
 
     /**
+     * Safety mechanism to avoid infinite loops
+     */
+    private const MAX_CALLS = 100;
+
+
+    /**
+     * @var Node\Mapper
+     */
+    private Node\Mapper $curriculumNodeMapper;
+
+
+    /**
+     * A list of (csv row id, model id) tuples
+     *
+     * @var array
+     */
+    private array $parentLookup = [];
+
+
+    public function __construct()
+    {
+        $this->curriculumNodeMapper = Node\Mapper::getInstance();
+    }
+
+
+    /**
      * Install the contents of the source file into the db
      * $user is unused in this installer.
      *
@@ -58,8 +84,6 @@ class Installer implements IPackageInstall
          * ...but it'd be better to feed it functional data instead, from the outset
          */
         $csv = (new CsvReader($path))->setLoadFromFirst(true);
-        $curriculumMapper = Node\Mapper::getInstance();
-        $parentLookup = [];
 
         /* You can no longer presume that the csv nodes are in hierarchical order
          *
@@ -73,29 +97,105 @@ class Installer implements IPackageInstall
             $graph[$row['id']] = $row;
         }
 
+        /* A pretty-bad-use-case is when:
+         * csv row 1 is the root node
+         * csv row 2 is some distant grandchild node (call it "Alice")
+         * csv row 3000 is the actual parent node for csv row 2 (call it "Frank")
+         *
+         * Importing the Alice node will cause importStrand() to build the entire
+         * ancestry, up to and including Frank
+         *
+         * When Frank is finally encountered, it'll create a new $node unless
+         * you skip it by checking the $parentLookup hash
+         */
         foreach ($graph as $id => $row) {
-            /* Check if $row[curriculum_node_parent_id] exists in $parentLookup;
+            /* Import $row's parent nodes, all the way back to root
+             */
+            $this->importStrand($graph, $row);
+
+            /* $row might have been imported by importStrand()
              *
-             * If it does - reuse it
-             * Otherwise, spawn a new node and store it in the lookup, then use that
+             * This predominantly affects immediate descendents of root node
+             * if they appear in the csv at the very end, but the first few
+             * lines of csv use those as parents
              */
+            if (isset($this->parentLookup[$id])) {
+                continue;
+            }
 
+            $parentId = $row['curriculum_node_parent_id'];
 
-            /* Then proceed through the rest of the $graph stack
+            /* Treat this special word with special care
              */
-        }
-        foreach ($csv as $row) {
-            $node = $curriculumMapper->createModel()
-                ->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null)
+            if ('NULL' === $parentId) {
+                $parentId = null;
+            }
+
+            $node = $this->curriculumNodeMapper->createModel()
+                ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
                 ->setName($row['name'])
                 ->setDescription($row['description'])
                 ->setCode($row['code'])
                 ->setOrder($row['order']);
 
-            $curriculumMapper->save($node);
+            $this->curriculumNodeMapper->save($node);
 
             // Store the inserted ID so we can link children to it
-            $parentLookup[$row['id']] = $node->getId();
+            $this->parentLookup[$id] = $node->getId();
+        }
+    }
+
+
+    /**
+     * For the given $row, import its parent node and all the ancestral nodes,
+     * right back until the root node is encountered - this is defined by having
+     * a null curriculum_node_parent_id
+     *
+     * @param array $graph
+     * @param array $row
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importStrand(array $graph, array $row): void
+    {
+        $next = $row['curriculum_node_parent_id'];
+
+        /* Treat this special word with special care
+         */
+        if ('NULL' === $next) {
+            $next = null;
+        }
+
+        /* Have a max of MAX_CALL ancestors
+         * I guess 100 might be enough, but reconfigure it as you need
+         */
+        for ($i = 0; $next && $i < self::MAX_CALLS; $i++) {
+            if (!isset($this->parentLookup[$next])) {
+                $parent = $graph[$row['curriculum_node_parent_id']];
+
+                $node = $this->curriculumNodeMapper->createModel()
+                    ->setParent($parent['curriculum_node_parent_id'] ? $this->parentLookup[$parent['curriculum_node_parent_id']] : null)
+                    ->setName($parent['name'])
+                    ->setDescription($parent['description'])
+                    ->setCode($parent['code'])
+                    ->setOrder($parent['order']);
+
+                $this->curriculumNodeMapper->save($node);
+
+                // Store the inserted ID so we can link children to it
+                $this->parentLookup[$parent['id']] = $node->getId();
+
+                /* Because NULL string is not the same as a NULL data type
+                 * and people are going to forget to clear this in the csv
+                 */
+                if ('NULL' === $parent['curriculum_node_parent_id']) {
+                    $next = null;
+                } else {
+                    $next = (int)$parent['curriculum_node_parent_id'];
+                }
+            }
         }
     }
 }
