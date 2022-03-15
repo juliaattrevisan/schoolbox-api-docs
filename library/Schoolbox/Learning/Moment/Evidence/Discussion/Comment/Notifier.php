@@ -60,7 +60,7 @@ class Notifier extends AbstractModuleNotifier
             'setMapper'         => $mf->get(CommentMapper::class),
             'setThreadMapper'   => $mf->get(ThreadMapper::class),
             'setEvidenceMapper' => $mf->get(EvidenceMapper::class),
-            'setUserMapper'     => $mf->getLazy(UserMapper::class),
+            'setUserMapper'     => $mf->get(UserMapper::class),
         ];
     }
 
