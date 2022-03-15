@@ -262,36 +262,54 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
          * will always return true, as the $result will always be set, even it its set to false.
          * where this checks if there actually are results
          */
-        $statement = $this->database->prepare("
 
+        /**
+         * break up the forum query into 2 separate checks, one to check if it is on a page,
+         * the other to see if it is alt sourced.
+         */
+        $homepageQuery  = $this->database->prepare("SELECT ci.id FROM component_instance ci
+        JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
+        WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage'
+        AND identifier = :id");
+
+        $homepageQuery->execute(array(
+                                'id' => $folderID,
+                            ));
+
+        /**
+         * if we found a forum on the homepage, return true, else check for alt sourcing forums
+         */
+        if (($row = $homepageQuery->fetch()) !== false) {
+            return true;
+        }
+
+        $altSourceQuery  = $this->database->prepare("
 SELECT
     `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
 FROM        `component_instance`
-                INNER JOIN  `component_definition` `cd` ON
-        `component_instance`.`component_definition_id` = `cd`.`id`
-                LEFT JOIN   `component_config_definition` `ccd` ON
-        `cd`.`id` = `ccd`.`component_definition_id`
-                LEFT JOIN   `component_config_instance` `cci` ON
+    INNER JOIN  `component_definition` `cd` ON `component_instance`.`component_definition_id` = `cd`.`id`  AND class = 'Component_Homepage_ForumListController'
+    JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
+    JOIN   `component_config_instance` `cci` ON
             `ccd`.`id` = `cci`.`component_config_definition_id` AND
-            `cci`.`component_instance_id` = `component_instance`.`id`
+            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = ':id1'
 
 WHERE
-      `ccd`.`label` = 'Source'
-AND
-        (`component_instance`.`identifier` = :id1 AND `cci`.`value` is null)
-OR
-        (`component_instance`.`identifier` != :id2 AND `cci`.`value` = :id3)
-        ");
+  `component_instance`.module = 'homepage'
+  AND
+        `component_instance`.`identifier` != :id2");
 
-        $statement->execute(array(
+        $altSourceQuery->execute(array(
             'id1' => $folderID,
             'id2' => $folderID,
-            'id3' => $folderID,
                             ));
 
-        if (($row = $statement->fetch()) !== false) {
+        if (($row = $altSourceQuery->fetch()) !== false) {
             return true;
         }
+
+        /**
+         * no results from either homepage or alt sourcing, no forum enabled
+         */
         return false;
     }
 }

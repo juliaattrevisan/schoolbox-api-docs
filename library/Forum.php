@@ -110,31 +110,45 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
      */
     public function hasForum($categoryID)
     {
+        /**
+         * break up the forum query into 2 separate checks, one to check if it is on a page,
+         * the other to see if it is alt sourced.
+         */
+        $homepageQuery  = "SELECT ci.id FROM component_instance ci
+        JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
+        WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage'
+        AND identifier = $categoryID";
+        $result = $this->db->getOne($homepageQuery);
 
-        $query  = "
+        /**
+         * if we found a forum on the homepage, return true, else check for alt sourcing forums
+         */
+        if ($result !== false) {
+            return true;
+        }
+
+        $altSourceQuery  = "
 SELECT
     `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
 FROM        `component_instance`
-                INNER JOIN  `component_definition` `cd` ON
-        `component_instance`.`component_definition_id` = `cd`.`id`
-                LEFT JOIN   `component_config_definition` `ccd` ON
-        `cd`.`id` = `ccd`.`component_definition_id`
-                LEFT JOIN   `component_config_instance` `cci` ON
+    INNER JOIN  `component_definition` `cd` ON `component_instance`.`component_definition_id` = `cd`.`id`  AND class = 'Component_Homepage_ForumListController'
+    JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
+    JOIN   `component_config_instance` `cci` ON
             `ccd`.`id` = `cci`.`component_config_definition_id` AND
-            `cci`.`component_instance_id` = `component_instance`.`id`
+            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = '$categoryID'
 
 WHERE
-      `ccd`.`label` = 'Source'
-AND
-        (`component_instance`.`identifier` = $categoryID AND `cci`.`value` is null)
-OR
-        (`component_instance`.`identifier` != $categoryID AND `cci`.`value` = $categoryID)
-";
-        $result = $this->db->getOne($query);
+  `component_instance`.module = 'homepage'
+  AND
+        `component_instance`.`identifier` != $categoryID";
+        $result = $this->db->getOne($altSourceQuery);
 
         if ($result !== false) {
             return true;
         }
+        /**
+         * no results from either homepage or alt sourcing, no forum enabled
+         */
 
         return false;
     }
