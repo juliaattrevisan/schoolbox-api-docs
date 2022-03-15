@@ -118,40 +118,14 @@ class Installer implements IPackageInstall
          * When Frank is finally encountered, it'll create a new $node unless
          * you skip it by checking the $parentLookup hash
          */
-        foreach ($graph as $id => $row) {
+        foreach ($graph as $row) {
             /* Import $row's parent nodes, all the way back to root
              */
-            $this->importStrand($graph, $row);
+            $this->importAncestors($graph, $row);
 
-            /* $row might have been imported by importStrand()
-             *
-             * This predominantly affects immediate descendents of root node
-             * if they appear in the csv at the very end, but the first few
-             * lines of csv use those as parents
-             */
-            if (isset($this->parentLookup[$id])) {
-                continue;
-            }
-
-            $parentId = $row['curriculum_node_parent_id'];
-
-            /* Treat this special word with special care
-             */
-            if (self::NULL_STRING === $parentId) {
-                $parentId = null;
-            }
-
-            $node = $this->curriculumNodeMapper->createModel()
-                ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
-                ->setName($row['name'])
-                ->setDescription($row['description'])
-                ->setCode($row['code'])
-                ->setOrder($row['order']);
-
-            $this->curriculumNodeMapper->save($node);
-
-            // Store the inserted ID so we can link children to it
-            $this->parentLookup[$id] = $node->getId();
+            /* Import $row itself
+            */
+            $this->importNode($row);
         }
     }
 
@@ -168,7 +142,7 @@ class Installer implements IPackageInstall
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStrand(array $graph, array $row): void
+    private function importAncestors(array $graph, array $row): void
     {
         $next = $row['curriculum_node_parent_id'];
 
@@ -207,5 +181,48 @@ class Installer implements IPackageInstall
                 }
             }
         }
+    }
+
+
+    /**
+     * Import the $row node
+     *
+     * @param array $row
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importNode(array $row): void
+    {
+        /* $row might have been imported by importStrand()
+         *
+         * This predominantly affects immediate descendents of root node
+         * if they appear in the csv at the very end, but the first few
+         * lines of csv use those as parents
+         */
+        if (isset($this->parentLookup[$row['id']])) {
+            return;
+        }
+
+        $parentId = $row['curriculum_node_parent_id'];
+
+        /* Treat this special word with special care
+         */
+        if (self::NULL_STRING === $parentId) {
+            $parentId = null;
+        }
+
+        $node = $this->curriculumNodeMapper->createModel()
+            ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
+            ->setName($row['name'])
+            ->setDescription($row['description'])
+            ->setCode($row['code'])
+            ->setOrder($row['order']);
+
+        $this->curriculumNodeMapper->save($node);
+
+        // Store the inserted ID so we can link children to it
+        $this->parentLookup[$row['id']] = $node->getId();
     }
 }
