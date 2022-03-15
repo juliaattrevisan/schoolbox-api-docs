@@ -13,12 +13,8 @@ export default {
 
   data() {
     return {
-      selected: null,
+      selected: this.selectedFilters,
     };
-  },
-
-  created () {
-    this.selected = this.selectedFilters;
   },
 
   methods: {
@@ -90,8 +86,8 @@ export default {
      * @param ids
      * @return {Boolean}
      */
-    isSourceChecked(ids) {
-      return this.selected?.source.some((source) => source.id === ids)
+    isSourceChecked(changedSource) {
+      return this.selected.source.some((source) => source.join() === changedSource.join());
     },
 
     /**
@@ -99,11 +95,11 @@ export default {
      * @param $event
      * @param ids
      */
-    onSourceChanged($event, ids) {
+    onSourceChanged($event, changedSource) {
       if ($event.target.checked) {
-        this.selected[filterKey] = this.getAllIds(filterKey);
+        this.selected.source = [...this.selected.source, changedSource];
       } else {
-        this.selected[filterKey] = [];
+        this.selected.source = this.selected.source.filter((source) => source.join() !== changedSource.join());
       }
     },
 
@@ -168,8 +164,7 @@ export default {
                     <input
                       type="checkbox"
                       :id="`source-${source.ids}`"
-                      :value="source.ids"
-                      :checked="isSourceChecked(source)"
+                      :checked="isSourceChecked(source.ids)"
                       @change="onSourceChanged($event, source.ids)"
                     />
                     <label :for="`source-${source.ids}`">{{ source.name }}</label>
