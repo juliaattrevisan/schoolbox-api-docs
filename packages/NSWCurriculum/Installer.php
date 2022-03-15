@@ -31,6 +31,13 @@ class Installer implements IPackageInstall
 
 
     /**
+     * Some kind of export includes this word for a column with
+     * the datatype null, instead of leaving it empty
+     */
+    private const NULL_STRING = 'NULL';
+
+
+    /**
      * @var Node\Mapper
      */
     private Node\Mapper $curriculumNodeMapper;
@@ -44,6 +51,9 @@ class Installer implements IPackageInstall
     private array $parentLookup = [];
 
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->curriculumNodeMapper = Node\Mapper::getInstance();
@@ -127,7 +137,7 @@ class Installer implements IPackageInstall
 
             /* Treat this special word with special care
              */
-            if ('NULL' === $parentId) {
+            if (self::NULL_STRING === $parentId) {
                 $parentId = null;
             }
 
@@ -164,7 +174,7 @@ class Installer implements IPackageInstall
 
         /* Treat this special word with special care
          */
-        if ('NULL' === $next) {
+        if (self::NULL_STRING === $next) {
             $next = null;
         }
 
@@ -190,7 +200,7 @@ class Installer implements IPackageInstall
                 /* Because NULL string is not the same as a NULL data type
                  * and people are going to forget to clear this in the csv
                  */
-                if ('NULL' === $parent['curriculum_node_parent_id']) {
+                if (self::NULL_STRING === $parent['curriculum_node_parent_id']) {
                     $next = null;
                 } else {
                     $next = (int)$parent['curriculum_node_parent_id'];
