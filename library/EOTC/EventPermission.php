@@ -32,7 +32,7 @@ class EventPermission
     /**
      * The campus to which this permissions/subscriptions applies
      *
-     * @var Campus
+     * @var Campus|null
      */
     private $campus;
 
@@ -87,7 +87,7 @@ class EventPermission
     }
 
     /**
-     * @return Campus
+     * @return Campus|null
      */
     public function getCampus()
     {
