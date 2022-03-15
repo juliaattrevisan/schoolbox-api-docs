@@ -13,6 +13,7 @@ use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
 
 /**
@@ -151,7 +152,7 @@ class Api implements IApi
         $dsnParts = (new Codec\DSN())->decode($dsn);
 
         if (!isset($dsnParts[$module])) {
-            throw new DomainException("Tass API DSN: Invalid module name {$module}");
+            throw new MissingModule("Tass API DSN: Invalid module name {$module}");
         }
 
         $this->credentials = $dsnParts[$module];

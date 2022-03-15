@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\ApiCertification;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
@@ -150,13 +151,13 @@ class Factory
 
 
     /**
-     * @return GenericCollection
+     * @return null|GenericCollection
      * @throws \DomainException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(): GenericCollection
+    public function produce(): ?GenericCollection
     {
         $this->log->info('Accessing api endpoint');
 
@@ -171,6 +172,16 @@ class Factory
             foreach ($modules as $module) {
                 $api[$module] = new Api($this->host, $this->key, $module);
             }
+        } catch (MissingModule $e) {
+            /* You tried to access a module that wasn't specified in the dsn
+             * Tell me that, then exit quietly; the TASS API calendar is optional
+             */
+            $this->log->debug(sprintf(
+                'Tried to access TASS module %s, but it was not specified in School Data Endpoint key.',
+                $module
+            ));
+
+            return null;
         } catch (\DomainException $e) {
             /* schoolcalendarandnotices might not be enabled for a school who chooses to eschew
              * this feature; instead of catastrophically dying with a fatal, just accumulate quietly
