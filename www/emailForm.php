@@ -52,7 +52,8 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
     $core   = new CoreContext($myconf);
     $email  = new TwigEmail('feedback.twig');
     $email->setCoreContext($core->getContext());
-    $email->setFrom($_POST['email'], $name);
+    $email->setFrom(Config::get('mail_from_address'), Config::get('mail_from_name'));
+    $email->setReplyTo($_POST['email'], $name);
     $email->setSubject(Config::get('title') . ' Feedback - ' . $_POST['subject']);
     $email->setContext($context)->send(array(
                         'name' => Config::get('mail_from_name'),
