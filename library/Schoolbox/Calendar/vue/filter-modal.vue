@@ -13,8 +13,12 @@ export default {
 
   data() {
     return {
-      selected: this.selectedFilters
+      selected: null,
     };
+  },
+
+  created () {
+    this.selected = this.selectedFilters;
   },
 
   methods: {
@@ -142,11 +146,10 @@ export default {
                       type="checkbox"
                       name="source"
                       :id="'source' + String(source.ids)"
-                      :key="'input-' + source.id"
                       :value="source.ids"
                       v-model="selected.source"
                     />
-                    <label :for="'source' + String(source.ids)" :key="'label' + source.id">{{ source.name }}</label>
+                    <label :for="'source' + String(source.ids)">{{ source.name }}</label>
                   </li>
               </ul>
             </fieldset>
@@ -169,11 +172,10 @@ export default {
                       type="checkbox"
                       name="group"
                       :id="'group' + String(group.id)"
-                      :key="'input-' + group.id"
                       :value="group.id"
                       v-model="selected.group"
                     />
-                    <label :for="'group' + String(group.id)" :key="'label-' + group.id">{{ group.name }}</label>
+                    <label :for="'group' + String(group.id)">{{ group.name }}</label>
                 </li>
               </ul>
             </fieldset>
@@ -196,11 +198,10 @@ export default {
                         type="checkbox"
                         name="group"
                         :id="'campus' + String(campus.id)"
-                        :key="'input-' + campus.id"
                         :value="campus.id"
                         v-model="selected.campus"
                     />
-                    <label :for="'campus' + String(campus.id)" :key="'label-' + campus.id">{{ campus.name }}</label>
+                    <label :for="'campus' + String(campus.id)">{{ campus.name }}</label>
                 </li>
               </ul>
             </fieldset>
@@ -223,14 +224,12 @@ export default {
                       type="checkbox"
                       name="group"
                       :id="'eventType' + String(eventType.id)"
-                      :key="'input-' + eventType.id"
                       :value="eventType.id"
                       v-model="selected.eventType"
                     />
                     <label
                       :for="'eventType' + String(eventType.id)"
                       :style="getEventTypeStyles(eventType)"
-                      :key="'label-' + eventType.id"
                       >{{ eventType.name }}</label
                     >
                 </li>
