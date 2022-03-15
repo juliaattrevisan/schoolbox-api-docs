@@ -81,24 +81,28 @@ export default {
     },
 
     /**
-     * 
+     * Check if the updates Source is in the currently selected list
+     * to determine whether the checkbox should be selected or not
      *
-     * @param ids
+     * @param Array - ie Array [5, 6];
      * @return {Boolean}
      */
-    isSourceChecked(changedSource) {
-      return this.selected.source.some((source) => source.join() === changedSource.join());
+    isSourceChecked(sourceToCheck) {
+      return this.selected.source.some((source) => source.join() === sourceToCheck.join());
     },
 
     /**
+     * Add or remove the source from the selected sources based on the current
+     * status of the checkbox
      * 
      * @param $event
-     * @param ids
+     * @param Array - ie Array [5, 6];
      */
     onSourceChanged($event, changedSource) {
       if ($event.target.checked) {
         this.selected.source = [...this.selected.source, changedSource];
       } else {
+        //the changedSource arrays are just a list of ids, so we can use join() to compare each 
         this.selected.source = this.selected.source.filter((source) => source.join() !== changedSource.join());
       }
     },
