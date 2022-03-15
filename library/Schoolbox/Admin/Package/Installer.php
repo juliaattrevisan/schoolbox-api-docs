@@ -48,7 +48,11 @@ class Installer
                 $installer->install($user);
             } catch (\Throwable $e) {
                 $db->rollBack();
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to install package, rolling back.");
+
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, sprintf(
+                    'Unable to install package, rolling back - %s',
+                    $e->getMessage()
+                ));
             }
             $db->commit();
 
