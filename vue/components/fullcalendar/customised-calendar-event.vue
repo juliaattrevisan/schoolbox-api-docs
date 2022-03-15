@@ -140,12 +140,13 @@ export default {
 
 //apply padding as .fc-event-title will lose its padding from display: inline
 .event-container { 
-    padding: 2px 0px;
+    padding: 2px;
 }
 
 //needs to be inline to ensure the .strike class works 
 .fc-event-title { 
     display: inline;
+    padding-right: 2px;
 }
 
 //the task checkbox can be selected, but this change wont be reflected in the view-event-modal.vue that's opened
