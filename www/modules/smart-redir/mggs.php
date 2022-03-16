@@ -160,7 +160,7 @@ if ($_GET) {
             $action                   = "https://www.magpies.net.au/wp-login.php";
             $method                   = "POST";
             $formArray['log']         = 'mggs';
-            $formArray['pwd']         = 'girls';
+            $formArray['pwd']         = 'mggs123';
             $formArray['redirect_to'] = "https://www.magpies.net.au/the-source/";
             break;
 
