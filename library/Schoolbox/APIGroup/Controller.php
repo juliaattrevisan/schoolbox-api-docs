@@ -60,7 +60,7 @@ class Controller extends Base
      * Returns group memberships for a user
      *
      * @param User $user
-     * @api /user/{userId}/groupMembership
+     * @api /apigroup/{userId}/groupMembership
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipSearch
      */
     public function apiMembership(User $user)
