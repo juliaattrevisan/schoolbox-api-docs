@@ -86,7 +86,7 @@
         "symfony/lock": "^5.2.3",
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
-        "enshrined/svg-sanitize": "~0.14.0",
+        "enshrined/svg-sanitize": "~0.15.0",
         "symfony/yaml": "^5.2",
         "maennchen/zipstream-php": "^2.1",
         "ext-mbstring": "*",
