@@ -62,28 +62,6 @@ class Module extends BaseModule
 
 
     /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params): array
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['userId']);
-        } catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function buildController(): Base
