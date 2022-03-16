@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\APIGroup;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
+use Schoolbox\APIGroup\ModelToArray;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -65,33 +67,11 @@ class Controller extends Base
     {
 
         $users_groups = $this->groupsHelper->getCurrentGroups($user);
-        $apiGroups = [];
-        foreach ($users_groups as $group) {
-            $membership = 'none';
-            if ($group['isAccessRead']) {
-                $membership = 'read';
-            } elseif ($group['isAccessWrite']) {
-                $membership = 'write';
-            } elseif ($group['isAccessAdmin']) {
-                $membership = 'admin';
-            }
-            $apiGroups[] = [
-                'id'                => $group['id'],
-                'name'              => $group['name'],
-                'type'              => $group['type'],
-                'isForceFollow'     => $group['isForceFollow'],
-                'isNotificationsOn' => $group['isNotificationsOn'],
-                'enrollmentStatus'   => $group['enrolmentStatus'],
-                'membership'        => $membership,
-                '_links'            => [
-                    'homepage'      => sprintf('/homepage/%d', $group['id'])
-                ]
-            ];
-        }
-
+        $apiGroups = new Collection($users_groups);
+        $output = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput(
-                $apiGroups
+                $output
             )
         );
     }
