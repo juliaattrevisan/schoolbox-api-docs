@@ -67,7 +67,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
             /* If modifying this textbox */
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                if (($this->getSitePage()->arg[2] == 'textbox') && ($this->getSitePage()->arg[4] == $instance_id)) {
+                if ( isset($this->getSitePage()->arg[2]) && $this->getSitePage()->arg[2] == 'textbox' && $this->getSitePage()->arg[4] == $instance_id ) {
                     $this->setVar('TEXTBOX_CONTENT', Scrub::text($textBox->getContent()));
                     $this->parse('has_modify_form_block', 'has_modify_form');
                 } else {

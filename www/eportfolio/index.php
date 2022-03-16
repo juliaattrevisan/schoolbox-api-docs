@@ -9,7 +9,7 @@
 use Schoolbox\Permission\Access\UserAccess;
 
 /** @var SitePage $this */
-$ownerId = is_numeric($this->arg[0]) ? (int)$this->arg[0] : $_SESSION['id'];
+$ownerId = (isset($this->arg[0]) && is_numeric($this->arg[0])) ? (int)$this->arg[0] : $_SESSION['id'];
 
 try {
     $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
@@ -19,7 +19,7 @@ try {
 }
 
 $page = null;
-if (is_numeric($this->arg[1])) {
+if (isset($this->arg[1]) && is_numeric($this->arg[1])) {
     try {
         $page = \Eportfolio\PageMapper::getInstance()->findById((int)$this->arg[1]);
         $pageName = $page->getPageId();
@@ -27,7 +27,7 @@ if (is_numeric($this->arg[1])) {
         $this->pageNotFound();
         exit;
     }
-} elseif (in_array($this->arg[1], [\Eportfolio\Page::PROFILE, \Eportfolio\Page::SHOWCASE, \Eportfolio\Page::CREATE])) {
+} elseif (isset($this->arg[1]) && in_array($this->arg[1], [\Eportfolio\Page::PROFILE, \Eportfolio\Page::SHOWCASE, \Eportfolio\Page::CREATE])) {
     $pageName = $this->arg[1];
 } else {
     $pageName = \Eportfolio\Page::PROFILE;

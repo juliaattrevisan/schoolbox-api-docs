@@ -582,7 +582,7 @@ class Group extends DeprecatedModel
 
     function isParentOfChild($childID)
     {
-        if (is_array($_SESSION['children'])) {
+        if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $child) {
                 if ($child['id'] == $childID) {
                     return true;

@@ -2333,7 +2333,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
-            if (!$folderCache[$folderId] instanceof Model) {
+            if (!isset($folderCache[$folderId])) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
                 $folderCache[$folderId]->setCodes($codeMapper->createCollection());
                 $folders[$folderId] = $folderCache[$folderId];

@@ -142,7 +142,7 @@ class PageMapper extends Schoolbox\Mapper
         foreach ($allPages as $currentPage) {
             /* They can be a superuser
              */
-            $isSuperuser = $_SESSION['su'];
+            $isSuperuser = $_SESSION['su'] ?? 0;
 
             /* They can be a staff member
              */
