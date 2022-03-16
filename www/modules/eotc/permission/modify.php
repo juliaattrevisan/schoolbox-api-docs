@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/** @var SitePage $this */
 new Authenticator($this);
 
 /** @var User $sessionUser */
@@ -38,7 +39,7 @@ $this->setBlock(TEMPLATE_content, 'permission', 'permission_block');
 $this->setVar([
     'campus_block'     => '',
     'status_block'     => '',
-    'permission_block' => ''
+    'permission_block' => '',
 ]);
 
 // Set staff group IDs into the magicsuggest.
@@ -54,12 +55,11 @@ if (is_numeric($this->arg[0])) {
     try {
         /** @var User $user */
         $user = $userMapper->findById($this->arg[0]);
+        $allPermissions   = $eventPermissionMapper->findByUser($user);
+        $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
     } catch (MapperException $e) {
         error(ErrorMapper::ERROR_USER_NOT_FOUND);
     }
-
-    $allPermissions   = $eventPermissionMapper->findByUser($user);
-    $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
 } else {
     /* Create new permissions for someone
      */
@@ -72,11 +72,11 @@ if (is_numeric($this->arg[0])) {
 $campusIds = [];
 
 foreach ($allPermissions as $currentPermission) {
-    $campusIds[] = $currentPermission->getCampusId()->getId();
+    $campusIds[] = $currentPermission->getCampus()->getId();
 }
 
 $campusMapper = CampusMapper::getInstance();
-$allCampuses  = $campusMapper->findAll();
+$allCampuses  = $campusMapper->findAll()->sortBy('sequence', 'ASC');
 
 foreach ($allCampuses as $currentCampus) {
     if (in_array($currentCampus->getId(), $campusIds)) {
@@ -88,7 +88,7 @@ foreach ($allCampuses as $currentCampus) {
     $this->setVar([
         'CAMPUS_ID'       => $currentCampus->getId(),
         'CAMPUS_NAME'     => $currentCampus->getName(),
-        'CAMPUS_SELECTED' => $selected
+        'CAMPUS_SELECTED' => $selected,
     ]);
 
     $this->parse('campus_block', 'campus', true);
@@ -99,7 +99,7 @@ foreach ($allCampuses as $currentCampus) {
 $statusIds = [];
 
 foreach ($allPermissions as $currentPermission) {
-    $statusIds[] = $currentPermission->getStatusId()->getId();
+    $statusIds[] = $currentPermission->getStatus()->getId();
 }
 
 $statusMapper = EventStatusMapper::getInstance();
@@ -116,7 +116,7 @@ foreach ($statusMapper->findPermissionStatuses() as $currentStatus) {
     $this->setVar([
         'STATUS_ID'       => $currentStatus->getId(),
         'STATUS_NAME'     => $currentStatus->getName(),
-        'STATUS_SELECTED' => $selected
+        'STATUS_SELECTED' => $selected,
     ]);
 
     $this->parse('status_block', 'status', true);
@@ -126,7 +126,7 @@ foreach ($statusMapper->findPermissionStatuses() as $currentStatus) {
 $statusIds = [];
 
 foreach ($allSubscriptions as $currentSubscription) {
-    $statusIds[] = $currentSubscription->getStatusId()->getId();
+    $statusIds[] = $currentSubscription->getStatus()->getId();
 }
 
 foreach ($statusMapper->findAll() as $currentStatus) {
@@ -139,7 +139,7 @@ foreach ($statusMapper->findAll() as $currentStatus) {
     $this->setVar([
         'STATUS_ID'       => $currentStatus->getId(),
         'STATUS_NAME'     => $currentStatus->getName(),
-        'STATUS_SELECTED' => $selected
+        'STATUS_SELECTED' => $selected,
     ]);
 
     $this->parse('subscription_block', 'subscription', true);
@@ -154,34 +154,23 @@ if (count($allUserIds)) {
 }
 
 foreach ($availableUsers as $user) {
-    $allPermissions = $eventPermissionMapper->findByUser($user);
-    $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
+    $userPermissions = $eventPermissionMapper->findByColumn('user_id', $user->getId());
 
-    /* Accumulate all the campus names and remove dupes
-     */
-    $campusNames = [];
+    $campusNames     = [];
+    $allowedStatuses = [];
+    $subscriptions   = [];
 
-    foreach ($allPermissions as $currentPermission) {
-        $campusNames[$currentPermission->getCampus()->getName()] = '';
-    }
-    foreach ($allSubscriptions as $currentPermission) {
-        $campusNames[$currentPermission->getCampus()->getName()] = '';
-    }
-
-    $allCampuses = implode(', ', array_keys($campusNames));
-
-    /* Accumulate all the status names and remove dupes
-     */
-    $statusNames = [];
-
-    foreach ($allPermissions as $currentPermission) {
-        $statusNames[$currentPermission->getStatus()->getName()] = '';
-    }
-
-    $statusSubscriptionNames = [];
-
-    foreach ($allSubscriptions as $currentSubscription) {
-        $statusSubscriptionNames[$currentSubscription->getStatus()->getName()] = '';
+    /** @var \EOTC\EventPermission $currentPermission */
+    foreach ($userPermissions as $currentPermission) {
+        if ($currentPermission->getCampus() && !in_array($currentPermission->getCampus()->getName(), $campusNames)) {
+            $campusNames[] = $currentPermission->getCampus()->getName();
+        }
+        if ($currentPermission->getAllowed() && !in_array($currentPermission->getStatus()->getName(), $allowedStatuses)) {
+            $allowedStatuses[] = $currentPermission->getStatus()->getName();
+        }
+        if ($currentPermission->getSubscribed() && !in_array($currentPermission->getStatus()->getName(), $subscriptions)) {
+            $subscriptions[] = $currentPermission->getStatus()->getName();
+        }
     }
 
     $this->setVar(
@@ -189,9 +178,9 @@ foreach ($availableUsers as $user) {
             'PERMISSION_USER_ID'              => $user->getId(),
             'PERMISSION_USER_FIRSTNAME'       => $user->getFirstname(),
             'PERMISSION_USER_LASTNAME'        => $user->getLastname(),
-            'PERMISSION_CAMPUS_NAMES'         => $allCampuses,
-            'PERMISSION_STATUS_NAMES'         => implode(', ', array_keys($statusNames)),
-            'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', array_keys($statusSubscriptionNames)),
+            'PERMISSION_CAMPUS_NAMES'         => implode(', ', $campusNames),
+            'PERMISSION_STATUS_NAMES'         => implode(', ', $allowedStatuses),
+            'PERMISSION_STATUS_SUBSCRIPTIONS' => implode(', ', $subscriptions),
         ]
     );
 

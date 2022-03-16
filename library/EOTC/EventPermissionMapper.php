@@ -43,6 +43,29 @@ class EventPermissionMapper extends BaseMapper
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getSelectString()
+    {
+        return "SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('campus', 'c')},
+                {$this->getJoinColumnString('status', 's')}
+                ";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFromString()
+    {
+        return "FROM `{$this->table}`
+                JOIN {$this->getJoinSql('campus', '', 'c')}
+                LEFT JOIN {$this->getJoinSql('status', '', 's')}
+                ";
+    }
+
+    /**
      * Delete all the permissions for a user
      *
      * @param User $user
@@ -95,16 +118,11 @@ class EventPermissionMapper extends BaseMapper
     public function findByUser(User $user)
     {
         $query = "
-			SELECT
-				{$this->getColumnString('p')},
-				{$this->getJoinColumnString('campus', 'c')},
-				{$this->getJoinColumnString('status', 's')}
-			FROM `{$this->table}` p
-			LEFT JOIN {$this->getJoinSql('campus', 'p', 'c')}
-			LEFT JOIN {$this->getJoinSql('status', 'p', 's')}
-			WHERE p.user_id = :userId
-			AND p.is_allowed IS TRUE
-			ORDER BY p.campus_id, p.status_id
+            {$this->getSelectString()}
+            {$this->getFromString()}
+			WHERE {$this->table}.user_id = :userId
+			AND {$this->table}.is_allowed IS TRUE
+			ORDER BY {$this->table}.status_id, c.sequence
 		";
 
         $statement = $this->database->prepare($query);
@@ -121,16 +139,11 @@ class EventPermissionMapper extends BaseMapper
     public function findSubscriptionsByUser(User $user)
     {
         $query = "
-			SELECT
-				{$this->getColumnString('p')},
-				{$this->getJoinColumnString('campus', 'c')},
-				{$this->getJoinColumnString('status', 's')}
-			FROM `{$this->table}` p
-			LEFT JOIN {$this->getJoinSql('campus', 'p', 'c')}
-			LEFT JOIN {$this->getJoinSql('status', 'p', 's')}
-			WHERE p.user_id = :userId
-			AND p.is_subscribed IS TRUE
-			ORDER BY p.campus_id, p.status_id
+            {$this->getSelectString()}
+            {$this->getFromString()}
+			WHERE {$this->table}.user_id = :userId
+			AND {$this->table}.is_subscribed IS TRUE
+			ORDER BY {$this->table}.status_id, c.sequence
 		";
 
         $statement = $this->database->prepare($query);
@@ -149,7 +162,7 @@ class EventPermissionMapper extends BaseMapper
     {
         $allPermissions = $this->createCollection();
         foreach ($statement as $row) {
-            $permissionItem = $this->hydrate($row, 'p');
+            $permissionItem = $this->hydrate($row);
 
             $campusItem = $this->hydrateJoin($row, 'campus', 'c');
             $permissionItem->setCampus($campusItem);
