@@ -49,7 +49,7 @@ To avoid it and allow Geosnapshot to fetch the student's profile pictures, we've
 
 The header token is stored in a config var `geosnapshot_api_key`. This is the same key we use to authenticate to geosnapshot, it is unique per school and is setup during provisioning. The header token must be sent in the header `X-API-KEY`.
 
-The request is made to the Geosnapshot-specific version of `portrait.php` located in `/geosnapshot/portrait.php` which will serve up a profile picture if the `X-API-KEY` of the Geosnapshot request matches the `geosnapshot_redaction_key` stored in config.
+The request is made to the Geosnapshot-specific version of `portrait.php` located in `/geosnapshot/portrait.php` which will serve up a profile picture if the `X-API-KEY` of the Geosnapshot request matches the `geosnapshot_api_key` stored in config.
 
 An example curl request:
 
