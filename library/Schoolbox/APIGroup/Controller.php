@@ -89,7 +89,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             $this->buildJsonOutput(
                 $apiGroups
             )

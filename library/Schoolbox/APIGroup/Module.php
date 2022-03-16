@@ -16,8 +16,9 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -55,8 +56,6 @@ class Module extends BaseModule
             return $this->preloadUserGroup($params);
         };
 
-        $this->register('GET', '/user/{id}', 'getExample', $apiPerm, $preloadUser);
-        $this->register('POST', '/user', 'postExample', $apiPerm, null);
         $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess, $preloadUser);
     }
 
@@ -68,7 +67,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
-            $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(Access::class),
@@ -130,7 +128,6 @@ class Module extends BaseModule
             'group' => $group,
         ];
     }
-
 
     /**
      * @return Mapper|UserMapper
