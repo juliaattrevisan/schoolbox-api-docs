@@ -134,6 +134,14 @@ class Profile implements IStrategy
 
 
     /**
+     * TASS communication rules type codes (in comma separated format) for all guardian relationships
+     * that can be associated with students
+     * @var string|null
+     */
+    private ?string $communicationTypes;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -185,6 +193,7 @@ class Profile implements IStrategy
      * @param int                             $addnumMother
      * @param string                          $fatherAddressDescription
      * @param string                          $motherAddressDescription
+     * @param string|null                     $communicationTypes
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -202,6 +211,7 @@ class Profile implements IStrategy
         int $addnumMother,
         string $fatherAddressDescription,
         string $motherAddressDescription,
+        ?string $communicationTypes,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -218,6 +228,7 @@ class Profile implements IStrategy
         $this->addnumMother = $addnumMother;
         $this->fatherAddressDescription = $fatherAddressDescription;
         $this->motherAddressDescription = $motherAddressDescription;
+        $this->communicationTypes = $communicationTypes;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -262,10 +273,12 @@ class Profile implements IStrategy
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
+            $this->communicationTypes,
             (new Phone(
                 $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                 $this->fatherAddressDescription,
-                $this->motherAddressDescription
+                $this->motherAddressDescription,
+                $this->communicationTypes
             ))->generate()
         ))->generate();
 

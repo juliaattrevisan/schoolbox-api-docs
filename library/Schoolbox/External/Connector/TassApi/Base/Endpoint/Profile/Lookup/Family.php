@@ -86,6 +86,14 @@ class Family
 
 
     /**
+     * TASS communication rules type codes (in comma separated format) for all guardian relationships
+     * that can be associated with students
+     * @var string|null
+     */
+    private ?string $communicationTypes;
+
+
+    /**
      * An array of phone numbers indexed by family code
      *
      * @var array
@@ -110,6 +118,7 @@ class Family
      * @param string $spousePrefix
      * @param int    $addnumFather
      * @param int    $addnumMother
+     * @param string|null $communicationTypes
      * @param array  $phones
      */
     public function __construct(
@@ -117,6 +126,7 @@ class Family
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        ?string $communicationTypes,
         array $phones
     ) {
         $this->api = $api;
@@ -130,6 +140,8 @@ class Family
          */
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+
+        $this->communicationTypes = $communicationTypes;
 
         /* Phone lookup; data from another endpoint
          */
@@ -377,6 +389,11 @@ class Family
             $family[$node]['preferred_name'],
             $family[$node]['first_name']
         ]);
+
+        // if communication types are explicitly specified, do not populate parent who is not in $this->phones
+        if ($this->communicationTypes && !isset($this->phones[$family['user_code']][$node])) {
+            return [];
+        }
 
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,

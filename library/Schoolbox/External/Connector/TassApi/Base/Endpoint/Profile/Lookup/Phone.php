@@ -52,6 +52,14 @@ class Phone
 
 
     /**
+     * TASS communication rules type codes (in comma separated format) for all guardian relationships
+     * that can be associated with students
+     * @var string|null
+     */
+    private ?string $communicationTypes;
+
+
+    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
@@ -59,12 +67,14 @@ class Phone
      * @param IApi   $api
      * @param string $fatherAddressDescription
      * @param string $motherAddressDescription
+     * @param string|null $communicationTypes
      */
-    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription)
+    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, ?string $communicationTypes)
     {
         $this->api = $api;
         $this->fatherAddressDescription = $fatherAddressDescription;
         $this->motherAddressDescription = $motherAddressDescription;
+        $this->communicationTypes = $communicationTypes;
     }
 
 
@@ -81,7 +91,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'tkco'
+            'commtype' => $this->communicationTypes ?: 'tkco'
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
