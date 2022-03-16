@@ -1,10 +1,22 @@
 # Geosnapshot
 Geosnapshot is a photo library with AI-driven face detection so you can find a set of pictures by face rather than the traditional searching of keywords.
 
+## Setup
+For Geosnapshot to work, you need to know about these pieces of the puzzle.
+
+1. A Geosnapshot API Key.
+2. The Geosnapshot Module needs to be enabled in admin.
+3. Your SIS must support redaction.
+4. Students must be current (it won't work with non-current students). This is implemented on a per-connector basis (for example, live Synergetic). Every connector will implement redaction uniquely.
+
 ## Redaction
 Some students don't want/can't have their face made public. Geosnapshot Redactions is a means by which schools can explicitly prevent someone's face from matching a search request.
 
 To do it, Schoolbox interrogates the SIS and gets a list of students and their redaction status according to the SIS. This list is compiled into a Geosnapshot-compatible payload before being sent to them, at which point they take over the handling of that data. This payload is essentially a complete list of students with a `1` or `0` for their redaction status (`1` meaning the student's face is redacted). (There's other data here too.)
+
+> The redaction list consists of **current students** only. 
+> 
+> At the time of writing, only Synergetic supports redactions explicitly;  students need to be in the current `FileYear` and `FileSemester`.
 
 For Geosnapshot to redact someone from a search result, they need a sample picture of that person's face. Instead of having the entire fleet transmit the pictures en masse, Geosnapshot is intending to visit the instances themselves and grab the picture programmatically.
 
@@ -13,7 +25,7 @@ If we transmitted the files:
 * Geosnapshot would have needed to build more endpoints for us to put binary data
 * we'll probably end up ddos'ing Geosnapshot at some point
 
-Therefore, in the payloads we send to Gesnapshot, we also provide a url to a sample picture of that person's face. After we send that payload, Geosnapshot then visits the aforementioned url and grabs the picture's binary contents so it can be put into their system.
+Therefore, in the payloads we send to Geosnapshot, we also provide a url to a sample picture of that person's face. After we send that payload, Geosnapshot then visits the aforementioned url and grabs the picture's binary contents so it can be put into their system.
 
 ### Connector Support
 Only specific SIS will support redaction. At the time of writing, only the following connectors support Redaction:

@@ -57,6 +57,8 @@ $app = new class extends CliTool\App
 Geosnapshot Redactions send a list of students to Geosnapshot, describing which humans
 had their pictures redacted via the sis. Also transmits some additional metadata.
 
+The redaction list consists of current students only. 
+
 Usage: php redaction.php [--perform]
 
 
