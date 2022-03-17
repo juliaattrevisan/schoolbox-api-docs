@@ -15,6 +15,7 @@ use PDO;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
 
 /**
  * Class GroupMapper
@@ -138,5 +139,31 @@ class GroupMapper extends Mapper
             'sid'     => $group->getFolder()->getId(),
             'service' => UserAccess::SERVICE_HOMEPAGE,
         ]);
+    }
+
+    /**
+     * get all available groups ids in the system that the user could enrol in
+     * based on the user requested, having at least read perms to that folder
+     */
+    public function getAvailableGroupIds(User $user): array
+    {
+        //get list of all possible public groups, that the role has at least read permissions for.
+        $groups = $this->database->prepare("
+        SELECT userGroups.cid
+            FROM userGroups
+            WHERE userGroups.type in (:mod, :free)
+            AND userGroups.cid in (SELECT perms.cid FROM perms where perms.gid = :roleID and perms.type != :deny)
+            ");
+        $groups->execute(array(
+                             'roleID'   => $user->getRole()->getId(),
+                             'deny'     => UserAccess::ACCESS_DENY,
+                             'mod'      => Group::MODERATED_GROUP,
+                             'free'     => Group::FREE_GROUP,
+                         ));
+        $groupsArr = [];
+        while ($groupsLine = $groups->fetch()) {
+            $groupsArr[] = (int)$groupsLine['cid'];
+        }
+        return $groupsArr;
     }
 }

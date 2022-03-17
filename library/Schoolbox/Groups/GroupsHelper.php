@@ -61,20 +61,7 @@ class GroupsHelper
                                                                    'service' => UserAccess::SERVICE_HOMEPAGE,
                                                                ])->indexBy('serviceIdentifier');
 
-        //get list of all possible public groups, that the role has at least read permissions for.
-        $groups = $this->groupMapper->getDatabase()->prepare("
-        SELECT userGroups.cid
-            FROM userGroups
-            WHERE userGroups.type in (2, 3)
-            AND userGroups.cid in (SELECT perms.cid FROM perms where perms.gid = :roleID and perms.type != 0)
-            ");
-        $groups->execute(array(
-                                     'roleID' => $user->getRole()->getId(),
-                                 ));
-        $groupsArr = [];
-        while ($groupsLine = $groups->fetch()) {
-            $groupsArr[] = (int)$groupsLine['cid'];
-        }
+        $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enrolled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
 

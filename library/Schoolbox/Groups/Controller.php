@@ -110,6 +110,16 @@ class Controller extends BaseController
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the user is part of the group.
         } catch (MapperException\NotFound $e) {
+            //check if user is able to be added to the group
+            $availableGroups = $this->groupMapper->getAvailableGroupIds($user);
+            if (!in_array($post['group'], $availableGroups)) {
+                $problem = (new ApiProblem('User does not have access to enrol in this group'))
+                    ->setStatus(400)
+                    ->asArray();
+                $this->getResponse()->status->setCode(400);
+                $this->getResponse()->content->set($this->buildJsonOutput($problem));
+                return; //exit early the user is part of the group.
+            }
             //add the user to the group
             $userGroup = $this->userAccessMapper->createModel();
             $userGroup->setServiceIdentifier($post['group'])
