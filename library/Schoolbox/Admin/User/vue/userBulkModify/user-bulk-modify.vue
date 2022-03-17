@@ -6,6 +6,7 @@ import RevealModal from '@schoolboxVue/components/reveal-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 
 export default {
+
     components: {
         BottomDrawer,
         RevealModal
@@ -40,7 +41,8 @@ export default {
             required: true
         }
     },
-    data() {
+
+    data () {
         return {
             selectedFilters: {
                 campusId: -1,
@@ -130,93 +132,9 @@ export default {
             logData: [],
         }
     },
-    mounted() {
-        this.loadRows();
-    },
-    methods: {
-        /**
-         * load users
-         */
-        async loadRows() {
-            try {
-                const response = await fetch(this.srcUserList, {
-                    method: 'POST',
-                    body: JSON.stringify(this.selectedFilters),
-                    // body: this.$refs.filter.data
-                });
-                this.rows = await response.json();
-                this.hasRowsLoaded = true;
-            } catch (error) {
-                console.log(error);
-                this.hasLoadError = true; //display error note in the DOM
-            }
-        },
 
-        /**
-         * Notify state change
-         *
-         * @param { Object }
-         */
-        onSelectionChange() {
-            this.loadRows();
-        },
-
-        /**
-         * to keep track of selected rows
-         */
-        onRowSelected(event) {
-            this.selectedRows = event;
-        },
-
-        /**
-         * clear the selection
-         */
-        clearRows() {
-            this.selectedRows = [];
-        },
-
-        /**
-         * To confirm/cancel selected users deletion
-         */
-        onClearUsersToSelected() {
-            this.clearRows();
-            this.$refs.table.resetSelectedRows();
-        },
-
-        onUpdateUsersSelected() {
-            fetch(this.srcUserModify, {
-                method: 'POST',
-                body: this.getFormData(),
-            }).then((response) => response.json())
-                .then((data) => {
-                        this.logData = data;
-                        this.$refs.modal.open();
-                        this.clearRows();
-                    }
-                ).catch((error) => {
-                console.log(error);
-            })
-        },
-
-        /**
-         * Set up updating fields to POST
-         *
-         * @returns {FormData}
-         */
-        getFormData() {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
-            const formData = new FormData();
-            usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
-            });
-            for (const [key, value] of Object.entries(this.updateFields)) {
-                formData.append(key, value);
-            }
-            return formData;
-        },
-
-    },
     computed: {
+
         /**
          * To track how many are selected
          *
@@ -240,9 +158,104 @@ export default {
                 return this.selectedRowsCount + ' ' + this.pluralRowName;
             }
         },
-    }
+
+    },
+
+    mounted () {
+        this.loadRows();
+    },
+
+    methods: {
+
+        /**
+         * load users
+         */
+        async loadRows () {
+            try {
+                const response = await fetch(this.srcUserList, {
+                    method: 'POST',
+                    body: JSON.stringify(this.selectedFilters),
+                    // body: this.$refs.filter.data
+                });
+                this.rows = await response.json();
+                this.hasRowsLoaded = true;
+            } catch (error) {
+                console.log(error);
+                this.hasLoadError = true; //display error note in the DOM
+            }
+        },
+
+        /**
+         * Notify state change
+         *
+         * @param { Object }
+         */
+        onSelectionChange () {
+            this.loadRows();
+        },
+
+        /**
+         * to keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedRows = event;
+        },
+
+        /**
+         * clear the selection
+         */
+        clearRows () {
+            this.selectedRows = [];
+        },
+
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onClearUsersToSelected () {
+            this.clearRows();
+            this.$refs.table.resetSelectedRows();
+        },
+
+        /**
+         * Update the selected users
+         */
+        onUpdateUsersSelected () {
+            fetch(this.srcUserModify, {
+                method: 'POST',
+                body: this.getFormData(),
+            }).then((response) => response.json())
+                .then((data) => {
+                        this.logData = data;
+                        this.$refs.modal.open();
+                        this.clearRows();
+                    }
+                ).catch((error) => {
+                console.log(error);
+            })
+        },
+
+        /**
+         * Set up updating fields to POST
+         *
+         * @returns {FormData}
+         */
+        getFormData () {
+            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+            const formData = new FormData();
+            usersToModifyIDList.forEach((item) => {
+                formData.append('users[]', item);
+            });
+            for (const [key, value] of Object.entries(this.updateFields)) {
+                formData.append(key, value);
+            }
+            return formData;
+        },
+
+    },
+    
 }
 </script>
+
 <template>
     <div>
         <v-client-table
@@ -324,11 +337,10 @@ export default {
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
+
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
-
-
             <section class="content">
                 <div class="row">
                     <div class="small-12 columns">
@@ -497,6 +509,7 @@ export default {
         </reveal-modal>
     </div>
 </template>
+
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
