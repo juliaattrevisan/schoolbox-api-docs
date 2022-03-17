@@ -162,7 +162,7 @@ class Controller extends Base
     public function apiMembershipPatch(User $user, Group $group)
     {
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
-        $post = $this->getRequest()->post->getArrayCopy();
+        $post = json_decode(json_encode($this->request->content->get()), true);
         $post['membership'] = $post['membership'] ?: $users_group['membership'];
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: $users_group['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?: $users_group['isFavourite'];
