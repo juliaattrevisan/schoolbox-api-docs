@@ -93,32 +93,11 @@ class Controller extends Base
         $this->groupsHelper->addToGroup($user, $group, $post['enrollmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
-        $apiGroups = [];
-        foreach ($users_groups as $group) {
-            $membership = 'read';
-            if ($group['isAccessWrite']) {
-                $membership = 'write';
-            } elseif ($group['isAccessAdmin']) {
-                $membership = 'admin';
-            }
-            $apiGroups[] = [
-                'id'                => $group['id'],
-                'name'              => $group['name'],
-                'type'              => $group['type'],
-                'isForceFollow'     => $group['isForceFollow'],
-                'isNotificationsOn' => $group['isNotificationsOn'],
-                'isPrivate'         => $group['isPrivate'],
-                'enrolmentStatus'   => $group['enrolmentStatus'],
-                'membership'        => $membership,
-                '_links'            => [
-                    'homepage'      => sprintf('/homepage/%d', $group['id'])
-                ]
-            ];
-        }
-
-        $this->getResponse()->content->set(
+        $apiGroups = new Collection($users_groups);
+        $output = $apiGroups->map(new ModelToArray());
+        $this->response->content->set(
             $this->buildJsonOutput(
-                $apiGroups
+                $output
             )
         );
     }
