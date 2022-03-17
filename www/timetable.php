@@ -94,7 +94,7 @@ foreach ($userList as $user) {
     $checkedCampusList = [];
 
     if (!$user->getHideTimetable()) {
-        foreach ($user->getCampusCollection() as $campus) {
+        foreach ($user->getCampusCollection()->sortBy('sequence', 'ASC') as $campus) {
             $campusCode = $campus->getExtTimetableCode();
             if (isset($checkedCampusList[$campusCode])) {
                 continue;
