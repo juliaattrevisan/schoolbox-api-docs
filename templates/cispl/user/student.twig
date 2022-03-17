@@ -33,7 +33,7 @@
                         </nav>
                         <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
                             <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
-                            {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
+                            {% if contact.StudentContactDefaultEmail %}
                                 <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
                             {% endif %}
                             {% if contact.StudentContactMobilePhone %}

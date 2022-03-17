@@ -30,7 +30,7 @@ class External_Isams_Cispl_User extends External_Isams_User
                         ''                            AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.student_contact_home_email AS StudentContactDefaultEmail,
+                        V_Parent.PersonalEmail        AS StudentContactDefaultEmail,
                         1                             AS ValidAddressFlag,
                         V_Parent.Address1             AS StudentContactAddress1,
                         V_Parent.Address2             AS StudentContactAddress2,
