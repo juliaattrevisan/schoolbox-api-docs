@@ -451,14 +451,17 @@ if [[ -z $s3Referer ]]; then
   echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Github access token from .env environment file: not starting task daemon!"
 else
   echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
-  # Where does the task daemon go?
-  git clone https://${accessToken}@github.com/alaress/taskd-prototype.git
+  # Where does the task daemon go? Let's say in the home dir for now
+  # Not in the main install dir, otherwise it risks getting committed
+  cd ~
+  git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
   cd taskd-prototype
-  # apt install docker-compose
+  git checkout ${taskd_branch}
+
+  # TODO include docker-compose in base box, or alternately download a pre-built box
+  apt install -y docker-compose
   docker-compose build
   docker-compose up -d
-
-  # before starting: update the .env
 fi
 
 
