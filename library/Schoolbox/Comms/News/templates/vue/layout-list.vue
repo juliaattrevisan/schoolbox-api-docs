@@ -48,17 +48,17 @@
                     <template v-else-if="fallbackImage === 'author'">
                         <div v-if="!isCompactMode" class="card-feature-avatar">
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img :src="article.author._links.avatar.href + '&size=square64'" alt="feature image">
+                                <img :src="article.author._links.avatar.href + '&size=square64'" alt="author portrait">
                             </a>
                         </div>
                         <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail" alt="feature image">
+                            <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail" alt="author portrait">
                         </a>
                     </template>
                     <template v-else-if="fallbackImage === 'school-logo'">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail" alt="feature image">
-                            <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'" alt="feature image">
+                            <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail" alt="school logo">
+                            <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'" alt="school logo">
                         </a>
                     </template>
                     <h3>
@@ -67,8 +67,8 @@
 
                     <p class="meta">
                         <span>
-                            <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by</template>
-                            <template v-else>By</template>
+                            <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by </template>
+                            <template v-else>By </template>
                             <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">{{ article.author.fullname }}</a>
                             <template v-else>{{ article.author.fullname }}</template>
                         </span>

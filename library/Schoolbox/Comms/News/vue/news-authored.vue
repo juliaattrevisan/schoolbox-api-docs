@@ -219,8 +219,7 @@
                                     <a v-else :href="article._links.self.href">(untitled)</a>
                                 </h3>
                                 <p class="meta">
-                                    <b>{{article.status }}</b>
-                                    <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
+                                    <b>{{article.status }}</b> <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
                                 </p>
                             </div>
                         </div>
