@@ -27,5 +27,7 @@ class API extends ModuleLoader
         $this->loadModule($kernel, Schoolbox\API\Module::class, '/api');
 
         $this->loadModule($kernel, Schoolbox\Admin\API\Module::class, '/api/admin');
+
+        $this->loadModule($kernel, Schoolbox\APIGroup\Module::class, '/api/group');
     }
 }

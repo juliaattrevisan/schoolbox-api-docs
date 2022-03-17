@@ -30,7 +30,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'apigroup';
+    protected $basename = 'groupApi';
 
 
     /**
