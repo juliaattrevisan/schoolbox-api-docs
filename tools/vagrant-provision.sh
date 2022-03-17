@@ -454,9 +454,12 @@ else
   # Where does the task daemon go? Let's say in the home dir for now
   # Not in the main install dir, otherwise it risks getting committed
   cd ~
-  git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
+  if [ ! -d taskd-prototype ]; then
+    git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
+  fi
   cd taskd-prototype
   git checkout ${taskd_branch}
+  git pull --ff-only
 
   # TODO include docker-compose in base box, or alternately download a pre-built box
   apt install -y docker-compose
