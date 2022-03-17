@@ -268,9 +268,19 @@ class Factory
         );
         $folder = $folderWithGrades['folder'];
 
-        if ($folder && self::isSubjectLateralLearning($folder->getName())) {
+        // Treat the subject as a lateral learning subject if either of these
+        // match the lateral learning subject regular expression:
+        // * the folder name
+        // * the subject name
+        // (Need to match both as the student may not be a participant of the
+        //  lateral learning subject anymore.)
+        $subjectData = $this->gateway->getSubject($year, $subjectCode, true);
+        if (
+            ($folder && self::isSubjectLateralLearning($folder->getName()))
+            || self::isSubjectLateralLearning($subjectData['sub_desc'])
+        ) {
             return $this->buildLateralLearning(
-                $this->gateway->getSubject($year, $subjectCode, true),
+                $subjectData,
                 $folder,
                 $year,
                 $student,
