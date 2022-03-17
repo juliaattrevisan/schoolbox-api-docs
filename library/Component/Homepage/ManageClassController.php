@@ -71,6 +71,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $wasClassPage = $this->getContext()->wasClass();
         $isUnitPage   = $this->getContext()->hasUnitSpecification();
         $isCoursePage = $this->getContext()->hasCourseSpecification();
+        $lmsEnabled   = $this->getConfigLoader()->get(ConfigMapper::NAME_LMS_ENABLED);
 
 
         // If context is not a group, unit or class, render nothing
@@ -115,15 +116,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
-        $classMarkbookLink = $this->buildMarkbookLink();
-        if (
-            $classMarkbookLink
-            && ($isGroupPage || $isClassPage || $wasClassPage)
-            && $this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
-        ) {
-            $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
-            $this->parse('markbook_link_block', 'markbook_link');
-            $hasClassActions = true;
+        if ($lmsEnabled && $this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)) {
+            $classMarkbookLink = $this->buildMarkbookLink();
+            if (
+                $classMarkbookLink
+                && ($isGroupPage || $isClassPage || $wasClassPage)
+
+            ) {
+                $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
+                $this->parse('markbook_link_block', 'markbook_link');
+                $hasClassActions = true;
+            }
         }
 
         /** @var Alaress\Authorizer\Authorizer $authorizer */
@@ -253,7 +256,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (
             ($involvedInGroup || $involvedInClass)
             && UserAccess::ACCESS_READ === $this->getContentPermission()
-            && $this->getConfigLoader()->get('lms_enabled')
+            && $lmsEnabled
             && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
         ) {
             $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
@@ -279,7 +282,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          */
         if (
             ($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage)
-            && $this->getConfigLoader()->get('lms_enabled')
+            && $lmsEnabled
             && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
             && $this->getUser()->getRole()->isStaff()
         ) {

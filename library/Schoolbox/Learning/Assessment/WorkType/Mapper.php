@@ -15,6 +15,7 @@ use Schoolbox;
 /**
  * @method Model findById($identifierValue)
  * @method Model createModel($idValue = null)
+ * @method Schoolbox\GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends Schoolbox\Mapper
 {

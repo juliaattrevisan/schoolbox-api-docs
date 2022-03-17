@@ -1,0 +1,233 @@
+<script type="text/javascript"
+        src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+<script type="text/javascript"
+        src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island" id="formReportExport">
+            <form class="top" id="reportExportForm" method="post" enctype="multipart/form-data" action="">
+                <h2 class="subheader">{{ locale.term.proper }}</h2>
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-terms"></label>
+                            <select data-actions name="terms[]" id="report-terms" multiple></select>
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#report-terms').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    placeholder: 'Search {{ locale.term.plural }}',
+                                    preload: true,
+                                    persist: true,
+                                    hideSelected: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                            url: '{{ routeLookup('adminReportExport.getTerms') }}',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                            });
+                            {% endautoescape %}
+                        </script>
+                    </fieldset>
+                </section>
+                <h2 class="subheader">Students</h2>
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-year-levels">Year Level</label>
+                            <select data-actions name="yearLevels[]" id="report-year-levels" multiple></select>
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#report-year-levels').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    placeholder: 'Search Year Levels',
+                                    preload: true,
+                                    persist: true,
+                                    hideSelected: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                            url: '{{ routeLookup('adminReportExport.getYearLevels') }}',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                            });
+                            {% endautoescape %}
+                        </script>
+                        <div class="small-12 columns">
+                            <label for="report-campuses">Campuses</label>
+                            <select data-actions name="campuses[]" id="report-campuses" multiple></select>
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#report-campuses').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    placeholder: 'Search campuses',
+                                    preload: true,
+                                    persist: true,
+                                    hideSelected: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                            url: '{{ routeLookup('adminReportExport.getCampuses') }}',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                            });
+                            {% endautoescape %}
+                        </script>
+                        <div class="small-12 columns">
+                            <label for="report-students">Students</label>
+                            <select data-actions name="students[]" id="report-students" multiple></select>
+                        </div>
+                        <script type="text/javascript">
+                            {% autoescape 'js' %}
+
+                            $('#report-students').selectizeSelector({
+                                multiple: true,
+                                ajax: {
+                                    url: '/ajax/user.php',
+                                    type: 'GET',
+                                    data: {
+                                        roleTypeID: 'student',
+                                    },
+                                    dataType: 'json'
+                                },
+                            });
+                            {% endautoescape %}
+                        </script>
+                    </fieldset>
+                </section>
+                <h2 class="subheader">Summary Page</h2>
+                <section>
+                    <fieldset>
+                        <div class="small-12 medium-6 large-6 columns">
+                            <label for="includeSummaryPage">Include summary page</label>
+                            <div class="switch">
+                                <input name="includeSummaryPage" id="includeSummaryPage" type="checkbox" value="1"/>
+                                <label for="includeSummaryPage">
+                                    <span>ON</span>
+                                    <span>OFF</span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset id="summaryPageOptions" class="hide">
+                        {% for summaryPageOption in summaryPageOptions %}
+                            <div class="small-12 medium-6 large-6 columns">
+                                <label for="{{ summaryPageOption.id }}">{{ summaryPageOption.name }}</label>
+                                <div class="switch">
+                                    <input name="{{ summaryPageOption.id }}" id="{{ summaryPageOption.id }}"
+                                           type="checkbox" value="1"/>
+                                    <label for="{{ summaryPageOption.id }}">
+                                        <span>ON</span>
+                                        <span>OFF</span>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <fieldset id="summaryPageAssessmentOptions" class="hide">
+                        {% include '@adminReportExport/assessmentOptions.twig' with
+                            {assessmentOptions: assessmentOptions, page: 'summary'} only %}
+                    </fieldset>
+                </section>
+                <h2 class="subheader">Class Page</h2>
+                <section>
+                    <fieldset>
+                        <div class="small-12 medium-6 large-6 columns">
+                            <label for="includeClassPage">Include Class Page</label>
+                            <div class="switch">
+                                <input name="includeClassPage" id="includeClassPage" type="checkbox" value="1"/>
+                                <label for="includeClassPage">
+                                    <span>ON</span>
+                                    <span>OFF</span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset id="classPageOptions" class="hide">
+                        {% for classPageOption in classPageOptions %}
+                            <div class="small-12 medium-6 large-6 columns">
+                                <label for="{{ classPageOption.id }}">{{ classPageOption.name }}</label>
+                                <div class="switch">
+                                    <input name="{{ classPageOption.id }}" id="{{ classPageOption.id }}" type="checkbox"
+                                           value="1"/>
+                                    <label for="{{ classPageOption.id }}">
+                                        <span>ON</span>
+                                        <span>OFF</span>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                    <fieldset id="classPageAssessmentOptions" class="hide">
+                        {% include '@adminReportExport/assessmentOptions.twig' with
+                            {assessmentOptions: assessmentOptions, page: 'class'} only %}
+                    </fieldset>
+                </section>
+                <input type="submit" class="expand" value="Download ZIP">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('#includeSummaryPage').on('change', function () {
+                if ($(this).is(":checked")) {
+                    $('#summaryPageOptions').removeClass('hide');
+                    $('#summaryPageAssessmentOptions').removeClass('hide');
+                } else {
+                    $('#summaryPageOptions').addClass('hide');
+                    $('#summaryPageAssessmentOptions').addClass('hide');
+                }
+            }
+    );
+    $('#includeClassPage').on('change', function () {
+                if ($(this).is(":checked")) {
+                    $('#classPageOptions').removeClass('hide');
+                    $('#classPageAssessmentOptions').removeClass('hide');
+                } else {
+                    $('#classPageOptions').addClass('hide');
+                    $('#classPageAssessmentOptions').addClass('hide');
+                }
+            }
+    );
+</script>
