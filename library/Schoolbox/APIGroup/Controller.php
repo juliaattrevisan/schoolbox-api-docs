@@ -163,7 +163,7 @@ class Controller extends Base
     {
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
-        $post['membership'] = $post['membership'] ?: $users_group['membership'];
+        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: $users_group['membership'];
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: $users_group['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?: $users_group['isFavourite'];
 
