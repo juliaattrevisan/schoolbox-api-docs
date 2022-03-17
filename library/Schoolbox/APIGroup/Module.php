@@ -49,11 +49,16 @@ class Module extends BaseModule
         );
 
         $preloadUser = function ($params) {
-            return $this->preloadUser($params);
+            return [
+                'user' => $this->preloadUser($params)
+                ];
         };
 
         $preloadUserGroup = function ($params) {
-            return $this->preloadUserGroup($params);
+            return [
+                'user' => $this->preloadUser($params),
+                'group' => $this->preloadGroup($params)
+                ];
         };
 
         $this->register('GET', '/{userId}/groupMembership', 'apiMembership', $hasApiAccess, $preloadUser);
@@ -79,11 +84,11 @@ class Module extends BaseModule
      * Preload a User instance
      *
      * @param array $params
-     * @return array
+     * @return object
      * @throws \InvalidArgumentException
      * @throws SchoolboxException
      */
-    private function preloadUser(array $params): array
+    private function preloadUser(array $params): object
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
@@ -91,33 +96,26 @@ class Module extends BaseModule
             throw new SchoolboxException('User Does not Exist');
         }
 
-        return [
-            'user' => $user,
-        ];
+        return $user;
     }
 
     /**
-     * Preload a User and Group instances
+     * Preload a Group instances
      *
      * @param array $params
-     * @return array
+     * @return object
      * @throws \InvalidArgumentException
      * @throws SchoolboxException
      */
-    private function preloadUserGroup(array $params): array
+    private function preloadGroup(array $params): object
     {
-        $user = $this->preloadUser($params);
-
         try {
             $group = $this->getGroupMapper()->findOneByColumn('cid', $params['groupId']);
         } catch (MapperException $e) {
             throw new SchoolboxException('Group Does not Exist');
         }
 
-        return [
-            'user' => $user,
-            'group' => $group,
-        ];
+        return $group;
     }
 
     /**
