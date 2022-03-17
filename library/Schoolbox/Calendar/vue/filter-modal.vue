@@ -13,7 +13,7 @@ export default {
 
   data() {
     return {
-      selected: this.selectedFilters
+      selected: this.selectedFilters,
     };
   },
 
@@ -81,6 +81,33 @@ export default {
     },
 
     /**
+     * Check if the updates Source is in the currently selected list
+     * to determine whether the checkbox should be selected or not
+     *
+     * @param Array - ie Array [5, 6];
+     * @return {Boolean}
+     */
+    isSourceChecked(sourceToCheck) {
+      return this.selected.source.some((source) => source.join() === sourceToCheck.join());
+    },
+
+    /**
+     * Add or remove the source from the selected sources based on the current
+     * status of the checkbox
+     * 
+     * @param $event
+     * @param Array - ie Array [5, 6];
+     */
+    onSourceChanged($event, changedSource) {
+      if ($event.target.checked) {
+        this.selected.source = [...this.selected.source, changedSource];
+      } else {
+        //the changedSource arrays are just a list of ids, so we can use join() to compare each 
+        this.selected.source = this.selected.source.filter((source) => source.join() !== changedSource.join());
+      }
+    },
+
+    /**
      * Get all IDs available for the given filter key.
      *
      * @param filterKey
@@ -137,16 +164,14 @@ export default {
                   />
                   <label for="sourceSelectAll">Select all</label>
                 </li>
-                  <li v-for="source in sources" :key="'input-' + source.id">
+                  <li v-for="source in sources" :key="`input-${source.id}`">
                     <input
                       type="checkbox"
-                      name="source"
-                      :id="'source' + String(source.ids)"
-                      :key="'input-' + source.id"
-                      :value="source.ids"
-                      v-model="selected.source"
+                      :id="`source-${source.ids}`"
+                      :checked="isSourceChecked(source.ids)"
+                      @change="onSourceChanged($event, source.ids)"
                     />
-                    <label :for="'source' + String(source.ids)" :key="'label' + source.id">{{ source.name }}</label>
+                    <label :for="`source-${source.ids}`">{{ source.name }}</label>
                   </li>
               </ul>
             </fieldset>
@@ -167,13 +192,11 @@ export default {
                 <li v-for="group in groups" :key="'input-' + group.id">
                     <input
                       type="checkbox"
-                      name="group"
-                      :id="'group' + String(group.id)"
-                      :key="'input-' + group.id"
+                      :id="`group-${group.id}`"
                       :value="group.id"
                       v-model="selected.group"
                     />
-                    <label :for="'group' + String(group.id)" :key="'label-' + group.id">{{ group.name }}</label>
+                    <label :for="`group-${group.id}`">{{ group.name }}</label>
                 </li>
               </ul>
             </fieldset>
@@ -191,16 +214,14 @@ export default {
                   />
                   <label for="campusSelectAll">Select all</label>
                 </li>
-                <li v-for="campus in campuses" :key="'input-' + campus.id">
+                <li v-for="campus in campuses" :key="`input-${campus.id}`">
                     <input
                         type="checkbox"
-                        name="group"
-                        :id="'campus' + String(campus.id)"
-                        :key="'input-' + campus.id"
+                        :id="`campus-${campus.id}`"
                         :value="campus.id"
                         v-model="selected.campus"
                     />
-                    <label :for="'campus' + String(campus.id)" :key="'label-' + campus.id">{{ campus.name }}</label>
+                    <label :for="`campus-${campus.id}`">{{ campus.name }}</label>
                 </li>
               </ul>
             </fieldset>
@@ -218,19 +239,16 @@ export default {
                   />
                   <label for="eventTypeSelectAll">Select all</label>
                 </li>
-                <li v-for="eventType in eventTypes" :key="'input-' + eventType.id">
+                <li v-for="eventType in eventTypes" :key="`input-${eventType.id}`">
                     <input
                       type="checkbox"
-                      name="group"
-                      :id="'eventType' + String(eventType.id)"
-                      :key="'input-' + eventType.id"
+                      :id="`eventType-${eventType.id}`"
                       :value="eventType.id"
                       v-model="selected.eventType"
                     />
                     <label
-                      :for="'eventType' + String(eventType.id)"
+                      :for="`eventType-${eventType.id}`"
                       :style="getEventTypeStyles(eventType)"
-                      :key="'label-' + eventType.id"
                       >{{ eventType.name }}</label
                     >
                 </li>
