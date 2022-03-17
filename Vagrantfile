@@ -32,6 +32,8 @@ extra_hostname = default["extra_hostname"]
 aws_iam_key = default["aws_iam_key"]
 aws_iam_secret = default["aws_iam_secret"]
 primary_php_majver = default["primary_php_majver"]
+taskd_fork = default["taskd_fork"]
+taskd_branch = default["taskd_branch"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -112,6 +114,12 @@ if File.file?('vagrant.yaml')
   if !conf["primary_php_majver"].nil?
     primary_php_majver = conf["primary_php_majver"]
   end
+  if !conf["taskd_fork"].nil?
+    taskd_fork = conf["taskd_fork"]
+  end
+  if !conf["taskd_branch"].nil?
+    taskd_branch = conf["taskd_branch"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -187,7 +195,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "'#{data_source}' '#{data_filename}' '#{external_db}' '#{external_db_host}' '#{external_db_db}' '#{enable_xdebug}' '#{instance_id_env_var}' '#{force_upgrade}' '#{instance_registry_url_override}' '#{extra_hostname}' '#{primary_php_majver}'"
+    s.args = \
+        "'#{data_source}' " \
+        + "'#{data_filename}' " \
+        + "'#{external_db}' " \
+        + "'#{external_db_host}' " \
+        + "'#{external_db_db}' " \
+        + "'#{enable_xdebug}' " \
+        + "'#{instance_id_env_var}' " \
+        + "'#{force_upgrade}' " \
+        + "'#{instance_registry_url_override}' " \
+        + "'#{extra_hostname}' " \
+        + "'#{primary_php_majver}' " \
+        + "'#{taskd_fork}' " \
+        + "'#{taskd_branch}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 end
