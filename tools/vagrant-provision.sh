@@ -443,6 +443,23 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
+
+accessToken=$(read_var GITHUB_ACCESS_TOKEN)
+if [[ -z $s3Referer ]]; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Github access token from .env environment file: not starting task daemon!"
+else
+  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+  # Where does the task daemon go?
+  git clone https://${accessToken}@github.com/alaress/taskd-prototype.git
+  cd taskd-prototype
+  # apt install docker-compose
+  docker-compose build
+  docker-compose up -d
+
+  # before starting: update the .env
+fi
+
+
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];
 then
