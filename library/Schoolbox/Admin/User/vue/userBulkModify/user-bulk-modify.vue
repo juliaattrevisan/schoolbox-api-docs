@@ -1,9 +1,12 @@
 <script>
+
 /**
  * Bulk modify selected users
  */
+
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -11,6 +14,10 @@ export default {
         BottomDrawer,
         RevealModal
     },
+
+    mixins: [
+        footerUI //to place and keep the tables UI in the footer
+    ],
 
     props: {
         srcUserList: {
@@ -122,7 +129,6 @@ export default {
                     }
                 }
             },
-
             singleRowName: 'user',
             pluralRowName: 'users',
             selectContainer: null,
@@ -140,7 +146,7 @@ export default {
          *
          * @returns {Number}
          */
-        selectedRowsCount() {
+        selectedRowsCount () {
             return this.selectedRows.length;
         },
 
@@ -149,7 +155,7 @@ export default {
          *
          * @returns {String}
          */
-        selectedRowsCountWithRowName() {
+        selectedRowsCountWithRowName () {
             if (this.selectedRowsCount === 0) {
                 return 'No ' + this.singleRowName;
             } else if (this.selectedRowsCount === 1) {
@@ -162,10 +168,27 @@ export default {
     },
 
     mounted () {
+        this.initShiftKeyDetection();
         this.loadRows();
     },
 
     methods: {
+
+        /**
+         * to hide a UI note informing of shift-selection once pressed once
+         */
+        initShiftKeyDetection () {
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = true;
+                }
+            });
+            document.addEventListener('keyup', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = false;
+                }
+            });
+        },
 
         /**
          * load users
@@ -186,6 +209,13 @@ export default {
         },
 
         /**
+         * To update the table to show the UI in the footer
+         */
+        onLoaded () {
+            this.$nextTick(() => this.footerUI_update());
+        },
+
+        /**
          * Notify state change
          *
          * @param { Object }
@@ -199,6 +229,9 @@ export default {
          */
         onRowSelected (event) {
             this.selectedRows = event;
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
         },
 
         /**
@@ -211,7 +244,7 @@ export default {
         /**
          * To confirm/cancel selected users deletion
          */
-        onClearUsersToSelected () {
+        onClearUsersSelected () {
             this.clearRows();
             this.$refs.table.resetSelectedRows();
         },
@@ -219,19 +252,32 @@ export default {
         /**
          * Update the selected users
          */
-        onUpdateUsersSelected () {
-            fetch(this.srcUserModify, {
-                method: 'POST',
-                body: this.getFormData(),
-            }).then((response) => response.json())
-                .then((data) => {
-                        this.logData = data;
-                        this.$refs.modal.open();
-                        this.clearRows();
-                    }
-                ).catch((error) => {
-                console.log(error);
-            })
+        async onUpdateUsersSelected () {
+            // fetch(this.srcUserModify, {
+            //     method: 'POST',
+            //     body: this.getFormData(),
+            // }).then((response) => response.json())
+            //     .then((data) => {
+            //             this.logData = data;
+            //             this.$refs.modal.open();
+            //             this.clearRows();
+            //         }
+            //     ).catch((error) => {
+            //     console.log(error);
+            // })
+            try {
+                const response = await fetch(this.srcUserModify, {
+                    method: 'POST',
+                    body: this.getFormData(),
+                });
+                const responseData = await response.json();
+                this.logData = responseData;
+                this.$refs.modal.open();
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.clearRows();
+            }
         },
 
         /**
@@ -263,6 +309,7 @@ export default {
             :data="rows"
             :columns="columns"
             :options="options"
+            @loaded="onLoaded"
             @select="onRowSelected"
         >
             <template #beforeTable>
@@ -341,6 +388,7 @@ export default {
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
+            <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <section class="content">
                 <div class="row">
                     <div class="small-12 columns">
@@ -493,7 +541,6 @@ export default {
                 </div>
             </section>
 
-            <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onUpdateUsersSelected" class="button submit button-update">Update Users</button>
         </bottom-drawer>
         <reveal-modal ref="modal">
