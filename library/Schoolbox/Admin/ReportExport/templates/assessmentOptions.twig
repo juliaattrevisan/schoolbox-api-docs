@@ -5,9 +5,7 @@
  # * assessmentOptions: available options for assessments
  # * page:              name of the page to display the options for
 #}
-<div class="small-12 columns">
-    <h2>{{ locale.assessment.plural | capitalize }}</h2>
-</div>
+<legend>{{ locale.assessment.plural | capitalize }}</legend>
 <div class="small-12 columns">
     <label for="report-work-types-{{ page }}">Work Types</label>
     <select data-actions name="workTypes-{{ page }}[]" id="report-work-types-{{ page }}" multiple></select>
