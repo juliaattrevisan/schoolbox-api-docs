@@ -54,13 +54,6 @@ export default {
 
     data () {
         return {
-            selectedFilters: {
-                campusId: -1,
-                roleId: -1,
-                ePortfolio: -1,
-                yearLevelId: -1,
-                token: -1,
-            },
             updateFields: {
                 campusIds: [],
                 roleId: -1,
@@ -80,7 +73,7 @@ export default {
             hasRowsLoaded: false,
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token'],
+            columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
             tableOptions: {
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -95,24 +88,24 @@ export default {
                             return row.role === query; 
                         }
                     },
-                    // {
-                    //     name: FilterEvents.EPORTFOLIO,
-                    //     callback: (row, query) => {
-                    //         return row.submission.status !== query;
-                    //     }
-                    // },
                     {
                         name: FilterEvents.YEAR,
                         callback: (row, query) => {
                             return row.year === query; 
                         }
                     },
-                    // {
-                    //     name: FilterEvents.TOKEN,
-                    //     callback: (row, query) => {
-                    //         return row.submission.status !== query;
-                    //     }
-                    // },
+                    {
+                        name: FilterEvents.TOKEN,
+                        callback: (row, query) => {
+                            return row.token === query;
+                        }
+                    },
+                    {
+                        name: FilterEvents.EPORTFOLIO,
+                        callback: (row, query) => {
+                            return row.eportfolio_enabled === query;
+                        }
+                    },
                 ],
                 customSorting: {
                     year: (ascending) => { //sort year level naturally
@@ -134,13 +127,14 @@ export default {
                     role: 'Role',
                     year: 'Year Level',
                     token: 'Token',
+                    eportfolio_enabled: 'ePortfolio',
                 },
                 orderBy: {
                     ascending: false,
                     column: 'Surname' //TODO ??
                 },
-                perPage: 50,
-                perPageValues: [50, 100, 200],
+                perPage: 25,
+                perPageValues: [25, 50, 100, 150, 200],
                 resizableColumns: false,
                 selectable: {
                     mode: 'multiple' //to enable multi-select
@@ -155,7 +149,13 @@ export default {
                 templates: {
                     campuses: (h, row, index) => {
                         return row.campuses.join(', ');
-                    }
+                    },
+                    token: (h, row, index) => {
+                        return row.token !== null ? 'Set' : 'Not set';
+                    },
+                    eportfolio_enabled: (h, row, index) => {
+                        return row.eportfolio_enabled === '1' ? 'Enabled' : 'Disabled';
+                    },
                 },
                 texts: {
                     filterPlaceholder: 'Search for users...',
@@ -232,8 +232,7 @@ export default {
             try {
                 const response = await fetch(this.srcUserList, {
                     method: 'POST',
-                    body: JSON.stringify(this.selectedFilters),
-                    // body: this.$refs.filter.data
+                    body: JSON.stringify(this.getRowsBody()),
                 });
                 this.rows = await response.json();
                 this.hasRowsLoaded = true;
@@ -244,19 +243,25 @@ export default {
         },
 
         /**
+         * Pass in the params to return all rows
+         * 
+         * @retrun { Object}
+         */
+        getRowsBody () {
+            return  {
+                campusId: -1,
+                roleId: -1,
+                yearLevelId: -1,
+                token: -1,
+                ePortfolio: -1,
+            }
+        },
+
+        /**
          * To update the table to show the UI in the footer
          */
         onLoaded () {
             this.$nextTick(() => this.footerUI_update());
-        },
-
-        /**
-         * Notify state change
-         *
-         * @param { Object }
-         */
-        onSelectionChange () {
-            this.loadRows();
         },
 
         /**
@@ -303,7 +308,7 @@ export default {
             try {
                 const response = await fetch(this.srcUserModify, {
                     method: 'POST',
-                    body: this.getFormData(),
+                    body: this.getUpdateUsersFormData(),
                 });
                 const responseData = await response.json();
                 this.logData = responseData;
@@ -318,9 +323,9 @@ export default {
         /**
          * Set up updating fields to POST
          *
-         * @returns {FormData}
+         * @returns { FormData }
          */
-        getFormData () {
+        getUpdateUsersFormData () {
             const usersToModifyIDList = this.selectedRows.map(row => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
@@ -349,7 +354,6 @@ export default {
         >
             <template #beforeTable>
                 <user-bulk-modify-filters 
-                    :selected-filters="selectedFilters"
                     :campuses="campuses"
                     :roles="roles"
                     :year-levels="yearLevels"
