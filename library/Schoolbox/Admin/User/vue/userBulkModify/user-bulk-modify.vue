@@ -4,6 +4,8 @@
  * Bulk modify selected users
  */
 
+import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
+import FilterEvents from './userBulkModifyFilterEvents';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
@@ -11,8 +13,9 @@ import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 export default {
 
     components: {
+        UserBulkModifyFilters,
         BottomDrawer,
-        RevealModal
+        RevealModal,
     },
 
     mixins: [
@@ -78,7 +81,51 @@ export default {
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
             columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token'],
-            options: {
+            tableOptions: {
+                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                    {
+                        name: FilterEvents.CAMPUS,
+                        callback: (row, query) => {
+                            return row.campuses.join().includes(query); //need to flatten the campuses array then check 
+                        }
+                    },
+                    {
+                        name: FilterEvents.ROLE,
+                        callback: (row, query) => {
+                            return row.role === query; 
+                        }
+                    },
+                    // {
+                    //     name: FilterEvents.EPORTFOLIO,
+                    //     callback: (row, query) => {
+                    //         return row.submission.status !== query;
+                    //     }
+                    // },
+                    {
+                        name: FilterEvents.YEAR,
+                        callback: (row, query) => {
+                            return row.year === query; 
+                        }
+                    },
+                    // {
+                    //     name: FilterEvents.TOKEN,
+                    //     callback: (row, query) => {
+                    //         return row.submission.status !== query;
+                    //     }
+                    // },
+                ],
+                customSorting: {
+                    year: (ascending) => { //sort year level naturally
+                        return (a, b) => {
+                            if (ascending) {
+                                return this.collator.compare(a.year, b.year);
+                            } else {
+                                return this.collator.compare(b.year, a.year);
+                            }
+                        }
+                    }
+                },
+                debounce: 100, //faster debounce as data is stored on the client side,
                 headings: {
                     firstname: 'First Name',
                     lastname: 'Surname',
@@ -92,24 +139,11 @@ export default {
                     ascending: false,
                     column: 'Surname' //TODO ??
                 },
-                templates: {
-                    campuses: (h, row, index) => {
-                        return row.campuses.join(', ');
-                    }
-                },
                 perPage: 50,
                 perPageValues: [50, 100, 200],
+                resizableColumns: false,
                 selectable: {
                     mode: 'multiple' //to enable multi-select
-                },
-                debounce: 100, //faster debounce as data is stored on the client side,
-                resizableColumns: false,
-                tabbable: false,
-                texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
                 },
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -117,17 +151,18 @@ export default {
                     up: 'glyphicon-chevron-up',
                     down: 'glyphicon-chevron-down'
                 },
-                customSorting: {
-                    year: (ascending) => { //sort year level naturally
-                        return (a, b) => {
-                            if (ascending) {
-                                return this.collator.compare(a.year, b.year);
-                            } else {
-                                return this.collator.compare(b.year, a.year);
-                            }
-                        }
+                tabbable: false,
+                templates: {
+                    campuses: (h, row, index) => {
+                        return row.campuses.join(', ');
                     }
-                }
+                },
+                texts: {
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
             },
             singleRowName: 'user',
             pluralRowName: 'users',
@@ -308,77 +343,18 @@ export default {
             ref="table"
             :data="rows"
             :columns="columns"
-            :options="options"
+            :options="tableOptions"
             @loaded="onLoaded"
             @select="onRowSelected"
         >
             <template #beforeTable>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <p>
-                            Search for users with the criteria listed below, and apply changes to selected users.
-                        </p>
-                    </div>
-
-                    <div class="small-12 medium-6 large-3 columns">
-                        <label>
-                            Campus
-                            <select @change="onSelectionChange" v-model="selectedFilters.campusId">
-                                <option value="-1">Any</option>
-                                <option v-for="campus in campuses" :value="campus.id" :key="campus.id">
-                                    {{ campus.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-3 columns">
-                        <label>
-                            Role
-                            <select @change="onSelectionChange" v-model="selectedFilters.roleId">
-                                <option value="-1">Any</option>
-                                <option v-for="role in roles" :value="role.id" :key="role.id">
-                                    {{ role.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div v-if="eportfolioEnabled" class="small-12 medium-6 large-2 columns">
-                        <label>
-                            ePortfolio
-                            <select @change="onSelectionChange" v-model="selectedFilters.ePortfolio">
-                                <option value="-1">Any</option>
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-2 columns">
-                        <label>
-                            Year
-                            <select @change="onSelectionChange" v-model="selectedFilters.yearLevelId">
-                                <option value="-1">Any</option>
-                                <option value="">Not set</option>
-                                <option v-for="yearLevel in yearLevels" :value="yearLevel.id" :key="yearLevel.id">
-                                    {{ yearLevel.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-2 columns">
-                        <label>
-                            Token
-                            <select @change="onSelectionChange" v-model="selectedFilters.token">
-                                <option value="-1">Any</option>
-                                <option value="1">Set</option>
-                                <option value="0">Not set</option>
-                            </select>
-                        </label>
-                    </div>
-                </fieldset>
+                <user-bulk-modify-filters 
+                    :selected-filters="selectedFilters"
+                    :campuses="campuses"
+                    :roles="roles"
+                    :year-levels="yearLevels"
+                    :eportfolio-enabled="eportfolioEnabled"
+                />
             </template>
             <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
