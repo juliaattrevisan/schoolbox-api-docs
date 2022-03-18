@@ -121,7 +121,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             if (
                 $classMarkbookLink
                 && ($isGroupPage || $isClassPage || $wasClassPage)
-
             ) {
                 $this->setVar('MARKBOOK_LINK', $classMarkbookLink);
                 $this->parse('markbook_link_block', 'markbook_link');
