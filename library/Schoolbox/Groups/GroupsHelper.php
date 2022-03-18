@@ -56,10 +56,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                               ])->indexBy('serviceIdentifier');
+        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         //get list of all possible public groups
         $groups   = $this->groupMapper->findByColumnList([
@@ -82,6 +79,7 @@ class GroupsHelper
                                                                    'uid'     => $user->getId(),
                                                                    'service' => UserAccess::SERVICE_HOMEPAGE,
                                                                ])->indexBy('serviceIdentifier');
+        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
     }
@@ -277,7 +275,14 @@ class GroupsHelper
                 $folder->setColour($folderColours->getNewColour());
             }
 
-            $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+            /**
+             * check if user is part of the group, if so use the group perms for the access,
+             * if they aren't a member they may have 'read' access via folder perms, but return deny (from group view)
+             */
+            $access = UserAccess::ACCESS_DENY;
+            if ($userPerms[$folder->getId()]) {
+                $access = $userPerms[$folder->getId()]->getAccessLevel();
+            }
             /**
              * check if admin
              * admin will have $userPerm[folderID] ACCESS_FULL
