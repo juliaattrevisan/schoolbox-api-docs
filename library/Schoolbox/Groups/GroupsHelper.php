@@ -382,4 +382,16 @@ class GroupsHelper
                                                                ])->indexBy('serviceIdentifier');
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
     }
+
+    /**
+     * is the user currently part of the group?
+     */
+    public function isEnrolledInGroup(User $user, Group $group)
+    {
+        $userPerms = $this->userAccessMapper->findByColumnList([
+                                                                      'uid'     => $user->getId(),
+                                                                      'sid'     => $group->getFolder()->getId()
+                                                                  ]);
+        return (bool)count($userPerms);
+    }
 }
