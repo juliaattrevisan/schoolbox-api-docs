@@ -74,6 +74,7 @@ class UserBulkMapper extends UserMapper
                 u.firstname,
                 u.lastname,
                 u.synergy_id as external_id,
+                u.eportfolio_enabled,
                 g.name as role,
                 c.name as campus,
                 lyl.name as year,
