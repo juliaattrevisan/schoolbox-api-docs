@@ -459,12 +459,13 @@ else
   fi
   cd taskd-prototype
   git checkout ${taskd_branch}
+  git fetch --all
   git pull --ff-only
 
   # TODO include docker-compose in base box, or alternately download a pre-built box
   apt install -y docker-compose
-  docker-compose build
-  docker-compose up -d
+  docker-compose build taskd
+  docker-compose up -d taskd
 fi
 
 
