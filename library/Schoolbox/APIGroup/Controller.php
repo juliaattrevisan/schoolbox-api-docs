@@ -132,6 +132,15 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
+        if (!$user->isGroupMember($group->getFolder()->getId())) {
+            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         $post = json_decode(json_encode($this->request->content->get()), true);
         $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: UserAccess::ACCESS_READ;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
@@ -161,6 +170,15 @@ class Controller extends Base
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
+        if (!$user->isGroupMember($group->getFolder()->getId())) {
+            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
         $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: $users_group['membership'];
