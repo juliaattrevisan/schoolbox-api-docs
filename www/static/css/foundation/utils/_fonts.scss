@@ -501,7 +501,7 @@
 }
 
 .icon-medical:before {
-    content: "\e926";
+    content: "\e928";
     font-family: $font-family-icon;
 }
 
@@ -912,5 +912,10 @@
 
 .icon-wolfram-alpha:before {
     content: '\e64d';
+    font-family: $font-family-icon;
+}
+
+.icon-intellischool:before {
+    content: '\e926';
     font-family: $font-family-icon;
 }
