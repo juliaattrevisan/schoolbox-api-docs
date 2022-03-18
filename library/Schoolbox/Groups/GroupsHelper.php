@@ -61,12 +61,9 @@ class GroupsHelper
                                                                    'service' => UserAccess::SERVICE_HOMEPAGE,
                                                                ])->indexBy('serviceIdentifier');
 
-        //get list of all possible public groups
-        $groups   = $this->groupMapper->findByColumnList([
-                                                             'type' => [Group::FREE_GROUP, Group::MODERATED_GROUP],
-                                                         ]);
+        $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enrolled in
-        $groupIds = array_unique(array_merge($userPerms->keys(), $groups->keys()));
+        $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
 
         return $this->buildGroups($user, $groupIds, $userPerms);
     }
