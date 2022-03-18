@@ -9,7 +9,9 @@
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ValueLabelInterface;
+use Schoolbox\YearLevel\Model;
 
 /**
  * Class Lookup
@@ -69,6 +71,10 @@ class Lookup
                      * in the ui
                      */
                     $allResults = $mapper->findFolders();
+                } elseif ($userField === 'year') {
+                    /** @var GenericCollection $allResults */
+                    $allResults = $mapper->createCollection()->add((new Model())->setName('Not Set'));
+                    $allResults = $allResults->merge($mapper->findAll());
                 } else {
                     $allResults = $mapper->findAll();
                 }
