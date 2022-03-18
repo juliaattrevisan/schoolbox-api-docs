@@ -23,6 +23,7 @@ use function implode;
  *
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Schoolbox\GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends Schoolbox\Mapper
 {

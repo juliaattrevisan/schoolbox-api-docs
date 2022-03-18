@@ -15,6 +15,7 @@
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 use Component_Instance;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -110,6 +111,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            return false;
+        }
+
         $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
         $this->canWrite = $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
         // Get the list of units for this course, as well as who has actually

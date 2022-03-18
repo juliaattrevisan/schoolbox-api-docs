@@ -1,0 +1,52 @@
+{# #
+ # Assessment options on Admin Report Export page.
+ #
+ # Parameters:
+ # * assessmentOptions: available options for assessments
+ # * page:              name of the page to display the options for
+#}
+<legend>{{ locale.assessment.plural | capitalize }}</legend>
+<div class="small-12 columns">
+    <label for="report-work-types-{{ page }}">Work Types</label>
+    <select data-actions name="workTypes-{{ page }}[]" id="report-work-types-{{ page }}" multiple></select>
+</div>
+<script type="text/javascript">
+    {% autoescape 'js' %}
+
+    $('#report-work-types-{{ page }}').selectizeSelector({
+        multiple: true,
+        selectize: {
+            create: false,
+            placeholder: 'Search work types',
+            preload: true,
+            persist: true,
+            hideSelected: true,
+            load: function (query, callback) {
+                $.ajax({
+                    url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {query: query}
+                }).done(function (result) {
+                    callback(result)
+                }).fail(function () {
+                    callback()
+                })
+            }
+        },
+    });
+    {% endautoescape %}
+</script>
+{% for assessmentOption in assessmentOptions %}
+    <div class="small-12 medium-6 large-6 columns">
+        <label for="{{ assessmentOption.id }}-{{ page }}">{{ assessmentOption.name }}</label>
+        <div class="switch">
+            <input name="{{ assessmentOption.id }}-{{ page }}" id="{{ assessmentOption.id }}-{{ page }}" type="checkbox"
+                   value="1"/>
+            <label for="{{ assessmentOption.id }}-{{ page }}">
+                <span>ON</span>
+                <span>OFF</span>
+            </label>
+        </div>
+    </div>
+{% endfor %}

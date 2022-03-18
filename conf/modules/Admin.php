@@ -9,6 +9,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Module as FilterModule;
 
 class Admin implements ModuleConfigInterface
@@ -25,11 +26,16 @@ class Admin implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        // Admin course builder page
-        (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
+        if ($di->get('config')->get(ConfigMapper::NAME_LMS_ENABLED)) {
+            // Admin course builder page
+            (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
 
-        // Bulk course import
-        (new \Schoolbox\Admin\BulkCourseImport\Module($di))->init('/adminv2/bulkCourseImport');
+            // Bulk course import
+            (new \Schoolbox\Admin\BulkCourseImport\Module($di))->init('/adminv2/bulkCourseImport');
+
+            // Report export
+            (new \Schoolbox\Admin\ReportExport\Module($di))->init('/adminv2/report-export');
+        }
 
         // Eportfolio
         (new \Schoolbox\Admin\Eportfolio\Module($di))->init('/adminv2/eportfolio');
