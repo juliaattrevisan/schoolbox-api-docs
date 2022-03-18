@@ -84,6 +84,15 @@ class Controller extends Base
      */
     public function apiMembershipAdd(User $user, Group $group)
     {
+        if (!$user->isGroupMember($group->getFolder()->getId())) {
+            $problem = (new ApiProblem('User is already Enrolled in the Group'))
+                ->setStatus(409)
+                ->asArray();
+            $this->getResponse()->status->setCode(409);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         $post = $this->getRequest()->post->getArrayCopy();
         $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;

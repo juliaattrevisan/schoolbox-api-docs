@@ -60,6 +60,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '/{userId}/group', 'apiMembership', $hasApiAccess, $preloadUser);
+        $this->register('POST', '/{userId}/group/{groupId}', 'apiMembershipAdd', $hasApiAccess, $preloadUserGroup);
     }
 
 
