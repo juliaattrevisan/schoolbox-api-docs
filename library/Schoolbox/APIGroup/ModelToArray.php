@@ -42,6 +42,7 @@ class ModelToArray
             'name'              => $group['name'],
             'type'              => $group['type'],
             'isForceFollow'     => $group['isForceFollow'],
+            'isFavourite'       => $group['isFavourite'],
             'isNotificationsOn' => $group['isNotificationsOn'],
             'enrollmentStatus'   => $group['enrolmentStatus'],
             'membership'        => $membership,
