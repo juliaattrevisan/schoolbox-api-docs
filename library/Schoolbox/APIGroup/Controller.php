@@ -130,14 +130,18 @@ class Controller extends Base
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
+        if (!$user->isGroupMember($group->getFolder()->getId())) {
+            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         try {
             $this->groupsHelper->deleteFromGroup($user, $group);
             $this->getResponse()->status->setCode(204);
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    'The User was removed from the group successfully.'
-                )
-            );
         } catch (Exception $e) {
             $problem = (new ApiProblem('Unable to remove the user from the group.'))
                 ->setStatus(400)
