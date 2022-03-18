@@ -13,13 +13,6 @@ class Group extends DeprecatedModel
     public $cache = array();
     public $cacheUser = array();
 
-    /* Enum in groups table
-      */
-    const STAFF_GROUP_TYPE = 'staff';
-    const PARENT_GROUP_TYPE = 'parent';
-    const STUDENT_GROUP_TYPE = 'student';
-    const GUEST_GROUP_TYPE = 'guest';
-
     /**
      * A copy of the user notifier - it is called when a user changes.
      *
@@ -34,7 +27,7 @@ class Group extends DeprecatedModel
      */
     private $_service;
 
-    function __construct($service = UserAccess::SERVICE_HOMEPAGE)
+    public function __construct($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
@@ -58,7 +51,7 @@ class Group extends DeprecatedModel
     }
 
 
-    function setService($service = UserAccess::SERVICE_HOMEPAGE)
+    public function setService($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_service = $service;
     }
@@ -85,28 +78,6 @@ class Group extends DeprecatedModel
         }
 
         return false;
-    }
-
-    /**
-     * Get the array of ids for groups that can change passwords
-     *
-     * @return array|bool
-     */
-    public function canChangePassword()
-    {
-        $query = "SELECT id FROM groups WHERE can_change_password = 'true'";
-
-        $allIds = $this->db->getAll($query);
-
-        $ids = array();
-
-        if (is_array($allIds) && count($allIds)) {
-            foreach ($allIds as $currentId) {
-                $ids[] = $currentId['id'];
-            }
-        }
-
-        return $ids;
     }
 
     /**
@@ -185,25 +156,13 @@ class Group extends DeprecatedModel
         return $this->getGroupTypeIds(Role::GUEST);
     }
 
-    function getAllByType($type)
-    {
-        $query = "SELECT name, id, userAccess.type accessType
-				  FROM (folder, userGroups )
-				  LEFT JOIN userAccess ON cid = sid AND service = " . UserAccess::SERVICE_HOMEPAGE . " AND uid = '" . $_SESSION['id'] . "'
-				  WHERE cid = id
-				  AND folder.deleted_at IS NULL
-				  AND userGroups.type = '$type'
-				  ORDER BY name";
-        return $this->db->getAll($query);
-    }
-
-    function getAllUserAccess($uid)
+    public function getAllUserAccess($uid)
     {
         $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid='$uid'";
         return $this->db->getAll($query);
     }
 
-    function groupExists($relationID)
+    public function groupExists($relationID)
     {
         $query = "SELECT cid FROM userGroups WHERE cid = $relationID";
         $result = $this->db->getRow($query);
@@ -214,19 +173,7 @@ class Group extends DeprecatedModel
         }
     }
 
-    function groupList()
-    {
-        $query = "
-            SELECT name, id
-            FROM folder, userGroups
-            WHERE cid = id
-            AND folder.deleted_at IS NULL
-            ORDER BY name
-        ";
-        return $this->db->getAll($query);
-    }
-
-    function createGroup($relationID, $type = 1)
+    public function createGroup($relationID, $type = 1)
     {
         $data = array(
             'cid' => $relationID,
@@ -235,33 +182,12 @@ class Group extends DeprecatedModel
         return $this->db->insert('userGroups', $data);
     }
 
-    function setType($relationID, $type = 1)
-    {
-        // change group type
-        $data = array(
-            'type' => $type,
-            'cid' => $relationID,
-        );
-        $this->update($data);
-    }
-
-    function getOwner($relationID)
-    {
-
-        //get the owner(s) of the group
-        $query = "SELECT title, firstname, lastname, uid, alt_email, local_email, username
-				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_FULL;
-        return $this->db->getAll($query);
-    }
-
-
     /**
      * @deprecated replaced by Schoolbox\Permission\Access\RoleAccessMapper::roleMayOwnFolders()
      * @param int $userID
      * @return bool
      */
-    function allowOwner($userID)
+    public function allowOwner($userID)
     {
         //checks if the user can become the owner of group
         if (Config::get('group_staff_only')) {
@@ -271,7 +197,7 @@ class Group extends DeprecatedModel
         }
     }
 
-    function getMemberList($relationID)
+    public function getMemberList($relationID)
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
@@ -280,7 +206,7 @@ class Group extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getWaitingList($relationID)
+    public function getWaitingList($relationID)
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
@@ -289,7 +215,7 @@ class Group extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function isUser($relationID, $userID)
+    public function isUser($relationID, $userID)
     {
         $query = "SELECT uid FROM userAccess WHERE service = '" . $this->_service . "' AND sid = '$relationID' AND uid = '$userID'";
         $this->db->query($query);
@@ -311,7 +237,7 @@ class Group extends DeprecatedModel
      * @param int $type
      * @return bool
      */
-    function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
+    public function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         if (!$this->isUser($relationID, $userID)) {
             $data = array(
@@ -392,7 +318,7 @@ class Group extends DeprecatedModel
      * @param  bool $cache      If false, ignore cache.
      * @return int
      */
-    function getPermission($relationID, $userID = 0, $cache = true)
+    public function getPermission($relationID, $userID = 0, $cache = true)
     {
         if ($userID == 0) {
             if ($_SESSION['id']) {
@@ -580,7 +506,7 @@ class Group extends DeprecatedModel
         }
     }
 
-    function isParentOfChild($childID)
+    public function isParentOfChild($childID)
     {
         if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $child) {
@@ -592,7 +518,7 @@ class Group extends DeprecatedModel
         return false;
     }
 
-    function involvedInGroup($uid, $cid)
+    public function involvedInGroup($uid, $cid)
     {
         //returns true on user being involved in group
         $query = "SELECT userAccess.type FROM userAccess, folder
@@ -604,7 +530,7 @@ class Group extends DeprecatedModel
         return $this->db->getOne($query);
     }
 
-    function involvedInSubject($code, $userId = null)
+    public function involvedInSubject($code, $userId = null)
     {
         if (!isset($userId)) {
             $userId = $_SESSION['id'];
@@ -688,7 +614,7 @@ class Group extends DeprecatedModel
      * @see `\Schoolbox\Resource\Folder\Mapper::findForUser`
      *      for an implementation that uses the mapper classes.
      */
-    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = UserAccess::ACCESS_READ, $requireHomepage = false)
+    public function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = UserAccess::ACCESS_READ, $requireHomepage = false)
     {
 
         $catList = array();
@@ -741,44 +667,6 @@ class Group extends DeprecatedModel
 
         return $catList;
     }
-
-
-    /*
-     * Deprecated in favour of involvedInCateogoryList above...
-     */
-    function involvedCategoryList($id, $subjects = '', $accessType = UserAccess::ACCESS_READ)
-    {
-        //returns a list of categories that the user is involved in
-        //optional accessType specifies read=1 , write=2, ownership=3 access levels
-
-        if (is_array($subjects)) {
-            foreach ($subjects as $subject) {
-                //convert code to id and get name
-                $query = "SELECT name, id, cc.code FROM folder JOIN folder_code cc ON id = cc.folder_id WHERE cc.code = '" . $subject['code'] . "'";
-                if (is_array($catTmp = $this->db->getRow($query))) {
-                    $catList[] = $catTmp;
-                }
-            }
-        }
-
-        //get list of groups involved in
-        $query = "SELECT folder.name, folder.id, type, GROUP_CONCAT(cc.code) as code
-        FROM userAccess, folder
-        LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
-		WHERE userAccess.uid = '$id' AND userAccess.sid = folder.id AND userAccess.service = '" . $this->_service . "'
-		AND userAccess.type >= '$accessType'
-		AND folder.deleted_at IS NULL
-		GROUP BY folder.id
-		ORDER BY folder.name";
-
-        $this->db->query($query);
-        while ($result = $this->db->getNextArray()) {
-            $catList[] = $result;
-        }
-
-        return $catList;
-    }
-
 
     public function getGroupName($groupID)
     {
