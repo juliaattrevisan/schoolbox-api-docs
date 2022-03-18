@@ -5,6 +5,7 @@
  */
 
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
+import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
@@ -14,6 +15,7 @@ export default {
 
     components: {
         UserBulkModifyFilters,
+        UserBulkModifyNewValues,
         BottomDrawer,
         RevealModal,
     },
@@ -49,31 +51,15 @@ export default {
         houses: {
             type: Array,
             required: true
-        }
+        },
     },
 
     data () {
         return {
-            updateFields: {
-                campusIds: [],
-                roleId: -1,
-                yearLevelId: -1,
-                houseId: -1,
-                ePortfolio: -1,
-                emailFromUserName: -1,
-                externalMailClient: -1,
-                webmail: -1,
-                accountEnabled: -1,
-                hideContacts: -1,
-                hideTimetable: -1,
-                positionTitle: '',
-                displayGradeGraph: -1,
-                revokeToken: -1,
-            },
             hasRowsLoaded: false,
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
+            tableColumns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
             tableOptions: {
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -170,6 +156,7 @@ export default {
             collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
+            isModifying: false, //to open up the user-bulk-modify-new-values view
             logData: [],
         }
     },
@@ -210,7 +197,7 @@ export default {
     methods: {
 
         /**
-         * to hide a UI note informing of shift-selection once pressed once
+         * To hide a UI note informing of shift-selection once pressed once
          */
         initShiftKeyDetection () {
             document.addEventListener('keydown', (event) => {
@@ -226,7 +213,7 @@ export default {
         },
 
         /**
-         * load users
+         * Load users
          */
         async loadRows () {
             try {
@@ -265,7 +252,7 @@ export default {
         },
 
         /**
-         * to keep track of selected rows
+         * To keep track of selected rows
          */
         onRowSelected (event) {
             this.selectedRows = event;
@@ -275,7 +262,7 @@ export default {
         },
 
         /**
-         * clear the selection
+         * Clear the selection
          */
         clearRows () {
             this.selectedRows = [];
@@ -290,51 +277,10 @@ export default {
         },
 
         /**
-         * Update the selected users
+         * Clear the selection
          */
-        async onUpdateUsersSelected () {
-            // fetch(this.srcUserModify, {
-            //     method: 'POST',
-            //     body: this.getFormData(),
-            // }).then((response) => response.json())
-            //     .then((data) => {
-            //             this.logData = data;
-            //             this.$refs.modal.open();
-            //             this.clearRows();
-            //         }
-            //     ).catch((error) => {
-            //     console.log(error);
-            // })
-            try {
-                const response = await fetch(this.srcUserModify, {
-                    method: 'POST',
-                    body: this.getUpdateUsersFormData(),
-                });
-                const responseData = await response.json();
-                this.logData = responseData;
-                this.$refs.modal.open();
-            } catch (error) {
-                console.warn(error);
-            } finally {
-                this.clearRows();
-            }
-        },
-
-        /**
-         * Set up updating fields to POST
-         *
-         * @returns { FormData }
-         */
-        getUpdateUsersFormData () {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
-            const formData = new FormData();
-            usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
-            });
-            for (const [key, value] of Object.entries(this.updateFields)) {
-                formData.append(key, value);
-            }
-            return formData;
+        onModifySelected () {
+            this.isModifying = true;
         },
 
     },
@@ -347,7 +293,7 @@ export default {
         <v-client-table
             ref="table"
             :data="rows"
-            :columns="columns"
+            :columns="tableColumns"
             :options="tableOptions"
             @loaded="onLoaded"
             @select="onRowSelected"
@@ -359,169 +305,25 @@ export default {
                     :year-levels="yearLevels"
                     :eportfolio-enabled="eportfolioEnabled"
                 />
+                <user-bulk-modify-new-values 
+                    :campuses="campuses"
+                    :roles="roles"
+                    :year-levels="yearLevels"
+                    :houses="houses"
+                    :eportfolio-enabled="eportfolioEnabled"
+                    :selected-rows="selectedRows"
+                    :is-modifying="isModifying"
+                />
             </template>
             <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
-
-        <bottom-drawer :showDrawer="selectedRowsCount > 0">
+        <bottom-drawer :showDrawer="selectedRowsCount > 0 && !isModifying">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
-            <section class="content">
-                <div class="row">
-                    <div class="small-12 columns">
-                        <h3 class="subheader">New Values</h3>
-                    </div>
-                    <div data-applycampus="true" class="small-6 medium-3 columns">
-                        <label>
-                            Campus Involvement
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="One or more campuses that the users will be involved in.
-                                  Leave blank if you don't want to update their campuses.">?</span>
-                        </label>
-                        <ul class="option-list">
-                            <li v-for="campus in campuses">
-                                <input :id="'apply_campus-' + String(campus.id)" name='apply_campus[]'
-                                       :value=campus.id v-model="updateFields.campusIds" type="checkbox"/>
-                                <label class="checkbox-label"
-                                       :for="'apply_campus-' + String(campus.id)">{{ campus.name }}</label>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_role">Role</label>
-                        <select id="apply_role" name="apply_role" v-model="updateFields.roleId">
-                            <option value="-1">Unchanged</option>
-                            <option v-for="role in roles" :value="role.id">{{ role.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_year_id">
-                            Year
-                        </label>
-                        <select id="apply_year_id" name="apply_year_id" v-model="updateFields.yearLevelId">
-                            <option value="-1" selected="selected">Unchanged</option>
-                            <option value="">Not set</option>
-                            <option v-for="yearLevel in yearLevels" :value="yearLevel.id">{{ yearLevel.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_position_title">
-                            Position Title
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="Leave blank if you don't want to update their position title.">?</span>
-                        </label>
-                        <input id="apply_position_title" name="apply_position_title" type="text"
-                               v-model="updateFields.positionTitle">
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_house_id">
-                            House
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="Leave blank if you don't want to update their house.">?</span>
-                        </label>
-                        <select id="apply_house_id" name="apply_house_id" v-model="updateFields.houseId">
-                            <option value="-1" selected="selected">Unchanged</option>
-                            <option value="">Not set</option>
-                            <option v-for="house in houses" :value="house.id">{{ house.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_eportfolio">ePortfolio</label>
-                        <select id="apply_eportfolio" name="apply_eportfolio" v-model="updateFields.ePortfolio"
-                                :disabled="!eportfolioEnabled">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_emailfromusername">Email Address From Username</label>
-                        <select id="apply_emailfromusername" name="apply_emailfromusername"
-                                v-model="updateFields.emailFromUserName">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_externalmailclient">Use External Mail Client</label>
-                        <select id="apply_externalmailclient" name="apply_externalmailclient"
-                                v-model="updateFields.externalMailClient">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_webmail">Enable Webmail Tab</label>
-                        <select id="apply_webmail" name="apply_webmail" v-model="updateFields.webmail">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_accountenabled">Account Enabled</label>
-                        <select id="apply_accountenabled" name="apply_accountenabled"
-                                v-model="updateFields.accountEnabled">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_hidecontacts">Hide Contact Details</label>
-                        <select id="apply_hidecontacts" name="apply_hidecontacts" v-model="updateFields.hideContacts">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns end">
-                        <label for="apply_hidetimetable">Hide Timetable</label>
-                        <select id="apply_hidetimetable" name="apply_hidetimetable"
-                                v-model="updateFields.hideTimetable">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns end">
-                        <label for="apply_displaygradegraph">Display Comparative Graph on Grades</label>
-                        <select id="apply_displaygradegraph" name="apply_displaygradegraph"
-                                v-model="updateFields.displayGradeGraph">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="revoke_token">Revoke Token</label>
-                        <select id="revoke_token" name="revoke_token" v-model="updateFields.revokeToken">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Revoke</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-
-            <button @click.prevent="onUpdateUsersSelected" class="button submit button-update">Update Users</button>
+            <button @click.prevent="onModifySelected" class="button submit">Modify</button>
         </bottom-drawer>
         <reveal-modal ref="modal">
             <div class="row">
@@ -541,10 +343,6 @@ export default {
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
-#stale-users-report {
-    position: relative;
-}
-
 .VueTables--client {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
@@ -553,7 +351,7 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .button-update, .selected-count {
+.button-clear, .selected-count {
     display: inline-block;
 }
 
@@ -569,6 +367,10 @@ export default {
     background: none;
     vertical-align: baseline;
     font-size: 0.8rem;
+    &:hover {
+        background: none;
+    }
 }
+
 
 </style>
