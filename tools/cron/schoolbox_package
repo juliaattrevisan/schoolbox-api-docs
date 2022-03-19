@@ -1,0 +1,14 @@
+# Schoolbox Package Cron Jobs.
+# Description:
+#   Lists all cron jobs for a schoolbox package.
+#   Deployed for running by puppet into /etc/cron.d/schoolbox_package
+#   Unlike the Instance cron job template, this file is deployed as-is by puppet.
+#   Jobs in this file are expected to be instance-agnostic. Ie they will run per-package, not per-instance.
+# Usage:
+#   Automatically run by cron from /etc/cron.d/schoolbox_package
+#
+# @copyright   Copyright 2022, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
+#
+# m h dom mon dow user command
+MAILTO="support@schoolbox.com.au"
