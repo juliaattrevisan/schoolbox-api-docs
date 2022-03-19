@@ -1,12 +1,16 @@
-# Schoolbox Cron Jobs
+# Schoolbox Instance Cron Job template.
 # Description:
-#	Lists all automatically install cron jobs for schoolbox
-#	Deployed for running by cron into /etc/cron.d/
+#   Lists all cron jobs for a schoolbox instance.
+#   Deployed for running by puppet into /etc/cron.d/sbc_schoolbox_${INSTANCE_ID}
+#   Puppet will modify each line to:
+#   * insert the INSTANCE_ID as an env var when invoking the cron job
+#   * remap schedule to align to instance's timezone
+#   * insert jitter if none explicitly defined in this template
+#   * log stdout/stderr to /var/log/schoolbox/${INSTANCE_ID}/
 # Usage:
-#	Automatically run by cron from /etc/cron.d/
+#   Automatically run by cron from /etc/cron.d/sbc_schoolbox_${INSTANCE_ID}
 #
-# @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   Copyright 2019, Schoolbox Pty Ltd
+# @copyright   Copyright 2022, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 #
 # m h dom mon dow user command
