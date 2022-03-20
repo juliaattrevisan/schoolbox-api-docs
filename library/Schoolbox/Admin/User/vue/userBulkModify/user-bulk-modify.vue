@@ -280,7 +280,8 @@ export default {
          * Clear the selection
          */
         onModifySelected () {
-            this.isModifying = true;
+            // this.isModifying = true;
+            this.$refs.modal.open();
         },
 
     },
@@ -308,15 +309,6 @@ export default {
             </template>
             <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
-                <user-bulk-modify-new-values 
-                    :campuses="campuses"
-                    :roles="roles"
-                    :year-levels="yearLevels"
-                    :houses="houses"
-                    :eportfolio-enabled="eportfolioEnabled"
-                    :selected-rows="selectedRows"
-                    :is-modifying="isModifying"
-                />
             </template>
         </v-client-table>
         <bottom-drawer :showDrawer="selectedRowsCount > 0 && !isModifying">
@@ -325,8 +317,17 @@ export default {
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
         </bottom-drawer>
-        <reveal-modal ref="modal">
-            <div class="row">
+        <reveal-modal ref="modal" size="xlarge">
+            <user-bulk-modify-new-values 
+                :campuses="campuses"
+                :roles="roles"
+                :year-levels="yearLevels"
+                :houses="houses"
+                :eportfolio-enabled="eportfolioEnabled"
+                :selected-rows="selectedRows"
+                :is-modifying="isModifying"
+            />
+            <!-- <div class="row">
                 <div class="small-12 island">
                     <section>
                         <div class="content">
@@ -334,7 +335,7 @@ export default {
                         </div>
                     </section>
                 </div>
-            </div>
+            </div> -->
         </reveal-modal>
     </div>
 </template>

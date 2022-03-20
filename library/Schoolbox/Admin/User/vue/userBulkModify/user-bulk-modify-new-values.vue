@@ -118,7 +118,7 @@ export default {
 <template>
     <div class="new-values">
         <div class="new-values__full-width">
-            <h3 class="subheader">New Values</h3>
+            <h2>Bulk modify selected users</h2>
         </div>
         <div>
             <label>
@@ -244,7 +244,7 @@ export default {
     grid-gap: 1.5rem;
     grid-template-columns: repeat(4, 1fr);
     grid-template-columns: repeat(auto-fill, minmax(max(var(300px), var(--grid-item--max-width)), 1fr));
-    padding: 1.5rem;
+    padding: 0.5rem;
     // @media (max-width: $tableToSingleColumn) {
     //     flex-direction: column;
     // }
