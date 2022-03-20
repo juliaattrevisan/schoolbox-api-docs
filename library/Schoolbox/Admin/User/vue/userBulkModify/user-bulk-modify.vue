@@ -305,6 +305,9 @@ export default {
                     :year-levels="yearLevels"
                     :eportfolio-enabled="eportfolioEnabled"
                 />
+            </template>
+            <template #afterTable>
+                <div class="VueTables__table-footer" ref="tableFooter"></div>
                 <user-bulk-modify-new-values 
                     :campuses="campuses"
                     :roles="roles"
@@ -314,9 +317,6 @@ export default {
                     :selected-rows="selectedRows"
                     :is-modifying="isModifying"
                 />
-            </template>
-            <template #afterTable>
-                <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
         <bottom-drawer :showDrawer="selectedRowsCount > 0 && !isModifying">

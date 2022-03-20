@@ -1,11 +1,3 @@
-<template>
-    <div :class="'reveal-modal ' + size" data-reveal aria-hidden="true" role="dialog" :id="elementId">
-        <!-- @slot Reveal modal content goes into this slot -->
-        <slot></slot>
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
-</template>
-
 <script>
 
     // Valid sizes from https://get.foundation/sites/docs-v5/bundle/reveal.html
@@ -89,3 +81,11 @@
         },
     }
 </script>
+
+<template>
+    <div :class="'reveal-modal ' + size" data-reveal aria-hidden="true" role="dialog" :id="elementId">
+        <!-- @slot Reveal modal content goes into this slot -->
+        <slot></slot>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+</template>
