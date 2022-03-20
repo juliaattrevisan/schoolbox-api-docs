@@ -454,6 +454,13 @@ class Family
             $family[$node]['first_name']
         ]);
 
+        // if communication types are explicitly specified, do not populate parent who is not in $this->phones
+        // this is the case for when, there is two past students where the parent does have TKCO ticked,
+        // but the current student does not.
+        if ($this->communicationTypes && !isset($this->phones[$family['user_code']][$node])) {
+            return [];
+        }
+
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
