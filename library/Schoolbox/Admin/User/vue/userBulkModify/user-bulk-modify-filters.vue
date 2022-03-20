@@ -131,8 +131,6 @@ export default {
 
 <style lang="scss" scoped>
 
-// @import './similarity-report';
-
 .filters {
     background: white;
     display: flex;

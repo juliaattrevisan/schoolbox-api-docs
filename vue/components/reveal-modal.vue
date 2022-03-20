@@ -39,13 +39,14 @@ export default {
 
     beforeCreate () {
 
-        /* Generate a really unique identifier
-            * instances of reveal-modal may inadevertently generate conflicting identifier strings
-            * when they're based on an autoincrementing integer, since the dom is a universal pool
-            * of ids, but reveal-modal ucids aren't shared among each other
-            *
-            * https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
-            */
+        /**  
+         * Generate a really unique identifier
+         * instances of reveal-modal may inadevertently generate conflicting identifier strings
+         * when they're based on an autoincrementing integer, since the dom is a universal pool
+         * of ids, but reveal-modal ucids aren't shared among each other
+         *
+         * https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+         */
         function uuidv4() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);

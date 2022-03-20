@@ -7,7 +7,6 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
@@ -17,7 +16,6 @@ export default {
         UserBulkModifyFilters,
         UserBulkModifyNewValues,
         BottomDrawer,
-        RevealModal,
     },
 
     mixins: [
@@ -156,8 +154,6 @@ export default {
             collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
-            isModifying: false, //to open up the user-bulk-modify-new-values view
-            logData: [],
         }
     },
 
@@ -266,6 +262,7 @@ export default {
          */
         clearRows () {
             this.selectedRows = [];
+            this.$refs.table.resetSelectedRows();
         },
 
         /**
@@ -273,15 +270,20 @@ export default {
          */
         onClearUsersSelected () {
             this.clearRows();
-            this.$refs.table.resetSelectedRows();
         },
 
         /**
          * Clear the selection
          */
         onModifySelected () {
-            // this.isModifying = true;
-            this.$refs.modal.open();
+            this.$refs.newValues.modify(); //will open up the reveal-modal in user-bulk-modify-new-values
+        },
+
+        /**
+         * Clear the selection
+         */
+        onUpdated () {
+            this.clearRows();
         },
 
     },
@@ -311,32 +313,23 @@ export default {
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
-        <bottom-drawer :showDrawer="selectedRowsCount > 0 && !isModifying">
+        <bottom-drawer :showDrawer="selectedRowsCount > 0">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
         </bottom-drawer>
-        <reveal-modal ref="modal" size="xlarge">
-            <user-bulk-modify-new-values 
-                :campuses="campuses"
-                :roles="roles"
-                :year-levels="yearLevels"
-                :houses="houses"
-                :eportfolio-enabled="eportfolioEnabled"
-                :selected-rows="selectedRows"
-                :is-modifying="isModifying"
-            />
-            <!-- <div class="row">
-                <div class="small-12 island">
-                    <section>
-                        <div class="content">
-                            <p v-html="logData"></p>
-                        </div>
-                    </section>
-                </div>
-            </div> -->
-        </reveal-modal>
+        <user-bulk-modify-new-values 
+            ref="newValues"
+            :src-user-modify="srcUserModify"
+            :campuses="campuses"
+            :roles="roles"
+            :year-levels="yearLevels"
+            :houses="houses"
+            :eportfolio-enabled="eportfolioEnabled"
+            :selected-rows="selectedRows"
+            @updated="onUpdated"
+        />
     </div>
 </template>
 
