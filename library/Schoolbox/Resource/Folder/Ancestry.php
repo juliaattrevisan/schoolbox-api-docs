@@ -255,7 +255,7 @@ class Ancestry
         /* If it wasn't already cached, decide how complex the Folder
          * instance should be, and cache that for future reference
          */
-        if (!($this->cache[$id] instanceof Folder)) {
+        if (!(isset($this->cache[$id]))) {
             if ($cheaply) {
                 $node = $this->folderMapper->findCheaplyById($id);
             } else {

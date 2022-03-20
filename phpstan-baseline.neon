@@ -2571,11 +2571,6 @@ parameters:
 			path: library/Group.php
 
 		-
-			message: "#^Variable \\$catList might not be defined\\.$#"
-			count: 1
-			path: library/Group.php
-
-		-
 			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
 			count: 1
 			path: library/Homepage.php

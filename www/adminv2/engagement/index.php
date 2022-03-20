@@ -23,7 +23,7 @@ $validPages = [
 ];
 
 /* Setup period **/
-if ($this->arg[1]) {
+if (isset($this->arg[1])) {
     $start = \Alaress_Date_Format::newUrlDate($this->arg[1]);
 } else {
     $start = new Alaress_Date_Format();
@@ -31,14 +31,14 @@ if ($this->arg[1]) {
 }
 $start = $start->startOfMonth();
 
-if ($this->arg[2]) {
+if (isset($this->arg[2])) {
     $end = \Alaress_Date_Format::newUrlDate($this->arg[2]);
 } else {
     $end = new Alaress_Date_Format();
 }
 $end = $end->endOfMonth();
 
-if (in_array($this->arg[0], $validPages)) {
+if (isset($this->arg[0]) && in_array($this->arg[0], $validPages)) {
     $page = $this->arg[0];
 } else {
     $page = 'collaboration';

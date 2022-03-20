@@ -34,28 +34,26 @@ if (count($this->arg) < 2) {
 
 // url expected to be in the format:
 //   /adminv2/reports/reportType/reportVar/[sortBy/[sortDir/]][page|export]
-$reportType = $this->arg[0];
-$reportVar = urldecode($this->arg[1]);
+$reportType  = $this->arg[0] ?? '';
+$reportVar   = urldecode($this->arg[1] ?? '');
 $exportToCSV = false;
 
 // default sorting
-if ($this->arg[2] == "exportToCSV") {
-    $page = 0; //export, so no pagination
-    $orderBy = "";
+if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
+    $page        = 0; //export, so no pagination
+    $orderBy     = "";
     $exportToCSV = true;
-}
-// page number
-elseif (is_numeric($this->arg[2])) {
-    $page = $this->arg[2];
+} elseif (isset($this->arg[2]) && is_numeric($this->arg[2])) {
+    // page number
+    $page    = $this->arg[2];
     $orderBy = "";
-}
-// sortBy
-else {
-    $page = 1;
-    $orderBy = $this->arg[2];
+} else {
+    // sortBy
+    $page    = 1;
+    $orderBy = $this->arg[2] ?? '';
 
     // if direction is unspecified, leave it to the report itself to decide its preference
-    switch (strtolower($this->arg[3])) {
+    switch (strtolower($this->arg[3] ?? '')) {
         case 'desc':
             $orderDir = "DESC";
             break;
@@ -67,12 +65,11 @@ else {
             break;
     }
 
-    if ($this->arg[4] == "exportToCSV") {
-        $page = 0; //export, so no pagination
+    if (isset($this->arg[4]) && $this->arg[4] == "exportToCSV") {
+        $page        = 0; //export, so no pagination
         $exportToCSV = true;
-    }
-    // page number
-    elseif (is_numeric($this->arg[4])) {
+    } elseif (isset($this->arg[4]) && is_numeric($this->arg[4])) {
+        // page number
         $page = $this->arg[4];
     }
 }
@@ -86,7 +83,7 @@ else {
 
 // setup pagination vars from args
 if (!$exportToCSV) {
-    $limit = Config::get('search_type_limit') * 2;
+    $limit  = Config::get('search_type_limit') * 2;
     $offset = ($page - 1) * $limit;
 } else {
     $limit = $offset = 0;
@@ -102,7 +99,7 @@ $report->setIndexID($reportVar);
 
 $slugDir = $orderDir ? $orderDir : 'ASC';
 
-$pageSlug = strtolower("$reportType/$reportVar/" . ( $orderBy ? "$orderBy/$slugDir/" : '' ));
+$pageSlug = strtolower("$reportType/$reportVar/" . ($orderBy ? "$orderBy/$slugDir/" : ''));
 $this->setVar('REPORT_FILTER', $pageSlug);
 $this->setVar('RETURN', $reportType);
 
@@ -198,20 +195,19 @@ if (($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir)
             $this->setVar('last_page_block', '');
             $this->setVar('first_page_block', '');
         }
-        $outputPagination = array(
+        $outputPagination = [
             'PREVIOUS_PAGE' => $pageSlug . ($page - 1),
             'NEXT_PAGE'     => $pageSlug . ($page + 1),
             'LAST_PAGE'     => $pageSlug . $pageCount,
-        );
+        ];
 
         $this->setVar($outputPagination);
 
         $report->render();
     }
-}
-// else there are no results
-else {
-    $output = array(
+} else {
+    // else there are no results
+    $output = [
         'download_report_block' => '',
         'previous_button_block' => '',
         'page_number_block'     => '',
@@ -221,8 +217,8 @@ else {
         'REPORT_TITLE'          => $report->getReportTitle(),
         'COUNTABLE_COUNT'       => '0',
         'COUNTABLE'             => 'results',
-        'RESULT'                => ''
-    );
+        'RESULT'                => '',
+    ];
 
     $this->setVar($output);
 

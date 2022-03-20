@@ -255,6 +255,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 $previous = $component;
 
                 $this->tabList[$this_category]['name'] = Scrub::text($this->getEportfolioHandler()->getTemplateNameById($component->getIdentifier()));
+                if (!isset($this->tabList[$this_category]['count'])) {
+                    $this->tabList[$this_category]['count'] = 0;
+                }
                 $this->tabList[$this_category]['count']++;
             }
 

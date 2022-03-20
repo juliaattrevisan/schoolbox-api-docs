@@ -57,7 +57,7 @@ foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $compo
     $position      = "position_{$position_no}";
     $defintionId   = $component->getInstance()->getDefinition()->getId();
     $defintionName = $component->getInstance()->getDefinition()->getName();
-    $componentCounts[$defintionId]++;
+    $componentCounts[$defintionId]  = !isset($componentCounts[$defintionId]) ? 0 : $componentCounts[$defintionId]++;
 
     if (!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
@@ -100,7 +100,7 @@ $this->setVar('component_block', '');
 foreach ($definitionCollection as $definition) {
     /* @var $definition Component_Definition */
     $definitionId = $definition->getId();
-    $count        = $componentCounts[$definitionId] ?: 0;
+    $count        = $componentCounts[$definitionId] ?? 0;
     $multiState   = '';
     // Failse
     if ($definition->getMultiple() === false) {

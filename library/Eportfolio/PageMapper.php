@@ -142,7 +142,7 @@ class PageMapper extends Schoolbox\Mapper
         foreach ($allPages as $currentPage) {
             /* They can be a superuser
              */
-            $isSuperuser = $_SESSION['su'];
+            $isSuperuser = $_SESSION['su'] ?? 0;
 
             /* They can be a staff member
              */
@@ -154,9 +154,9 @@ class PageMapper extends Schoolbox\Mapper
 
             if ($isSuperuser || $isStaff || $isOwner) {
                 $viewablePages->setOffset($currentPage->getPageId(), $currentPage);
-            } /* If there are any specific permissions, try those too
-             */
-            else {
+            } else {
+                /* If there are any specific permissions, try those too
+                */
                 foreach ($currentPage->getPermissions() as $currentPermission) {
                     /* They can be a parent (the getValue() here is a binary 1 or 0)
                      */

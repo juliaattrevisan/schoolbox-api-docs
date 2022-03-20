@@ -477,8 +477,8 @@ class Controller extends BaseController
          * via their id (some sis don't have the id)
          */
         $coordTeacher = null;
-        if ($externalUser['StudentYearLevelCoordinator']) {
-            if ($externalUser['YearLevelCoordID']) {
+        if (!empty($externalUser['StudentYearLevelCoordinator'])) {
+            if (!empty($externalUser['YearLevelCoordID'])) {
                 try {
                     $coordTeacher = $this->userMapper->findByExternalId($externalUser['YearLevelCoordID'], Role::STAFF);
                 } catch (MapperException $e) {
@@ -493,8 +493,8 @@ class Controller extends BaseController
 
         // Get coach
         $studentCoach = null;
-        if ($externalUser['StudentCoach']) {
-            if ($externalUser['CoachID']) {
+        if (!empty($externalUser['StudentCoach'])) {
+            if (!empty($externalUser['CoachID'])) {
                 try {
                     $studentCoach = $this->userMapper->findByExternalId($externalUser['CoachID']);
                 } catch (MapperException $e) {

@@ -164,7 +164,7 @@ class Factory
 
             /* Condense types
              */
-            switch ($currentMap['type']) {
+            switch ($currentMap['type'] ?? '') {
                 /* Both Boolean types (lol)
                  */
                 case UserMapper::TYPE_BOOL_ENUM:

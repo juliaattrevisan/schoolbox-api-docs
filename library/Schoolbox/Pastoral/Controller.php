@@ -329,8 +329,8 @@ class Controller extends Base
         $auditRecord->setUser($user);
         $this->pastoralAuditMapper->save($auditRecord);
 
-        $typeId    = is_numeric($get['type']) ? (int)$get['type'] : null;
-        $subtypeId = is_numeric($get['subtype']) ? (int)$get['subtype'] : null;
+        $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
+        $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
