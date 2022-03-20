@@ -154,8 +154,7 @@ class PageMapper extends Schoolbox\Mapper
 
             if ($isSuperuser || $isStaff || $isOwner) {
                 $viewablePages->setOffset($currentPage->getPageId(), $currentPage);
-            }
-            else {
+            } else {
                 /* If there are any specific permissions, try those too
                 */
                 foreach ($currentPage->getPermissions() as $currentPermission) {

@@ -43,12 +43,12 @@ if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
     $page        = 0; //export, so no pagination
     $orderBy     = "";
     $exportToCSV = true;
-} // page number
-elseif (isset($this->arg[2]) && is_numeric($this->arg[2])) {
+} elseif (isset($this->arg[2]) && is_numeric($this->arg[2])) {
+    // page number
     $page    = $this->arg[2];
     $orderBy = "";
-} // sortBy
-else {
+} else {
+    // sortBy
     $page    = 1;
     $orderBy = $this->arg[2] ?? '';
 
@@ -68,8 +68,8 @@ else {
     if (isset($this->arg[4]) && $this->arg[4] == "exportToCSV") {
         $page        = 0; //export, so no pagination
         $exportToCSV = true;
-    } // page number
-    elseif (isset($this->arg[4]) && is_numeric($this->arg[4])) {
+    } elseif (isset($this->arg[4]) && is_numeric($this->arg[4])) {
+        // page number
         $page = $this->arg[4];
     }
 }
@@ -205,8 +205,8 @@ if (($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir)
 
         $report->render();
     }
-} // else there are no results
-else {
+} else {
+    // else there are no results
     $output = [
         'download_report_block' => '',
         'previous_button_block' => '',
