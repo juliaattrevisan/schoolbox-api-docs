@@ -554,6 +554,8 @@ class Announcements
                 ->setAcceptedBy($author)
                 ->setPublishAt($publishedAt)
                 ->setExpiresAt($expiresAt);
+            // Make sure that the effector of this trigger is the author
+            $this->newsMapper->setSessionData(['user' => $author]);
             // finally publish
             $this->newsMapper->save($article);
 
