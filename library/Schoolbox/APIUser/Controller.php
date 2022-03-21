@@ -73,27 +73,11 @@ class Controller extends Base
      * Returns user object
      *
      * @param User $user
-     * @api /apiuser/{userId}
+     * @api /api/user/{userId}
      * @link http://api.schoolbox.com.au/#operation/userGet
      */
     public function apiUserGet(User $user)
     {
-        /**
-         * build list of children / students if the requested user is a parent
-         */
-        $students = new Collection();
-        if ($user->getRole()->isParent()) {
-            if ($user->getExternalId()) {
-                $enrolments = $this->externalUser->getEnrolledStudents($user->getExternalId());
-                foreach ($enrolments as $child) {
-                    try {
-                        $students->add($this->userMapper->findByExternalId($child['RelatedID']));
-                    } catch (MapperException $e) {
-                        // noop
-                    }
-                }
-            }
-        }
         /**
          * build the internal groups list
          * we are not using User::getAccessList(), as that will also include SIS group folders,
