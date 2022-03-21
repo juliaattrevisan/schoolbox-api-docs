@@ -11,7 +11,6 @@ namespace Schoolbox\External\Event;
 
 use Schoolbox\GenericCollection;
 
-
 /**
  * For a given event, find the final calculated list of users
  * which is the default users from sis_class, mutated by the
@@ -181,8 +180,8 @@ class InvolvedUsers
 
         $statement->execute([
             'externalId' => $user->getExternalId(),
-            'classification' => 'timetable',
-            'actionClear' => 'clear'
+            'classification' => Model::CLASSIFICATION_TIMETABLE,
+            'actionClear' => Overrides\Model::CLEAR
         ]);
 
         $overrideEventIds = [];

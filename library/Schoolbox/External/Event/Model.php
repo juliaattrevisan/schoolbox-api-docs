@@ -20,6 +20,14 @@ class Model implements ISoftDeletable
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
 
+
+    /**
+     * These consts correspond to the Classification enum
+     */
+    public const CLASSIFICATION_EVENT = 'event';
+    public const CLASSIFICATION_TIMETABLE = 'timetable';
+
+
     /**
      * @var int|null
      */
