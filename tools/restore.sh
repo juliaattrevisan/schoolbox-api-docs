@@ -854,7 +854,8 @@ if [ "$destination_site_type" = 'stg' ]; then
 fi
 
 # Truncate storage_transform table if it is a DB only sync
-if [[ $syncType == "db" ]]; then
+if [ "$sourcetype" != '[A]' ];
+then
   echo "DB-only restore. Truncating 'storage_transform' table" >&2
   mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
 fi
