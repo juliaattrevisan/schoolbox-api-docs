@@ -31,8 +31,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 13 ]]; then
-  error "Script requires 13 params, found $#"
+if [[ $# -ne 11 ]]; then
+  error "Script requires 11 params, found $#"
   exit 1
 fi
 
@@ -53,8 +53,6 @@ if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade
 if [ -n "$9" ]; then instance_registry_url="$9"; fi;
 extra_hostname=${10}
 phpversion_supported="${11}"
-taskd_fork="${12}"
-taskd_branch="${13}"
 if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
