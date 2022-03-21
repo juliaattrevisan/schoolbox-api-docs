@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Translator\Author;
 
+use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 /**
@@ -27,10 +29,11 @@ use Schoolbox\User;
 class ModelToArray extends User\Translator\ModelToArray
 {
     /**
-     * @param User $user
+     * @param User                                      $user
+     * @param GenericCollection|UserAccess[]|array|bool $groups
      * @return array
      */
-    public function __invoke(User $user): array
+    public function __invoke(User $user, $groups = false): array
     {
         return [
             'id'        => $user->getId(),
