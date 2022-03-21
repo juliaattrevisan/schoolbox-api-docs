@@ -80,7 +80,7 @@ class Controller extends Base
     /**
      * adds a user into a group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
-     * @api POST /apigroup/{userId}/groupMembership/{groupId}
+     * @api POST /user/{userId}/group/{groupId}
      */
     public function apiMembershipAdd(User $user, Group $group)
     {
