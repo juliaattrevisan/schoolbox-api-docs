@@ -214,6 +214,12 @@ class InvolvedUsers
             $overrideEventIds[$row['id']] = $row['id'];
         }
 
+        /* No overrides? No trabajo
+         */
+        if (!\count($overrideEventIds)) {
+            return $events;
+        }
+
         /* Figure out the mutations that were specified by the event overrides
          * and then decide if $user was still involved
          */
