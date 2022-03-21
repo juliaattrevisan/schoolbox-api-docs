@@ -445,32 +445,25 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
-# This needs a docker password / token
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
-docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
+echo "[SB][`date +%Y-%m-%d\ %X`] Stopping task daemon service";
+taskd_container_ids="$(docker ps -f alaress/taskd:latest -q)"
+if [[ -n $taskd_container_ids ]]; then
+  echo -e "$taskd_container_ids" | xargs docker stop
+fi
 
-#accessToken=$(read_var GITHUB_ACCESS_TOKEN)
-#if [[ -z $s3Referer ]]; then
-#  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Github access token from .env environment file: not starting task daemon!"
-#else
-#  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
-#  # Where does the task daemon go? Let's say in the home dir for now
-#  # Not in the main install dir, otherwise it risks getting committed
-#  cd ~
-#  if [ ! -d taskd-prototype ]; then
-#    git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
-#  fi
-#  cd taskd-prototype
-#  git checkout ${taskd_branch}
-#  git fetch --all
-#  git pull --ff-only
-#
-#  # TODO include docker-compose in base box, or alternately download a pre-built box
-#  apt install -y docker-compose
-#  docker-compose build taskd
-#  docker-compose up -d taskd
-#fi
-
+# The task daemon needs a dockerhub access token, as it is a private repo
+accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
+if [[ -z $accessToken ]]; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Dockerhub access token from .env environment file: not starting task daemon!";
+else
+  # Docker login needs the `pass` package to actually accept a password,
+  # otherwise this error gets raised:
+  # "Cannot autolaunch D-Bus without X11 $DISPLAY"
+  apt install -y pass
+  echo $accessToken | docker login -u alaress --password-stdin
+  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+  docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
+fi
 
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];
