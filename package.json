@@ -89,7 +89,7 @@
     "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
     "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
     "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production",
-    "storybook": "start-storybook -s ./stories/assets -p 6006",
+    "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   }
 }

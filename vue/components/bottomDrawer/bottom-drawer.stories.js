@@ -6,18 +6,12 @@ export default {
     component: BottomDrawer,
     // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
     argTypes: {
-        showDrawer: false,
+        showDrawer: { 
+            type: { required: true },
+        },
         default: {
-            control: {
-                type: 'text'
-            },
-            defaultValue: '<strong>My slot prop</strong>',
-            meta_description: 'slot content',
-            table: {
-                type: {
-                    summary: null,
-                }
-            },
+            control: { type: 'text' },
+            defaultValue: '<strong>Bottom drawer content</strong>',
         },
     },
     //wrap the component in some html: https://storybook.js.org/docs/vue/writing-stories/introduction#using-decorators
@@ -26,12 +20,15 @@ export default {
 
 // More on component templates: https://storybook.js.org/docs/vue/writing-stories/introduction#using-args
 const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
     components: { BottomDrawer },
+    setup() {
+        //👇 The args will now be passed down to the template
+        return { args };
+    },
     template:
         `
-        <bottom-drawer v-bind="$props">
-            <template v-if="${'default' in args}" v-slot:default>${args.default}</template>
+        <bottom-drawer v-bind="args">
+            ${args.default}
         </bottom-drawer>
         `,
 });
@@ -39,5 +36,5 @@ const Template = (args, { argTypes }) => ({
 export const Default = Template.bind({});
 // More on args: https://storybook.js.org/docs/vue/writing-stories/args
 Default.args = {
-    showDrawer: true,
+    showDrawer: false,
 };
