@@ -130,7 +130,6 @@ class InvolvedUsers
      * @param \Schoolbox\User $user
      * @param int             $startTimestamp
      * @param int             $endTimestamp
-     * @param array|null      $allowedEventTypes
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DebugBar\DebugBarException
@@ -140,7 +139,7 @@ class InvolvedUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
+    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
