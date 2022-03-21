@@ -100,29 +100,6 @@ class ValidCSV
     }
 
     /**
-     * iterates through the while file checking for the existence of UTF8 characters
-     * @return bool
-     */
-    public function noUTF8(): bool
-    {
-        //is there utf8 in the file anywhere? usually run after the clean headers, so really just checking the main data
-        //parse csv
-        $lineCount = 0;
-        while (!feof($this->fp) && ($line = fgetcsv($this->fp)) !== false) {
-            $lineCount++;
-            $cellCount = 0;
-            foreach ($line as $cell) {
-                $cellCount++;
-                //check line for non ascii characters
-                if (false === mb_detect_encoding($cell, 'ASCII', true)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * scans the while file and will confirm where the non ASCII (UTF8) characters exist in the file.
      * including the BOM character
      * @param LoggerInterface $logger
