@@ -66,6 +66,13 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                 $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir'),
             ],
         ];
+
+        /* Optional limits
+         */
+        if ($this->getConfig('size')) {
+            $options['limit'] = $this->getConfig('size');
+        }
+
         /* Find all the pads associated with this list of groups
         * Apply all the component powers
         */
@@ -106,12 +113,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                     'source_folder_deleted_block' => '',
                 ]
             );
-
-            /* Optional limits
-             */
-            if ($this->getConfig('size')) {
-                $options['limit'] = $this->getConfig('size');
-            }
 
             /* Only provide Modify Document button to those with write access
              */
