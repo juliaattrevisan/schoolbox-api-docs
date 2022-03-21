@@ -157,7 +157,7 @@ class InvolvedUsers
 
         $statement->execute([
             'externalId' => $user->getExternalId(),
-            'classification' => 'timetable'
+            'classification' => Model::CLASSIFICATION_TIMETABLE
         ]);
 
         $usualEventIds = [];
