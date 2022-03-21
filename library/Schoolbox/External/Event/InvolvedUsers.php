@@ -71,7 +71,7 @@ class InvolvedUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generate(\Schoolbox\External\Event\Model $event): array
+    public function generateForEvent(\Schoolbox\External\Event\Model $event): array
     {
 
         /* Find the sis_class that corresponds to $event
