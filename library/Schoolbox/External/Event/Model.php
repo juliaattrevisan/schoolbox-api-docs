@@ -29,9 +29,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var int|null
+     * @var string|null
      */
-    private ?int $title;
+    private ?string $title;
 
 
     /**
@@ -95,19 +95,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getTitle(): ?int
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
 
     /**
-     * @param int|null $title
+     * @param string|null $title
      * @return Model
      */
-    public function setTitle(?int $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
         return $this;
