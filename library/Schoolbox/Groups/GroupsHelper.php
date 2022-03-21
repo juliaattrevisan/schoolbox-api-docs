@@ -501,4 +501,21 @@ class GroupsHelper
         ];
         return $enrolmentArray[$enrolment];
     }
+
+    /**
+     * get membership int from string, usually used in the API
+     */
+    public function membershipStringToInt(string $membership): int
+    {
+        switch ($membership) {
+            case 'admin':
+                return UserAccess::ACCESS_FULL;
+            case 'write':
+                return UserAccess::ACCESS_WRITE;
+            case 'read':
+                return UserAccess::ACCESS_READ;
+            default:
+                return UserAccess::ACCESS_DENY;
+        }
+    }
 }

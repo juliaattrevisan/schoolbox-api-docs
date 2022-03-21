@@ -132,8 +132,8 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
-        $post = $this->getRequest()->post->getArrayCopy();
-        $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
+        $post = json_decode(json_encode($this->request->content->get()), true);
+        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: UserAccess::ACCESS_READ;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
         $post['isFavourite'] = $post['isFavourite'] ?: false;
 
