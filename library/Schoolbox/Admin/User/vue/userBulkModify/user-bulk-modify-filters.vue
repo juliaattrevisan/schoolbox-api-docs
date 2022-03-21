@@ -131,30 +131,23 @@ export default {
 
 <style lang="scss" scoped>
 
+$toWrapFlex: 1000px;
+
 .filters {
     background: white;
     display: flex;
     gap: 1rem;
     padding: 0 1rem 1rem 1rem;
-    // @media (max-width: $tableToSingleColumn) {
-    //     flex-direction: column;
-    // }
+    @media (max-width: $toWrapFlex) {
+        flex-wrap: wrap; //start allowing list on multiple lines
+    }
 }
 
     .filters__column { 
         flex: 1 1 0; //keep both sides equal
+        @media (max-width: $toWrapFlex) {
+            flex: none; //back to default state 
+        }
     }
-
-// legend { 
-//     margin-bottom: 0.5rem; //extra gap between it and the form element below
-// }
-
-// .option-list li {
-//     display: inline-block; //rather than block, to line up with similarity score filter better
-//     margin-right: 2rem;
-//     @media (max-width: $tableToSingleColumn) {
-//         display: block;
-//     }
-// }
 
 </style>

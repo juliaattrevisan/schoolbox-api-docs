@@ -54,7 +54,8 @@ export default {
 
     data () {
         return {
-            hasRowsLoaded: false,
+            hasDataLoaded: false, //show loading display until true
+            hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
             tableColumns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
@@ -218,10 +219,11 @@ export default {
                     body: JSON.stringify(this.getRowsBody()),
                 });
                 this.rows = await response.json();
-                this.hasRowsLoaded = true;
             } catch (error) {
                 console.log(error);
                 this.hasLoadError = true; //display error note in the DOM
+            } finally {
+                this.hasDataLoaded = true; //update the display to show the list
             }
         },
 
@@ -273,17 +275,18 @@ export default {
         },
 
         /**
-         * Clear the selection
+         * To open the modify modal
          */
         onModifySelected () {
             this.$refs.newValues.modify(); //will open up the reveal-modal in user-bulk-modify-new-values
         },
 
         /**
-         * Clear the selection
+         * Selected modify is complete, so clear the rows and update the data
          */
         onUpdated () {
             this.clearRows();
+            this.loadRows(); //refresh the data
         },
 
     },
@@ -293,7 +296,15 @@ export default {
 
 <template>
     <div>
+        <div v-if="hasLoadError">
+            <section class="content">
+                <div tableData-alert class="alert-box alert">
+                    Sorry, we are currently unable to load the Bulk Modify list. Please contact your support it the problem persists.
+                </div>
+            </section>
+        </div>
         <v-client-table
+            v-else-if="hasDataLoaded"
             ref="table"
             :data="rows"
             :columns="tableColumns"
@@ -313,6 +324,23 @@ export default {
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
+        <div v-else>
+            <table class="skeleton">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
@@ -365,6 +393,5 @@ export default {
         background: none;
     }
 }
-
 
 </style>

@@ -65,10 +65,26 @@ export default {
                 displayGradeGraph: -1,
                 revokeToken: -1,
             },
+            updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
-            logData: [],
+            logData: [], //to display the output of the returned action
         }
+    },
+
+    computed: {
+
+        /**
+         * To strip the <br> from the log data
+         */
+        updatedLogData () {
+            return this.logData[0].replace(/<br\s*\/?>/gi, '');
+        }
+
+    },
+
+    mounted () {
+        this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
     },
 
     methods: {
@@ -86,6 +102,7 @@ export default {
          */
         async onUpdateUsersSelected () {
             try {
+                this.isProcessing = true;
                 const response = await fetch(this.srcUserModify, {
                     method: 'POST',
                     body: this.getUpdateUsersFormData(),
@@ -94,9 +111,12 @@ export default {
                 this.logData = responseData;
             } catch (error) {
                 console.warn(error);
+                this.isProcessing = false;
             } finally {
                 this.hasUpdated = true;
                 this.$emit('updated'); 
+                this.isProcessing = false;
+                this.updateFields = Object.assign({}, this.updateFieldsOriginal); //reset to original values
             }
         },
 
@@ -131,16 +151,16 @@ export default {
 
 <template>
     <reveal-modal ref="modal" size="xlarge">
-        <div class="new-values">
-            <template v-if="hasUpdated">
+        <Transition name="fade" mode="out-in">
+            <div v-if="hasUpdated" class="new-values">
                 <div class="new-values__full-width">
-                    <p v-html="logData"></p>
+                    <textarea v-html="updatedLogData"></textarea>
                 </div>
                 <div class="new-values__full-width">
                     <button @click.prevent="onCloseSelected" class="button submit">Close</button>
                 </div>
-            </template>
-            <template v-else>
+            </div>
+            <div v-else class="new-values">
                 <div class="new-values__full-width">
                     <h2>Bulk modify {{ selectedRows.length }} users selected</h2>
                 </div>
@@ -253,33 +273,49 @@ export default {
                     </select>
                 </div>
                 <div class="new-values__full-width">
-                    <button @click.prevent="onUpdateUsersSelected" class="button submit">Update Selected</button>
+                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing">Update Selected</button>
                 </div>
-            </template>
-        </div>
+            </div>
+        </Transition>
     </reveal-modal>
 </template>
 
 <style lang="scss" scoped>
 
+$toTwoColumns: 1200px;
+$toOneColumn: 600px;
+
 .new-values {
     display: grid;
-    grid-gap: 1.5rem;
+    grid-gap: 0 1.5rem;
     grid-template-columns: repeat(4, 1fr); //four equal columns
-    // grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     padding: 0.5rem;
-    // @media (max-width: $tableToSingleColumn) {
-    //     flex-direction: column;
-    // }
+    @media (max-width: $toTwoColumns) {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+    @media (max-width: $toOneColumn) {
+        display: block;
+    }
 }
-
-    // .new-values__column { 
-    //     // flex: 1 1 0; //keep both sides equal
-    //     flex: 1 0 21%; /* explanation below */
-    // }
 
     .new-values__full-width {
         grid-column: 1 / span 4; //extend full grid width
+        @media (max-width: $toTwoColumns) {
+            grid-column: 1 / span 2; 
+        }
     }
+
+textarea { //to prevent the potential for a massively long modal
+    min-height: 200px;
+    max-height: 600px;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.2s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+}
 
 </style>
