@@ -124,7 +124,7 @@ class InvolvedUsers
 
 
     /**
-     * Generate a list of events in which $user is involved
+     * Generate a list of events in which $user is involved, between two timestamps
      * Also takes into account any event overrides
      *
      * @param \Schoolbox\User $user
