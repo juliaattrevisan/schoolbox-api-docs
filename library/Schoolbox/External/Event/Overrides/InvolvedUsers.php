@@ -114,7 +114,7 @@ class InvolvedUsers
             if (Model::SUBTRACT === $override->getAction()) {
                 unset($stack[$override->getUser()->getExternalId()]);
             } elseif (Model::ADD === $override->getAction()) {
-                $stack[$override->getUser()->getExternalId()] = $override->getUser();
+                $stack[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
             } elseif (Model::CLEAR === $override->getAction()) {
                 $stack = [];
             }
