@@ -41,6 +41,10 @@ class Module extends BaseModule
     {
         $this->attachResourceRoutes($router, $basePath);
         $this->addGetRoute($router, 'search', $basePath, '/search');
+
+        /* You can view the Curriculum Tree with this route
+         * $this->addGetRoute($router, 'browse', $basePath, '/browse');
+         */
     }
 
     /**
