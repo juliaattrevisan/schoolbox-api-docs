@@ -32,6 +32,12 @@ class InvolvedUsers
 
 
     /**
+     * @var Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
      * @var Overrides\Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overrideMapper;
@@ -46,17 +52,20 @@ class InvolvedUsers
     /**
      * @param \Schoolbox\External\ClassEntryMapper       $classEntryMapper
      * @param \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper
+     * @param Mapper                                     $eventMapper
      * @param Overrides\Mapper                           $overrideMapper
      * @param \Schoolbox\UserMapper                      $userMapper
      */
     public function __construct(
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
     }
@@ -160,7 +169,7 @@ class InvolvedUsers
         /* This is the default scenario for the most part; it's all the events
          * that $user is usually involved with via sis_class_user
          */
-        $events = \Schoolbox\External\Event\Mapper::getInstance()->findByColumn('id', $usualEventIds)->indexBy('id');
+        $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
 
         /* Find a list of events which have overrides that might affect $user
          * If there are overrides, process each one specially
@@ -193,7 +202,7 @@ class InvolvedUsers
         /* Figure out the mutations that were specified by the event overrides
          * and then decide if $user was still involved
          */
-        $overrideEvents = \Schoolbox\External\Event\Mapper::getInstance()->findByColumn('id', $overrideEventIds)->indexBy('id');
+        $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds)->indexBy('id');
 
         foreach ($overrideEvents as $eventId => $overrideEvent) {
             $mutatedInvolvements = $this->generateForEvent($overrideEvent);
