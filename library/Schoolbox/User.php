@@ -1491,12 +1491,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     /**
      * Checks group access
+     * @param int $groupId
      * @return bool
      */
-    public function isGroupMember($group_id): bool
+    public function isGroupMember(int $groupId): bool
     {
         foreach ($this->getAccessList() as $access) {
-            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE && $access->getServiceIdentifier() == $group_id) {
+            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE && $access->getServiceIdentifier() == $groupId) {
                 return true;
             }
         }
