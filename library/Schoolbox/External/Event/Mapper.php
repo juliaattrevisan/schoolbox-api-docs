@@ -12,7 +12,6 @@ namespace Schoolbox\External\Event;
 
 use Schoolbox\GenericCollection;
 
-
 /**
  * @method Model findById($id)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
