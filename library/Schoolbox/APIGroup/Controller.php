@@ -125,8 +125,8 @@ class Controller extends Base
 
     /**
      * Deletes a user's group membership
-
-     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPatch
+     * @api /user/{userId}/group
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipDelete
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
