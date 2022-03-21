@@ -151,7 +151,7 @@ class FilePayload
 
                 case 'Submission':
                     $sendUrl = "/storage/fetch.php?hash={$row['hash']}";
-                    $deleteUrl = "/submission/delete-file/{$row['id']}/hash/{$row['hash']}";
+                    $deleteUrl = null;
                     break;
 
                 case 'Return':

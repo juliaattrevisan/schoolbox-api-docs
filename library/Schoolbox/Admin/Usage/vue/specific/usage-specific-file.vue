@@ -30,7 +30,7 @@ export default {
      */
     props: {
         endpoint: {
-           type: String, 
+           type: String,
            required: true
         }
     },
@@ -62,7 +62,7 @@ export default {
              */
             allData: [],
 
-            /* Table columns. 
+            /* Table columns.
              */
             columns: [ 'name', 'size', 'folder', 'location', 'id' ],
 
@@ -78,9 +78,9 @@ export default {
                 },
                 orderBy: {
                     ascending: true,
-                    column: 'name' 
+                    column: 'name'
                 },
-                perPage: 50, 
+                perPage: 50,
                 perPageValues: [50, 100, 200],
                 debounce: 100, //faster debouce as data is stored on the client side,
                 resizableColumns: false,
@@ -146,13 +146,13 @@ export default {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.loading = false; 
+                this.loading = false;
             }
         },
 
         /**
          * To update the table to show the UI in the footer
-         * 
+         *
          */
         onLoaded () {
             this.$nextTick(() => this.footerUI_update());
@@ -160,9 +160,9 @@ export default {
 
         /**
          * To convert the bytes into a more readable string
-         * 
+         *
          * @param { Number } - 214430838
-         * 
+         *
          * @returns { String } - 204.5 MB
          */
         getHumanReadableFilesize (value) {
@@ -239,23 +239,23 @@ export default {
             </table>
         </template>
         <template v-else>
-            <v-client-table 
-                :data="allData" 
-                :columns="columns" 
-                :options="options" 
+            <v-client-table
+                :data="allData"
+                :columns="columns"
+                :options="options"
                 @loaded="onLoaded"
             >
-                <template #name="props"> 
+                <template #name="props">
                     <a :href="props.row._links.send">{{ props.row.name }}</a>
                 </template>
-                <template #size="props"> 
+                <template #size="props">
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
-                <template #folder="props"> 
+                <template #folder="props">
                     <a :href="`/homepage/${props.row.folderId}`">{{ props.row.folder }}</a>
                 </template>
-                <template #id="props"> 
-                    <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
+                <template #id="props">
+                    <a v-if="props.row._links.delete" :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
