@@ -14,6 +14,8 @@ use Closure;
 use House;
 use HouseResidential;
 use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model as YearLevel;
@@ -31,10 +33,12 @@ class ModelToArray
 {
     /**
      * @param User $user
+     * @param GenericCollection|UserAccess[]|array|bool $groups
      * @return array
      */
-    public function __invoke(User $user): array
+    public function __invoke(User $user, $groups = false): array
     {
+        $groups = $groups ?: $user->getAccessList()->indexBy('serviceIdentifier');
         return [
             'id'     => $user->getId(),
             'campus' => $user->getCampusCollection()
@@ -43,16 +47,15 @@ class ModelToArray
             'role'   => $this->convertRole($user->getRole()),
 
             // Null for now, may hydrate later or make nullable in API
-            'groups' => null,
+            'groups' => $groups,
 
             'schoolHouse'      => $this->convertSchoolHouse($user->getSchoolHouse()),
-            'residentialHouse' => $this->convertResidentialHouse($user->getResidentialHouse()),
 
             // Null for now
-            'guardians'        => null,
-            'students'         => null,
+            'guardians'        => $user->getParents(),
+            'students'         => $user->getChildren(),
 
-            'impersonableUser' => null,
+            'impersonableUser' => $user->getLinkedUser(),
 
             'email'          => $user->getEmail(),
             '_links'         => $this->deriveLinks($user),

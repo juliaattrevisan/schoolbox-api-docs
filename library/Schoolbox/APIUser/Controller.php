@@ -95,7 +95,9 @@ class Controller extends Base
             }
         }
         /**
-         * build the groups list
+         * build the internal groups list
+         * we are not using User::getAccessList(), as that will also include SIS group folders,
+         * that the user is unable to change membership of, or other details.
          */
         $users_groups = $this->groupsHelper->getCurrentGroups($user);
         $apiGroups = new Collection($users_groups);
@@ -103,7 +105,7 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new ModelToArray())($user, $groupsArr, $students);
+        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
