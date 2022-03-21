@@ -67,19 +67,21 @@ HELP;
             $this->getLogger()->error($e->getMessage());
             exit();
         }
-        try {
-            $valid->hasBOM();
-            $this->getLogger()->info("No Bom");
-        } catch (\UnexpectedValueException $e) {
-            $this->getLogger()->error($e->getMessage());
+        //check if the file has a BOM, which we should always be removing, but good to know.
+        if ($valid->hasBOM()) {
+            $this->getLogger()->warning("File has BOM character");
+        } else {
+            $this->getLogger()->info("File does not contain a BOM characher");
         }
-        try {
-            $valid->hasAsciiHeaderRow();
-            $this->getLogger()->info("Headers are clean of UTF8");
-        } catch (\UnexpectedValueException $e) {
-            $this->getLogger()->error($e->getMessage());
-        }
-        $valid->locateUTF8($this->getLogger());
 
+        //check the header row (excluding BOM character), this is where imports usually fail.
+        if ($valid->hasAsciiHeaderRow()) {
+            $this->getLogger()->info("Headers are clean of UTF8");
+        } else {
+            $this->getLogger()->warning("File has non ASCII charcters in the header row");
+        }
+
+        //dump all locations where UTF8 characters exist, including the BOM and headers.
+        $valid->locateUTF8($this->getLogger());
     }
 }
