@@ -13,13 +13,9 @@ namespace Schoolbox\APIGroup;
 use Schoolbox\Collection;
 
 /**
- * Translator for translating a user model into an array, ready for JSON
+ * Translator for translating a group model into an array, ready for JSON
  * encoding.
  *
- * The information returned by this translator may contain private information,
- * such as the user's email address:
- * see `\Schoolbox\User\Translator\Author\ModelToArray` for a variant which is
- * guaranteed to return only public information.
  */
 class ModelToArray
 {

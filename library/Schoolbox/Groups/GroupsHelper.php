@@ -75,10 +75,6 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                               ])->indexBy('serviceIdentifier');
         $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
@@ -386,17 +382,5 @@ class GroupsHelper
                                                                    'sid'     => $group->getFolder()->getId()
                                                                ])->indexBy('serviceIdentifier');
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
-    }
-
-    /**
-     * is the user currently part of the group?
-     */
-    public function isEnrolledInGroup(User $user, Group $group)
-    {
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                      'uid'     => $user->getId(),
-                                                                      'sid'     => $group->getFolder()->getId()
-                                                                  ]);
-        return (bool)count($userPerms);
     }
 }
