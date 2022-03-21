@@ -94,7 +94,7 @@ class Controller extends Base
      * Deletes a user object
      *
      * @param User $user
-     * @api DELETE /apiuser/{userId}
+     * @api DELETE /user/{userId}
      * @link http://api.schoolbox.com.au/#operation/userDelete
      */
     public function apiUserDelete(User $user)
