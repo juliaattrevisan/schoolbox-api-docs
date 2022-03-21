@@ -139,13 +139,18 @@ class InvolvedUsers
             INNER JOIN user u ON u.synergy_id = scu.external_id
             INNER JOIN groups g ON u.group_id = g.id
             LEFT JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
-            WHERE se.classification = 'timetable' 
+            WHERE se.classification = :classification 
             AND se.deleted_at IS NULL
-            AND u.synergy_id = {$user->getExternalId()}
+            AND u.synergy_id = :externalId
             AND u.deleted_at IS NULL
         ";
 
-        $statement = $this->overrideMapper->getDatabase()->query($query);
+        $statement = $this->overrideMapper->getDatabase()->prepare($query);
+
+        $statement->execute([
+            'externalId' => $user->getExternalId(),
+            'classification' => 'timetable'
+        ]);
 
         $usualEventIds = [];
 
@@ -165,14 +170,20 @@ class InvolvedUsers
             SELECT se.id
             FROM sis_event se 
             INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
-            WHERE se.classification = 'timetable'
-            AND (seuo.external_id = {$user->getExternalId()} OR seuo.action = 'clear')
+            WHERE se.classification = :classification
+            AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
             AND se.deleted_at IS NULL
             GROUP BY se.id 
             ORDER BY se.id
         ";
 
-        $statement = $this->overrideMapper->getDatabase()->query($query);
+        $statement = $this->overrideMapper->getDatabase()->prepare($query);
+
+        $statement->execute([
+            'externalId' => $user->getExternalId(),
+            'classification' => 'timetable',
+            'actionClear' => 'clear'
+        ]);
 
         $overrideEventIds = [];
 
