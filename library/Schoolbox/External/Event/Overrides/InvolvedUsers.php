@@ -97,7 +97,7 @@ class InvolvedUsers
         $usualUsers = [];
 
         foreach ($involvements as $involvement) {
-            $usualUsers[$involvement->getExternalId()] = $this->userMapper->findByExternalId($involvement->getExternalId());
+            $usualUsers[$involvement->getExternalId()] = $involvement->getExternalId();
         }
 
         /* Remember a new set
