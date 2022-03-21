@@ -135,7 +135,7 @@ class Module extends BaseModule
     {
         return (new Controller())
             ->setEventMapper($this->getMapperFactory()->get(Calendar\EventMapper::class))
-            ->setEventRecurrenceMapper($this->getMapperFactory()->get(Calendar\EventMapper::class))
+            ->setEventRecurrenceMapper(new Calendar\EventRecurrenceMapper($this->getMapperFactory()->get(Calendar\EventMapper::class)))
             ->setBookingMapper($this->getMapperFactory()->get(Mapper::class))
             ->setResourceMapper($this->getMapperFactory()->get(ItemMapper::class))
             ->setExternalTimetableHandler($this->injector->get('externalTimetable'))
