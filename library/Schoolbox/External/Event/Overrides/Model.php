@@ -21,6 +21,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * These consts correspond to the enum values in sis_event_user_overrides
+     */
+    public const CLEAR = 'clear';
+    public const ADD = 'add';
+    public const SUBTRACT = 'subtract';
+
+
+    /**
      * @var int|null
      */
     private ?int $eventId;
