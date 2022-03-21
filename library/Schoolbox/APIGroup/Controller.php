@@ -127,7 +127,7 @@ class Controller extends Base
      *
      * @param User $user
      * @param Group $group
-     * @api PUT /apigroup/{userId}/groupMembership/{groupId}
+     * @api PUT /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPut
      */
     public function apiMembershipPut(User $user, Group $group)
@@ -165,7 +165,7 @@ class Controller extends Base
      *
      * @param User $user
      * @param Group $group
-     * @api PATCH /apigroup/{userId}/groupMembership/{groupId}
+     * @api PATCH /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPatch
      */
     public function apiMembershipPatch(User $user, Group $group)
