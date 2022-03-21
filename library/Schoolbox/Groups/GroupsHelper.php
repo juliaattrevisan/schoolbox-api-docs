@@ -262,7 +262,7 @@ class GroupsHelper
              * then confirm with the $userPerms array to see if the user has that group as a favourite
              */
             $isFavourite = false;
-            if ($userPerms[$folder->getId()]) {
+            if ($userPerms[$folder->getId()] ?? false) {
                 $isFavourite = $userPerms[$folder->getId()]->getFavourite();
             }
 
@@ -280,7 +280,7 @@ class GroupsHelper
              * if they aren't a member they may have 'read' access via folder perms, but return deny (from group view)
              */
             $access = UserAccess::ACCESS_DENY;
-            if ($userPerms[$folder->getId()]) {
+            if ($userPerms[$folder->getId()] ?? false) {
                 $access = $userPerms[$folder->getId()]->getAccessLevel();
             }
             /**
@@ -289,7 +289,7 @@ class GroupsHelper
              * Superuser will not.
              */
             $isAdmin = false;
-            if ($userPerms[$folder->getId()]) {
+            if ($userPerms[$folder->getId()] ?? false) {
                 $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
             }
 
