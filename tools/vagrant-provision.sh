@@ -445,28 +445,31 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
+# This needs a docker password / token
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
 
-accessToken=$(read_var GITHUB_ACCESS_TOKEN)
-if [[ -z $s3Referer ]]; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Github access token from .env environment file: not starting task daemon!"
-else
-  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
-  # Where does the task daemon go? Let's say in the home dir for now
-  # Not in the main install dir, otherwise it risks getting committed
-  cd ~
-  if [ ! -d taskd-prototype ]; then
-    git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
-  fi
-  cd taskd-prototype
-  git checkout ${taskd_branch}
-  git fetch --all
-  git pull --ff-only
-
-  # TODO include docker-compose in base box, or alternately download a pre-built box
-  apt install -y docker-compose
-  docker-compose build taskd
-  docker-compose up -d taskd
-fi
+#accessToken=$(read_var GITHUB_ACCESS_TOKEN)
+#if [[ -z $s3Referer ]]; then
+#  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Github access token from .env environment file: not starting task daemon!"
+#else
+#  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+#  # Where does the task daemon go? Let's say in the home dir for now
+#  # Not in the main install dir, otherwise it risks getting committed
+#  cd ~
+#  if [ ! -d taskd-prototype ]; then
+#    git clone https://${accessToken}@github.com/${taskd_fork}/taskd-prototype.git
+#  fi
+#  cd taskd-prototype
+#  git checkout ${taskd_branch}
+#  git fetch --all
+#  git pull --ff-only
+#
+#  # TODO include docker-compose in base box, or alternately download a pre-built box
+#  apt install -y docker-compose
+#  docker-compose build taskd
+#  docker-compose up -d taskd
+#fi
 
 
 # call custom provisioning
