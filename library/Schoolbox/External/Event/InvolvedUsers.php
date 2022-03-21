@@ -141,12 +141,12 @@ class InvolvedUsers
          */
         $query = "
             SELECT se.id
-            FROM sis_event se
-            INNER JOIN sis_class sc ON se.code = sc.code
-            INNER JOIN sis_class_user scu ON scu.class_id = sc.id
-            INNER JOIN user u ON u.synergy_id = scu.external_id
-            INNER JOIN groups g ON u.group_id = g.id
-            LEFT JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->classEntryMapper->getTable()} sc ON se.code = sc.code
+            INNER JOIN {$this->classInvolvementMapper->getTable()} scu ON scu.class_id = sc.id
+            INNER JOIN {$this->userMapper->getTable()} u ON u.synergy_id = scu.external_id
+            INNER JOIN {$this->userMapper->getJoinSql('role', 'u', 'g')}
+            LEFT JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification 
             AND se.deleted_at IS NULL
             AND u.synergy_id = :externalId
@@ -176,8 +176,8 @@ class InvolvedUsers
          */
         $query = "
             SELECT se.id
-            FROM sis_event se 
-            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se 
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
             AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
             AND se.deleted_at IS NULL
