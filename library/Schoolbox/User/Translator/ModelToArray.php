@@ -12,7 +12,6 @@ namespace Schoolbox\User\Translator;
 use Alaress\Image\Transformation\Storage;
 use Closure;
 use House;
-use HouseResidential;
 use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
@@ -140,24 +139,6 @@ class ModelToArray
             ]
             : null;
     }
-
-
-    /**
-     * Helper for converting a residential house into an array.
-     *
-     * @param HouseResidential|null $residentialHouse
-     * @return array|null
-     */
-    private function convertResidentialHouse(?HouseResidential $residentialHouse): ?array
-    {
-        return $residentialHouse
-            ? [
-                'id'   => $residentialHouse->getId(),
-                'name' => $residentialHouse->getHouse(),
-            ]
-            : null;
-    }
-
 
     /**
      * Helper for converting a year level into an array.
