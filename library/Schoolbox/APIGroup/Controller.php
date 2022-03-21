@@ -97,9 +97,9 @@ class Controller extends Base
         $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
         $post['isFavourite'] = $post['isFavourite'] ?: false;
-        $post['enrollmentStatus'] = $post['enrollmentStatus'] ?: UserAccess::ACCESS_AWAITING_AUTHORISATION;
+        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?: UserAccess::ACCESS_AWAITING_AUTHORISATION;
 
-        $this->groupsHelper->addToGroup($user, $group, $post['enrollmentStatus'], $post['membership'], $post['isFavourite']);
+        $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
         $apiGroups = new Collection($users_groups);
