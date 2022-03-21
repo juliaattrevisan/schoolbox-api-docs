@@ -10,12 +10,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Schoolbox\GenericCollection;
+
+
 /**
  * @method Model findById($id)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
- * @method Model[] findByColumn($columnName, $columnValue, array $options = [])
- * @method Model[] findByColumnList($columnList, array $options = [])
+ * @method GenericCollection findByColumn($columnName, $columnValue, array $options = [])
+ * @method GenericCollection findByColumnList($columnList, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
  */

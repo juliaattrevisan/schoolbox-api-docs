@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Schoolbox\GenericCollection;
+
+
 /**
  * For a given event, find the final calculated list of users
  * which is the default users from sis_class, mutated by the
@@ -109,5 +112,92 @@ class InvolvedUsers
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Generate a list of events in which $user is involved
+     * Also takes into account any event overrides
+     *
+     * @param \Schoolbox\User $user
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DebugBar\DebugBarException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    public function generateForUser(\Schoolbox\User $user): GenericCollection
+    {
+        /* Find the list of events where you might be involved normally
+         */
+        $query = "
+            SELECT se.id
+            FROM sis_event se
+            INNER JOIN sis_class sc ON se.code = sc.code
+            INNER JOIN sis_class_user scu ON scu.class_id = sc.id
+            INNER JOIN user u ON u.synergy_id = scu.external_id
+            INNER JOIN groups g ON u.group_id = g.id
+            LEFT JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            WHERE se.classification = 'timetable' 
+            AND se.deleted_at IS NULL
+            AND u.synergy_id = {$user->getExternalId()}
+            AND u.deleted_at IS NULL
+        ";
+
+        $statement = $this->overrideMapper->getDatabase()->query($query);
+
+        $usualEventIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $usualEventIds[$row['id']] = $row['id'];
+        }
+
+        /* This is the default scenario for the most part; it's all the events
+         * that $user is usually involved with via sis_class_user
+         */
+        $events = \Schoolbox\External\Event\Mapper::getInstance()->findByColumn('id', $usualEventIds)->indexBy('id');
+
+        /* Find a list of events which have overrides that might affect $user
+         * If there are overrides, process each one specially
+         */
+        $query = "
+            SELECT se.id
+            FROM sis_event se 
+            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            WHERE se.classification = 'timetable'
+            AND (seuo.external_id = {$user->getExternalId()} OR seuo.action = 'clear')
+            AND se.deleted_at IS NULL
+            GROUP BY se.id 
+            ORDER BY se.id
+        ";
+
+        $statement = $this->overrideMapper->getDatabase()->query($query);
+
+        $overrideEventIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $overrideEventIds[$row['id']] = $row['id'];
+        }
+
+        /* Figure out the mutations that were specified by the event overrides
+         * and then decide if $user was still involved
+         */
+        $overrideEvents = \Schoolbox\External\Event\Mapper::getInstance()->findByColumn('id', $overrideEventIds)->indexBy('id');
+
+        foreach ($overrideEvents as $eventId => $overrideEvent) {
+            $mutatedInvolvements = $this->generateForEvent($overrideEvent);
+
+            /* If you're still in the list after the mutations; pile it into the stack
+             * Otherwise, you aren't involved anymore; remove it from the stack
+             */
+            if (isset($mutatedInvolvements[$user->getExternalId()])) {
+                $events[$overrideEvent->getId()] = $overrideEvent;
+            } else {
+                unset($events[$overrideEvent->getId()]);
+            }
+        }
+
+        return $events;
     }
 }
