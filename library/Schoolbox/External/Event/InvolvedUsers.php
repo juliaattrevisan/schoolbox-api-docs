@@ -128,15 +128,23 @@ class InvolvedUsers
      * Also takes into account any event overrides
      *
      * @param \Schoolbox\User $user
+     * @param int             $startTimestamp
+     * @param int             $endTimestamp
+     * @param array|null      $allowedEventTypes
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DebugBar\DebugBarException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateForUser(\Schoolbox\User $user): GenericCollection
+    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): GenericCollection
     {
+        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
+
         /* Find the list of events where you might be involved normally
          */
         $query = "
@@ -147,7 +155,9 @@ class InvolvedUsers
             INNER JOIN {$this->userMapper->getTable()} u ON u.synergy_id = scu.external_id
             INNER JOIN {$this->userMapper->getJoinSql('role', 'u', 'g')}
             LEFT JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-            WHERE se.classification = :classification 
+            WHERE se.classification = :classification
+            AND se.start_at >= :startDatetime
+            AND se.finish_at <= :finishDatetime
             AND se.deleted_at IS NULL
             AND u.synergy_id = :externalId
             AND u.deleted_at IS NULL
@@ -156,6 +166,8 @@ class InvolvedUsers
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
 
         $statement->execute([
+            'startDatetime' => $startDatetime,
+            'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
             'classification' => Model::CLASSIFICATION_TIMETABLE
         ]);
@@ -179,6 +191,8 @@ class InvolvedUsers
             FROM {$this->eventMapper->getTable()} se 
             INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
+            AND se.start_at >= :startDatetime
+            AND se.finish_at <= :finishDatetime
             AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
             AND se.deleted_at IS NULL
             GROUP BY se.id 
@@ -188,6 +202,8 @@ class InvolvedUsers
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
 
         $statement->execute([
+            'startDatetime' => $startDatetime,
+            'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
             'classification' => Model::CLASSIFICATION_TIMETABLE,
             'actionClear' => Overrides\Model::CLEAR
