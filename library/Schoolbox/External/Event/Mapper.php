@@ -33,6 +33,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('detail', self::TYPE_STRING);
+        $this->uses('location', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('day', self::TYPE_STRING);
         $this->uses('period', self::TYPE_STRING);

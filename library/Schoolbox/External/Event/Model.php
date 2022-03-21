@@ -43,6 +43,12 @@ class Model implements ISoftDeletable
     /**
      * @var string|null
      */
+    private ?string $location;
+
+
+    /**
+     * @var string|null
+     */
     private ?string $code;
 
 
@@ -130,6 +136,26 @@ class Model implements ISoftDeletable
     public function setDetail(?string $detail): self
     {
         $this->detail = $detail;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+
+    /**
+     * @param string|null $location
+     * @return Model
+     */
+    public function setLocation(?string $location): self
+    {
+        $this->location = $location;
         return $this;
     }
 
