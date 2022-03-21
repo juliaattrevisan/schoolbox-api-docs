@@ -74,7 +74,7 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($statement as $row) {
             $override = $this->hydrate($row);
 
-            /** @var \Schoolbox\User $user */
+            /** @var \Schoolbox\User|null $user */
             $user = $this->hydrateJoin($row, 'externalId', 'u');
 
             /* This corresponds to a 'clear' mutation in the overrides
