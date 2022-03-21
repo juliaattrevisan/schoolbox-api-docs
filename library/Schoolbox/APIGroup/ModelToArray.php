@@ -23,19 +23,24 @@ use Schoolbox\Collection;
  */
 class ModelToArray
 {
+    const MEMBERSHIP_NONE = 'none';
+    const MEMBERSHIP_READ = 'read';
+    const MEMBERSHIP_WRITE = 'write';
+    const MEMBERSHIP_ADMIN = 'admin';
+
     /**
      * @param array $group
      * @return array
      */
     public function __invoke(array $group): array
     {
-        $membership = 'none';
+        $membership = self::MEMBERSHIP_NONE;
         if ($group['isAccessRead']) {
-            $membership = 'read';
+            $membership = self::MEMBERSHIP_READ;
         } elseif ($group['isAccessWrite']) {
-            $membership = 'write';
+            $membership = self::MEMBERSHIP_WRITE;
         } elseif ($group['isAccessAdmin']) {
-            $membership = 'admin';
+            $membership = self::MEMBERSHIP_ADMIN;
         }
         return [
             'id'                => $group['id'],
