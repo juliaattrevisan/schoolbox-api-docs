@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Event;
+namespace Schoolbox\External\Event\Overrides;
 
 use Schoolbox\GenericCollection;
 
@@ -15,6 +15,8 @@ use Schoolbox\GenericCollection;
  * For a given event, find the final calculated list of users
  * which is the default users from sis_class, mutated by the
  * Overrides, then deduped.
+ *
+ * Only applies to the 'timetable' event classification
  */
 class InvolvedUsers
 {
@@ -32,13 +34,13 @@ class InvolvedUsers
 
 
     /**
-     * @var Mapper
+     * @var \Schoolbox\External\Event\Mapper
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
-     * @var Overrides\Mapper
+     * @var Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overrideMapper;
 
@@ -52,8 +54,8 @@ class InvolvedUsers
     /**
      * @param \Schoolbox\External\ClassEntryMapper       $classEntryMapper
      * @param \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper
-     * @param Mapper                                     $eventMapper
-     * @param Overrides\Mapper                           $overrideMapper
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param Mapper                                     $overrideMapper
      * @param \Schoolbox\UserMapper                      $userMapper
      */
     public function __construct(
@@ -74,10 +76,9 @@ class InvolvedUsers
     /**
      * Find the overall set of involved humans for $event
      *
-     * @param Model $event
+     * @param \Schoolbox\External\Event\Model $event
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
@@ -110,11 +111,11 @@ class InvolvedUsers
         /* Decide how each $override affects the $stack set
          */
         foreach ($overrides as $override) {
-            if (Overrides\Model::SUBTRACT === $override->getAction()) {
+            if (Model::SUBTRACT === $override->getAction()) {
                 unset($stack[$override->getUser()->getExternalId()]);
-            } elseif (Overrides\Model::ADD === $override->getAction()) {
+            } elseif (Model::ADD === $override->getAction()) {
                 $stack[$override->getUser()->getExternalId()] = $override->getUser();
-            } elseif (Overrides\Model::CLEAR === $override->getAction()) {
+            } elseif (Model::CLEAR === $override->getAction()) {
                 $stack = [];
             }
         }
@@ -168,7 +169,7 @@ class InvolvedUsers
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
-            'classification' => Model::CLASSIFICATION_TIMETABLE
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
         ]);
 
         $usualEventIds = [];
@@ -204,8 +205,8 @@ class InvolvedUsers
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
-            'classification' => Model::CLASSIFICATION_TIMETABLE,
-            'actionClear' => Overrides\Model::CLEAR
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+            'actionClear' => Model::CLEAR
         ]);
 
         $overrideEventIds = [];
