@@ -35,9 +35,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var string|null
+     * @var \Schoolbox\User|null
      */
-    private ?string $externalId;
+    private ?\Schoolbox\User $user;
 
 
     /**
@@ -67,21 +67,21 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string|null
+     * @return \Schoolbox\User|null
      */
-    public function getExternalId(): ?string
+    public function getUser(): ?\Schoolbox\User
     {
-        return $this->externalId;
+        return $this->user;
     }
 
 
     /**
-     * @param string|null $externalId
+     * @param \Schoolbox\User|null $user
      * @return Model
      */
-    public function setExternalId(?string $externalId): self
+    public function setUser(?\Schoolbox\User $user): self
     {
-        $this->externalId = $externalId;
+        $this->user = $user;
         return $this;
     }
 

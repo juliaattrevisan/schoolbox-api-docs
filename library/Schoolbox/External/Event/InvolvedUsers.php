@@ -100,13 +100,9 @@ class InvolvedUsers
          */
         foreach ($overrides as $override) {
             if (Overrides\Model::SUBTRACT === $override->getAction()) {
-                unset($stack[$override->getExternalId()]);
+                unset($stack[$override->getUser()->getExternalId()]);
             } elseif (Overrides\Model::ADD === $override->getAction()) {
-                /* Only fetch them if they weren't already here
-                 */
-                if (!isset($stack[$override->getExternalId()])) {
-                    $stack[$override->getExternalId()] = $this->userMapper->findByExternalId($override->getExternalId());
-                }
+                $stack[$override->getUser()->getExternalId()] = $override->getUser();
             } elseif (Overrides\Model::CLEAR === $override->getAction()) {
                 $stack = [];
             }

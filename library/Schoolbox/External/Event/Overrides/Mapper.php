@@ -21,6 +21,7 @@ namespace Schoolbox\External\Event\Overrides;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
     /**
      * @inheritDoc
      */
@@ -29,10 +30,69 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('sis_event_user_overrides');
         $this->hasModel(Model::class);
         $this->uses('event_id', self::TYPE_INTEGER);
-        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('action', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joins('external_id', \Schoolbox\UserMapper::class, 'synergy_id', null, null, 'user', 'externalId');
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('externalId', 'u')},
+                {$this->getJoinColumnString('externalId.role', 'r')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('externalId', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param \PDOStatement $statement
+     * @return \Schoolbox\GenericCollection
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $override = $this->hydrate($row);
+
+            /** @var \Schoolbox\User $user */
+            $user = $this->hydrateJoin($row, 'externalId', 'u');
+
+            /* This corresponds to a 'clear' mutation in the overrides
+             */
+            if (null === $user) {
+                $stack->add($override);
+                continue;
+            }
+
+            /** @var \Schoolbox\Role $role */
+            $role = $this->hydrateJoin($row, 'externalId.role', 'r');
+
+            $user->setRole($role);
+            $override->setUser($user);
+
+            $stack->add($override);
+        }
+
+        return $stack;
     }
 }
