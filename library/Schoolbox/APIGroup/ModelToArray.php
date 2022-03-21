@@ -45,7 +45,7 @@ class ModelToArray
             'isForceFollow'     => $group['isForceFollow'],
             'isFavourite'       => $group['isFavourite'],
             'isNotificationsOn' => $group['isNotificationsOn'],
-            'enrollmentStatus'   => $group['enrolmentStatus'],
+            'enrolmentStatus'   => $group['enrolmentStatus'],
             'membership'        => $membership,
             '_links'            => [
                 'homepage'      => sprintf('/homepage/%d', $group['id'])
