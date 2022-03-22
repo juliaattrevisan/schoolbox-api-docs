@@ -8,22 +8,21 @@
 
 declare(strict_types=1);
 
-use Enqueue\Client\Message;
 use Schoolbox\Application\CliTool;
-use Schoolbox\TaskDaemon\ClientFactory;
+use Schoolbox\TaskDaemon\ContextFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(new class extends CliTool\App {
     public function run(): void
     {
-        // Get the taskd client
-        $client = (new ClientFactory())->build($this->getConfig()->get('redis_url'));
+        // Get the taskd context
+        $context = (new ContextFactory())->build($this->getConfig()->get('redis_url'));
 
-        // Do something with the client
-        $message = new Message(json_encode(['message' => 'message',]));
-        $message->setMessageId(uniqid());
-        $client->sendEvent('taskd_queue', $message);
+        // Send a message
+        $message = $context->createMessage(json_encode(['message' => 'message',]));
+        $queue   = $context->createQueue('taskd_queue');
+        $context->createProducer()->send($queue, $message);
     }
 });
 $kernel->runApp();

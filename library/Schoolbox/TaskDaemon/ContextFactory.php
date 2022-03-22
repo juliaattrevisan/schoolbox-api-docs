@@ -21,15 +21,14 @@ class ContextFactory
      * Build the queue context which the task daemon requires in order to send
      * and receive messages.
      *
-     * @param string|null $redisHost
-     * @param int|null $redisPort
+     * @param string $redisUrl
      * @return Context
      */
-    public function build(?string $redisHost, ?int $redisPort): Context
+    public function build(string $redisUrl): Context
     {
         $factory = new RedisConnectionFactory([
-            'host'              => $redisHost,
-            'port'              => $redisPort,
+            'host'              => parse_url($redisUrl, PHP_URL_HOST),
+            'port'              => parse_url($redisUrl, PHP_URL_PORT),
             'scheme_extensions' => ['predis'],
         ]);
         return $factory->createContext();
