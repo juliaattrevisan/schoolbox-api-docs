@@ -18,9 +18,9 @@ use Timetable_ColourMapper;
 class GroupsHelper
 {
     //sting const's for enrolment text
-    const ENROLLED    = 'enrolled';
-    const NOTENROLLED = 'notEnrolled';
-    const PENDING     = 'pending';
+    public const ENROLLED    = 'enrolled';
+    public const NOTENROLLED = 'notEnrolled';
+    public const PENDING     = 'pending';
 
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
