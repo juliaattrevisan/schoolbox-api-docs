@@ -3,7 +3,6 @@
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -19,14 +18,13 @@ use Timetable_ColourMapper;
 class GroupsHelper
 {
     //sting const's for enrolment text
-    const ENROLLED    = 'enrolled';
-    const NOTENROLLED = 'notEnrolled';
-    const PENDING     = 'pending';
+    public const ENROLLED    = 'enrolled';
+    public const NOTENROLLED = 'notEnrolled';
+    public const PENDING     = 'pending';
 
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
     private FolderMapper $folderMapper;
-    private Access $accessHelper;
     private Timetable_ColourMapper $timetableColourMapper;
     private RerouteOverrideMapper $reRouteOverrideMapper;
 
@@ -37,14 +35,12 @@ class GroupsHelper
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
-        Access $accessHelper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
         $this->groupMapper              = $groupMapper;
         $this->userAccessMapper         = $userAccessMapper;
         $this->folderMapper             = $folderMapper;
-        $this->accessHelper             = $accessHelper;
         $this->timetableColourMapper    = $timetableColourMapper;
         $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
     }
@@ -56,10 +52,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                               ])->indexBy('serviceIdentifier');
+        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enrolled in
@@ -75,10 +68,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                               ])->indexBy('serviceIdentifier');
+        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
     }
@@ -261,7 +251,7 @@ class GroupsHelper
              * then confirm with the $userPerms array to see if the user has that group as a favourite
              */
             $isFavourite = false;
-            if ($userPerms[$folder->getId()]) {
+            if ($userPerms[$folder->getId()] ?? false) {
                 $isFavourite = $userPerms[$folder->getId()]->getFavourite();
             }
 
@@ -274,14 +264,21 @@ class GroupsHelper
                 $folder->setColour($folderColours->getNewColour());
             }
 
-            $access = $this->accessHelper->getFolderAccess($user, $folder->getId()) ?: UserAccess::ACCESS_DENY;
+            /**
+             * check if user is part of the group, if so use the group perms for the access,
+             * if they aren't a member they may have 'read' access via folder perms, but return deny (from group view)
+             */
+            $access = UserAccess::ACCESS_DENY;
+            if ($userPerms[$folder->getId()] ?? false) {
+                $access = $userPerms[$folder->getId()]->getAccessLevel();
+            }
             /**
              * check if admin
              * admin will have $userPerm[folderID] ACCESS_FULL
              * Superuser will not.
              */
             $isAdmin = false;
-            if ($userPerms[$folder->getId()]) {
+            if ($userPerms[$folder->getId()] ?? false) {
                 $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
             }
 

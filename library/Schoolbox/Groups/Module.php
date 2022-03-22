@@ -19,7 +19,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\GroupMapper;
-use Schoolbox\Permission\Access\Access;
 
 /**
  * Class Module
@@ -66,7 +65,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
-            $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );

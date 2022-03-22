@@ -33,13 +33,11 @@ class Controller extends Base
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @param External_User   $externalHandler
-     * @param Logger\Mapper    $assumeUserLogMapper
-     */
-    public function __construct(UserAccessMapper $userAccessMapper, External_User $externalHandler, Logger\Mapper $assumeUserLogMapper)
-    {
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        External_User $externalHandler,
+        Logger\Mapper $assumeUserLogMapper
+    ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->externalHandler     = $externalHandler;
         $this->assumeUserLogMapper = $assumeUserLogMapper;

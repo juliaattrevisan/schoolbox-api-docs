@@ -131,9 +131,10 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->injector->get('externalUser'),
-            $this->getMapperFactory()->get(Logger\Mapper::class),
+            $this->getMapperFactory()->get(Logger\Mapper::class)
         );
     }
+
 
     /* Getters / Setters
      */

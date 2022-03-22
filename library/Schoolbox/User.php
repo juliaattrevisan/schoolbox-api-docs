@@ -1488,4 +1488,19 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
         return $this->getRole()->getAccessPastoral();
     }
+
+    /**
+     * Checks group access
+     * @param int $groupId
+     * @return bool
+     */
+    public function isGroupMember(int $groupId): bool
+    {
+        foreach ($this->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE && $access->getServiceIdentifier() == $groupId) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
