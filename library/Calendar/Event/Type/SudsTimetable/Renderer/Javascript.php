@@ -37,30 +37,18 @@ class Javascript extends Base
          * which spawns in the frontend under custom > moreDetailsLink...
          * ...I think?
          */
+        $path = null;
 
-        /* Try to find a matching folder for this event's code
-         * If a folder exists, link to that
-         * Otherwise, leave it empty
-         *
-         * There isn't a convenient place to inject a mapper, sadly
-         *
-         * This class spawns dynamically in:
-         * library/Calendar/Api/Event/Collection/Renderer.php:renderEvent()
-         */
-        try {
-            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByCode($this->event->getCode());
-
+        if (null !== $this->event->getFolder()) {
             $path = sprintf(
                 '/homepage/code/%s',
-                $folder->getCodeString()
+                $this->event->getFolder()->getCodeString()
             );
 
             /* If you link to a folder code, a checkbox appears in the calendar
              * Filter modal underneath Groups, allowing you to toggle it
              */
-            $classes[] = 'group' . $folder->getId();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $path = null;
+            $classes[] = 'group' . $this->event->getFolder()->getId();
         }
 
         /* Ram in the Day and Period labels as part of the event title

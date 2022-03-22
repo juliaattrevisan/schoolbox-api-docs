@@ -36,6 +36,12 @@ class Event extends Day\Event
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Model|null
+     */
+    private ?\Schoolbox\Resource\Folder\Model $folder;
+
+
+    /**
      * @return string[]
      */
     protected function getRenderClasses(): array
@@ -104,6 +110,26 @@ class Event extends Day\Event
     public function setPeriod(?string $period): self
     {
         $this->period = $period;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model|null
+     */
+    public function getFolder(): ?\Schoolbox\Resource\Folder\Model
+    {
+        return $this->folder;
+    }
+
+
+    /**
+     * @param \Schoolbox\Resource\Folder\Model|null $folder
+     * @return Event
+     */
+    public function setFolder(?\Schoolbox\Resource\Folder\Model $folder): self
+    {
+        $this->folder = $folder;
         return $this;
     }
 }

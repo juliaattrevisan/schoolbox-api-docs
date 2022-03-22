@@ -51,6 +51,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
      * @inheritdoc
      */
     public function __construct(
@@ -62,7 +68,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper
+        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -72,6 +79,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
+        $this->folderMapper = $folderMapper;
     }
 
 
@@ -150,6 +158,16 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
+            /* Try to find a matching folder for this event's code
+             * If a folder exists, link to that
+             * Otherwise, leave it empty
+             */
+            try {
+                $folder = $this->folderMapper->findByCode($timetableEvent->getCode());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $folder = null;
+            }
+
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($timetableEvent->getTitle());
@@ -163,6 +181,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setAllDay(false);
             $instance->setColour($eventColor);
             $instance->setType($eventType);
+            $instance->setFolder($folder);
 
             $stack->add($instance);
         }

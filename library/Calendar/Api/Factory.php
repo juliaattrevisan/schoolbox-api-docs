@@ -247,7 +247,8 @@ class Calendar_Api_Factory
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()
                 );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");

@@ -409,7 +409,8 @@ try {
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -537,7 +538,8 @@ try {
                         \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                         \Schoolbox\External\Event\Mapper ::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                        \Schoolbox\UserMapper::getInstance()
+                        \Schoolbox\UserMapper::getInstance(),
+                        \Schoolbox\Resource\Folder\Mapper::getInstance()
                     ],
                     true,
                     $sentry
