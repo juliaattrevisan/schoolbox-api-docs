@@ -4,6 +4,7 @@ namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -377,7 +378,7 @@ class GroupsHelper
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->findSingleGroup($user, $group);
-        return $this->buildGroups($user, $userPerms->keys(), $userPerms);
+        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], $userPerms);
     }
 
     /**
@@ -385,8 +386,12 @@ class GroupsHelper
      */
     public function inGroup(User $user, Group $group): bool
     {
-        $userPerms = $this->findSingleGroup($user, $group);
-        return (bool)(count($userPerms));
+        try {
+            $userPerms = $this->findSingleGroup($user, $group);
+            return true;
+        } catch (NotFound $e) {
+            return false;
+        }
     }
 
     /**
