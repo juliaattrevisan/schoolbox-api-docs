@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIGroup;
 
-use Schoolbox\Collection;
-
 /**
  * Translator for translating a group model into an array, ready for JSON
  * encoding.
@@ -19,10 +17,10 @@ use Schoolbox\Collection;
  */
 class ModelToArray
 {
-    const MEMBERSHIP_NONE = 'none';
-    const MEMBERSHIP_READ = 'read';
-    const MEMBERSHIP_WRITE = 'write';
-    const MEMBERSHIP_ADMIN = 'admin';
+    private const MEMBERSHIP_NONE = 'none';
+    private const MEMBERSHIP_READ = 'read';
+    private const MEMBERSHIP_WRITE = 'write';
+    private const MEMBERSHIP_ADMIN = 'admin';
 
     /**
      * @param array $group
