@@ -591,9 +591,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = '' !== (string)($this->request->query['returnUrl'] ?? '')
-            ? $this->request->query['returnUrl']
-            : Redirect::encode('/calendar');
+        $returnUrl = $this->request->query['returnUrl'] ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
