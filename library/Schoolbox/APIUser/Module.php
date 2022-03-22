@@ -73,15 +73,6 @@ class Module extends BaseModule
         );
     }
 
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initTemplatePaths(IChainLoader $templateLoader): void
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
     /**
      * Preload a User instance
      *
