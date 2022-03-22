@@ -136,11 +136,11 @@ class NewsInitialCest
         $i->waitForElementVisible(['css' => 'div#cke_comment-0'], 5);
         $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("indeed this is intresting news");');
         sleep(2);
-        $i->click(['css' => 'a[class=button\ submit]']);
+        $i->click(['css' => 'button[class=button\ submit]']);
         sleep(3);
         $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("its poop, like your face");');
         sleep(2);
-        $i->click(['css' => 'a[class=button\ submit]']);
+        $i->click(['css' => 'button[class=button\ submit]']);
         sleep(3);
     }
 
