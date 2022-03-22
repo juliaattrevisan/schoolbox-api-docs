@@ -68,7 +68,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
+        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
 
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
     }
