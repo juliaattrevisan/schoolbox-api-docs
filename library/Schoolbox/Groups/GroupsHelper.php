@@ -3,7 +3,6 @@
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -26,7 +25,6 @@ class GroupsHelper
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
     private FolderMapper $folderMapper;
-    private Access $accessHelper;
     private Timetable_ColourMapper $timetableColourMapper;
     private RerouteOverrideMapper $reRouteOverrideMapper;
 
@@ -37,14 +35,12 @@ class GroupsHelper
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
-        Access $accessHelper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
         $this->groupMapper              = $groupMapper;
         $this->userAccessMapper         = $userAccessMapper;
         $this->folderMapper             = $folderMapper;
-        $this->accessHelper             = $accessHelper;
         $this->timetableColourMapper    = $timetableColourMapper;
         $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
     }

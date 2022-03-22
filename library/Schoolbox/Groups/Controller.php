@@ -12,7 +12,6 @@ namespace Schoolbox\Groups;
 use Alaress\Web\Controller\Base as BaseController;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
@@ -35,7 +34,6 @@ class Controller extends BaseController
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
-        Access $accessHelper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
@@ -45,7 +43,6 @@ class Controller extends BaseController
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
-            $accessHelper,
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
