@@ -12,11 +12,9 @@ namespace Schoolbox\APIGroup;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper;
@@ -74,7 +72,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
-            $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );

@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\APIGroup\ModelToArray;
 use Schoolbox\Groups\GroupsHelper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\GroupMapper;
@@ -34,7 +33,6 @@ class Controller extends Base
      * @param UserAccessMapper       $userAccessMapper
      * @param GroupMapper            $groupMapper
      * @param FolderMapper           $folderMapper
-     * @param Access                 $accessHelper
      * @param Timetable_ColourMapper $timetableColourMapper
      * @param RerouteOverrideMapper  $reRouteOverrideMapper
      */
@@ -42,7 +40,6 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         GroupMapper $groupMapper,
         FolderMapper $folderMapper,
-        Access $accessHelper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
@@ -50,7 +47,6 @@ class Controller extends Base
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
-            $accessHelper,
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
