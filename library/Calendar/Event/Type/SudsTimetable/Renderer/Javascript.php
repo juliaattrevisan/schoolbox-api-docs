@@ -51,6 +51,11 @@ class Javascript extends Base
                 '/homepage/code/%s',
                 $folder->getCodeString()
             );
+
+            /* If you link to a folder code, a checkbox appears in the calendar
+             * Filter modal underneath Groups, allowing you to toggle it
+             */
+            $classes[] = 'group' . $folder->getId();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $path = null;
         }
