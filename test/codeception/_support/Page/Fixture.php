@@ -7,6 +7,7 @@
 
 namespace Page;
 
+use AcceptanceTester;
 use Codeception\Util\Locator;
 
 class Fixture
@@ -19,6 +20,7 @@ class Fixture
 
     public const SELECTOR_NAME = 'input[name="name"]';
     public const SELECTOR_START_AT = '#startAtDate';
+    public const SELECTOR_FINISH_AT = '#finishAtDate';
     public const SELECTOR_JS_VENUE = '#venue';
     public const SELECTOR_JS_HOME_TEAM = '#homeTeam';
     public const SELECTOR_JS_AWAY_TEAM = '#awayTeam';
@@ -75,19 +77,28 @@ class Fixture
         $i->amOnPage(self::getCreateMatchUrl(1, 4));
         $i->see('CREATE MATCH');
 
-        $startAt = '';
+        $date = '';
+        $foundDate = false;
         $startAtDb = '';
+        //for each field and its value
         foreach ($fields as $fieldName => $fieldValue) {
+            //if the field is a date then add the date
             if ($fieldValue instanceof \DateTime) {
-                $startAt = $fieldValue->format('d/m/Y h:ia');
-                $startAtDb = $fieldValue->format('Y-m-d H:i');
-                $fieldValue = $startAt;
+                $fieldValueFormat = $fieldValue->format('d/m/Y h:ia');
+                //if a field date is found for the first time then record its date
+                if ($foundDate == false) {
+                    $date = $fieldValue->format('d/m/Y h:ia');
+                    $startAtDb = $fieldValue->format('Y-m-d H:i');
+                }
+                $fieldValue = $fieldValueFormat;
+                //the field date was field once so it won't record dates for the other fields (eg: finishDate)
+                $foundDate = true;
             }
             $i->fillField($fieldName, $fieldValue);
         }
         $i->click('[data-item-add]');
         //<input type="text" name="itinerary[date][]" id="itineraryDate-new-1529450182910" placeholder="Date" data-itinerary-date="" data-datepicker-time="" value="" data-datepicker-id="2">
-        $i->fillField(['name' => 'itinerary[date][]'], $startAt);
+        $i->fillField(['name' => 'itinerary[date][]'], $date);
         $i->fillField(['name' => 'itinerary[description][]'], 'aaa');
         $i->wait(3);
 

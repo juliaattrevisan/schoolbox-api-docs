@@ -56,10 +56,13 @@ class FixtureCest
         $matchName1 = 'First Cest Match';
         $start = new \DateTime();
         $start->modify('-120 minutes');
+        $finish = new \DateTime();
+        $finish->modify('-60 minutes');
         $fixturePage->createMatch(
             [
                 Fixture::SELECTOR_NAME => $matchName1,
-                Fixture::SELECTOR_START_AT => $start
+                Fixture::SELECTOR_START_AT => $start,
+                Fixture::SELECTOR_FINISH_AT => $finish
             ],
             [
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
@@ -74,11 +77,14 @@ class FixtureCest
         $matchName2 = 'Second Cest Match';
         $start = new \DateTime();
         $start->modify('+30 minutes');
+        $finish = new \DateTime();
+        $finish->modify('+120 minutes');
 
         $matchId = $fixturePage->createMatch(
             [
                 Fixture::SELECTOR_NAME => $matchName2,
-                Fixture::SELECTOR_START_AT => $start
+                Fixture::SELECTOR_START_AT => $start,
+                Fixture::SELECTOR_FINISH_AT => $finish
             ],
             [
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
@@ -105,11 +111,13 @@ class FixtureCest
         $matchName4 = 'Fourth Cest Match';
         $start = new \DateTime();
         $start->modify('+30 minutes');
+        $finish->modify('+120 minutes');
 
         $matchId4 = $fixturePage->createMatch(
             [
                 Fixture::SELECTOR_NAME => $matchName4,
-                Fixture::SELECTOR_START_AT => $start
+                Fixture::SELECTOR_START_AT => $start,
+                Fixture::SELECTOR_FINISH_AT => $finish
             ],
             [
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
@@ -124,11 +132,13 @@ class FixtureCest
         $matchName5 = 'Fifth Cest Match';
         $start = new \DateTime();
         $start->modify('+30 minutes');
+        $finish->modify('+120 minutes');
 
         $matchId5 = $fixturePage->createMatch(
             [
                 Fixture::SELECTOR_NAME => $matchName5,
-                Fixture::SELECTOR_START_AT => $start
+                Fixture::SELECTOR_START_AT => $start,
+                Fixture::SELECTOR_FINISH_AT => $finish
             ],
             [
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
@@ -139,14 +149,16 @@ class FixtureCest
         $fixturePage->deleteItinerary($matchId5);
         $fixturePage->assertNotifExists('Your upcoming Basketball match ' . $matchName5 . ' itinerary has been changed');
 
-        //== Match in future - No instant notification ==
+       //== Match in future - No instant notification ==
         $matchName1 = 'Sixth Cest Match';
         $start = new \DateTime();
         $start->modify('+ 1 day 2 minutes');
+        $finish->modify('+ 1 day 120 minutes');
         $matchId = $fixturePage->createMatch(
             [
                 Fixture::SELECTOR_NAME => $matchName1,
-                Fixture::SELECTOR_START_AT => $start
+                Fixture::SELECTOR_START_AT => $start,
+                Fixture::SELECTOR_FINISH_AT => $finish,
             ],
             [
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_OAKLEIGH_RECREATION,
