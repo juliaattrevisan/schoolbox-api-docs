@@ -41,11 +41,14 @@ class Javascript extends Base
         /* Try to find a matching folder for this event's code
          * If a folder exists, link to that
          * Otherwise, leave it empty
+         *
+         * There isn't a convenient place to inject a mapper, sadly
+         *
+         * This class spawns dynamically in:
+         * library/Calendar/Api/Event/Collection/Renderer.php:renderEvent()
          */
-        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-
         try {
-            $folder = $folderMapper->findByCode($this->event->getCode());
+            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByCode($this->event->getCode());
 
             $path = sprintf(
                 '/homepage/code/%s',
