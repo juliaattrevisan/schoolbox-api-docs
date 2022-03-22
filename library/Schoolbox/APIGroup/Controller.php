@@ -91,10 +91,10 @@ class Controller extends Base
         }
 
         $post = $this->getRequest()->post->getArrayCopy();
-        $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
-        $post['isFavourite'] = $post['isFavourite'] ?: false;
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?: UserAccess::ACCESS_AWAITING_AUTHORISATION;
+        $post['membership'] = $post['membership'] ?? UserAccess::ACCESS_READ;
+        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? true;
+        $post['isFavourite'] = $post['isFavourite'] ?? false;
+        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? UserAccess::ACCESS_READ;
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
