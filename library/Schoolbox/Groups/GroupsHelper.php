@@ -3,6 +3,7 @@
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -52,7 +53,8 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
+        $userPerms = $this->findGroups($user);
+//        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enrolled in
@@ -348,10 +350,7 @@ class GroupsHelper
     public function deleteFromGroup(User $user, Group $group)
     {
         //find user record
-        $userGroup = $this->userAccessMapper->findOneByColumnList([
-                                                                      'uid' => $user->getId(),
-                                                                      'sid' => $group->getFolder()->getId(),
-                                                                  ]);
+        $userGroup = $this->findSingleGroup($user, $group);
         //remove the user group / favourite
         $this->userAccessMapper->delete($userGroup);
 
@@ -366,10 +365,7 @@ class GroupsHelper
      */
     public function setFavourite(User $user, Group $group, bool $isFavourite)
     {
-        $userPerms = $this->userAccessMapper->findOneByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'sid'     => $group->getFolder()->getId()
-                                                               ]);
+        $userPerms = $this->findSingleGroup($user, $group);
         $userPerms->setFavourite($isFavourite);
         $this->userAccessMapper->save($userPerms);
     }
@@ -380,11 +376,45 @@ class GroupsHelper
     public function getGroup(User $user, Group $group)
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                                   'sid'     => $group->getFolder()->getId()
-                                                               ])->indexBy('serviceIdentifier');
+        $userPerms = $this->findSingleGroup($user, $group);
         return $this->buildGroups($user, $userPerms->keys(), $userPerms);
+    }
+
+    /**
+     * checks if the user is a member of the group (not including sis groups)
+     */
+    public function inGroup(User $user, Group $group): bool
+    {
+        $userPerms = $this->findSingleGroup($user, $group);
+        return (bool)(count($userPerms));
+    }
+
+    /**
+     * get only configurable groups (not SIS controlled)
+     * @return GenericCollection|UserAccess[]
+     */
+    private function findGroups(User $user): GenericCollection
+    {
+        return $this->userAccessMapper->findByColumnList([
+                                                                   'uid'     => $user->getId(),
+                                                                   'service' => UserAccess::SERVICE_HOMEPAGE
+                                                               ])->indexBy('serviceIdentifier');
+    }
+
+    /**
+     * get the 1 group that is also configurable (not SIS controlled)
+     * @param User  $user
+     * @param Group $group
+     * @return UserAccess
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    private function findSingleGroup(User $user, Group $group): UserAccess
+    {
+        return $this->userAccessMapper->findOneByColumnList([
+                                                             'uid'     => $user->getId(),
+                                                             'service' => UserAccess::SERVICE_HOMEPAGE,
+                                                             'sid'     => $group->getFolder()->getId()
+                                                         ]);
     }
 }

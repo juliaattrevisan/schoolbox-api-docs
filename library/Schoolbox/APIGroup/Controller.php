@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\APIGroup;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\APIGroup\ModelToArray;
 use Schoolbox\Groups\GroupsHelper;
@@ -80,7 +81,7 @@ class Controller extends Base
      */
     public function apiMembershipAdd(User $user, Group $group)
     {
-        if (!$user->isGroupMember($group->getFolder()->getId())) {
+        if ($this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is already Enrolled in the Group'))
                 ->setStatus(409)
                 ->asArray();
