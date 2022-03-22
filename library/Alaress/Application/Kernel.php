@@ -147,6 +147,7 @@ use Schoolbox\Sync\Provisioner\Provisioner;
 use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
+use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\UserMapper;
@@ -395,6 +396,19 @@ abstract class Kernel
             );
             return $di->get('redis.storage');
         }));
+
+        // Task daemon message producer
+        $di->set(
+            'taskd.messageProducer',
+            $di->lazy(
+                function () use ($config) {
+                    return (new ProducerFactory())->build(
+                        $config->get(ConfigMapper::NAME_TASKD_REDIS_URL),
+                        $config->get(ConfigMapper::NAME_TASKD_REDIS_QUEUE)
+                    );
+                }
+            )
+        );
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();

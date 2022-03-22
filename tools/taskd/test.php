@@ -9,21 +9,17 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\TaskDaemon\ContextFactory;
+use Schoolbox\TaskDaemon\Producer;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(new class extends CliTool\App {
     public function run(): void
     {
-        // Get the taskd context
-        $context = (new ContextFactory())->build($this->getConfig()->get(ConfigMapper::NAME_TASKD_REDIS_URL));
-
-        // Send a message
-        $message = $context->createMessage(json_encode(['message' => 'message',]));
-        $queue   = $context->createQueue($this->getConfig()->get(ConfigMapper::NAME_TASKD_REDIS_QUEUE));
-        $context->createProducer()->send($queue, $message);
+        // Get the taskd context, and send
+        /** @var Producer $producer */
+        $producer = $this->getDi()->get('taskd.messageProducer');
+        $producer->send(json_encode(['message' => 'message',]));
     }
 });
 $kernel->runApp();
