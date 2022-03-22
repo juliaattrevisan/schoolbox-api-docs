@@ -55,12 +55,25 @@ class Javascript extends Base
             $path = null;
         }
 
-        // $path = $this->getRouteIfAuthorized();
+        /* Ram in the Day and Period labels as part of the event title
+         * Schools sometimes use this terminology colloquially, rather
+         * than just the datetimes, to refer to when things happen
+         *
+         * However, the Day and Period strings might be null or otherwise
+         * meaningless, so filter and implode as best you can
+         */
+        $title = implode(', ', array_filter([
+            $this->event->getDay(),
+            $this->event->getPeriod(),
+            $this->event->getTitle()
+        ], static function ($val) {
+            return '' !== trim($val);
+        }));
 
         /* Flatten the representation into a standardised structure
          */
         $event = [
-            'title'     => $this->event->getTitle(),
+            'title'     => $title,
             'start'     => $this->event->getStartTime()->getDatabase(),
             'end'       => $this->event->getEndTime()->getDatabase(),
 
