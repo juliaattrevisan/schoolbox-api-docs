@@ -195,16 +195,17 @@ class Provisioner
     {
         $this->prepareForLog();
         foreach ($this->runOrder as $roleType) {
-            $this->currentRun = $this->logMapper->createModel()
-                ->setDry(!$update)
-                ->setRoleType($roleType)
-                ->setUsersCreated(0)
-                ->setUsersUpdated(0)
-                ->setUsersSkipped(0);
             if (isset($forRoleType) && $roleType !== $forRoleType) {
                 // Don't run the provisioner for this role
                 continue;
             }
+
+            $this->currentRun = $this->logMapper->createModel()
+                                                ->setDry(!$update)
+                                                ->setRoleType($roleType)
+                                                ->setUsersCreated(0)
+                                                ->setUsersUpdated(0)
+                                                ->setUsersSkipped(0);
 
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
@@ -218,243 +219,9 @@ class Provisioner
                 $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
                 try {
-                    $externalUsers = $this->getAllExternalUsers($roleType);
+                    $this->provisionUsers($roleType, $ruleset, $update);
                 } catch (\Exception $e) {
-                    // Raise exception message, and continue as if nothing was returned
                     $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
-                    $externalUsers = [];
-                }
-
-                foreach ($externalUsers as $externalUser) {
-                    // No user id? do nothing
-                    $externalUserId = $externalUser->getId();
-                    if (!$externalUserId) {
-                        $this->logger->error("Cannot process user: User must have an External ID");
-                        $this->currentRun->incrementUsersSkipped();
-                        continue;
-                    }
-
-                    // this is the context that needs to be applied to every log message while working with a user, for filtering
-                    $commonContext = [
-                        'externalUserId' => $externalUserId,
-                    ];
-
-                    // Get the currently stored user
-                    $accessList = $this->userAccessMapper->createCollection();
-                    try {
-                        $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
-                        // Don't need to know about external DB access.
-                        // UPS can't change or do anything with class membership
-                        // as that comes from the SIS anyway.
-                        // Don't want to know about any permissions other than
-                        // group permissions, either: only group permissions can
-                        // be changed by UPS.
-                        $accessList = $this->userAccessMapper->findByColumnList(
-                            [
-                                'uid' => $internalUser->getId(),
-                                'service' => UserAccess::SERVICE_HOMEPAGE,
-                            ]
-                        );
-                        // set original access list - this will be referred to update/keep groups in UserMapper postSave
-                        $internalUser->setAccessList($accessList);
-                        $commonContext['internalUserId'] = $internalUser->getId();
-                        $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
-                        $action = 'update';
-                    } catch (MapperException $e) {
-                        $internalUser = (new User())
-                            ->setCampusCollection(new GenericCollection(Campus::class));
-                        $internalUser->getRole()->setType($roleType);
-                        $this->logger->debug("No existing user to retrieve: new user", $commonContext);
-                        $action = 'create';
-                    }
-
-
-                    // Keep a copy of the original user, for comparison
-                    $originalUser = clone $internalUser;
-
-                    $commonContext['action'] = $action;
-
-
-                    // Run this user through the hydrators
-                    try {
-                        $ruleset->hydrate($externalUser, $internalUser);
-                    } catch (SkipException $e) {
-                        $commonContext['action'] = 'skip';
-                        $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
-                        $this->currentRun->incrementUsersSkipped();
-                        continue;
-                    } catch (\Exception $e) {
-                        // something untoward happened - better raise an error
-                        $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
-                        $this->currentRun->incrementUsersSkipped();
-                        continue;
-                    }
-
-                    // get a diff of the original user and what we've ended up with
-                    $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
-
-
-                    /* Modify accessList only when ups_groups_enabled is actually enabled
-                     * Otherwise leave it unchanged from whatever it was
-                     */
-                    if ($this->config->get('ups_groups_enabled')) {
-                        /* Figure out what is going on in the userAccess mutations
-                         *
-                         * UPS Rulesets can have N adds/removes in any order so you need to compute
-                         * the mutations in order to find out where you ended up. These evaluations
-                         * also create log->debug entries so you can see what happened
-                         */
-                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($accessList);
-                        // the following is for PHPStan :(
-                        /** @var User $internalUser */
-                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($accessList, $internalUser->getUserAccessMutations());
-
-                        /* Compute the actual difference - if the set of (folderId, accessLevel)
-                         * tuples are the same, then there's no difference and we don't need to
-                         * tell anyone about changes
-                         *
-                         * Otherwise show them the old list and the new list and let them see
-                         * how they're different
-                         *
-                         * Note: In the past the XOR serialisation was done on log messages which
-                         * sounds like a kind of weird way to do it but I guess it's not as insane
-                         * as it might first appear
-                         */
-                        $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
-
-                        if (\count($diffGroups)) {
-                            $this->logger->debug(sprintf(
-                                'Groups for %s underwent a meaningful mutation',
-                                $internalUser->getFullName()
-                            ));
-
-                            /* Translate the existing group tuples into something nice for humans
-                             * to read - there's a lot of overhead doing these folder lookups
-                             * which can definitely be optimised further if we want to keep it
-                             */
-                            $oldLog = [];
-
-                            foreach ($existingGroups as $folderId => $accessLevel) {
-                                /* Maybe this folder doesn't actually exist at runtime
-                                  */
-                                try {
-                                    $folder = $this->folderMapper->findCheaplyById($folderId);
-                                    $folderName = $folder->getName();
-                                } catch (\Schoolbox\Mapper\Exception $e) {
-                                    $folderName = 'unknown folder';
-                                }
-
-                                $oldLog[] = sprintf(
-                                    '%s access to %s (/homepage/%s)',
-                                    self::ACCESS_MAP[$accessLevel],
-                                    $folderName,
-                                    $folderId
-                                );
-                            }
-
-                            /* Translate the final group tuples into something nice for humans
-                             * to read - there's a lot of overhead doing these folder lookups
-                             * which can definitely be optimised further if we want to keep it
-                             */
-                            $newLog = [];
-
-                            foreach ($finalGroups as $folderId => $accessLevel) {
-                                /* Maybe this folder doesn't actually exist at runtime
-                                 */
-                                try {
-                                    $folder = $this->folderMapper->findCheaplyById($folderId);
-                                    $folderName = $folder->getName();
-                                } catch (\Schoolbox\Mapper\Exception $e) {
-                                    $folderName = 'unknown folder';
-                                }
-
-                                $newLog[] = sprintf(
-                                    '%s access to %s (/homepage/%s)',
-                                    self::ACCESS_MAP[$accessLevel],
-                                    $folderName,
-                                    $folderId
-                                );
-                            }
-
-                            /* Do you actually need to see what they had,
-                             * or is the new set of UserAccess enough?
-                             */
-                            $diff['accessList'] = [
-                                'old' => $oldLog,
-                                'new' => $newLog
-                            ];
-                        } else {
-                            $this->logger->debug(sprintf(
-                                'Groups for %s remained unchanged',
-                                $internalUser->getFullName()
-                            ));
-                        }
-                    }
-
-
-                    $originalName = ($action === 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
-                        : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
-
-                    if (count($diff)) {
-                        $level = Logger::NOTICE;
-                        $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
-                        $context = array_merge($commonContext, ['diff' => $this->formatForLog($diff)]);
-                    } else {
-                        // The user hasn't been changed: still, they've been
-                        // seen by UPS so their updated at time should update.
-                        // This is so they are not considered stale by the stale
-                        // users report.
-                        $level = Logger::INFO;
-                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
-                        $context = $commonContext;
-                        $this->logger->log($level, $message, $context);
-                        if ($update && ($action === 'update')) {
-                            $this->logger->debug("Marking $originalName as having been updated", $commonContext);
-                            $internalUser->setUpdatedAt(Alaress_Date_Format::now());
-                            try {
-                                $this->userMapper->save($internalUser);
-                            } catch (MapperException | UnexpectedValueException $e) {
-                                $this->logger->warning(
-                                    sprintf(
-                                        "Failed to mark %s as having been updated (%s): ",
-                                        $originalName,
-                                        $e->getMessage()
-                                    ),
-                                    $context
-                                );
-                            }
-                        }
-                        $this->currentRun->incrementUsersSkipped();
-                        continue;
-                    }
-
-                    try {
-                        if (!$update) {
-                            // Dry Run
-                            $this->sanityCheck($internalUser);
-                            $this->logger->debug("User record passes sanity check", $commonContext);
-                        } else {
-                            // Save includes pre-save sanity check
-                            $this->userMapper->save($internalUser);
-                            $this->logger->debug("User record passes sanity check", $commonContext);
-                            $this->logger->debug("User record saved", $commonContext);
-                        }
-
-                        $this->logger->log($level, $message, $context);
-
-                        if ($action === 'update') {
-                            $this->currentRun->incrementUsersUpdated();
-                        } else {
-                            $this->currentRun->incrementUsersCreated();
-                        }
-                    } catch (UnexpectedValueException $e) {
-                        $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
-                        $this->currentRun->incrementUsersSkipped();
-                        continue;
-                    } catch (\Exception $e) {
-                        $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
-                        $this->currentRun->incrementUsersSkipped();
-                    }
                 }
 
                 // end of a strat - save the result
@@ -467,6 +234,259 @@ class Provisioner
                     )
                 );
                 $this->logMapper->flush($this->logger, $this->currentRun);
+            }
+        }
+    }
+
+    /**
+     * @param string          $roleType
+     * @param Ruleset\Ruleset $ruleset
+     * @param bool            $update
+     * @throws MapperException
+     */
+    private function provisionUsers(string $roleType, Ruleset\Ruleset $ruleset, bool $update): void
+    {
+        try {
+            $externalUsers = $this->getAllExternalUsers($roleType);
+        } catch (\Exception $e) {
+            // Raise exception message, and continue as if nothing was returned
+            $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
+            $externalUsers = [];
+        }
+
+        foreach ($externalUsers as $externalUser) {
+            // No user id? do nothing
+            $externalUserId = $externalUser->getId();
+            if (!$externalUserId) {
+                $this->logger->error("Cannot process user: User must have an External ID");
+                $this->currentRun->incrementUsersSkipped();
+                continue;
+            }
+
+            // this is the context that needs to be applied to every log message while working with a user, for filtering
+            $commonContext = [
+                'externalUserId' => $externalUserId,
+            ];
+
+            // Get the currently stored user
+            $accessList = $this->userAccessMapper->createCollection();
+            try {
+                $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
+                // Don't need to know about external DB access.
+                // UPS can't change or do anything with class membership
+                // as that comes from the SIS anyway.
+                // Don't want to know about any permissions other than
+                // group permissions, either: only group permissions can
+                // be changed by UPS.
+                $accessList = $this->userAccessMapper->findByColumnList(
+                    [
+                        'uid'     => $internalUser->getId(),
+                        'service' => UserAccess::SERVICE_HOMEPAGE,
+                    ]
+                );
+                // set original access list - this will be referred to update/keep groups in UserMapper postSave
+                $internalUser->setAccessList($accessList);
+                $commonContext['internalUserId'] = $internalUser->getId();
+                $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
+                $action = 'update';
+            } catch (MapperException $e) {
+                $internalUser = (new User())
+                    ->setCampusCollection(new GenericCollection(Campus::class));
+                $internalUser->getRole()->setType($roleType);
+                $this->logger->debug("No existing user to retrieve: new user", $commonContext);
+                $action = 'create';
+            }
+
+
+            // Keep a copy of the original user, for comparison
+            $originalUser = clone $internalUser;
+
+            $commonContext['action'] = $action;
+
+
+            // Run this user through the hydrators
+            try {
+                $ruleset->hydrate($externalUser, $internalUser);
+            } catch (SkipException $e) {
+                $commonContext['action'] = 'skip';
+                $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
+                $this->currentRun->incrementUsersSkipped();
+                continue;
+            } catch (\Exception $e) {
+                // something untoward happened - better raise an error
+                $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
+                $this->currentRun->incrementUsersSkipped();
+                continue;
+            }
+
+            // get a diff of the original user and what we've ended up with
+            $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
+
+
+            /* Modify accessList only when ups_groups_enabled is actually enabled
+             * Otherwise leave it unchanged from whatever it was
+             */
+            if ($this->config->get('ups_groups_enabled')) {
+                /* Figure out what is going on in the userAccess mutations
+                 *
+                 * UPS Rulesets can have N adds/removes in any order so you need to compute
+                 * the mutations in order to find out where you ended up. These evaluations
+                 * also create log->debug entries so you can see what happened
+                 */
+                $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($accessList);
+                // the following is for PHPStan :(
+                /** @var User $internalUser */
+                $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($accessList, $internalUser->getUserAccessMutations());
+
+                /* Compute the actual difference - if the set of (folderId, accessLevel)
+                 * tuples are the same, then there's no difference and we don't need to
+                 * tell anyone about changes
+                 *
+                 * Otherwise show them the old list and the new list and let them see
+                 * how they're different
+                 *
+                 * Note: In the past the XOR serialisation was done on log messages which
+                 * sounds like a kind of weird way to do it but I guess it's not as insane
+                 * as it might first appear
+                 */
+                $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
+
+                if (\count($diffGroups)) {
+                    $this->logger->debug(
+                        sprintf(
+                            'Groups for %s underwent a meaningful mutation',
+                            $internalUser->getFullName()
+                        )
+                    );
+
+                    /* Translate the existing group tuples into something nice for humans
+                     * to read - there's a lot of overhead doing these folder lookups
+                     * which can definitely be optimised further if we want to keep it
+                     */
+                    $oldLog = [];
+
+                    foreach ($existingGroups as $folderId => $accessLevel) {
+                        /* Maybe this folder doesn't actually exist at runtime
+                          */
+                        try {
+                            $folder     = $this->folderMapper->findCheaplyById($folderId);
+                            $folderName = $folder->getName();
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            $folderName = 'unknown folder';
+                        }
+
+                        $oldLog[] = sprintf(
+                            '%s access to %s (/homepage/%s)',
+                            self::ACCESS_MAP[$accessLevel],
+                            $folderName,
+                            $folderId
+                        );
+                    }
+
+                    /* Translate the final group tuples into something nice for humans
+                     * to read - there's a lot of overhead doing these folder lookups
+                     * which can definitely be optimised further if we want to keep it
+                     */
+                    $newLog = [];
+
+                    foreach ($finalGroups as $folderId => $accessLevel) {
+                        /* Maybe this folder doesn't actually exist at runtime
+                         */
+                        try {
+                            $folder     = $this->folderMapper->findCheaplyById($folderId);
+                            $folderName = $folder->getName();
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            $folderName = 'unknown folder';
+                        }
+
+                        $newLog[] = sprintf(
+                            '%s access to %s (/homepage/%s)',
+                            self::ACCESS_MAP[$accessLevel],
+                            $folderName,
+                            $folderId
+                        );
+                    }
+
+                    /* Do you actually need to see what they had,
+                     * or is the new set of UserAccess enough?
+                     */
+                    $diff['accessList'] = [
+                        'old' => $oldLog,
+                        'new' => $newLog,
+                    ];
+                } else {
+                    $this->logger->debug(
+                        sprintf(
+                            'Groups for %s remained unchanged',
+                            $internalUser->getFullName()
+                        )
+                    );
+                }
+            }
+
+
+            $originalName = ($action === 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
+                : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
+
+            if (count($diff)) {
+                $level   = Logger::NOTICE;
+                $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
+                $context = array_merge($commonContext, ['diff' => $this->formatForLog($diff)]);
+            } else {
+                // The user hasn't been changed: still, they've been
+                // seen by UPS so their updated at time should update.
+                // This is so they are not considered stale by the stale
+                // users report.
+                $level   = Logger::INFO;
+                $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
+                $context = $commonContext;
+                $this->logger->log($level, $message, $context);
+                if ($update && ($action === 'update')) {
+                    $this->logger->debug("Marking $originalName as having been updated", $commonContext);
+                    $internalUser->setUpdatedAt(Alaress_Date_Format::now());
+                    try {
+                        $this->userMapper->save($internalUser);
+                    } catch (MapperException | UnexpectedValueException $e) {
+                        $this->logger->warning(
+                            sprintf(
+                                "Failed to mark %s as having been updated (%s): ",
+                                $originalName,
+                                $e->getMessage()
+                            ),
+                            $context
+                        );
+                    }
+                }
+                $this->currentRun->incrementUsersSkipped();
+                continue;
+            }
+
+            try {
+                if (!$update) {
+                    // Dry Run
+                    $this->sanityCheck($internalUser);
+                    $this->logger->debug("User record passes sanity check", $commonContext);
+                } else {
+                    // Save includes pre-save sanity check
+                    $this->userMapper->save($internalUser);
+                    $this->logger->debug("User record passes sanity check", $commonContext);
+                    $this->logger->debug("User record saved", $commonContext);
+                }
+
+                $this->logger->log($level, $message, $context);
+
+                if ($action === 'update') {
+                    $this->currentRun->incrementUsersUpdated();
+                } else {
+                    $this->currentRun->incrementUsersCreated();
+                }
+            } catch (UnexpectedValueException $e) {
+                $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
+                $this->currentRun->incrementUsersSkipped();
+                continue;
+            } catch (\Exception $e) {
+                $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
+                $this->currentRun->incrementUsersSkipped();
             }
         }
     }
