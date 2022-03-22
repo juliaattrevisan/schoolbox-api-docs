@@ -237,6 +237,18 @@ class Calendar_Api_Factory
                     \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
                     \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
                 );
+            case Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\UserMapper::getInstance()
+                );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
         }
