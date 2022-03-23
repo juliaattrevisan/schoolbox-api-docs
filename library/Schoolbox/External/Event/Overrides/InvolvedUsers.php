@@ -128,16 +128,16 @@ class InvolvedUsers
      * @param \Schoolbox\User $user
      * @param int             $startTimestamp
      * @param int             $endTimestamp
+     * @param string|null     $folderCode
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp): GenericCollection
+    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
@@ -160,14 +160,22 @@ class InvolvedUsers
             AND u.deleted_at IS NULL
         ";
 
-        $statement = $this->overrideMapper->getDatabase()->prepare($query);
-
-        $statement->execute([
+        $params = [
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
-        ]);
+        ];
+
+        /* Optionally filter by foldercode
+         */
+        if ('' !== (string)$folderCode) {
+            $query .= " AND se.code = :folderCode";
+            $params['folderCode'] = $folderCode;
+        }
+
+        $statement = $this->overrideMapper->getDatabase()->prepare($query);
+        $statement->execute($params);
 
         $usualEventIds = [];
 
@@ -193,19 +201,25 @@ class InvolvedUsers
             AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
             AND se.deleted_at IS NULL
             AND seuo.deleted_at IS NULL
-            GROUP BY se.id 
-            ORDER BY se.id
         ";
 
-        $statement = $this->overrideMapper->getDatabase()->prepare($query);
-
-        $statement->execute([
+        $params = [
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
             'actionClear' => Model::CLEAR
-        ]);
+        ];
+
+        /* Optionally filter by foldercode
+         */
+        if ('' !== (string)$folderCode) {
+            $query .= " AND se.code = :folderCode";
+            $params['folderCode'] = $folderCode;
+        }
+
+        $statement = $this->overrideMapper->getDatabase()->prepare($query);
+        $statement->execute($params);
 
         $overrideEventIds = [];
 
