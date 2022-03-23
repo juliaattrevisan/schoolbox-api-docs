@@ -14,8 +14,6 @@ use Alaress\Web\Controller\Base;
 use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\GroupMapper;
@@ -31,39 +29,29 @@ class Controller extends Base
     protected UserMapper $userMapper;
 
     /**
-     * External_UserInterface
-     */
-    private External_UserInterface $externalUser;
-
-    /**
      * Controller constructor.
      *
      * @param UserAccessMapper       $userAccessMapper
      * @param GroupMapper            $groupMapper
      * @param FolderMapper           $folderMapper
-     * @param Access                 $accessHelper
      * @param Timetable_ColourMapper $timetableColourMapper
      * @param RerouteOverrideMapper  $reRouteOverrideMapper
-     * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         GroupMapper $groupMapper,
         FolderMapper $folderMapper,
-        Access $accessHelper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper,
         External_UserInterface $externalUser,
         UserMapper $userMapper
     ) {
-        $this->externalUser = $externalUser;
         $this->userMapper = $userMapper;
         $this->groupsHelper = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
-            $accessHelper,
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
