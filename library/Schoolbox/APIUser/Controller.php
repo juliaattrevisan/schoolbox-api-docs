@@ -132,7 +132,7 @@ class Controller extends Base
          * build the user Model object from the POST data
          */
         //set default fields
-        $newuser->setEnabled(false);
+        $newuser->setEnabled(true);
         $newuser->setSuperuser(false);
 
         /** @var User $model */
