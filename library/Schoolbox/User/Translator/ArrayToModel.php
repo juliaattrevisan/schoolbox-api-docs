@@ -72,11 +72,10 @@ class ArrayToModel extends Base
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
-                try {
-                    $model->$function($value);
-                } catch (\Throwable $e) {
-                    throw new SchoolboxException("Model does not implement $function");
+                if (!method_exists($model, $function)) {
+                    throw new SchoolboxException("Unable to set '$label' field from this endpoint");
                 }
+                $model->$function($value);
             }
         }
         return $model;
