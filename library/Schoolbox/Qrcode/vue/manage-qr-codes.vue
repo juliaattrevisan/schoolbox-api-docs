@@ -1,17 +1,17 @@
 <script>
 
 /**
- * Generate a list of QR login codes for the current class / group. 
- * Using the QR code, the student can login and be redirected to the specified URL. 
- * The codes are set to a specific expiry. 
- * By default all users have the QR login code generated, however select students can also be chosen. 
+ * Generate a list of QR login codes for the current class / group.
+ * Using the QR code, the student can login and be redirected to the specified URL.
+ * The codes are set to a specific expiry.
+ * By default all users have the QR login code generated, however select students can also be chosen.
  */
 
 import ManageQrCodesStudent from './manage-qr-codes-student';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 
 export default {
-   
+
     components: {
         ManageQrCodesStudent, //to generate and display QR codes
         BottomDrawer, //to provide submit actions
@@ -39,7 +39,6 @@ export default {
             destination: 'homepage', //where to redirect the student on login
             expiry: '', //when the returned qr code will expire
             expiryMonth: '1', //how long to set the login expiry for
-            loginUrl: '', //the base url to login to
         }
     },
 
@@ -47,25 +46,25 @@ export default {
 
         /**
          * No qr codes to show if there's no students, so show a 'no students' display
-         * 
+         *
          * @returns { Boolean }
          */
         hasStudents () {
-            return this.students.length > 0; 
+            return this.students.length > 0;
         },
 
         /**
          * To toggle the bottom-drawer, only show when there's students to submit
-         * 
+         *
          * @returns { Boolean }
          */
         hasSelectedStudents () {
-            return this.selectedStudents.length > 0; 
+            return this.selectedStudents.length > 0;
         },
 
         /**
          * To display how many students are selected
-         * 
+         *
          * @returns { Number }
          */
         selectedStudentsCount () {
@@ -74,7 +73,7 @@ export default {
 
         /**
          * To display how many students are selected
-         * 
+         *
          * @returns { String }
          */
         selectedStudentsStatus () {
@@ -90,8 +89,8 @@ export default {
         },
 
         /**
-         * To update the toggle selection status based on the current selection 
-         * 
+         * To update the toggle selection status based on the current selection
+         *
          * @returns { String }
          */
         toggleStudentSelectionStatus () {
@@ -99,13 +98,13 @@ export default {
                 return 'Clear selection';
             } else {
                 return 'Select all';
-            } 
+            }
         },
 
         /**
          * To disable the submit button while already processing or
          * when there's no students currently selected
-         * 
+         *
          * @returns { Boolean }
          */
         isGenerateCodesDisabled () {
@@ -118,7 +117,7 @@ export default {
 
         /**
          * To notify that codes are currently being generated
-         * 
+         *
          * @returns { String }
          */
         generateCodesStatus () {
@@ -160,9 +159,9 @@ export default {
 
         /**
          * To determine the checked/unchecked display of the checkbox on the student
-         * 
+         *
          * @param { Number }
-         * 
+         *
          * @returns { Boolean }
          */
         isInSelectedStudents (studentId) {
@@ -171,8 +170,8 @@ export default {
 
         /**
          * Update the selected student list with the selected or unselected student
-         * 
-         * @params { Object } 
+         *
+         * @params { Object }
          */
         onStudentSelected (student) {
             if (this.isInSelectedStudents(student.id)) {
@@ -194,7 +193,6 @@ export default {
                 });
                 const data = await response.json();
                 this.expiry = data.expiry;
-                this.loginUrl = data.loginUrl;
                 this.students = data.students;
                 this.selectedStudents = []; //clear the selected students once generated once
             } catch (error) {
@@ -207,8 +205,8 @@ export default {
 
         /**
          * Get the FormData to submit to the QR generation endpoint
-         * 
-         * @returns { FormData } 
+         *
+         * @returns { FormData }
          */
         getFormData () {
             const formData = new FormData();
@@ -221,7 +219,7 @@ export default {
         },
 
         /**
-         * Clear the currently selected students or select all based on 
+         * Clear the currently selected students or select all based on
          * whether there's any students currently selected
          */
         onToggleStudentSelection () {
@@ -233,7 +231,7 @@ export default {
         },
 
         /**
-         * Print the qrcodes 
+         * Print the qrcodes
          */
         onPrintSelected () {
             window.print();
@@ -246,16 +244,15 @@ export default {
 <template>
 
     <div class="small-12 island manage-qrcodes">
-            
+
         <div v-if="isDataLoaded && hasStudents">
             <section class="content">
                 <div class="students">
-                    <manage-qr-codes-student 
+                    <manage-qr-codes-student
                         v-for="student in students"
                         :key="student.id"
                         :student="student"
                         :selectedStudents="selectedStudents"
-                        :loginUrl="loginUrl"
                         :expiry="expiry"
                         :folder-name-with-code="folderNameWithCode"
                         @student-selected="onStudentSelected"
@@ -285,6 +282,7 @@ export default {
                     <select v-model="destination">
                         <option value="homepage">Homepage</option>
                         <option value="dashboard">Dashboard</option>
+                        <option value="profile">Profile</option>
                     </select>
                 </div>
                 <div class="options-list__option">
@@ -336,7 +334,7 @@ export default {
     }
 }
 
-    .options-list__option { 
+    .options-list__option {
         flex: 1 1 0; //keep both sides equal
     }
 

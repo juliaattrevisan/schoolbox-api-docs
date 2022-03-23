@@ -10,7 +10,7 @@ import { gsap } from 'gsap/all';
 
 
 export default {
-   
+
     components: {
         qrcodeVue, //to display QR codes according to the link returned
     },
@@ -22,10 +22,6 @@ export default {
         },
         selectedStudents: { //to know whether the student is currently selected or not
             type: Array,
-            required: true,
-        },
-        loginUrl: { //the base url to login to
-            type: String,
             required: true,
         },
         expiry: { //when the qr code will expire
@@ -50,7 +46,7 @@ export default {
 
         /**
          * To determine the display of the checkbox on the student
-         * 
+         *
          * @returns { Boolean }
          */
         isInSelectedStudents () {
@@ -63,18 +59,18 @@ export default {
 
         /**
          * Every student is always returned, with those not selected just returning a null token.
-         * So we need to ensure that qr codes previously generated for a student aren't 
-         * overwritten with every new generation request. 
+         * So we need to ensure that qr codes previously generated for a student aren't
+         * overwritten with every new generation request.
          */
         student: {
             deep: true,
             handler (value) {
-                if (value.token) { 
+                if (value.qrCodeValue) {
                     this.studentExpiry = this.expiry;
-                    this.qrCodeValue = `${this.loginUrl}${value.token}`;
+                    this.qrCodeValue = `${value.qrCodeValue}`;
                     this.hasQrCode = true;
                     this.animateQrCodeChange();
-                } 
+                }
             }
         }
 
@@ -93,14 +89,14 @@ export default {
          * To help the user realise there's been a change of QR code
          */
         animateQrCodeChange () {
-            gsap.to(this.$refs.qrCodeContainer, { 
-                duration: 0.7, 
+            gsap.to(this.$refs.qrCodeContainer, {
+                duration: 0.7,
                 ease: 'power2.inOut',
                 onComplete: () => this.$refs.emptyState.remove(), //so we don't see the empty state in any subsequent animations
-                opacity: 1, 
+                opacity: 1,
                 rotationY: 0,
                 startAt: {
-                    opacity: 0, 
+                    opacity: 0,
                     rotationY: 180,
                 },
                 transformPerspective: 1000,
@@ -135,7 +131,7 @@ export default {
             <h5 v-else>&nbsp;</h5>
         </div>
     </div>
-                
+
 </template>
 
 <style lang="scss" scoped>
@@ -184,7 +180,7 @@ export default {
 
 @media print {
 
-    .student { 
+    .student {
         border: 1px dashed black; //change to 'scissor cut' guide lines
         margin: 0 -1px -1px 0;
         padding: 2.5rem 1rem;
@@ -206,7 +202,7 @@ export default {
         a { //remove default link styles
             font-size: 14px;
             font-weight: bold;
-            text-decoration: none; 
+            text-decoration: none;
         }
         h4, h5 {
             display: block;
