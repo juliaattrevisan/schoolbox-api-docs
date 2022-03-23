@@ -444,7 +444,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Stopping task daemon service";
-taskd_container_ids="$(docker ps -f alaress/taskd:latest -q)"
+taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:latest -q)"
 if [[ -n $taskd_container_ids ]]; then
   echo -e "$taskd_container_ids" | xargs docker stop
 fi

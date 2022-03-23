@@ -16,6 +16,7 @@ use Psr\Log\NullLogger;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
@@ -29,6 +30,7 @@ use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\Sanitizer;
+use Schoolbox\TaskDaemon\ProducerFactory;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -96,6 +98,19 @@ class Kernel extends WebKernelAbstract
             );
             return $di->get('redis.storage');
         }));
+
+        // Task daemon message producer
+        $di->set(
+            'taskd.messageProducer',
+            $di->lazy(
+                function () use ($config) {
+                    return (new ProducerFactory())->build(
+                        $config->get(ConfigMapper::NAME_TASKD_REDIS_URL),
+                        $config->get(ConfigMapper::NAME_TASKD_REDIS_QUEUE)
+                    );
+                }
+            )
+        );
 
         $di->set('amqp', $di->lazy(function () {
             return Connector::getInstance();
