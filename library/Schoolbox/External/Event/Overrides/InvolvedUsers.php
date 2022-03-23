@@ -192,6 +192,7 @@ class InvolvedUsers
             AND se.finish_at <= :finishDatetime
             AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
             AND se.deleted_at IS NULL
+            AND seuo.deleted_at IS NULL
             GROUP BY se.id 
             ORDER BY se.id
         ";
