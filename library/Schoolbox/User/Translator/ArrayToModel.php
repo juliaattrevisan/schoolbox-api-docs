@@ -32,7 +32,14 @@ class ArrayToModel extends Base
         foreach ($array as $label => $value) {
             //check if what the user is attempting to edit is valid?
             if (in_array($label, ["guardians", "students", "impersonableUser", "groups"])) {
-                throw new SchoolboxException("$label field is unable to be updated at this endpoint");
+                throw new SchoolboxException("'$label' field is unable to be updated at this endpoint");
+            }
+            if ('fullName' === $label) {
+                throw new SchoolboxException("'fullName' is unable to be updated, please use title, firstName, lastname.");
+            }
+            if ('email' === $label) {
+                //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
+                throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
             }
             //is function?
             //just need the build setFunction function, which exists in the mapper, so lets hit it from the side
@@ -42,8 +49,6 @@ class ArrayToModel extends Base
              */
             if ('isEmailDerived' === $label) {
                 $model->setLocalEmail($value);
-            } elseif ('email' === $label) {
-                //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             } elseif ('role' === $label) {
                 $model->getRole()->setId($value);
             } elseif ('campus' === $label) {
