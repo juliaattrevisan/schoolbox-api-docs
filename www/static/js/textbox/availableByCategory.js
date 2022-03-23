@@ -90,7 +90,7 @@ $j(function() {
 					}
 				}
 				else {
-					allOptions.push($('<option/>').val(0).text('(none)').prop('disabled', true));
+					allOptions.push($('<option/>').val(0).text('(none)'));
 				}
 
 				/* If the target exists, replace it - since Resource Browser

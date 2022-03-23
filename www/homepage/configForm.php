@@ -173,6 +173,10 @@ if (is_numeric($_REQUEST['cid'])) {
                 if (isset($config[$key])) {
                     $configItem = Component_Config_Factory::build($key, null, $config);
                     $value      = $configItem->dehydrate($config[$key], $controller);
+                    // if src is the current folder id, reset the value to empty string
+                    if ($key === 'src' && (int)$value === $folder->getId()) {
+                        $value = '';
+                    }
 
                     // this should be 1:1 relation, so return only the first instance of this definition
                     /** @var Component_Config $confI */
