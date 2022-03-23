@@ -119,8 +119,14 @@ foreach ($typeList as $type) {
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
+            if ($currentEventType === 'SudsTimetable') {
+                $label = 'School Data Timetable';
+            } else {
+                $label = trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType));
+            }
+
             $this->setVar([
-                'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
+                'EVENTTYPE_LABEL' => $label,
                 'EVENTTYPE_NAME' => $currentEventType,
             ]);
 

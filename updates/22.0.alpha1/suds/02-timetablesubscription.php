@@ -18,7 +18,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $config = (new \Calendar_Api_Config_Connector_SudsTimetable())
-            ->setLabel('SUDS Timetable')
+            ->setLabel('Timetable Events')
             ->setEventType('SudsTimetable') // This is actually the classname corresponding to Calendar/Api/Config/Connector/SudsTimetable.php
             ->setLuEventType('1');
 

@@ -24,7 +24,7 @@ class Calendar_Api_Config_Connector_SudsTimetable extends Calendar_Api_Config_Co
      */
     public function getDefaultLabel(): string
     {
-        return 'SUDS Timetable';
+        return 'Timetable Events';
     }
 
 
