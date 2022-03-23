@@ -33,21 +33,10 @@ class Javascript extends Base
             $classes[] = 'source' . $connectorId;
         }
 
-        /* Apparently this is a place to put a link to More Details
-         * which spawns in the frontend under custom > moreDetailsLink...
-         * ...I think?
+        /* If you link to a folder code, a checkbox appears in the calendar
+         * Filter modal underneath Groups, allowing you to toggle it
          */
-        $path = null;
-
         if (null !== $this->event->getFolder()) {
-            $path = sprintf(
-                '/homepage/code/%s',
-                $this->event->getFolder()->getCodeString()
-            );
-
-            /* If you link to a folder code, a checkbox appears in the calendar
-             * Filter modal underneath Groups, allowing you to toggle it
-             */
             $classes[] = 'group' . $this->event->getFolder()->getId();
         }
 
@@ -110,8 +99,8 @@ class Javascript extends Base
                 ],
                 'links'      => [
                     'category' => [
-                        'id'   => '',
-                        'name' => '',
+                        'id'   => $this->event->getFolder()->getId(),
+                        'name' => $this->event->getFolder()->getTitle(),
                     ],
                 ],
                 'styles'     => [
@@ -125,7 +114,7 @@ class Javascript extends Base
                     'listButton'    => false,
                 ],
                 'custom'     => [
-                    'moreDetailsLink' => $path
+                    'moreDetailsLink' => null
                 ],
             ],
         ];
