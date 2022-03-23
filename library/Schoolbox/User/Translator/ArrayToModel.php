@@ -4,8 +4,8 @@ namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Campus;
-use Schoolbox\GenericCollection;
+use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\YearLevel\Mapper;
 
 class ArrayToModel extends Base
@@ -23,6 +23,8 @@ class ArrayToModel extends Base
          */
         $yearLevelMapper = Mapper::getInstance();
         $houseMapper = \HouseMapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
+        $campusMapper = CampusMapper::getInstance();
         foreach ($array as $label => $value) {
             //is function?
             //just need the build setFunction function, which exists in the mapper, so lets hit it from the side
@@ -35,19 +37,15 @@ class ArrayToModel extends Base
             } elseif ('email' === $label) {
                 //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             } elseif ('role' === $label) {
-                $model->getRole()->setId($value);
+                $role = $roleMapper->findByName($value);
+                $model->getRole()->setId($role->first()->getId());
             } elseif ('campus' === $label) {
                 //build the campus
-                $model->setCampusCollection(new GenericCollection(Campus::class));
-                foreach ($value as $campusId) {
-                    $campus = new Campus();
-                    $campus->setId($campusId);
-                    $model->getCampusCollection()->add($campus);
-                }
+                $model->setCampusCollection($campusMapper->findByColumn('name', $value));
             } elseif ('yearLevel' === $label) {
                 //find the year level or set to null.
                 try {
-                    $model->setYear($yearLevelMapper->findById($value));
+                    $model->setYear($yearLevelMapper->findByColumn('name', $value)->first());
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     /* noop - went looking for a deleted or nonexistent year_id
                      * just use null
@@ -55,7 +53,7 @@ class ArrayToModel extends Base
                     $model->setYear(null);
                 }
             } elseif ('schoolHouse' === $label) {
-                $model->setSchoolHouse($houseMapper->createModel($value));
+                $model->setSchoolHouse($houseMapper->findByColumn('house', $value)->first());
             } elseif ('flags' === $label) {
                     //set all the flags...
                     $model->setWebmail($value['showWebmailTab'])
@@ -67,6 +65,8 @@ class ArrayToModel extends Base
                         ->setEportfolioEnable($value['enableEportfolio'])
                         ->setUseInternalMail($value['useInternalMail'])
                         ->setCalendarView($value['calendarView']);
+            } elseif ('isBoarder' === $label) {
+                $model->setBoardingStatus($value);
             } else {
                 try {
                     $model->$function($value);

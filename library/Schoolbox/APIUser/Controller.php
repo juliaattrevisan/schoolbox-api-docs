@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -111,8 +112,25 @@ class Controller extends Base
     public function apiUserPost()
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
-        $newuser = $this->userMapper->createModel();
+        /**
+         * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
+         * that should be done at the PUT/PATCH method
+         */
+        $uid = $data['id'] ?? null;
+        if (null !== $uid) {
+            $problem = (new ApiProblem('Unable to update a user at this endpoint.'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
+        }
 
+        $newuser = $this->userMapper->createModel($uid);
+
+        /**
+         * build the user Model object from the POST data
+         */
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $newuser);
         $model->setEnabled(true);
