@@ -4,8 +4,8 @@
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 
-	// We shoudln't use more than 4 action buttons in a row
-	@for $i from 1 through 4 {
+	// We shoudln't use more than 5 action buttons in a row
+	@for $i from 1 through 5 {
 		.actions-#{$size}-#{$i},
 		.island .row.actions-#{$size}-#{$i}{
 			position: relative;
