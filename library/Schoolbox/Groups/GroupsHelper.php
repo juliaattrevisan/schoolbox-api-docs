@@ -527,4 +527,28 @@ class GroupsHelper
                 throw new SchoolboxException("Incorrect membership value");
         }
     }
+
+    /**
+     * get user membership string from buildGroup object
+     */
+    public function getMembershipStringFromGroup(array $groupObject): string
+    {
+        /**
+         * looking for something true in
+         * 'isAccessAdmin'     => $isAdmin,
+         * 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
+         * 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
+         */
+
+        if ($groupObject['isAccessAdmin']) {
+            return self::MEMBERSHIP_ADMIN;
+        }
+        if ($groupObject['isAccessWrite']) {
+            return self::MEMBERSHIP_WRITE;
+        }
+        if ($groupObject['isAccessRead']) {
+            return self::MEMBERSHIP_READ;
+        }
+        return self::MEMBERSHIP_NONE;
+    }
 }

@@ -181,11 +181,10 @@ class Controller extends Base
         }
         if (UserAccess::ACCESS_READ === $post['enrolmentStatus']) {
             /**
-             * epic spaceship, time to fly.
              * it should grab the higher perm either membership or read
              * $post['membership'] could be none, read, write or admin, so need to check, not just assume.
              */
-            $post['membership'] = $post['membership'] <=> UserAccess::ACCESS_READ;
+            $post['membership'] = max($post['membership'], UserAccess::ACCESS_READ);
         }
 
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
@@ -212,7 +211,7 @@ class Controller extends Base
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
-        if (!$user->isGroupMember($group->getFolder()->getId())) {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enrolled in the Group'))
                 ->setStatus(404)
                 ->asArray();
@@ -223,10 +222,39 @@ class Controller extends Base
 
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
-        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $users_group['membership']);
+
+        //check if user is trying to break the system by deleting a user via the PUT command, and error
+        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early this API wont delete a user...
+        }
+
+        $currentMembership = $this->groupsHelper->getMembershipStringFromGroup($users_group);
+
+        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $currentMembership);
         $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? $users_group['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?? $users_group['isFavourite'];
         $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? $users_group['enrolmentStatus']);
+
+        /**
+         * check if we should be updating the users enrolment / membership
+         * if enrolment status is set, and is Enroled / awaiting auth, then lets change the membership perms
+         */
+        if (UserAccess::ACCESS_AWAITING_AUTHORISATION === $post['enrolmentStatus']) {
+            //if set to awaiting auth, set to deny (which is in the groups system awaiting auth)
+            $post['membership'] = UserAccess::ACCESS_DENY;
+        }
+        if (UserAccess::ACCESS_READ === $post['enrolmentStatus']) {
+            /**
+             * it should grab the higher perm either membership or read
+             * $post['membership'] could be none, read, write or admin, so need to check, not just assume.
+             */
+            $post['membership'] = max($post['membership'], UserAccess::ACCESS_READ);
+        }
 
         //update details
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
