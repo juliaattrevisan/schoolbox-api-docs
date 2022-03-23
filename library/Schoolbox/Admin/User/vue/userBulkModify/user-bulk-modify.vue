@@ -1,15 +1,26 @@
 <script>
+
 /**
  * Bulk modify selected users
  */
-import RevealModal from '@schoolboxVue/components/reveal-modal';
+
+import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
+import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
+import FilterEvents from './userBulkModifyFilterEvents';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {
+
     components: {
+        UserBulkModifyFilters,
+        UserBulkModifyNewValues,
         BottomDrawer,
-        RevealModal
     },
+
+    mixins: [
+        footerUI //to place and keep the tables UI in the footer
+    ],
 
     props: {
         srcUserList: {
@@ -38,76 +49,49 @@ export default {
         houses: {
             type: Array,
             required: true
-        }
+        },
     },
-    data() {
+
+    data () {
         return {
-            selectedFilters: {
-                campusId: -1,
-                roleId: -1,
-                ePortfolio: -1,
-                yearLevelId: -1,
-                token: -1,
-            },
-            updateFields: {
-                campusIds: [],
-                roleId: -1,
-                yearLevelId: -1,
-                houseId: -1,
-                ePortfolio: -1,
-                emailFromUserName: -1,
-                externalMailClient: -1,
-                webmail: -1,
-                accountEnabled: -1,
-                hideContacts: -1,
-                hideTimetable: -1,
-                positionTitle: '',
-                displayGradeGraph: -1,
-                revokeToken: -1,
-            },
-            hasRowsLoaded: false,
+            hasDataLoaded: false, //show loading display until true
+            hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            columns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token'],
-            options: {
-                headings: {
-                    firstname: 'First Name',
-                    lastname: 'Surname',
-                    external_id: 'External ID',
-                    campuses: 'Campuses',
-                    role: 'Role',
-                    year: 'Year Level',
-                    token: 'Token',
-                },
-                orderBy: {
-                    ascending: false,
-                    column: 'Surname' //TODO ??
-                },
-                templates: {
-                    campuses: (h, row, index) => {
-                        return row.campuses.join(', ');
-                    }
-                },
-                perPage: 50,
-                perPageValues: [50, 100, 200],
-                selectable: {
-                    mode: 'multiple' //to enable multi-select
-                },
-                debounce: 100, //faster debounce as data is stored on the client side,
-                resizableColumns: false,
-                tabbable: false,
-                texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
-                },
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
-                },
+            tableColumns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
+            tableOptions: {
+                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                    {
+                        name: FilterEvents.CAMPUS,
+                        callback: (row, query) => {
+                            return row.campuses.join().includes(query); //need to flatten the campuses array then check 
+                        }
+                    },
+                    {
+                        name: FilterEvents.ROLE,
+                        callback: (row, query) => {
+                            return row.role === query; 
+                        }
+                    },
+                    {
+                        name: FilterEvents.YEAR,
+                        callback: (row, query) => {
+                            return row.year === query; 
+                        }
+                    },
+                    {
+                        name: FilterEvents.TOKEN,
+                        callback: (row, query) => {
+                            return row.token === query;
+                        }
+                    },
+                    {
+                        name: FilterEvents.EPORTFOLIO,
+                        callback: (row, query) => {
+                            return row.eportfolio_enabled === query;
+                        }
+                    },
+                ],
                 customSorting: {
                     year: (ascending) => { //sort year level naturally
                         return (a, b) => {
@@ -118,111 +102,70 @@ export default {
                             }
                         }
                     }
-                }
+                },
+                debounce: 100, //faster debounce as data is stored on the client side,
+                headings: {
+                    firstname: 'First Name',
+                    lastname: 'Surname',
+                    external_id: 'External ID',
+                    campuses: 'Campuses',
+                    role: 'Role',
+                    year: 'Year Level',
+                    token: 'Token',
+                    eportfolio_enabled: 'ePortfolio',
+                },
+                orderBy: {
+                    ascending: false,
+                    column: 'Surname' //TODO ??
+                },
+                perPage: 25,
+                perPageValues: [25, 50, 100, 150, 200],
+                resizableColumns: false,
+                selectable: {
+                    mode: 'multiple' //to enable multi-select
+                },
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
+                tabbable: false,
+                templates: {
+                    campuses: (h, row, index) => {
+                        return row.campuses.join(', ');
+                    },
+                    token: (h, row, index) => {
+                        return row.token === '1' ? 'Set' : 'Not set';
+                    },
+                    eportfolio_enabled: (h, row, index) => {
+                        return row.eportfolio_enabled === '1' ? 'Enabled' : 'Disabled';
+                    },
+                },
+                texts: {
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
             },
-
             singleRowName: 'user',
             pluralRowName: 'users',
             selectContainer: null,
             collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
-            logData: [],
         }
     },
-    mounted() {
-        this.loadRows();
-    },
-    methods: {
-        /**
-         * load users
-         */
-        async loadRows() {
-            try {
-                const response = await fetch(this.srcUserList, {
-                    method: 'POST',
-                    body: JSON.stringify(this.selectedFilters),
-                    // body: this.$refs.filter.data
-                });
-                this.rows = await response.json();
-                this.hasRowsLoaded = true;
-            } catch (error) {
-                console.log(error);
-                this.hasLoadError = true; //display error note in the DOM
-            }
-        },
 
-        /**
-         * Notify state change
-         *
-         * @param { Object }
-         */
-        onSelectionChange() {
-            this.loadRows();
-        },
-
-        /**
-         * to keep track of selected rows
-         */
-        onRowSelected(event) {
-            this.selectedRows = event;
-        },
-
-        /**
-         * clear the selection
-         */
-        clearRows() {
-            this.selectedRows = [];
-        },
-
-        /**
-         * To confirm/cancel selected users deletion
-         */
-        onClearUsersToSelected() {
-            this.clearRows();
-            this.$refs.table.resetSelectedRows();
-        },
-
-        onUpdateUsersSelected() {
-            fetch(this.srcUserModify, {
-                method: 'POST',
-                body: this.getFormData(),
-            }).then((response) => response.json())
-                .then((data) => {
-                        this.logData = data;
-                        this.$refs.modal.open();
-                        this.clearRows();
-                    }
-                ).catch((error) => {
-                console.log(error);
-            })
-        },
-
-        /**
-         * Set up updating fields to POST
-         *
-         * @returns {FormData}
-         */
-        getFormData() {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
-            const formData = new FormData();
-            usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
-            });
-            for (const [key, value] of Object.entries(this.updateFields)) {
-                formData.append(key, value);
-            }
-            return formData;
-        },
-
-    },
     computed: {
+
         /**
          * To track how many are selected
          *
          * @returns {Number}
          */
-        selectedRowsCount() {
+        selectedRowsCount () {
             return this.selectedRows.length;
         },
 
@@ -231,7 +174,7 @@ export default {
          *
          * @returns {String}
          */
-        selectedRowsCountWithRowName() {
+        selectedRowsCountWithRowName () {
             if (this.selectedRowsCount === 0) {
                 return 'No ' + this.singleRowName;
             } else if (this.selectedRowsCount === 1) {
@@ -240,270 +183,187 @@ export default {
                 return this.selectedRowsCount + ' ' + this.pluralRowName;
             }
         },
-    }
+
+    },
+
+    mounted () {
+        this.initShiftKeyDetection();
+        this.loadRows();
+    },
+
+    methods: {
+
+        /**
+         * To hide a UI note informing of shift-selection once pressed once
+         */
+        initShiftKeyDetection () {
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = true;
+                }
+            });
+            document.addEventListener('keyup', (event) => {
+                if (event.key === 'Shift') {
+                    this.isShiftKeySelected = false;
+                }
+            });
+        },
+
+        /**
+         * Load users
+         */
+        async loadRows () {
+            try {
+                const response = await fetch(this.srcUserList, {
+                    method: 'POST',
+                    body: JSON.stringify(this.getRowsBody()),
+                });
+                this.rows = await response.json();
+            } catch (error) {
+                console.log(error);
+                this.hasLoadError = true; //display error note in the DOM
+            } finally {
+                this.hasDataLoaded = true; //update the display to show the list
+            }
+        },
+
+        /**
+         * Pass in the params to return all rows
+         * 
+         * @retrun { Object}
+         */
+        getRowsBody () {
+            return  {
+                campusId: -1,
+                roleId: -1,
+                yearLevelId: -1,
+                token: -1,
+                ePortfolio: -1,
+            }
+        },
+
+        /**
+         * To update the table to show the UI in the footer
+         */
+        onLoaded () {
+            this.$nextTick(() => this.footerUI_update());
+        },
+
+        /**
+         * To keep track of selected rows
+         */
+        onRowSelected (event) {
+            this.selectedRows = event;
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+                this.hasSelectedShiftKey = true;
+            }
+        },
+
+        /**
+         * Clear the selection
+         */
+        clearRows () {
+            this.selectedRows = [];
+            this.$refs.table.resetSelectedRows();
+        },
+
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onClearUsersSelected () {
+            this.clearRows();
+        },
+
+        /**
+         * To open the modify modal
+         */
+        onModifySelected () {
+            this.$refs.newValues.modify(); //will open up the reveal-modal in user-bulk-modify-new-values
+        },
+
+        /**
+         * Selected modify is complete, so clear the rows and update the data
+         */
+        onUpdated () {
+            this.clearRows();
+            this.loadRows(); //refresh the data
+        },
+
+    },
+    
 }
 </script>
+
 <template>
     <div>
+        <div v-if="hasLoadError">
+            <section class="content">
+                <div tableData-alert class="alert-box alert">
+                    Sorry, we are currently unable to load the Bulk Modify list. Please contact your support it the problem persists.
+                </div>
+            </section>
+        </div>
         <v-client-table
+            v-else-if="hasDataLoaded"
             ref="table"
             :data="rows"
-            :columns="columns"
-            :options="options"
+            :columns="tableColumns"
+            :options="tableOptions"
+            @loaded="onLoaded"
             @select="onRowSelected"
         >
             <template #beforeTable>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <p>
-                            Search for users with the criteria listed below, and apply changes to selected users.
-                        </p>
-                    </div>
-
-                    <div class="small-12 medium-6 large-3 columns">
-                        <label>
-                            Campus
-                            <select @change="onSelectionChange" v-model="selectedFilters.campusId">
-                                <option value="-1">Any</option>
-                                <option v-for="campus in campuses" :value="campus.id" :key="campus.id">
-                                    {{ campus.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-3 columns">
-                        <label>
-                            Role
-                            <select @change="onSelectionChange" v-model="selectedFilters.roleId">
-                                <option value="-1">Any</option>
-                                <option v-for="role in roles" :value="role.id" :key="role.id">
-                                    {{ role.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div v-if="eportfolioEnabled" class="small-12 medium-6 large-2 columns">
-                        <label>
-                            ePortfolio
-                            <select @change="onSelectionChange" v-model="selectedFilters.ePortfolio">
-                                <option value="-1">Any</option>
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-2 columns">
-                        <label>
-                            Year
-                            <select @change="onSelectionChange" v-model="selectedFilters.yearLevelId">
-                                <option value="-1">Any</option>
-                                <option value="">Not set</option>
-                                <option v-for="yearLevel in yearLevels" :value="yearLevel.id" :key="yearLevel.id">
-                                    {{ yearLevel.name }}
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="small-12 medium-6 large-2 columns">
-                        <label>
-                            Token
-                            <select @change="onSelectionChange" v-model="selectedFilters.token">
-                                <option value="-1">Any</option>
-                                <option value="1">Set</option>
-                                <option value="0">Not set</option>
-                            </select>
-                        </label>
-                    </div>
-                </fieldset>
+                <user-bulk-modify-filters 
+                    :campuses="campuses"
+                    :roles="roles"
+                    :year-levels="yearLevels"
+                    :eportfolio-enabled="eportfolioEnabled"
+                />
             </template>
             <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
+        <div v-else>
+            <table class="skeleton">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
-
-
-            <section class="content">
-                <div class="row">
-                    <div class="small-12 columns">
-                        <h3 class="subheader">New Values</h3>
-                    </div>
-                    <div data-applycampus="true" class="small-6 medium-3 columns">
-                        <label>
-                            Campus Involvement
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="One or more campuses that the users will be involved in.
-                                  Leave blank if you don't want to update their campuses.">?</span>
-                        </label>
-                        <ul class="option-list">
-                            <li v-for="campus in campuses">
-                                <input :id="'apply_campus-' + String(campus.id)" name='apply_campus[]'
-                                       :value=campus.id v-model="updateFields.campusIds" type="checkbox"/>
-                                <label class="checkbox-label"
-                                       :for="'apply_campus-' + String(campus.id)">{{ campus.name }}</label>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_role">Role</label>
-                        <select id="apply_role" name="apply_role" v-model="updateFields.roleId">
-                            <option value="-1">Unchanged</option>
-                            <option v-for="role in roles" :value="role.id">{{ role.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_year_id">
-                            Year
-                        </label>
-                        <select id="apply_year_id" name="apply_year_id" v-model="updateFields.yearLevelId">
-                            <option value="-1" selected="selected">Unchanged</option>
-                            <option value="">Not set</option>
-                            <option v-for="yearLevel in yearLevels" :value="yearLevel.id">{{ yearLevel.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_position_title">
-                            Position Title
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="Leave blank if you don't want to update their position title.">?</span>
-                        </label>
-                        <input id="apply_position_title" name="apply_position_title" type="text"
-                               v-model="updateFields.positionTitle">
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_house_id">
-                            House
-                            <span data-tooltip class="hint has-tip tip-top"
-                                  title="Leave blank if you don't want to update their house.">?</span>
-                        </label>
-                        <select id="apply_house_id" name="apply_house_id" v-model="updateFields.houseId">
-                            <option value="-1" selected="selected">Unchanged</option>
-                            <option value="">Not set</option>
-                            <option v-for="house in houses" :value="house.id">{{ house.name }}</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_eportfolio">ePortfolio</label>
-                        <select id="apply_eportfolio" name="apply_eportfolio" v-model="updateFields.ePortfolio"
-                                :disabled="!eportfolioEnabled">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_emailfromusername">Email Address From Username</label>
-                        <select id="apply_emailfromusername" name="apply_emailfromusername"
-                                v-model="updateFields.emailFromUserName">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_externalmailclient">Use External Mail Client</label>
-                        <select id="apply_externalmailclient" name="apply_externalmailclient"
-                                v-model="updateFields.externalMailClient">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_webmail">Enable Webmail Tab</label>
-                        <select id="apply_webmail" name="apply_webmail" v-model="updateFields.webmail">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_accountenabled">Account Enabled</label>
-                        <select id="apply_accountenabled" name="apply_accountenabled"
-                                v-model="updateFields.accountEnabled">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="apply_hidecontacts">Hide Contact Details</label>
-                        <select id="apply_hidecontacts" name="apply_hidecontacts" v-model="updateFields.hideContacts">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns end">
-                        <label for="apply_hidetimetable">Hide Timetable</label>
-                        <select id="apply_hidetimetable" name="apply_hidetimetable"
-                                v-model="updateFields.hideTimetable">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns end">
-                        <label for="apply_displaygradegraph">Display Comparative Graph on Grades</label>
-                        <select id="apply_displaygradegraph" name="apply_displaygradegraph"
-                                v-model="updateFields.displayGradeGraph">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-
-                    <div class="small-6 medium-3 columns">
-                        <label for="revoke_token">Revoke Token</label>
-                        <select id="revoke_token" name="revoke_token" v-model="updateFields.revokeToken">
-                            <option value="-1">Unchanged</option>
-                            <option value="1">Revoke</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-
-            <button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
-            <button @click.prevent="onUpdateUsersSelected" class="button submit button-update">Update Users</button>
+            <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
+            <button @click.prevent="onModifySelected" class="button submit">Modify</button>
         </bottom-drawer>
-        <reveal-modal ref="modal">
-            <div class="row">
-                <div class="small-12 island">
-                    <section>
-                        <div class="content">
-                            <p v-html="logData"></p>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </reveal-modal>
+        <user-bulk-modify-new-values 
+            ref="newValues"
+            :src-user-modify="srcUserModify"
+            :campuses="campuses"
+            :roles="roles"
+            :year-levels="yearLevels"
+            :houses="houses"
+            :eportfolio-enabled="eportfolioEnabled"
+            :selected-rows="selectedRows"
+            @updated="onUpdated"
+        />
     </div>
 </template>
+
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-
-#stale-users-report {
-    position: relative;
-}
 
 .VueTables--client {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
@@ -513,7 +373,7 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .button-update, .selected-count {
+.button-clear, .selected-count {
     display: inline-block;
 }
 
@@ -529,6 +389,9 @@ export default {
     background: none;
     vertical-align: baseline;
     font-size: 0.8rem;
+    &:hover {
+        background: none;
+    }
 }
 
 </style>

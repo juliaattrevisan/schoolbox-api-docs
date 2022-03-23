@@ -74,10 +74,11 @@ class UserBulkMapper extends UserMapper
                 u.firstname,
                 u.lastname,
                 u.synergy_id as external_id,
+                u.eportfolio_enabled,
                 g.name as role,
                 c.name as campus,
                 lyl.name as year,
-                jwt.jwt_id as token
+                (jwt.jwt_id IS NOT NULL) as token
             FROM {$this->getTable()} u
             LEFT JOIN `groups` g ON u.`group_id` = g.`id`
             LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`

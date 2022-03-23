@@ -5,19 +5,18 @@
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
         <div class="small-12 columns">
-            <div id='user-bulk-modify'>
+            <div id='user-bulk-modify-container'>
                 <user-bulk-modify
-                        src-user-list="{{ routeLookupIfAuthorized('adminUserBulkModify.getUserList') }}"
-                        src-user-modify="{{ routeLookupIfAuthorized('adminUserBulkModify.postModify') }}"
-                        :campuses="{{ campuses | json_encode }}"
-                        :roles="{{ roles | json_encode }}"
-                        :year-levels="{{ yearLevels | json_encode }}"
-                        :eportfolio-enabled="Boolean({{ config.eportfolio_enabled }})"
-                        :houses="{{ houses | json_encode }}"
+                    src-user-list="{{ routeLookupIfAuthorized('adminUserBulkModify.getUserList') }}"
+                    src-user-modify="{{ routeLookupIfAuthorized('adminUserBulkModify.postModify') }}"
+                    :campuses="{{ campuses | json_encode }}"
+                    :roles="{{ roles | json_encode }}"
+                    :year-levels="{{ yearLevels | json_encode }}"
+                    :eportfolio-enabled="Boolean({{ config.eportfolio_enabled }})"
+                    :houses="{{ houses | json_encode }}"
                 />
             </div>
-            <script type="text/javascript"
-                    src="{{ CDN_PREFIX }}/js/bundle/userBulkModify.js?v={{ config.site_version }}"></script>
+            <script src="{{ CDN_PREFIX }}/js/bundle/userBulkModify.js?v={{ config.site_version }}"></script>
         </div>
     </div>
 </div>
