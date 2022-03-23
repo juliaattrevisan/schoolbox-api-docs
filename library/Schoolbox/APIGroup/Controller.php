@@ -156,10 +156,37 @@ class Controller extends Base
             return; //exit early the api does not have enough data to work correctly.
         }
 
+        //check if user is trying to break the system by deleting a user via the PUT command, and error
+        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early this API wont delete a user...
+        }
+
         $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?? false;
         $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
+
+        /**
+         * check if we should be updating the users enrolment / membership
+         * if enrolment status is set, and is Enroled / awaiting auth, then lets change the membership perms
+         */
+        if (UserAccess::ACCESS_AWAITING_AUTHORISATION === $post['enrolmentStatus']) {
+            //if set to awaiting auth, set to deny (which is in the groups system awaiting auth)
+            $post['membership'] = UserAccess::ACCESS_DENY;
+        }
+        if (UserAccess::ACCESS_READ === $post['enrolmentStatus']) {
+            /**
+             * epic spaceship, time to fly.
+             * it should grab the higher perm either membership or read
+             * $post['membership'] could be none, read, write or admin, so need to check, not just assume.
+             */
+            $post['membership'] = $post['membership'] <=> UserAccess::ACCESS_READ;
+        }
 
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
