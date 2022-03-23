@@ -90,14 +90,12 @@ class Controller extends Base
             return; //exit early the user is part of the group.
         }
 
-        $post = json_decode($this->request->content->get(), true);
+        $post = json_decode(json_encode($this->request->content->get()), true);
         /**
          * check post array if missing any, lets error out...
          */
         if (
-            !isset($post['membership']) ||
-            !isset($post['isNotificationsOn']) ||
-            !isset($post['isFavourite'])
+            !isset($post['membership'], $post['isNotificationsOn'], $post['isFavourite'])
         ) {
             $problem = (new ApiProblem('Not all fields are filled'))
                 ->setStatus(401)
