@@ -37,6 +37,11 @@ class Controller extends Base
 
     private Jwt $tokenBuilder;
 
+    /** destinations for QR codes */
+    private const DESTINATION_HOMEPAGE  = 'homepage';
+    private const DESTINATION_DASHBOARD = 'dashboard';
+    private const DESTINATION_PROFILE   = 'profile';
+
     /**
      * Controller constructor.
      */
@@ -84,7 +89,9 @@ class Controller extends Base
     {
         $destination = $this->request->post->get('destination') ?? null;
         $expiryMonth = $this->request->post->get('expiry') ?? null;
-        $showCodes   = in_array($destination, ['homepage', 'dashboard']) && in_array($expiryMonth, [1, 3, 6]);
+        $showCodes   =
+            in_array($destination, [self::DESTINATION_DASHBOARD, self::DESTINATION_HOMEPAGE, self::DESTINATION_PROFILE])
+            && in_array($expiryMonth, [1, 3, 6]);
 
         try {
             $users = $this->userAccessMapper
@@ -94,11 +101,12 @@ class Controller extends Base
             $users = $this->userMapper->createCollection();
         }
 
+        $redirects = [];
         if (!$showCodes) {
             // name list only
             $tokens           = $this->tokenMapper->createCollection();
             $selectedStudents = $this->userMapper->createCollection();
-            $url              = null;
+            $urlBase          = null;
             $expiry           = null;
         } else {
             $studentIds = $this->request->post->get('students') ?? [];
@@ -114,7 +122,18 @@ class Controller extends Base
                                             }
                                         );
 
+            $redirect = null;
+            if (!$destination || $destination === self::DESTINATION_HOMEPAGE) {
+                $redirect = sprintf('/homepage/%d', $folder->getId());
+            }
             foreach ($selectedStudents as $student) {
+                // redirects
+                if ($redirect) {
+                    $redirects[$student->getId()] = $redirect;
+                } elseif ($destination === self::DESTINATION_PROFILE) {
+                    $redirects[$student->getId()] = sprintf('/search/user/%d', $student->getId());
+                }
+                // tokens
                 if ($tokens->offsetExists($student->getId())) {
                     // already generated
                     continue;
@@ -127,34 +146,36 @@ class Controller extends Base
                 }
             }
 
-            $expiry = (new \Alaress_Date_Format())->addMonths((int)$expiryMonth);
-            if (!$destination || $destination === 'homepage') {
-                $params['redirect'] = sprintf('/homepage/%d', $folder->getId());
-            }
-            $params['jwt'] = '';
-            $url           = (new Factory($this->getConfigLoader()))
+            $expiry  = (new \Alaress_Date_Format())->addMonths((int)$expiryMonth);
+            $urlBase = (new Factory($this->getConfigLoader()))
                 ->buildFullyQualified()
-                ->setPath($this->router->generate('api.initSessionFromQueryString'))->setQuery($params);
+                ->setPath($this->router->generate('api.initSessionFromQueryString'));
         }
 
         $students = [];
         foreach ($users as $user) {
+            $params = [];
             /** @var Model|null $userJwtId */
-            $userJwtId  = ($tokens->offsetExists($user->getId()) && $selectedStudents->offsetExists($user->getId())) ? $tokens->offsetGet($user->getId()) : null;
-            $students[] = [
-                'id'       => $user->getId(),
-                'fullname' => $user->getFullName(),
-                'token'    => $userJwtId ? $this->tokenBuilder->generate(
+            $userJwtId = ($tokens->offsetExists($user->getId()) && $selectedStudents->offsetExists($user->getId())) ? $tokens->offsetGet($user->getId()) : null;
+            if ($userJwtId) {
+                if ($urlBase && isset($redirects[$user->getId()])) {
+                    $params['redirect'] = $redirects[$user->getId()];
+                }
+                $params['jwt'] = $this->tokenBuilder->generate(
                     $user,
                     $expiry,
                     $userJwtId->getJwtId()
-                ) : null,
+                );
+            }
+            $students[] = [
+                'id'          => $user->getId(),
+                'fullname'    => $user->getFullName(),
+                'qrCodeValue' => ($userJwtId && $urlBase) ? $urlBase->setQuery($params)->toString() : null,
             ];
         }
 
         $payload = [
             'students' => $students,
-            'loginUrl' => $url ? $url->toString() : '',
             'expiry'   => $expiry ? $expiry->getLocalShort() : null,
         ];
 
