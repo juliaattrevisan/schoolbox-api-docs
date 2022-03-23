@@ -170,18 +170,12 @@ if (is_numeric($_REQUEST['cid'])) {
             /** @var Component_ConfigDefinition $confD */
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
-                if (isset($config[$key]) || $controller instanceof \Schoolbox\Tile\Component\HomepageTileController) {
+                if (isset($config[$key])) {
                     $configItem = Component_Config_Factory::build($key, null, $config);
-                    if (isset($config[$key])) {
-                        $value = $configItem->dehydrate($config[$key], $controller);
-                        // if src is the current folder id, reset the value to empty string
-                        if ($key === 'src' && (int)$value === $folder->getId()) {
-                            $value = '';
-                        }
-                    } else {
-                        // if this key is not in request and this is about homepage tile controller
-                        // reset the value to default
-                        $value = $confD->getDefaultValue();
+                    $value      = $configItem->dehydrate($config[$key], $controller);
+                    // if src is the current folder id, reset the value to empty string
+                    if ($key === 'src' && (int)$value === $folder->getId()) {
+                        $value = '';
                     }
 
                     // this should be 1:1 relation, so return only the first instance of this definition
