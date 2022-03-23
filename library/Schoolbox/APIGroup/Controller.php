@@ -132,7 +132,7 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
-        if (!$user->isGroupMember($group->getFolder()->getId())) {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enrolled in the Group'))
                 ->setStatus(404)
                 ->asArray();
