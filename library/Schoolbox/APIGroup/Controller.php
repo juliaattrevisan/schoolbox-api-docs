@@ -125,12 +125,12 @@ class Controller extends Base
 
     /**
      * Deletes a user's group membership
-     * @api /user/{userId}/group
+     * @api DELETE /user/{userId}/group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipDelete
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
-        if (!$user->isGroupMember($group->getFolder()->getId())) {
+        if ($this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enrolled in the Group'))
                 ->setStatus(404)
                 ->asArray();
