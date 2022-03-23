@@ -130,7 +130,7 @@ class Controller extends Base
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
-        if ($this->groupsHelper->inGroup($user, $group)) {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enrolled in the Group'))
                 ->setStatus(404)
                 ->asArray();
