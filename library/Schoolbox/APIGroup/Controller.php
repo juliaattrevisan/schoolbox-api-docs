@@ -13,7 +13,6 @@ namespace Schoolbox\APIGroup;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
-use Schoolbox\APIGroup\ModelToArray;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception;
@@ -116,6 +115,66 @@ class Controller extends Base
         $users_groups = $this->groupsHelper->getGroup($user, $group);
         $apiGroups    = new Collection($users_groups);
         $output       = $apiGroups->map(new ModelToArray());
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
+    }
+
+    /**
+     * updated all group field for a user
+     *
+     * @param User $user
+     * @param Group $group
+     * @api PUT /apigroup/{userId}/groupMembership/{groupId}
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPut
+     */
+    public function apiMembershipPut(User $user, Group $group)
+    {
+        $post = $this->getRequest()->post->getArrayCopy();
+        $post['membership'] = $post['membership'] ?: UserAccess::ACCESS_READ;
+        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
+        $post['isFavourite'] = $post['isFavourite'] ?: false;
+
+        $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
+
+        //get data from save
+        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $apiGroups = new Collection($users_groups);
+        $output = $apiGroups->map(new ModelToArray());
+        //output
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
+    }
+
+    /**
+     * updated selected group field for a user
+     *
+     * @param User $user
+     * @param Group $group
+     * @api PATCH /apigroup/{userId}/groupMembership/{groupId}
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPatch
+     */
+    public function apiMembershipPatch(User $user, Group $group)
+    {
+        $users_group = $this->groupsHelper->getGroup($user, $group)[0];
+        $post = $this->getRequest()->post->getArrayCopy();
+        $post['membership'] = $post['membership'] ?: $users_group['membership'];
+        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: $users_group['isNotificationsOn'];
+        $post['isFavourite'] = $post['isFavourite'] ?: $users_group['isFavourite'];
+
+        //update details
+        $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
+
+        //get data from save
+        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $apiGroups = new Collection($users_groups);
+        $output = $apiGroups->map(new ModelToArray());
+        //output
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output

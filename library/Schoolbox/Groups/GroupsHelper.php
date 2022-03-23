@@ -351,6 +351,28 @@ class GroupsHelper
     }
 
     /**
+     * update params for user / group
+     */
+    public function updateUserGroup(User $user, Group $group, int $membership, bool $isFavourite, bool $isNotificaionsOn)
+    {
+        //find user record
+        $userGroup = $this->userAccessMapper->findOneByColumnList([
+                                                                      'uid' => $user->getId(),
+                                                                      'sid' => $group->getFolder()->getId(),
+                                                                  ]);
+        //update fields
+        $userGroup->setFavourite($isFavourite)
+            ->setAccessLevel($membership);
+
+        $this->userAccessMapper->save($userGroup);
+
+        /**
+         * remove the mute for the user / group this will remove the mute entry from the database.
+         */
+        $this->setNotification($group->getFolder()->getId(), $user, $isNotificaionsOn);
+    }
+
+    /**
      * delete user from group
      */
     public function deleteFromGroup(User $user, Group $group)
