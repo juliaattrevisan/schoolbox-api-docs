@@ -121,7 +121,7 @@ export default {
         <div class="student__code" ref="container">
             <div class="student_code-option empty-state" ref="emptyState"></div>
             <div class="student_code-option qr-code-container" ref="qrCodeContainer">
-                <qrcode-vue :value="qrCodeValue" :size="170" class="qr-code" />
+                <qrcode-vue :value="qrCodeValue" :size="170" level="M" class="qr-code" />
             </div>
         </div>
         <div class="student__details">

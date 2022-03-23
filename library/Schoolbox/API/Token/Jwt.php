@@ -30,7 +30,7 @@ class Jwt
     /**
      * Signing algorithm for JWTs.
      */
-    private const SIGNING_ALGORITHMS = ['RS256', 'HS256'];
+    private const SIGNING_ALGORITHMS = ['RS256', 'ES256'];
 
 
     /**
