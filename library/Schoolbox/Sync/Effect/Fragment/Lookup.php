@@ -11,7 +11,6 @@ namespace Schoolbox\Sync\Effect\Fragment;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ValueLabelInterface;
-use Schoolbox\YearLevel\Model;
 
 /**
  * Class Lookup
@@ -71,9 +70,10 @@ class Lookup
                      * in the ui
                      */
                     $allResults = $mapper->findFolders();
-                } elseif ($userField === 'year') {
+                } elseif (in_array($userField, ['year', 'residentialHouse', 'schoolHouse'])) {
+                    $notSet = ($userField === 'year') ? ($mapper->createModel())->setName('Not Set') : ($mapper->createModel())->setHouse('Not Set');
                     /** @var GenericCollection $allResults */
-                    $allResults = $mapper->createCollection()->add((new Model())->setName('Not Set'));
+                    $allResults = $mapper->createCollection()->add($notSet);
                     $allResults = $allResults->merge($mapper->findAll());
                 } else {
                     $allResults = $mapper->findAll();
