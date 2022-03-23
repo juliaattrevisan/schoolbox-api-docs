@@ -65,7 +65,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
-            $this->injector->get('externalUser'),
             $this->getMapperFactory()->get(UserMapper::class),
         );
     }

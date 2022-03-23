@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
-use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -44,7 +43,6 @@ class Controller extends Base
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper,
-        External_UserInterface $externalUser,
         UserMapper $userMapper
     ) {
         $this->userMapper = $userMapper;
@@ -74,6 +72,11 @@ class Controller extends Base
         $users_groups = $this->groupsHelper->getCurrentGroups($user);
         $apiGroups = new Collection($users_groups);
         $groupsArr = $apiGroups->map(new GroupArray());
+
+        //load parents and students / children for export.
+        $user->loadParents()
+             ->loadStudents();
+
         /**
          * build the whole thing
          */

@@ -35,13 +35,8 @@ class ModelToArray
      * @param GenericCollection|UserAccess[]|array|bool $groups
      * @return array
      */
-    public function __invoke(User $user, $groups = false): array
+    public function __invoke(User $user, $groups = null): array
     {
-        //if no groups were passed through, build the groups including sis groups
-        $groups = $groups ?: $user->getAccessList()->indexBy('serviceIdentifier');
-        //load parents and students / children for export.
-        $user->loadParents()
-            ->loadStudents();
         return [
             'id'     => $user->getId(),
             'campus' => $user->getCampusCollection()

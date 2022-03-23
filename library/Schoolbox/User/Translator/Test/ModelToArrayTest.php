@@ -50,7 +50,6 @@ class ModelToArrayTest extends TestCase
             'role'             => null,
             'groups'           => null,
             'schoolHouse'      => null,
-            'residentialHouse' => null,
             'guardians'        => null,
             'students'         => null,
             'impersonableUser' => null,
@@ -152,10 +151,6 @@ class ModelToArrayTest extends TestCase
                 'schoolHouse'      => [
                     'id'   => 1,
                     'name' => 'School House',
-                ],
-                'residentialHouse' => [
-                    'id'   => 1,
-                    'name' => 'Res House',
                 ],
                 'guardians'        => null,
                 'students'         => null,
