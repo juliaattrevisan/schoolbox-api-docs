@@ -142,6 +142,62 @@ class InvolvedUsers
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
+        /* This is the default scenario for the most part; it's all the events
+         * that $user is usually involved with via sis_class_user
+         */
+        $usualEventIds = $this->generateUsualEventIds($user, $startDatetime, $finishDatetime, $folderCode);
+
+        $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
+
+        /* Find a list of events which have overrides that might affect $user
+         * If there are overrides, process each one specially
+         */
+        $overrideEventIds = $this->generateOverrideEventIds($user, $startDatetime, $finishDatetime, $folderCode);
+
+        /* No overrides? No trabajo
+         */
+        if (!\count($overrideEventIds)) {
+            return $events;
+        }
+
+        /* Figure out the mutations that were specified by the event overrides
+         * and then decide if $user was still involved
+         */
+        $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds);
+
+        foreach ($overrideEvents as $overrideEvent) {
+            $mutatedInvolvements = $this->generateForEvent($overrideEvent);
+
+            /* If you're still in the list after the mutations; pile it into the stack
+             * Otherwise, you aren't involved anymore; remove it from the stack
+             */
+            if (isset($mutatedInvolvements[$user->getExternalId()])) {
+                $events[$overrideEvent->getId()] = $overrideEvent;
+            } else {
+                unset($events[$overrideEvent->getId()]);
+            }
+        }
+
+        return $events;
+    }
+
+
+    /**
+     * Get a list of events between $startDatetime and $finishDatetime
+     * where $user is in the usual involvement list specified by sis_class_user
+     *
+     * Optionally filters to $folderCode
+     *
+     * @param \Schoolbox\User $user
+     * @param string          $startDatetime
+     * @param string          $finishDatetime
+     * @param string|null     $folderCode
+     * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    private function generateUsualEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?string $folderCode = null): array
+    {
         /* Find the list of events where you might be involved normally
          */
         $query = "
@@ -183,14 +239,26 @@ class InvolvedUsers
             $usualEventIds[$row['id']] = $row['id'];
         }
 
-        /* This is the default scenario for the most part; it's all the events
-         * that $user is usually involved with via sis_class_user
-         */
-        $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
+        return $usualEventIds;
+    }
 
-        /* Find a list of events which have overrides that might affect $user
-         * If there are overrides, process each one specially
-         */
+
+    /**
+     * Get a list of events between $startDatetime and $finishDatetime
+     * where each event has some kind of override that can affect $user's
+     * usual involvement via sis_class_user
+     *
+     * Optionally filters to $folderCode
+     *
+     * @param \Schoolbox\User $user
+     * @param string          $startDatetime
+     * @param string          $finishDatetime
+     * @param string|null     $folderCode
+     * @return array
+     * @throws \PDOException
+     */
+    private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?string $folderCode = null): array
+    {
         $query = "
             SELECT se.id
             FROM {$this->eventMapper->getTable()} se 
@@ -227,30 +295,6 @@ class InvolvedUsers
             $overrideEventIds[$row['id']] = $row['id'];
         }
 
-        /* No overrides? No trabajo
-         */
-        if (!\count($overrideEventIds)) {
-            return $events;
-        }
-
-        /* Figure out the mutations that were specified by the event overrides
-         * and then decide if $user was still involved
-         */
-        $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds);
-
-        foreach ($overrideEvents as $overrideEvent) {
-            $mutatedInvolvements = $this->generateForEvent($overrideEvent);
-
-            /* If you're still in the list after the mutations; pile it into the stack
-             * Otherwise, you aren't involved anymore; remove it from the stack
-             */
-            if (isset($mutatedInvolvements[$user->getExternalId()])) {
-                $events[$overrideEvent->getId()] = $overrideEvent;
-            } else {
-                unset($events[$overrideEvent->getId()]);
-            }
-        }
-
-        return $events;
+        return $overrideEventIds;
     }
 }
