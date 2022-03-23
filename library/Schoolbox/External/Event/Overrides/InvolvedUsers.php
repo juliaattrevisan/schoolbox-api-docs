@@ -225,9 +225,9 @@ class InvolvedUsers
         /* Figure out the mutations that were specified by the event overrides
          * and then decide if $user was still involved
          */
-        $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds)->indexBy('id');
+        $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds);
 
-        foreach ($overrideEvents as $eventId => $overrideEvent) {
+        foreach ($overrideEvents as $overrideEvent) {
             $mutatedInvolvements = $this->generateForEvent($overrideEvent);
 
             /* If you're still in the list after the mutations; pile it into the stack
