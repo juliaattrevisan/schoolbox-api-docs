@@ -14,6 +14,7 @@ use DomainException;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
+use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -30,7 +31,7 @@ class Jwt
     /**
      * Signing algorithm for JWTs.
      */
-    private const SIGNING_ALGORITHMS = ['RS256', 'ES256'];
+    private const SIGNING_ALGORITHM = 'RS256';
 
 
     /**
@@ -71,9 +72,9 @@ class Jwt
      *                                   many seconds.
      * @param array                    $additionalClaims Any extra claims to make beyond the
      *                                   standard 'iss', 'sub', 'exp'. 'jti'
-     * @param bool                     $shorten          If true, 'HS256' will be used
+     * @return string
      */
-    public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = [], bool $shorten = false): string
+    public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
@@ -93,7 +94,7 @@ class Jwt
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-            $shorten ? self::SIGNING_ALGORITHMS[1] : self::SIGNING_ALGORITHMS[0]
+            self::SIGNING_ALGORITHM
         );
     }
 
@@ -124,12 +125,9 @@ class Jwt
         // Set leeway for this decode only, set it back once done
         $previousLeeway     = JwtLibrary::$leeway;
         JwtLibrary::$leeway = (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY);
+        $key = new Key($publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), self::SIGNING_ALGORITHM);
         try {
-            return (array)JwtLibrary::decode(
-                $jwt,
-                $publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-                self::SIGNING_ALGORITHMS
-            );
+            return (array)JwtLibrary::decode($jwt, $key);
         } finally {
             JwtLibrary::$leeway = $previousLeeway;
         }
