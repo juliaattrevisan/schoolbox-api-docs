@@ -14,6 +14,7 @@ use DomainException;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
+use Firebase\JWT\Key;
 use Firebase\JWT\SignatureInvalidException;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -124,12 +125,9 @@ class Jwt
         // Set leeway for this decode only, set it back once done
         $previousLeeway     = JwtLibrary::$leeway;
         JwtLibrary::$leeway = (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY);
+        $key = new Key($publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), self::SIGNING_ALGORITHM);
         try {
-            return (array)JwtLibrary::decode(
-                $jwt,
-                $publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-                [self::SIGNING_ALGORITHM]
-            );
+            return (array)JwtLibrary::decode($jwt, $key);
         } finally {
             JwtLibrary::$leeway = $previousLeeway;
         }
