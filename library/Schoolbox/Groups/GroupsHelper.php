@@ -5,6 +5,7 @@ namespace Schoolbox\Groups;
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -465,6 +466,9 @@ class GroupsHelper
             self::MEMBERSHIP_WRITE  => UserAccess::ACCESS_WRITE,
             self::MEMBERSHIP_ADMIN  => UserAccess::ACCESS_FULL,
         ];
+        if (!isset($membershipArray[$membership])) {
+            throw new SchoolboxException("Incorrect membership value");
+        }
         return $membershipArray[$membership];
     }
 
@@ -499,6 +503,9 @@ class GroupsHelper
             self::PENDING       => UserAccess::ACCESS_AWAITING_AUTHORISATION,
             self::ENROLLED      => UserAccess::ACCESS_READ,
         ];
+        if (!isset($enrolmentArray[$enrolment])) {
+            throw new SchoolboxException("Incorrect enrolment value");
+        }
         return $enrolmentArray[$enrolment];
     }
 
@@ -514,8 +521,10 @@ class GroupsHelper
                 return UserAccess::ACCESS_WRITE;
             case 'read':
                 return UserAccess::ACCESS_READ;
-            default:
+            case 'none':
                 return UserAccess::ACCESS_DENY;
+            default:
+                throw new SchoolboxException("Incorrect membership value");
         }
     }
 }
