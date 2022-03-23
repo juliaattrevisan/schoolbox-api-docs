@@ -432,6 +432,8 @@ class Controller extends Base
 //                return;
 //                $launch_data['contentUrl'] = $embedUrl;
             }
+        } else {
+            $embedUrl = null;
         }
 
         // Define allowed return types from LTI providers
@@ -517,7 +519,7 @@ class Controller extends Base
             array_push($launch_params, $key . "=" . rawurlencode($launch_data[$key]));
         }
 
-        $base_string = "POST&" . urlencode($embedUrl) . "&" . rawurlencode(implode("&", $launch_params));
+        $base_string = "POST&" . urlencode($embedUrl ?? $provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
         $secret      = urlencode($provider->getSecret()) . "&";
         $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
 
