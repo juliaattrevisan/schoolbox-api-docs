@@ -292,6 +292,10 @@ class Controller extends Base
                             break;
                         }
                     }
+                    if (isset($item['url'])) {
+                        $targetUrl = $item['url'];
+                        break;
+                    }
                 }
             }
 
