@@ -103,7 +103,7 @@ class Controller extends Base
         // Which variant is being shown?
         // * text
         // * upload
-        $momentType = $this->request->query->get('momentType');
+        $momentType = $this->request->query->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
         $params = [
             'users'                    => $users,
