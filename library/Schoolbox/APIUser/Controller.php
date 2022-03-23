@@ -131,9 +131,13 @@ class Controller extends Base
         /**
          * build the user Model object from the POST data
          */
+        //set default fields
+        $newuser->setEnabled(false);
+        $newuser->setSuperuser(false);
+
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $newuser);
-        $model->setEnabled(true);
+
         $this->userMapper->save($model);
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
