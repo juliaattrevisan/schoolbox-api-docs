@@ -73,10 +73,12 @@ class Module extends BaseModule
                     /** @var SitePage $page */
                     $page = $this->injector->get('sitePage');
 
-                    $factory   = new Component_Homepage_Factory(new User(), $page);
-                    $component = $componentInstanceMapper->findByInstanceId($params['componentId']);
+                    $factory        = new Component_Homepage_Factory(new User(), $page);
+                    $componentModel = $componentInstanceMapper->findByInstanceId($params['componentId']);
+                    $component      = $factory->buildComponent($componentModel);
+                    $component->setup($folderMapper->findById($componentModel->getIdentifier()));
 
-                    $returnArray['component'] = $factory->buildComponent($component);
+                    $returnArray['component'] = $component;
                 }
 
                 // Preload folder

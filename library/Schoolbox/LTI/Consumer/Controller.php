@@ -331,6 +331,10 @@ class Controller extends Base
         // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
         // javascript inside this template updates these in the DOM.
 
+        // Shouldn't this redir to the launch URL instead?
+        // That "works" for Google Assignments LTI, but not for the YouTube etc.
+        // components, which post a link back directly.
+
         $this->getResponse()->content->set([
             'template' => '@ltiConsumer/redirect.twig',
             'format'   => 'nochrome',
@@ -338,6 +342,11 @@ class Controller extends Base
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'url'            => $targetUrl,
+                'iframeUrl'      => $this->router->generate('ltiConsumer.getLaunch', [
+                    'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+                    'componentId'  => $component->getInstance()->getId(),
+                    'folderId'     => $component->getContext()->getId(),
+                ]),
                 'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
@@ -554,40 +563,40 @@ class Controller extends Base
         // and it will just redirect to the target URL. The only real difference at this point
         // is that the return parameter names differ slightly.
 
-        $url    = null;
         $height = null;
-        $title  = null;
-
         switch ($return_type) {
             case self::LTI_RETURN_TYPE_IFRAME:
-                $url    = $get['url'];
-                $title  = $get['title'];
-                $height = $get['height'];
+                $url       = $get['url'];
+                $iframeUrl = $url;
+                $title     = $get['title'];
+                $height    = $get['height'];
                 break;
 
             case self::LTI_RETURN_TYPE_URL:
-                $url   = $get['url'];
-                $title = $get['text'];
-                break;
-
             case self::LTI_RETURN_TYPE_FILE:
-                $url   = $get['url'];
-                $title = $get['text'];
+                $url       = $get['url'];
+                $iframeUrl = $url;
+                $title     = $get['text'];
                 break;
 
             case self::LTI_RETURN_TYPE_IMAGE:
-                $url    = $get['url'];
-                $title  = $get['text'];
-                $height = $get['height'];
+                $url       = $get['url'];
+                $iframeUrl = $url;
+                $title     = $get['text'];
+                $height    = $get['height'];
                 break;
 
             case self::LTI_RETURN_TYPE_LAUNCH:
-                $url   = $get['url'];
-                $title = $get['text'];
+                $url       = $get['url'];
+                $iframeUrl = $this->router->generate('ltiConsumer.getLaunch', [
+                    'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+                    'componentId'  => $component->getInstance()->getId(),
+                    'folderId'     => $component->getContext()->getId(),
+                ]);
+                $title     = $get['text'];
                 break;
 
             // Throw an exception error if we receive an unknown
-
             default:
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -620,6 +629,7 @@ class Controller extends Base
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
                 'url'            => $url,
+                'iframeUrl'      => $iframeUrl,
                 'height'         => $height,
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
