@@ -37,10 +37,10 @@ class Factory
         $rubricData   = reset($postData);
 
         $assessment    = $grid->getAssessment();
-        $levels        = $rubricData['level']      ?: [];
-        $capabilities  = $rubricData['group']      ?: [];
-        $indicators    = $rubricData['criterion']  ?: [];
-        $descriptors   = $rubricData['descriptor'] ?: [];
+        $levels        = $rubricData['level']      ?? [];
+        $capabilities  = $rubricData['group']      ?? [];
+        $indicators    = $rubricData['criterion']  ?? [];
+        $descriptors   = $rubricData['descriptor'] ?? [];
         $usesMarkRange = false;
         $markPerCap    = false;
 

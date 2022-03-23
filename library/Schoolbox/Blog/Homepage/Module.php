@@ -106,12 +106,12 @@ class Module extends BaseModule
         // Allow any user who owns either the blog or comment to do stuff
         $ownershipRule = new Rule\Callback(
             function ($params, User $user) {
-                if ($params['blog'] instanceof BlogModel) {
+                if (($params['blog'] ?? null) instanceof BlogModel) {
                     if ($params['blog']->getOwner()->getId() == $user->getId()) {
                         return;
                     }
                 }
-                if ($params['comment'] instanceof BlogCommentModel) {
+                if (($params['comment'] ?? null) instanceof BlogCommentModel) {
                     if ($params['comment']->getOwner()->getId() == $user->getId()) {
                         return;
                     }
@@ -123,10 +123,10 @@ class Module extends BaseModule
         $permissionRule = new Rule\HasHomepageAccess(
             $accessLevel,
             function ($params) {
-                if ($params['folder'] instanceof Folder) {
+                if (($params['folder'] ?? null) instanceof Folder) {
                     return $params['folder']->getId();
                 }
-                if ($params['blog'] instanceof BlogModel) {
+                if (($params['blog'] ?? null) instanceof BlogModel) {
                     return $params['blog']->getFolder()->getId();
                 }
                 return null;

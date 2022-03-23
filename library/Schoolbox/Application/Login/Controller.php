@@ -138,13 +138,14 @@ class Controller extends Base
      */
     public function postLogin(): void
     {
-        $username = trim($this->getRequest()->post['username']);
-        $password = $this->getRequest()->post['password'];
-        $page = $this->getRequest()->post['page'];
+        $username = trim($this->request->post->get('username', ''));
+        $password = $this->request->post->get('password', '');
+        $page = $this->request->post->get('page');
         $pageUri = new Uri($page);
-        $tandc = $this->getRequest()->post['tandc'] === '1';
-        $remember = $this->getRequest()->post['rememberme'] === '1';
+        $tandc = $this->request->post->get('tandc') === '1';
+        $remember = $this->request->post->get('rememberme') === '1';
 
+        $message = '';
         if (strlen($username) && strlen($password)) {
             $sessionHandler = new Session();
 

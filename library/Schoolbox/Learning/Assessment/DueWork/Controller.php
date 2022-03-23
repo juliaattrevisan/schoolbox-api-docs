@@ -985,8 +985,8 @@ class Controller extends Assessment\Controller
         /* Set in javascript when automatically saving a draft
          * Careful the negation
          */
-        $isFinal = !$rq->post['saveDraft'];
-        $body    = $rq->post['body'];
+        $isFinal = !$rq->post->get('saveDraft');
+        $body    = $rq->post->get('body');
 
         /* Determine whether a finalised submission could be initialised
          * Check that you don't exceed the specified rate limit
@@ -1006,9 +1006,9 @@ class Controller extends Assessment\Controller
             }
         }
 
-        if ($rq->post['responseId']) {
+        if ($rq->post->get('responseId')) {
             // Load an existing response to update
-            $response = $this->dueWorkResponseMapper->findById($rq->post['responseId']);
+            $response = $this->dueWorkResponseMapper->findById($rq->post->get('responseId'));
 
             /* @var Response\Model $response */
             //check if $response has already been finalised, if so error
@@ -1038,10 +1038,10 @@ class Controller extends Assessment\Controller
 
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
-        if (!empty($rq->post['attachment'])) {
+        if (!empty($rq->post->get('attachment'))) {
             // Validate attachment list can actually be built
             try {
-                $attachments = $factory->build($rq->post['attachment'])->getAll();
+                $attachments = $factory->build($rq->post->get('attachment'))->getAll();
             } catch (InvalidArgumentException $e) {
                 $errorMessage = 'One or more files were not able to be attached';
                 $redirect     = $this->getRouter()->generate(
@@ -1122,9 +1122,9 @@ class Controller extends Assessment\Controller
             // recognised yet.
             $assessment  = $this->participantMapper->loadParticipationIntoAssessment($assessment);
             $participant = $assessment->getParticipant($student);
-            $comment     = $rq->post['comment'];
+            $comment     = $rq->post->get('comment');
             // There might not be a mark: due works may have mark type none, in which case no mark will be posted
-            $mark = $rq->post['mark'] ?? null;
+            $mark = $rq->post->get('mark') ?? null;
             // Awful hack because feedback factory expects a string (which it immediately casts to a bool) >.<
             $publish = $isFinal ? '1' : '0';
             // This gets used to decide whether to create a new feedback, or update an existing one

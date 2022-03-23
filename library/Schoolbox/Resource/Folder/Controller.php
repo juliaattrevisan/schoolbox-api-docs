@@ -791,7 +791,7 @@ class Controller extends BaseController
         // No changes in "KEEP_EXISTING" case
 
         // is 'Create Group' set true?
-        if ($postData['groupcheck']) {
+        if ($postData['groupcheck'] ?? false) {
             // Prevent students with write access from being able to create folders
             if ($this->roleAccessMapper->roleMayOwnFolders($user->getRole())) {
                 // Setup group and forward to group management page

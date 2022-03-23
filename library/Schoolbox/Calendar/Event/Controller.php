@@ -574,24 +574,24 @@ class Controller extends Base
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $folders     = $this->request->post['folder'] ? array_map('intval', $this->request->post['folder']) : [];
-        $campuses    = $this->request->post['campus'] ? array_map('intval', $this->request->post['campus']) : [];
-        $accessLevel = (int)$this->request->post['level'];
-        $eventTypeId = (int)$this->request->post['type'];
-        $title       = $this->request->post['title'];
-        $location    = $this->request->post['location'];
-        $detail      = $this->request->post['detail'];
-        $allDay      = (int)$this->request->post['allDay'];
+        $folders     = array_map('intval', $this->request->post['folder'] ?? []);
+        $campuses    = array_map('intval', $this->request->post['campus'] ?? []);
+        $accessLevel = (int)($this->request->post['level'] ?? null);
+        $eventTypeId = (int)($this->request->post['type'] ?? null);
+        $title       = $this->request->post['title'] ?? null;
+        $location    = $this->request->post['location'] ?? null;
+        $detail      = $this->request->post['detail'] ?? null;
+        $allDay      = (int)($this->request->post['allDay'] ?? null);
         $roles       = $this->request->post['roles'] ?? [];
 
         /* Recurrence settings
          */
-        $efficacy = $this->request->post['efficacy'];
-        $repeat   = $this->request->post['repeat'];
+        $efficacy = $this->request->post['efficacy'] ?? null;
+        $repeat   = $this->request->post['repeat'] ?? null;
 
         /* Redirects
          */
-        $returnUrl = '' !== (string)$this->request->query['returnUrl'] ? $this->request->query['returnUrl'] : Redirect::encode('/calendar');
+        $returnUrl = $this->request->query['returnUrl'] ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -609,18 +609,18 @@ class Controller extends Base
          */
         $publishDate = null;
 
-        if ('' !== $this->request->post['publishDate']) {
+        if ('' !== ($this->request->post['publishDate'] ?? '')) {
             $publishDate = Alaress_Date_Format::newLocal($this->request->post['publishDate']);
         }
 
         /* Start and end dates
          */
         if ($allDay === Event::ALL_DAY) {
-            $startDate = Alaress_Date_Format::newLocalShort($this->request->post['startDate'])->startOfDay();
-            $endDate   = Alaress_Date_Format::newLocalShort($this->request->post['endDate'])->endOfDay();
+            $startDate = Alaress_Date_Format::newLocalShort($this->request->post['startDate'] ?? '')->startOfDay();
+            $endDate   = Alaress_Date_Format::newLocalShort($this->request->post['endDate'] ?? '')->endOfDay();
         } else {
-            $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate']);
-            $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate']);
+            $startDate = Alaress_Date_Format::newLocal($this->request->post['startDate'] ?? '');
+            $endDate   = Alaress_Date_Format::newLocal($this->request->post['endDate'] ?? '');
         }
 
         /* All events recur, due to the dropdown "Repeat" always being set.
@@ -632,7 +632,7 @@ class Controller extends Base
          * if it does not, or if it is malformed (ddmm/yyyy, dd/mmyyyy) just set the repeat date till the endDay->endOfDay
          */
         try {
-            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'])->endOfDay();
+            $untilDate = Alaress_Date_Format::newLocalShort($this->request->post['repeat_until'] ?? '')->endOfDay();
         } catch (\Carbon\Exceptions\InvalidFormatException $e) {
             $untilDate = (clone $endDate)->endOfDay();
         }
@@ -651,9 +651,11 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance    = (int)$this->request->post['attendance'];
-        $maxAttendees  = '' === $this->request->post['maxAttendees'] ? null : (int)$this->request->post['maxAttendees'];
-        $showAttendees = (bool)$this->request->post['showAttendees'];
+        $attendance    = (int)($this->request->post['attendance'] ?? '');
+        $maxAttendees  = '' === ($this->request->post['maxAttendees'] ?? '')
+            ? null
+            : (int)$this->request->post['maxAttendees'];
+        $showAttendees = (bool)($this->request->post['showAttendees'] ?? '');
 
         // As of SA-10697 attendances are not reset on changing event time.
         // Prior to that, they were reset if the start or end time of the event changed.
@@ -664,7 +666,7 @@ class Controller extends Base
         $guests = [];
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if ('' !== (string)$this->request->post['guests']) {
+            if ('' !== (string)($this->request->post['guests'] ?? '')) {
                 $guests = explode(',', $this->request->post['guests']);
             }
         }

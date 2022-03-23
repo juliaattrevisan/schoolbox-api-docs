@@ -156,39 +156,39 @@ class Factory
      */
     public function __construct(User $creator, $post, $assessmentType, ?IAssessable $original)
     {
-        $this->setAssessmentType(trim($post['assessmentType']));
-        $this->setContext($post['context']);
-        $this->setTitle(trim($post['title']));
-        $this->setWorkType(trim($post['workType']));
-        $this->setDescription(trim($post['description']));
+        $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
+        $this->setContext($post['context'] ?? '');
+        $this->setTitle(trim($post['title'] ?? ''));
+        $this->setWorkType(trim($post['workType'] ?? ''));
+        $this->setDescription(trim($post['description'] ?? ''));
         $this->setCreator($creator);
-        $this->setWeight(trim($post['weight']));
-        $this->setCurriculumNodes($post['curriculumCodes']);
+        $this->setWeight(trim($post['weight'] ?? ''));
+        $this->setCurriculumNodes($post['curriculumCodes'] ?? []);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
-        $this->setCourseManaged((bool)$post['courseManaged']);
-        $this->setSebEnabled((bool)$post['sebEnabled']);
-        $this->setPublishAt(trim($post['publishDate']));
-        $this->setOpenAt(trim($post['openDate']));
-        $this->setDueAt(trim($post['dueDate']));
-        $this->setCloseAt(trim($post['closeDate']));
+        $this->setCourseManaged((bool)($post['courseManaged'] ?? ''));
+        $this->setSebEnabled((bool)($post['sebEnabled'] ?? ''));
+        $this->setPublishAt(trim($post['publishDate'] ?? ''));
+        $this->setOpenAt(trim($post['openDate'] ?? ''));
+        $this->setDueAt(trim($post['dueDate'] ?? ''));
+        $this->setCloseAt(trim($post['closeDate'] ?? ''));
 
         /* Projects need this to instantiate
          */
-        $this->setSummator($post['summator']);
+        $this->setSummator($post['summator'] ?? '');
 
         /* Due Work needs this to instantiate correctly
          */
-        $this->setAcceptOnline(trim($post['acceptOnline']));
-        $this->setWorkType(trim($post['workType']));
-        $markType = trim($post['markType']);
+        $this->setAcceptOnline(trim($post['acceptOnline'] ?? ''));
+        $this->setWorkType(trim($post['workType'] ?? ''));
+        $markType = trim($post['markType'] ?? '');
         $this->setMarkType($markType);
-        $this->setGradingScheme(trim($post['gradingScheme']));
-        $this->setUseRubric(trim($post['useRubric']));
+        $this->setGradingScheme(trim($post['gradingScheme'] ?? ''));
+        $this->setUseRubric(trim($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
-        $this->setCapabilityMarkType((int)trim($post['capability-markType']));
-        $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme']));
-        $this->setUseMarkRange(trim($post['useMarkRange']) === 'on');
+        $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
+        $this->setCapabilityGradeGroup((int)trim($post['capability-gradingScheme'] ?? ''));
+        $this->setUseMarkRange(trim($post['useMarkRange'] ?? '') === 'on');
 
         // Only due works have a max mark.
         if ($assessmentType === AssessmentType::TYPE_DUE_WORK) {
@@ -202,7 +202,7 @@ class Factory
                     $maxMark = null;
                     break;
                 default:
-                    $maxMark = (float)trim($post['maxMark']);
+                    $maxMark = (float)trim($post['maxMark'] ?? '');
                     break;
             }
 
@@ -221,27 +221,28 @@ class Factory
             $this->setSelfReviewable(null);
         }
 
+        // TODO what should this be?
         $this->setRubricData($post[$post['formField']]);
 
         /* Check if any attached files existed in POST data
          * Use their array if it existed
          */
-        if (is_array($post['attachment'])) {
+        if (is_array($post['attachment'] ?? null)) {
             $this->setAttachedFiles($post['attachment']);
         }
 
         /* Task needs this to instantiate correctly
          */
-        $this->setHasSelfAssessed(trim($post['hasSelfAssessed']));
-        $this->setUrl(trim($post['url']));
+        $this->setHasSelfAssessed(trim($post['hasSelfAssessed'] ?? ''));
+        $this->setUrl(trim($post['url'] ?? ''));
 
         /* Quiz needs this to instantiate correctly
          */
-        $this->setDurationHours(trim($post['durationHours']));
-        $this->setDurationMinutes(trim($post['durationMinutes']));
-        $this->setMaxAttempts(intval($post['maxAttempts']));
-        $this->setMarkVisibility(intval($post['visibility']));
-        $this->setCompletionMessage($post['completion_message']);
+        $this->setDurationHours(trim($post['durationHours'] ?? 0));
+        $this->setDurationMinutes(trim($post['durationMinutes'] ?? 0));
+        $this->setMaxAttempts(intval($post['maxAttempts'] ?? 0));
+        $this->setMarkVisibility(intval($post['visibility'] ?? 0));
+        $this->setCompletionMessage($post['completion_message'] ?? '');
 
         // LTI needs this to instantiate correctly
         $this->setLtiAssessmentUrl($post['ltiAssessmentUrl'] ?? null);

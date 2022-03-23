@@ -467,7 +467,7 @@ class Controller extends BaseController
         // same assessment in both retrieveGrid calls the current grid thinks
         // the current assessment state is the same as the proposed state.
         $proposedAssessment = (clone $currentAssessment)
-            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)$this->request->post['capability-markType']))
+            ->setCapabilityMarkType($this->markTypeMapper->createModel()->setId((int)($this->request->post['capability-markType'] ?? '')))
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
         $proposedGrid = (new GridFactory())->buildFromPostData(
             $this->mapper->retrieveGrid($proposedAssessment, false),

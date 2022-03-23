@@ -33,7 +33,7 @@ class CanModerateItem implements Rule\IAuthorizationRule
     {
         // Authorize results should be cached, as hitting DB for each perm
         // check is expensive.
-        if ($params['item'] instanceof Model) {
+        if (($params['item'] ?? null) instanceof Model) {
             // search for item
             foreach ($params['item']->getModeratorList() as $moderator) {
                 if ($moderator->getId() == $user->getId()) {
