@@ -435,11 +435,12 @@ class Controller extends Base
 
                     $launch_data['contentUrl'] = $embedUrl;
                 }
-//            } else {
+            } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
+                // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
-//                $this->response->redirect->to($embedUrl);
-//                return;
-//                $launch_data['contentUrl'] = $embedUrl;
+                // (The return type from getComponentCallback probably matters here)
+                $this->response->redirect->to($embedUrl);
+                return;
             }
         } else {
             $embedUrl = null;
