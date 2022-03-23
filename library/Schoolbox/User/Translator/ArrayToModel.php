@@ -4,7 +4,11 @@ namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\RoleMapper;
 use Schoolbox\YearLevel\Mapper;
 
@@ -41,15 +45,22 @@ class ArrayToModel extends Base
             } elseif ('email' === $label) {
                 //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             } elseif ('role' === $label) {
-                $role = $roleMapper->findByName($value);
-                $model->getRole()->setId($role->first()->getId());
+                $model->getRole()->setId($value);
             } elseif ('campus' === $label) {
                 //build the campus
-                $model->setCampusCollection($campusMapper->findByColumn('name', $value));
+                $model->setCampusCollection(new GenericCollection(Campus::class));
+                foreach ($value as $campusId) {
+                    try {
+                        $campus = $campusMapper->findById($campusId);
+                    } catch (NotFound | Deleted $e) {
+                        throw new SchoolboxException("Campus '$campusId' Not Found or has been Deleted");
+                    }
+                    $model->getCampusCollection()->add($campus);
+                }
             } elseif ('yearLevel' === $label) {
                 //find the year level or set to null.
                 try {
-                    $model->setYear($yearLevelMapper->findByColumn('name', $value)->first());
+                    $model->setYear($yearLevelMapper->findById($value));
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     /* noop - went looking for a deleted or nonexistent year_id
                      * just use null
@@ -57,7 +68,7 @@ class ArrayToModel extends Base
                     $model->setYear(null);
                 }
             } elseif ('schoolHouse' === $label) {
-                $model->setSchoolHouse($houseMapper->findByColumn('house', $value)->first());
+                $model->setSchoolHouse($houseMapper->findById($value));
             } elseif ('flags' === $label) {
                     //set all the flags...
                     $model->setWebmail($value['showWebmailTab'])
