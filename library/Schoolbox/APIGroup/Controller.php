@@ -159,7 +159,7 @@ class Controller extends Base
         $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? UserAccess::ACCESS_READ;
+        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
 
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
@@ -196,9 +196,10 @@ class Controller extends Base
 
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
-        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: $users_group['membership'];
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: $users_group['isNotificationsOn'];
-        $post['isFavourite'] = $post['isFavourite'] ?: $users_group['isFavourite'];
+        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $users_group['membership']);
+        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? $users_group['isNotificationsOn'];
+        $post['isFavourite'] = $post['isFavourite'] ?? $users_group['isFavourite'];
+        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? $users_group['enrolmentStatus']);
 
         //update details
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
