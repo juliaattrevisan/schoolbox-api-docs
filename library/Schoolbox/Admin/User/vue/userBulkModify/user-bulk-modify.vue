@@ -136,7 +136,7 @@ export default {
                         return row.campuses.join(', ');
                     },
                     token: (h, row, index) => {
-                        return row.token !== null ? 'Set' : 'Not set';
+                        return row.token === '1' ? 'Set' : 'Not set';
                     },
                     eportfolio_enabled: (h, row, index) => {
                         return row.eportfolio_enabled === '1' ? 'Enabled' : 'Disabled';
