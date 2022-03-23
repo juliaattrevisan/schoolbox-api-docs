@@ -47,6 +47,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var int
+     */
+    private int $sequence;
+
+
+    /**
      * @return int|null
      */
     public function getEventId(): ?int
@@ -102,6 +108,26 @@ class Model implements ISoftDeletable
     public function setAction(?string $action): self
     {
         $this->action = $action;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSequence(): int
+    {
+        return $this->sequence;
+    }
+
+
+    /**
+     * @param int $sequence
+     * @return Model
+     */
+    public function setSequence(int $sequence): self
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }

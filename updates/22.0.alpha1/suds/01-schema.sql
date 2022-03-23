@@ -21,6 +21,7 @@ CREATE TABLE `sis_event_user_overrides` (
   `event_id` INT NOT NULL,
   `external_id` VARCHAR(255) NULL,
   `action` ENUM('clear', 'add', 'subtract') NULL DEFAULT 'add',
+  `sequence` INT NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL);
