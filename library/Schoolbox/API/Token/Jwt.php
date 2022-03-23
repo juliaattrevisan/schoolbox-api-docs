@@ -30,7 +30,7 @@ class Jwt
     /**
      * Signing algorithm for JWTs.
      */
-    private const SIGNING_ALGORITHM = 'RS256';
+    private const SIGNING_ALGORITHMS = ['RS256', 'HS256'];
 
 
     /**
@@ -71,9 +71,9 @@ class Jwt
      *                                   many seconds.
      * @param array                    $additionalClaims Any extra claims to make beyond the
      *                                   standard 'iss', 'sub', 'exp'. 'jti'
-     * @return string
+     * @param bool                     $shorten          If true, 'HS256' will be used
      */
-    public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
+    public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = [], bool $shorten = false): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
@@ -93,7 +93,7 @@ class Jwt
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-            self::SIGNING_ALGORITHM
+            $shorten ? self::SIGNING_ALGORITHMS[1] : self::SIGNING_ALGORITHMS[0]
         );
     }
 
@@ -128,7 +128,7 @@ class Jwt
             return (array)JwtLibrary::decode(
                 $jwt,
                 $publicKey ?? $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-                [self::SIGNING_ALGORITHM]
+                self::SIGNING_ALGORITHMS
             );
         } finally {
             JwtLibrary::$leeway = $previousLeeway;

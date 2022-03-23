@@ -164,7 +164,9 @@ class Controller extends Base
                 $params['jwt'] = $this->tokenBuilder->generate(
                     $user,
                     $expiry,
-                    $userJwtId->getJwtId()
+                    $userJwtId->getJwtId(),
+                    [],
+                    true
                 );
             }
             $students[] = [
