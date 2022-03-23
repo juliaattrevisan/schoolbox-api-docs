@@ -142,12 +142,27 @@ class Controller extends Base
         }
 
         $post = json_decode(json_encode($this->request->content->get()), true);
-        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership']) ?: UserAccess::ACCESS_READ;
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?: false;
-        $post['isFavourite'] = $post['isFavourite'] ?: false;
+        /**
+         * check post array if missing any, lets error out...
+         */
+        if (
+            !isset($post['membership'], $post['isNotificationsOn'], $post['isFavourite'])
+        ) {
+            $problem = (new ApiProblem('Not all fields are filled'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the api does not have enough data to work correctly.
+        }
+
+        $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
+        $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
+        $post['isFavourite'] = $post['isFavourite'] ?? false;
+        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? UserAccess::ACCESS_READ;
 
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
-
+        $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
         //get data from save
         $users_groups = $this->groupsHelper->getGroup($user, $group);
         $apiGroups = new Collection($users_groups);
