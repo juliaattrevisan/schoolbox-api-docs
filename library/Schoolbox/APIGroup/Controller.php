@@ -107,7 +107,7 @@ class Controller extends Base
         $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? UserAccess::ACCESS_READ;
+        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);

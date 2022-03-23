@@ -430,6 +430,10 @@ class GroupsHelper
 
     /**
      * convert membership string to membership int for DB use
+     * MEMBERSHIP_NONE      => UserAccess::ACCESS_DENY
+     * MEMBERSHIP_READ      => UserAccess::ACCESS_READ
+     * MEMBERSHIP_WRITE     => UserAccess::ACCESS_WRITE
+     * MEMBERSHIP_ADMIN     => UserAccess::ACCESS_FULL
      */
     public static function getMembershipInt(string $membership): int
     {
@@ -444,6 +448,10 @@ class GroupsHelper
 
     /**
      * convert membership int to membership string for json use
+     * UserAccess::ACCESS_DENY     => MEMBERSHIP_NONE
+     * UserAccess::ACCESS_READ     => MEMBERSHIP_READ
+     * UserAccess::ACCESS_WRITE    => MEMBERSHIP_WRITE
+     * UserAccess::ACCESS_FULL     => MEMBERSHIP_ADMIN
      */
     public static function getMembershipString(int $membership): string
     {
@@ -458,6 +466,9 @@ class GroupsHelper
 
     /**
      * convert enrolment string to enrolment int for DB use
+     * notEnroled   => UserAccess::ACCESS_DENY
+     * pending      => UserAccess::ACCESS_AWAITING_AUTH
+     * enroled      => UserAccess::ACCESS_READ
      */
     public static function getEnrolmentInt(string $enrolment): int
     {
