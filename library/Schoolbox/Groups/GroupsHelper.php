@@ -131,7 +131,7 @@ class GroupsHelper
              */
             $forced = false;
             if (null !== $grp) {
-                $forced = $grp->getForceFollow() || in_array($folder->getId(), $muted['disabled']);
+                $forced = $grp->getForceFollow();
             }
 
             $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
