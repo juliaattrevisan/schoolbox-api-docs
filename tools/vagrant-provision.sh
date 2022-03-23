@@ -443,6 +443,26 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Stopping task daemon service";
+taskd_container_ids="$(docker ps -f alaress/taskd:latest -q)"
+if [[ -n $taskd_container_ids ]]; then
+  echo -e "$taskd_container_ids" | xargs docker stop
+fi
+
+# The task daemon needs a dockerhub access token, as it is a private repo
+accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
+if [[ -z $accessToken ]]; then
+  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Dockerhub access token from .env environment file: not starting task daemon!";
+else
+  # Docker login needs the `pass` package to actually accept a password,
+  # otherwise this error gets raised:
+  # "Cannot autolaunch D-Bus without X11 $DISPLAY"
+  apt install -y pass
+  echo $accessToken | docker login -u alaress --password-stdin
+  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+  docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
+fi
+
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];
 then

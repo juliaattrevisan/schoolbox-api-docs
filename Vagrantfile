@@ -187,7 +187,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "'#{data_source}' '#{data_filename}' '#{external_db}' '#{external_db_host}' '#{external_db_db}' '#{enable_xdebug}' '#{instance_id_env_var}' '#{force_upgrade}' '#{instance_registry_url_override}' '#{extra_hostname}' '#{primary_php_majver}'"
+    s.args = \
+        "'#{data_source}' " \
+        + "'#{data_filename}' " \
+        + "'#{external_db}' " \
+        + "'#{external_db_host}' " \
+        + "'#{external_db_db}' " \
+        + "'#{enable_xdebug}' " \
+        + "'#{instance_id_env_var}' " \
+        + "'#{force_upgrade}' " \
+        + "'#{instance_registry_url_override}' " \
+        + "'#{extra_hostname}' " \
+        + "'#{primary_php_majver}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 end
