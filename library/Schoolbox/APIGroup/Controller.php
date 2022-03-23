@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\APIGroup\ModelToArray;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Group;
@@ -74,6 +75,7 @@ class Controller extends Base
             )
         );
     }
+
     /**
      * adds a user into a group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
@@ -104,20 +106,44 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the api does not have enough data to work correctly.
         }
-        $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
+        $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
-        $post['isFavourite'] = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
+        $post['isFavourite']       = $post['isFavourite'] ?? false;
+        $post['enrolmentStatus']   = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
         $users_groups = $this->groupsHelper->getGroup($user, $group);
-        $apiGroups = new Collection($users_groups);
-        $output = $apiGroups->map(new ModelToArray());
+        $apiGroups    = new Collection($users_groups);
+        $output       = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
             )
         );
+    }
+
+    /**
+     * Deletes a user's group membership
+
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPatch
+     */
+    public function apiMembershipDelete(User $user, Group $group)
+    {
+        try {
+            $this->groupsHelper->deleteFromGroup($user, $group);
+            $this->getResponse()->status->setCode(204);
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    'The User was removed from the group successfully.'
+                )
+            );
+        } catch (Exception $e) {
+            $problem = (new ApiProblem('Unable to remove the user from the group.'))
+                ->setStatus(400)
+                ->asArray();
+            $this->getResponse()->status->setCode(400);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+        }
     }
 }
