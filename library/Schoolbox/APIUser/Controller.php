@@ -94,20 +94,13 @@ class Controller extends Base
      * Deletes a user object
      *
      * @param User $user
-     * @api DELETE /user/{userId}
+     * @throws \Schoolbox\Mapper\Exception
      * @link http://api.schoolbox.com.au/#operation/userDelete
+     * @api  DELETE /user/{userId}
      */
     public function apiUserDelete(User $user)
     {
-        try {
-            $this->userMapper->delete($user);
-            $this->getResponse()->status->setCode(204);
-        } catch (Exception $e) {
-            $problem = (new ApiProblem('Unable to delete the user.'))
-                ->setStatus(400)
-                ->asArray();
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-        }
+        $this->userMapper->delete($user);
+        $this->getResponse()->status->setCode(204);
     }
 }
