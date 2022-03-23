@@ -100,10 +100,6 @@ class InvolvedUsers
             $usualUsers[$involvement->getExternalId()] = $involvement->getExternalId();
         }
 
-        /* Remember a new set
-         */
-        $stack = $usualUsers;
-
         /* Find the overrides
          */
         $overrides = $this->overrideMapper->findForEvent($event->getId());
@@ -113,15 +109,15 @@ class InvolvedUsers
         /** @var \Schoolbox\External\Event\Overrides\Model $override */
         foreach ($overrides as $override) {
             if (Model::SUBTRACT === $override->getAction()) {
-                unset($stack[$override->getUser()->getExternalId()]);
+                unset($usualUsers[$override->getUser()->getExternalId()]);
             } elseif (Model::ADD === $override->getAction()) {
-                $stack[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
+                $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
             } elseif (Model::CLEAR === $override->getAction()) {
-                $stack = [];
+                $usualUsers = [];
             }
         }
 
-        return $stack;
+        return $usualUsers;
     }
 
 
