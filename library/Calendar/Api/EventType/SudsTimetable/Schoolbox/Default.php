@@ -151,7 +151,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
          * or they've been mutated into said list via overrides
          */
         $timetableEvents = $generator->generateForUser(
-            $this->userMapper->findByExternalId($this->getUser()->getExternalId()),
+            $this->getUser(),
             $startTimestamp,
             $endTimestamp
         );

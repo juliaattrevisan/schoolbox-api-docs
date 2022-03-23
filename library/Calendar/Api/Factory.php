@@ -140,9 +140,9 @@ class Calendar_Api_Factory
      * Handles construction logic for a folder-specific variant of the calendar
      * connector.
      *
-     * @param int  $folderId
-     * @param User $user
-     * @param User $viewer
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param User                             $user
+     * @param User                             $viewer
      * @return Calendar_Api_EventType_Interface
      */
     public function produceForFolder(\Schoolbox\Resource\Folder\Model $folder, User $user, User $viewer): Calendar_Api_EventType_Interface
