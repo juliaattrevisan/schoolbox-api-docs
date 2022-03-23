@@ -426,10 +426,11 @@ class Controller extends Base
 
                     $launch_data['contentUrl'] = $embedUrl;
                 }
-            } else {
+//            } else {
                 // Maintain current behaviour (for fear of breaking any existing integrations)
-                $this->response->redirect->to($embedUrl);
-                return;
+//                $this->response->redirect->to($embedUrl);
+//                return;
+//                $launch_data['contentUrl'] = $embedUrl;
             }
         }
 
@@ -516,7 +517,7 @@ class Controller extends Base
             array_push($launch_params, $key . "=" . rawurlencode($launch_data[$key]));
         }
 
-        $base_string = "POST&" . urlencode($provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
+        $base_string = "POST&" . urlencode($embedUrl) . "&" . rawurlencode(implode("&", $launch_params));
         $secret      = urlencode($provider->getSecret()) . "&";
         $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
 
@@ -529,6 +530,7 @@ class Controller extends Base
                 'params'    => $launch_data,
                 'provider'  => $provider,
                 'signature' => $signature,
+                'embedUrl'  => $embedUrl,
             ],
         ]);
     }

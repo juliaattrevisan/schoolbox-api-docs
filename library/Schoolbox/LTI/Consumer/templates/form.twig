@@ -1,4 +1,4 @@
-<form id="ltiLaunchForm" name="ltiLaunchForm" method="POST" action="{{ provider.url }}">
+<form id="ltiLaunchForm" name="ltiLaunchForm" method="POST" action="{{ embedUrl ?? provider.url }}">
     {% for key,value in params %}
         <input type="hidden" name="{{ key }}" value="{{ value }}">
     {% endfor %}
