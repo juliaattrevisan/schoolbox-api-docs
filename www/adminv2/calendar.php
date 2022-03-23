@@ -77,14 +77,18 @@ $this->setVar('cleanup_has_events_block', '');
 $this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
-
-
 $typeList = [
     ['type' => 'Import'],
     ['type' => 'Subscribe'],
     ['type' => 'Cleanup']
 ];
 
+/* A list of custom overrides if you don't want to
+ * programmatically generate the titles
+ */
+$subscriptionLabels = [
+    'SudsTimetable' => 'School Data Timetable'
+];
 
 foreach ($typeList as $type) {
     /* Navigation stuff
@@ -119,11 +123,7 @@ foreach ($typeList as $type) {
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
-            if ($currentEventType === 'SudsTimetable') {
-                $label = 'School Data Timetable';
-            } else {
-                $label = trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType));
-            }
+            $label = $subscriptionLabels[$currentEventType] ?? trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType));
 
             $this->setVar([
                 'EVENTTYPE_LABEL' => $label,
