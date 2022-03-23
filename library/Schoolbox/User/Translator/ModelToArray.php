@@ -12,8 +12,9 @@ namespace Schoolbox\User\Translator;
 use Alaress\Image\Transformation\Storage;
 use Closure;
 use House;
-use HouseResidential;
 use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model as YearLevel;
@@ -31,9 +32,10 @@ class ModelToArray
 {
     /**
      * @param User $user
+     * @param GenericCollection|UserAccess[]|array|bool $groups
      * @return array
      */
-    public function __invoke(User $user): array
+    public function __invoke(User $user, $groups = null): array
     {
         return [
             'id'     => $user->getId(),
@@ -43,16 +45,15 @@ class ModelToArray
             'role'   => $this->convertRole($user->getRole()),
 
             // Null for now, may hydrate later or make nullable in API
-            'groups' => null,
+            'groups' => $groups,
 
             'schoolHouse'      => $this->convertSchoolHouse($user->getSchoolHouse()),
-            'residentialHouse' => $this->convertResidentialHouse($user->getResidentialHouse()),
 
             // Null for now
-            'guardians'        => null,
-            'students'         => null,
+            'guardians'        => $user->getParents(),
+            'students'         => $user->getChildren(),
 
-            'impersonableUser' => null,
+            'impersonableUser' => $user->getLinkedUser(),
 
             'email'          => $user->getEmail(),
             '_links'         => $this->deriveLinks($user),
@@ -137,24 +138,6 @@ class ModelToArray
             ]
             : null;
     }
-
-
-    /**
-     * Helper for converting a residential house into an array.
-     *
-     * @param HouseResidential|null $residentialHouse
-     * @return array|null
-     */
-    private function convertResidentialHouse(?HouseResidential $residentialHouse): ?array
-    {
-        return $residentialHouse
-            ? [
-                'id'   => $residentialHouse->getId(),
-                'name' => $residentialHouse->getHouse(),
-            ]
-            : null;
-    }
-
 
     /**
      * Helper for converting a year level into an array.

@@ -11,7 +11,6 @@ namespace Schoolbox\User\Translator\Author\Test;
 
 use Alaress_Date_Format;
 use House;
-use HouseResidential;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
 use Schoolbox\Config\TestLoader;
@@ -77,9 +76,6 @@ class ModelToArrayTest extends TestCase
             ->setSchoolHouse((new House())
                 ->setId(1)
                 ->setHouse('School House'))
-            ->setResidentialHouse((new HouseResidential())
-                ->setId(1)
-                ->setHouse('Res House'))
             ->setExternalId('7')
             ->setUsername('test')
             ->setSuperuser(false)

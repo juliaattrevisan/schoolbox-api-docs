@@ -255,6 +255,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     private $children;
 
+    /**
+     * Determines if children collection has been loaded
+     * @var bool
+     */
+    private $childrenLoaded = false;
+
     /** @var GenericCollection|Pastoral\Group\Member\Model[] */
     private $pastoralGroupsMemberships;
 
@@ -1208,6 +1214,34 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this;
     }
 
+    /**
+     * Load students / children into object from external db
+     * @return self
+     */
+    public function loadStudents(): self
+    {
+        if ($this->childrenLoaded) {
+            return $this;
+        }
+        $externalUser = new \External_User();
+        $userMapper = UserMapper::getInstance();
+        $this->children = new GenericCollection(self::class);
+        if (null === $this->externalId) {
+            return $this;
+        }
+        if ($this->getExternalId()) {
+            $enrolments = $externalUser->getEnrolledStudents($this->getExternalId());
+            foreach ($enrolments as $child) {
+                try {
+                    $this->children->add($userMapper->findByExternalId($child['RelatedID']));
+                } catch (Mapper\Exception $e) {
+                    // noop
+                }
+            }
+        }
+        $this->childrenLoaded = true;
+        return $this;
+    }
 
     /**
      * @param GenericCollection<User> $parents

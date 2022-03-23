@@ -195,18 +195,8 @@ class Controller extends BaseController
     {
         $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
 
-        $students = new Collection();
-
-        if ($parent->getExternalId()) {
-            $enrolments = $this->externalUser->getEnrolledStudents($parent->getExternalId());
-            foreach ($enrolments as $child) {
-                try {
-                    $students->add($this->userMapper->findByExternalId($child['RelatedID']));
-                } catch (MapperException $e) {
-                    // noop
-                }
-            }
-        }
+        $parent->loadStudents();
+        $students = $parent->getChildren();
 
         if (isset($externalUser['SpouseID'])) {
             try {
