@@ -26,6 +26,10 @@ class ArrayToModel extends Base
         $roleMapper = RoleMapper::getInstance();
         $campusMapper = CampusMapper::getInstance();
         foreach ($array as $label => $value) {
+            //check if what the user is attempting to edit is valid?
+            if (in_array($label, ["guardians", "students", "impersonableUser", "groups"])) {
+                throw new SchoolboxException("$label field is unable to be updated at this endpoint");
+            }
             //is function?
             //just need the build setFunction function, which exists in the mapper, so lets hit it from the side
             $function = $yearLevelMapper->getSetMethodName($label);
