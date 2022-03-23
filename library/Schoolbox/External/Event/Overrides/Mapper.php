@@ -77,25 +77,54 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($statement as $row) {
             $override = $this->hydrate($row);
 
-            /** @var \Schoolbox\User|null $user */
-            $user = $this->hydrateJoin($row, 'externalId', 'u');
-
             /* This corresponds to a 'clear' mutation in the overrides
+             * It has no user relationships
              */
-            if (null === $user) {
+            if (Model::CLEAR === $override->getAction()) {
                 $stack->add($override);
                 continue;
             }
 
-            /** @var \Schoolbox\Role $role */
-            $role = $this->hydrateJoin($row, 'externalId.role', 'r');
+            /** @var \Schoolbox\User|null $user */
+            $user = $this->hydrateJoin($row, 'externalId', 'u');
 
-            $user->setRole($role);
-            $override->setUser($user);
+            if ($user) {
+                /** @var \Schoolbox\Role $role */
+                $role = $this->hydrateJoin($row, 'externalId.role', 'r');
 
-            $stack->add($override);
+                /* The timetable doesn't involve parents. externalIds might end up
+                 * being shared among multiple roletypes, but we can specifically
+                 * exclude irrelevant roletypes here
+                 */
+                if ($role->isStudent() || $role->isStaff()) {
+                    $user->setRole($role);
+
+                    $override->setUser($user);
+
+                    $stack->add($override);
+                }
+            }
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Find an in-order list of overrides for a given event identifier
+     * This returns the mutations in explicitly order of 'sequence'
+     * so you can't get execute them in an unintended order e.g.
+     * relying on the db to push them out in the way you had thought
+     *
+     * @param int $eventId
+     * @return GenericCollection
+     */
+    public function findForEvent(int $eventId): GenericCollection
+    {
+        return $this->findByColumn('event_id', $eventId, [
+            'order' => [
+                'sequence' => 'asc'
+            ]
+        ]);
     }
 }

@@ -106,10 +106,11 @@ class InvolvedUsers
 
         /* Find the overrides
          */
-        $overrides = $this->overrideMapper->findByColumn('event_id', $event->getId());
+        $overrides = $this->overrideMapper->findForEvent($event->getId());
 
         /* Decide how each $override affects the $stack set
          */
+        /** @var \Schoolbox\External\Event\Overrides\Model $override */
         foreach ($overrides as $override) {
             if (Model::SUBTRACT === $override->getAction()) {
                 unset($stack[$override->getUser()->getExternalId()]);
