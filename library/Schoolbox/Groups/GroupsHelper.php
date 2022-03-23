@@ -24,6 +24,11 @@ class GroupsHelper
     public const NOTENROLLED = 'notEnrolled';
     public const PENDING     = 'pending';
 
+    public const MEMBERSHIP_NONE = 'none';
+    public const MEMBERSHIP_READ = 'read';
+    public const MEMBERSHIP_WRITE = 'write';
+    public const MEMBERSHIP_ADMIN = 'admin';
+
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
     private FolderMapper $folderMapper;
@@ -378,7 +383,7 @@ class GroupsHelper
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->findSingleGroup($user, $group);
-        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], $userPerms);
+        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], [$group->getFolder()->getId() => $userPerms]);
     }
 
     /**
@@ -420,6 +425,47 @@ class GroupsHelper
                                                              'uid'     => $user->getId(),
                                                              'service' => UserAccess::SERVICE_HOMEPAGE,
                                                              'sid'     => $group->getFolder()->getId()
-                                                         ]);
+                                                         ], ['cache' => false]);
+    }
+
+    /**
+     * convert membership string to membership int for DB use
+     */
+    public static function getMembershipInt(string $membership): int
+    {
+        $membershipArray = [
+            self::MEMBERSHIP_NONE   => UserAccess::ACCESS_DENY,
+            self::MEMBERSHIP_READ   => UserAccess::ACCESS_READ,
+            self::MEMBERSHIP_WRITE  => UserAccess::ACCESS_WRITE,
+            self::MEMBERSHIP_ADMIN  => UserAccess::ACCESS_FULL,
+        ];
+        return $membershipArray[$membership];
+    }
+
+    /**
+     * convert membership int to membership string for json use
+     */
+    public static function getMembershipString(int $membership): string
+    {
+        $membershipArray = [
+            UserAccess::ACCESS_DENY     => self::MEMBERSHIP_NONE,
+            UserAccess::ACCESS_READ     => self::MEMBERSHIP_READ,
+            UserAccess::ACCESS_WRITE    => self::MEMBERSHIP_WRITE,
+            UserAccess::ACCESS_FULL     => self::MEMBERSHIP_ADMIN,
+        ];
+        return $membershipArray[$membership];
+    }
+
+    /**
+     * convert enrolment string to enrolment int for DB use
+     */
+    public static function getEnrolmentInt(string $enrolment): int
+    {
+        $enrolmentArray = [
+            self::NOTENROLLED   => UserAccess::ACCESS_DENY,
+            self::PENDING       => UserAccess::ACCESS_AWAITING_AUTHORISATION,
+            self::ENROLLED      => UserAccess::ACCESS_READ,
+        ];
+        return $enrolmentArray[$enrolment];
     }
 }

@@ -90,11 +90,26 @@ class Controller extends Base
             return; //exit early the user is part of the group.
         }
 
-        $post = $this->getRequest()->post->getArrayCopy();
-        $post['membership'] = $post['membership'] ?? UserAccess::ACCESS_READ;
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? true;
+        $post = json_decode($this->request->content->get(), true);
+        /**
+         * check post array if missing any, lets error out...
+         */
+        if (
+            !isset($post['membership']) ||
+            !isset($post['isNotificationsOn']) ||
+            !isset($post['isFavourite'])
+        ) {
+            $problem = (new ApiProblem('Not all fields are filled'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the api does not have enough data to work correctly.
+        }
+        $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
+        $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite'] = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? UserAccess::ACCESS_READ;
+        $post['enrolmentStatus'] = UserAccess::ACCESS_READ;
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);

@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIGroup;
 
+use Schoolbox\Groups\GroupsHelper;
+
 /**
  * Translator for translating a group model into an array, ready for JSON
  * encoding.
@@ -17,24 +19,19 @@ namespace Schoolbox\APIGroup;
  */
 class ModelToArray
 {
-    private const MEMBERSHIP_NONE = 'none';
-    private const MEMBERSHIP_READ = 'read';
-    private const MEMBERSHIP_WRITE = 'write';
-    private const MEMBERSHIP_ADMIN = 'admin';
-
     /**
      * @param array $group
      * @return array
      */
     public function __invoke(array $group): array
     {
-        $membership = self::MEMBERSHIP_NONE;
+        $membership = GroupsHelper::MEMBERSHIP_NONE;
         if ($group['isAccessRead']) {
-            $membership = self::MEMBERSHIP_READ;
+            $membership = GroupsHelper::MEMBERSHIP_READ;
         } elseif ($group['isAccessWrite']) {
-            $membership = self::MEMBERSHIP_WRITE;
+            $membership = GroupsHelper::MEMBERSHIP_WRITE;
         } elseif ($group['isAccessAdmin']) {
-            $membership = self::MEMBERSHIP_ADMIN;
+            $membership = GroupsHelper::MEMBERSHIP_ADMIN;
         }
         return [
             'id'                => $group['id'],
