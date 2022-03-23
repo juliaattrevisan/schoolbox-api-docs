@@ -17,7 +17,6 @@ CREATE TABLE `sis_event` (
   `deleted_at` DATETIME NULL,
   PRIMARY KEY (`id`));
 
-
 CREATE TABLE `sis_event_user_overrides` (
   `event_id` INT NOT NULL,
   `external_id` VARCHAR(255) NULL,
@@ -25,7 +24,6 @@ CREATE TABLE `sis_event_user_overrides` (
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL);
-
 
 CREATE TABLE `sis_event_roletype` (
   `event_id` INT NOT NULL,
@@ -65,4 +63,41 @@ ALTER TABLE `sis_event_user_overrides` COLLATE=utf8mb4_unicode_ci,
 ALTER TABLE `sis_event_roletype` COLLATE=utf8mb4_unicode_ci,
  CHANGE COLUMN `roletype` `roletype` enum('staff','student','parent') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL;
 
+-- Indices
 
+ALTER TABLE `sis_event`
+CHANGE COLUMN `code` `code` VARCHAR(255) NULL DEFAULT NULL,
+ADD INDEX `code` (`code` ASC),
+ADD INDEX `source` (`source` ASC);
+
+-- Foreigner keys
+
+ALTER TABLE `sis_event_campus`
+ADD INDEX `fk_sis_event_campus_idx` (`event_id` ASC);
+
+ALTER TABLE `sis_event_campus`
+ADD CONSTRAINT `fk_sis_event_campus`
+  FOREIGN KEY (`event_id`)
+  REFERENCES `sis_event` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `sis_event_roletype`
+ADD INDEX `fk_sis_event_roletype_idx` (`event_id` ASC);
+
+ALTER TABLE `sis_event_roletype`
+ADD CONSTRAINT `fk_sis_event_roletype`
+  FOREIGN KEY (`event_id`)
+  REFERENCES `sis_event` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `sis_event_user_overrides`
+ADD INDEX `fk_sis_event_user_overrides_idx` (`event_id` ASC);
+
+ALTER TABLE `sis_event_user_overrides`
+ADD CONSTRAINT `fk_sis_event_user_overrides`
+  FOREIGN KEY (`event_id`)
+  REFERENCES `sis_event` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
