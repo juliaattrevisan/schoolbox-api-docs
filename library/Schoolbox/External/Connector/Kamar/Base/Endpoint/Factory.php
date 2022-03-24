@@ -231,19 +231,16 @@ class Factory
             throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
-        /* Purge previously-imported profile relationships and classes
+        /* Purge previously-imported profile relationships
          */
-        $bus->add(new Prepare(
+        $bus->add(new Profile\Prepare(
             $this->log,
             $this->perform,
             $this->baseProfileMapper,
             $this->studentProfileMapper,
             $this->parentProfileMapper,
             $this->staffProfileMapper,
-            $this->relationshipMapper,
-            $this->classEntryMapper,
-            $this->classInvolvementMapper,
-            $this->classPeriodMapper
+            $this->relationshipMapper
         ));
 
         /* Load all the Profile xmls
@@ -263,6 +260,18 @@ class Factory
                 $this->relationshipMapper
             ));
         }
+
+        /* Clean up after Profile import
+         */
+        $bus->add(new Profile\Cleanup(
+            $this->log,
+            $this->perform,
+            $this->baseProfileMapper,
+            $this->studentProfileMapper,
+            $this->parentProfileMapper,
+            $this->staffProfileMapper,
+            $this->relationshipMapper
+        ));
 
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
          * Schools must do this via a timetableStructure import csv
@@ -327,6 +336,16 @@ class Factory
             $currentTerm
         ));
 
+        /* Purge previously-imported classes
+         */
+        $bus->add(new Timetable\Prepare(
+            $this->log,
+            $this->perform,
+            $this->classEntryMapper,
+            $this->classInvolvementMapper,
+            $this->classPeriodMapper
+        ));
+
         /* Load all the Student Timetable xmls
          */
         foreach ($xml[Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
@@ -354,12 +373,7 @@ class Factory
         $bus->add(new Cleanup(
             $this->log,
             $this->perform,
-            $this->streamDir,
-            $this->baseProfileMapper,
-            $this->studentProfileMapper,
-            $this->parentProfileMapper,
-            $this->staffProfileMapper,
-            $this->relationshipMapper
+            $this->streamDir
         ));
 
         return $bus;

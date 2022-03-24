@@ -110,11 +110,30 @@ class Prepare implements IStrategy
             $this->staffProfileMapper->getDatabase()->query("UPDATE {$this->staffProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->baseProfileMapper->getDatabase()->query("UPDATE {$this->baseProfileMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
 
+            /* Clear students' emergency contacts
+             *
+             * Alternatively I could have done it in Profile.php but it just makes that
+             * algorithm longer, plus you can make less-obvious mistakes about it
+             */
+            $this->studentProfileMapper->getDatabase()->query("
+                UPDATE {$this->studentProfileMapper->getTable()}
+                SET 
+                    emergency_contact_name_1 = NULL,
+                    emergency_contact_phone_1 = NULL,
+                    emergency_contact_phone_alt_1 = NULL,
+                    emergency_contact_name_2 = NULL,
+                    emergency_contact_phone_2 = NULL,
+                    emergency_contact_phone_alt_2 = NULL,
+                    emergency_contact_name_3 = NULL,
+                    emergency_contact_phone_3 = NULL,
+                    emergency_contact_phone_alt_3 = NULL
+            ");
+
             /* Truncate other data entirely
              */
             $this->relationshipMapper->truncate();
 
-            $this->log->info('Purged existing profile relations');
+            $this->log->info('Purged existing profiles and profile relations');
         }
     }
 }

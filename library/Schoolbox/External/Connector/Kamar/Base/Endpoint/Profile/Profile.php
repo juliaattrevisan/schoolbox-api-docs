@@ -301,13 +301,6 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-            ));
-
             /* Then save it
              */
             if ($this->perform) {
@@ -552,13 +545,6 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-            ));
-
             /* Then save it
              */
             if ($this->perform) {
@@ -658,13 +644,6 @@ class Profile implements IStrategy
                 ->setTitle($title)
                 ->setFirstname($firstname)
                 ->setLastname($lastname);
-
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-            ));
 
             /* Then save it
              */

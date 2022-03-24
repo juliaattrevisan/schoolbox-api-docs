@@ -120,7 +120,7 @@ class Prepare implements IStrategy
             $this->periodMapper->truncate();
             $this->log->debug('Purged classPeriod');
 
-            $this->log->info('Purged existing classInvolvement, classPeriod, classEntry data');
+            $this->log->info('Purged existing classEntry, classInvolvement, classPeriod and period data');
         }
     }
 }
