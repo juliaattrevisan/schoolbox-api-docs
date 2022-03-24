@@ -171,6 +171,18 @@ class Calendar_Api_Factory
             \Schoolbox\UserMapper::getInstance()
         ));
 
+        $sudsEventConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class);
+
+        $composite->add(new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
+            $sudsEventConfig->getId(),
+            $user,
+            $viewer,
+            \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+            \Schoolbox\External\Event\Mapper ::getInstance(),
+            \Schoolbox\UserMapper::getInstance(),
+            \Schoolbox\Resource\Folder\Mapper::getInstance()
+        ));
+
         return $composite;
     }
 
@@ -269,6 +281,16 @@ class Calendar_Api_Factory
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
                     \Schoolbox\UserMapper::getInstance()
+                );
+            case Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance()
                 );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");
