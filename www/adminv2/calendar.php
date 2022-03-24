@@ -210,10 +210,9 @@ foreach ($typeList as $type) {
         }
 
         $this->parse('subscribe_block', 'subscribe');
-    } /* Cleanup page
-     */
-    elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
-        /* If both dates specified, find events between those two dates inclusive
+    } elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+        /* Cleanup page
+         * If both dates specified, find events between those two dates inclusive
          */
         if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
             $from = \Alaress_Date_Format::newLocalShort($_GET['cleanupFrom']);
