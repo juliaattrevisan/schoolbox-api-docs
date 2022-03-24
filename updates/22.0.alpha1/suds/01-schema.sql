@@ -15,6 +15,8 @@ CREATE TABLE `sis_event` (
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
+  INDEX `code` (`code` ASC),
+  INDEX `source` (`source` ASC),
   PRIMARY KEY (`id`))
   COLLATE=utf8mb4_unicode_ci
   ;
@@ -26,7 +28,14 @@ CREATE TABLE `sis_event_user_overrides` (
   `sequence` INT NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
-  `deleted_at` DATETIME NULL)
+  `deleted_at` DATETIME NULL,
+  INDEX `fk_sis_event_user_overrides_idx` (`event_id` ASC),
+    CONSTRAINT `fk_sis_event_user_overrides`
+      FOREIGN KEY (`event_id`)
+      REFERENCES `sis_event` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+  )
   COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `sis_event_roletype` (
@@ -34,7 +43,14 @@ CREATE TABLE `sis_event_roletype` (
   `roletype` ENUM('staff', 'student', 'parent') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
-  `deleted_at` DATETIME NOT NULL)
+  `deleted_at` DATETIME NOT NULL,
+  INDEX `fk_sis_event_roletype_idx` (`event_id` ASC),
+    CONSTRAINT `fk_sis_event_roletype`
+      FOREIGN KEY (`event_id`)
+      REFERENCES `sis_event` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+  )
   COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `sis_event_campus` (
@@ -42,44 +58,12 @@ CREATE TABLE `sis_event_campus` (
   `campus_name` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
-  `deleted_at` DATETIME NULL)
+  `deleted_at` DATETIME NULL,
+  INDEX `fk_sis_event_campus_idx` (`event_id` ASC),
+  CONSTRAINT `fk_sis_event_campus`
+      FOREIGN KEY (`event_id`)
+      REFERENCES `sis_event` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
+  )
   COLLATE=utf8mb4_unicode_ci;
-
--- Indices
-
-ALTER TABLE `sis_event`
-CHANGE COLUMN `code` `code` VARCHAR(255) NULL DEFAULT NULL,
-ADD INDEX `code` (`code` ASC),
-ADD INDEX `source` (`source` ASC);
-
--- Foreigner keys
-
-ALTER TABLE `sis_event_campus`
-ADD INDEX `fk_sis_event_campus_idx` (`event_id` ASC);
-
-ALTER TABLE `sis_event_campus`
-ADD CONSTRAINT `fk_sis_event_campus`
-  FOREIGN KEY (`event_id`)
-  REFERENCES `sis_event` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-ALTER TABLE `sis_event_roletype`
-ADD INDEX `fk_sis_event_roletype_idx` (`event_id` ASC);
-
-ALTER TABLE `sis_event_roletype`
-ADD CONSTRAINT `fk_sis_event_roletype`
-  FOREIGN KEY (`event_id`)
-  REFERENCES `sis_event` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-ALTER TABLE `sis_event_user_overrides`
-ADD INDEX `fk_sis_event_user_overrides_idx` (`event_id` ASC);
-
-ALTER TABLE `sis_event_user_overrides`
-ADD CONSTRAINT `fk_sis_event_user_overrides`
-  FOREIGN KEY (`event_id`)
-  REFERENCES `sis_event` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
