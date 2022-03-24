@@ -30,16 +30,16 @@ class ArrayToModel extends Base
             } elseif ('yearLevel' === $label) {
                 $model->setYear($value);
             } elseif ('flags' === $label) {
-                    //set all the flags...
-                    $model->setWebmail($value['showWebmailTab'])
-                        ->setHideContacts($value['showContacts'])
-                        ->setHideTimetable($value['enableTimetable'])
-                        ->setHideSidenav($value['showSideNav'])
-                        ->setHideNotificationsTray($value['showNotificationsPanel'])
-                        ->setDisplayGradeGraph($value['showGradeGraph'])
-                        ->setEportfolioEnable($value['enableEportfolio'])
-                        ->setUseInternalMail($value['useInternalMail'])
-                        ->setCalendarView($value['calendarView']);
+                //set all the flags...
+                $model->setWebmail($value['showWebmailTab'])
+                      ->setHideContacts($value['showContacts'])
+                      ->setHideTimetable($value['enableTimetable'])
+                      ->setHideSidenav($value['showSideNav'])
+                      ->setHideNotificationsTray($value['showNotificationsPanel'])
+                      ->setDisplayGradeGraph($value['showGradeGraph'])
+                      ->setEportfolioEnable($value['enableEportfolio'])
+                      ->setUseInternalMail($value['useInternalMail'])
+                      ->setCalendarView($value['calendarView']);
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
