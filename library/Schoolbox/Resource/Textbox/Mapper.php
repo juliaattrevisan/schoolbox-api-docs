@@ -29,7 +29,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Textbox Homepage Controller classname
      */
-    private const HOMEPAGE_COMPONENT_CONTROLLER = Controller::class;
+    public const HOMEPAGE_COMPONENT_CONTROLLER = Controller::class;
 
 
     /**
@@ -41,7 +41,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Homepage uses "textbox" component config name to specify the textbox
      */
-    private const HOMEPAGE_COMPONENT_KEY = 'textbox';
+    public const HOMEPAGE_COMPONENT_KEY = 'textbox';
 
 
     /**
