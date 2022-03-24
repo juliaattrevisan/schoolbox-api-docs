@@ -37,15 +37,15 @@
 
     {# Resize the iframe to match the component configuration #}
 
-    {% if url is not empty %}
+    {% if embedUrl is not empty %}
 
     {# Update the input in the components configuration #}
 
-    component.find('input[name="url"]').val('{{ url | e('js') }}');
+    component.find('input[name="url"]').val('{{ embedUrl | e('js') }}');
 
     {% endif %}
 
     {# Redirect to the required resource #}
 
-    window.location.href = '{{ iframeUrl | e('js') }}';
+    window.location.href = '{{ launchUrl | e('js') }}';
 </script>
