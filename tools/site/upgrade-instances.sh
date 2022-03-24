@@ -222,18 +222,9 @@ function remove_maintenance_page(){
 }
 
 
-function rebuild_and_restart_daemons(){
+function restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
-    log "---rebuilding + restarting daemon on primary host---";
-    if [[ -z $socketd_ports ]] && [[ $verbose == 0 ]]; then
-      /usr/local/bin/schoolbox-rebuild-daemons --fetch
-    elif [[ -z $socketd_ports ]] && [[ $verbose == 1 ]]; then
-      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
-    elif [[ -n $socketd_ports ]] && [[ $verbose == 0 ]]; then
-      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports"
-    else
-      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports" -v
-    fi
+    log "---restarting daemons on primary host---";
     for instance in $instance_list; do
       INSTANCE_ID="$instance" /usr/share/schoolbox/tools/notif/allrestart
     done
@@ -289,7 +280,7 @@ function main() {
   upgrade_instances
   restart_php_fpm
   remove_maintenance_page
-  rebuild_and_restart_daemons
+  restart_daemons
   rebuild_cron_jobs
   reload_binding_cache
   log "Upgrade complete"
