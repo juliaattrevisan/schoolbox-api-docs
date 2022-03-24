@@ -43,7 +43,7 @@ CREATE TABLE `sis_event_roletype` (
   `roletype` ENUM('staff', 'student', 'parent') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
-  `deleted_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL,
   INDEX `fk_sis_event_roletype_idx` (`event_id` ASC),
     CONSTRAINT `fk_sis_event_roletype`
       FOREIGN KEY (`event_id`)
