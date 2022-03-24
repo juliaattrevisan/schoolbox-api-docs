@@ -51,12 +51,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
      * @inheritdoc
      */
     public function __construct(
@@ -68,8 +62,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\UserMapper $userMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -79,7 +72,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
-        $this->folderMapper = $folderMapper;
     }
 
 
