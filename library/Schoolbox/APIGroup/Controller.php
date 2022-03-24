@@ -107,6 +107,15 @@ class Controller extends Base
             return; //exit early the api does not have enough data to work correctly.
         }
         $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
+        //check if user is trying to break the system by deleting a user via the PUT command, and error
+        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early this API wont delete a user...
+        }
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite']       = $post['isFavourite'] ?? false;
         $post['enrolmentStatus']   = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
