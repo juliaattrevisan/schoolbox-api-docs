@@ -9,7 +9,6 @@ use Schoolbox\CampusMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper;
@@ -29,7 +28,6 @@ class ArrayToModel extends Base
          */
         $yearLevelMapper = Mapper::getInstance();
         $houseMapper = \HouseMapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
         $campusMapper = CampusMapper::getInstance();
         $userMapper = UserMapper::getInstance();
         foreach ($array as $label => $value) {
