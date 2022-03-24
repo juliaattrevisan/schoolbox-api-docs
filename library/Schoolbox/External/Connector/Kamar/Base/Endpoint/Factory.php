@@ -261,6 +261,18 @@ class Factory
             ));
         }
 
+        /* Clean up after Profile import
+         */
+        $bus->add(new Profile\Cleanup(
+            $this->log,
+            $this->perform,
+            $this->baseProfileMapper,
+            $this->studentProfileMapper,
+            $this->parentProfileMapper,
+            $this->staffProfileMapper,
+            $this->relationshipMapper
+        ));
+
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
          * Schools must do this via a timetableStructure import csv
          */
@@ -361,12 +373,7 @@ class Factory
         $bus->add(new Cleanup(
             $this->log,
             $this->perform,
-            $this->streamDir,
-            $this->baseProfileMapper,
-            $this->studentProfileMapper,
-            $this->parentProfileMapper,
-            $this->staffProfileMapper,
-            $this->relationshipMapper
+            $this->streamDir
         ));
 
         return $bus;
