@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
-use Crell\ApiProblem\ApiProblem;
-use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -102,5 +100,37 @@ class Controller extends Base
     {
         $this->userMapper->delete($user);
         $this->getResponse()->status->setCode(204);
+    }
+
+    /**
+     * Create a user
+     *
+     * @api POST /api/user
+     * @link http://api.schoolbox.com.au/#operation/userPost
+     */
+    public function apiUserPost()
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+        $newuser = $this->userMapper->createModel();
+
+        /** @var User $model */
+        $model = (new User\Translator\ArrayToModel())($data, $newuser);
+        $model->setEnabled(true);
+        $this->userMapper->save($model);
+
+        //get hydrated user, or the campus/role/house wont have names, just ids...
+        $user = $this->userMapper->findById($model->getId());
+        $users_groups = $this->groupsHelper->getCurrentGroups($user);
+        $apiGroups = new Collection($users_groups);
+        $groupsArr = $apiGroups->map(new GroupArray());
+        /**
+         * build the whole thing
+         */
+        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
     }
 }

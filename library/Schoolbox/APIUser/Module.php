@@ -52,6 +52,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{userId}', 'apiUserGet', $hasApiAccess, $preloadUser);
         $this->register('DELETE', '/{userId}', 'apiUserDelete', $hasApiAccess, $preloadUser);
+        $this->register('POST', '', 'apiUserPost', $hasApiAccess);
     }
 
 
