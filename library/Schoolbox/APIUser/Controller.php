@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
+use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -86,5 +88,19 @@ class Controller extends Base
                 $output
             )
         );
+    }
+
+    /**
+     * Deletes a user object
+     *
+     * @param User $user
+     * @throws \Schoolbox\Mapper\Exception
+     * @link http://api.schoolbox.com.au/#operation/userDelete
+     * @api  DELETE /user/{userId}
+     */
+    public function apiUserDelete(User $user)
+    {
+        $this->userMapper->delete($user);
+        $this->getResponse()->status->setCode(204);
     }
 }
