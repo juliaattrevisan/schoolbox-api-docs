@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Event\Overrides;
+namespace Schoolbox\External\Event;
 
 use Schoolbox\GenericCollection;
 
@@ -18,7 +18,7 @@ use Schoolbox\GenericCollection;
  *
  * Only applies to the 'timetable' event classification
  */
-class InvolvedUsers
+class TimetableUsers
 {
 
     /**
@@ -55,7 +55,7 @@ class InvolvedUsers
      * @param \Schoolbox\External\ClassEntryMapper       $classEntryMapper
      * @param \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param Mapper                                     $overrideMapper
+     * @param Overrides\Mapper                           $overrideMapper
      * @param \Schoolbox\UserMapper                      $userMapper
      */
     public function __construct(
@@ -83,7 +83,7 @@ class InvolvedUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateForEvent(\Schoolbox\External\Event\Model $event): array
+    public function findForEvent(\Schoolbox\External\Event\Model $event): array
     {
 
         /* Find the sis_class that corresponds to $event
@@ -108,11 +108,11 @@ class InvolvedUsers
          */
         /** @var \Schoolbox\External\Event\Overrides\Model $override */
         foreach ($overrides as $override) {
-            if (Model::SUBTRACT === $override->getAction()) {
+            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override->getAction()) {
                 unset($usualUsers[$override->getUser()->getExternalId()]);
-            } elseif (Model::ADD === $override->getAction()) {
+            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override->getAction()) {
                 $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
-            } elseif (Model::CLEAR === $override->getAction()) {
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
                 $usualUsers = [];
             }
         }
@@ -137,7 +137,7 @@ class InvolvedUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
+    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
@@ -166,7 +166,7 @@ class InvolvedUsers
         $overrideEvents = $this->eventMapper->findByColumn('id', $overrideEventIds);
 
         foreach ($overrideEvents as $overrideEvent) {
-            $mutatedInvolvements = $this->generateForEvent($overrideEvent);
+            $mutatedInvolvements = $this->findForEvent($overrideEvent);
 
             /* If you're still in the list after the mutations; pile it into the stack
              * Otherwise, you aren't involved anymore; remove it from the stack
@@ -273,7 +273,7 @@ class InvolvedUsers
             'finishDatetime' => $finishDatetime,
             'externalId' => $user->getExternalId(),
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'actionClear' => Model::CLEAR
+            'actionClear' => \Schoolbox\External\Event\Overrides\Model::CLEAR
         ];
 
         /* Optionally filter by foldercode

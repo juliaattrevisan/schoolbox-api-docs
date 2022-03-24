@@ -138,19 +138,17 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             // noop
         }
 
-        $generator = new \Schoolbox\External\Event\Overrides\InvolvedUsers(
+        /* The list of events in which $this->getUser() is involved
+         * They're involved because they're part of the usual class list
+         * or they've been mutated into said list via overrides
+         */
+        $timetableEvents = (new \Schoolbox\External\Event\TimetableUsers(
             $this->classEntryMapper,
             $this->classInvolvementMapper,
             $this->eventMapper,
             $this->overrideMapper,
             $this->userMapper
-        );
-
-        /* The list of events in which $this->getUser() is involved
-         * They're involved because they're part of the usual class list
-         * or they've been mutated into said list via overrides
-         */
-        $timetableEvents = $generator->generateForUser(
+        ))->findForUser(
             $this->getUser(),
             $startTimestamp,
             $endTimestamp
