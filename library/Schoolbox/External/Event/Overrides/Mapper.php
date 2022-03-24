@@ -99,7 +99,7 @@ class Mapper extends \Schoolbox\Mapper
                 /** @var \Schoolbox\User|null $user */
                 $user = $this->hydrateJoin($row, 'externalId', 'u');
 
-                /** @var \Schoolbox\Role $role */
+                /** @var \Schoolbox\Role|null $role */
                 $role = $this->hydrateJoin($row, 'externalId.role', 'r');
 
                 if ($user && $role) {
