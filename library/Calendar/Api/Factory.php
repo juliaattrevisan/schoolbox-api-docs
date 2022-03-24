@@ -140,17 +140,38 @@ class Calendar_Api_Factory
      * Handles construction logic for a folder-specific variant of the calendar
      * connector.
      *
-     * @param int  $folderId
-     * @param User $user
-     * @param User $viewer
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param User                             $user
+     * @param User                             $viewer
      * @return Calendar_Api_EventType_Interface
      */
-    public function produceForFolderId(int $folderId, User $user, User $viewer): Calendar_Api_EventType_Interface
+    public function produceForFolder(\Schoolbox\Resource\Folder\Model $folder, User $user, User $viewer): Calendar_Api_EventType_Interface
     {
-        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(
-            Calendar_Api_EventType_Event_Schoolbox_Group::class
-        );
-        return new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $user, $viewer, $folderId);
+        $composite = new Calendar_Api_Composite();
+
+        /* Group Events
+         */
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Group::class);
+
+        $composite->add(new Calendar_Api_EventType_Event_Schoolbox_Group($calendarConfig->getId(), $user, $viewer, $folder->getId()));
+
+        /* Summon the sis events that might be relevant to $folder, too
+         */
+        $sudsTimetableConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class);
+
+        $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+            $sudsTimetableConfig->getId(),
+            $user,
+            $viewer,
+            \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+            \Schoolbox\External\Event\Mapper ::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+            \Schoolbox\UserMapper::getInstance()
+        ));
+
+        return $composite;
     }
 
 
@@ -236,6 +257,18 @@ class Calendar_Api_Factory
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
                     \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
+                );
+            case Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class:
+                return new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                    $connectorId,
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\UserMapper::getInstance()
                 );
             default:
                 throw new InvalidArgumentException("Calendar connector not recognised: $className");

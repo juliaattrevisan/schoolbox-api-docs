@@ -10,15 +10,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Model implements ISoftDeletable
+class Model
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
 
 
     /**
@@ -98,6 +96,12 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     private ?string $source;
+
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Model|null
+     */
+    private ?\Schoolbox\Resource\Folder\Model $folder = null;
 
 
     /**
@@ -336,6 +340,26 @@ class Model implements ISoftDeletable
     public function setSource(?string $source): self
     {
         $this->source = $source;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model|null
+     */
+    public function getFolder(): ?\Schoolbox\Resource\Folder\Model
+    {
+        return $this->folder;
+    }
+
+
+    /**
+     * @param \Schoolbox\Resource\Folder\Model|null $folder
+     * @return $this
+     */
+    public function setFolder(?\Schoolbox\Resource\Folder\Model $folder): self
+    {
+        $this->folder = $folder;
         return $this;
     }
 }

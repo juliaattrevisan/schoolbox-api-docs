@@ -397,6 +397,24 @@ try {
                 $sentry
             ));
 
+            /* SUDS Timetable
+             */
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\UserMapper::getInstance()
+                ],
+                true,
+                $sentry
+            ));
+
             $filename = 'external';
             break;
 
@@ -442,7 +460,7 @@ try {
                 $api->add($subApi);
             }
 
-            // Only include EOTC if eNnabled
+            // Only include EOTC if enabled
             $eotcEnabled = (bool)$config->get('eotc_enabled');
             if ($eotcEnabled) {
                 $subApi = buildApiClass(
@@ -502,6 +520,24 @@ try {
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\Fixtures\Matchup\Mapper::getInstance(),
                         \Schoolbox\Fixtures\Team\Player\Mapper::getInstance()
+                    ],
+                    true,
+                    $sentry
+                ));
+
+                /* SUDS Timetable
+                 */
+                $api->add(buildApiClass(
+                    Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
+                    [
+                        $user,
+                        $viewer,
+                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                        \Schoolbox\External\ClassEntryMapper::getInstance(),
+                        \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                        \Schoolbox\External\Event\Mapper ::getInstance(),
+                        \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                        \Schoolbox\UserMapper::getInstance()
                     ],
                     true,
                     $sentry

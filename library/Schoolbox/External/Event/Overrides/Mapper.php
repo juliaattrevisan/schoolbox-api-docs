@@ -33,9 +33,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('event_id', self::TYPE_INTEGER);
         $this->uses('action', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins('external_id', \Schoolbox\UserMapper::class, 'synergy_id', null, null, 'user', 'externalId');
     }
@@ -49,6 +49,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString()
     {
+        $staff = \Schoolbox\Role::STAFF;
+        $student = \Schoolbox\Role::STUDENT;
+
         return "
             SELECT
                 {$this->getColumnString()},
@@ -56,7 +59,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('externalId.role', 'r')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('externalId', '', 'u')}
-            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')}
+            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')} 
+                AND r.group_type IN ('{$staff}', '{$student}')
         ";
     }
 
@@ -76,25 +80,57 @@ class Mapper extends \Schoolbox\Mapper
         foreach ($statement as $row) {
             $override = $this->hydrate($row);
 
-            /** @var \Schoolbox\User|null $user */
-            $user = $this->hydrateJoin($row, 'externalId', 'u');
-
             /* This corresponds to a 'clear' mutation in the overrides
+             * It has no user relationships
              */
-            if (null === $user) {
+            if (Model::CLEAR === $override->getAction()) {
                 $stack->add($override);
                 continue;
             }
 
-            /** @var \Schoolbox\Role $role */
-            $role = $this->hydrateJoin($row, 'externalId.role', 'r');
+            /* If the role is not null,
+             * then we have a staff or student user we can utilise
+             *
+             * Parent and Guest roletypes spawn with r.id as null
+             * but we can't exclude those in LEFT JOIN via getSelectString
+             * because we'll lose the (null, 'clear') overrides.
+             */
+            if ($row['r.id']) {
+                /** @var \Schoolbox\User|null $user */
+                $user = $this->hydrateJoin($row, 'externalId', 'u');
 
-            $user->setRole($role);
-            $override->setUser($user);
+                /** @var \Schoolbox\Role|null $role */
+                $role = $this->hydrateJoin($row, 'externalId.role', 'r');
 
-            $stack->add($override);
+                if ($user && $role) {
+                    $user->setRole($role);
+
+                    $override->setUser($user);
+
+                    $stack->add($override);
+                }
+            }
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Find an in-order list of overrides for a given event identifier
+     * This returns the mutations in explicitly order of 'sequence'
+     * so you can't get execute them in an unintended order e.g.
+     * relying on the db to push them out in the way you had thought
+     *
+     * @param int $eventId
+     * @return GenericCollection
+     */
+    public function findForEvent(int $eventId): GenericCollection
+    {
+        return $this->findByColumn('event_id', $eventId, [
+            'order' => [
+                'sequence' => 'asc'
+            ]
+        ]);
     }
 }

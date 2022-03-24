@@ -66,7 +66,9 @@ if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
 } elseif (isset($_GET['folderId'])) {
     /* If folderId was a querystring param, produce a specific set of subscriptions
      */
-    $api = $this->getDi()->get('calendarApiFactory')->produceForFolderId((int)$_GET['folderId'], $user, $viewer);
+    $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById((int)$_GET['folderId']);
+
+    $api = $this->getDi()->get('calendarApiFactory')->produceForFolder($folder, $user, $viewer);
 } else {
     /* Otherwise just get the set of events relevant to a particular user
      */

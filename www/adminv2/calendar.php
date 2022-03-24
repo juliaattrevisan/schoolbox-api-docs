@@ -77,14 +77,18 @@ $this->setVar('cleanup_has_events_block', '');
 $this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
-
-
 $typeList = [
     ['type' => 'Import'],
     ['type' => 'Subscribe'],
     ['type' => 'Cleanup']
 ];
 
+/* A list of custom overrides if you don't want to
+ * programmatically generate the titles
+ */
+$subscriptionLabels = [
+    'SudsTimetable' => 'School Data Timetable'
+];
 
 foreach ($typeList as $type) {
     /* Navigation stuff
@@ -119,8 +123,10 @@ foreach ($typeList as $type) {
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
+            $label = $subscriptionLabels[$currentEventType] ?? trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType));
+
             $this->setVar([
-                'EVENTTYPE_LABEL' => trim(preg_replace('/[A-Z]+/', ' $0', $currentEventType)),
+                'EVENTTYPE_LABEL' => $label,
                 'EVENTTYPE_NAME' => $currentEventType,
             ]);
 
@@ -204,10 +210,9 @@ foreach ($typeList as $type) {
         }
 
         $this->parse('subscribe_block', 'subscribe');
-    } /* Cleanup page
-     */
-    elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
-        /* If both dates specified, find events between those two dates inclusive
+    } elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
+        /* Cleanup page
+         * If both dates specified, find events between those two dates inclusive
          */
         if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
             $from = \Alaress_Date_Format::newLocalShort($_GET['cleanupFrom']);

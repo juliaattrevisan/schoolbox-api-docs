@@ -10,14 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event\Overrides;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Model implements ISoftDeletable
+class Model
 {
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
 
 
     /**
@@ -44,6 +42,12 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     private ?string $action;
+
+
+    /**
+     * @var int
+     */
+    private int $sequence;
 
 
     /**
@@ -102,6 +106,26 @@ class Model implements ISoftDeletable
     public function setAction(?string $action): self
     {
         $this->action = $action;
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSequence(): int
+    {
+        return $this->sequence;
+    }
+
+
+    /**
+     * @param int $sequence
+     * @return Model
+     */
+    public function setSequence(int $sequence): self
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }
