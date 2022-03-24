@@ -288,4 +288,26 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * updates all fields for a user
+     *
+     * @api PUT /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPut
+     */
+    public function apiUserPut()
+    {
+
+    }
+
+    /**
+     *  updates selected fields for a user
+     *
+     * @api PATCH /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPATCH
+     */
+    public function apiUserPatch()
+    {
+
+    }
 }
