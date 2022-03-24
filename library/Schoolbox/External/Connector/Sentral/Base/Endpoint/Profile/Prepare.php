@@ -138,8 +138,10 @@ class Prepare implements IStrategy
              * that were supposed to have been deleted prior
              */
             sleep(1);
+
             $this->relationshipMapper->truncate();
-            $this->log->debug('Purged profile relations');
+
+            $this->log->info('Purged existing profiles and profile relations');
         }
     }
 }

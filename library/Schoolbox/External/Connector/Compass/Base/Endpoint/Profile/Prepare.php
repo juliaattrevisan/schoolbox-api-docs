@@ -133,7 +133,7 @@ class Prepare implements IStrategy
              */
             $this->relationshipMapper->truncate();
 
-            $this->log->info('Purged existing profile relations and user profile data');
+            $this->log->info('Purged existing profiles and profile relations');
         }
     }
 }
