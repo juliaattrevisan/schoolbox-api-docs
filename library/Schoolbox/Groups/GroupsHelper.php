@@ -3,6 +3,8 @@
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -21,6 +23,11 @@ class GroupsHelper
     public const ENROLLED    = 'enrolled';
     public const NOTENROLLED = 'notEnrolled';
     public const PENDING     = 'pending';
+
+    public const MEMBERSHIP_NONE = 'none';
+    public const MEMBERSHIP_READ = 'read';
+    public const MEMBERSHIP_WRITE = 'write';
+    public const MEMBERSHIP_ADMIN = 'admin';
 
     private GroupMapper $groupMapper;
     private UserAccessMapper $userAccessMapper;
@@ -52,7 +59,8 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
+        $userPerms = $this->findGroups($user);
+//        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enrolled in
@@ -317,16 +325,27 @@ class GroupsHelper
 
     /**
      * add user to group
+     * @param User  $user
+     * @param Group $group
+     * @param int   $enrollmentStatus (default: ACCESS_AWAITING_AUTHORISATION)
+     * @param int   $membership (default: ACCESS_READ, only has effect if $enrolmentStatus is GroupsHelper::ENROLLED)
+     * @param bool  $isFavourite (default: false)
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function addToGroup(User $user, Group $group)
+    public function addToGroup(User $user, Group $group, int $enrollmentStatus = UserAccess::ACCESS_AWAITING_AUTHORISATION, int $membership = UserAccess::ACCESS_READ, bool $isFavourite = false)
     {
+        //is awaiting Auth?
+        $accessLevel = $enrollmentStatus;
+        if (UserAccess::ACCESS_AWAITING_AUTHORISATION !== $accessLevel && UserAccess::ACCESS_DENY !== $accessLevel) {
+            $accessLevel = $membership;
+        }
         //add the user to the group
         $userGroup = $this->userAccessMapper->createModel();
         $userGroup->setServiceIdentifier($group->getFolder()->getId())
                   ->setUser($user)
                   ->setService(UserAccess::SERVICE_HOMEPAGE)
-                  ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
-                  ->setFavourite(false); //default to no favourite groups.
+                  ->setAccessLevel($accessLevel)
+                  ->setFavourite($isFavourite); //default to no favourite groups.
         //save group object
         $this->userAccessMapper->save($userGroup);
     }
@@ -337,10 +356,7 @@ class GroupsHelper
     public function deleteFromGroup(User $user, Group $group)
     {
         //find user record
-        $userGroup = $this->userAccessMapper->findOneByColumnList([
-                                                                      'uid' => $user->getId(),
-                                                                      'sid' => $group->getFolder()->getId(),
-                                                                  ]);
+        $userGroup = $this->findSingleGroup($user, $group);
         //remove the user group / favourite
         $this->userAccessMapper->delete($userGroup);
 
@@ -355,10 +371,7 @@ class GroupsHelper
      */
     public function setFavourite(User $user, Group $group, bool $isFavourite)
     {
-        $userPerms = $this->userAccessMapper->findOneByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'sid'     => $group->getFolder()->getId()
-                                                               ]);
+        $userPerms = $this->findSingleGroup($user, $group);
         $userPerms->setFavourite($isFavourite);
         $this->userAccessMapper->save($userPerms);
     }
@@ -369,11 +382,101 @@ class GroupsHelper
     public function getGroup(User $user, Group $group)
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findByColumnList([
+        $userPerms = $this->findSingleGroup($user, $group);
+        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], [$group->getFolder()->getId() => $userPerms]);
+    }
+
+    /**
+     * checks if the user is a member of the group (not including sis groups)
+     */
+    public function inGroup(User $user, Group $group): bool
+    {
+        try {
+            $userPerms = $this->findSingleGroup($user, $group);
+            return true;
+        } catch (NotFound $e) {
+            return false;
+        }
+    }
+
+    /**
+     * get only configurable groups (not SIS controlled)
+     * @return GenericCollection|UserAccess[]
+     */
+    private function findGroups(User $user): GenericCollection
+    {
+        return $this->userAccessMapper->findByColumnList([
                                                                    'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                                   'sid'     => $group->getFolder()->getId()
+                                                                   'service' => UserAccess::SERVICE_HOMEPAGE
                                                                ])->indexBy('serviceIdentifier');
-        return $this->buildGroups($user, $userPerms->keys(), $userPerms);
+    }
+
+    /**
+     * get the 1 group that is also configurable (not SIS controlled)
+     * @param User  $user
+     * @param Group $group
+     * @return UserAccess
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    private function findSingleGroup(User $user, Group $group): UserAccess
+    {
+        return $this->userAccessMapper->findOneByColumnList([
+                                                             'uid'     => $user->getId(),
+                                                             'service' => UserAccess::SERVICE_HOMEPAGE,
+                                                             'sid'     => $group->getFolder()->getId()
+                                                         ], ['cache' => false]);
+    }
+
+    /**
+     * convert membership string to membership int for DB use
+     * MEMBERSHIP_NONE      => UserAccess::ACCESS_DENY
+     * MEMBERSHIP_READ      => UserAccess::ACCESS_READ
+     * MEMBERSHIP_WRITE     => UserAccess::ACCESS_WRITE
+     * MEMBERSHIP_ADMIN     => UserAccess::ACCESS_FULL
+     */
+    public static function getMembershipInt(string $membership): int
+    {
+        $membershipArray = [
+            self::MEMBERSHIP_NONE   => UserAccess::ACCESS_DENY,
+            self::MEMBERSHIP_READ   => UserAccess::ACCESS_READ,
+            self::MEMBERSHIP_WRITE  => UserAccess::ACCESS_WRITE,
+            self::MEMBERSHIP_ADMIN  => UserAccess::ACCESS_FULL,
+        ];
+        return $membershipArray[$membership];
+    }
+
+    /**
+     * convert membership int to membership string for json use
+     * UserAccess::ACCESS_DENY     => MEMBERSHIP_NONE
+     * UserAccess::ACCESS_READ     => MEMBERSHIP_READ
+     * UserAccess::ACCESS_WRITE    => MEMBERSHIP_WRITE
+     * UserAccess::ACCESS_FULL     => MEMBERSHIP_ADMIN
+     */
+    public static function getMembershipString(int $membership): string
+    {
+        $membershipArray = [
+            UserAccess::ACCESS_DENY     => self::MEMBERSHIP_NONE,
+            UserAccess::ACCESS_READ     => self::MEMBERSHIP_READ,
+            UserAccess::ACCESS_WRITE    => self::MEMBERSHIP_WRITE,
+            UserAccess::ACCESS_FULL     => self::MEMBERSHIP_ADMIN,
+        ];
+        return $membershipArray[$membership];
+    }
+
+    /**
+     * convert enrolment string to enrolment int for DB use
+     * notEnroled   => UserAccess::ACCESS_DENY
+     * pending      => UserAccess::ACCESS_AWAITING_AUTH
+     * enroled      => UserAccess::ACCESS_READ
+     */
+    public static function getEnrolmentInt(string $enrolment): int
+    {
+        $enrolmentArray = [
+            self::NOTENROLLED   => UserAccess::ACCESS_DENY,
+            self::PENDING       => UserAccess::ACCESS_AWAITING_AUTHORISATION,
+            self::ENROLLED      => UserAccess::ACCESS_READ,
+        ];
+        return $enrolmentArray[$enrolment];
     }
 }
