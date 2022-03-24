@@ -444,7 +444,8 @@ class Controller extends Base
                 $this->response->redirect->to($embedUrl);
                 return;
             } else {
-                // Content is already selected: just launch it
+                // This component is a picker, and content has been selected:
+                // now launch it.
                 $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
             }
         } else {
