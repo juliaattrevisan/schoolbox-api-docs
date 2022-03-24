@@ -14,7 +14,9 @@ CREATE TABLE `sis_event` (
   `source` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  INDEX `classification` (`classification` ASC),
   INDEX `code` (`code` ASC),
+  INDEX `location` (`location` ASC),
   INDEX `source` (`source` ASC),
   PRIMARY KEY (`id`))
   COLLATE=utf8mb4_unicode_ci
@@ -27,6 +29,8 @@ CREATE TABLE `sis_event_user_overrides` (
   `sequence` INT NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  INDEX `action` (`action` ASC),
+  INDEX `external_id` (`external_id` ASC),
   INDEX `fk_sis_event_user_overrides_idx` (`event_id` ASC),
     CONSTRAINT `fk_sis_event_user_overrides`
       FOREIGN KEY (`event_id`)
@@ -41,6 +45,7 @@ CREATE TABLE `sis_event_roletype` (
   `roletype` ENUM('staff', 'student', 'parent') CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  INDEX `roletype` (`roletype` ASC),
   INDEX `fk_sis_event_roletype_idx` (`event_id` ASC),
     CONSTRAINT `fk_sis_event_roletype`
       FOREIGN KEY (`event_id`)
@@ -55,6 +60,7 @@ CREATE TABLE `sis_event_campus` (
   `campus_name` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
+  INDEX `campus_name` (`campus_name` ASC),
   INDEX `fk_sis_event_campus_idx` (`event_id` ASC),
   CONSTRAINT `fk_sis_event_campus`
       FOREIGN KEY (`event_id`)
