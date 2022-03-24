@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -132,15 +133,6 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enrolled in the Group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
-        }
-
         $post = json_decode(json_encode($this->request->content->get()), true);
         /**
          * check post array if missing any, lets error out...
@@ -156,49 +148,13 @@ class Controller extends Base
             return; //exit early the api does not have enough data to work correctly.
         }
 
-        //check if user is trying to break the system by deleting a user via the PUT command, and error
-        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
-            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early this API wont delete a user...
-        }
-
-        $post['membership'] = $this->groupsHelper->getMembershipInt($post['membership']);
-        $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
-        $post['isFavourite'] = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
-
-        /**
-         * check if we should be updating the users enrolment / membership
-         * if enrolment status is set, and is Enroled / awaiting auth, then lets change the membership perms
-         */
-        if (UserAccess::ACCESS_AWAITING_AUTHORISATION === $post['enrolmentStatus']) {
-            //if set to awaiting auth, set to deny (which is in the groups system awaiting auth)
-            $post['membership'] = UserAccess::ACCESS_DENY;
-        }
-        if (UserAccess::ACCESS_READ === $post['enrolmentStatus']) {
-            /**
-             * it should grab the higher perm either membership or read
-             * $post['membership'] could be none, read, write or admin, so need to check, not just assume.
-             */
-            $post['membership'] = max($post['membership'], UserAccess::ACCESS_READ);
-        }
-
-        $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
-        $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
-        //get data from save
-        $users_groups = $this->groupsHelper->getGroup($user, $group);
-        $apiGroups = new Collection($users_groups);
-        $output = $apiGroups->map(new ModelToArray());
-        //output
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $defaultData = [
+            'membership'        => UserAccess::ACCESS_READ,
+            'isNotificationsOn' => true,
+            'isFavourite'       => false,
+            'enrolmentStatus'   => GroupsHelper::ENROLLED,
+        ];
+        $this->processGroupPostData($user, $group, $post, $defaultData);
     }
 
     /**
@@ -211,6 +167,19 @@ class Controller extends Base
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
+        $users_group = $this->groupsHelper->getGroup($user, $group)[0];
+        $post = json_decode(json_encode($this->request->content->get()), true);
+        $defaultData = [
+            'membership'        => $this->groupsHelper->getMembershipStringFromGroup($users_group),
+            'isNotificationsOn' => $users_group['isNotificationsOn'],
+            'isFavourite'       => $users_group['isFavourite'],
+            'enrolmentStatus'   => $users_group['enrolmentStatus'],
+        ];
+        $this->processGroupPostData($user, $group, $post, $defaultData);
+    }
+
+    private function processGroupPostData(User $user, Group $group, array $post, array $defaultData): void
+    {
         if (!$this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enrolled in the Group'))
                 ->setStatus(404)
@@ -219,9 +188,6 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the user is part of the group.
         }
-
-        $users_group = $this->groupsHelper->getGroup($user, $group)[0];
-        $post = json_decode(json_encode($this->request->content->get()), true);
 
         //check if user is trying to break the system by deleting a user via the PUT command, and error
         if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
@@ -233,12 +199,10 @@ class Controller extends Base
             return; //exit early this API wont delete a user...
         }
 
-        $currentMembership = $this->groupsHelper->getMembershipStringFromGroup($users_group);
-
-        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $currentMembership);
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? $users_group['isNotificationsOn'];
-        $post['isFavourite'] = $post['isFavourite'] ?? $users_group['isFavourite'];
-        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? $users_group['enrolmentStatus']);
+        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $defaultData['membership']);
+        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? $defaultData['isNotificationsOn'];
+        $post['isFavourite'] = $post['isFavourite'] ?? $defaultData['isFavourite'];
+        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? $defaultData['enrolmentStatus']);
 
         /**
          * check if we should be updating the users enrolment / membership
