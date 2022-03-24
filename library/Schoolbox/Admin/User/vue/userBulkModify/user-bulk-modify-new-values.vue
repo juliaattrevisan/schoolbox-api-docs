@@ -79,7 +79,20 @@ export default {
          */
         updatedLogData () {
             return this.logData[0].replace(/<br\s*\/?>/gi, '');
-        }
+        },
+
+        /**
+         * For proper count display, eg: '1 user' / '4 users'
+         *
+         * @returns {String}
+         */
+        selectedRowsCountWithRowName () {
+            if (this.selectedRows.length === 1) {
+                return this.selectedRows.length + ' user';
+            } else {
+                return this.selectedRows.length + ' users';
+            }
+        },
 
     },
 
@@ -162,7 +175,7 @@ export default {
             </div>
             <div v-else class="new-values">
                 <div class="new-values__full-width">
-                    <h2>Bulk modify {{ selectedRows.length }} users selected</h2>
+                    <h2>Bulk modify {{ selectedRowsCountWithRowName }} selected</h2>
                 </div>
                 <div>
                     <label>
