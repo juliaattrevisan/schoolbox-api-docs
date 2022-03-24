@@ -23,6 +23,31 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Code\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
+
+
+    /**
+     * Special usages of mappers due to an exotic join
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+    }
+
+
     /**
      * @inheritDoc
      */
@@ -34,6 +59,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('detail', self::TYPE_STRING);
         $this->uses('location', self::TYPE_STRING);
+        $this->uses('code', self::TYPE_STRING);
         $this->uses('day', self::TYPE_STRING);
         $this->uses('period', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
@@ -45,8 +71,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->joins('code', \Schoolbox\Resource\Folder\Code\Mapper::class, 'code', null, null, 'code', 'folderCode');
     }
 
 
@@ -54,21 +78,23 @@ class Mapper extends \Schoolbox\Mapper
      * @inheritDoc
      *
      * @return string
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     protected function getSelectString()
     {
-        $x = "
+        /* I can't join to a folder via a code (code doesn't have an identifier property)
+         */
+        $folderColumnString = $this->folderMapper->getColumnString('f');
+        $folderCodeColumnString = $this->folderCodeMapper->getColumnString('fc');
+
+        return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('folderCode', 'fc')},
-                {$this->getJoinColumnString('folderCode.folder', 'f')}
+                {$folderColumnString}, 
+                {$folderCodeColumnString}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('folderCode', '', 'fc')}
-            LEFT JOIN {$this->getJoinSql('folderCode.folder', 'fc', 'f')}
+            LEFT JOIN folder_code fc ON {$this->getTable()}.code = fc.code
+            LEFT JOIN folder f ON fc.folder_id = f.id 
         ";
-
-        return $x;
     }
 
 
@@ -85,24 +111,23 @@ class Mapper extends \Schoolbox\Mapper
         $stack = $this->createCollection();
 
         foreach ($statement as $row) {
-            new \Alaress_Probe($row);
             $event = $this->hydrate($row);
-//
+
             /* If a folder code x folder join can be found, shove it in
              */
             if ($row['f.id']) {
-                /** @var \Schoolbox\Resource\Folder\Model $folder */
-                $folder = $this->hydrateJoin($row, 'folderCode.folder', 'f');
+                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
+                $folder = $this->folderMapper->hydrate($row, 'f');
 
-                /** @var \Schoolbox\Resource\Folder\Code\Model $folderCode */
-                $folderCode = $this->hydrateJoin($row, 'folderCode', 'fc');
+                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
+                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
 
-                $folder->setCodes($this->getJoinMapper('folderCode')->createCollection([$folderCode]));
+                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
 
-
+                $event->setFolder($folder);
             }
 
-            new \Alaress_Probe($row, $folderCode, $folder);
+            $stack->add($event);
         }
 
         return $stack;

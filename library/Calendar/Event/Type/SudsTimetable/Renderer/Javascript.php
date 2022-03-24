@@ -99,8 +99,8 @@ class Javascript extends Base
                 ],
                 'links'      => [
                     'category' => [
-                        'id'   => $this->event->getFolder()->getId(),
-                        'name' => $this->event->getFolder()->getTitle(),
+                        'id'   => $this->event->getFolder() ? $this->event->getFolder()->getId() : null,
+                        'name' => $this->event->getFolder() ? $this->event->getFolder()->getTitle() : null
                     ],
                 ],
                 'styles'     => [

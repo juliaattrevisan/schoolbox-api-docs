@@ -101,6 +101,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Model|null
+     */
+    private ?\Schoolbox\Resource\Folder\Model $folder = null;
+
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string
@@ -336,6 +342,26 @@ class Model implements ISoftDeletable
     public function setSource(?string $source): self
     {
         $this->source = $source;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model|null
+     */
+    public function getFolder(): ?\Schoolbox\Resource\Folder\Model
+    {
+        return $this->folder;
+    }
+
+
+    /**
+     * @param \Schoolbox\Resource\Folder\Model|null $folder
+     * @return $this
+     */
+    public function setFolder(?\Schoolbox\Resource\Folder\Model $folder): self
+    {
+        $this->folder = $folder;
         return $this;
     }
 }

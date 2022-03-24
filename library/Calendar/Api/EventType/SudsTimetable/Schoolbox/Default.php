@@ -158,16 +158,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
-            /* Try to find a matching folder for this event's code
-             * If a folder exists, link to that
-             * Otherwise, leave it empty
-             */
-            try {
-                $folder = $this->folderMapper->findByCode($timetableEvent->getCode());
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $folder = null;
-            }
-
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($timetableEvent->getTitle());
@@ -181,7 +171,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setAllDay(false);
             $instance->setColour($eventColor);
             $instance->setType($eventType);
-            $instance->setFolder($folder);
+            $instance->setFolder($timetableEvent->getFolder());
 
             $stack->add($instance);
         }
