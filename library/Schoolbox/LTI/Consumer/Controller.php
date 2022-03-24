@@ -275,6 +275,7 @@ class Controller extends Base
 
             if (isset($item['@type']) && isset($item['mediaType'])) {
                 if ($item['@type'] === 'LtiLinkItem' && $item['mediaType'] === self::LTI_MEDIA_TYPE_LINK) {
+                    // Handle the EducationPerfect special case
                     if (isset($item['custom'])) {
                         if (
                             isset($item['custom']['contentUrl']) &&
@@ -283,14 +284,21 @@ class Controller extends Base
                         ) {
                             // Construct the URL
 
-                            $targetUrl = $item['custom']['contentUrl'] . "#/";
-                            $targetUrl .= $item['custom']['activity'] . "/";
-                            $targetUrl .= $item['custom']['module'] . "/activity-starter";
+                            $embedUrl = $item['custom']['contentUrl'] . "#/";
+                            $embedUrl .= $item['custom']['activity'] . "/";
+                            $embedUrl .= $item['custom']['module'] . "/activity-starter";
 
                             // Found everything we need, get outta here and use it
 
                             break;
                         }
+                    }
+
+                    // Handle the standard case
+                    // (as returned by Google Assignments and probably others)
+                    if (isset($item['url'])) {
+                        $embedUrl = $item['url'];
+                        break;
                     }
                 }
             }
@@ -300,13 +308,13 @@ class Controller extends Base
 
         // If we got here without finding and URL, throw an exception because there is nothing else we can do
 
-        if (!isset($targetUrl) || strlen(trim($targetUrl)) === 0) {
+        if (!isset($embedUrl) || strlen(trim($embedUrl)) === 0) {
             throw new Exception("No content location header could be found, cannot proceed.");
         }
 
         // Update the component with the target URL
 
-        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $targetUrl);
+        $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
 
         // Update the component with the title (assuming we found one)
 
@@ -327,13 +335,21 @@ class Controller extends Base
         // has its title or iframe height adjusted to the new parameters until the page is reloaded. The
         // javascript inside this template updates these in the DOM.
 
+        // The launch URL generates a POST request to the embed URL.
+        $launchUrl = $this->router->generate('ltiConsumer.getLaunch', [
+            'providerId'  => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+            'componentId' => $component->getInstance()->getId(),
+            'folderId'    => $component->getContext()->getId(),
+        ]);
+
         $this->getResponse()->content->set([
             'template' => '@ltiConsumer/redirect.twig',
             'format'   => 'nochrome',
             'data'     => [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
-                'url'            => $targetUrl,
+                'embedUrl'       => $embedUrl,
+                'launchUrl'      => $launchUrl,
                 'height'         => $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
@@ -422,11 +438,18 @@ class Controller extends Base
 
                     $launch_data['contentUrl'] = $embedUrl;
                 }
-            } else {
+            } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
+                // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
                 $this->response->redirect->to($embedUrl);
                 return;
+            } else {
+                // This component is a picker, and content has been selected:
+                // now launch it.
+                $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
             }
+        } else {
+            $embedUrl = null;
         }
 
         // Define allowed return types from LTI providers
@@ -512,7 +535,7 @@ class Controller extends Base
             array_push($launch_params, $key . "=" . rawurlencode($launch_data[$key]));
         }
 
-        $base_string = "POST&" . urlencode($provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
+        $base_string = "POST&" . urlencode($embedUrl ?? $provider->getUrl()) . "&" . rawurlencode(implode("&", $launch_params));
         $secret      = urlencode($provider->getSecret()) . "&";
         $signature   = base64_encode(hash_hmac("sha1", $base_string, $secret, true));
 
@@ -525,6 +548,7 @@ class Controller extends Base
                 'params'    => $launch_data,
                 'provider'  => $provider,
                 'signature' => $signature,
+                'embedUrl'  => $embedUrl,
             ],
         ]);
     }
@@ -546,40 +570,42 @@ class Controller extends Base
         // and it will just redirect to the target URL. The only real difference at this point
         // is that the return parameter names differ slightly.
 
-        $url    = null;
         $height = null;
-        $title  = null;
-
         switch ($return_type) {
             case self::LTI_RETURN_TYPE_IFRAME:
-                $url    = $get['url'];
-                $title  = $get['title'];
-                $height = $get['height'];
+                $embedUrl  = $get['url'];
+                $launchUrl = $embedUrl;
+                $title     = $get['title'];
+                $height    = $get['height'];
                 break;
 
             case self::LTI_RETURN_TYPE_URL:
-                $url   = $get['url'];
-                $title = $get['text'];
-                break;
-
             case self::LTI_RETURN_TYPE_FILE:
-                $url   = $get['url'];
-                $title = $get['text'];
+                $embedUrl  = $get['url'];
+                $launchUrl = $embedUrl;
+                $title     = $get['text'];
                 break;
 
             case self::LTI_RETURN_TYPE_IMAGE:
-                $url    = $get['url'];
-                $title  = $get['text'];
-                $height = $get['height'];
+                $embedUrl  = $get['url'];
+                $launchUrl = $embedUrl;
+                $title     = $get['text'];
+                $height    = $get['height'];
                 break;
 
             case self::LTI_RETURN_TYPE_LAUNCH:
-                $url   = $get['url'];
-                $title = $get['text'];
+                // For launches:
+                // the launch URL generates a POST request to the embed URL
+                $embedUrl  = $get['url'];
+                $launchUrl = $this->router->generate('ltiConsumer.getLaunch', [
+                    'providerId'   => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
+                    'componentId'  => $component->getInstance()->getId(),
+                    'folderId'     => $component->getContext()->getId(),
+                ]);
+                $title     = $get['text'];
                 break;
 
             // Throw an exception error if we receive an unknown
-
             default:
                 throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -590,8 +616,8 @@ class Controller extends Base
             $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_TITLE, $title);
         }
 
-        if (!empty($url)) {
-            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $url);
+        if (!empty($embedUrl)) {
+            $this->updateComponentValue($component, LtiComponent::COMPONENT_CONFIG_LTI_EMBED_URL, $embedUrl);
         }
 
         if (!empty($height)) {
@@ -611,7 +637,8 @@ class Controller extends Base
             'data'     => [
                 'componentId'    => $component->getInstance()->getId(),
                 'componentTitle' => $title,
-                'url'            => $url,
+                'embedUrl'       => $embedUrl,
+                'launchUrl'      => $launchUrl,
                 'height'         => $height,
                 'version'        => $this->getConfigLoader()->get('site_version'),
             ],
