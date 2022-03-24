@@ -32,7 +32,7 @@ class ArrayToModel extends Base
         $userMapper = UserMapper::getInstance();
         foreach ($array as $label => $value) {
             //check if what the user is attempting to edit is valid?
-            if (in_array($label, ["guardians", "students", "impersonableUser", "groups"])) {
+            if (in_array($label, ["guardians", "students", "groups"])) {
                 throw new SchoolboxException("'$label' field is unable to be updated at this endpoint");
             }
             if ('fullName' === $label) {
