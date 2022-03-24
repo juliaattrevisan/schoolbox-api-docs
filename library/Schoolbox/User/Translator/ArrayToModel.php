@@ -96,7 +96,7 @@ class ArrayToModel extends Base
                     } catch (NotFound | Deleted $e) {
                         throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
                     }
-                    $model->setLinkedUser()->add($user);
+                    $model->getLinkedUser()->add($user);
                 }
             } else {
                 if (!method_exists($model, $function)) {
