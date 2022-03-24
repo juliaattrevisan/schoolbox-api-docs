@@ -265,6 +265,9 @@ class Controller extends Base
             }
         }
 
+        /**
+         * build the user Model object from the POST data
+         */
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $newUser);
 
