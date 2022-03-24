@@ -40,7 +40,7 @@ class TimetableUsers
 
 
     /**
-     * @var Mapper
+     * @var \Schoolbox\External\Event\Overrides\Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overrideMapper;
 
