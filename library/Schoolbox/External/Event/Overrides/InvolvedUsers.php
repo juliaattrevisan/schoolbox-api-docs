@@ -211,7 +211,6 @@ class InvolvedUsers
             WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
-            AND se.deleted_at IS NULL
             AND u.synergy_id = :externalId
             AND u.deleted_at IS NULL
         ";
@@ -267,8 +266,6 @@ class InvolvedUsers
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
             AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
-            AND se.deleted_at IS NULL
-            AND seuo.deleted_at IS NULL
         ";
 
         $params = [

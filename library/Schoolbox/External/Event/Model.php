@@ -10,15 +10,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Model implements ISoftDeletable
+class Model
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
 
 
     /**
