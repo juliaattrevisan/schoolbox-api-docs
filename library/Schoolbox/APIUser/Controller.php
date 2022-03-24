@@ -298,20 +298,18 @@ class Controller extends Base
     public function apiUserPut(User $user)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
-        /**
-         * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
-         * that should be done at the PUT/PATCH method
-         */
+
+        $userModal = $this->userMapper->createModel($user->getId());
 
         /**
          * build the user Model object from the POST data
          */
         //set default fields
-        $user->setEnabled(true);
-        $user->setSuperuser(false);
+        $userModal->setEnabled(true);
+        $userModal->setSuperuser(false);
 
         /** @var User $model */
-        $model = (new User\Translator\ArrayToModel())($data, $user);
+        $model = (new User\Translator\ArrayToModel())($data, $userModal);
 
         $this->userMapper->save($model);
 
@@ -339,6 +337,33 @@ class Controller extends Base
      */
     public function apiUserPatch(User $user)
     {
+        $data = json_decode(json_encode($this->request->content->get()), true);
 
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+        $user->setEnabled(true);
+        $user->setSuperuser(false);
+
+        /** @var User $model */
+        $model = (new User\Translator\ArrayToModel())($data, $user);
+
+        $this->userMapper->save($model);
+
+        //get hydrated user, or the campus/role/house wont have names, just ids...
+        $updatedUser = $this->userMapper->findById($model->getId());
+        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser);
+        $apiGroups = new Collection($users_groups);
+        $groupsArr = $apiGroups->map(new GroupArray());
+        /**
+         * build the whole thing
+         */
+        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
     }
 }
