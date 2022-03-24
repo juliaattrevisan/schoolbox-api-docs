@@ -441,6 +441,9 @@ class Controller extends Base
                 // (The return type from getComponentCallback probably matters here)
                 $this->response->redirect->to($embedUrl);
                 return;
+            } else {
+                // Content is already selected: just launch it
+                $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
             }
         } else {
             $embedUrl = null;
