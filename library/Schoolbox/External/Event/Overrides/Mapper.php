@@ -49,6 +49,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString()
     {
+        $staff = \Schoolbox\Role::STAFF;
+        $student = \Schoolbox\Role::STUDENT;
+
         return "
             SELECT
                 {$this->getColumnString()},
@@ -56,7 +59,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('externalId.role', 'r')}
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('externalId', '', 'u')}
-            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')}
+            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')} 
+                AND r.group_type IN ('{$staff}', '{$student}')
         ";
     }
 
@@ -84,18 +88,21 @@ class Mapper extends \Schoolbox\Mapper
                 continue;
             }
 
-            /** @var \Schoolbox\User|null $user */
-            $user = $this->hydrateJoin($row, 'externalId', 'u');
+            /* If the role is not null,
+             * then we have a staff or student user we can utilise
+             *
+             * Parent and Guest roletypes spawn with r.id as null
+             * but we can't exclude those in LEFT JOIN via getSelectString
+             * because we'll lose the (null, 'clear') overrides.
+             */
+            if ($row['r.id']) {
+                /** @var \Schoolbox\User|null $user */
+                $user = $this->hydrateJoin($row, 'externalId', 'u');
 
-            if ($user) {
                 /** @var \Schoolbox\Role $role */
                 $role = $this->hydrateJoin($row, 'externalId.role', 'r');
 
-                /* The timetable doesn't involve parents. externalIds might end up
-                 * being shared among multiple roletypes, but we can specifically
-                 * exclude irrelevant roletypes here
-                 */
-                if ($role->isStudent() || $role->isStaff()) {
+                if ($user && $role) {
                     $user->setRole($role);
 
                     $override->setUser($user);
