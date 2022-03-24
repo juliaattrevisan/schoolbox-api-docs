@@ -179,7 +179,8 @@ class Calendar_Api_Factory
             $viewer,
             \Schoolbox\Calendar\EventTypeMapper::getInstance(),
             \Schoolbox\External\Event\Mapper ::getInstance(),
-            \Schoolbox\UserMapper::getInstance(),
+            \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+            \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
             \Schoolbox\Resource\Folder\Mapper::getInstance()
         ));
 
@@ -289,7 +290,8 @@ class Calendar_Api_Factory
                     $viewer,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
                     \Schoolbox\Resource\Folder\Mapper::getInstance()
                 );
             default:

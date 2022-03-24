@@ -424,7 +424,8 @@ try {
                     $viewer,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
                     \Schoolbox\Resource\Folder\Mapper::getInstance()
                 ],
                 true,
@@ -568,7 +569,8 @@ try {
                         $viewer,
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\External\Event\Mapper ::getInstance(),
-                        \Schoolbox\UserMapper::getInstance(),
+                        \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                        \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
                         \Schoolbox\Resource\Folder\Mapper::getInstance()
                     ],
                     true,

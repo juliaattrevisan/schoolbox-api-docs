@@ -2,6 +2,7 @@
 
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\User;
 
 /**
@@ -26,9 +27,15 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
 
     /**
-     * @var \Schoolbox\UserMapper
+     * @var \Schoolbox\External\Event\Campus\Mapper
      */
-    private \Schoolbox\UserMapper $userMapper;
+    private \Schoolbox\External\Event\Campus\Mapper $campusMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Roletype\Mapper
+     */
+    private \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper;
 
 
     /**
@@ -46,14 +53,16 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         User $viewer,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\External\Event\Campus\Mapper $campusMapper,
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
         \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
         $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
-        $this->userMapper = $userMapper;
+        $this->campusMapper = $campusMapper;
+        $this->roletypeMapper = $roletypeMapper;
         $this->folderMapper = $folderMapper;
     }
 
@@ -118,8 +127,8 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
          */
         $events = (new \Schoolbox\External\Event\EventUsers(
             $this->eventMapper,
-            \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-            \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+            $this->campusMapper,
+            $this->roletypeMapper
         ))->findForUser($this->getUser());
 
         /** @var \Schoolbox\External\Event\Model $event */
