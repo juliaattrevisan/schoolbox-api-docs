@@ -29,7 +29,7 @@ class Lookup
      *
      * @var array
      */
-    private $allLookups = [
+    private array $allLookups = [
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
@@ -40,6 +40,11 @@ class Lookup
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
         'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
     ];
+
+    /**
+     * ID for Not Set options for properties which can be unset
+     */
+    public const NOT_SET_ID = -1;
 
     /**
      * Get lookup data
@@ -71,7 +76,8 @@ class Lookup
                      */
                     $allResults = $mapper->findFolders();
                 } elseif (in_array($userField, ['year', 'residentialHouse', 'schoolHouse'])) {
-                    $notSet = ($userField === 'year') ? ($mapper->createModel())->setName('Not Set') : ($mapper->createModel())->setHouse('Not Set');
+                    $notSet = ($mapper->createModel())->setId(self::NOT_SET_ID);
+                    ($userField === 'year') ? $notSet->setName('Not Set') : $notSet->setHouse('Not Set');
                     /** @var GenericCollection $allResults */
                     $allResults = $mapper->createCollection()->add($notSet);
                     $allResults = $allResults->merge($mapper->findAll());

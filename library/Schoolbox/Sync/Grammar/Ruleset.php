@@ -12,6 +12,7 @@ use Alaress\Rules\TokenizedRuleset;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\Mapper;
+use Schoolbox\Sync\Effect\Fragment\Lookup;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
 
@@ -234,6 +235,12 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      */
     protected function applyModelPropertyValue($object, $property, $value)
     {
+        if (in_array($property, ['year', 'residentialHouse', 'schoolHouse']) && (int)$value === Lookup::NOT_SET_ID) {
+            $set_method = $this->mapper->getSetMethodName($property);
+            $object->$set_method(null);
+            return;
+        }
+
         $this->mapper->setModelProperty($object, $property, $value);
     }
 
