@@ -27,13 +27,17 @@ function error(){
 }
 
 function help_msg(){
-  echo "Packages static assets and uploads to S3"
+  echo "Uploads static assets to S3"
+  echo "Does not build/publish assets. You need to do that prior to invoking this tool with npm"
   echo "Requires AWS S3 credentials to a development account. These credentials will be derived in following order:"
   echo "1. Via CLI args"
   echo "2. From .env file"
   echo "3. Prompted at run-time"
   echo ""
-  echo "To use this script, you must first create a S3 bucket with public READ access + public CORS"
+  echo "To use this script, you must first:"
+  echo " 1. Create a development AWS account and provision IAM Access + Secret key pair"
+  echo " 2. Create a S3 bucket with public READ access + public CORS"
+  echo " 3. Build static assets with \`npm run build\` or \`npm run publish\` as appropriate"
   echo ""
   echo "Options:"
   echo "  -$ARG_HELP_SHORT,--$ARG_HELP_LONG       Print this message and exit"
@@ -121,10 +125,6 @@ function load_access_and_secret_keys(){
   done
 }
 
-function package_assets(){
-  log "Packaging assets..."
-  cd "$site_root" && npm install && npm run publish
-}
 
 function upload_assets(){
   log "Uploading assets..."
@@ -154,7 +154,6 @@ function main(){
   derive_site_root "$@"
   parse_args "$@"
   load_access_and_secret_keys
-  package_assets
   upload_assets
 }
 
