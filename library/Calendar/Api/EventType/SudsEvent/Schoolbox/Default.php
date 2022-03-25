@@ -39,12 +39,6 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
 
     /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
      * @inheritdoc
      */
     public function __construct(
@@ -54,8 +48,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -63,7 +56,6 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-        $this->folderMapper = $folderMapper;
     }
 
 

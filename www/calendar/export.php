@@ -425,8 +425,7 @@ try {
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
-                    \Schoolbox\Resource\Folder\Mapper::getInstance()
+                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
                 ],
                 true,
                 $sentry
@@ -570,8 +569,7 @@ try {
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\External\Event\Mapper ::getInstance(),
                         \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-                        \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
-                        \Schoolbox\Resource\Folder\Mapper::getInstance()
+                        \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
                     ],
                     true,
                     $sentry

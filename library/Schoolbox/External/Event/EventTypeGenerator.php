@@ -39,7 +39,7 @@ class EventTypeGenerator
      *
      * @param \Calendar_Api_Config_Record $config
      * @param array|null                  $allowedEventTypes
-     * @return EventType|null
+     * @return array|null
      */
     public function findEventType(\Calendar_Api_Config_Record $config, ?array $allowedEventTypes): ?array
     {
