@@ -101,7 +101,7 @@ class EventUsers
         ";
 
         $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute(array_merge($campusParams, $roleParams));
+        $statement->execute(array_merge(['classification' => Model::CLASSIFICATION_EVENT], $campusParams, $roleParams));
 
         $stack = $this->eventMapper->createCollection();
 

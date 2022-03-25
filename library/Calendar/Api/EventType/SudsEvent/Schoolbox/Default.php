@@ -66,8 +66,9 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      * @throws PDOException
+     * @throws UnderflowException
      * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
@@ -115,37 +116,41 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
         /* The list of events in which $this->getUser() is involved
          */
-//        $events = [];
-//
-//        /** @var \Schoolbox\External\Event\Model $event */
-//        foreach ($events as $event) {
-//            /* Try to find a matching folder for this event's code
-//             * If a folder exists, link to that
-//             * Otherwise, leave it empty
-//             */
-//            try {
-//                $folder = $this->folderMapper->findByCode($event->getCode());
-//            } catch (\Schoolbox\Mapper\Exception $e) {
-//                $folder = null;
-//            }
-//
-//            $instance = new \Calendar\Event\Type\SudsTimetable\Event();
-//            $instance->setConnectorId($this->getConnectorId());
-//            $instance->setTitle($event->getTitle());
-//            $instance->setDetail($event->getDetail());
-//            $instance->setLocation($event->getLocation());
-//            $instance->setCode($event->getCode());
-//            $instance->setDay($event->getDay());
-//            $instance->setPeriod($event->getPeriod());
-//            $instance->setStartTime($event->getStartAt());
-//            $instance->setEndTime($event->getFinishAt());
-//            $instance->setAllDay(false);
-//            $instance->setColour($eventColor);
-//            $instance->setType($eventType);
-//            $instance->setFolder($folder);
-//
-//            $stack->add($instance);
-//        }
+        $events = (new \Schoolbox\External\Event\EventUsers(
+            $this->eventMapper,
+            \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+            \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+        ))->findForUser($this->getUser());
+
+        /** @var \Schoolbox\External\Event\Model $event */
+        foreach ($events as $event) {
+            /* Try to find a matching folder for this event's code
+             * If a folder exists, link to that
+             * Otherwise, leave it empty
+             */
+            try {
+                $folder = $this->folderMapper->findByCode($event->getCode());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $folder = null;
+            }
+
+            $instance = new \Calendar\Event\Type\SudsTimetable\Event();
+            $instance->setConnectorId($this->getConnectorId());
+            $instance->setTitle($event->getTitle());
+            $instance->setDetail($event->getDetail());
+            $instance->setLocation($event->getLocation());
+            $instance->setCode($event->getCode());
+            $instance->setDay($event->getDay());
+            $instance->setPeriod($event->getPeriod());
+            $instance->setStartTime($event->getStartAt());
+            $instance->setEndTime($event->getFinishAt());
+            $instance->setAllDay(false);
+            $instance->setColour($eventColor);
+            $instance->setType($eventType);
+            $instance->setFolder($folder);
+
+            $stack->add($instance);
+        }
 
         return $stack;
     }
