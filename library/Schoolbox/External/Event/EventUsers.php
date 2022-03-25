@@ -38,6 +38,18 @@ class EventUsers
 
 
     /**
+     * @var \Schoolbox\Resource\Folder\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+
+
+    /**
+     * @var \Schoolbox\Resource\Folder\Code\Mapper
+     */
+    private \Schoolbox\Resource\Folder\Code\Mapper $folderCodeMapper;
+
+
+    /**
      * @param Mapper          $eventMapper
      * @param Campus\Mapper   $campusMapper
      * @param Roletype\Mapper $roletypeMapper
@@ -50,6 +62,9 @@ class EventUsers
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
+
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
     }
 
 
@@ -59,15 +74,21 @@ class EventUsers
      *    - The event is associated with the $user's roletype
      *
      * @param \Schoolbox\User $user
+     * @param int             $startTimestamp
+     * @param int             $endTimestamp
+     * @param string|null     $folderCode
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DebugBar\DebugBarException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findForUser(\Schoolbox\User $user): GenericCollection
+    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
     {
+        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
         /* Campus requirement
          */
@@ -87,26 +108,67 @@ class EventUsers
         $roleWhere = implode(' AND ', $rolePb->getWhere());
         $roleParams = $rolePb->getParams();
 
+        /* I can't join to a folder via a code (code doesn't have an identifier property)
+         */
+        $folderColumnString = $this->folderMapper->getColumnString('f');
+        $folderCodeColumnString = $this->folderCodeMapper->getColumnString('fc');
+
         /* Perhaps controversial:
          * In order for you to be involved in an event, you have to be in
          * both the campus and the roletype
          */
         $query = "
-            SELECT DISTINCT *
+            SELECT 
+                {$this->eventMapper->getColumnString('se')},
+                {$folderColumnString}, 
+                {$folderCodeColumnString}
             FROM {$this->eventMapper->getTable()} se
             LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
             LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id
+            LEFT JOIN folder_code fc ON se.code = fc.code
+            LEFT JOIN folder f ON fc.folder_id = f.id
             WHERE {$campusWhere} AND {$roleWhere}
-            ORDER BY se.start_at
+            AND se.classification = :classification
+            AND se.start_at >= :startDatetime
+            AND se.finish_at <= :finishDatetime
         ";
 
+        $params = array_merge([
+            'startDatetime' => $startDatetime,
+            'finishDatetime' => $finishDatetime,
+            'classification' => Model::CLASSIFICATION_EVENT
+        ], $campusParams, $roleParams);
+
+        /* Optionally filter by foldercode
+         */
+        if ('' !== (string)$folderCode) {
+            $query .= " AND se.code = :folderCode";
+            $params['folderCode'] = $folderCode;
+        }
+
         $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute(array_merge(['classification' => Model::CLASSIFICATION_EVENT], $campusParams, $roleParams));
+        $statement->execute($params);
 
         $stack = $this->eventMapper->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $stack->add($this->eventMapper->hydrate($row));
+            $event = $this->eventMapper->hydrate($row, 'se');
+
+            /* If a folder code x folder join can be found, shove it in
+             */
+            if ($row['f.id']) {
+                /** @var \Schoolbox\Resource\Folder\Model|null $folder */
+                $folder = $this->folderMapper->hydrate($row, 'f');
+
+                /** @var \Schoolbox\Resource\Folder\Code\Model|null $folderCode */
+                $folderCode = $this->folderCodeMapper->hydrate($row, 'fc');
+
+                $folder->setCodes($this->folderCodeMapper->createCollection([$folderCode]));
+
+                $event->setFolder($folder);
+            }
+
+            $stack->add($event);
         }
 
         return $stack;
