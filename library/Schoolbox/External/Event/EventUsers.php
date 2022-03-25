@@ -125,8 +125,8 @@ class EventUsers
             FROM {$this->eventMapper->getTable()} se
             LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
             LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id
-            LEFT JOIN folder_code fc ON se.code = fc.code
-            LEFT JOIN folder f ON fc.folder_id = f.id
+            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
+            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
             WHERE {$campusWhere} AND {$roleWhere}
             AND se.classification = :classification
             AND se.start_at >= :startDatetime
