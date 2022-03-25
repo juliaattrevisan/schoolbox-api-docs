@@ -44,15 +44,8 @@ class EventTypeGenerator
     public function findEventType(\Calendar_Api_Config_Record $config, ?array $allowedEventTypes): ?array
     {
         // Figure out event type
-        try {
-            $decodedConfig = $config->decodeConfig();
-            $eventType     = $decodedConfig->getLuEventType();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Something went awry with loadConnectorConfiguration()
-             * Can't determine what event type this would be
-             */
-            $eventType = null;
-        }
+        $decodedConfig = $config->decodeConfig();
+        $eventType     = $decodedConfig->getLuEventType();
 
         /* Ensure $eventType is valid, finding first available one if it is invalid.
          * If you can't find one, we can't assign anything to the events from this subscription

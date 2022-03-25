@@ -93,8 +93,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
     {
         $stack = new \Calendar\Event\Collection();
 
-        $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
-            ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+        try {
+            $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
+                ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $eventTypeSettings = null;
+        }
 
         /* No event type for the ($config, $allowedEventTypes) combination
          * or something went wrong with the event type detection

@@ -1,8 +1,6 @@
 <?php
 
-use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\External\Event\Mapper;
 use Schoolbox\User;
 
 /**
@@ -70,16 +68,18 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
         $stack = new \Calendar\Event\Collection();
 
-        $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
-            ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+        try {
+            $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
+                ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $eventTypeSettings = null;
+        }
 
         /* No event type for the ($config, $allowedEventTypes) combination
          * or something went wrong with the event type detection

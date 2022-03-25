@@ -79,7 +79,6 @@ class EventUsers
      * @param string|null     $folderCode
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
