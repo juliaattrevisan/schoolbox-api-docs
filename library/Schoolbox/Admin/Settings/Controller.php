@@ -124,8 +124,8 @@ class Controller extends ConfigController
             if ($parentData['searchable'] ?? false) {
                 $jsonPayload[] = [
                     'name'        => $parentUrl,
-                    'title'       => $parentData['name'],
-                    'description' => $parentData['description'],
+                    'title'       => $parentData['name'] ?? '',
+                    'description' => $parentData['description'] ?? '',
                     'url'         => $parentUrl,
                 ];
             }
@@ -136,8 +136,8 @@ class Controller extends ConfigController
                 }
                 $jsonPayload[] = [
                     'name'        => $childUrl,
-                    'title'       => $parentData['name'] . ' › ' . $childData['name'],
-                    'description' => $childData['description'],
+                    'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
+                    'description' => $childData['description'] ?? '',
                     'url'         => $childUrl,
                 ];
             }
