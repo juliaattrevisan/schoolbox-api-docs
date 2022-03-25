@@ -33,6 +33,43 @@ function check_run_as_root(){
   fi
 }
 
+# Install awscli v2, removing v1 if present
+function install_dependencies(){
+  local remove_v1
+  local install_v2
+
+  if ! type aws &>/dev/null; then
+    remove_v1=0
+    install_v2=1
+  else
+    aws_version=$(aws --version 2>/dev/null | grep -Eo "aws-cli/[0-9.]+" | cut -d '/' -f 2)
+    if [[ $aws_version =~ ^1. ]]; then
+      remove_v1=1
+      install_v2=1
+    else
+      remove_v1=0
+      install_v2=0
+    fi
+  fi
+
+  if [[ $remove_v1 == 1 ]]; then
+    log "Removing awscli v1..."
+    apt remove awscli -y
+  fi
+
+  if [[ $install_v2 == 1 ]]; then
+    pwd=$(pwd)
+    cd /tmp || exit 1
+    log "Installing awscli v2..."
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+    rm awscliv2.zip
+    rm -r aws/
+    cd "$pwd" || exit 1
+  fi
+}
+
 function help_msg(){
   echo "Uploads static assets to S3"
   echo "Does not build/publish assets. You need to do that prior to invoking this tool with npm"
@@ -135,10 +172,6 @@ function load_access_and_secret_keys(){
 
 function upload_assets(){
   log "Uploading assets..."
-  if ! type aws &>/dev/null; then
-    log "Installing awscli..."
-    apt install awscli -y
-  fi
   site_version=$(find "$site_root"/updates/ -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V | tail -n 1)
   site_package=${site_version}-0
 
@@ -159,6 +192,7 @@ function upload_assets(){
 
 function main(){
   check_run_as_root
+  install_dependencies
   derive_site_root "$@"
   parse_args "$@"
   load_access_and_secret_keys
