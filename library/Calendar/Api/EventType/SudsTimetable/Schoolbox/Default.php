@@ -83,51 +83,24 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      * @throws PDOException
-     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
         $stack = new \Calendar\Event\Collection();
 
-        // Figure out event type
-        try {
-            /** @var Calendar_Api_Config_Record $config */
-            $config        = $this->loadConnectorConfiguration();
-            $decodedConfig = $config->decodeConfig();
-            $eventType     = $decodedConfig->getLuEventType();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Something went awry with loadConnectorConfiguration()
-             * Can't determine what event type this would be
-             */
-            $eventType = null;
-        }
+        $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
+            ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
 
-        /* Ensure $eventType is valid, finding first available one if it is invalid.
-         * If you can't find one, we can't assign anything to the events from this subscription
-         * so just return the empty stack; there's no way we could categorise those events
-         *
-         * getLuEventType() can return a deleted event type identifier.
+        /* No event type for the ($config, $allowedEventTypes) combination
+         * or something went wrong with the event type detection
          */
-        $eventType = $this->eventTypeMapper->findFirstMeaningfulId($eventType);
-
-        /* Do a detection on $allowedEventTypes, if provided and meaningful
-         */
-        if (null !== $allowedEventTypes && \count($allowedEventTypes)) {
-            if (!\in_array((int)$eventType, $allowedEventTypes, true)) {
-                return $stack;
-            }
-        }
-
-        $eventColor = null;
-
-        try {
-            /** @var EventType $eventTypeObject */
-            $eventTypeObject = $this->eventTypeMapper->findById($eventType);
-            $eventColor      = $eventTypeObject->getColor();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            // noop
+        if (null === $eventTypeSettings) {
+            return $stack;
         }
 
         /* The list of events in which $this->getUser() is involved
@@ -159,8 +132,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setStartTime($timetableEvent->getStartAt());
             $instance->setEndTime($timetableEvent->getFinishAt());
             $instance->setAllDay(false);
-            $instance->setColour($eventColor);
-            $instance->setType($eventType);
+            $instance->setColour($eventTypeSettings['color']);
+            $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
 
             $stack->add($instance);
