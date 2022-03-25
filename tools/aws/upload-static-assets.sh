@@ -26,6 +26,13 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
+function check_run_as_root(){
+  if [[ $EUID -ne 0 ]]; then
+     error "This script must be run as root to enable install of awscli package"
+     exit 1
+  fi
+}
+
 function help_msg(){
   echo "Uploads static assets to S3"
   echo "Does not build/publish assets. You need to do that prior to invoking this tool with npm"
@@ -151,6 +158,7 @@ function upload_assets(){
 
 
 function main(){
+  check_run_as_root
   derive_site_root "$@"
   parse_args "$@"
   load_access_and_secret_keys
