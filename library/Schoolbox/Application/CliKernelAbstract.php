@@ -122,8 +122,11 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         ];
 
         // don't report anything
+        // Return instead of `exit(0)`:
+        // this shutdown could've been triggered by an `exit()` call, we want to
+        // preserve its exit code, and a non-error will exit with 0 anyway.
         if (!isset($error['type'], $cases[$error['type']])) {
-            exit(self::EXIT_STATUS_OK);
+            return;
         }
 
         // report
@@ -134,6 +137,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             // can't do anything, logging stream has been closed
         }
 
+        // I guess we should raise an exit code here?
         exit(self::EXIT_STATUS_KERNEL_ERROR);
     }
 
