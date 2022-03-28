@@ -301,24 +301,24 @@ class Controller extends AbstractController
     {
         // Division
         try {
-            $division = DivisionMapper::getInstance()->findById($this->getRequest()->post['divisionId']);
+            $division = DivisionMapper::getInstance()->findById($this->request->post->get('divisionId'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
         // Name
-        $name = $this->getRequest()->post['name'];
+        $name = $this->request->post->get('name');
 
         // Season
         try {
-            $season = SeasonMapper::getInstance()->findById($this->getRequest()->post['seasonId']);
+            $season = SeasonMapper::getInstance()->findById($this->request->post->get('seasonId'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
 
         // Start At
         try {
-            $dateTime = $this->getRequest()->post['startAtDate'];
+            $dateTime = $this->request->post->get('startAtDate');
             $startAt  = \Alaress_Date_Format::newLocal($dateTime);
         } catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
@@ -326,7 +326,7 @@ class Controller extends AbstractController
 
         // Finish At
         try {
-            $dateTime = $this->getRequest()->post['finishAtDate'];
+            $dateTime = $this->request->post->get('finishAtDate');
             $finishAt  = \Alaress_Date_Format::newLocal($dateTime);
         } catch (\InvalidArgumentException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_DATE_FORMAT);
@@ -334,24 +334,24 @@ class Controller extends AbstractController
 
         // Venue
         try {
-            $venue = $this->getVenueMapper()->findById($this->getRequest()->post['venueId']);
+            $venue = $this->getVenueMapper()->findById($this->request->post->get('venueId'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
 
         // Teams
         try {
-            list ($homeTeam, $homeSchool) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
-            list ($awayTeam, $awaySchool) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
+            list ($homeTeam, $homeSchool) = $this->calculateTeam($this->request->post->get('homeTeamId'));
+            list ($awayTeam, $awaySchool) = $this->calculateTeam($this->request->post->get('awayTeamId'));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
         // Notes
-        $notes = $this->getRequest()->post['notes'];
+        $notes = $this->request->post->get('notes');
 
         // Itinerary
-        $itinerary = $this->transposeItineraryPost($this->getRequest()->post['itinerary']);
+        $itinerary = $this->transposeItineraryPost($this->request->post->get('itinerary'));
 
         $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 

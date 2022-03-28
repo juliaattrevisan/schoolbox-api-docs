@@ -219,12 +219,12 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $sport  = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
-            $season = $this->getSeasonMapper()->findById($this->getRequest()->post['seasonId']);
+            $sport  = $this->getSportMapper()->findById($this->request->post->get('sportId'));
+            $season = $this->getSeasonMapper()->findById($this->request->post->get('seasonId'));
 
-            $this->saveDivision($sport, $season, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
+            $this->saveDivision($sport, $season, $this->request->post->get('name'), $this->request->post->get('url'), $entity);
 
-            $return = base64_decode($this->getRequest()->post['returnUrl']);
+            $return = base64_decode($this->request->post->get('returnUrl'));
 
             if (empty($return)) {
                 $return = $this->getRouter()->generate('sportsfixturesSport.getEntity', [
@@ -373,7 +373,7 @@ class Controller extends AbstractController
     public function postPlayerPositions($entityId)
     {
 
-        $teamId = $this->getRequest()->post['team_id'];
+        $teamId = $this->request->post->get('team_id');
         try {
             // Load team
             $team = $this->getTeamMapper()->findById($teamId);
@@ -381,7 +381,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $userId = $this->getRequest()->post['user_id'];
+        $userId = $this->request->post->get('user_id');
         try {
             // Load player
             $player = $this->getUserMapper()->findById($userId);
@@ -402,7 +402,7 @@ class Controller extends AbstractController
 
         // Iterate through all the position checkboxes that were ticked
 
-        $positions = $this->getRequest()->post["positions"];
+        $positions = $this->request->post->get("positions");
 
         if (is_array($positions)) {
             foreach ($positions as $position) {
