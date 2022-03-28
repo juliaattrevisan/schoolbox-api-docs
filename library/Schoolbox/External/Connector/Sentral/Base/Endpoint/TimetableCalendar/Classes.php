@@ -55,6 +55,24 @@ class Classes implements IStrategy
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * A date string in the format Y-m-d e.g. 2020-10-12
      *
      * @var string
@@ -100,7 +118,7 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->registry = $registry;
-        $this->eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
+        $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->overridesMapper = $overridesMapper;
@@ -163,6 +181,8 @@ class Classes implements IStrategy
      */
     private function consumeTimetable(string $endpoint, array $data, string $name): void
     {
+        $externalId = $data['person']['externalId'];
+
         /* Try to fetch and consume this person's timetable
          */
         $this->log->debug(sprintf(
@@ -189,7 +209,7 @@ class Classes implements IStrategy
                     $data['person']['type'],
                     $name,
                     $data['person']['id'],
-                    $data['person']['externalId']
+                    $externalId
                 ));
             }
         } catch (\InvalidArgumentException | \DomainException $e) {
@@ -200,7 +220,7 @@ class Classes implements IStrategy
                 $data['person']['type'],
                 $name,
                 $data['person']['id'],
-                $data['person']['externalId']
+                $externalId
             ));
 
             $this->log->warning($e->getMessage());
@@ -241,7 +261,6 @@ class Classes implements IStrategy
              * looking at an event that we've already loaded before
              */
             $guid = $class['id'];
-            $externalId = $data['person']['externalId'];
 
             /* Try to recycle a previous instance
              */

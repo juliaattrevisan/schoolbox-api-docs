@@ -192,12 +192,10 @@ class Factory implements IFactory
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
                      */
-                    CampusMapper::getInstance(),
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             case self::TASS_API:
