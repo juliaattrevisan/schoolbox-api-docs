@@ -218,5 +218,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 
   # Rebuild taskd too
-  config.vm.provision "shell", run: "always", inline: "tools/taskd/rebuild.sh", args: [taskd_dir]
+  config.vm.provision "shell", run: "always", path: "tools/taskd/rebuild.sh"
 end
