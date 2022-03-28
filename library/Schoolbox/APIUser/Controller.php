@@ -358,7 +358,7 @@ class Controller extends Base
         $filter = $request['filter'] ?? null;
         $userHelper = new Helper($this->userMapper);
         $output = [];
-        $ajaxSearch = $userHelper->ajaxSearch($search);
+        $ajaxSearch = $userHelper->ajaxSearch($search, $filter);
         $userIds = [];
         foreach ($ajaxSearch as $item) {
             foreach ($item as $label => $value) {
