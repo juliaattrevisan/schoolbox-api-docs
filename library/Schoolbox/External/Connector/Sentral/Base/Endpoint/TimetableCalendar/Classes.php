@@ -208,34 +208,73 @@ class Classes implements IStrategy
             return;
         }
 
+        /* A list of event guids that we saw previously
+         */
+        $seen = [];
+
         /* Consume everything inside this payload
          */
         foreach ($payload['data'] as $class) {
-            /* Save main event info
-             */
-            $event = $this->eventMapper->createModel()
-                ->setTitle($class['attributes']['className'])
-                ->setDetail(null)
-                ->setLocation($class['attributes']['roomName'])
-                ->setCode($class['attributes']['className'])
-                ->setDay($class['attributes']['dayName'])
-                ->setPeriod($class['attributes']['periodName'])
-                ->setStartAt(\Alaress_Date_Format::newDatabaseDate(sprintf(
-                    '%s %s',
-                    $class['attributes']['date'],
-                    $class['attributes']['startTime']
-                )))
-                ->setFinishAt(\Alaress_Date_Format::newDatabaseDate(sprintf(
-                    '%s %s',
-                    $class['attributes']['date'],
-                    $class['attributes']['endTime']
-                )))
-                ->setType($class['attributes']['classType'])
-                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                ->setGuid($class['id'])
-                ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+            $start = \Alaress_Date_Format::newDatabaseDate(sprintf(
+                '%s %s',
+                $class['attributes']['date'],
+                $class['attributes']['startTime']
+            ));
 
-            $this->eventMapper->save($event);
+            $finish = \Alaress_Date_Format::newDatabaseDate(sprintf(
+                '%s %s',
+                $class['attributes']['date'],
+                $class['attributes']['endTime']
+            ));
+
+            /* Save main event info - see if one already exists
+             * if it has the same name, place, day, period and time
+             * If you have five columns the same, you're probably
+             * looking at an event that we've already loaded before
+             */
+            $guid = $class['id'];
+
+            /* Try to recycle a previous instance
+             */
+            if (isset($seen[$guid])) {
+                $event = $seen[$guid];
+
+                $this->log->debug(sprintf(
+                    'Reusing previously seen timetable event %s - %s, %s, %s-%s',
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+            } else {
+                $event = $this->eventMapper->createModel()
+                    ->setTitle($class['attributes']['className'])
+                    ->setDetail(null)
+                    ->setLocation($class['attributes']['roomName'])
+                    ->setCode($class['attributes']['className'])
+                    ->setDay($class['attributes']['dayName'])
+                    ->setPeriod($class['attributes']['periodName'])
+                    ->setStartAt($start)
+                    ->setFinishAt($finish)
+                    ->setType($class['attributes']['classType'])
+                    ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                    ->setGuid($class['id'])
+                    ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+
+                $this->eventMapper->save($event);
+
+                $this->log->debug(sprintf(
+                    'Creating new timetable event %s - %s, %s, %s-%s',
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+
+                $seen[$guid] = $event;
+            }
 
             /* Save sis_class record
              */
