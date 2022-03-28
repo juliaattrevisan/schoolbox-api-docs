@@ -32,6 +32,8 @@ extra_hostname = default["extra_hostname"]
 aws_iam_key = default["aws_iam_key"]
 aws_iam_secret = default["aws_iam_secret"]
 primary_php_majver = default["primary_php_majver"]
+taskd_dir = default["taskd_dir"]
+taskd_sync_type = default["taskd_sync_type"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -112,6 +114,12 @@ if File.file?('vagrant.yaml')
   if !conf["primary_php_majver"].nil?
     primary_php_majver = conf["primary_php_majver"]
   end
+  if !conf["taskd_dir"].nil?
+    taskd_dir = conf["taskd_dir"]
+  end
+  if !conf["taskd_sync_type"].nil?
+    taskd_sync_type = conf["taskd_sync_type"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -163,6 +171,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # This script runs inside vagrant and can access the shared mount at '/tmp/puppet'
   config.vm.synced_folder "#{puppet_dir}/vagrant", "/tmp/puppet"
   config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet"
+
+
+  # Sync the taskd shared folder
+  config.vm.synced_folder taskd_dir, "/tmp/taskd"
+  # This script builds the taskd image, and starts the container
+#   config.vm.provision "shell", inline: "tools/taskd/rebuild.sh"
+
 
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
