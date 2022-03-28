@@ -262,6 +262,14 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
+            ->add(new TimetableCalendar\Prepare(
+                $this->log,
+                $this->perform,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+            ))
 //            ->add(new Timetable\Prepare(
 //                $this->log,
 //                $this->perform,
