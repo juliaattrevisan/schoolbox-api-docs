@@ -89,6 +89,30 @@ class Classes implements IStrategy
 
 
     /**
+     * A list of event guids that we saw previously
+     *
+     * @var array
+     */
+    private array $seen = [];
+
+
+    /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
+
+
+    /**
+     * A list of classInvolvements that we saw previously
+     *
+     * @var array
+     */
+    private array $classInvolvements = [];
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                            $log
@@ -228,18 +252,6 @@ class Classes implements IStrategy
             return;
         }
 
-        /* A list of event guids that we saw previously
-         */
-        $seen = [];
-
-        /* A list of classEntries that we saw previously
-         */
-        $classEntries = [];
-
-        /* A list of classInvolvements that we saw previously
-         */
-        $classInvolvements = [];
-
         /* Consume everything inside this payload
          */
         foreach ($payload['data'] as $class) {
@@ -264,9 +276,9 @@ class Classes implements IStrategy
 
             /* Try to recycle a previous instance
              */
-            if (isset($seen[$guid])) {
-                $event = $seen[$guid];
-                $classEntry = $classEntries[$event->getCode()];
+            if (isset($this->seen[$guid])) {
+                $event = $this->seen[$guid];
+                $classEntry = $this->classEntries[$event->getCode()];
 
                 $this->log->debug(sprintf(
                     'Reusing previously seen timetable event %s - %s, %s, %s-%s',
@@ -302,12 +314,12 @@ class Classes implements IStrategy
                     $event->getFinishAt()->getDatabase()
                 ));
 
-                $seen[$guid] = $event;
+                $this->seen[$guid] = $event;
 
                 /* Save sis_class record
                  */
-                if (isset($classEntries[$event->getCode()])) {
-                    $classEntry = $classEntries[$event->getCode()];
+                if (isset($this->classEntries[$event->getCode()])) {
+                    $classEntry = $this->classEntries[$event->getCode()];
                 } else {
                     $classEntry = $this->classEntryMapper->createModel()
                         ->setName($class['attributes']['className'])
@@ -315,13 +327,13 @@ class Classes implements IStrategy
 
                     $this->classEntryMapper->save($classEntry);
 
-                    $classEntries[$event->getCode()] = $classEntry;
+                    $this->classEntries[$event->getCode()] = $classEntry;
                 }
             }
 
             /* Save sis_class_user involvements
              */
-            if (isset($classInvolvements[$classEntry->getId()][$externalId])) {
+            if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
                 $this->log->debug(sprintf(
                     'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
                     $name,
@@ -339,7 +351,7 @@ class Classes implements IStrategy
 
                 $this->classInvolvementMapper->save($classInvolvement);
 
-                $classInvolvements[$classEntry->getId()][$externalId] = true;
+                $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
                 $this->log->debug(sprintf(
                     'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
