@@ -16,10 +16,14 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use Schoolbox\CampusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 class Module extends BaseModule
@@ -36,6 +40,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
         $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
         $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
+        $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
     }
 
     /**
@@ -48,6 +53,20 @@ class Module extends BaseModule
     }
 
     /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '.*', function ($params) {
+            $preloads = [];
+            if (isset($params['studentId'])) {
+                $preloads['student'] = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
+            }
+            return $preloads;
+        });
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildController(): Base
@@ -56,7 +75,10 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(YearLevelMapper::class),
             $this->getMapperFactory()->get(CampusMapper::class),
-            $this->getMapperFactory()->get(WorkTypeMapper::class)
+            $this->getMapperFactory()->get(WorkTypeMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(Access::class),
         );
     }
 

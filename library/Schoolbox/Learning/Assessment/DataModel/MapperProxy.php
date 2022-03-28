@@ -1023,6 +1023,7 @@ class MapperProxy
      * @param Alaress_Date_Format|null $from         If provided, fetch only assessables due on or after this date
      * @param Alaress_Date_Format|null $to           If provided, fetch only assessables due on or before this date
      * @param array               $options      Any other query options
+     * @param array|null $folderIds
      * @return GenericCollection|IAssessable[]
      * @throws DefinitionException If specified join mapper unable to not registered
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
@@ -1036,13 +1037,14 @@ class MapperProxy
         bool $usePlanDates,
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null,
-        array $options = []
+        array $options = [],
+        ?array $folderIds = null
     ) {
         /** @var FolderMapper $folderMapper */
         $folderMapper = $this->baseMapper->getJoinMapper('assessment_folder');
 
         // Find this user's folders from folder mapper
-        $classFolderIds = $folderMapper->findFolderIdsForUser(
+        $classFolderIds = $folderIds ?: $folderMapper->findFolderIdsForUser(
             $student,
             // Only actual students have classes
             $student->getRole()->isStudent() && !$student->getHideTimetable(),

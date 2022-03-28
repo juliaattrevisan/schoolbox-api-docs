@@ -1,0 +1,73 @@
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/urgency.twig' as urgency %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+<div class="content">
+    <h1>{{ config.school_name }}</h1>
+    <h2>{{ reportTitle }}</h2>
+    <div>
+        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" width="48" alt="{{ student.fullName }}">
+        <h3>{{ student.fullname }}</h3>
+        <p>{{ student.year.name ?? '' }}</p>
+    </div>
+    {% if showSummary %}
+        {% for folder in folders %}
+            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+            {% set weightedMean = studentGrade.weightedMean %}
+            <div>
+                <div>
+                    {{ folder.nameWithCodes }}
+                    {% if showOverallGrade %}<span>{{ weightedMean ?? '' }}</span>{% endif %}
+                </div>
+            </div>
+            {% if (assessmentTasks[folder.id] ?? [])| length %}
+                <li>
+                    <ul class="activity-list">
+                        {% for assessment in assessmentTasks[folder.id] %}
+                            <li class="assessment">
+
+                                {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+
+                                <div class="flex-grade">
+                                    <div class="small-12 card columns">
+                                        <span class="{{ icon.renderClass(assessment) }}"></span>
+                                        <p>{{ assessment.title }}</p>
+                                        <p>
+                                            {% include '@learningAssessment/fragments/statusLine.twig' with {
+                                                assessable: assessment,
+                                                student:    student
+                                            } only %}
+                                            <span class="{{ participant ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
+                                            <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+                                        </p>
+                                    </div>
+
+                                    {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                        {% set grade = assessment.humanReadableMark(participant, true) %}
+                                        {% if assessment is task %}
+                                            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                                                assessment: assessment,
+                                                student:    student
+                                            } only %}
+                                        {% elseif showSummaryGrades and grade %}
+                                            <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                                                <span>{{ grade }}</span>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+                                    {% if showSummaryComments and feedback and feedback.comment %}
+                                        <div class="content">
+                                            <blockquote>{{ feedback.comment | linkify | nl2br }}</blockquote>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>

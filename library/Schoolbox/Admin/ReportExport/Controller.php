@@ -13,7 +13,15 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Grades\Helper;
+use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 /**
@@ -34,22 +42,37 @@ class Controller extends Base
 
     private WorkTypeMapper $workTypeMapper;
 
+    private FolderMapper $folderMapper;
+
+    private AssessmentMapperProxy $assessmentMapperProxy;
+
+    private Access $access;
+
     /**
-     * @param TermMapper      $termMapper
-     * @param YearLevelMapper $yearLevelMapper
-     * @param CampusMapper    $campusMapper
-     * @param WorkTypeMapper  $workTypeMapper
+     * @param TermMapper            $termMapper
+     * @param YearLevelMapper       $yearLevelMapper
+     * @param CampusMapper          $campusMapper
+     * @param WorkTypeMapper        $workTypeMapper
+     * @param FolderMapper          $folderMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Access                $access
      */
     public function __construct(
         TermMapper $termMapper,
         YearLevelMapper $yearLevelMapper,
         CampusMapper $campusMapper,
-        WorkTypeMapper $workTypeMapper
+        WorkTypeMapper $workTypeMapper,
+        FolderMapper $folderMapper,
+        AssessmentMapperProxy $assessmentMapperProxy,
+        Access $access
     ) {
-        $this->termMapper      = $termMapper;
-        $this->yearLevelMapper = $yearLevelMapper;
-        $this->campusMapper    = $campusMapper;
-        $this->workTypeMapper  = $workTypeMapper;
+        $this->termMapper            = $termMapper;
+        $this->yearLevelMapper       = $yearLevelMapper;
+        $this->campusMapper          = $campusMapper;
+        $this->workTypeMapper        = $workTypeMapper;
+        $this->folderMapper          = $folderMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->access                = $access;
     }
 
     /**
@@ -187,5 +210,89 @@ class Controller extends Base
             ];
         }
         $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+    /**
+     *
+     * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/student/25?startDate=2021-01-01&endDate=2022-12-31&showOverallGrade=1&showSummary=1
+     * @param User $student
+     * @return void
+     */
+    public function getStudentReport(User $student)
+    {
+        $startDate           = $this->request->query->get('startDate');
+        $endDate             = $this->request->query->get('endDate');
+        $viewAs              = $this->request->query->get('viewAs');
+        $showSummary         = (bool)$this->request->query->get('showSummary');
+        $showOverallGrade    = (bool)$this->request->query->get('showOverallGrade');
+        $workTypes           = $this->request->query->get('workTypes');
+        $showSummaryGrades   = (bool)$this->request->query->get('showGrades');
+        $showSummaryComments = (bool)$this->request->query->get('showComments');
+        $showSummaryRubrics  = (bool)$this->request->query->get('showRubrics');
+
+        // Dates
+        try {
+            $from = new \Alaress_Date_Format($startDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $to   = new \Alaress_Date_Format($endDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $term = $this->termMapper->findForDate($from);
+        } catch (\Exception $e) {
+            $term = $this->termMapper->findForToday();
+            $from = $term->getStart();
+            $to   = $term->getActualFinish();
+        }
+
+        // View As
+        switch ($viewAs) {
+            case Role::STUDENT:
+                $viewer = $student;
+                break;
+            case Role::PARENT:
+                $student->loadParents();
+                $viewer = $student->getParents()->first();
+                break;
+            case Role::STAFF:
+            default:
+                // the current admin
+                $viewer = $this->getUser();
+        }
+
+        $filteredWorkTypes = !$workTypes ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $workTypes)));
+
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+
+        $gradeHelper = new Helper(
+            $this->folderMapper,
+            $this->assessmentMapperProxy,
+            $this->access,
+            $markSchemeFactory
+        );
+
+        [
+            $folders,
+            $markbooks,
+            $assessments,
+        ] = $gradeHelper->generateGrades($viewer, $student, $term, $from, $to);
+
+        $assessmentTasks = new Collection();
+
+        if ($filteredWorkTypes && $filteredWorkTypes->count() > 0) {
+            $assessmentTasks = $gradeHelper->filterAssessments($this->getUser(), $student, $assessments, $filteredWorkTypes);
+        }
+
+        $data = [
+            'student'             => $student,
+            'folders'             => $folders,
+            'markbooks'           => $markbooks,
+            'assessmentTasks'     => $assessmentTasks,
+            'reportTitle'         => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
+            'showSummary'         => $showSummary,
+            'showOverallGrade'    => $showOverallGrade,
+            'showSummaryGrades'   => $showSummaryGrades,
+            'showSummaryComments' => $showSummaryComments,
+            'showSummaryRubrics'  => $showSummaryRubrics,
+        ];
+        $this->getResponse()->content->set(
+            $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
+        );
     }
 }
