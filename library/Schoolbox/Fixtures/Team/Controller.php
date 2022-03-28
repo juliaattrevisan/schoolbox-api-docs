@@ -179,7 +179,7 @@ class Controller extends AbstractController
     public function persistEntity($entity)
     {
         try {
-            $divisionId = $this->getRequest()->post['divisionId'];
+            $divisionId = $this->request->post->get('divisionId');
             $division   = $this->getDivisionMapper()->findById($divisionId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
@@ -187,9 +187,9 @@ class Controller extends AbstractController
 
         $this->saveTeam(
             $division,
-            $this->getRequest()->post['name'],
-            $this->getRequest()->post['url'],
-            $this->getRequest()->post->get('coach', []),
+            $this->request->post->get('name'),
+            $this->request->post->get('url'),
+            $this->request->post->get('coach', []),
             $entity
         );
 

@@ -20,6 +20,7 @@ class FileUploadForm extends Upload
         $this->setFormParam('attachedFile', '');
         $this->setFormParam('Submit', 'Post File');
         $this->setFormParam('attachment', [$fileHashInStorage]);
+        $this->setFile('file', 'cat.png', codecept_data_dir('/UploadTestFiles/cat.png'));
         $this->setCategory($folder_id);
         $this->setDescription($fileName);
         $this->setComment($description);

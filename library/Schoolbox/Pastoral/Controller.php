@@ -856,7 +856,7 @@ class Controller extends Base
         // Save system role permissions, de-duplicating as we go
         $accesses = $this->pastoralAccessMapper->createCollection();
 
-        if (is_array($post["role"])) {
+        if (is_array($post["role"] ?? null)) {
             $foundRoles       = [];
             $allowedRoles     = $this->determineAllowedRoles();
             $allowedRoleTypes = $this->determineAllowedRoleTypes();
@@ -889,7 +889,7 @@ class Controller extends Base
         }
 
         // Save pastoral group permissions, de-duplicating as we go
-        if (is_array($post["group"])) {
+        if (is_array($post["group"] ?? null)) {
             $foundGroups = [];
             foreach ($post["group"] as $group_id => $accessLevel) {
                 if (in_array($group_id, $foundGroups)) {
@@ -910,7 +910,7 @@ class Controller extends Base
         }
 
         // Save individual user permissions, de-duplicating as we go
-        if (is_array($post["user"])) {
+        if (is_array($post["user"] ?? null)) {
             $foundUsers = [];
             foreach ($post["user"] as $user_id => $accessLevel) {
                 if (in_array($user_id, $foundUsers)) {
@@ -1380,7 +1380,7 @@ class Controller extends Base
             $processedHash = [];
 
             // If there are any new attachments, compare and replace
-            if (is_array($post[$attachzone . '_attachments'])) {
+            if (is_array($post[$attachzone . '_attachments'] ?? null)) {
                 $collectorFactory  = new CollectorFactory();
                 $attachmentObjects = $collectorFactory->build($post[$attachzone . '_attachments'])->getAll();
 

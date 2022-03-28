@@ -247,7 +247,10 @@ class Group extends DeprecatedModel
                 'type' => $type,
             );
             if ($result = $this->db->insert('userAccess', $data)) {
-                $this->getUserNotifier()->manualNotifyUpdated($userID, $_SESSION['user']);
+                $user = $this->extractSessionUser();
+                if ($user) {
+                    $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
+                }
             }
             return $result;
         }
@@ -274,7 +277,10 @@ class Group extends DeprecatedModel
 		";
 
         if ($result = $this->db->query($query)) {
-            $this->getUserNotifier()->manualNotifyUpdated($userID, $_SESSION['user']);
+            $user = $this->extractSessionUser();
+            if ($user) {
+                $this->getUserNotifier()->manualNotifyUpdated($userID, $user);
+            }
         }
         return $result;
     }
@@ -293,7 +299,8 @@ class Group extends DeprecatedModel
     public function hasChildAccessOnly($category_id, $user_id = 0)
     {
         if (!$user_id) {
-            $user_id = $_SESSION['id'];
+            $user    = $this->extractSessionUser();
+            $user_id = $user ? $user->getId() : null;
         }
         if (!$user_id) {
             return true;
@@ -321,9 +328,10 @@ class Group extends DeprecatedModel
     public function getPermission($relationID, $userID = 0, $cache = true)
     {
         if ($userID == 0) {
-            if ($_SESSION['id']) {
-                $userID = $_SESSION['id'];
-                $this->cacheUser[$userID] = $_SESSION['user'];
+            $sessionUser = $this->extractSessionUser();
+            if ($sessionUser) {
+                $userID = $sessionUser->getId();
+                $this->cacheUser[$userID] = $sessionUser;
             } else {
                 return UserAccess::ACCESS_DENY;
             }
@@ -423,8 +431,9 @@ class Group extends DeprecatedModel
             $user = $userHandler->getByID($userId);
             $groupID = $user['group_id'];
         } else {
-            if (is_numeric($_SESSION['gid'])) {
-                $groupID = $_SESSION['gid'];
+            $user = $this->extractSessionUser();
+            if ($user && $user->getRole()->getId()) {
+                $groupID = $user->getRole()->getId();
             } else {
                 return false;
             }
@@ -502,7 +511,8 @@ class Group extends DeprecatedModel
                 return false;
             }
         } else {
-            return $_SESSION['su'] == 1 ? true : false;
+            $user = $this->extractSessionUser();
+            return $user && $user->isSuperuser();
         }
     }
 
@@ -533,7 +543,11 @@ class Group extends DeprecatedModel
     public function involvedInSubject($code, $userId = null)
     {
         if (!isset($userId)) {
-            $userId = $_SESSION['id'];
+            $user   = $this->extractSessionUser();
+            $userId = $user ? $user->getId() : null;
+        }
+        if (!isset($userId)) {
+            return false;
         }
         $subjects = $this->involvedInSubjects($userId);
         //returns true on user being involved in subject (case-insensitive)
@@ -672,5 +686,17 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT name FROM groups WHERE id = \"{$groupID}\"";
         return $this->db->getOne($query);
+    }
+
+    /**
+     * Extract a user out of the session.
+     *
+     * @return UserModel|null
+     */
+    private function extractSessionUser(): ?\Schoolbox\User
+    {
+        return isset($_SESSION['user']) && $_SESSION['user'] instanceof \Schoolbox\User
+            ? $_SESSION['user']
+            : null;
     }
 }

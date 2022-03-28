@@ -1438,7 +1438,7 @@ class Controller extends Base
             ->setTitle($postData['title'])
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics'] ?? null));
 
         /* I still think that the ValidNewsModerator spec pattern makes this low level
          * interrogation go away and behave consistently...but ok
@@ -1446,18 +1446,18 @@ class Controller extends Base
          * Write and Moderate are the only service level perms; Read doesn't exist.
          */
         if ($this->isNewsModerator()) {
-            $article->setSticky((bool)$postData['sticky']);
+            $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
         // Exception thrown when an invalid date is submitted; use last known value instead
         // This can occur with bad input; or when datepicker is still processing strtotime shuriken
         try {
-            $article->setPublishAt(\Alaress_Date_Format::newLocal($postData['publishAt']));
+            $article->setPublishAt(\Alaress_Date_Format::newLocal($postData['publishAt'] ?? null));
         } catch (InvalidArgumentException $e) {
             // noop
         }
         try {
-            $article->setExpiresAt(\Alaress_Date_Format::newLocal($postData['expiresAt']));
+            $article->setExpiresAt(\Alaress_Date_Format::newLocal($postData['expiresAt'] ?? null));
         } catch (InvalidArgumentException $e) {
             // noop
         }
@@ -1465,7 +1465,7 @@ class Controller extends Base
         /* If any Feature Image was provided, remember it
          * Otherwise clear it (remove a Feature Image)
          */
-        if (\is_array($postData['attachment'])) {
+        if (\is_array($postData['attachment'] ?? null)) {
             /** @var Storage\Model $featureImage */
             $featureImage = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
             $article->setFeatureImage($featureImage);
@@ -1482,7 +1482,11 @@ class Controller extends Base
          */
         $newList = new Collection();
 
-        if (\is_array($postData['attachedFiles']) && \count($postData['attachedFiles'])) {
+        if (
+            isset($postData['attachedFiles'])
+            && \is_array($postData['attachedFiles'])
+            && \count($postData['attachedFiles'])
+        ) {
             /* These are the task_file relations we already know about
              */
             $existing = $article->getAttachedFiles()->indexBy('hash')->getAll();

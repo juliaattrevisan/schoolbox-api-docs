@@ -28,15 +28,15 @@ $page->setAjax($ajax);
 
 $groupHandler = new Group();
 
-$modifyExisting = is_numeric($_POST['fileID']);
+$modifyExisting = is_numeric($_POST['fileID'] ?? null);
 
 /* Upload single file */
-if (is_string($_POST['description']) && isset($_POST['category'])) {
+if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
 // get a file object or die
     try {
         // if we're editing an existing file, ensure the file exists
         if ($modifyExisting) {
-            $file = FileMapper::getInstance()->findById($_POST['fileID']);
+            $file = FileMapper::getInstance()->findById($_POST['fileID'] ?? null);
         } else {
             $file = FileMapper::getInstance()->createModel();
         }
@@ -75,7 +75,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     }
 
     // if file was uploaded from File Component / Resource Browser
-    if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+    if (isset($_FILES['file']['name'], $_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
         try {
             // fake this momentarily
             $file->setFilename($_FILES['file']['name']);
@@ -99,8 +99,8 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
          */
         $file->setOwner($_SESSION['user']);
     }
-    $file->setTitle($_POST['description']);
-    $file->setDescription($_POST['comment']);
+    $file->setTitle($_POST['description'] ?? '');
+    $file->setDescription($_POST['comment'] ?? '');
     // If not set default to whatever in admin settings
     $visible = $_POST['visible'] ?? !$kernel->get('config')->get('file_default_to_hidden');
 
@@ -212,7 +212,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     } catch (Exception $e) {
         outputException($e, $file, $ajax);
     }
-} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+} elseif (is_numeric($_POST['move'] ?? null) && is_numeric($_POST['categoryID'] ?? null)) {
     /* Move file from one category to another */
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
@@ -237,7 +237,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
     header("Content-type: application/json");
     print json_encode(array('result' => $result));
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'] ?? null)) {
     /* Delete a single file */
     try {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
@@ -260,9 +260,9 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     } else {
         SitePage::localRedir(Redirect::decode($encodedReturnUrl));
     }
-} elseif (is_numeric($_GET['deleteList'])) {
+} elseif (is_numeric($_GET['deleteList'] ?? null)) {
     /* Delete a list of files */
-    $fileList = array_filter(explode(',', rtrim($_GET['fileList'], ',')));
+    $fileList = array_filter(explode(',', rtrim($_GET['fileList'] ?? '', ',')));
 
     if (is_array($fileList)) {
         foreach ($fileList as $fileID) {
@@ -282,7 +282,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         }
     }
 
-    $linkList = array_filter(explode(',', rtrim($_GET['linkList'], ',')));
+    $linkList = array_filter(explode(',', rtrim($_GET['linkList'] ?? '', ',')));
     if (is_array($linkList)) {
         foreach ($linkList as $linkID) {
             try {
