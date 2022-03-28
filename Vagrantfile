@@ -217,7 +217,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{force_upgrade}' " \
         + "'#{instance_registry_url_override}' " \
         + "'#{extra_hostname}' " \
-        + "'#{primary_php_majver}'" \
+        + "'#{primary_php_majver}' " \
         + "'#{taskd_build_from_local ? 1 : 0}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"

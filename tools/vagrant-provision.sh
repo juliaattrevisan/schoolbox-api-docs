@@ -57,7 +57,7 @@ if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
 fi
-taskd_build_from_local="$12";
+taskd_build_from_local="${12}";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -447,7 +447,7 @@ docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingma
 
 # Start and rebuild task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir
-if [[ $taskd_build_from_local -gt 0 ]]; then
+if [ $taskd_build_from_local -gt 0 ]; then
   "$SITE_ROOT"/tools/taskd/rebuild.sh
 else
   accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
