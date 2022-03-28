@@ -84,7 +84,7 @@ class Module extends BaseModule
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
         } catch (MapperException $e) {
-            throw new SchoolboxException('User Does not Exist');
+            throw new SchoolboxException('User Does not Exist', 404, null, 404);
         }
 
         return [

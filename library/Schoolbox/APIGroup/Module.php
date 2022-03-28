@@ -90,7 +90,7 @@ class Module extends BaseModule
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
         } catch (MapperException $e) {
-            throw new SchoolboxException('User Does not Exist');
+            throw new SchoolboxException('User Does not Exist', 404, null, 404);
         }
 
         return $user;
@@ -109,7 +109,7 @@ class Module extends BaseModule
         try {
             $group = $this->getGroupMapper()->findOneByColumn('cid', $params['groupId']);
         } catch (MapperException $e) {
-            throw new SchoolboxException('Group Does not Exist');
+            throw new SchoolboxException('Group Does not Exist', 404, null, 404);
         }
 
         return $group;
