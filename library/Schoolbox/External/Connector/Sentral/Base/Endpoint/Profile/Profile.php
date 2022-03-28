@@ -228,13 +228,6 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
-
-                /* FIXME 67417 Look for a particular guy
-                 */
-                if ($externalId != 67417) {
-                    continue;
-                }
-
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = '';
