@@ -483,7 +483,6 @@ class Profile implements IStrategy
                         'firstname' => $studentBaseProfile->getFirstname(),
                         'lastname' => $studentBaseProfile->getLastname()
                     ],
-                    'timetable' => null
                 ]);
             }
 
@@ -1215,7 +1214,6 @@ class Profile implements IStrategy
                         'firstname' => $staffBaseProfile->getFirstname(),
                         'lastname' => $staffBaseProfile->getLastname()
                     ],
-                    'timetable' => null
                 ]);
             }
 
