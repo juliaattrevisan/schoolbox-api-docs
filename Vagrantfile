@@ -176,7 +176,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Sync the taskd shared folder
   config.vm.synced_folder taskd_dir, "/tmp/taskd"
   # This script builds the taskd image, and starts the container
-#   config.vm.provision "shell", inline: "tools/taskd/rebuild.sh"
+#   config.vm.provision "shell", inline: "tools/taskd/restart.sh"
 
 
   # Puppet Apply Provisioner (without a puppet master)
@@ -216,4 +216,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{primary_php_majver}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
+
+  # Rebuild taskd too
+  config.vm.provision "shell", run: "always", inline: "tools/taskd/rebuild.sh", args: [taskd_dir]
 end
