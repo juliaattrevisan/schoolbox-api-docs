@@ -26,6 +26,12 @@ class Prepare implements IStrategy
 {
 
     /**
+     * An arbitrarily-chosen string to denote where these events came from
+     */
+    public const EVENT_IMPORT_IDENTIFIER = 'suds_sentral';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;

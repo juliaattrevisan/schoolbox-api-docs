@@ -270,6 +270,18 @@ class Factory
                 $this->classInvolvementMapper,
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance()
             ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $registry,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                $monday,
+                $friday
+            ))
 //            ->add(new Timetable\Prepare(
 //                $this->log,
 //                $this->perform,
