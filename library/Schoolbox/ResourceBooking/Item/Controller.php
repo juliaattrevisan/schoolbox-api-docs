@@ -321,18 +321,18 @@ class Controller extends Base
     protected function updateItemWithFormValues(Model $model, $post): void
     {
         $model
-            ->setName($post['name'])
-            ->setRoomCode($post['room_code'])
-            ->setDescription($post['description'])
-            ->setCategory($post['resource_category_id'])
-            ->setModerationType($post['resource_moderation_type_id'])
-            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time']))
-            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time']))
-            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time']))
-            ->setCurrentTermRestriction($post['current_term_restriction']);
+            ->setName($post['name'] ?? null)
+            ->setRoomCode($post['room_code'] ?? null)
+            ->setDescription($post['description'] ?? null)
+            ->setCategory($post['resource_category_id'] ?? null)
+            ->setModerationType($post['resource_moderation_type_id'] ?? null)
+            ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time'] ?? []))
+            ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time'] ?? []))
+            ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time'] ?? []))
+            ->setCurrentTermRestriction($post['current_term_restriction'] ?? null);
 
         // Rectumize the file that was uploaded
-        if (is_array($post['attachment'])) {
+        if (is_array($post['attachment'] ?? null)) {
             try {
                 // Get the file out of the rectum, and put it in the resource
                 $factory = new CollectorFactory();
@@ -350,7 +350,7 @@ class Controller extends Base
         // Clear and create the moderator list
         $model->setModeratorList(new Collection());
         // because of BelgianSuggest I have to check if this is even an array!
-        if (is_array($post['moderator_id'])) {
+        if (is_array($post['moderator_id'] ?? null)) {
             foreach ($post['moderator_id'] as $moderator_id) {
                 $user = new User();
                 $user->setId($moderator_id);
@@ -360,7 +360,7 @@ class Controller extends Base
 
         // Do likewise with the related resource list
         $model->setRelatedResourceList(new Collection());
-        if (is_array($post['related_resource_id'])) {
+        if (is_array($post['related_resource_id'] ?? null)) {
             foreach ($post['related_resource_id'] as $related_resource_id) {
                 $resource = new Model();
                 $resource->setId($related_resource_id);
@@ -370,7 +370,7 @@ class Controller extends Base
 
         // Do likewise with the role list
         $model->setRoleList(new Collection());
-        if (is_array($post['role'])) {
+        if (is_array($post['role'] ?? null)) {
             foreach ($post['role'] as $roleId => $allowed) {
                 $resourceRole = new RolePermission\Model();
                 $role         = new Role();
@@ -395,7 +395,11 @@ class Controller extends Base
     protected function getDateIntervalFromForm($formPart): \DateInterval
     {
         return new \DateInterval(
-            sprintf('PT%dH%dM', ((int)$formPart['day'] * 24 + (int)$formPart['hour']), (int)$formPart['minute'])
+            sprintf(
+                'PT%dH%dM',
+                ((int)($formPart['day'] ?? 0) * 24 + (int)($formPart['hour'] ?? 0)),
+                (int)($formPart['minute'] ?? 0),
+            )
         );
     }
 

@@ -806,7 +806,7 @@ class Controller extends Base
      */
     protected function getStatusChangeCallbackUrl()
     {
-        return $this->request->post['returnUrl'] ?: $this->getSession()->getHistory();
+        return $this->request->post->get('returnUrl') ?: $this->getSession()->getHistory();
     }
 
     /**
@@ -904,8 +904,8 @@ class Controller extends Base
     protected function getSeriesBookings(Model $booking)
     {
         if (
-            $this->getRequest()->query['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
-            || $this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
+            $this->request->query->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
+            || $this->request->post->get('efficacy') === EventRecurrenceMapper::EFFICACY_SERIES
         ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {
                 return $this->getBookingMapper()->findSeriesBookings($booking->getId(), $seriesId);
