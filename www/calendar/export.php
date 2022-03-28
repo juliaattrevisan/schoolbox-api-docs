@@ -415,6 +415,22 @@ try {
                 $sentry
             ));
 
+            /* SUDS Event
+             */
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
+                ],
+                true,
+                $sentry
+            ));
+
             $filename = 'external';
             break;
 
@@ -538,6 +554,22 @@ try {
                         \Schoolbox\External\Event\Mapper ::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
                         \Schoolbox\UserMapper::getInstance()
+                    ],
+                    true,
+                    $sentry
+                ));
+
+                /* SUDS Event
+                 */
+                $api->add(buildApiClass(
+                    Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class,
+                    [
+                        $user,
+                        $viewer,
+                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                        \Schoolbox\External\Event\Mapper ::getInstance(),
+                        \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                        \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
                     ],
                     true,
                     $sentry

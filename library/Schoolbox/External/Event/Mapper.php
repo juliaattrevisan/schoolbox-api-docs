@@ -91,8 +91,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$folderColumnString}, 
                 {$folderCodeColumnString}
             FROM {$this->getTable()}
-            LEFT JOIN folder_code fc ON {$this->getTable()}.code = fc.code
-            LEFT JOIN folder f ON fc.folder_id = f.id 
+            LEFT JOIN folder_code fc ON {$this->getTable()}.code = fc.code AND fc.deleted_at IS NULL
+            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
         ";
     }
 

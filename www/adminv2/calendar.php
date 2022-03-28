@@ -87,6 +87,7 @@ $typeList = [
  * programmatically generate the titles
  */
 $subscriptionLabels = [
+    'SudsEvent' => 'School Data Events',
     'SudsTimetable' => 'School Data Timetable'
 ];
 
