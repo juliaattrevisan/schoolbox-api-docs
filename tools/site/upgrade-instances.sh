@@ -22,7 +22,6 @@ declare single_instance_mode=0
 declare site_root              # No trailing slash, eg '/usr/share/schoolbox'
 declare is_primary_host        # One of [0|1]
 declare instance_list          # Set of instances for this host
-declare socketd_ports          # Use these if provided, otherwise fetch from IR. Eg '--socketd-ports vagrantx:9081'
 
 # Logging helpers
 function debug(){
@@ -47,8 +46,6 @@ function help(){
   echo "  --is-primary-host      Required. Is this a primary (1) or non-primary (0) host."
   echo "                                   (Primary host has daemons/crons + runs SQL updates)"
   echo "  --instance-id          Optional. If specified, only upgrade this instance"
-  echo "  --socketd-ports [MAP]  Optional. If specified, use this [instance_id:port] map, otherwise fetch from IR."
-  echo "                                   Eg '--socketd-ports vagrantx:9081'"
   echo "  -v,--verbose           Optional. Log with increased verbosity"
   echo "  -h,--help              Optional. Print this help message and exit"
 }
@@ -88,10 +85,6 @@ function parse_args() {
       --instance-id)
         instance_list=$2
         single_instance_mode=1
-        shift; shift;
-        ;;
-      --socketd-ports)
-        socketd_ports=$2
         shift; shift;
         ;;
       *)
