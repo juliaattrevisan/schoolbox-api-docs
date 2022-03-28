@@ -29,6 +29,20 @@ class Factory
 {
 
     /**
+     * Get timetable classes occurring this far in the past
+     * Measured in months, defaults to -1 month
+     */
+    private const FROM = -1;
+
+
+    /**
+     * Get timetable classes up to this far into the future
+     * Measured in months, defaults to 6 months
+     */
+    private const TO = 6;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -178,13 +192,12 @@ class Factory
          */
         $registry = new Registry();
 
-        $monday = date('Y-m-d', strtotime('monday last week'));
-        $friday = date('Y-m-d', strtotime('friday next week'));
+        /* Date range
+         */
+        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
 
         return (new GenericCollection(IStrategy::class))
-
-            /* Purge previously-imported profile relationships and classes
-             */
             ->add(new Profile\Prepare(
                 $this->log,
                 $this->perform,
@@ -231,8 +244,8 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->overridesMapper,
-                $monday,
-                $friday
+                $from,
+                $to
             ))
             ->add(new ApiStatistics(
                 $this->log,
