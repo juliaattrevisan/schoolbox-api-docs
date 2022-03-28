@@ -12,8 +12,14 @@ namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\GroupMapper;
@@ -21,6 +27,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\APIGroup\ModelToArray as GroupArray;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel\Mapper;
 use Timetable_ColourMapper;
 
 class Controller extends Base
@@ -126,17 +133,97 @@ class Controller extends Base
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
-        $newuser = $this->userMapper->createModel($uid);
+        //check if what the user is attempting to edit is valid?
+        if (array_key_exists('groups', $data)) {
+            throw new SchoolboxException("groups field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('students', $data)) {
+            throw new SchoolboxException("students field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('guardians', $data)) {
+            throw new SchoolboxException("guardians field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('fullName', $data)) {
+            throw new SchoolboxException("'fullName' is unable to be updated, please use title, firstName, lastname.");
+        }
+        if (array_key_exists('email', $data)) {
+            //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
+            throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
+        }
+
+        $newUser = $this->userMapper->createModel($uid);
 
         /**
          * build the user Model object from the POST data
          */
         //set default fields
-        $newuser->setEnabled(true);
-        $newuser->setSuperuser(false);
+        $newUser->setEnabled(true);
+        $newUser->setSuperuser(false);
+
+        $houseMapper = \HouseMapper::getInstance();
+        $campusMapper = CampusMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
+        $yearLevelMapper = Mapper::getInstance();
+        /**
+         * build the db check data for the new model.
+         */
+        if (array_key_exists('yearLevel', $data)) {
+            $yearLevel = $data['yearLevel'];
+            try {
+                $data['yearLevel'] = $yearLevelMapper->findById($yearLevel);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new SchoolboxException("Year Level '$yearLevel' Not Found or has been Deleted");
+            }
+        }
+        /**
+         * campus creation
+         */
+        if (array_key_exists('campus', $data)) {
+            $campus = $data['campus'];
+            $campusCollection = (new GenericCollection(Campus::class));
+            foreach ($campus as $campusId) {
+                try {
+                    $campusObj = $campusMapper->findById($campusId);
+                } catch (NotFound | Deleted $e) {
+                    throw new SchoolboxException("Campus '$campusId' Not Found or has been Deleted");
+                }
+                $campusCollection->add($campusObj);
+            }
+            $data['campusCollection'] = $campusCollection;
+            unset($data['campus']);
+        }
+        /**
+         * get schoolHouse
+         */
+        if (array_key_exists('schoolHouse', $data)) {
+            $schoolHouse = $data['schoolHouse'];
+            try {
+                $house = $houseMapper->findById($schoolHouse);
+                $data['schoolHouse'] = $house;
+            } catch (NotFound | Deleted $e) {
+                throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
+            }
+        }
+        /**
+         * impersonatable users
+         */
+        if (array_key_exists('impersonableUser', $data)) {
+            $impersonate = $data['impersonableUser'];
+            $impersonateCollection = new GenericCollection(User::class);
+            foreach ($impersonate as $userId) {
+                try {
+                    $impUser = $userMapper->findById($userId);
+                } catch (NotFound | Deleted $e) {
+                    throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                }
+                $impersonateCollection->add($impUser);
+            }
+            $data['linkedUser'] = $impersonateCollection;
+            unset($data['impersonableUser']);
+        }
 
         /** @var User $model */
-        $model = (new User\Translator\ArrayToModel())($data, $newuser);
+        $model = (new User\Translator\ArrayToModel())($data, $newUser);
 
         $this->userMapper->save($model);
 
