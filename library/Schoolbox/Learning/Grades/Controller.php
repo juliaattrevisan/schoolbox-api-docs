@@ -576,7 +576,7 @@ class Controller extends Base
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
             $includeComparison = $this->getUser()->getRole()->isStaff() || $viewee->getDisplayGradeGraph();
             $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison, $subject);
-            $rubricAssessmentList = $longitudinalRubric['assessments'];
+            $rubricAssessmentList = $longitudinalRubric['assessments'] ?? [];
             unset($longitudinalRubric['assessments']);
         }
 
@@ -615,7 +615,7 @@ class Controller extends Base
             $context       = $assessment->getContext();
             $contextId     = $context->getId();
             $baseContextId = $assessment->getBaseContext()->getId();
-            if ($tree[$baseContextId]['context'] && $contextId !== $baseContextId) {
+            if (isset($tree[$baseContextId]) && $contextId !== $baseContextId) {
                 // Ensure projects and their participation are always in the
                 // base of the tree.
                 // This means that a project's mark will always show,

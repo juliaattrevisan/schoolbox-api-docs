@@ -1196,7 +1196,6 @@ class DataSource
 
         while ($row = $capabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
             $longitude[$row['capability_id']]['name']                                                                  = $row['capability_name'];
-            $longitude[$row['capability_id']]['value'][$row['assessment_id']]                                          = $row['capability_value'];
             $longitude[$row['capability_id']]['mark_type'][$row['assessment_id']]                                      = $row['mark_type'];
             $longitude[$row['capability_id']]['max_value'][$row['assessment_id']]                                      = $row['capability_max_value'];
             $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name']                              = $row['indicator_name'];
