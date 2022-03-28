@@ -6046,11 +6046,6 @@ parameters:
 			path: library/Schoolbox/Learning/Grades/AssessmentComparator.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Grades\\\\Controller\\:\\:buildGraph\\(\\) should return array\\<array\\> but returns array\\<string, string\\|false\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Controller.php
