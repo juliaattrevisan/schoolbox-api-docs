@@ -77,6 +77,25 @@ class Controller extends Base
     }
 
     /**
+     * Returns group membership for a user
+     *
+     * @param User $user
+     * @param Group $group
+     * @api GET /user/{userId}/group/{groupId}
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipGet
+     */
+    public function apiMembershipGet(User $user, Group $group)
+    {
+        $apiGroups = new Collection($group);
+        $output = $apiGroups->map(new ModelToArray());
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
+    }
+
+    /**
      * adds a user into a group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
      * @api POST /user/{userId}/group/{groupId}
