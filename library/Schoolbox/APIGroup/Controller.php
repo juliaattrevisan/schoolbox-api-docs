@@ -88,9 +88,9 @@ class Controller extends Base
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
             $problem = (new ApiProblem('User is not Enroled in the Group'))
-                ->setStatus(409)
+                ->setStatus(404)
                 ->asArray();
-            $this->getResponse()->status->setCode(409);
+            $this->getResponse()->status->setCode(404);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the user is part of the group.
         }
