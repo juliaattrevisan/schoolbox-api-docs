@@ -22,16 +22,16 @@ class Helper
      * Find a user based on a keyword, for an AJAX response.
      * stripped and updated from `library/User.php`
      *
-     * @param string        $keyword
-     * @param array|null    $filter
-     * @param null          $limit
+     * @param string     $keyword
+     * @param array|null $filter
+     * @param int|null   $limit
      * @return array|bool
      * @throws \Exception
      */
     public function ajaxSearch(
         string $keyword,
-        $filter,
-        $limit = null
+        ?array $filter,
+        ?int $limit = null
     ) {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
@@ -112,13 +112,5 @@ class Helper
         $statement = $this->userMapper->getDatabase()->query($select . $from . $where);
         $statement->execute();
         return $statement->fetchAll();
-    }
-
-    /**
-     * db likeQuote Helper
-     */
-    private function likeQuoter($input)
-    {
-        return $this->userMapper->getDatabase()->quote("%$input%");
     }
 }
