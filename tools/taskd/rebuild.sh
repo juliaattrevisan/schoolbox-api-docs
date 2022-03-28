@@ -11,6 +11,8 @@ if [[ -n $taskd_container_ids ]]; then
   echo -e "$taskd_container_ids" | xargs docker stop
 fi
 
+# Should the task daemon container be built here or not?
+
 # build image: /tmp/taskd is assumed
 echo "[SB][`date +%Y-%m-%d\ %X`] Rebuilding task daemon image";
 docker build -q -t alaress/taskd:latest --network host /tmp/taskd

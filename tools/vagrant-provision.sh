@@ -31,8 +31,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 11 ]]; then
-  error "Script requires 11 params, found $#"
+if [[ $# -ne 12 ]]; then
+  error "Script requires 12 params, found $#"
   exit 1
 fi
 
@@ -57,6 +57,7 @@ if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
 fi
+taskd_build_from_local="$12";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -443,25 +444,46 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Stopping task daemon service";
-taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:latest -q)"
-if [[ -n $taskd_container_ids ]]; then
-  echo -e "$taskd_container_ids" | xargs docker stop
-fi
+#echo "[SB][`date +%Y-%m-%d\ %X`] Stopping task daemon service";
+#taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:latest -q)"
+#if [[ -n $taskd_container_ids ]]; then
+#  echo -e "$taskd_container_ids" | xargs docker stop
+#fi
 
-# The task daemon needs a dockerhub access token, as it is a private repo
-accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
-if [[ -z $accessToken ]]; then
-  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Dockerhub access token from .env environment file: not starting task daemon!";
+
+# Build task daemon:
+# if `taskd_build_from_local` then build from the mounted taskd dir
+if [[ taskd_build_from_local -gt 0 ]]; then
+  "$SITE_ROOT"/tools/taskd/rebuild.sh --build-from-local=1
 else
-  # Docker login needs the `pass` package to actually accept a password,
-  # otherwise this error gets raised:
-  # "Cannot autolaunch D-Bus without X11 $DISPLAY"
-  apt install -y pass
-  echo $accessToken | docker login -u alaress --password-stdin
-  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
-  docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
-fi
+  accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
+  if [[ -z $accessToken ]]; then
+    echo "[SB][`date +%Y-%m-%d\ %X`] Cannot start task daemon: not building from local dir, and unable to derive Dockerhub access token from .env environment file";
+  else
+    # Docker login needs the `pass` package to actually accept a password,
+    # otherwise this error gets raised:
+    # "Cannot autolaunch D-Bus without X11 $DISPLAY"
+    apt install -y pass
+    "$SITE_ROOT"/tools/taskd/rebuild.sh --build-from-local=0 --dockerhub-access-token=$accessToken
+#    echo $accessToken | docker login -u alaress --password-stdin
+#    echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+#    docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
+  fi
+fi;
+
+## The task daemon needs a dockerhub access token, as it is a private repo
+#accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
+#if [[ -z $accessToken ]]; then
+#  echo "[SB][`date +%Y-%m-%d\ %X`] Unable to derive Dockerhub access token from .env environment file: not starting task daemon!";
+#else
+#  # Docker login needs the `pass` package to actually accept a password,
+#  # otherwise this error gets raised:
+#  # "Cannot autolaunch D-Bus without X11 $DISPLAY"
+#  apt install -y pass
+#  echo $accessToken | docker login -u alaress --password-stdin
+#  echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting task daemon service";
+#  docker run -d --rm --network host --name schoolbox_vagrant_taskd alaress/taskd:latest;
+#fi
 
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];

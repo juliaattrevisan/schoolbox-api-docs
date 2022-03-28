@@ -34,6 +34,7 @@ aws_iam_secret = default["aws_iam_secret"]
 primary_php_majver = default["primary_php_majver"]
 taskd_dir = default["taskd_dir"]
 taskd_sync_type = default["taskd_sync_type"]
+taskd_build_from_local = default["taskd_build_from_local"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -120,6 +121,9 @@ if File.file?('vagrant.yaml')
   if !conf["taskd_sync_type"].nil?
     taskd_sync_type = conf["taskd_sync_type"]
   end
+  if !conf["taskd_build_from_local"].nil?
+    taskd_build_from_local = conf["taskd_build_from_local"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -173,10 +177,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet"
 
 
-  # Sync the taskd shared folder
-  config.vm.synced_folder taskd_dir, "/tmp/taskd"
-  # This script builds the taskd image, and starts the container
-#   config.vm.provision "shell", inline: "tools/taskd/restart.sh"
+  # Sync the taskd shared folder, if taskd_build_from_local is on
+  if taskd_build_from_local
+    config.vm.synced_folder taskd_dir, "/tmp/taskd"
+  end
 
 
   # Puppet Apply Provisioner (without a puppet master)
@@ -213,7 +217,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{force_upgrade}' " \
         + "'#{instance_registry_url_override}' " \
         + "'#{extra_hostname}' " \
-        + "'#{primary_php_majver}'"
+        + "'#{primary_php_majver}'" \
+        + "'#{taskd_build_from_local ? 1 : 0}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 

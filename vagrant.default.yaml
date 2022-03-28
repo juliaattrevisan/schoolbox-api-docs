@@ -44,3 +44,8 @@ primary_php_majver: '7.4'
 # Task daemon repo settings: analogous to the Puppet repo settings
 taskd_dir: "../taskd-prototype"
 taskd_sync_type: "pull"
+
+# Should the task daemon image be built from the local dir at all?
+# If not, then the image will be pulled from Dockerhub
+# (requires a valid DOCKERHUB_ACCESS_TOKEN in .env)
+taskd_build_from_local: true
