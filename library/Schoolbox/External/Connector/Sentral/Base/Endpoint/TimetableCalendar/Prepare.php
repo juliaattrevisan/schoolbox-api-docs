@@ -116,10 +116,7 @@ class Prepare implements IStrategy
 
             /* Delete any overrides that existed
              */
-            $this->overridesMapper->getDatabase()->query("
-                DELETE FROM {$this->overridesMapper->getTable()}
-            ");
-
+            $this->overridesMapper->truncate();
             $this->log->debug('Purged timetable event overrides');
 
             /* Truncate other data entirely

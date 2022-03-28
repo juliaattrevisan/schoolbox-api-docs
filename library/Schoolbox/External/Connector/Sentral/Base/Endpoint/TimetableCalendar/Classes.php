@@ -212,6 +212,14 @@ class Classes implements IStrategy
          */
         $seen = [];
 
+        /* A list of classEntries that we saw previously
+         */
+        $classEntries = [];
+
+        /* A list of classInvolvements that we saw previously
+         */
+        $classInvolvements = [];
+
         /* Consume everything inside this payload
          */
         foreach ($payload['data'] as $class) {
@@ -233,11 +241,13 @@ class Classes implements IStrategy
              * looking at an event that we've already loaded before
              */
             $guid = $class['id'];
+            $externalId = $data['person']['externalId'];
 
             /* Try to recycle a previous instance
              */
             if (isset($seen[$guid])) {
                 $event = $seen[$guid];
+                $classEntry = $classEntries[$event->getCode()];
 
                 $this->log->debug(sprintf(
                     'Reusing previously seen timetable event %s - %s, %s, %s-%s',
@@ -274,13 +284,55 @@ class Classes implements IStrategy
                 ));
 
                 $seen[$guid] = $event;
-            }
 
-            /* Save sis_class record
-             */
+                /* Save sis_class record
+                 */
+                if (isset($classEntries[$event->getCode()])) {
+                    $classEntry = $classEntries[$event->getCode()];
+                } else {
+                    $classEntry = $this->classEntryMapper->createModel()
+                        ->setName($class['attributes']['className'])
+                        ->setCode($class['attributes']['className']);
+
+                    $this->classEntryMapper->save($classEntry);
+
+                    $classEntries[$event->getCode()] = $classEntry;
+                }
+            }
 
             /* Save sis_class_user involvements
              */
+            if (isset($classInvolvements[$classEntry->getId()][$externalId])) {
+                $this->log->debug(sprintf(
+                    'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                    $name,
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+            } else {
+                $classInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setClass($classEntry)
+                    ->setExternalId($externalId);
+
+                $this->classInvolvementMapper->save($classInvolvement);
+
+                $classInvolvements[$classEntry->getId()][$externalId] = true;
+
+                $this->log->debug(sprintf(
+                    'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                    $name,
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+            }
         }
     }
 }
