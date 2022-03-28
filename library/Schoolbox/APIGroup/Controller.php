@@ -86,7 +86,17 @@ class Controller extends Base
      */
     public function apiMembershipGet(User $user, Group $group)
     {
-        $apiGroups = new Collection($group);
+        if (!$this->groupsHelper->inGroup($user, $group)) {
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
+                ->setStatus(409)
+                ->asArray();
+            $this->getResponse()->status->setCode(409);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $apiGroups    = new Collection($users_groups);
         $output = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput(
