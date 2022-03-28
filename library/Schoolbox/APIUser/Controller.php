@@ -357,21 +357,42 @@ class Controller extends Base
         $search = $request['search'] ?? null;
         $filter = $request['filter'] ?? null;
         $userHelper = new Helper($this->userMapper);
-
-        $output = $userHelper->ajaxSearch($search);
-        $userReturn = [];
-        foreach ($output as $item) {
-            $user = [];
+        $output = [];
+        $ajaxSearch = $userHelper->ajaxSearch($search);
+        $userIds = [];
+        foreach ($ajaxSearch as $item) {
             foreach ($item as $label => $value) {
-                if (!is_numeric($label)) {
-                    $user[$label] = $value;
+                if ('uid' === $label) {
+                    $userIds[] = $value;
                 }
             }
-            $userReturn[] = $user;
+        }
+        /**
+         * now we have the user id's that match the search result, create the standard user array with hydration.
+         */
+        $users = $this->userMapper->findByColumn('id', $userIds);
+        foreach ($users as $user) {
+            $users_groups = $this->groupsHelper->getCurrentGroups($user);
+            $apiGroups = new Collection($users_groups);
+            $groupsArr = $apiGroups->map(new GroupArray());
+
+            //load parents and students / children for export.
+            $user->loadParents()
+                 ->loadStudents();
+
+            /**
+             * build the whole thing
+             */
+            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
         }
         $this->response->content->set(
             $this->buildJsonOutput(
-                $userReturn
+                [
+                    'data'  =>  $output,
+                    'metadata'  => [
+                        'count' => count($output),
+                    ]
+                ]
             )
         );
     }
