@@ -262,31 +262,31 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $definitionCompiler,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $registry,
-                $preloader,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
+//            ->add(new Timetable\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->timetablePeriodMapper,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+//            ->add(new Timetable\Definition(
+//                $this->log,
+//                $this->perform,
+//                $definitionCompiler,
+//                $this->timetableCycleMapper,
+//                $this->timetablePeriodMapper
+//            ))
+//            ->add(new Timetable\Classes(
+//                $this->log,
+//                $this->perform,
+//                $lookup,
+//                $registry,
+//                $preloader,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
             ->add(new ApiStatistics(
                 $this->log,
                 $api
