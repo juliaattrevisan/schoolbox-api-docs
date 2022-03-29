@@ -10,6 +10,8 @@
 
 use External\IConnector;
 use Schoolbox\Engagement\Login;
+use Schoolbox\Resource\LogMapper;
+use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -67,10 +69,236 @@ switch ($_POST['module']) {
         // other cases unimplemented for now
     case 'storage':
     case 'memory':
-    case 'service_db':
+    case 'service_external_db':
+        $config = $kernel->get('config');
+        $external_db_version = '';
+        $external_db = ucfirst($config->get('external_type'));
+        if ($config->get('external_enable')) {
+            $external_ping = new \External_Ping();
+            if ($external_ping->isResponsive()) {
+                $external_db_light = 'success';
+                $external_db_status = 'Online';
+                $external_db_version = $external_ping->getVersion();
+            } else {
+                $external_db_light = 'alert';
+                $external_db_status = 'Offline';
+            }
+        } else {
+            $external_db_light = 'alert';
+            $external_db_status = 'Disabled';
+        }
+        $output = [
+            'external_db' => $external_db,
+            'external_db_light' => $external_db_light,
+            'external_db_status' => $external_db_status,
+            'external_db_version' => $external_db_version,
+        ];
+        break;
     case 'service_email':
+        $config = $kernel->get('config');
+        if ($config->get('mail_enable') && $config->get('mail_smtp_host')) {
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
+
+            if (@socket_connect($socket, $config->get('mail_smtp_host'), $config->get('mail_smtp_port'))) {
+                $email_light = 'success';
+                $email_status = 'Online';
+            } else {
+                $email_light = 'alert';
+                $email_status = 'Offline';
+            }
+
+            socket_close($socket);
+        } else {
+            $email_light = 'alert';
+            $email_status = 'Disabled';
+        }
+        $output = [
+            'email_light' => $email_light,
+            'email_status' => $email_status,
+        ];
+        break;
     case 'service_ldap':
-    case 'recent_activity':
+        $config = $kernel->get('config');
+        $ldap_light = 'alert';
+        $ldap_status = 'Disabled';
+
+        $ldap_alt_light = 'alert';
+        $ldap_alt_status = 'Disabled';
+
+        if ($config->get('ldap_enable')) {
+            $tempsession = new \Session();
+
+            // Check primary LDAP server bind
+
+            if (trim($config->get('ldap_host')) !== "") {
+                $ldapbind = $tempsession->ldapConnect(
+                    $config->get('ldap_host'),
+                    $config->get('ldap_user'),
+                    $config->get('ldap_pass'),
+                    $config->get('ldap_ca_certificate')
+                );
+
+                if ($ldapbind) {
+                    $ldap_light = 'success';
+                    $ldap_status = 'Online';
+                } else {
+                    $ldap_status = 'Offline';
+                }
+
+                unset($ldapbind);
+            }
+
+            // Check secondary LDAP server bind
+
+            if (trim($config->get('ldap_host_alt')) !== "") {
+                $ldapbind = $tempsession->ldapConnect(
+                    $config->get('ldap_host_alt'),
+                    $config->get('ldap_user_alt'),
+                    $config->get('ldap_pass'),
+                    $config->get('ldap_ca_certificate')
+                );
+
+                if ($ldapbind) {
+                    $ldap_alt_light = 'success';
+                    $ldap_alt_status = 'Online';
+                } else {
+                    $ldap_alt_status = 'Offline';
+                }
+
+                unset($ldapbind);
+            }
+        }
+        $output = [
+            'ldap_light' => $ldap_light,
+            'ldap_status' => $ldap_status,
+            'ldap_alt_light' => $ldap_alt_light,
+            'ldap_alt_status' => $ldap_alt_status,
+        ];
+        break;
+    case 'rss':
+        $config = $kernel->get('config');
+        $rss = new Alaress_Rss_Stream($config->get('release_notes_url'));
+        $rss->stream();
+        $output = $rss->getOutput();
+        break;
+    case 'ntp':
+        $ntpServer = "pool.ntp.org";
+        $socket = stream_socket_client("udp://$ntpServer:123",  $errno, $errstr, 1);
+        if (!$socket) {
+             $output = array('error' => 'Unable to connect to NTP server', 'errno' => $errno,);
+             break;
+        }
+        stream_set_timeout($socket, 1);
+        $data = "\x1b" . str_repeat("\0", 47);
+        $result = fwrite($socket, $data);
+        if (!$result) {
+            $output = array('error' => 'Unable to write to NTP server', 'errno' => -1,);
+            break;
+        }
+        $data = fread($socket, 48);
+        fclose($socket);
+        $decoded   = unpack('N12', $data);
+        $timestamp = sprintf('%u', $decoded[9]);
+        $timestamp -= 2208988800; #convert ntp timestamp to unix timestamp
+        $output = array('diff' => abs($timestamp - time()));
+        break;
+    case 'logs':
+        $logsRecent = LogMapper::getInstance()->findRecent();
+
+        foreach ($logsRecent as $log) {
+            $action = '';
+
+            switch ($log['action']) {
+                case '1':
+                    $action = 'Logged in';
+                    break;
+                case '0':
+                    $action = 'Failed login';
+                    break;
+                case 'modify':
+                    $action = 'Modified ' . $log['ip'];
+                    break;
+                case 'move':
+                    $action = 'Moved ' . $log['ip'];
+                    break;
+                case 'access':
+                    $action = 'Accessed ' . $log['ip'];
+                    break;
+                case 'create':
+                    $action = 'Added ' . $log['ip'];
+                    break;
+                case 'delete':
+                    $action = 'Deleted ' . $log['ip'];
+                    break;
+
+                default:  //If unknown, skip output
+                    continue 2;
+            }
+
+            if ($action !== '') {
+                $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
+
+                $output[] = [
+                    'date' => $date->getShort(),
+                    'action' => $action,
+                    'name' => "{$log['firstname']} {$log['lastname']}"
+                ];
+            }
+        }
+        break;
+    case 'rabbitmq':
+        $amqpOnline = true;
+        $amqpLight = 'success';
+        try {
+            Schoolbox\Notif\MQ\Connector::getInstance();
+        } catch (\Throwable $e) {
+            $amqpOnline = false;
+            $amqpLight = 'alert';
+        }
+        $output = [
+            'rabbitmq_status' => $amqpOnline,
+            'rabbitmq_light' => $amqpLight,
+            ];
+        break;
+    case 'ssl_cert':
+        $config = $kernel->get('config');
+        $host = (new Factory($config))->buildFullyQualified();
+        $host = str_replace('https://', '', $host);
+        $streamContext = stream_context_create(
+            [
+                'ssl' => [
+                    'capture_peer_cert' => true,
+                    'peer_name'         => $host,
+                ],
+            ]
+        );
+        $timeout = 4.0;
+        $client = stream_socket_client(
+            'ssl://127.0.0.1:443',
+            $errorNumber,
+            $errorDescription,
+            $timeout,
+            STREAM_CLIENT_CONNECT,
+            $streamContext
+        );
+        $response = stream_context_get_params($client);
+        $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
+
+        // Check cert is issued by LetsEncrypt for exact hostname
+        if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
+            // Not issued by LetsEncrypt
+            $isCustomCert = true;
+        } else {
+            // Does not contain exact match
+            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
+        }
+
+        $output =  [
+            'isCustomCert' => $isCustomCert,
+            'expiry' => (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
+        ];
+        break;
     default:
         break;
 }

@@ -156,120 +156,6 @@ class Controller extends Base
             $memory_gradient = '';
         }
 
-        // External database checked
-
-        $external_db_version = '';
-
-        if ($this->getConfigLoader()->get('external_enable')) {
-            $external_ping = new \External_Ping();
-
-            if ($external_ping->isResponsive()) {
-                $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
-                $external_db_light = 'success';
-                $external_db_status = 'Online';
-                $external_db_version = $external_ping->getVersion();
-            } else {
-                $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
-                $external_db_light = 'alert';
-                $external_db_status = 'Offline';
-            }
-        } else {
-            $external_db = ucfirst($this->getConfigLoader()->get('external_type'));
-            $external_db_light = 'alert';
-            $external_db_status = 'Disabled';
-        }
-
-        // Email status
-
-        if ($this->getConfigLoader()->get('mail_enable') && $this->getConfigLoader()->get('mail_smtp_host')) {
-            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
-
-            if (@socket_connect($socket, $this->getConfigLoader()->get('mail_smtp_host'), $this->getConfigLoader()->get('mail_smtp_port'))) {
-                $email_light = 'success';
-                $email_status = 'Online';
-            } else {
-                $email_light = 'alert';
-                $email_status = 'Offline';
-            }
-
-            socket_close($socket);
-        } else {
-            $email_light = 'alert';
-            $email_status = 'Disabled';
-        }
-
-        // LDAP status
-
-        $ldap_light = 'alert';
-        $ldap_status = 'Disabled';
-
-        $ldap_alt_light = 'alert';
-        $ldap_alt_status = 'Disabled';
-
-        if ($this->getConfigLoader()->get('ldap_enable')) {
-            $tempsession = new \Session();
-
-            // Check primary LDAP server bind
-
-            if (trim($this->getConfigLoader()->get('ldap_host')) != "") {
-                $ldapbind = $tempsession->ldapConnect(
-                    $this->getConfigLoader()->get('ldap_host'),
-                    $this->getConfigLoader()->get('ldap_user'),
-                    $this->getConfigLoader()->get('ldap_pass'),
-                    $this->getConfigLoader()->get('ldap_ca_certificate')
-                );
-
-                if ($ldapbind) {
-                    $ldap_light = 'success';
-                    $ldap_status = 'Online';
-                } else {
-                    $ldap_light = 'alert';
-                    $ldap_status = 'Offline';
-                }
-
-                unset($ldapbind);
-            }
-
-            // Check secondary LDAP server bind
-
-            if (trim($this->getConfigLoader()->get('ldap_host_alt')) != "") {
-                $ldapbind = $tempsession->ldapConnect(
-                    $this->getConfigLoader()->get('ldap_host_alt'),
-                    $this->getConfigLoader()->get('ldap_user_alt'),
-                    $this->getConfigLoader()->get('ldap_pass'),
-                    $this->getConfigLoader()->get('ldap_ca_certificate')
-                );
-
-                if ($ldapbind) {
-                    $ldap_alt_light = 'success';
-                    $ldap_alt_status = 'Online';
-                } else {
-                    $ldap_alt_light = 'alert';
-                    $ldap_alt_status = 'Offline';
-                }
-
-                unset($ldapbind);
-            }
-        }
-
-        // Check WWW
-
-        $context = ProxyServer::getInstance()->getContext('http', true);
-        $context['http']['timeout'] = 1;
-        $rss = '';
-
-        if (@file_get_contents('https://schoolbox.com.au/schoolboxinstaller/status.html', null, stream_context_create($context))) {
-            $www_light = 'success';
-            $www_status = 'Available';
-
-            $rss = new Alaress_Rss_Stream($this->getConfigLoader()->get('release_notes_url'));
-            $rss->stream();
-        } else {
-            $www_light = 'alert';
-            $www_status = 'Inaccessible';
-        }
-
         // check ssh status
         if (file_exists('/etc/schoolbox/fleet-connected')) {
             $last_touched = filemtime('/etc/schoolbox/fleet-connected');
@@ -287,62 +173,6 @@ class Controller extends Base
         } else {
             $ssh_light  = 'alert';
             $ssh_status = 'Offline';
-        }
-
-        // Check RabbitMQ
-        $amqpOnline = true;
-        try {
-            MQ\Connector::getInstance();
-        } catch (\Throwable $e) {
-            $amqpOnline = false;
-        }
-
-        // SSL cert details
-        [$isCustomCert, $certExpiry] = $this->sslCertCheck();
-
-        // Get logs
-        $logs = [];
-        $logsRecent = LogMapper::getInstance()->findRecent();
-
-        foreach ($logsRecent as $log) {
-            $action = '';
-
-            switch ($log['action']) {
-                case '1':
-                    $action = 'Logged in';
-                    break;
-                case '0':
-                    $action = 'Failed login';
-                    break;
-                case 'modify':
-                    $action = 'Modified ' . $log['ip'];
-                    break;
-                case 'move':
-                    $action = 'Moved ' . $log['ip'];
-                    break;
-                case 'access':
-                    $action = 'Accessed ' . $log['ip'];
-                    break;
-                case 'create':
-                    $action = 'Added ' . $log['ip'];
-                    break;
-                case 'delete':
-                    $action = 'Deleted ' . $log['ip'];
-                    break;
-
-                default:  //If unknown, skip output
-                    continue 2;
-            }
-
-            if ($action != '') {
-                $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
-
-                $logs[] = [
-                    'date' => $date->getShort(),
-                    'action' => $action,
-                    'name' => "{$log['firstname']} {$log['lastname']}"
-                ];
-            }
         }
 
         $version = new Version($this->getConfigLoader());
@@ -379,20 +209,8 @@ class Controller extends Base
                     'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
                     'memory_percentage' => $memory_percentage,
                     'memory_gradient' => $memory_gradient,
-                    'external_db' => $external_db,
-                    'external_db_version' => $external_db_version,
-                    'external_db_light' => $external_db_light,
-                    'external_db_status' => $external_db_status,
-                    'email_light' => $email_light,
-                    'email_status' => $email_status,
-                    'ldap_light' => $ldap_light,
-                    'ldap_status' => $ldap_status,
-                    'ldap_alt_light' => $ldap_alt_light,
-                    'ldap_alt_status' => $ldap_alt_status,
-                    'www_light' => $www_light,
-                    'www_status' => $www_status,
-                    'updates_rss' => $rss instanceof Alaress_Rss_Stream ? $rss->getOutput() : '',
-                    'logs' => $logs,
+                    'external_db' => ucfirst($this->getConfigLoader()->get('external_type')),
+                    'ldap_enabled' => $this->getConfigLoader()->get('ldap_enable'),
                     'kamiEnabled' => $this->kamiConnector->isEnabled(),
                     'kamiOnline' => $this->kamiConnector->isOnline(),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
@@ -410,10 +228,6 @@ class Controller extends Base
                      */
                     'suds_import_data_enabled' => $sudsEnabled,
                     'suds_import_logs' => $importLogs,
-
-                    'amqpOnline' => $amqpOnline,
-                    'isCustomCert' => $isCustomCert,
-                    'certExpiry'   => $certExpiry,
                     'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
                 ),
             )
@@ -692,57 +506,5 @@ class Controller extends Base
     private function isCloudHosted(): bool
     {
         return $this->getConfigLoader()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS;
-    }
-
-
-    /**
-     * Returns whether this onprem instance:
-     * * is using a custom cert or a managed LetsEncrypt cert, and
-     * * number of days till cert expiry
-     *
-     * If cloud-hosted, returns NULL
-     *
-     * @return array
-     */
-    private function sslCertCheck(): array
-    {
-        if ($this->isCloudHosted()) {
-            return [null, null];
-        }
-        $host = (new Factory($this->getConfigLoader()))->buildFullyQualified();
-        $host = str_replace('https://', '', $host);
-        $streamContext = stream_context_create(
-            [
-                'ssl' => [
-                    'capture_peer_cert' => true,
-                    'peer_name'         => $host,
-                ],
-            ]
-        );
-        $timeout = 4.0;
-        $client = stream_socket_client(
-            'ssl://127.0.0.1:443',
-            $errorNumber,
-            $errorDescription,
-            $timeout,
-            STREAM_CLIENT_CONNECT,
-            $streamContext
-        );
-        $response = stream_context_get_params($client);
-        $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
-
-        // Check cert is issued by LetsEncrypt for exact hostname
-        if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
-            // Not issued by LetsEncrypt
-            $isCustomCert = true;
-        } else {
-            // Does not contain exact match
-            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
-        }
-
-        return [
-            $isCustomCert,
-            (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
-        ];
     }
 }
