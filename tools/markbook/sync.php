@@ -243,11 +243,6 @@ $kernel->run(static function (ContainerInterface $di, LoopInterface $loop, Logge
             if (!$markbookExternal->isSyncable($assessment)) {
                 continue;
             }
-            if ($assessment->getSpecificationAssessment() instanceof IAssessable && $assessment->getTitle() != $assessment->getSpecificationAssessment()->getTitle()) {
-                $log->warning("Rewriting title of assessment");
-                $assessment->setTitle($assessment->getSpecificationAssessment()->getTitle());
-            }
-
 
             $action = str_pad("Assessment:", 30, " ");
 
