@@ -188,7 +188,7 @@ switch ($_POST['module']) {
         break;
     case 'ntp':
         $ntpServer = "pool.ntp.org";
-        $socket = stream_socket_client("udp://$ntpServer:123",$errno,$errstr,1);
+        $socket    = stream_socket_client("udp://$ntpServer:123", $errno, $errstr, 1);
         if (!$socket) {
              $output = array('error' => 'Unable to connect to NTP server', 'errno' => $errno,);
              break;
