@@ -416,7 +416,7 @@ class Controller extends BaseController
 
         // Load users for form teacher, tutor, etc.
         $formTeacher = null;
-        if ($externalUser['StudentFormStaffName']) {
+        if (isset($externalUser['StudentFormStaffName'])) {
             if ($externalUser['TeacherFormID']) {
                 try {
                     $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
@@ -434,7 +434,7 @@ class Controller extends BaseController
          * via their id (some sis don't have the id)
          */
         $tutorTeacher = null;
-        if ($externalUser['StudentTutorName']) {
+        if (isset($externalUser['StudentTutorName'])) {
             if ($externalUser['TeacherTutorID']) {
                 try {
                     $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
@@ -449,7 +449,7 @@ class Controller extends BaseController
         }
 
         $hohTeacher = null;
-        if ($externalUser['StudentHeadOfHouse']) {
+        if (isset($externalUser['StudentHeadOfHouse'])) {
             if ($externalUser['HeadOfHouseID']) {
                 try {
                     $hohTeacher = $this->userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
@@ -681,7 +681,7 @@ class Controller extends BaseController
                     'hideContacts'             => $hideContacts,
                     'showClasses'              => $showClasses,
                     'now'                      => Alaress_Date_Format::now(),
-                    'boarderType'              => $this->externalUser->determineBoarderType($externalUser['StudentBoarder']),
+                    'boarderType'              => $this->externalUser->determineBoarderType($externalUser['StudentBoarder'] ?? null),
                     'contacts'                 => $contacts,
                     'subjects'                 => $subjects,
                     'customButtons'            => $customButtons,
