@@ -161,6 +161,8 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
+        $this->log->info('Processing timetables.');
+
         foreach ($this->registry->recallAll() as $externalId => $data) {
             $name = trim("{$data['person']['firstname']} {$data['person']['lastname']}");
 
