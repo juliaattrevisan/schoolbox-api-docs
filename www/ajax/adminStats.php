@@ -205,7 +205,7 @@ switch ($_POST['module']) {
         $decoded   = unpack('N12', $data);
         $timestamp = sprintf('%u', $decoded[9]);
         $timestamp -= 2208988800; #convert ntp timestamp to unix timestamp
-        $output = array('diff' => abs($timestamp - time()));
+        $output = ['diff' => abs($timestamp - time())];
         break;
     case 'logs':
         $logsRecent = LogMapper::getInstance()->findRecent();
