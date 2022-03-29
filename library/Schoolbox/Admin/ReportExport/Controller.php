@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -217,24 +218,35 @@ class Controller extends Base
      * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/student/25?startDate=2021-01-01&endDate=2022-12-31&showOverallGrade=1&showSummary=1
      * @param User $student
      * @return void
+     * @throws MapperException
      */
     public function getStudentReport(User $student)
     {
-        $startDate           = $this->request->query->get('startDate');
-        $endDate             = $this->request->query->get('endDate');
-        $viewAs              = $this->request->query->get('viewAs');
-        $showSummary         = (bool)$this->request->query->get('showSummary');
-        $showOverallGrade    = (bool)$this->request->query->get('showOverallGrade');
-        $workTypes           = $this->request->query->get('workTypes');
-        $showSummaryGrades   = (bool)$this->request->query->get('showGrades');
-        $showSummaryComments = (bool)$this->request->query->get('showComments');
-        $showSummaryRubrics  = (bool)$this->request->query->get('showRubrics');
+        $startDate = $this->request->query->get('startDate');
+        $endDate   = $this->request->query->get('endDate');
+        $viewAs    = $this->request->query->get('viewAs');
+        // summary
+        $showSummary             = (bool)$this->request->query->get('showSummary');
+        $showSummaryOverallGrade = (bool)$this->request->query->get('showOverallGrade');
+        $summaryWorkTypeIds      = $this->request->query->get('workTypes');
+        $showSummaryGrades       = (bool)$this->request->query->get('showGrades');
+        $showSummaryComments     = (bool)$this->request->query->get('showComments');
+        $showSummaryRubrics      = (bool)$this->request->query->get('showRubrics');
+        // class
+        $showClass             = (bool)$this->request->query->get('showClass');
+        $showClassOverallGrade = (bool)$this->request->query->get('showClassOverallGrade');
+        $classWorkTypeIds      = $this->request->query->get('classWorkTypes');
+        $showClassGrades       = (bool)$this->request->query->get('showClassGrades');
+        $showClassComments     = (bool)$this->request->query->get('showClassComments');
+        $showClassRubrics      = (bool)$this->request->query->get('showClassRubrics');
+
 
         // Dates
         try {
             $from = new \Alaress_Date_Format($startDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $to   = new \Alaress_Date_Format($endDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $term = $this->termMapper->findForDate($from);
+            // fake term
+            $term = $this->termMapper->createModel()->setStart($from)->setActualFinish($to);
         } catch (\Exception $e) {
             $term = $this->termMapper->findForToday();
             $from = $term->getStart();
@@ -256,7 +268,8 @@ class Controller extends Base
                 $viewer = $this->getUser();
         }
 
-        $filteredWorkTypes = !$workTypes ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $workTypes)));
+        $summaryWorkTypes = !$summaryWorkTypeIds ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $summaryWorkTypeIds)));
+        $classWorkTypes   = !$classWorkTypeIds ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $classWorkTypeIds)));
 
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
@@ -273,23 +286,32 @@ class Controller extends Base
             $assessments,
         ] = $gradeHelper->generateGrades($viewer, $student, $term, $from, $to);
 
-        $assessmentTasks = new Collection();
-
-        if ($filteredWorkTypes && $filteredWorkTypes->count() > 0) {
-            $assessmentTasks = $gradeHelper->filterAssessments($this->getUser(), $student, $assessments, $filteredWorkTypes);
+        $summaryAssessments = new Collection();
+        if ($summaryWorkTypes && $summaryWorkTypes->count() > 0) {
+            $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
+        }
+        $classAssessments = new Collection();
+        if ($classWorkTypes && $classWorkTypes->count() > 0) {
+            $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
         }
 
         $data = [
-            'student'             => $student,
-            'folders'             => $folders,
-            'markbooks'           => $markbooks,
-            'assessmentTasks'     => $assessmentTasks,
-            'reportTitle'         => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
-            'showSummary'         => $showSummary,
-            'showOverallGrade'    => $showOverallGrade,
-            'showSummaryGrades'   => $showSummaryGrades,
-            'showSummaryComments' => $showSummaryComments,
-            'showSummaryRubrics'  => $showSummaryRubrics,
+            'student'                 => $student,
+            'folders'                 => $folders,
+            'markbooks'               => $markbooks,
+            'summaryAssessments'      => $summaryAssessments,
+            'classAssessments'        => $classAssessments,
+            'reportTitle'             => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
+            'showSummary'             => $showSummary,
+            'showSummaryOverallGrade' => $showSummaryOverallGrade,
+            'showSummaryGrades'       => $showSummaryGrades,
+            'showSummaryComments'     => $showSummaryComments,
+            'showSummaryRubrics'      => $showSummaryRubrics,
+            'showClass'               => $showClass,
+            'showClassOverallGrade'   => $showClassOverallGrade,
+            'showClassGrades'         => $showClassGrades,
+            'showClassComments'       => $showClassComments,
+            'showClassRubrics'        => $showClassRubrics,
         ];
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
