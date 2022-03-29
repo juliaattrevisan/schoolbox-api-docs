@@ -108,6 +108,12 @@ class Helper
             }
         }
 
+        // remove folders without assessments
+        $folders = $folders->filter(
+            static function (Folder $folder) use ($assessmentsPerFolder) {
+                return in_array($folder->getId(), $assessmentsPerFolder->keys());
+            }
+        )->indexBy('id');
         $folders->sortNaturally('name');
 
         return [$folders, $markbooks, $assessmentsPerFolder];
