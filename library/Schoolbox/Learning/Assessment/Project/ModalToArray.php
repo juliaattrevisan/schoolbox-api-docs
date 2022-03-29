@@ -8,7 +8,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 class ModalToArray extends \Schoolbox\Learning\Assessment\ModelToArray
 {
     /**
-     * @param IAssessable|Model $assessment
+     * @param IAssessable $assessment
      * @return array
      */
     public function __invoke($assessment): array
@@ -26,9 +26,6 @@ class ModalToArray extends \Schoolbox\Learning\Assessment\ModelToArray
                     break;
                 case 'lti':
                     $tmp['assessments'][] = (new \Schoolbox\Learning\Assessment\Lti\ModalToArray())($subAssessment);
-                    break;
-                case 'project':
-                    $tmp['assessments'][] = (new \Schoolbox\Learning\Assessment\Project\ModalToArray())($subAssessment);
                     break;
                 case 'task':
                     $tmp['assessments'][] = (new \Schoolbox\Learning\Assessment\Task\ModalToArray())($subAssessment);
