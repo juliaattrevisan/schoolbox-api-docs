@@ -193,10 +193,10 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 if (!($nextSection && is_numeric($nextSection['section_id'])) && !($prevSection && is_numeric($prevSection['section_id']))) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+    * previous button if applicable
+    */
     if (is_numeric($nextSection['section_id'])) {
         $this->setVar(
             array(

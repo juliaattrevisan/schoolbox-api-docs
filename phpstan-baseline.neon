@@ -7471,11 +7471,6 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Model.php
 
 		-
-			message: "#^Variable \\$campus might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Controller.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Series.php
@@ -7487,11 +7482,6 @@ parameters:
 
 		-
 			message: "#^Call to method DateTime\\:\\:format\\(\\) on a separate line has no effect\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
-
-		-
-			message: "#^Variable \\$campus might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
 
