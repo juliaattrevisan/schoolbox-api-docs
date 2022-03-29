@@ -248,12 +248,12 @@ switch ($_POST['module']) {
         }
         break;
     case 'rabbitmq':
-        $amqpOnline = true;
+        $amqpOnline = "online";
         $amqpLight = 'success';
         try {
             Schoolbox\Notif\MQ\Connector::getInstance();
         } catch (\Throwable $e) {
-            $amqpOnline = false;
+            $amqpOnline = "offline";
             $amqpLight = 'alert';
         }
         $output = [
