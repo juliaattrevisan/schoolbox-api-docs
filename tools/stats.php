@@ -85,7 +85,8 @@ $app = new class extends CliTool\App {
             'plagscan_docs'     => 'SELECT count(*) FROM plagscan_document WHERE status = 3 and deleted_at is null',
             'plagscan_errors'   => 'SELECT count(*) FROM plagscan_document WHERE status = -1 and deleted_at is null',
             'kami_docs'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "done" and deleted_at is null',
-            'kami_errors'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
+            'kami_processing'   => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "processing" and deleted_at is null',
+            'kami_errors'       => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
             'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
 
