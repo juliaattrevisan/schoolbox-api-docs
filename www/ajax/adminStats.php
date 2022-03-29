@@ -307,6 +307,25 @@ switch ($_POST['module']) {
 
         }
         break;
+    case 'kami';
+        $config = $kernel->get('config');
+        $light = 'success';
+        $status = 'online';
+        $connector  = new Schoolbox\Learning\InlineGrader\Kami\Connector(
+            new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
+            $config->get('kami_enabled'),
+            $config->get('kami_api_key'),
+            $config->get('site_school_code')
+        );
+        if (!$connector->isOnline()){
+            $light = 'alert';
+            $status = 'offline';
+        }
+        $output = [
+            'kami_status' => $status,
+            'kami_light' => $light,
+        ];
+        break;
     default:
         break;
 }

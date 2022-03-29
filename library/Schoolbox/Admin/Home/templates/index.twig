@@ -285,6 +285,17 @@
                 }
             }
         });
+        // get kami status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "kami"
+            },
+            success:function(data) {
+                $('[data-light="kami"]').html(data.kami_status).removeClass('neutral').addClass(data.kami_light);
+            }
+        });
     });
 </script>
 
@@ -388,16 +399,12 @@
                             </div>
                         </li>
                         {% endif %}
-                        {% if kamiEnabled %}
-                            {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
-                            {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
                             <li>
                                 <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
                                 <div class="small-7 columns content">
-                                    <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
+                                    <span class="full-width neutral label" data-light="kami">Testing...</span>
                                 </div>
                             </li>
-                        {% endif %}
                         {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
                         {% if drRoute %}
                             <li>

@@ -211,8 +211,6 @@ class Controller extends Base
                     'memory_gradient' => $memory_gradient,
                     'external_db' => ucfirst($this->getConfigLoader()->get('external_type')),
                     'ldap_enabled' => $this->getConfigLoader()->get('ldap_enable'),
-                    'kamiEnabled' => $this->kamiConnector->isEnabled(),
-                    'kamiOnline' => $this->kamiConnector->isOnline(),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
                     'collabDocsEnabled' => $this->collabDocsEnabled(),
                     'ssh_light' => $ssh_light,
