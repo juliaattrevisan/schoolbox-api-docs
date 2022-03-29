@@ -5,6 +5,7 @@ namespace Schoolbox\Groups;
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -351,6 +352,28 @@ class GroupsHelper
     }
 
     /**
+     * update params for user / group
+     */
+    public function updateUserGroup(User $user, Group $group, int $membership, bool $isFavourite, bool $isNotificaionsOn)
+    {
+        //find user record
+        $userGroup = $this->userAccessMapper->findOneByColumnList([
+                                                                      'uid' => $user->getId(),
+                                                                      'sid' => $group->getFolder()->getId(),
+                                                                  ]);
+        //update fields
+        $userGroup->setFavourite($isFavourite)
+            ->setAccessLevel($membership);
+
+        $this->userAccessMapper->save($userGroup);
+
+        /**
+         * remove the mute for the user / group this will remove the mute entry from the database.
+         */
+        $this->setNotification($group->getFolder()->getId(), $user, $isNotificaionsOn);
+    }
+
+    /**
      * delete user from group
      */
     public function deleteFromGroup(User $user, Group $group)
@@ -443,6 +466,9 @@ class GroupsHelper
             self::MEMBERSHIP_WRITE  => UserAccess::ACCESS_WRITE,
             self::MEMBERSHIP_ADMIN  => UserAccess::ACCESS_FULL,
         ];
+        if (!isset($membershipArray[$membership])) {
+            throw new SchoolboxException("Incorrect membership value");
+        }
         return $membershipArray[$membership];
     }
 
@@ -477,6 +503,52 @@ class GroupsHelper
             self::PENDING       => UserAccess::ACCESS_AWAITING_AUTHORISATION,
             self::ENROLLED      => UserAccess::ACCESS_READ,
         ];
+        if (!isset($enrolmentArray[$enrolment])) {
+            throw new SchoolboxException("Incorrect enrolment value");
+        }
         return $enrolmentArray[$enrolment];
+    }
+
+    /**
+     * get membership int from string, usually used in the API
+     */
+    public function membershipStringToInt(string $membership): int
+    {
+        switch ($membership) {
+            case 'admin':
+                return UserAccess::ACCESS_FULL;
+            case 'write':
+                return UserAccess::ACCESS_WRITE;
+            case 'read':
+                return UserAccess::ACCESS_READ;
+            case 'none':
+                return UserAccess::ACCESS_DENY;
+            default:
+                throw new SchoolboxException("Incorrect membership value");
+        }
+    }
+
+    /**
+     * get user membership string from buildGroup object
+     */
+    public function getMembershipStringFromGroup(array $groupObject): string
+    {
+        /**
+         * looking for something true in
+         * 'isAccessAdmin'     => $isAdmin,
+         * 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
+         * 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
+         */
+
+        if ($groupObject['isAccessAdmin']) {
+            return self::MEMBERSHIP_ADMIN;
+        }
+        if ($groupObject['isAccessWrite']) {
+            return self::MEMBERSHIP_WRITE;
+        }
+        if ($groupObject['isAccessRead']) {
+            return self::MEMBERSHIP_READ;
+        }
+        return self::MEMBERSHIP_NONE;
     }
 }
