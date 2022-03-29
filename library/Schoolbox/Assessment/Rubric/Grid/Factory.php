@@ -66,7 +66,7 @@ class Factory
         // Which capabilities are actually in use?
         $capabilityIdsInUse = [];
         foreach ($indicators as $indicator) {
-            if ($indicator['on']) {
+            if (isset($indicator['on'])) {
                 $capabilityIdsInUse[$indicator['groupId']] = true;
             }
         }

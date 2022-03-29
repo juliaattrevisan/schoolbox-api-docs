@@ -142,6 +142,7 @@ class ImportFactory
                 sa.default_open_span  AS 'sa.default_open_span',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
+                sa.deleted_at         AS 'sa.deleted_at',
                 lwt.name              AS 'lwt.name',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -173,8 +174,8 @@ class ImportFactory
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $unitSpecId = $row['us.id'];
 
-            // Is is the first time this UnitSpec has been seen?
-            if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
+            // Is this the first time this UnitSpec has been seen?
+            if (!isset($unitSpecDBCache[$unitSpecId]) || !($unitSpecDBCache[$unitSpecId] instanceof UnitSpecification)) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder                       = new Folder();
@@ -306,6 +307,7 @@ class ImportFactory
                 ia.close_date         AS 'ia.close_date',
                 ia.sequence           AS 'ia.sequence',
                 ia.work_type_id       AS 'ia.work_type_id',
+                ia.deleted_at         AS 'ia.deleted_at',
                 idw.assessment_id     AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -363,6 +365,7 @@ class ImportFactory
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
                 ia.work_type_id   AS 'ia.work_type_id',
+                ia.deleted_at     AS 'ia.deleted_at',
                 idw.assessment_id AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -395,8 +398,8 @@ class ImportFactory
         $statement->execute(array_merge($pbInner1->getParams(), $pbOuter1->getParams(), $pbOuter2->getParams()));
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $unitSpecId = $row['us.id'];
-            // Is is the first time this UnitSpec has been seen?
-            if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
+            // Is this the first time this UnitSpec has been seen?
+            if (!isset($unitSpecDBCache[$unitSpecId]) || !($unitSpecDBCache[$unitSpecId] instanceof UnitSpecification)) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder                       = new Folder();
