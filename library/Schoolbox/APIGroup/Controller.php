@@ -137,7 +137,7 @@ class Controller extends Base
         }
         $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
         //check if user is trying to break the system by deleting a user via the PUT command, and error
-        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus'] || UserAccess::ACCESS_DENY === $post['membership']) {
             $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
                 ->setStatus(401)
                 ->asArray();
