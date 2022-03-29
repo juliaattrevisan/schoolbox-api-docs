@@ -264,6 +264,27 @@
                 $('[data-light="rabbitmq"]').html(data.rabbitmq_status).removeClass('neutral').addClass(data.rabbitmq_light);
             }
         });
+        // get turnitin status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "turnitin"
+            },
+            success:function(data) {
+                if (data.show === true){
+                    let light = "";
+                    if (data.available) {
+                        light = "success";
+                    } else {
+                        light = "alert";
+                    }
+                    $('[id="turnitin-url"]').attr('href', data.url).html(data.name);
+                    $('[data-light="turnitin"]').html(data.message).removeClass('neutral').addClass(light);
+                    $('[id="turnitin-block"]').removeAttr('hidden');
+                }
+            }
+        });
     });
 </script>
 
@@ -390,20 +411,14 @@
                         {% endif %}
 
                         {# Optionally show turnitin status #}
-                        {% if turnitin.show %}
-                            <li>
+                            <li id="turnitin-block" hidden>
                                 <div class="small-5 columns content">
-                                    <a href="{{ turnitin.url }}" target="_blank">{{ turnitin.name }}</a>
+                                    <a id="turnitin-url" href="" target="_blank"></a>
                                 </div>
                                 <div class="small-7 columns content">
-                                    {% if turnitin.available %}
-                                        <span class="full-width success label">{{ turnitin.message }}</span>
-                                    {% else %}
-                                        <span class="full-width alert label">{{ turnitin.message }}</span>
-                                    {% endif %}
+                                    <span class="full-width success neutral label" data-light="turnitin">Testing...</span>
                                 </div>
                             </li>
-                        {% endif %}
                         {# Show ssh + SSL cert status if not cloud hosted #}
                         {% if not is_cloud %}
                             <li>

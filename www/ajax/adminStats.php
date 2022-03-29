@@ -299,6 +299,14 @@ switch ($_POST['module']) {
             'expiry' => (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
         ];
         break;
+    case 'turnitin':
+        $config = $kernel->get('config');
+        try {
+            $output = (new \Schoolbox\Learning\Turnitin\Admin\Status($config))->generate();
+        } catch (JsonException $e) {
+
+        }
+        break;
     default:
         break;
 }

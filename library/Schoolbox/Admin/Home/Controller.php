@@ -220,10 +220,6 @@ class Controller extends Base
                     'is_cloud'  => $this->isCloudHosted(),
                     'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
 
-                    /* Turnitin status indicator
-                     */
-                    'turnitin' => (new \Schoolbox\Learning\Turnitin\Admin\Status($this->getConfigLoader()))->generate(),
-
                     /* SUDS panel
                      */
                     'suds_import_data_enabled' => $sudsEnabled,
