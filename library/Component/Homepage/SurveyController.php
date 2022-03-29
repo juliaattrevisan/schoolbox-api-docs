@@ -119,9 +119,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                          * Set up Attempt vars
                          */
                         $attempt              = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
-                        $attemptStartTime     = strtotime($attempt['start']);
-                        $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
-                        $attemptEndTime       = $attemptStartTime + $currentSurvey['duration'];
 
                         /* Tests can be undertaken if:
                            *
@@ -131,11 +128,14 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                          * 4. You aren't the owner of the test
                             */
                         if (is_array($attempt)) {
+                            $attemptStartTime     = strtotime($attempt['start']);
+                            $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
                             $numAttempts  = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                             // If the last assess is not completed provide resume link
-                            if (!$attempt['finish']
+                            if (
+                                !$attempt['finish']
                                 && ($attemptTimeRemaining < 0
                                     || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION
                                 )
@@ -151,20 +151,18 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                                 $this->parse('resumeLink_block', 'resumeLink');
                                 $this->setVar('surveyLink_block', '');
                                 $this->setVar('surveyNoLink_block', '');
-                            } // allow to resit
-                            else {
-                                if (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts + 1 > $currentSurvey['max_attempts']))) {
-                                    $this->parse('surveyLink_block', 'surveyLink');
-                                    $this->setVar('surveyNoLink_block', '');
-                                    $this->setVar('resumeLink_block', '');
-                                } // else dont let them complete it again
-                                else {
-                                    $this->setVar('surveyLink_block', '');
-                                    $this->parse('surveyNoLink_block', 'surveyNoLink');
-                                    $this->setVar('assessLink_block', '');
-                                    $this->setVar('resumeLink_block', '');
-                                    $this->setVar('SURVEY_FINISH_DATE', 'Completed');
-                                }
+                            } elseif (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts + 1 > $currentSurvey['max_attempts']))) {
+                                // allow to resit
+                                $this->parse('surveyLink_block', 'surveyLink');
+                                $this->setVar('surveyNoLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                            } else {
+                                // else dont let them complete it again
+                                $this->setVar('surveyLink_block', '');
+                                $this->parse('surveyNoLink_block', 'surveyNoLink');
+                                $this->setVar('assessLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                                $this->setVar('SURVEY_FINISH_DATE', 'Completed');
                             }
 
                             /* Find out if you have recently completed an attempt - if so

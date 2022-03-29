@@ -19,6 +19,7 @@ $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
 $userHandler = new User();
+/** @var SitePage $this */
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
@@ -60,9 +61,6 @@ if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['c
  */
 $numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $_SESSION['id']);
 $attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['id']);
-$attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $survey['duration'] - time();
-$attemptEndTime = $attemptStartTime + $survey['duration'];
 /* If there is a resumable attempt, resume it.
  * Otherwise start a new attempt if there is a limit
  */
@@ -72,12 +70,15 @@ if (!$attempt) {
     if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
         error(146);
     }
-}
-
-/* Check if Attempt ran out of time
- */
-if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-    error(122);
+} else {
+    /* Check if Attempt ran out of time
+     */
+    $attemptStartTime = strtotime($attempt['start']);
+    $attemptTimeRemaining = $attemptStartTime + $survey['duration'] - time();
+    $attemptEndTime = $attemptStartTime + $survey['duration'];
+    if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+        error(122);
+    }
 }
 
 /* Continue once you get past checks
