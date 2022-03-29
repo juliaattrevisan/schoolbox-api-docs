@@ -163,7 +163,7 @@ abstract class AbstractController extends BaseController
      */
     public function picker($sourceSlug)
     {
-        $mime = $this->getRequest()->query['mime'];
+        $mime = $this->request->query->get('mime');
 
         if (empty($mime)) {
             $mime = '*/*';
@@ -262,7 +262,7 @@ abstract class AbstractController extends BaseController
      */
     public function listNodes($folderId)
     {
-        $mime = $this->getRequest()->query["mime"];
+        $mime = $this->request->query->get('mime');
 
         if (empty($mime)) {
             $mime = "*/*";

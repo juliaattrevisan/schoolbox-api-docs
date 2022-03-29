@@ -185,6 +185,7 @@ class Validation
 
         if (!($existingBooking instanceof Booking)) {
             // new booking: Validate related and recurrent bookings
+            $campus = null;
             if ($postData['campus'] > 0) {
                 $campus = $this->getCampusMapper()->findById($postData['campus']);
             }
@@ -193,9 +194,9 @@ class Validation
                 $resource,
                 $startDate,
                 $endDate,
-                $postData['repeat_until'],
-                $postData['related_item'],
-                $postData['repeat'],
+                $postData['repeat_until'] ?? null,
+                $postData['related_item'] ?? null,
+                $postData['repeat'] ?? null,
                 $campus
             );
             foreach ($dateParts as $check) {
