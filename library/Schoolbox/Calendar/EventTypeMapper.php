@@ -86,10 +86,10 @@ class EventTypeMapper extends Schoolbox\Mapper
      *
      * If your luEventType is empty, return null
      *
-     * @param int|null $eventTypeId
+     * @param mixed $eventTypeId
      * @return int|null
      */
-    public function findFirstMeaningfulId(?int $eventTypeId): ?int
+    public function findFirstMeaningfulId($eventTypeId): ?int
     {
         try {
             $eventTypeExists = $this->findById($eventTypeId);
@@ -104,6 +104,6 @@ class EventTypeMapper extends Schoolbox\Mapper
             $id = $firstEventType->getId();
         }
 
-        return $id;
+        return (int)$id;
     }
 }

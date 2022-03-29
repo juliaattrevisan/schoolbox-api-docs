@@ -45,7 +45,7 @@ class EventTypeGenerator
     {
         // Figure out event type
         $decodedConfig = $config->decodeConfig();
-        $eventType     = $decodedConfig->getLuEventType();
+        $eventType     = (int)$decodedConfig->getLuEventType();
 
         /* Ensure $eventType is valid, finding first available one if it is invalid.
          * If you can't find one, we can't assign anything to the events from this subscription
