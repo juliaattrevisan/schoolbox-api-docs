@@ -100,24 +100,18 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
-            /* Delete existing timetable events
-             */
-            $this->eventMapper->getDatabase()->prepare("
-                DELETE FROM {$this->eventMapper->getTable()}
-                WHERE classification = :classification
-            ")->execute([
-                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
-            ]);
-
-            $this->log->debug(sprintf(
-                'Purged timetable events classified as %s',
-                \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
-            ));
-
             /* Delete any overrides that existed
              */
             $this->overridesMapper->truncate();
             $this->log->debug('Purged timetable event overrides');
+
+            /* Delete existing timetable events
+             */
+            $this->eventMapper->deleteByColumn('classification', \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE);
+            $this->log->debug(sprintf(
+                'Purged timetable events classified as %s',
+                \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
+            ));
 
             /* Truncate other data entirely
              *
