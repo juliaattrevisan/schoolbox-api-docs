@@ -48,4 +48,4 @@ taskd_sync_type: "pull"
 # Should the task daemon image be built from the local dir at all?
 # If not, then the image will be pulled from Dockerhub
 # (requires a valid DOCKERHUB_ACCESS_TOKEN in .env)
-taskd_build_from_local: true
+taskd_build_from_local: false
