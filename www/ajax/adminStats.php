@@ -184,7 +184,7 @@ switch ($_POST['module']) {
         break;
     case 'ntp':
         $ntpServer = "pool.ntp.org";
-        $socket = stream_socket_client("udp://$ntpServer:123",  $errno, $errstr, 1);
+        $socket = stream_socket_client("udp://$ntpServer:123",$errno,$errstr,1);
         if (!$socket) {
              $output = array('error' => 'Unable to connect to NTP server', 'errno' => $errno,);
              break;
@@ -304,10 +304,9 @@ switch ($_POST['module']) {
         try {
             $output = (new \Schoolbox\Learning\Turnitin\Admin\Status($config))->generate();
         } catch (JsonException $e) {
-
         }
         break;
-    case 'kami';
+    case 'kami':
         $config = $kernel->get('config');
         $light = 'success';
         $status = 'online';
@@ -317,7 +316,7 @@ switch ($_POST['module']) {
             $config->get('kami_api_key'),
             $config->get('site_school_code')
         );
-        if (!$connector->isOnline()){
+        if (!$connector->isOnline()) {
             $light = 'alert';
             $status = 'offline';
         }
