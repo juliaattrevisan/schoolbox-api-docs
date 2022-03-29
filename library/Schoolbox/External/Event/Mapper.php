@@ -226,7 +226,7 @@ class Mapper extends \Schoolbox\Mapper
                 $row['u.title'],
                 $row['u.firstname'],
                 $row['u.lastname']
-            ], static function($val) {
+            ], static function ($val) {
                 return '' !== trim((string)$val);
             }));
 

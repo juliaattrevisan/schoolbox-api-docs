@@ -384,7 +384,7 @@ class TimetableUsers
                 $row['title'],
                 $row['firstname'],
                 $row['lastname']
-            ], static function($val) {
+            ], static function ($val) {
                 return '' !== trim((string)$val);
             }));
         }
