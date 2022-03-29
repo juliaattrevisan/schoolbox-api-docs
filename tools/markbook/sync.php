@@ -20,7 +20,6 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 
