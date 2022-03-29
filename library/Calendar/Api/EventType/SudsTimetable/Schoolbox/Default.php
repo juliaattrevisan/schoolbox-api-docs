@@ -156,6 +156,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
+            $instance->setEventId($timetableEvent->getId());
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($timetableEvent->getTitle());
             $instance->setDetail($timetableEvent->getDetail());
