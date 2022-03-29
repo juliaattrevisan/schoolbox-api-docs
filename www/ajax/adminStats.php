@@ -14,7 +14,7 @@ use Schoolbox\Resource\LogMapper;
 use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
