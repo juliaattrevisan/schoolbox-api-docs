@@ -43,6 +43,10 @@ export default {
             type: Array,
             required: true,
         },
+        selectedRowsCountWithRowName: {
+            type: String,
+            required: true,
+        },
     },
 
     emits: ['updated'],
@@ -79,19 +83,6 @@ export default {
          */
         updatedLogData () {
             return this.logData[0].replace(/<br\s*\/?>/gi, '');
-        },
-
-        /**
-         * For proper count display, eg: '1 user' / '4 users'
-         *
-         * @returns {String}
-         */
-        selectedRowsCountWithRowName () {
-            if (this.selectedRows.length === 1) {
-                return this.selectedRows.length + ' user';
-            } else {
-                return this.selectedRows.length + ' users';
-            }
         },
 
     },
