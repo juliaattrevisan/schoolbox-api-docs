@@ -61,6 +61,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{userId}/group', 'apiMembership', $hasApiAccess, $preloadUser);
         $this->register('POST', '/{userId}/group/{groupId}', 'apiMembershipAdd', $hasApiAccess, $preloadUserGroup);
+        $this->register('GET', '/{userId}/group/{groupId}', 'apiMembershipGet', $hasApiAccess, $preloadUserGroup);
         $this->register('PUT', '/{userId}/group/{groupId}', 'apiMembershipPut', $hasApiAccess, $preloadUserGroup);
         $this->register('PATCH', '/{userId}/group/{groupId}', 'apiMembershipPatch', $hasApiAccess, $preloadUserGroup);
         $this->register('DELETE', '/{userId}/group/{groupId}', 'apiMembershipDelete', $hasApiAccess, $preloadUserGroup);

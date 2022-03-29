@@ -77,6 +77,35 @@ class Controller extends Base
     }
 
     /**
+     * Returns group membership for a user
+     *
+     * @param User $user
+     * @param Group $group
+     * @api GET /user/{userId}/group/{groupId}
+     * @link http://api.schoolbox.com.au/#operation/userGroupMembershipGet
+     */
+    public function apiMembershipGet(User $user, Group $group)
+    {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $apiGroups    = new Collection($users_groups);
+        $output = $apiGroups->map(new ModelToArray());
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
+    }
+
+    /**
      * adds a user into a group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
      * @api POST /user/{userId}/group/{groupId}
@@ -108,7 +137,7 @@ class Controller extends Base
         }
         $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
         //check if user is trying to break the system by deleting a user via the PUT command, and error
-        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus'] || UserAccess::ACCESS_DENY === $post['membership']) {
             $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
                 ->setStatus(401)
                 ->asArray();
