@@ -87,10 +87,8 @@ class Module extends BaseModule
             $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
-            throw new SchoolboxException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            throw new SchoolboxException("Assessment Not Found", 404, null, 404);
         }
-
-
 
         return [
             'assessment' => $assessment
