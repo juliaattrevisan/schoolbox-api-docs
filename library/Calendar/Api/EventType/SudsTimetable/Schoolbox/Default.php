@@ -99,6 +99,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
