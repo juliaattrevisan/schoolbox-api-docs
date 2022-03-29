@@ -310,8 +310,10 @@ class Session
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                @ldap_bind($ds, $this->ldapEscape($username), utf8_encode($password));
-                return $ds;
+                $bind = @ldap_bind($ds, $this->ldapEscape($username), utf8_encode($password));
+                if ($bind) {
+                    return $ds;
+                }
             }
         }
         return false;

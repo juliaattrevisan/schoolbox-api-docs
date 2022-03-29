@@ -115,7 +115,187 @@
                 $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
             }
         });
+        // check ntp status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            data: { module : 'ntp' },
+            method: "POST",
+            success: function(data) {
+                if (data.error !== undefined || data.diff === undefined) {
+                    $('[data-light="ntp"]').html('Unavailable').removeClass('neutral').addClass('alert');
+                } else if (data.diff >= 0 && data.diff <= 1) {
+                    $('[data-light="ntp"]').html('OK').removeClass('neutral').addClass('success');
+                } else if (data.diff > 1 && data.diff <= 5) {
+                    $('[data-light="ntp"]').html('Drifted ' + data.diff + " seconds").removeClass('neutral').addClass('warning');
+                } else {
+                    $('[data-light="ntp"]').html('Drifted ' + data.diff + ' seconds').removeClass('neutral').addClass('alert');
+                }
+            }
+        });
+        // get ssl cert status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            data: { module : 'ssl_cert' },
+            method: "POST",
+            success: function(data) {
+                let status = "";
+                let light = "";
+                if (data.expiry < 0){
+                    status = "Expired";
+                    light = "alert";
+                } else if (data.expiry < 30){
+                    status = "Expires in " + data.expiry + " days";
+                    light = "warning";
+                    if (data.isCustomCert) {
+                        status = "Unmanaged" + status;
+                    }
+                    if (data.expiry < 7) {
+                        light = "alert";
+                    }
+                } else if (data.isCustomCert){
+                    status = "Unmanaged";
+                    light = 'warning';
+                } else {
+                    status = "Valid";
+                    light = "success";
+                }
+                $('[data-light="cert_status"]').html(status).removeClass('neutral').addClass(light);
+            }
+        });
         {% endif %}
+        {%  if ldap_enabled %}
+        //set ldap status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "service_ldap"
+            },
+            success: function (data) {
+                $('[data-light="ldap_status"]').html(data.ldap_status).removeClass('neutral').addClass(data.ldap_light);
+                $('[data-light="ldap_alt_status"]').html(data.ldap_alt_status).removeClass('neutral').addClass(data.ldap_alt_light);
+            }
+        });
+        {% endif %}
+        // get rss feed
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "rss"
+            },
+            success:function(data) {
+                let html = '<h2 class=sub-header>Recent Updates</h2>';
+                if (data.length > 0) {
+                    html  += '<section><ul class="information-list">';
+                    for (let row in data) {
+                        let pubDate = new Date(data[row].pubDate.date);
+                        options = {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                            hour12: true
+                        };
+                        let date = pubDate.toLocaleString(undefined, options);
+                        html += "<li><div class='list-item'><div class='card small-12'><h3><a href='" + data[row].link + "'target='_blank'>" + data[row].title + "</a></h3><p class='meta'>Posted " + date + "</p></div></div></li>";
+                    }
+                    html += '</ul></section>';
+                } else {
+                    html += '<div class="empty-state"><i class="icon-rss"></i><p>We checked and there is no recent update news available.</p></div>';
+                }
+                $('div.rss-feed').html(html);
+            }
+        });
+        {%  if external_db != 'Schoolbox' %}
+        // get external db status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "service_external_db"
+            },
+            success:function(data) {
+                let version = ""
+                if (data.external_db_version !== "") {
+                    version = " (" + data.external_db_version + ")";
+                }
+                $('[id="healthcheck-link"]').html(data.external_db + version) ;
+                $('[data-light="external_db"]').html(data.external_db_status).removeClass('neutral').addClass(data.external_db_light);
+            }
+        });
+        {% endif %}
+        // get email status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "service_email"
+            },
+            success:function(data) {
+                $('[data-light="email_status"]').html(data.email_status).removeClass('neutral').addClass(data.email_light);
+            }
+        });
+        // get logs
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "logs"
+            },
+            success:function (data) {
+                let html = "";
+                for (let row in data){
+                    html += "<tr><td>" + data[row].date + "</td><td>"+ data[row].action + "</td><td>" + data[row].name + "</td></tr>"
+                }
+                $('tbody.logs').html(html);
+            }
+        });
+        // get rabbitmq status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "rabbitmq"
+            },
+            success:function(data) {
+                $('[data-light="rabbitmq"]').html(data.rabbitmq_status).removeClass('neutral').addClass(data.rabbitmq_light);
+            }
+        });
+        // get turnitin status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "turnitin"
+            },
+            success:function(data) {
+                if (data.show === true){
+                    let light = "";
+                    if (data.available) {
+                        light = "success";
+                    } else {
+                        light = "alert";
+                    }
+                    $('[id="turnitin-url"]').attr('href', data.url).html(data.name);
+                    $('[data-light="turnitin"]').html(data.message).removeClass('neutral').addClass(light);
+                    $('[id="turnitin-block"]').removeAttr('hidden');
+                }
+            }
+        });
+        // get kami status
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "kami"
+            },
+            success:function(data) {
+                $('[data-light="kami"]').html(data.kami_status).removeClass('neutral').addClass(data.kami_light);
+            }
+        });
     });
 </script>
 
@@ -160,10 +340,10 @@
                         {% if external_db and external_db != 'Schoolbox' %}
                         <li>
                             <div class="small-5 columns content">
-                                <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}{% if external_db_version is not empty %} ({{ external_db_version }}){% endif %}</a>
+                                <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}</a>
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {{ external_db_light }} label">{{ external_db_status }}</span>
+                                <span class="full-width neutral label" data-light="external_db">Testing...</span>
                             </div>
                         </li>
                         {% endif %}
@@ -172,7 +352,7 @@
                                 Email
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {{ email_light }} label">{{ email_status }}</span>
+                                <span class="full-width neutral label" data-light="email_status">Testing...</span>
                             </div>
                         </li>
                         <li>
@@ -180,26 +360,24 @@
                                 Notifications
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {% if amqpOnline %}success{% else %}alert{% endif %} label" data-light="ssh">{% if amqpOnline %}Online{% else %}Offline{% endif %}</span>
+                                <span class="full-width neutral label" data-light="rabbitmq">Testing...</span>
                             </div>
                         </li>
-                        {% if ldap_status != 'Disabled' %}
+                        {% if ldap_enabled %}
                         <li>
                             <div class="small-5 columns content">
                                 LDAP Primary
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {{ ldap_light }} label">{{ ldap_status }}</span>
+                                <span class="full-width neutral label" data-light="ldap_status">Testing...</span>
                             </div>
                         </li>
-                        {% endif %}
-                        {% if ldap_alt_status != 'Disabled' %}
                         <li>
                             <div class="small-5 columns content">
                                 LDAP Secondary
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width {{ ldap_alt_light }} label">{{ ldap_alt_status }}</span>
+                                <span class="full-width neutral label" data-light="ldap_alt_status">Testing...</span>
                             </div>
                         </li>
                         {% endif %}
@@ -208,7 +386,7 @@
                                 WWW
                             </div>
                             <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="www">{{ www_status }}</span>
+                                <span class="full-width neutral label" data-light="www">Testing...</span>
                             </div>
                         </li>
                         {% if collabDocsEnabled %}
@@ -221,16 +399,12 @@
                             </div>
                         </li>
                         {% endif %}
-                        {% if kamiEnabled %}
-                            {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
-                            {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
                             <li>
                                 <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
                                 <div class="small-7 columns content">
-                                    <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
+                                    <span class="full-width neutral label" data-light="kami">Testing...</span>
                                 </div>
                             </li>
-                        {% endif %}
                         {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
                         {% if drRoute %}
                             <li>
@@ -244,20 +418,14 @@
                         {% endif %}
 
                         {# Optionally show turnitin status #}
-                        {% if turnitin.show %}
-                            <li>
+                            <li id="turnitin-block" hidden>
                                 <div class="small-5 columns content">
-                                    <a href="{{ turnitin.url }}" target="_blank">{{ turnitin.name }}</a>
+                                    <a id="turnitin-url" href="" target="_blank"></a>
                                 </div>
                                 <div class="small-7 columns content">
-                                    {% if turnitin.available %}
-                                        <span class="full-width success label">{{ turnitin.message }}</span>
-                                    {% else %}
-                                        <span class="full-width alert label">{{ turnitin.message }}</span>
-                                    {% endif %}
+                                    <span class="full-width success neutral label" data-light="turnitin">Testing...</span>
                                 </div>
                             </li>
-                        {% endif %}
                         {# Show ssh + SSL cert status if not cloud hosted #}
                         {% if not is_cloud %}
                             <li>
@@ -268,24 +436,12 @@
                                     <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
                                 </div>
                             </li>
-                            {% if certExpiry < 0 %}
-                                {% set certMessage = 'Expired' %}
-                            {% elseif certExpiry < 30 %}
-                                {% set certMessage = 'Expires in ' ~ certExpiry ~ ' days' %}
-                                {% if isCustomCert %}
-                                    {% set certMessage = 'Unmanaged. ' ~ certMessage %}
-                                {% endif %}
-                            {% elseif isCustomCert %}
-                                {% set certMessage = 'Unmanaged' %}
-                            {% else %}
-                                {% set certMessage = 'Valid' %}
-                            {% endif %}
                             <li>
                                 <div class="small-5 columns content">
                                     SSL Certificate
                                 </div>
                                 <div class="small-7 columns content">
-                                    <span class="full-width {% if certExpiry < 7 %}alert{% elseif certExpiry < 30 or isCustomCert %}warning{% else %}success{% endif %} label">{{ certMessage }}</span>
+                                    <span class="full-width neutral label" data-light="cert_status">Testing...</span>
                                 </div>
                             </li>
                             {% if show_port_80_availability_check %}
@@ -319,6 +475,14 @@
                                     </li>
                                 {% endfor %}
                             {% endif %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    NTP Drift
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="ntp">Testing...</span>
+                                </div>
+                            </li>
                         {% endif %}
                     </ul>
                 </section>
@@ -352,33 +516,13 @@
             <!-- Recent Log Entries -->
 
             <div class="small-12 large-7 island">
-                <h2 class="subheader">Recent Updates</h2>
-                {% if updates_rss is empty %}
-                <div class="empty-state">
-                    <i class="icon-rss"></i>
-                    <p>We checked and there is no recent update news available.</p>
+                <div class="rss-feed">
+                    <h2 class="subheader">Recent Updates</h2>
+                    <div class="empty-state">
+                        <i class="icon-rss"></i>
+                        <p>Loading...</p>
+                    </div>
                 </div>
-                {% else %}
-                <section>
-                    <ul class="information-list">
-                        {% for article in updates_rss %}
-                        <li>
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <h3>
-                                        <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
-                                    </h3>
-                                    <p class="meta">
-                                        Posted {{ article.pubDate|date(dateFormats.longFormat) }}
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-
-                    </ul>
-                </section>
-                {% endif %}
                 <div class="actions-small-2 row">
                     <div class="list-item">
                         <div class="small-12 columns">
@@ -399,14 +543,7 @@
                             <th>User</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {% for log in logs %}
-                            <tr>
-                                <td>{{ log.date }}</td>
-                                <td>{{ log.action }}</td>
-                                <td>{{ log.name}}</td>
-                            </tr>
-                        {% endfor %}
+                        <tbody class="logs">
                         </tbody>
                     </table>
                 </section>
