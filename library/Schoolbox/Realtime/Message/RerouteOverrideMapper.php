@@ -9,6 +9,7 @@
 namespace Schoolbox\Realtime\Message;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
@@ -80,7 +81,12 @@ class RerouteOverrideMapper extends Mapper
 
         $results = parent::findByColumnList($columnList, $options);
 
-        $regex = "`$routeKey`";
+        //fix arrayToStringConvert
+        if (is_array($routeKey)) {
+            $regex = "`$routeKey[0]`";
+        } else {
+            $regex = "`$routeKey`";
+        }
 
         return $results->map(function ($override) use ($regex) {
             /** @var RerouteOverride $override */
@@ -169,5 +175,35 @@ class RerouteOverrideMapper extends Mapper
     public function isRouteMuted($routeKey, $userId = null)
     {
         return $this->getMatchingRoutes($routeKey, RoutePermission::MUTE, $userId)->count();
+    }
+
+    /**
+     * Special Egg delete function
+     */
+    public function delete($object)
+    {
+        $collection = $this->getModelAsCollection($object);
+        if (count($collection) === 0) {
+            return false;
+        }
+
+        // delete each object(s)
+        $this->database->beginTransaction();
+        foreach ($collection as $item) {
+            // Run query
+            try {
+                $this->deleteByColumnList(
+                    [
+                        'user_id'        => $item->getUser()->getId(),
+                        'msg_route_key'  => $item->getRouteKey(),
+                        'delivery'       => $item->getDelivery()
+                    ]
+                );
+            } catch (PDOException $e) {
+                $this->database->rollBack();
+                throw $e;
+            }
+        }
+        return $this->database->commit();
     }
 }
