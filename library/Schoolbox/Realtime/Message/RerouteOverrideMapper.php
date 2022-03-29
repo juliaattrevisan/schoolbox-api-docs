@@ -81,7 +81,12 @@ class RerouteOverrideMapper extends Mapper
 
         $results = parent::findByColumnList($columnList, $options);
 
-        $regex = "`$routeKey`";
+        //fix arrayToStringConvert
+        if (is_array($routeKey)) {
+            $regex = "`$routeKey[0]`";
+        } else {
+            $regex = "`$routeKey`";
+        }
 
         return $results->map(function ($override) use ($regex) {
             /** @var RerouteOverride $override */
