@@ -132,7 +132,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if puppet_sync_type != 'none'
     config.trigger.before :provision do |sync|
       sync.name = "Syncing Puppet"
-      sync.run = {inline: "./tools/vagrant-sync-puppet-repo.sh #{puppet_sync_type} #{puppet_dir}"}
+      sync.run = {inline: "./tools/vagrant-sync-repo.sh #{puppet_sync_type} #{puppet_dir} stable"}
     end
   end
 
@@ -180,6 +180,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Sync the taskd shared folder, if taskd_build_from_local is on
   if taskd_build_from_local
     config.vm.synced_folder taskd_dir, "/tmp/taskd"
+
+    # also sync the folder
+    if taskd_sync_type != 'none'
+      config.trigger.before :provision do |sync|
+        sync.name = "Syncing taskd"
+        sync.run = {inline: "./tools/vagrant-sync-repo.sh #{taskd_sync_type} #{taskd_dir} master"}
+      end
+    end
   end
 
 
