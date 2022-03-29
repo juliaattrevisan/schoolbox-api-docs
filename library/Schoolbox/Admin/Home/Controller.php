@@ -12,8 +12,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Byte_Format;
-use Alaress_Date_Format;
-use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use Component_DefinitionMapper;
@@ -24,17 +22,13 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Psr\Log\AbstractLogger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
+use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\LogMapper;
-use Proxy\Server as ProxyServer;
 use Healthcheck;
-use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
-use Schoolbox\Notif\MQ;
-use Schoolbox\Url\Factory;
 use UnexpectedValueException;
 
 use function array_column;
@@ -48,40 +42,41 @@ use function trim;
 
 class Controller extends Base
 {
-
-    /** @var Kami\IConnector */
-    private $kamiConnector;
-
-    /** @var Database\Factory */
+    /**
+     * @var Database\Factory
+     */
     private $databaseFactory;
 
-    /** @var null|IConnector */
+    /**
+     * @var null|IConnector
+     */
     private $databaseExternal;
 
-    /** @var ConfigMapper  */
+    /**
+     * @var ConfigMapper
+     */
     private ConfigMapper $configMapper;
 
-
     /**
-     * @var \Schoolbox\External\Connector\Log\Mapper
+     * @var ImportLogMapper
      */
-    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+    protected ImportLogMapper $importLogMapper;
 
 
     /**
-     * @param Kami\IConnector  $kamiConnector
+     * Constructor
+     *
      * @param Database\Factory $databaseFactory
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
-     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     * @param ConfigMapper     $configMapper
+     * @param ImportLogMapper  $importLogMapper
      */
     public function __construct(
-        Kami\IConnector $kamiConnector,
         Database\Factory $databaseFactory,
         ?IConnector $databaseExternal,
         ConfigMapper $configMapper,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        ImportLogMapper $importLogMapper
     ) {
-        $this->kamiConnector    = $kamiConnector;
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = $databaseExternal;
         $this->configMapper     = $configMapper;
