@@ -62,7 +62,7 @@ class ModelToArray
     private function formatParticipants($participants)
     {
         $output = [];
-        /** @var participant $participant */
+        /** @var Participant $participant */
         foreach ($participants as $participant) {
             $output[] = [
                 'id' => $participant->getUser()->getId(),
