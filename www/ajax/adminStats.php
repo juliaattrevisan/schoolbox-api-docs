@@ -8,8 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use External\IConnector;
 use Schoolbox\Engagement\Login;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Url\Factory;
 
@@ -30,7 +30,7 @@ if (!isset($_POST['module'])) {
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        /** @var IConnector $config */
+        /** @var IConfigLoader $config */
         $config        = $kernel->get('config');
         $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
         $summary       = $login->userSummary(null);
@@ -70,6 +70,7 @@ switch ($_POST['module']) {
     case 'storage':
     case 'memory':
     case 'service_external_db':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         $external_db_version = '';
         $external_db = ucfirst($config->get('external_type'));
@@ -95,6 +96,7 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_email':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         if ($config->get('mail_enable') && $config->get('mail_smtp_host')) {
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -119,6 +121,7 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_ldap':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         $ldap_light = 'alert';
         $ldap_status = 'Disabled';
@@ -177,6 +180,7 @@ switch ($_POST['module']) {
         ];
         break;
     case 'rss':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         $rss = new Alaress_Rss_Stream($config->get('release_notes_url'));
         $rss->stream();
@@ -262,6 +266,7 @@ switch ($_POST['module']) {
             ];
         break;
     case 'ssl_cert':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         $host = (new Factory($config))->buildFullyQualified();
         $host = str_replace('https://', '', $host);
@@ -300,6 +305,7 @@ switch ($_POST['module']) {
         ];
         break;
     case 'turnitin':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         try {
             $output = (new \Schoolbox\Learning\Turnitin\Admin\Status($config))->generate();
@@ -307,6 +313,7 @@ switch ($_POST['module']) {
         }
         break;
     case 'kami':
+        /** @var IConfigLoader $config */
         $config = $kernel->get('config');
         $light = 'success';
         $status = 'online';
