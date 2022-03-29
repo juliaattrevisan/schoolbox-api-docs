@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Collection;
+
 /**
  * Translator for translating an assessment model into an array, ready for JSON
  * encoding.
@@ -38,7 +40,7 @@ class ModelToArray
             'workType'         => $assessment->getWorkType(),
             'gradeGroup'       => $assessment->getGradeGroup(),
             'markScheme'       => $assessment->getMarkScheme(),
-            'allParticipants'  => $assessment->getAllParticipants(),
+            'allParticipants'  => $this->formatParticipants($assessment->getAllParticipants()),
             'participantUsers' => $assessment->getParticipantUsers(),
             'creator'          => $assessment->getCreator(),
             'plans'            => $assessment->getPlans(),
@@ -51,5 +53,28 @@ class ModelToArray
             'updatedAt'        => $assessment->getUpdatedAt(),
             'deletedAt'        => $assessment->getDeletedAt(),
         ];
+    }
+
+    /**
+     * get participants
+     * @param Collection|Participant[] $participants
+     */
+    private function formatParticipants($participants)
+    {
+        $output = [];
+        /** @var participant $participant */
+        foreach ($participants as $participant) {
+            $output[] = [
+                'id' => $participant->getUser()->getId(),
+                'name' => $participant->getUser()->getFullName(),
+                'isExcluded' => $participant->isExcluded(),
+                'publishDate' => $participant->getPublishDate(),
+                'openDate' => $participant->getOpenDate(),
+                'dueDate' => $participant->getDueDate(),
+                'closeDate' => $participant->getCloseDate(),
+                'description' => $participant->getDescription(),
+            ];
+        }
+        return $output;
     }
 }
