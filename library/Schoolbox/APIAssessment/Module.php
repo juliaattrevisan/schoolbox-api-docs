@@ -14,11 +14,19 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\UserMapper;
+use DomainException;
+use LogicException;
+use Schoolbox\Application\Exception as ApplicationException;
+use UnexpectedValueException;
 
 class Module extends BaseModule
 {
@@ -43,11 +51,11 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preloadUser = function ($params) {
-            return $this->preloadUser($params);
+        $preloadAssessment             = function ($params) {
+            return $this->preloadAssessment($params);
         };
 
-        $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess);
+        $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess, $preloadAssessment);
     }
 
 
@@ -60,23 +68,32 @@ class Module extends BaseModule
     }
 
     /**
-     * Preload a User instance
+     * Convert route params into an assessment object
      *
-     * @param array $params
-     * @return array
-     * @throws \InvalidArgumentException
-     * @throws SchoolboxException
+     * @param array     $params
+     * @return array$assessable
+     * @throws ApplicationException\Exception If assessment is not found
+     * @throws DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws LogicException If cyclic graph detected
+     * @throws Mapper\DefinitionException If a specified join mapper is not found
+     * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    private function preloadUser(array $params): array
+    protected function preloadAssessment(array $params): array
     {
         try {
-            $user = $this->getUserMapper()->findById($params['userId']);
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+        } catch (MapperException\Deleted $e) {
+            $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
-            throw new SchoolboxException('User Does not Exist');
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw new SchoolboxException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+
+
         return [
-            'user' => $user,
+            'assessment' => $assessment
         ];
     }
 
@@ -95,5 +112,15 @@ class Module extends BaseModule
     protected function getGroupMapper(): GroupMapper
     {
         return $this->getMapperFactory()->get(GroupMapper::class);
+    }
+
+    /**
+     * @return object|AssessmentMapperProxy
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function getAssessmentMapperProxy()
+    {
+        return $this->injector->get('assessmentDataSource');
     }
 }

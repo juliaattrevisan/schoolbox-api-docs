@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\ModelToArray;
 
 class Controller extends Base
 {
@@ -33,7 +34,7 @@ class Controller extends Base
      * @api /api/assessment/{assessmentId}
      * @link TODO:
      */
-    public function apiAssessmentGet(IAssessable $assessable)
+    public function apiAssessmentGet(IAssessable $assessment)
     {
         //get all assessment info for object
 
@@ -41,7 +42,7 @@ class Controller extends Base
          * build the whole thing
          */
 
-        $output = (new ModelToArray())($model, $array);
+        $output = (new ModelToArray())($assessment);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
