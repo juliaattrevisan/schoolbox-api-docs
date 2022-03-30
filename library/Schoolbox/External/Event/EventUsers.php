@@ -73,10 +73,10 @@ class EventUsers
      *    - The event is associated with one or more of $user's campuses, and
      *    - The event is associated with the $user's roletype
      *
-     * @param \Schoolbox\User $user
-     * @param int             $startTimestamp
-     * @param int             $endTimestamp
-     * @param string|null     $folderCode
+     * @param \Schoolbox\User        $user
+     * @param int                    $startTimestamp
+     * @param int                    $endTimestamp
+     * @param GenericCollection|null $folderCodes
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -84,7 +84,7 @@ class EventUsers
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
+    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
@@ -138,11 +138,16 @@ class EventUsers
             'classification' => Model::CLASSIFICATION_EVENT
         ], $campusParams, $roleParams);
 
-        /* Optionally filter by foldercode
+        /* Optionally filter by foldercodes
          */
-        if ('' !== (string)$folderCode) {
-            $query .= " AND se.code = :folderCode";
-            $params['folderCode'] = $folderCode;
+        if ($folderCodes && $folderCodes->count()) {
+            $pb = $this->eventMapper->getPredicateBuilder();
+            $pb->in('se.code', $folderCodes->keys());
+
+            $where = $pb->getWhere()[0];
+            $params = array_merge($params, $pb->getParams());
+
+            $query .= " AND {$where}";
         }
 
         $statement = $this->eventMapper->getDatabase()->prepare($query);

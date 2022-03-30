@@ -3,6 +3,7 @@
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Event\Overrides\Mapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
@@ -51,12 +52,19 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $folderCodes;
+
+
+    /**
      * @inheritdoc
      */
     public function __construct(
         int $connectorId,
         User $user,
         User $viewer,
+        ?GenericCollection $folderCodes,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
@@ -66,6 +74,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
+        $this->folderCodes = $folderCodes;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -120,7 +129,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         ))->findForUser(
             $this->getUser(),
             $startTimestamp,
-            $endTimestamp
+            $endTimestamp,
+            $this->folderCodes ?? null
         );
 
         /** @var \Schoolbox\External\Event\Model $timetableEvent */

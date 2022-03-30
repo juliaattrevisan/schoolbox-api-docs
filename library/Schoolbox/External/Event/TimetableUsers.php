@@ -125,10 +125,10 @@ class TimetableUsers
      * Generate a list of events in which $user is involved, between two timestamps
      * Also takes into account any event overrides
      *
-     * @param \Schoolbox\User $user
-     * @param int             $startTimestamp
-     * @param int             $endTimestamp
-     * @param string|null     $folderCode
+     * @param \Schoolbox\User        $user
+     * @param int                    $startTimestamp
+     * @param int                    $endTimestamp
+     * @param GenericCollection|null $folderCodes
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -137,7 +137,7 @@ class TimetableUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?string $folderCode = null): GenericCollection
+    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
@@ -145,14 +145,14 @@ class TimetableUsers
         /* This is the default scenario for the most part; it's all the events
          * that $user is usually involved with via sis_class_user
          */
-        $usualEventIds = $this->generateUsualEventIds($user, $startDatetime, $finishDatetime, $folderCode);
+        $usualEventIds = $this->generateUsualEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
 
         $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
 
         /* Find a list of events which have overrides that might affect $user
          * If there are overrides, process each one specially
          */
-        $overrideEventIds = $this->generateOverrideEventIds($user, $startDatetime, $finishDatetime, $folderCode);
+        $overrideEventIds = $this->generateOverrideEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
 
         /* No overrides? No trabajo
          */
@@ -188,15 +188,15 @@ class TimetableUsers
      *
      * Optionally filters to $folderCode
      *
-     * @param \Schoolbox\User $user
-     * @param string          $startDatetime
-     * @param string          $finishDatetime
-     * @param string|null     $folderCode
+     * @param \Schoolbox\User        $user
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
      * @return array
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function generateUsualEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?string $folderCode = null): array
+    private function generateUsualEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
     {
         /* Find the list of events where you might be involved normally
          */
@@ -222,11 +222,16 @@ class TimetableUsers
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
         ];
 
-        /* Optionally filter by foldercode
+        /* Optionally filter by foldercodes
          */
-        if ('' !== (string)$folderCode) {
-            $query .= " AND se.code = :folderCode";
-            $params['folderCode'] = $folderCode;
+        if ($folderCodes && $folderCodes->count()) {
+            $pb = $this->eventMapper->getPredicateBuilder();
+            $pb->in('se.code', $folderCodes->keys());
+
+            $where = $pb->getWhere()[0];
+            $params = array_merge($params, $pb->getParams());
+
+            $query .= " AND {$where}";
         }
 
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
@@ -249,14 +254,14 @@ class TimetableUsers
      *
      * Optionally filters to $folderCode
      *
-     * @param \Schoolbox\User $user
-     * @param string          $startDatetime
-     * @param string          $finishDatetime
-     * @param string|null     $folderCode
+     * @param \Schoolbox\User        $user
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
      * @return array
      * @throws \PDOException
      */
-    private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?string $folderCode = null): array
+    private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
     {
         $query = "
             SELECT se.id
@@ -276,11 +281,16 @@ class TimetableUsers
             'actionClear' => \Schoolbox\External\Event\Overrides\Model::CLEAR
         ];
 
-        /* Optionally filter by foldercode
+        /* Optionally filter by foldercodes
          */
-        if ('' !== (string)$folderCode) {
-            $query .= " AND se.code = :folderCode";
-            $params['folderCode'] = $folderCode;
+        if ($folderCodes && $folderCodes->count()) {
+            $pb = $this->eventMapper->getPredicateBuilder();
+            $pb->in('se.code', $folderCodes->keys());
+
+            $where = $pb->getWhere()[0];
+            $params = array_merge($params, $pb->getParams());
+
+            $query .= " AND {$where}";
         }
 
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
