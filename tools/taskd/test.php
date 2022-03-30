@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\Url\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 
@@ -34,7 +35,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
                 'from'      => call_user_func($userSerializer, $adminUser),
                 'to'        => call_user_func($userSerializer, $adminUser),
             ],
-            null
+            (new Factory($this->getConfig()))
+                ->buildFullyQualified()
+                ->setPath('/notify/')
+                ->setQuery(['userId' => $adminUser->getId()])
+                ->toString(),
         );
 
         $producer->send($message);
