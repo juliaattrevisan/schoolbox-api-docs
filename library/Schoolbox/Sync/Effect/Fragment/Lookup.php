@@ -9,6 +9,7 @@
 namespace Schoolbox\Sync\Effect\Fragment;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\ValueLabelInterface;
 
 /**
@@ -28,7 +29,7 @@ class Lookup
      *
      * @var array
      */
-    private $allLookups = [
+    private array $allLookups = [
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
@@ -39,6 +40,11 @@ class Lookup
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',
         'userAccessRemove' => '\Schoolbox\Resource\GroupMapper',
     ];
+
+    /**
+     * ID for Not Set options for properties which can be unset
+     */
+    public const NOT_SET_ID = -1;
 
     /**
      * Get lookup data
@@ -69,6 +75,12 @@ class Lookup
                      * in the ui
                      */
                     $allResults = $mapper->findFolders();
+                } elseif (in_array($userField, ['year', 'residentialHouse', 'schoolHouse'])) {
+                    $notSet = ($mapper->createModel())->setId(self::NOT_SET_ID);
+                    ($userField === 'year') ? $notSet->setName('Not Set') : $notSet->setHouse('Not Set');
+                    /** @var GenericCollection $allResults */
+                    $allResults = $mapper->createCollection()->add($notSet);
+                    $allResults = $allResults->merge($mapper->findAll());
                 } else {
                     $allResults = $mapper->findAll();
                 }
