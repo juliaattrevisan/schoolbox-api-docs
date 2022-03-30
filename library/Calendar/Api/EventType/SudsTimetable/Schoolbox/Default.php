@@ -167,6 +167,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
+            $instance->setStaff($timetableEvent->getStaff());
 
             $stack->add($instance);
         }

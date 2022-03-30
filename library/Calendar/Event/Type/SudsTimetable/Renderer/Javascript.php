@@ -107,6 +107,12 @@ class Javascript extends Base
                     'visible' => '',
                 ],
 
+                /* Timetable-related nodes
+                 */
+                'timetable' => [
+                    'staff' => $this->event->getStaff()
+                ],
+
                 'attendance' => [
                     'icon'          => false,
                     'status'        => false,
