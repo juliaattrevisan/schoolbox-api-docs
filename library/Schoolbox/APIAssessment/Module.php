@@ -56,6 +56,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess, $preloadAssessment);
+        $this->register('GET', '', 'apiAssessmentGetAll', $hasApiAccess);
     }
 
 
@@ -64,7 +65,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller($this->getAssessmentMapperProxy());
     }
 
     /**
