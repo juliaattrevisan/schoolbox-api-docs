@@ -152,6 +152,12 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findWithCheapStaff(array $eventIds): GenericCollection
     {
+        $stack = $this->createCollection();
+
+        if (!\count($eventIds)) {
+            return $stack;
+        }
+
         /* I can't join to a folder via a code (code doesn't have an identifier property)
          */
         $folderColumnString = $this->folderMapper->getColumnString('f');
@@ -190,8 +196,6 @@ class Mapper extends \Schoolbox\Mapper
         $statement->execute(array_merge([
             'staffRoleType' => \Schoolbox\Role::STAFF
         ], $params));
-
-        $stack = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /* If we haven't seen this event yet, spawn it and stash it in the stack
