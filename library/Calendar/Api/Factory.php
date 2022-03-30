@@ -170,7 +170,8 @@ class Calendar_Api_Factory
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\UserMapper::getInstance()
+                \Schoolbox\UserMapper::getInstance(),
+                \Timetable_ColourMapper::getInstance()
             ));
         }
 
@@ -287,7 +288,8 @@ class Calendar_Api_Factory
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance()
                 );
             case Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class:
                 return new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(

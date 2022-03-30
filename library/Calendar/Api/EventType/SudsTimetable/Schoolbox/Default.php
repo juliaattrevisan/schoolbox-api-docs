@@ -52,6 +52,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
+     * @var Timetable_ColourMapper
+     */
+    private \Timetable_ColourMapper $timetableColourMapper;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $folderCodes;
@@ -70,7 +76,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper
+        \Schoolbox\UserMapper $userMapper,
+        \Timetable_ColourMapper $timetableColourMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -81,6 +88,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
+        $this->timetableColourMapper = $timetableColourMapper;
     }
 
 
@@ -133,6 +141,11 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $this->folderCodes ?? null
         );
 
+        /* Generate a unique association between event codes and the
+         * available sambell pastel colours, overriding the colours entirely
+         */
+        $timetableColorManager = new Timetable_ColourManager($this->timetableColourMapper->findAll()->reindex());
+
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
@@ -146,7 +159,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setStartTime($timetableEvent->getStartAt());
             $instance->setEndTime($timetableEvent->getFinishAt());
             $instance->setAllDay(false);
-            $instance->setColour($eventTypeSettings['color']);
+            $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
 
