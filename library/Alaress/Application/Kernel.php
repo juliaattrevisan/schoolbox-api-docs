@@ -148,6 +148,7 @@ use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\TaskDaemon\ProducerFactory;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\UserMapper;
@@ -407,6 +408,13 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_TASKD_REDIS_QUEUE)
                     );
                 }
+            )
+        );
+        $di->set(
+            'taskd.messageFactory',
+            $di->lazyNew(
+                MessageFactory::class,
+                ['instance' => $di->get('instance')],
             )
         );
 

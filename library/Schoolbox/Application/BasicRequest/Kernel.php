@@ -31,6 +31,7 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\TaskDaemon\ProducerFactory;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -109,6 +110,13 @@ class Kernel extends WebKernelAbstract
                         $config->get(ConfigMapper::NAME_TASKD_REDIS_QUEUE)
                     );
                 }
+            )
+        );
+        $di->set(
+            'taskd.messageFactory',
+            $di->lazyNew(
+                MessageFactory::class,
+                ['instance' => $di->get('instance')],
             )
         );
 

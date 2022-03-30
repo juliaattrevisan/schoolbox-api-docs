@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\TaskDaemon;
 
 use Enqueue\Redis\RedisConnectionFactory;
+use Schoolbox\TaskDaemon\Request\MessageSerializer;
 
 /**
  * Factory for the task daemon message producer class.
@@ -30,6 +31,6 @@ class ProducerFactory
             'port'              => parse_url($redisUrl, PHP_URL_PORT),
             'scheme_extensions' => ['predis'],
         ]);
-        return new Producer($contextFactory->createContext(), $redisQueue);
+        return new Producer($contextFactory->createContext(), $redisQueue, new MessageSerializer());
     }
 }
