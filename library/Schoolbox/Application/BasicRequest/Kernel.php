@@ -116,7 +116,7 @@ class Kernel extends WebKernelAbstract
             'taskd.messageFactory',
             $di->lazyNew(
                 MessageFactory::class,
-                ['instance' => $di->get('instance')],
+                ['instance' => $di->lazyGet('instance')],
             )
         );
 
