@@ -172,6 +172,15 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
+            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         $post = json_decode(json_encode($this->request->content->get()), true);
         /**
          * check post array if missing any, lets error out...
@@ -206,6 +215,15 @@ class Controller extends Base
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
+        if (!$this->groupsHelper->inGroup($user, $group)) {
+            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         $users_group = $this->groupsHelper->getGroup($user, $group)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
         $defaultData = [
