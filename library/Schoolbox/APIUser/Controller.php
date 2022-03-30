@@ -198,12 +198,14 @@ class Controller extends Base
          * get schoolHouse
          */
         if (array_key_exists('schoolHouse', $data)) {
-            $schoolHouse = $data['schoolHouse'];
-            try {
-                $house = $houseMapper->findById($schoolHouse);
-                $data['schoolHouse'] = $house;
-            } catch (NotFound | Deleted $e) {
-                throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
+            $schoolHouse = $data['schoolHouse']['id'] ?? null;
+            if (null !== $schoolHouse) {
+                try {
+                    $house               = $houseMapper->findById($schoolHouse);
+                    $data['schoolHouse'] = $house;
+                } catch (NotFound | Deleted $e) {
+                    throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
+                }
             }
         }
         /**
