@@ -168,11 +168,13 @@ class Controller extends Base
          * build the db check data for the new model.
          */
         if (array_key_exists('yearLevel', $data)) {
-            $yearLevel = $data['yearLevel'];
-            try {
-                $data['yearLevel'] = $yearLevelMapper->findById($yearLevel);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                throw new SchoolboxException("Year Level '$yearLevel' Not Found or has been Deleted");
+            $yearLevel = $data['yearLevel']['id'] ?? null;
+            if (null !== $yearLevel) {
+                try {
+                    $data['yearLevel'] = $yearLevelMapper->findById($yearLevel);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $data['yearLevel'] = null;
+                }
             }
         }
         /**
