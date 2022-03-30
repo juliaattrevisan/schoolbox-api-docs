@@ -307,7 +307,9 @@ class Classes implements IStrategy
                     ->setGuid($class['id'])
                     ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
 
-                $this->eventMapper->save($event);
+                if ($this->perform) {
+                    $this->eventMapper->save($event);
+                }
 
                 $this->log->debug(sprintf(
                     'Creating new timetable event %s - %s, %s, %s-%s',
@@ -329,7 +331,9 @@ class Classes implements IStrategy
                         ->setName($class['attributes']['className'])
                         ->setCode($class['attributes']['className']);
 
-                    $this->classEntryMapper->save($classEntry);
+                    if ($this->perform) {
+                        $this->classEntryMapper->save($classEntry);
+                    }
 
                     $this->classEntries[$event->getCode()] = $classEntry;
                 }
@@ -353,7 +357,9 @@ class Classes implements IStrategy
                     ->setClass($classEntry)
                     ->setExternalId($externalId);
 
-                $this->classInvolvementMapper->save($classInvolvement);
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($classInvolvement);
+                }
 
                 $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
