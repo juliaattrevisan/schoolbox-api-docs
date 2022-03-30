@@ -3,8 +3,6 @@
 namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\YearLevel\Mapper;
 
 class ArrayToModel extends Base
 {
@@ -19,11 +17,11 @@ class ArrayToModel extends Base
          * check if they have a 'set function' for the model if so, use it, or use the defined function in the if statements
          * else return error that the model does not match the array
          */
-        $yearLevelMapper = Mapper::getInstance();
+
         foreach ($array as $label => $value) {
             //is function?
             //just need the build setFunction function, which exists in the mapper, so lets hit it from the side
-            $function = $yearLevelMapper->getSetMethodName($label);
+            $function = 'set' . ucfirst($label);
             /**
              * specific functions that have more than just a `setValue` or have a weird setValue
              */
@@ -47,10 +45,7 @@ class ArrayToModel extends Base
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
-                if (!method_exists($model, $function)) {
-                    throw new SchoolboxException("Unable to set '$label' field from this endpoint");
-                }
-                $model->$function($value);
+                $this->setScalar([$label => $value], $label, $model, $function);
             }
         }
         return $model;
