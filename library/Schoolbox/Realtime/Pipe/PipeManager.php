@@ -651,7 +651,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function refreshUser($userId)
     {
-        if ($this->userTimeouts[$userId] instanceof TimerInterface) {
+        if (isset($this->userTimeouts[$userId]) && $this->userTimeouts[$userId] instanceof TimerInterface) {
             $this->reactLoop->cancelTimer($this->userTimeouts[$userId]);
             unset($this->userTimeouts[$userId]);
         }
