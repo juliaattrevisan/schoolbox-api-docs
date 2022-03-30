@@ -137,7 +137,7 @@ class Controller extends Base
         }
         $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
         //check if user is trying to break the system by deleting a user via the PUT command, and error
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? '';
+        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? GroupsHelper::ENROLLED;
         if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
             $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
                 ->setStatus(401)
@@ -148,7 +148,7 @@ class Controller extends Base
         }
         $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
         $post['isFavourite']       = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus']   = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? GroupsHelper::ENROLLED);
+        $post['enrolmentStatus']   = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus']);
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
