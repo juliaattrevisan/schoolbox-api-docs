@@ -21,6 +21,7 @@ use Schoolbox;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
@@ -240,7 +241,7 @@ class UserMapper extends Mapper
     public function blockAlaressUserDeletion(User $user): bool
     {
         if ($user->getUsername() === self::USERNAME_ALARESS_ADMIN) {
-            throw new UnexpectedValueException(sprintf('The %s user may not be deleted', self::USERNAME_ALARESS_ADMIN));
+            throw new SchoolboxException(sprintf('The %s user may not be deleted', self::USERNAME_ALARESS_ADMIN));
         }
         return true;
     }
