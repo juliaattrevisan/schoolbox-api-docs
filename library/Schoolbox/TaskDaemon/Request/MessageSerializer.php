@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon\Request;
 
+use DateTimeInterface;
+
 /**
  * Serializer for request messages.
  */
@@ -37,7 +39,7 @@ class MessageSerializer
                 'params'   => $message->getParams(),
                 'callback' => null,
             ],
-            'timestamp' => $message->getTimestamp()->toRfc3339String(),
+            'timestamp' => $message->getTimestamp()->format(DateTimeInterface::RFC3339),
         ];
 
         $callback = $message->getCallbackUrl();

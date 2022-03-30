@@ -44,7 +44,7 @@ class MessageFactory
         return new Message(
             $task,
             $params,
-            Alaress_Date_Format::now(),
+            Alaress_Date_Format::now()->getDateTimeObject(),
             $this->instance,
             $callbackUrl,
             null,

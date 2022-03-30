@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\TaskDaemon\Request;
 
-use Alaress_Date_Format;
+use DateTimeInterface;
 use Schoolbox\Instance;
 
 /**
@@ -46,22 +46,22 @@ class Message
     /**
      * The time at which the task was sent to the task daemon.
      */
-    private Alaress_Date_Format $timestamp;
+    private DateTimeInterface $timestamp;
 
     /**
      * Constructor
      *
-     * @param string              $task
-     * @param array               $params
-     * @param Alaress_Date_Format $timestamp
-     * @param Instance            $instance
-     * @param string|null         $callbackUrl
-     * @param string|null         $callbackToken
+     * @param string            $task
+     * @param array             $params
+     * @param DateTimeInterface $timestamp
+     * @param Instance          $instance
+     * @param string|null       $callbackUrl
+     * @param string|null       $callbackToken
      */
     public function __construct(
         string $task,
         array $params,
-        Alaress_Date_Format $timestamp,
+        DateTimeInterface $timestamp,
         Instance $instance,
         ?string $callbackUrl,
         ?string $callbackToken
@@ -115,9 +115,9 @@ class Message
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return DateTimeInterface
      */
-    public function getTimestamp(): Alaress_Date_Format
+    public function getTimestamp(): DateTimeInterface
     {
         return $this->timestamp;
     }
