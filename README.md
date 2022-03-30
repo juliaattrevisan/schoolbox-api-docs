@@ -105,6 +105,7 @@ For full information on the build process of making a APT package and deploying 
   * [NESA](./docs/nesa.md)
   * [Notifications](./docs/notifications/README.md)
   * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
+  * [Task Daemon](./library/Schoolbox/TaskDaemon/README.md)
 * Custom Modules
   * [Loyola: Survey](library/Custom/Lc/Survey/README.md)
   * [Meriden: Pastoral](library/Custom/Ms/Pastoral/README.md)

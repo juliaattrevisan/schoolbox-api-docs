@@ -32,6 +32,9 @@ extra_hostname = default["extra_hostname"]
 aws_iam_key = default["aws_iam_key"]
 aws_iam_secret = default["aws_iam_secret"]
 primary_php_majver = default["primary_php_majver"]
+taskd_dir = default["taskd_dir"]
+taskd_sync_type = default["taskd_sync_type"]
+taskd_build_from_local = default["taskd_build_from_local"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -112,6 +115,15 @@ if File.file?('vagrant.yaml')
   if !conf["primary_php_majver"].nil?
     primary_php_majver = conf["primary_php_majver"]
   end
+  if !conf["taskd_dir"].nil?
+    taskd_dir = conf["taskd_dir"]
+  end
+  if !conf["taskd_sync_type"].nil?
+    taskd_sync_type = conf["taskd_sync_type"]
+  end
+  if !conf["taskd_build_from_local"].nil?
+    taskd_build_from_local = conf["taskd_build_from_local"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -120,7 +132,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if puppet_sync_type != 'none'
     config.trigger.before :provision do |sync|
       sync.name = "Syncing Puppet"
-      sync.run = {inline: "./tools/vagrant-sync-puppet-repo.sh #{puppet_sync_type} #{puppet_dir}"}
+      sync.run = {inline: "./tools/vagrant-sync-repo.sh #{puppet_sync_type} #{puppet_dir} stable"}
     end
   end
 
@@ -164,6 +176,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "#{puppet_dir}/vagrant", "/tmp/puppet"
   config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet"
 
+
+  # Sync the taskd shared folder, if taskd_build_from_local is on
+  if taskd_build_from_local
+    config.vm.synced_folder taskd_dir, "/tmp/taskd"
+
+    # also sync the folder
+    if taskd_sync_type != 'none'
+      config.trigger.before :provision do |sync|
+        sync.name = "Syncing taskd"
+        sync.run = {inline: "./tools/vagrant-sync-repo.sh #{taskd_sync_type} #{taskd_dir} master"}
+      end
+    end
+  end
+
+
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
   config.vm.synced_folder "#{puppet_dir}/environments/staging/hieradata/node", "/etc/puppetlabs/code/hieradata/node"
@@ -198,7 +225,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{force_upgrade}' " \
         + "'#{instance_registry_url_override}' " \
         + "'#{extra_hostname}' " \
-        + "'#{primary_php_majver}'"
+        + "'#{primary_php_majver}' " \
+        + "'#{taskd_build_from_local ? 1 : 0}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 end
