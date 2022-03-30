@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\TaskDaemon\Message;
+namespace Schoolbox\TaskDaemon\Request;
 
 /**
- * Serializer for messages.
+ * Serializer for request messages.
  */
-class Serializer
+class MessageSerializer
 {
     /**
      * Serializes `$message` into an array format, for sending to the task

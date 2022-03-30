@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\TaskDaemon\Message;
+namespace Schoolbox\TaskDaemon\Request;
 
 use Alaress_Date_Format;
 use Schoolbox\Instance;

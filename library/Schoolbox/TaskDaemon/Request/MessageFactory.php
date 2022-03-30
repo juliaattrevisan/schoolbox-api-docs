@@ -6,15 +6,15 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\TaskDaemon\Message;
+namespace Schoolbox\TaskDaemon\Request;
 
 use Alaress_Date_Format;
 use Schoolbox\Instance;
 
 /**
- * Class Factory
+ * Factory for building request messages.
  */
-class Factory
+class MessageFactory
 {
     /**
      * Information about the Schoolbox instance.
