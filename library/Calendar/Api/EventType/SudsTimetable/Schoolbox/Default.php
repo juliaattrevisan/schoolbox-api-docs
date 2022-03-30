@@ -110,6 +110,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
     {
         $stack = new \Calendar\Event\Collection();
 
+        /* If the viewee's Hide Timetable is set, hide it from everyone
+         */
+        if ($this->getUser()->getHideTimetable()) {
+            return $stack;
+        }
+
         try {
             $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
                 ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
