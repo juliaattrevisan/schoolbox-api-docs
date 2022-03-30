@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;

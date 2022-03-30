@@ -238,7 +238,8 @@ try {
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -443,12 +444,14 @@ try {
                 [
                     $user,
                     $viewer,
+                    null,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\ClassEntryMapper::getInstance(),
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -461,6 +464,7 @@ try {
                 [
                     $user,
                     $viewer,
+                    null,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
@@ -587,12 +591,14 @@ try {
                     [
                         $user,
                         $viewer,
+                        null,
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\External\ClassEntryMapper::getInstance(),
                         \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                         \Schoolbox\External\Event\Mapper ::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                        \Schoolbox\UserMapper::getInstance()
+                        \Schoolbox\UserMapper::getInstance(),
+                        \Timetable_ColourMapper::getInstance()
                     ],
                     true,
                     $sentry
@@ -605,6 +611,7 @@ try {
                     [
                         $user,
                         $viewer,
+                        null,
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\External\Event\Mapper ::getInstance(),
                         \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
