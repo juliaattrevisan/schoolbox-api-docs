@@ -25,14 +25,14 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
+        $adminUser      = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+        $userSerializer = new ModelToArray();
         $message        = $messageFactory->build(
             'notify',
             [
-                'message' => 'Hi',
-                'sender'  => call_user_func(
-                    new ModelToArray(),
-                    UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN),
-                ),
+                'message'   => 'Hi',
+                'from'      => call_user_func($userSerializer, $adminUser),
+                'to'        => call_user_func($userSerializer, $adminUser),
             ],
             null
         );
