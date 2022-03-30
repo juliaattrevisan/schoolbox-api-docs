@@ -105,6 +105,14 @@ class Factory
 
 
     /**
+     * TASS communication rules type codes (in comma separated format) for all guardian relationships
+     * that can be associated with students
+     * @var string|null
+     */
+    private ?string $communicationTypes;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -186,6 +194,7 @@ class Factory
      * @param int                             $addnumMother
      * @param string                          $fatherAddressDescription
      * @param string                          $motherAddressDescription
+     * @param string|null                     $communicationTypes
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -208,8 +217,9 @@ class Factory
         int $addnumFather,
         int $addnumMother,
         string $fatherAddressDescription,
-        /* Profile pieces */
         string $motherAddressDescription,
+        ?string $communicationTypes,
+        /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -233,6 +243,7 @@ class Factory
         $this->addnumMother = $addnumMother;
         $this->fatherAddressDescription = $fatherAddressDescription;
         $this->motherAddressDescription = $motherAddressDescription;
+        $this->communicationTypes = $communicationTypes;
 
         /* Profile pieces
          */
@@ -317,6 +328,7 @@ class Factory
                 $this->addnumMother,
                 $this->fatherAddressDescription,
                 $this->motherAddressDescription,
+                $this->communicationTypes,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
