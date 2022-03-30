@@ -219,13 +219,18 @@ class Controller extends Base
         if (array_key_exists('impersonableUser', $data)) {
             $impersonate = $data['impersonableUser'];
             $impersonateCollection = new GenericCollection(User::class);
-            foreach ($impersonate as $userId) {
-                try {
-                    $impUser = $userMapper->findById($userId);
-                } catch (NotFound | Deleted $e) {
+            foreach ($impersonate as $userEntry) {
+                $userId = $userEntry['id'] ?? null;
+                if (null !== $userId) {
+                    try {
+                        $impUser = $userMapper->findById($userId);
+                    } catch (NotFound | Deleted $e) {
+                        throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                    }
+                    $impersonateCollection->add($impUser);
+                } else {
                     throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
                 }
-                $impersonateCollection->add($impUser);
             }
             $data['linkedUser'] = $impersonateCollection;
             unset($data['impersonableUser']);
