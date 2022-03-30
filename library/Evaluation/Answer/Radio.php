@@ -226,7 +226,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                         'ANSWER_VALUE_FACADE' => $valueFacade,
                         'ANSWER_VALUE' => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                        'ANSWER_AUTO_COMPLETE' => (isset($questionConfig['randomiseOptionOrder']) && $questionConfig['randomiseOptionOrder']) ? 'off' : 'on',
+                        'ANSWER_AUTO_COMPLETE' => !empty($questionConfig['randomiseOptionOrder']) ? 'off' : 'on',
                     )
                 );
 

@@ -379,7 +379,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query  = "SELECT Description FROM luDays WHERE Code = :code";
         $result = $this->getDatabase()->getRow($query, ['code' => (string)$dayNumber]);
 
-        if ($result && $result['Description']) {
+        if (isset($result['Description']) && $result['Description'] !== '') {
             return $result['Description'];
         }
 
@@ -909,10 +909,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'code'           => $desc['ClassCode'],
                         'campus'         => $desc['ClassCampus'],
                         'room'           => $desc['Room'],
-                        'staffID'        => $desc['StaffID'],
-                        'staffFirstname' => $desc['StaffPreferredName'],
-                        'staffSurname'   => $desc['StaffSurname'],
-                        'staffTitle'     => $desc['StaffTitle'],
+                        'staffID'        => $desc['StaffID'] ?? null,
+                        'staffFirstname' => $desc['StaffPreferredName'] ?? null,
+                        'staffSurname'   => $desc['StaffSurname'] ?? null,
+                        'staffTitle'     => $desc['StaffTitle'] ?? null,
                         'sequence'       => (int)$desc['sequence']
                     ];
 
