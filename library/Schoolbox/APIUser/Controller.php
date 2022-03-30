@@ -183,13 +183,18 @@ class Controller extends Base
         if (array_key_exists('campus', $data)) {
             $campus = $data['campus'];
             $campusCollection = (new GenericCollection(Campus::class));
-            foreach ($campus as $campusId) {
-                try {
-                    $campusObj = $campusMapper->findById($campusId);
-                } catch (NotFound | Deleted $e) {
-                    throw new SchoolboxException("Campus '$campusId' Not Found or has been Deleted");
+            foreach ($campus as $campusEntry) {
+                $campusId = $campusEntry['id'] ?? null;
+                if (null !== $campusId) {
+                    try {
+                        $campusObj = $campusMapper->findById($campusId);
+                    } catch (NotFound | Deleted $e) {
+                        throw new SchoolboxException("Campus '$campusId' Not Found or has been Deleted");
+                    }
+                    $campusCollection->add($campusObj);
+                } else {
+                    throw new SchoolboxException("Campus '$campusId' Not Found");
                 }
-                $campusCollection->add($campusObj);
             }
             $data['campusCollection'] = $campusCollection;
             unset($data['campus']);
