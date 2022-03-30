@@ -147,7 +147,9 @@ class Classes implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->overridesMapper = $overridesMapper;
+        /* Temporarily disabled while we wait for st gregs
+         * $this->overridesMapper = $overridesMapper;
+         */
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
     }
