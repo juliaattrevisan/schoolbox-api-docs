@@ -80,9 +80,24 @@ export default {
 
         /**
          * To strip the <br> from the log data
+         * 
+         * @return { String }
          */
         updatedLogData () {
             return this.logData[0].replace(/<br\s*\/?>/gi, '');
+        },
+
+        /**
+         * To change when processing
+         * 
+         * @return { String }
+         */
+        updateButtonText () {
+            if (this.isProcessing) {
+                return `<em>Processing, please wait...</em>`;
+            } else {
+                return `Update Selected`;
+            }
         },
 
     },
@@ -276,8 +291,11 @@ export default {
                         <option value="1">Revoke</option>
                     </select>
                 </div>
+                <div v-if="selectedRows.length > 1000" class="new-values__full-width">
+                    <div class="alert-box warning">Please note, as a large number of users has been selected, processing may take some time.</div>
+                </div>
                 <div class="new-values__full-width">
-                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing">Update Selected</button>
+                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing" v-html="updateButtonText"></button>
                 </div>
             </div>
         </Transition>
