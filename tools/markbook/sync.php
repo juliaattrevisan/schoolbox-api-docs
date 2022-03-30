@@ -20,7 +20,6 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 
@@ -243,11 +242,6 @@ $kernel->run(static function (ContainerInterface $di, LoopInterface $loop, Logge
             if (!$markbookExternal->isSyncable($assessment)) {
                 continue;
             }
-            if ($assessment->getSpecificationAssessment() instanceof IAssessable && $assessment->getTitle() != $assessment->getSpecificationAssessment()->getTitle()) {
-                $log->warning("Rewriting title of assessment");
-                $assessment->setTitle($assessment->getSpecificationAssessment()->getTitle());
-            }
-
 
             $action = str_pad("Assessment:", 30, " ");
 
