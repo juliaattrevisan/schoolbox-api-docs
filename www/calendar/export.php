@@ -211,6 +211,9 @@ try {
 
         case 'group':
             $export_id = (int)$_GET['group'];
+
+            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($export_id);
+
             if ($export_id <= 0) {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
@@ -221,6 +224,42 @@ try {
                 true,
                 $sentry
             );
+
+            /* SUDS Timetable
+             */
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    $folder->getCodes(),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\UserMapper::getInstance()
+                ],
+                true,
+                $sentry
+            ));
+
+            /* SUDS Event
+             */
+            $api->add(buildApiClass(
+                Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class,
+                [
+                    $user,
+                    $viewer,
+                    $folder->getCodes(),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
+                ],
+                true,
+                $sentry
+            ));
 
             $filename = sprintf('group%d', $export_id);
             break;
