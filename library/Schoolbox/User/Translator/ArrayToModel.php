@@ -4,13 +4,6 @@ namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Campus;
-use Schoolbox\CampusMapper;
-use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper;
 
 class ArrayToModel extends Base
