@@ -4216,19 +4216,9 @@ parameters:
 			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Api.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Factory\\:\\:\\$campusMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Factory.php
-
-		-
 			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:MAX_EMERGENCY_CONTACTS is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Profile/Profile.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Timetable\\\\Preloader\\:\\:\\$perform is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Timetable/Preloader.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\CommunityPortal\\:\\:changePassword\\(\\) should return bool but returns Alaress\\\\Database\\\\Statement\\\\Query\\\\Base\\|Alaress\\\\Database\\\\Statement\\\\Query\\\\IQuery\\.$#"
