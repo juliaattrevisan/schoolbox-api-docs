@@ -69,6 +69,7 @@ class ModelToArray
             'altEmail'       => $user->getAltEmail(),
             'positionTitle'  => $user->getPositionTitle(),
             'yearLevel'      => $this->convertYearLevel($user->getYear()),
+            'isDeleted'      => $user->isDeleted(),
 
             // Just cast to bool for now, maybe leave out later?
             'isBoarder'      => (bool)$user->getAbbreviatedBoardingStatus(),
