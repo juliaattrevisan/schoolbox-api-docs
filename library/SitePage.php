@@ -316,11 +316,11 @@ class SitePage extends Page
             $this->goLoginPage();
         }
 
-        if (
-            !$_SESSION['user'] instanceof User || //If session does not exist ||
-            ((int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
-            ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
-        ) {
+        $sessionUser       = $_SESSION['user'] ?? null;
+        $sessionExpired    = !isset($_SESSION['lasttime'])
+            || (int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time();
+        $sessionIpMismatch = $this->config->get('track_ip') && ($_SESSION['ip'] ?? '') !== Session::getIP();
+        if (!$sessionUser instanceof User || $sessionExpired || $sessionIpMismatch) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {
                 /** @var Remember\Remember $rememberer */
