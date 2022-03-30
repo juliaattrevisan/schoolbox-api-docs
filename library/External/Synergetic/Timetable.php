@@ -176,8 +176,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $params = array_merge($params, $fileTypeBindings->getParams());
         }
 
-        $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
-                    TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
+        $query = "SELECT TimetableDefinition.PeriodNumber,
+                         TimetableDefinition.PeriodNumberSeq,
+                         TimetableDefinition.TimeFrom,
+                         TimetableDefinition.TimeTo,
+                         TimetableDefinition.Description,
+                         TimetableDefinition.DayNumber,
+                         TimetableDefinition.FileType
                     FROM dbo.TimetableDefinition TimetableDefinition
                     WHERE TimetableDefinition.FileYear = :fileYear AND
                         TimetableDefinition.FileSemester = :fileSemester AND
@@ -374,7 +379,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query  = "SELECT Description FROM luDays WHERE Code = :code";
         $result = $this->getDatabase()->getRow($query, ['code' => (string)$dayNumber]);
 
-        if ($result['Description']) {
+        if (isset($result['Description']) && $result['Description'] !== '') {
             return $result['Description'];
         }
 
@@ -515,6 +520,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     'ClassCampus'               => $spRow['ClassCampus'],
                     'ClassCode'                 => $spRow['ClassCode'],
                     'FileType'                  => $spRow['FileType'],
+                    'StaffID'                   => $spRow['StaffID'],
                     'SubstituteFlag'            => $spRow['SubstituteFlag'],
                     'SubstitutedFlag'           => $spRow['SubstitutedFlag'],
                     'PeriodSequence'            => $sequenceId,
@@ -765,6 +771,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         } else {
             $query = "SELECT Timetable.Room, SubjectClasses.Description,
                 Timetable.PeriodNumber, Timetable.ClassCampus, Timetable.ClassCode,Timetable.FileType,
+                Timetable.StaffID,
                 Timetable.PeriodNumber as AttendancePeriod
                 FROM dbo.SubjectClasses SubjectClasses,
                 dbo.Timetable Timetable
@@ -902,10 +909,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'code'           => $desc['ClassCode'],
                         'campus'         => $desc['ClassCampus'],
                         'room'           => $desc['Room'],
-                        'staffID'        => $desc['StaffID'],
-                        'staffFirstname' => $desc['StaffPreferredName'],
-                        'staffSurname'   => $desc['StaffSurname'],
-                        'staffTitle'     => $desc['StaffTitle'],
+                        'staffID'        => $desc['StaffID'] ?? null,
+                        'staffFirstname' => $desc['StaffPreferredName'] ?? null,
+                        'staffSurname'   => $desc['StaffSurname'] ?? null,
+                        'staffTitle'     => $desc['StaffTitle'] ?? null,
                         'sequence'       => (int)$desc['sequence']
                     ];
 

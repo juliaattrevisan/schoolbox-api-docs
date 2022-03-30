@@ -273,13 +273,13 @@ class Controller extends BaseController
         $externalUser = [];
         if ($student->getExternalId()) {
             $externalUser = $this->externalUser->getStudent($student->getExternalId());
-            if (is_array($externalUser['AlertMessage'])) {
+            if (isset($externalUser['AlertMessage']) && is_array($externalUser['AlertMessage'])) {
                 $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
             } else {
                 $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
             }
-            if ($externalUser["CourtOrderType"] && (trim($externalUser["CourtOrderType"]) !== '')) {
-                $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
+            if (isset($externalUser['CourtOrderType']) && (trim($externalUser['CourtOrderType']) !== '')) {
+                $externalUser['AlertMessages'][] = 'Court Order - ' . trim($externalUser['CourtOrderType']);
             }
         }
 
@@ -416,7 +416,7 @@ class Controller extends BaseController
 
         // Load users for form teacher, tutor, etc.
         $formTeacher = null;
-        if ($externalUser['StudentFormStaffName']) {
+        if (isset($externalUser['StudentFormStaffName']) && (string)$externalUser['StudentFormStaffName'] !== '') {
             if ($externalUser['TeacherFormID']) {
                 try {
                     $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
@@ -434,7 +434,7 @@ class Controller extends BaseController
          * via their id (some sis don't have the id)
          */
         $tutorTeacher = null;
-        if ($externalUser['StudentTutorName']) {
+        if (isset($externalUser['StudentTutorName']) && (string)$externalUser['StudentTutorName'] !== '') {
             if ($externalUser['TeacherTutorID']) {
                 try {
                     $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
@@ -449,7 +449,7 @@ class Controller extends BaseController
         }
 
         $hohTeacher = null;
-        if ($externalUser['StudentHeadOfHouse']) {
+        if (isset($externalUser['StudentHeadOfHouse']) && (string)$externalUser['StudentHeadOfHouse'] !== '') {
             if ($externalUser['HeadOfHouseID']) {
                 try {
                     $hohTeacher = $this->userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
@@ -681,7 +681,7 @@ class Controller extends BaseController
                     'hideContacts'             => $hideContacts,
                     'showClasses'              => $showClasses,
                     'now'                      => Alaress_Date_Format::now(),
-                    'boarderType'              => $this->externalUser->determineBoarderType($externalUser['StudentBoarder']),
+                    'boarderType'              => $this->externalUser->determineBoarderType($externalUser['StudentBoarder'] ?? null),
                     'contacts'                 => $contacts,
                     'subjects'                 => $subjects,
                     'customButtons'            => $customButtons,

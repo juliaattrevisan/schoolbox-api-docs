@@ -88,7 +88,7 @@ class Controller extends Base
         $booking  = (new Model())
             ->setResource($resource)
             ->setEvent(new Calendar\Event())
-            ->setName($this->getRequest()->query['name'])
+            ->setName($this->request->query->get('name'))
             ->setRelatedBookingList(new GenericCollection(Model::class));
 
         // Create datetime is unique to this method, so it can be a function.
@@ -109,12 +109,12 @@ class Controller extends Base
 
         // Was the time set here? If so set it into the booking.
         $startDate = $createDatetime(
-            $this->request->query['startDate'],
-            $this->request->query['startTime']
+            $this->request->query->get('startDate'),
+            $this->request->query->get('startTime')
         );
         $endDate   = $createDatetime(
-            $this->request->query['endDate'],
-            $this->request->query['endTime']
+            $this->request->query->get('endDate'),
+            $this->request->query->get('endTime')
         );
         if ($startDate instanceof DateTime) {
             $booking->getEvent()->setStartDateTime(new Alaress_Date_Format($startDate));
@@ -150,7 +150,7 @@ class Controller extends Base
                     'item'              => $booking,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->getRequest()->query['returnUrl'],
+                    'returnUrl'         => $this->request->query->get('returnUrl'),
                     'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
@@ -475,6 +475,7 @@ class Controller extends Base
         $campusId = null
     ) {
         $newList = new Collection();
+        $campus = null;
         if ($campusId) {
             $campus = $this->getCampusMapper()->findById($campusId);
         }
@@ -535,8 +536,8 @@ class Controller extends Base
     protected function getRelatedItemsFromForm()
     {
         $relatedItems = [];
-        foreach ($this->request->post['related_item'] ?: [] as $relatedItem) {
-            if ($relatedItem['resource_id']) {
+        foreach ($this->request->post->get('related_item') ?: [] as $relatedItem) {
+            if (isset($relatedItem['resource_id'])) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
         }

@@ -119,7 +119,7 @@ class Series
         // Get all booking dates for all the related resources
         $relatedItems = [];
         foreach ($related ?? [] as $relatedItem) {
-            if ($relatedItem['resource_id']) {
+            if (isset($relatedItem['resource_id'])) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
         }

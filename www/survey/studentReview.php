@@ -18,7 +18,7 @@ $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $sectionHandler  = new Survey_Section();
-
+/** @var SitePage $this */
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
@@ -190,13 +190,13 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
  */
-if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
+if (!($nextSection && is_numeric($nextSection['section_id'])) && !($prevSection && is_numeric($prevSection['section_id']))) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+    * previous button if applicable
+    */
     if (is_numeric($nextSection['section_id'])) {
         $this->setVar(
             array(
@@ -237,8 +237,9 @@ $trail->renderIntoSitePage(
         ],
         [
             'text'  => $survey['title'],
-            'href'  => '/survey/intro/' . $survey['assess_id'],
-            'class' => ''
+            // do not show link to intro, when already reached max attempts
+            'href'  => (int)$survey['max_attempts'] === 1 ? null : '/survey/intro/' . $survey['assess_id'],
+            'class' => 'active'
         ],
         [
             'text'  => $user->formatName(),

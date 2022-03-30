@@ -196,15 +196,15 @@ class Controller extends Base
         /* Set up default values
          */
         $event = (new Event())
-            ->setTitle($this->request->query['title'] ?? '')
+            ->setTitle((string)$this->request->query->get('title'))
             ->setAuthor($this->getUser())
-            ->setAccess((int)$this->request->query['level'])
-            ->setAllDay((int)$this->request->query['allDay'])
+            ->setAccess((int)$this->request->query->get('level'))
+            ->setAllDay((int)$this->request->query->get('allDay'))
             ->setPublishDateTime(Alaress_Date_Format::now());
 
-        $event->getType()->setId((int)$this->request->query['type'] ?: '');
+        $event->getType()->setId((int)$this->request->query->get('type'));
 
-        $event->setupDates($this->request->query['date']);
+        $event->setupDates($this->request->query->get('date'));
 
         if (!$event->getAllDay()) {
             $event->getEndDateTime()->addHours(1);
@@ -281,7 +281,7 @@ class Controller extends Base
             'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
 
             'guests' => [],
-            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query->get('returnUrl') ?? Redirect::encode('/')),
         ])->setTitle('Create event'));
     }
 
@@ -368,7 +368,7 @@ class Controller extends Base
             'canInvite' => (new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
 
             'guests' => $this->attendanceMapper->findAttendances($event),
-            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query['returnUrl'] ?? Redirect::encode('/')),
+            'returnUrl' => Redirect::queryStringEncodedParam($this->request->query->get('returnUrl') ?? Redirect::encode('/')),
         ])->setTitle("Modify {$event->getTitle()}"));
     }
 
@@ -386,7 +386,7 @@ class Controller extends Base
          * Otherwise default to the current user
          */
         $selectedUser = $this->getUser();
-        $userId = (int)$this->request->query['userId'];
+        $userId = (int)$this->request->query->get('userId');
 
         if ($userId) {
             try {
@@ -422,7 +422,7 @@ class Controller extends Base
          * but isn't involved in the homepage used to get here:
          * force the homepage into the checkbox list
          */
-        $homepageId = (int)$this->request->query['homepageId'];
+        $homepageId = (int)$this->request->query->get('homepageId');
 
         if ($homepageId && !in_array($homepageId, $tempFolderIds, false) && FolderAccess::getInstance()->getFolderAccess($this->getUser(), $homepageId) >= UserAccess::ACCESS_WRITE) {
             $tempFolderIds[] = $homepageId;
@@ -515,7 +515,7 @@ class Controller extends Base
 
         foreach ($allFolderList as $currentFolder) {
             $alreadyInCategory = in_array($currentFolder->getId(), $previousInvolvement, false);
-            $fromHomepage      = ((int)$this->request->query['level'] === Event::ACCESS_GROUP) && ((int)$this->request->query['homepageId'] === $currentFolder->getId());
+            $fromHomepage      = ((int)$this->request->query->get('level') === Event::ACCESS_GROUP) && ((int)$this->request->query->get('homepageId') === $currentFolder->getId());
 
             if ($alreadyInCategory || $fromHomepage) {
                 $items['selected'][] = $currentFolder->getId();
@@ -591,7 +591,7 @@ class Controller extends Base
 
         /* Redirects
          */
-        $returnUrl = $this->request->query['returnUrl'] ?? Redirect::encode('/calendar');
+        $returnUrl = $this->request->query->get('returnUrl') ?? Redirect::encode('/calendar');
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
@@ -804,7 +804,7 @@ class Controller extends Base
 
         /* Redirect
          */
-        $redirect = Redirect::decode($this->request->query['returnUrl']);
+        $redirect = Redirect::decode($this->request->query->get('returnUrl'));
 
         /* Calculate redirect for async javascript
          */
