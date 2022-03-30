@@ -41,11 +41,17 @@ class MessageFactory
      */
     public function build(string $task, array $params, ?string $callbackUrl): Message
     {
+        // Convert the instance to an intermediary format
         return new Message(
             $task,
             $params,
             Alaress_Date_Format::now()->getDateTimeObject(),
-            $this->instance,
+            $this->instance->getId(),
+            $this->instance->getHostname(),
+            $this->instance->getDomain(),
+            $this->instance->getVersion(),
+            $this->instance->getType(),
+            $this->instance->getSchoolCode(),
             $callbackUrl,
             null,
         );

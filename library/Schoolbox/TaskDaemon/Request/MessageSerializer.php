@@ -26,12 +26,12 @@ class MessageSerializer
     {
         $return = [
             'instance' => [
-                'id'         => $message->getInstance()->getId(),
-                'hostname'   => $message->getInstance()->getHostname(),
-                'domain'     => $message->getInstance()->getDomain(),
-                'version'    => $message->getInstance()->getVersion(),
-                'type'       => $message->getInstance()->getType(),
-                'schoolcode' => $message->getInstance()->getSchoolCode(),
+                'id'         => $message->getInstanceId(),
+                'hostname'   => $message->getHostname(),
+                'domain'     => $message->getDomain(),
+                'version'    => $message->getVersion(),
+                'type'       => $message->getType(),
+                'schoolcode' => $message->getSchoolCode(),
             ],
             'task'     => [
                 'type'     => $message->getTask(),

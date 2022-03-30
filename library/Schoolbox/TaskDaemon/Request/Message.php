@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\TaskDaemon\Request;
 
 use DateTimeInterface;
-use Schoolbox\Instance;
 
 /**
  * A strongly-typed representation of a message to be sent to the task daemon.
@@ -17,9 +16,52 @@ use Schoolbox\Instance;
 class Message
 {
     /**
-     * Information about the Schoolbox instance.
+     * The ID of the Schoolbox instance.
      */
-    private Instance $instance;
+    private string $instanceId;
+
+    /**
+     * The host name of the Schoolbox instance.
+     *
+     * Along with `$domain` forms a fully-qualified domain name for the
+     * Schoolbox instance: `${hostname}.${domain}`.
+     */
+    private string $hostName;
+
+    /**
+     * The domain name on which the Schoolbox instance is hosted.
+     *
+     * Along with `$hostname` forms a fully-qualified domain name for the
+     * Schoolbox instance: `${hostname}.${domain}`.
+     */
+    private string $domain;
+
+    /**
+     * The version of the Schoolbox platform which the instance is running.
+     *
+     * Required because the task daemon may need to run a task differently
+     * depending on Schoolbox version.
+     */
+    private string $version;
+
+    /**
+     * The type of instance this is:
+     * * prod: Production instance (currently contains live data)
+     * * stg: Staging instance (no live data: used for testing by customers
+     *   and Schoolbox staff)
+     * * dev: Development instance (former type for staging instances: should
+     *   be obsolete)
+     * * trial: Trial instance (for evaluation use by prospect customers)
+     */
+    private string $type;
+
+    /**
+     * A unique human-readable identifier for the organisation which owns the
+     * Schoolbox instance.
+     *
+     * This will be the same for all of an organisation's instances.
+     */
+    private string $schoolCode;
 
     /**
      * The name of the task to run.
@@ -54,7 +96,12 @@ class Message
      * @param string            $task
      * @param array             $params
      * @param DateTimeInterface $timestamp
-     * @param Instance          $instance
+     * @param string            $instanceId
+     * @param string            $hostName
+     * @param string            $domain
+     * @param string            $version
+     * @param string            $type
+     * @param string            $schoolCode
      * @param string|null       $callbackUrl
      * @param string|null       $callbackToken
      */
@@ -62,24 +109,74 @@ class Message
         string $task,
         array $params,
         DateTimeInterface $timestamp,
-        Instance $instance,
+        string $instanceId,
+        string $hostName,
+        string $domain,
+        string $version,
+        string $type,
+        string $schoolCode,
         ?string $callbackUrl,
         ?string $callbackToken
     ) {
-        $this->instance      = $instance;
         $this->task          = $task;
         $this->params        = $params;
+        $this->timestamp     = $timestamp;
+        $this->instanceId    = $instanceId;
+        $this->hostName      = $hostName;
+        $this->domain        = $domain;
+        $this->version       = $version;
+        $this->type          = $type;
+        $this->schoolCode    = $schoolCode;
         $this->callbackUrl   = $callbackUrl;
         $this->callbackToken = $callbackToken;
-        $this->timestamp     = $timestamp;
     }
 
     /**
-     * @return Instance
+     * @return string
      */
-    public function getInstance(): Instance
+    public function getInstanceId(): string
     {
-        return $this->instance;
+        return $this->instanceId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHostName(): string
+    {
+        return $this->hostName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain(): string
+    {
+        return $this->domain;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSchoolCode(): string
+    {
+        return $this->schoolCode;
     }
 
     /**
