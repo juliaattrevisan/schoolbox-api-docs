@@ -159,7 +159,7 @@ class Calendar_Api_Factory
          */
         $sudsTimetableConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class);
 
-        if ($sudsTimetableConfig->getStatus()) {
+        if ($sudsTimetableConfig->isActive()) {
             $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
                 $sudsTimetableConfig->getId(),
                 $user,
@@ -176,7 +176,7 @@ class Calendar_Api_Factory
 
         $sudsEventConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class);
 
-        if ($sudsEventConfig->getStatus()) {
+        if ($sudsEventConfig->isActive()) {
             $composite->add(new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
                 $sudsEventConfig->getId(),
                 $user,
