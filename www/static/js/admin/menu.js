@@ -15,6 +15,24 @@
         let config = init(options, $(this));
         let resizeTimeout = false;
 
+        /**
+         * We should ensure each flyout menu is fully visible when active, so the 
+         * user doesn't have to scroll further down the page to see all items
+         */
+        const flyoutMenuList = document.querySelectorAll('[data-admin-subnav-flyout]');
+        const defaultMarginTop = 35;
+        const extraPadding = 20;
+        const intersectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.intersectionRatio < 1 && entry.intersectionRatio !== 0) { //is partially visible and not just display: none
+                    //shift the menu up the page so it's fully visible
+                    entry.target.style.marginTop = `-${(1-entry.intersectionRatio) * entry.boundingClientRect.height + defaultMarginTop + extraPadding}px`;
+                } else { //otherwise reset it to default marginTop
+                    entry.target.style.marginTop = `-${defaultMarginTop}px`;
+                }
+            });
+        });
+
         /* Whenever the viewport dimension changes, run this evaluation
          * The viewport could start large and become small, or vice versa,
          * so on resize you need to re-evaluate what strategy to use
@@ -100,11 +118,28 @@
 
                     $('[data-admin]').slideToggle();
                 });
+
+                /**
+                 * Stop tracking the flyout menus and ensure the marginTop is reset for each
+                 */
+                 flyoutMenuList.forEach((flyoutMenu) => {
+                    intersectionObserver.unobserve(flyoutMenu);
+                    flyoutMenu.style.marginTop = `-${defaultMarginTop}px`;
+                });
+
             } else {
 
                 /* This is the flyout menu which should become available again
                  */
                 $('[data-admin-subnav-flyout]').removeAttr('style');
+
+                /**
+                 * Ensure the flyout menu is fully visible when active
+                 */
+                flyoutMenuList.forEach((flyoutMenu) => {
+                    intersectionObserver.observe(flyoutMenu);
+                });
+
             }
         }
     }
