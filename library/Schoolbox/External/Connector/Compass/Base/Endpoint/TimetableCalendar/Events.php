@@ -303,7 +303,7 @@ class Events implements IStrategy
          */
         $this->log->info(sprintf(
             'Fetching Timetable Events between %s and %s',
-            \Alaress_Date_Format::now()->addDays(-1 *self::PAST_THRESHOLD)->getDatabase(),
+            \Alaress_Date_Format::now()->addDays(-1 * self::PAST_THRESHOLD)->getDatabase(),
             \Alaress_Date_Format::now()->addDays(self::FUTURE_THRESHOLD)->getDatabase(),
         ));
 
