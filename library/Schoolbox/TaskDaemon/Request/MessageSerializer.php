@@ -20,9 +20,9 @@ class MessageSerializer
      * daemon.
      *
      * @param Message $message
-     * @return array
+     * @return string
      */
-    public function serialize(Message $message): array
+    public function serialize(Message $message): string
     {
         $return = [
             'instance' => [
@@ -50,6 +50,6 @@ class MessageSerializer
             ];
         }
 
-        return $return;
+        return json_encode($return);
     }
 }

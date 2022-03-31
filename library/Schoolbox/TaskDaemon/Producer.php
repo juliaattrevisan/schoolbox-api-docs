@@ -67,7 +67,7 @@ class Producer
     {
         $this->context->createProducer()->send(
             $this->context->createQueue($this->queueName),
-            $this->context->createMessage(json_encode($this->messageSerializer->serialize($message))),
+            $this->context->createMessage($this->messageSerializer->serialize($message)),
         );
     }
 }
