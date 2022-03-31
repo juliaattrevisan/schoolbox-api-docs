@@ -338,7 +338,7 @@ abstract class AbstractController extends BaseController
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
-            'RETURN_URL' => Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
+            'RETURN_URL' => Redirect::RETURN_URL . '=' . Redirect::encode(sprintf("/%s/$folderId", ($this->nodeType === 'myfile') ? 'my-files' : 'resources')),
             'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($file),
         ];
 

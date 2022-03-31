@@ -192,7 +192,7 @@ class NodeRenderer
             'NODE_FILE_NAME'   => Scrub::text($currentRecord['name']),
             'NODE_FILE_ICON'   => $currentRecord['icon'],
             'NODE_MIME_TYPE'   => $currentRecord['mime'],
-            'NODE_FILE_SIZE'   => $currentRecord['size']
+            'NODE_FILE_SIZE'   => $currentRecord['size'] ?? null
         ));
 
         $this->getPage()->parse('node_file_block', 'node_file', true);

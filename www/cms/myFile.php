@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 use Eportfolio\PageMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'cms/myFile.html');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
 $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
@@ -25,7 +31,7 @@ $zone->setAttachmentsLabel('')
      ->setModalTitle('Select file');
 
 // userId is always arg[1]
-$userId = $this->arg[1] ?: $_SESSION['id'];
+$userId = $this->arg[1] ?? $_SESSION['id'];
 
 $userMapper = new \Schoolbox\UserMapper();
 $user       = $userMapper->findById($userId);
@@ -42,8 +48,8 @@ $folderHandler = new MyFolder($userId);
 
 // create a new file
 if ($this->arg[0] == 'new') {
-    $myFolderId = $this->arg[2] ?: 0;
-    $publishComponent = $this->arg[3] ?: false;
+    $myFolderId = $this->arg[2] ?? 0;
+    $publishComponent = $this->arg[3] ?? false;
 
     if ($myFolderId == 0) {
         $parent = array('id' => 0);
@@ -61,7 +67,8 @@ if ($this->arg[0] == 'new') {
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
         "COMPONENT_INSTANCE_ID" => $publishComponent,
-        "USER_ID" => $userId
+        "USER_ID" => $userId,
+        'RETURN_URL' => $_GET['returnUrl'] ?? ''
     );
 
     $this->setVar($output);
@@ -78,7 +85,7 @@ if ($this->arg[0] == 'new') {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $user->formatName() . "'s Files",
-            'href' => "/cms/myFile/{$user->getId()}",
+            'href' => "/my-files",
             'class' => '',
         ],
         [
@@ -98,7 +105,7 @@ if ($this->arg[0] == 'new') {
 
     $zone->attachFiles(array($myFileId));
 
-    $ft = new FileType('', $file['mime_type']);
+    $ft = new FileType('', $file['mime_type'] ?? null);
 
     $this->setTitle('Modify File');
     $this->setVar('browse_row_block', '');
@@ -109,6 +116,7 @@ if ($this->arg[0] == 'new') {
         'DESCRIPTION' => Scrub::text($file['description']),
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $file['parent'],
+        'RETURN_URL' => $_GET['returnUrl'] ? \Schoolbox\Learning\Assessment\Redirect::decode($_GET['returnUrl']) : ''
     );
     $this->setVar($output);
 
@@ -124,7 +132,7 @@ if ($this->arg[0] == 'new') {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => $user->formatName() . "'s Files",
-            'href' => "/cms/myFile/{$user->getId()}",
+            'href' => "/my-files",
             'class' => '',
         ],
         [
@@ -212,35 +220,20 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
     /* Manufacture the necessary info
      */
     if (is_array($availablePages) && count($availablePages)) {
-        $allPageData = array();
-
         foreach ($availablePages as $currentPage) {
             /** @var Eportfolio\Page $ePage */
-            $ePage = $currentPage['page'];
-            $pageData = array(
-                'pageId' => $ePage->getPageId(),
-                'pageTitle' => $ePage->getPageTitle(),
-                'pageOwnerId' => $ePage->getOwner()->getId(),
+            $ePage    = $currentPage['page'];
+            $selected = $ePage->getPageId() == $targetPageId;
+            $page->setVar(
+                [
+                    'PUBLISHED'                  => $selected ? 'checked="checked"' : '',
+                    'PUBLISH_PAGE_PAGE_ID'       => $ePage->getPageId(),
+                    'PUBLISH_PAGE_PAGE_OWNER_ID' => $ePage->getOwner()->getId(),
+                    'PUBLISH_PAGE_PAGE_NAME'     => $ePage->getPageTitle(),
+                ]
             );
-            $allPageData[$pageData['pageId']] = $pageData;
-        }
 
-        if (is_array($allPageData) && count($allPageData)) {
-            foreach ($allPageData as $currentPageData) {
-                $selected = $currentPageData['pageId'] == $targetPageId;
-                $page->setVar(array(
-                    'PUBLISHED' => $selected ? 'checked="checked"' : '',
-                    'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
-                    'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
-                    'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
-                    'PUBLISH_PAGE_COMPONENT_INSTANCE_ID' => $currentPageData['componentInstanceId'],
-                    'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
-                ));
-
-                $page->parse('publish_page_block', 'publish_page', true);
-            }
-        } else {
-            $page->setVar('publish_page_block', '<p>You have no locations available for publishing.</p>');
+            $page->parse('publish_page_block', 'publish_page', true);
         }
     } else {
         $page->setVar('publish_page_block', '<p>You have no locations available for publishing.</p>');

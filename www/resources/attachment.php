@@ -26,9 +26,9 @@ $this->setFile(TEMPLATE_content, '/resources/attach-browser.html');
 $this->setBlock(TEMPLATE_content, 'source', 'source_block');
 $this->setBlock(TEMPLATE_content, 'source_panel', 'source_panel_block');
 
-$multi             = empty($_GET['multi']) ? false : !!($_GET['multi']);
+$multi             = !empty($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
-$defaultFolderId   = (int)$_GET['fid'];
+$defaultFolderId   = (int)($_GET['fid'] ?? 0);
 
 /* This is the first instance of two places where this is specified
  * The other is www/ajax/resources.php

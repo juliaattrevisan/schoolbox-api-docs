@@ -81,7 +81,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
             $this->setVar('TEXTBOX_CONTENT', '');
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                if (($this->getSitePage()->arg[2] == 'textbox') && ($this->getSitePage()->arg[4] == $instance_id)) {
+                if ((($this->getSitePage()->arg[2] ?? '') == 'textbox') && (($this->getSitePage()->arg[4] ?? '') == $instance_id)) {
                     $this->parse('has_modify_form_block', 'has_modify_form');
                 } else {
                     $this->parse('output_text_block', 'output_text');

@@ -69,7 +69,7 @@ if (is_numeric($_GET['id'])) {
         }
     }
 
-    $disposition = (!$file->getMimetype()->getInline() || $_GET['save'])
+    $disposition = (!$file->getMimetype()->getInline() || !empty($_GET['save']))
         ? PreSignedUrlService::DISPOSITION_ATTACHMENT
         : PreSignedUrlService::DISPOSITION_INLINE;
     $contentType    = ($file->getMime()) ?: 'application/octet-stream';
