@@ -29,6 +29,15 @@ export default {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * For when closing the modal needs to be temporarily disabled, 
+         * for example when an action is processing. 
+         */
+        isCloseDisabled: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data () {
@@ -71,8 +80,19 @@ export default {
             this.modal.foundation(
                 'reveal',
                 'open',
-                {close_on_background_click: this.closeOnBackgroundClick}
+                {close_on_background_click: this.closeOnBackgroundClick }
             );
+        },
+
+        /**
+         * To prevent the modal being closed when it should be disabled
+         * 
+         * @param { Event } select event
+         */
+        onCloseSelected (event) {
+            if (this.isCloseDisabled) {
+                event.stopImmediatePropagation();
+            }
         },
 
         /**
@@ -91,7 +111,7 @@ export default {
     <div :class="'reveal-modal ' + size" data-reveal aria-hidden="true" role="dialog" :id="elementId">
         <!-- @slot Reveal modal content goes into this slot -->
         <slot></slot>
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#215;</a>
     </div>
 </template>
 

@@ -169,7 +169,7 @@ export default {
 </script>
 
 <template>
-    <reveal-modal ref="modal" size="xlarge">
+    <reveal-modal ref="modal" size="xlarge" :close-on-background-click="false" :is-close-disabled="isProcessing">
         <Transition name="fade" mode="out-in">
             <div v-if="hasUpdated" class="new-values">
                 <div class="new-values__full-width">
