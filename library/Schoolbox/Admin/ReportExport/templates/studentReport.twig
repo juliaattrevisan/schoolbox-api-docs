@@ -189,7 +189,7 @@
                 {% set weightedMean = studentGrade.weightedMean %}
                 <div class="row row__subject-summary-result">
                     <div class="small-10 columns">
-                        <h3 class="heading__secondary">{{ folder.name }}</h3>
+                        <h3 class="heading__secondary">{{ folder.title }}</h3>
                     </div>
                     <div class="small-2 columns columns__subject-summary-result">
                         {% if showSummaryOverallGrade %}<h3
@@ -234,7 +234,7 @@
                 {% set weightedMean = studentGrade.weightedMean %}
                 <div class="row row__margin-bottom row__subject-start">
                     <div class="small-10 columns">
-                        <h2 class="heading__secondary heading__subject">{{ folder.name }}</h2>
+                        <h2 class="heading__secondary heading__subject">{{ folder.title }}</h2>
                         {% for teacher in folder.teachers %}
                             <div class="card compact">
                                 <img src="/portrait.php?id={{ teacher.id }}&size=square32"/>
@@ -242,13 +242,14 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <div class="small-2 columns columns__subject-result">
-                        {% if showClassOverallGrade %}<h3
-                                class="heading__tertiary text-center">{{ weightedMean ?? '' }}</h3>{% endif %}
-                    </div>
-                </div>
-                <div class="row row__margin-bottom">
-                    <div class="small-12 columns">...</div>
+                    {% if showClassOverallGrade and weightedMean %}
+                        <div class="small-2 columns columns__subject-result">
+                            <h3 class="heading__tertiary text-center">{{ weightedMean ?? '' }}</h3>
+                        </div>
+                    {% else %}
+                        <div class="small-2 columns">
+                        </div>
+                    {% endif %}
                 </div>
                 {% if (classAssessments[folder.id] ?? [])| length %}
                     {% for assessment in classAssessments[folder.id] %}
