@@ -81,7 +81,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
         $allAnswers = parent::getAnswersFromAnswerGroup($answerGroup);
         $question   = $this->questionHandler->getByID($answerGroup['question_id']);
         $config     = json_decode($question['config']);
-        if ($config->randomiseOptionOrder) {
+        if ($config->randomiseOptionOrder ?? false) {
             shuffle($allAnswers);
         }
         return $allAnswers;
@@ -196,7 +196,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
     {
         $options = json_decode($config);
 
-        if ($options->randomiseOptionOrder) {
+        if ($options->randomiseOptionOrder ?? false) {
             $page->setVar(array(
                 'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => 'checked="checked"'
             ));

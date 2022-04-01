@@ -25,6 +25,7 @@ $groupHandler = new Group();
 
 /* If a question was submitted
  */
+/** @var SitePage $this */
 if (!empty($_POST)) {
     $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
@@ -89,7 +90,7 @@ if (!empty($_POST)) {
         SitePage::localRedir('/assess/question/create/' . $section['section_id'] . $returnUrl);
     }
 } else {
-    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
+    $returnUrl = ($_GET[Redirect::RETURN_URL] ?? '') != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(51);
@@ -144,7 +145,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ASSESS_TITLE'          => Scrub::text($assess['title']),
         'RETURN_URL_NAME'       => Redirect::RETURN_URL,
-        'RETURN_URL'            => $_GET[Redirect::RETURN_URL],
+        'RETURN_URL'            => $_GET[Redirect::RETURN_URL] ?? '',
         'ASSESS_ASSESS_ID'      => $section['assess_id'],
         'ASSESS_KIND_LC'        => 'assess',
         'ASSESS_KIND'           => 'Quiz',
@@ -167,17 +168,18 @@ if (!empty($_POST)) {
 
     /* If a particular question type has been selected; otherwise ignore it
      */
-    if (is_numeric($this->arg[1])) {
-        $answerHandler = $factory->createAnswerModel($this->arg[1]);
+    $typeId = $this->arg[1] ?? null;
+    if (is_numeric($typeId)) {
+        $answerHandler = $factory->createAnswerModel($typeId);
     }
 
     foreach ($questionTypes as $currentQuestionType) {
-        if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
+        if (is_numeric($typeId) && ($typeId == $currentQuestionType['type_id'])) {
             $selected = 'selected=\'selected\'';
 
             /* Load answer template into answerOption block
              */
-            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html');
+            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($typeId) . '/create.html');
             $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
             /* Render existing answers, or clear if none
@@ -192,7 +194,7 @@ if (!empty($_POST)) {
              * block if there are configuration options available
              */
             if ($currentQuestionType['has_config'] == 'true') {
-                $this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html');
+                $this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($typeId) . '/configuration.html');
                 $this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
 
                 $answerHandler->configure($this, json_encode(array()));
@@ -223,23 +225,21 @@ if (!empty($_POST)) {
 
     /* If a particular question type has been selected; otherwise ignore it
      */
-    if (is_numeric($this->arg[1])) {
+    if (is_numeric($typeId)) {
         $this->setVar(array(
             'IMPORT_SELECTED' => '',
             'DISABLED_SELECTED' => '',
         ));
 
         $this->parse('type_selected_block', 'type_selected');
-    } else if ($this->arg[1] == 'import') {
+    } else if ($typeId == 'import') {
         $this->setVar(array(
             'IMPORT_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => ''
         ));
     } else {
         $this->setVar(array(
             'IMPORT_SELECTED' => '',
             'DISABLED_SELECTED' => 'selected=\'selected\'',
-            'ANSWER_INPUTS' => $answerTemplate,
             'SUBMIT_DISABLED' => 'disabled="disabled"'
         ));
     }
@@ -268,7 +268,7 @@ if (!empty($_POST)) {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL] ?? '');
 
     // sprinkle some crumbs on top
     $crumbs = array_merge($crumbs, [

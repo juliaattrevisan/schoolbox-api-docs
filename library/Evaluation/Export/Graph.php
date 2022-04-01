@@ -118,6 +118,7 @@ class Evaluation_Export_Graph
 
             /* Load answer template into answerOption block
              */
+            /** @var array|string $currentResponse */
             $currentResponse = $answerHandler->exportResponseToArray($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
             if (is_array($currentResponse)) {
@@ -132,16 +133,20 @@ class Evaluation_Export_Graph
                         $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['text'] = $answerText;
                     }
 
+                    if (!isset($this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values'])) {
+                        $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values'] = 0;
+                    }
                     $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values']++;
                 }
-            }
-
+            } elseif ($currentResponse) {
             /* Inconcatenatable non-summarisable data (short answer) which only
              * need to be collated into a giant list
              *
              * Also prevent non-responses from being legendised
              */
-            else if ($currentResponse) {
+                if (!isset($this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values'])) {
+                    $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values'] = 0;
+                }
                 $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values']++;
             }
         }
@@ -172,7 +177,7 @@ class Evaluation_Export_Graph
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
                         $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
-                        $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description;
+                        $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description ?? '';
                     }
                 }
             }

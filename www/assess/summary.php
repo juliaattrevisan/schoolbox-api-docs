@@ -67,7 +67,7 @@ if ($assess['finish']) {
     $assessFinishDate = new Alaress_Date_NullDate();
 }
 
-$returnUrl = $_GET[Redirect::RETURN_URL]
+$returnUrl = ($_GET[Redirect::RETURN_URL] ?? '')
     ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}"
     : '';
 
@@ -84,7 +84,7 @@ $this->setVar(array(
     'ASSESS_DESCRIPTION'   => Scrub::html($assess['description']),
     'ASSESS_START'         => $assessStartDate->getShort(),
     'ASSESS_FINISH'        => $assessFinishDate->getShort(),
-    'FIRST_SECTION'        => $allSections[0]['section_id'],
+    'FIRST_SECTION'        => $allSections[0]['section_id'] ?? null,
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'ASSESSMENT_ID'        => $assess['assessment_id'],
@@ -133,7 +133,7 @@ if ($assessment->isImplementation()) {
 $trail = new \Schoolbox\Breadcrumbs();
 
 // get a crunchy biscuit base
-$crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
+$crumbs = $trail->getFolderCrumbs($folder, ($_GET[Redirect::RETURN_URL] ?? ''));
 
 if ($assessment->getContext() instanceof Project) {
     $crumbs = array_merge($crumbs, [

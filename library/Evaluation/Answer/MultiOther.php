@@ -249,7 +249,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                     'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE'        => $currentAnswer->value,
                     'ANSWER_DESCRIPTION'  => Scrub::text($currentAnswer->description),
-                    'ANSWER_DATA_ROLE'    => ($currentAnswer->isOther ? 'data-role="other-checkbox"' : ''),
+                    'ANSWER_DATA_ROLE'    => (($currentAnswer->isOther ?? false) ? 'data-role="other-checkbox"' : ''),
                 ));
 
                 if ($existingAnswer) {
@@ -517,7 +517,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
             ));
 
             foreach ($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
+                if ($currentAnswer->correct ?? false) {
                     $page->setVar(array(
                         'ACTUAL_CORRECT_VALUE' => 'correct-answer'
                     ));
