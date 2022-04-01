@@ -71,7 +71,7 @@ if (Config::get('mail_enable') == 1) {
     $replyToEmailAddresses = [];
 
     foreach ($addressLists as $type => $request) {
-        if (null !== $_REQUEST[$type]) {
+        if (null !== ($_REQUEST[$type] ?? null)) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type]);
 
             /* Remember some invalid emails, if any were found
@@ -97,7 +97,7 @@ if (Config::get('mail_enable') == 1) {
                     }
                 }
             }
-        } elseif (!$buildEmailFromId && null === $_REQUEST[$type] && $type === 'bcc') {
+        } elseif (!$buildEmailFromId && null === ($_REQUEST[$type] ?? null) && $type === 'bcc') {
             /* For the CC and BCC fields, if an email address was already in To field,
              * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
              * by the system rather than the human
@@ -138,7 +138,7 @@ if (Config::get('mail_enable') == 1) {
     }
 
     $output = array(
-        'SUBJECT' => $_REQUEST['subject'] ? Scrub::text($_REQUEST['subject']) : '',
+        'SUBJECT' => ($_REQUEST['subject'] ?? false) ? Scrub::text($_REQUEST['subject']) : '',
         'BODY'    => '',
         'REPLYTO' => json_encode($addressLists['replyto']),
         'CC'      => json_encode($addressLists['cc']),

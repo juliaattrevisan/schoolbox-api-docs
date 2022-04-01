@@ -32,7 +32,7 @@ if (!($user->isSuperuser())) {
 $componentInstanceMapper       = Component_InstanceMapper::getInstance();
 $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-if ($_POST['type'] == 'components') {
+if (($_POST['type'] ?? '') == 'components') {
     // AJAX request for drag and drop of components
     $columns = array(
         'left'  => $_POST['column1'],
@@ -76,7 +76,7 @@ if ($_POST['type'] == 'components') {
         $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
         $page->outputPage(true);
     }
-} elseif (is_numeric($_POST['delete'])) {
+} elseif (is_numeric($_POST['delete'] ?? false)) {
     // AJAX request to delete component from homepage
     // locate the instance, locate its config instances, then blast them away
     try {
@@ -89,7 +89,7 @@ if ($_POST['type'] == 'components') {
         $componentInstanceMapper->delete($instance);
     } catch (Schoolbox\Mapper\Exception $e) {
     }
-} elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
+} elseif (is_numeric($_POST['cid'] ?? null) && (is_numeric($_POST['add'] ?? null) || is_numeric($_POST['reload'] ?? null))) {
     // POST new component to page and output render of component
     if (is_numeric($_POST['add'])) {
         $componentDefinitionId = (int)$_POST['add'];

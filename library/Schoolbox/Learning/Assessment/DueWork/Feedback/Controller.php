@@ -200,7 +200,7 @@ class Controller extends Base
         $factory = new \Schoolbox\Assessment\Rubric\MarkedGrid\Factory();
 
         // Did we just give some rubric marks? Save them
-        if (\is_array($post['rubric'])) {
+        if (\is_array($post['rubric'] ?? null)) {
             $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback),
                 $post['rubric']
@@ -306,11 +306,11 @@ class Controller extends Base
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
-            $postVars['mark'],
+            $postVars['mark'] ?? null,
             (bool)($postVars['resubmissionRequired'] ?? false),
-            $postVars['comment'],
-            $postVars['publish'],
-            $postVars['attachment'],
+            $postVars['comment'] ?? '',
+            $postVars['publish'] ?? null,
+            $postVars['attachment'] ?? null,
             $fromInlineGrader,
             $reviewRoute,
             $mostRecentFeedback,

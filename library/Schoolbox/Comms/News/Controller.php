@@ -571,7 +571,7 @@ class Controller extends Base
          * Even when you copy/paste a link to someone in email or instant messenger,
          * and they visit it from that place, "we" decided to  consider them as a conversion.
          */
-        $referrer = $this->getRequest()->query[Querystring::REFERRER];
+        $referrer = $this->request->query->get(Querystring::REFERRER);
 
         /* Record this Conversion/Open
          * referrer value determines what kind it was
@@ -1001,7 +1001,7 @@ class Controller extends Base
             $pageTitle = $details['label'];
         }
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->request->query->get('page'));
 
         $data = array_merge($data, $sidebar->generate());
 

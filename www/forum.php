@@ -6,6 +6,7 @@ use Schoolbox\Permission\Access\UserAccess;
 $forumHandler = new Forum();
 $groupHandler = new Group();
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'forum/forum.html');
 $this->setBlock(TEMPLATE_content, 'thread', 'thread_block');
 $this->setBlock('thread', 'last_post', 'last_post_block');
@@ -25,7 +26,7 @@ $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 
 // category exists
-if (is_numeric($this->arg[0])) {
+if (is_numeric($this->arg[0] ?? null)) {
     $categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
@@ -86,7 +87,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 /* output pagination */
 
 $threadList = $forumHandler->getThreadList($category->getId());
-$pageNum = $this->arg[1];
+$pageNum = $this->arg[1] ?? 1;
 
 if (!$pageNum) {
     $pageNum = 1;

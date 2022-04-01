@@ -281,6 +281,7 @@ class Full
         /* Only grab unique Floating Feedbacks that match the filter
          */
         if ($isFeedbackVisible) {
+            /** @var DueWork\Feedback\Model $currentFeedback */
             foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
                 if (
                     !\in_array($currentFeedback->getId(), $processedFeedback, true)
@@ -288,7 +289,7 @@ class Full
                 ) {
                     // Adding Kami documents for visibility.
                     // TODO: This needs to be reconsidered once the core solution for SA-6464 is provided.
-                    if ($currentResponse instanceof DueWork\Response\Model) {
+                    if (isset($currentResponse)) {
                         foreach ($currentResponse->getAllFiles() as $currentFile) {
                             // If the status is other than "done", nobody has viewed it online.
                             if ($currentFile->getKami() && $currentFile->getKami()->isStatusDone()) {

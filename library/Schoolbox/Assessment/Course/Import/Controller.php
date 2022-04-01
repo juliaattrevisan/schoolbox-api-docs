@@ -685,7 +685,7 @@ class Controller extends Base\Base
                 $folderId = $folderCrumb->getId();
 
                 // Have we seen this folder before?
-                if ($folderCache[$folderId] instanceof Folder\Model) {
+                if (($folderCache[$folderId] ?? null) instanceof Folder\Model) {
                     break;
                 }
                 // Add to cache
@@ -716,7 +716,7 @@ class Controller extends Base\Base
                 if (!$parent instanceof Folder\Model) {
                     break;
                 }
-                $parent = $folderCache[$parent->getParent()->getId()];
+                $parent = $folderCache[$parent->getParent()->getId()] ?? null;
             }
             $folderAncestry[$courseImplId] = array_reverse($folderAncestry[$courseImplId]);
         }
