@@ -43,7 +43,7 @@ Data:
 </script>
 
 <div class="small-12 columns">
-    {% for timetable in campusTimetables %}
+    {% for timetable in campusTimetables | filter (timetable => (timetable.periods|length) > 0) %}
         {% set countPeriods = timetable.periods|length %}
         {% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(0, 'floor') %}
     <div data-timetable-container>
