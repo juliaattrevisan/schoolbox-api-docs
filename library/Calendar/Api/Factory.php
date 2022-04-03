@@ -159,29 +159,36 @@ class Calendar_Api_Factory
          */
         $sudsTimetableConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class);
 
-        $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
-            $sudsTimetableConfig->getId(),
-            $user,
-            $viewer,
-            \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-            \Schoolbox\External\ClassEntryMapper::getInstance(),
-            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-            \Schoolbox\External\Event\Mapper ::getInstance(),
-            \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-            \Schoolbox\UserMapper::getInstance()
-        ));
+        if ($sudsTimetableConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                $sudsTimetableConfig->getId(),
+                $user,
+                $viewer,
+                $folder->getCodes(),
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Timetable_ColourMapper::getInstance()
+            ));
+        }
 
         $sudsEventConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class);
 
-        $composite->add(new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
-            $sudsEventConfig->getId(),
-            $user,
-            $viewer,
-            \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-            \Schoolbox\External\Event\Mapper ::getInstance(),
-            \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-            \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
-        ));
+        if ($sudsEventConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
+                $sudsEventConfig->getId(),
+                $user,
+                $viewer,
+                $folder->getCodes(),
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance()
+            ));
+        }
 
         return $composite;
     }
@@ -275,18 +282,21 @@ class Calendar_Api_Factory
                     $connectorId,
                     $user,
                     $viewer,
+                    null,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\ClassEntryMapper::getInstance(),
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
-                    \Schoolbox\UserMapper::getInstance()
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance()
                 );
             case Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class:
                 return new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(
                     $connectorId,
                     $user,
                     $viewer,
+                    null,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper ::getInstance(),

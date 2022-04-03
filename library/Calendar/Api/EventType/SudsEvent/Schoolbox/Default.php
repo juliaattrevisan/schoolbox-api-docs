@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
@@ -37,12 +38,19 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
 
     /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $folderCodes;
+
+
+    /**
      * @inheritdoc
      */
     public function __construct(
         int $connectorId,
         User $user,
         User $viewer,
+        ?GenericCollection $folderCodes,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
@@ -50,6 +58,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
+        $this->folderCodes = $folderCodes;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
@@ -94,7 +103,12 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $this->eventMapper,
             $this->campusMapper,
             $this->roletypeMapper
-        ))->findForUser($this->getUser(), $startTimestamp, $endTimestamp);
+        ))->findForUser(
+            $this->getUser(),
+            $startTimestamp,
+            $endTimestamp,
+            $this->folderCodes ?? null
+        );
 
         /** @var \Schoolbox\External\Event\Model $event */
         foreach ($events as $event) {
