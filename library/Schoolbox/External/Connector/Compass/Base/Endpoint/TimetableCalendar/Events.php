@@ -50,7 +50,7 @@ class Events implements IStrategy
      *
      * Defaults to 6 months but we can tune that later.
      */
-    private const FUTURE_THRESHOLD = 30 * 1;
+    private const FUTURE_THRESHOLD = 30 * 12;
 
 
     /**
@@ -298,6 +298,14 @@ class Events implements IStrategy
         $numRelationships = 0;
 
         $this->log->info('Fetching Staff Lookup, Academic Groups, Enrolments, Schedules and their Activity Instances...');
+
+        /* Announce window
+         */
+        $this->log->info(sprintf(
+            'Fetching Timetable Events between %s and %s',
+            \Alaress_Date_Format::now()->addDays(-1 * self::PAST_THRESHOLD)->getDatabase(),
+            \Alaress_Date_Format::now()->addDays(self::FUTURE_THRESHOLD)->getDatabase(),
+        ));
 
         /* Generate a list of staff members
          */
