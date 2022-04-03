@@ -1,0 +1,283 @@
+<style>
+    /* chromeFoundation */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    .small-12 {
+        width: 98%;
+    }
+
+    .small-10 {
+        width: 75%;
+    }
+
+    .small-2 {
+        width: 15%;
+    }
+
+    .island .content {
+        padding: 0.75rem;
+    }
+
+    .island section {
+        margin-bottom: 16px;
+    }
+
+    .row {
+        max-width: none;
+    }
+
+    .row:after {
+        clear: both;
+    }
+
+    .row:before, .row:after {
+        content: " ";
+        display: table;
+    }
+
+    .card {
+        float: left;
+        position: relative;
+        padding: 0.5rem 1rem 0 1rem;
+    }
+
+    .card.compact {
+        min-height: 2.5rem;
+        padding: 0 1rem;
+    }
+
+    .card.compact > * {
+        align-items: center;
+        display: flex;
+    }
+
+    .card h2 {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .card img, .card .img {
+        width: 4rem;
+    }
+
+    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
+        float: left;
+        margin: -0.5rem 1rem 0 -1rem;
+    }
+
+    img {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .columns {
+        position: relative;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        float: left;
+    }
+
+    .columns + .columns:last-child {
+        float: left;
+    }
+
+    .text-center, .card.compact [class*=icon-] {
+        text-align: center !important;
+    }
+
+    /* report */
+    .row__margin-bottom {
+        margin-bottom: 2rem;
+    }
+
+    .row__subject-summary-result,
+    .row__subject-summary-details {
+        border: 1px solid black;
+        margin-top: -1px; /*to avoid 2px borders */
+        padding: 1rem 0;
+    }
+
+    .row__subject-summary-details {
+        padding: 1rem 0.5rem;
+    }
+
+    .row__subject-summary-details .columns,
+    .row__subject-detail .columns {
+        margin-bottom: 0.5rem;
+    }
+
+    .row__subject-start {
+        margin-top: 2rem;
+    }
+
+    .columns__subject-summary-result {
+        border-left: 1px solid black;
+    }
+
+    .columns__subject-result {
+        border: 2px solid black;
+        padding: 1rem 0;
+    }
+
+    .heading__primary, .heading__secondary, .heading__tertiary {
+        margin: 0;
+    }
+
+    .heading__primary {
+        font-size: 2rem;
+    }
+
+    .heading__secondary {
+        font-size: 1.4rem;
+    }
+
+    .heading__tertiary {
+        font-size: 1.2rem;
+    }
+
+    .heading__subject {
+        margin-bottom: 1rem;
+    }
+
+    @page {
+        counter-increment: page;
+        size: A4 portrait; /* try and enforce portrait orientation */
+        margin: 0.1in ! default; /* stretch out the left/right margins further */
+        @bottom-right {
+            content: 'Page ' counter(page) ' / ' counter(pages);
+        }
+    }
+
+    @media print {
+        .content, .island {
+            padding: 0; /* to get more of the page real estate */
+        }
+
+        .row__subject-start {
+            page-break-before: always; /* ensure each individual subject goes on new page */
+        }
+
+        #footer {
+            display: none;
+        }
+    }
+</style>
+<div class="small-12 island">
+    <section class="content">
+        <div class="row row__margin-bottom">
+            <h1 class="heading__primary">{{ config.school_name }}</h1>
+        </div>
+        <div class="row row__margin-bottom">
+            <div class="card small-12">
+                <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}"/>
+                <h2 class="heading__secondary">{{ student.fullname }}</h2>
+                <h3 class="heading__tertiary">{{ student.year.name ?? '' }}</h3>
+            </div>
+        </div>
+        {# Summary #}
+        {% if showSummary %}
+            {% for folder in folders %}
+                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+                {% set weightedMean = studentGrade.weightedMean %}
+                <div class="row row__subject-summary-result">
+                    <div class="small-10 columns">
+                        <h3 class="heading__secondary">{{ folder.title }}</h3>
+                    </div>
+                    <div class="small-2 columns columns__subject-summary-result">
+                        {% if showSummaryOverallGrade %}<h3
+                                class="heading__secondary text-center">{{ weightedMean ?? '' }}</h3>{% endif %}
+                    </div>
+                </div>
+                {% if (summaryAssessments[folder.id] ?? [])| length %}
+                    {% for assessment in summaryAssessments[folder.id] %}
+                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+                        <div class="row row__subject-summary-details">
+                            <div class="small-10 columns">
+                                <h3 class="heading__tertiary">{{ assessment.title }}</h3>
+                            </div>
+                            <div class="small-2 columns">
+                                {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                    {% set grade = assessment.humanReadableMark(participant, true) %}
+                                    {% if showSummaryGrades and grade %}
+                                        <h3 class="heading__tertiary text-center">{{ grade }}</h3>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+                                {% if showSummaryComments and feedback and feedback.comment %}
+                                    <div class="small-12 columns">
+                                        <p>{{ feedback.comment | linkify | nl2br }}</p>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {# Class #}
+        {% if showClass %}
+            <div class="row row__margin-bottom">
+                <div class="small-12 columns"></div>
+            </div>
+            {% for folder in folders %}
+                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+                {% set weightedMean = studentGrade.weightedMean %}
+                <div class="row row__margin-bottom row__subject-start">
+                    <div class="small-10 columns">
+                        <h2 class="heading__secondary heading__subject">{{ folder.title }}</h2>
+                        {% for teacher in folder.teachers %}
+                            <div class="card compact">
+                                <img src="/portrait.php?id={{ teacher.id }}&size=square32"/>
+                                <h2 class="heading__tertiary">{{ teacher.fullname }}</h2>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if showClassOverallGrade and weightedMean %}
+                        <div class="small-2 columns columns__subject-result">
+                            <h3 class="heading__tertiary text-center">{{ weightedMean ?? '' }}</h3>
+                        </div>
+                    {% else %}
+                        <div class="small-2 columns">
+                        </div>
+                    {% endif %}
+                </div>
+                {% if (classAssessments[folder.id] ?? [])| length %}
+                    {% for assessment in classAssessments[folder.id] %}
+                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+                        <div class="row row__subject-detail">
+                            <div class="small-10 columns">
+                                <h3 class="heading__tertiary">{{ assessment.title }}</h3>
+                            </div>
+                            <div class="small-2 columns">
+                                {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                    {% set grade = assessment.humanReadableMark(participant, true) %}
+                                    {% if showClassGrades and grade %}
+                                        <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+                                {% if showClassComments and feedback and feedback.comment %}
+                                    <div class="small-12 columns">
+                                        <p>{{ feedback.comment | linkify | nl2br }}</p>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </section>
+</div>
