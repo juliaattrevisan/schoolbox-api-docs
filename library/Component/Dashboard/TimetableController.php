@@ -314,7 +314,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 continue;
             }
 
-            $timetableContexts[] = $this->buildTimetableContext($campusList, $campusId, $timetable, $now);
+            $timetableContext = $this->buildTimetableContext($campusList, $campusId, $timetable, $now);
+            if (empty($timetableContext['periods'])) {
+                continue;
+            }
+            $timetableContexts[] = $timetableContext;
+        }
+
+        if (empty($timetableContexts)) {
+            return false;
         }
 
         return $this->renderTwigTemplate(
