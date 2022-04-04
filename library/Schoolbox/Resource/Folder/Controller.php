@@ -387,8 +387,8 @@ class Controller extends BaseController
         $post        = $this->getRequest()->post->getArrayCopy();
 
         /** No whitespace in the codes or year levels please **/
-        $classCodes = array_filter(array_map('trim', explode(',', $post['code'])));
-        $yearLevels = array_filter(array_map('trim', explode(',', $post['yearLevelIds'])));
+        $classCodes = array_filter(array_map('trim', explode(',', $post['code'] ?? '')));
+        $yearLevels = array_filter(array_map('trim', explode(',', $post['yearLevelIds'] ?? '')));
 
         try {
             $rolePermissions = $post['group'] ?? null;

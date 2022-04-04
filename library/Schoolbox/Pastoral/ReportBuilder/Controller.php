@@ -563,9 +563,9 @@ class Controller extends Base
 
         $pastoralReport->setOwner($this->getUser());
         $pastoralReport->setName($post['name']);
-        $pastoralReport->setDescription($post['description']);
+        $pastoralReport->setDescription($post['description'] ?? '');
         $pastoralReport->setOrderCsv($post['order']);
-        $pastoralReport->setInvolved($post['involved']);
+        $pastoralReport->setInvolved($post['involved'] ?? false);
 
         // Only save severity if it is enabled by policy
 
@@ -601,37 +601,37 @@ class Controller extends Base
             $pastoralReport->setTypesCsv('');
         }
 
-        if (is_array($post['subtypes'])) {
+        if (is_array($post['subtypes'] ?? false)) {
             $pastoralReport->setSubTypesCsv(implode(',', $post['subtypes']));
         } else {
             $pastoralReport->setSubTypesCsv('');
         }
 
-        if (is_array($post['authors'])) {
+        if (is_array($post['authors'] ?? false)) {
             $pastoralReport->setAuthorsCsv(implode(',', $post['authors']));
         } else {
             $pastoralReport->setAuthorsCsv('');
         }
 
-        if (is_array($post['students'])) {
+        if (is_array($post['students'] ?? false)) {
             $pastoralReport->setStudentsCsv(implode(',', $post['students']));
         } else {
             $pastoralReport->setStudentsCsv('');
         }
 
-        if (is_array($post['tags'])) {
+        if (is_array($post['tags'] ?? false)) {
             $pastoralReport->setTagsCsv(implode(',', $post['tags']));
         } else {
             $pastoralReport->setTagsCsv('');
         }
 
-        if (is_array($post['years'])) {
+        if (is_array($post['years'] ?? false)) {
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
         } else {
             $pastoralReport->setYearsCsv('');
         }
 
-        if (is_array($post['houses'])) {
+        if (is_array($post['houses'] ?? false)) {
             $pastoralReport->setHousesCsv(implode(',', $post['houses']));
         } else {
             $pastoralReport->setHousesCsv('');

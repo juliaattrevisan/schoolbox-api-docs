@@ -37,7 +37,7 @@ $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 
 /* thread exists
  */
-if (is_numeric($this->arg[0])) {
+if (is_numeric($this->arg[0] ?? false)) {
     try {
         $thread = $threadMapper->findById($this->arg[0]);
     } catch (Exception $e) {

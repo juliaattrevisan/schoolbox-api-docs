@@ -75,7 +75,7 @@ class Creational extends AbstractFactory
     {
 
         // if data contains an attachment
-        if (\is_array($data['attachment'])) {
+        if (\is_array($data['attachment'] ?? false)) {
             $factory = new CollectorFactory();
             try {
                 // posts (should) only have one attachment
@@ -129,7 +129,7 @@ class Creational extends AbstractFactory
                 $this->product = new \SocialStream_Post_Url();
                 $this->populate($data);
             }
-        } elseif ($_FILES['file']['size'] > 0) {
+        } elseif (($_FILES['file']['size'] ?? 0) > 0) {
             /* If upload option was chosen, extract metadata and thumbnail information
              * directly from already-known information (no curling needed)
              */

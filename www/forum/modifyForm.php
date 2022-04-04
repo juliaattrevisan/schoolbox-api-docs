@@ -17,7 +17,7 @@ $forumHandler = new Forum();
 $groupHandler = new Group();
 $access = Access::getInstance();
 
-if (is_numeric($_POST['categoryID'])) {
+if (is_numeric($_POST['categoryID'] ?? false)) {
     /* Category exists
      */
     try {
@@ -27,6 +27,7 @@ if (is_numeric($_POST['categoryID'])) {
     }
 
     // forum exists
+    /** @var \Schoolbox\Resource\Folder\Model $folder */
     if (!$forumHandler->hasForum($folder->getId())) {
         SitePage::localRedir('/homepage/' . $folder->getId());
     }
@@ -45,7 +46,6 @@ if (is_numeric($_POST['categoryID'])) {
      */
     if (is_numeric($_POST['postID'])) {
         try {
-            /** @var \Schoolbox\Forum\Post $post */
             $post = PostMapper::getInstance()->findById($_POST['postID']);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
@@ -56,12 +56,12 @@ if (is_numeric($_POST['categoryID'])) {
 
         /* check user owns post
          */
+        /** @var \Schoolbox\Forum\Post $post */
         if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
             error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         try {
-            /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -69,6 +69,7 @@ if (is_numeric($_POST['categoryID'])) {
 
         /* check locked
          */
+        /** @var \Schoolbox\Forum\Thread $thread */
         if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
             error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
@@ -100,7 +101,6 @@ if (is_numeric($_POST['categoryID'])) {
             ThreadMapper::getInstance()->save($thread);
         } else {
             try {
-                /** @var \Schoolbox\Forum\Thread $thread */
                 $thread = ThreadMapper::getInstance()->findById($_POST['threadID']);
             } catch (Exception $e) {
                 error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -108,6 +108,7 @@ if (is_numeric($_POST['categoryID'])) {
 
             /* check locked
              */
+            /** @var \Schoolbox\Forum\Thread $thread */
             if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
                 error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
@@ -136,11 +137,10 @@ if (is_numeric($_POST['categoryID'])) {
     }
 
     SitePage::localRedir('/forum/thread/' . $thread->getId() . '/' . $forumHandler->getPageNumber($post->getId()) . '/#' . $post->getId());
-} else if (is_numeric($_GET['toggleLock'])) {
+} elseif (is_numeric($_GET['toggleLock'] ?? false)) {
     /* thread exists
      */
     try {
-        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($_GET['toggleLock']);
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -148,6 +148,7 @@ if (is_numeric($_POST['categoryID'])) {
 
     /* forum exists
      */
+    /** @var \Schoolbox\Forum\Thread $thread */
     if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
         SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
     }
@@ -167,11 +168,10 @@ if (is_numeric($_POST['categoryID'])) {
     ThreadMapper::getInstance()->save($thread);
 
     $page->backToTheFuture(1);
-} else if (is_numeric($_GET['deleteThread'])) {
+} elseif (is_numeric($_GET['deleteThread'])) {
     /* thread exists
      */
     try {
-        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($_GET['deleteThread']);
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -179,6 +179,7 @@ if (is_numeric($_POST['categoryID'])) {
 
     /* forum exists
      */
+    /** @var \Schoolbox\Forum\Thread $thread */
     if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
         SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
     }
@@ -196,7 +197,7 @@ if (is_numeric($_POST['categoryID'])) {
     ThreadMapper::getInstance()->delete($thread);
 
     SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
-} else if (is_array($_POST['deleteThreads'])) {
+} elseif (is_array($_POST['deleteThreads'])) {
     foreach ($_POST['deleteThreads'] as $threadID) {
         /* thread exists
          */
@@ -222,17 +223,14 @@ if (is_numeric($_POST['categoryID'])) {
     }
 
     SitePage::localRedir('/forum/' . $categoryID);
-} else if (is_numeric($_GET['deletePost'])) {
+} elseif (is_numeric($_GET['deletePost'])) {
     /* post exists
      */
     try {
-        /** @var \Schoolbox\Forum\Post $post */
         $post   = PostMapper::getInstance()->findById($_GET['deletePost']);
 
-        /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
 
-        /** @var \Schoolbox\Forum\Thread earliest $earliestPost */
         $earliestPost  = PostMapper::getInstance()->findFirstPost($post->getThread()->getId());
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
@@ -241,7 +239,9 @@ if (is_numeric($_POST['categoryID'])) {
 
     /* check permissions
      */
+    /** @var \Schoolbox\Forum\Thread $thread */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
+    /** @var \Schoolbox\Forum\Post $post */
     if ($accessLevel < UserAccess::ACCESS_WRITE && $post->getOwner()->getId() !== $_SESSION['user']->getId()) {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
@@ -257,6 +257,7 @@ if (is_numeric($_POST['categoryID'])) {
 
     $pageNumber = $forumHandler->getPageNumber($post->getId());
 
+    /** @var \Schoolbox\Forum\Thread $earliestPost */
     if ($earliestPost->getId() !== $post->getId()) {
         PostMapper::getInstance()->delete($post);
     } else {

@@ -32,7 +32,7 @@ $postMapper = PostMapper::getInstance();
 
 /* Delete a post
  */
-if (is_numeric($_GET['delete'])) {
+if (is_numeric($_GET['delete'] ?? false)) {
     /* Softdelete the post and the entire thread
      */
     try {

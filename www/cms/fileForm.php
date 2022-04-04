@@ -178,7 +178,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
         }
 
         /* For some reason this is necessary for upload indication to reach completed status */
-        if ($_POST['uploadifydie'] == true) {
+        if (($_POST['uploadifydie'] ?? false) == true) {
             exit(true);
         }
 

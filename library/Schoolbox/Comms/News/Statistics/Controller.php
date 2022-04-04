@@ -117,7 +117,7 @@ class Controller extends Base
             /* Scale selector
              */
             'scaleOptions' => News\Statistics\Scale\Factory::SCALE_OPTIONS,
-            'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query['scale']),
+            'scale' => News\Statistics\Scale\Factory::assertScale($this->getRequest()->query->get('scale')),
 
             /* Historical Dailies
              * Temporarily disabled
