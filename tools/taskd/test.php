@@ -26,6 +26,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
+
+        // TODO this should be a system user, instead of an admin
         $adminUser      = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
         $userSerializer = new ModelToArray();
         $message        = $messageFactory->build(
@@ -37,8 +39,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
             ],
             (new Factory($this->getConfig()))
                 ->buildFullyQualified()
-                ->setPath('/notify/')
-                ->setQuery(['userId' => $adminUser->getId()])
+                ->setPath(sprintf('/api/user/%d/notify', $adminUser->getId()))
                 ->toString(),
             $adminUser,
         );

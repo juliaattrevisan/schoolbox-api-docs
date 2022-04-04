@@ -31,5 +31,7 @@ class API extends ModuleLoader
         $this->loadModule($kernel, Schoolbox\APIGroup\Module::class, '/api/user');
 
         $this->loadModule($kernel, Schoolbox\APIUser\Module::class, '/api/user');
+
+        $this->loadModule($kernel, Schoolbox\APIUser\Notify\Module::class, '/api/user');
     }
 }

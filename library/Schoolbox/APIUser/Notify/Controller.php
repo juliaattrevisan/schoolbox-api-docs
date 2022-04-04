@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @author      Justin Clarke <justin.clarke@schoolbox.com.au>
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\APIUser\Notify;
+
+use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
+use Alaress\Redis;
+use Alaress\Web\Controller\Base;
+use Monolog\Logger;
+use Schoolbox\Realtime\Alert\RedisPublisher;
+use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\User;
+
+class Controller extends Base
+{
+    /**
+     * Send a test notification to a user.
+     *
+     * @param User $user
+     * @return void
+     * @api POST /api/user/{userId}/notify
+     */
+    public function apiUserNotify(User $user): void
+    {
+//        $post = $this->getRequest()->post;
+
+        $userId = $user->getId();
+
+//        if (trim($post['body']) === '') {
+//            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+//        }
+
+        $bob = new NotificationInstanceBuilder();
+        $bob->setTitle('Hi')
+            ->setSeverity(Logger::INFO)
+            ->setNamespace(NSMapper::NS_MESSAGE)
+            ->setHref('#')
+            ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+            ->addTopic("notify.user.$userId")
+            ->putMeta('ttl', 30)
+            ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
+
+        (new RedisPublisher(
+            Redis::getStorageClientInstance(),
+            INSTANCE_ID,
+        ))->alertUser($userId, $bob->build());
+        // Output nothing
+    }
+}
