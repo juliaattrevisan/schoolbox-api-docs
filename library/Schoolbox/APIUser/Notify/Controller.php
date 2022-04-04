@@ -29,16 +29,18 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
+        $data   = json_decode(json_encode($this->request->content->get()), true);
         $userId = $user->getId();
         $bob    = new NotificationInstanceBuilder();
-        $bob->setTitle('Hi')
+        $bob->setTitle($data['message'] ?? '')
+            ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
             ->setHref('#')
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
-            ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
+            ->putMeta('title', 'Message from ' . $data['from']['fullName'] ?? 'Unknown User');
 
         (new RedisPublisher(
             Redis::getSignalQueueClientInstance(),
