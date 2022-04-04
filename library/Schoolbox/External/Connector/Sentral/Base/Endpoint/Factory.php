@@ -198,15 +198,15 @@ class Factory
         $to = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
 
         return (new GenericCollection(IStrategy::class))
-//            ->add(new Profile\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
+            ->add(new Profile\Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
@@ -218,15 +218,15 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-//            ->add(new Profile\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
