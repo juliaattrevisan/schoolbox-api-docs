@@ -275,11 +275,10 @@ class Evaluation_Export_Graph
                         }
                     }
                 }
-            }
-            /* With unmatched style and elan, gracefully remove sections which have no questions
-             * so they don't appear in the graph screen
-             */
-            else {
+            } else {
+                /* With unmatched style and elan, gracefully remove sections which have no questions
+                 * so they don't appear in the graph screen
+                 */
                 unset($this->sectionValues[$k]);
             }
         }
