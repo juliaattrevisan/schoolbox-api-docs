@@ -138,9 +138,16 @@ class EventUsers
             'classification' => Model::CLASSIFICATION_EVENT
         ], $campusParams, $roleParams);
 
-        /* Optionally filter by foldercodes
-         */
-        if ($folderCodes && $folderCodes->count()) {
+        $stack = $this->eventMapper->createCollection();
+
+        if (null === $folderCodes) {
+            /* $folderCodes was never set; you're looking for data via the main calendar
+             * No filtering required
+             */
+        } elseif ($folderCodes->count()) {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which do have a code should be filtered to that code specifically
+             */
             $pb = $this->eventMapper->getPredicateBuilder();
             $pb->in('se.code', $folderCodes->keys());
 
@@ -148,12 +155,15 @@ class EventUsers
             $params = array_merge($params, $pb->getParams());
 
             $query .= " AND {$where}";
+        } else {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which don't have a code should display nothing from this subscription
+             */
+            return $stack;
         }
 
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute($params);
-
-        $stack = $this->eventMapper->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $event = $this->eventMapper->hydrate($row, 'se');
