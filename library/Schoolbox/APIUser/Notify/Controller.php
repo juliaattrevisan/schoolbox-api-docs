@@ -43,7 +43,7 @@ class Controller extends Base
         (new RedisPublisher(
             Redis::getSignalQueueClientInstance(),
             INSTANCE_ID,
-        ))->alertUser($userId, $bob->build());
+        ))->pushUser($userId, $bob->build());
 
         // Output nothing
     }
