@@ -705,13 +705,20 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             SELECT COUNT({$this->table}.id)
             FROM {$this->getTable()}
             INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
-            AND cnau.entity_type = '" . Folder::getEntityType() . "' AND cnau.entity_value = " . $folderId . "
+            AND cnau.entity_type = :entity_type
+            AND cnau.entity_value = :entity_value
+            AND cnau.relationship = :relationship
             WHERE {$where} LIMIT 1
         ";
+        $folderParams = [
+            'entity_type'  => Folder::getEntityType(),
+            'entity_value' => $folderId,
+            'relationship' => \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF,
+        ];
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute($pb->getParams());
+        $statement->execute(array_merge($pb->getParams(), $folderParams));
 
         return (bool)$statement->fetch(PDO::FETCH_COLUMN);
     }
