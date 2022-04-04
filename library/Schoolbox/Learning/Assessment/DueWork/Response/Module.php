@@ -309,6 +309,13 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /* Historical Turnitin documents don't have any reports generated for them
+         * There's no link to that; just exit
+         */
+        if ($turnitinReport->getHistorical()) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         return [
             'assessment' => $assessment,
             'turnitin'  => $turnitinReport,

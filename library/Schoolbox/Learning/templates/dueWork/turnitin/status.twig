@@ -32,7 +32,10 @@
 
 {% if currentFile.turnitin %}
 <p class="meta">
-    {% if currentFile.turnitin.isComplete %}
+    {# Only provide links to turnitin reports which generated
+     # Historical Turnitin records won't have a report
+     #}
+    {% if currentFile.turnitin.isComplete and not currentFile.turnitin.historical %}
         {% set reportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getTurnitinReport', {
             assessmentId: assessment.id,
             assessment:   assessment,
