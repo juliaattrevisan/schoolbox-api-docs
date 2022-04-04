@@ -12,6 +12,8 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
+/** @var SitePage $this */
+
 $groupHandler  = new Group();
 $surveyHandler = new Survey_Main();
 
@@ -32,8 +34,8 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 if (!empty($_POST)) {
     /* Format date, time
      */
-    $start = Alaress_Date_Format::newLocal($_POST['start']['date']);
-    $finish = Alaress_Date_Format::newLocal($_POST['finish']['date']);
+    $start = Alaress_Date_Format::newLocal($_POST['start']['date'] ?? null);
+    $finish = Alaress_Date_Format::newLocal($_POST['finish']['date'] ?? null);
 
     /* Check for valid dates
      */
@@ -54,16 +56,16 @@ if (!empty($_POST)) {
     $surveyHandler->update(
         array(
             'assess_id'          => $this->arg[0],
-            'category_id'        => $_POST['category_id'],
-            'title'              => $_POST['title'],
-            'description'        => $_POST['description'],
+            'category_id'        => $_POST['category_id'] ?? null,
+            'title'              => $_POST['title'] ?? null,
+            'description'        => $_POST['description'] ?? null,
             'start'              => $start->getDatabase(),
             'finish'             => $finish->getDatabase(),
             'duration'           => Survey_Main::UNLIMITED_DURATION,
-            'anonymous_result'   => (int)$_POST['anonymous_result'],
-            'notify_author'      => (int)$_POST['notify_author'],
-            'max_attempts'       => $_POST['max_attempts'],
-            'completion_message' => $_POST['completion_message'],
+            'anonymous_result'   => (int)($_POST['anonymous_result'] ?? null),
+            'notify_author'      => (int)($_POST['notify_author'] ?? null),
+            'max_attempts'       => $_POST['max_attempts'] ?? null,
+            'completion_message' => $_POST['completion_message'] ?? null,
         )
     );
 
