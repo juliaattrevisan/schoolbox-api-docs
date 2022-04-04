@@ -414,7 +414,10 @@ abstract class Kernel
             'taskd.messageFactory',
             $di->lazyNew(
                 MessageFactory::class,
-                ['instance' => $di->lazyGet('instance')],
+                [
+                    'instance'     => $di->lazyGet('instance'),
+                    'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                ],
             )
         );
 

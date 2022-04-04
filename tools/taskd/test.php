@@ -40,6 +40,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
                 ->setPath('/notify/')
                 ->setQuery(['userId' => $adminUser->getId()])
                 ->toString(),
+            $adminUser,
         );
 
         $producer->send($message);
