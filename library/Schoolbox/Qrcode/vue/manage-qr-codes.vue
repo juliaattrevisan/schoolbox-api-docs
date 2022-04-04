@@ -346,7 +346,15 @@ export default {
 
 <style>
 
+@page {
+    size: A4 portrait; /* try and enforce portrait orientation */
+}
+
 @media print {
+
+    body, .manage-qrcodes {
+        background: white; /* ensure white background, may have been changed by custom styles */
+    }
 
     #container, .island {
         padding: 0; /* to get more of the page estate */
@@ -354,10 +362,6 @@ export default {
 
     .breadcrumb, h1, .bottom-drawer, #footer {
         display: none; /* not needed for print */
-    }
-
-    .manage-qrcodes {
-        background: white; /* ensure white background, may have been changed by custom styles */
     }
 
 }
