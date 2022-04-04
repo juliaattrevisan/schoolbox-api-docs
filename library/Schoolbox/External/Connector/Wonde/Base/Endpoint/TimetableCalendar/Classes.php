@@ -211,10 +211,20 @@ class Classes implements IStrategy
                         $event->getFinishAt()->getDatabase()
                     ));
                 } else {
+                    $room = null;
+
+                    /* Rooms are optional and come with two data points - name and code
+                     * Example wonde data had a meaningful name in the $code e.g. '3a HomeRoom'
+                     * and a less meaningful name in the $name e.g. '401'
+                     */
+                    if (is_array($lesson['room'])) {
+                        $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
+                    }
+
                     $event = $this->eventMapper->createModel()
                         ->setTitle($lesson['class']['data']['name'])
                         ->setDetail(null)
-                        ->setLocation(null)
+                        ->setLocation($room)
                         ->setCode($lesson['class']['data']['code'])
                         ->setDay($lesson['period']['data']['day'])
                         ->setPeriod($lesson['period']['data']['name'])
@@ -277,6 +287,30 @@ class Classes implements IStrategy
 
             new \Alaress_Probe($lessons);
         }
+
+
+        $nextUrl = sprintf(
+            'classes?'. implode('&', [
+                'page=%s',
+                'per_page=%s',
+                'has_students=%s',
+                'has_lessons=%s',
+                'include=%s'
+            ]),
+            1,
+            self::NUM_PER_PAGE,
+            true,
+            true,
+            implode(',', [
+                'students',
+                'subject'
+            ])
+        );
+
+        $classes = $this->api->retrieve('GET', $nextUrl, []);
+
+        new \Alaress_Probe($classes);
+
     }
 
 
