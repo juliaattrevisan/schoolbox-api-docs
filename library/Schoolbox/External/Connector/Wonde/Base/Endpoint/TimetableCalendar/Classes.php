@@ -27,14 +27,14 @@ class Classes implements IStrategy
     /**
      * Prevent infinite loop of api calls
      */
-    private const MAX_CALLS = 1;
+    private const MAX_CALLS = 100;
 
 
     /**
      * Number of records per page
      * The maximum is an unwritten 200 or so, apparently
      */
-    private const NUM_PER_PAGE = 10;
+    private const NUM_PER_PAGE = 200;
 
 
     /**
@@ -171,6 +171,12 @@ class Classes implements IStrategy
     {
         $this->log->info('Processing timetables.');
 
+        $this->log->debug('Preloading student involvements for all the classes.');
+
+        $studentInvolvements = $this->preloadStudentInvolvements();
+
+        $this->log->debug('Processing lessons.');
+
         $nextUrl = sprintf(
             'lessons?page=%s&per_page=%s&lessons_start_after=%s&lessons_start_before=%s&include=%s',
             1,
@@ -283,34 +289,41 @@ class Classes implements IStrategy
                 /* Save sis_class_user involvements
                  * This is the student(s)
                  */
+                $classCode = $lesson['class']['data']['code'];
+
+                /* No students involved in $classCode, I guess
+                 */
+                if (!isset($studentInvolvements[$classCode])) {
+                    $this->log->debug(sprintf(
+                        '%s: no students involved',
+                        $classCode
+                    ));
+
+                    continue;
+                }
+
+                $involvements = $studentInvolvements[$classCode];
+
+                $this->log->debug(sprintf(
+                    '%s: %s students involved',
+                    $classCode,
+                    \count($involvements)
+                ));
+
+                foreach ($involvements as $externalId => $name) {
+                    $this->saveInvolvement($event, $classEntry, $name, (string)$externalId);
+                }
             }
 
-            new \Alaress_Probe($lessons);
+            /* If there's a pagination struct, there's more data to come...
+             * But make sure that the 'next' element exists before trying to go there
+             */
+            $nextUrl = false;
+
+            if (isset($lessons['meta']['pagination'])) {
+                $nextUrl = $lessons['meta']['pagination']['next'] ?? false;
+            }
         }
-
-
-        $nextUrl = sprintf(
-            'classes?'. implode('&', [
-                'page=%s',
-                'per_page=%s',
-                'has_students=%s',
-                'has_lessons=%s',
-                'include=%s'
-            ]),
-            1,
-            self::NUM_PER_PAGE,
-            true,
-            true,
-            implode(',', [
-                'students',
-                'subject'
-            ])
-        );
-
-        $classes = $this->api->retrieve('GET', $nextUrl, []);
-
-        new \Alaress_Probe($classes);
-
     }
 
 
@@ -366,5 +379,78 @@ class Classes implements IStrategy
                 $event->getFinishAt()->getDatabase()
             ));
         }
+    }
+
+
+    /**
+     *
+     * FIXME Ask Colin - find a less-wonky way to do this. imho class['subject'] should
+     *  have a value, but doesn't, in the wonde test data (is their bug or valid data?)
+     *
+     * First dig out the Wonde class objects which is where the students live
+     * You can find it by the class name, because you don't get the subject identifier
+     * at the moment, for some reason - normally it lives in [class][data][subject]
+     * from what I can infer (it's just always blank)
+     *
+     * class_name is inconclusive - there are multiple class codes per class name
+     * so you end up having to sift multiple times through the same thing
+     * e.g. "Health and Physical Education 07" has four individual class codes
+     * associated with it - 07HPEDA 07HPEDB 07HPEDC 07HPEDD
+     *
+     * Anyway, since class_subject is often useless and class_name is inconclusive,
+     * just load everything into a set of (student external id, student fullname) tuples
+     *
+     * @return array
+     */
+    private function preloadStudentInvolvements(): array
+    {
+        $nextUrl = sprintf(
+            'classes?'. implode('&', [
+                'page=%s',
+                'per_page=%s',
+                'has_students=%s',
+                'has_lessons=%s',
+                'include=%s'
+            ]),
+            1,
+            self::NUM_PER_PAGE,
+            true,
+            true,
+            implode(',', [
+                'students',
+                'subject'
+            ])
+        );
+
+        $stack = [];
+
+        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
+            $classes = $this->api->retrieve('GET', $nextUrl, []);
+
+            foreach ($classes['data'] as $class) {
+                $classCode = $class['code'];
+
+                /* Build a big list of students involved with $classCode
+                 */
+                foreach ($class['students']['data'] as $student) {
+                    $stack[$classCode][(string)$student['mis_id']] = sprintf(
+                        '%s %s',
+                        $student['forename'],
+                        $student['surname']
+                    );
+                }
+            }
+
+            /* If there's a pagination struct, there's more data to come...
+             * But make sure that the 'next' element exists before trying to go there
+             */
+            $nextUrl = false;
+
+            if (isset($classes['meta']['pagination'])) {
+                $nextUrl = $classes['meta']['pagination']['next'] ?? false;
+            }
+        }
+
+        return $stack;
     }
 }
