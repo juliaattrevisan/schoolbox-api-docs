@@ -71,7 +71,7 @@
                 <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
             </nav>
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
-                <li><a href="{{ gradesRoute }}" class="icon-approve">Grades</a></li>
+                <li><a href="{{ gradesRoute }}" class="icon-approve">{{ locale.grades.properPlural }}</a></li>
             </ul>
         {% endif %}
         {% endblock %}
