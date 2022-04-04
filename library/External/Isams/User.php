@@ -268,7 +268,7 @@ class External_Isams_User implements External_UserInterface
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
                         V_Parent.ParentSurname        AS StudentContactSurname,
-                        V_Parent.PersonalEmail             AS StudentContactDefaultEmail,
+                        V_Parent.PersonalEmail        AS StudentContactDefaultEmail,
                         V_Parent.Mobile               AS StudentContactMobilePhone,
                         ''                            AS StudentContactOccupPhone,
                         ''                            AS StudentContactPhoneActual,
