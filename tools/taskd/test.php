@@ -49,57 +49,17 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
-        if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
-            $helpText = <<<HELP
-            Task daemon test harness
-
-            test.php --from=SENDER --to=RECIPIENT --msg=MESSAGE
-
-            -h, --help: Output this help message and exit
-            --from:     User which sends the message
-            --to:       User which receives the message.
-                        (Currently this test harness cannot send to the "%s" user.)
-            -m, --msg:  Message body
-
-            HELP;
-            printf($helpText, UserMapper::USERNAME_ALARESS_ADMIN);
-            exit;
-        }
-
-        $fromUserId     = $this->getOpt(self::OPT_LONG_FROM);
-        $toUserId       = $this->getOpt(self::OPT_LONG_TO);
-        $messageBody    = $this->getOpt(self::OPT_LONG_MESSAGE) ?? $this->getOpt(self::OPT_SHORT_MSG);
-        if (!isset($fromUserId, $toUserId, $messageBody)) {
-            fwrite(STDERR, "The following options must be provided: `--from`, `--to`, `-m|--msg`\m");
-            exit(1);
-        }
-
         // Get the taskd context, and send
         /** @var Producer $producer */
         $producer = $this->getDi()->get('taskd.messageProducer');
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
-
-        $userMapper = UserMapper::getInstance();
-        $fromUser   = $userMapper->findById($fromUserId);
-        $toUser     = $userMapper->findById($toUserId);
-
-        // TODO this should be a system user, instead of an admin
-        $adminUser      = $userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
-        $userSerializer = new ModelToArray();
         $message        = $messageFactory->build(
-            'notify',
-            [
-                'message'   => $messageBody,
-                'from'      => call_user_func($userSerializer, $fromUser),
-                'to'        => call_user_func($userSerializer, $toUser),
-            ],
-            (new Factory($this->getConfig()))
-                ->buildFullyQualified()
-                ->setPath(sprintf('/api/user/%d/notify', $toUserId))
-                ->toString(),
-            $adminUser,
+            'test',
+            [],
+            null,
+            null,
         );
 
         $producer->send($message);
