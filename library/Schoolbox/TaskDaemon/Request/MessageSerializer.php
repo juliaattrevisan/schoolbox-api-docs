@@ -35,9 +35,10 @@ class MessageSerializer
             ],
             'task'     => [
                 'type'     => $message->getTask(),
-                // Need to verify all params are scalar
-                'params'   => $message->getParams(),
-                'callback' => null,
+                // Need to verify all params are scalar,
+                // and that params are an object
+                'params'   => (object)$message->getParams(),
+                'callback' => (object)[],
             ],
             'timestamp' => $message->getTimestamp()->format(DateTimeInterface::RFC3339),
         ];
