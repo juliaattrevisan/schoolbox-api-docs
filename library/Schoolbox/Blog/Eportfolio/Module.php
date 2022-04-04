@@ -116,17 +116,17 @@ class Module extends BaseModule
     {
         $callback = function ($params, User $user) use ($method) {
             // Allow owner of either blog or comment to do stuff
-            if ($params['comment'] instanceof EportfolioBlogCommentModel) {
+            if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
                 if ($params['comment']->getOwner()->getId() == $user->getId()) {
                     return;
                 }
             }
-            if ($params['blog'] instanceof EportfolioBlogModel) {
+            if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
                 if ($params['blog']->getOwner()->getId() == $user->getId()) {
                     return;
                 }
             }
-            if ($params['page'] instanceof EportfolioPageModel) {
+            if (($params['page'] ?? null) instanceof EportfolioPageModel) {
                 $auth = new Eportfolio_Authenticator(
                     $user,
                     $params['page']->getOwner(),
