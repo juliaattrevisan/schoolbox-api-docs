@@ -210,7 +210,6 @@ class Classes implements IStrategy
                  */
                 if (isset($this->seen[$guid])) {
                     $event = $this->seen[$guid];
-                    $classEntry = $this->classEntries[$event->getCode()];
 
                     $this->log->debug(sprintf(
                         'Reusing previously seen timetable event %s - %s, %s, %s-%s',
@@ -231,6 +230,18 @@ class Classes implements IStrategy
                         $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
                     }
 
+                    /* Wonde gives you this data struct for dates
+
+                        [start_at] => Array
+                            (
+                                [date] => 2022-03-28 00:55:00.000000
+                                [timezone_type] => 3
+                                [timezone] => UTC
+                            )
+                    */
+                    $startAt = \Alaress_Date_Format::newDatabaseDate($lesson['start_at']['date'], new \DateTimeZone($lesson['start_at']['timezone']));
+                    $finishAt = \Alaress_Date_Format::newDatabaseDate($lesson['end_at']['date'], new \DateTimeZone($lesson['end_at']['timezone']));
+
                     $event = $this->eventMapper->createModel()
                         ->setTitle($lesson['class']['data']['name'])
                         ->setDetail(null)
@@ -238,8 +249,8 @@ class Classes implements IStrategy
                         ->setCode($lesson['class']['data']['code'])
                         ->setDay($lesson['period']['data']['day'])
                         ->setPeriod($lesson['period']['data']['name'])
-                        ->setStartAt(\Alaress_Date_Format::newDatabaseDate(explode('.', $lesson['start_at']['date'])[0], new \DateTimeZone($lesson['start_at']['timezone'])))
-                        ->setFinishAt(\Alaress_Date_Format::newDatabaseDate(explode('.', $lesson['end_at']['date'])[0], new \DateTimeZone($lesson['end_at']['timezone'])))
+                        ->setStartAt($startAt)
+                        ->setFinishAt($finishAt)
                         ->setType(null)
                         ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                         ->setGuid($lesson['id'])
