@@ -31,20 +31,28 @@ $zone->setAttachmentsLabel('')
      ->setModalTitle('Select file');
 
 // userId is always arg[1]
-$userId = $this->arg[1] ?? $_SESSION['id'];
-
-$userMapper = new \Schoolbox\UserMapper();
-$user       = $userMapper->findById($userId);
+$userMapper = \Schoolbox\UserMapper::getInstance();
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+if (is_numeric($this->arg[1] ?? false)) {
+    try {
+        $fileOwner = $userMapper->findById($this->arg[1]);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+    }
+} else {
+    $fileOwner = $sessionUser;
+}
 
 // PERMISSION: must be either session user, or staff
-$groupHandler = new Group();
-if (!($groupHandler->isStaff() || $userId == $_SESSION['id'])) {
+/** @var \Schoolbox\User $fileOwner */
+if (!($sessionUser->getRole()->isStaff() || $fileOwner->getId() === $sessionUser->getId())) {
     error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // instantiate handlers
-$fileHandler = new MyFile($userId);
-$folderHandler = new MyFolder($userId);
+$fileHandler = new MyFile($fileOwner->getId());
+$folderHandler = new MyFolder($fileOwner->getId());
 
 // create a new file
 if ($this->arg[0] == 'new') {
@@ -67,7 +75,7 @@ if ($this->arg[0] == 'new') {
         'MAX_FILE_SIZE' => Config::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
         "COMPONENT_INSTANCE_ID" => $publishComponent,
-        "USER_ID" => $userId,
+        "USER_ID" => $fileOwner->getId(),
         'RETURN_URL' => $_GET['returnUrl'] ?? ''
     );
 
@@ -77,14 +85,14 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $parent['id']);
-    renderPublishingOptions($this, $userId, true, $publishComponent);
+    renderPublishingOptions($this, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $user->formatName() . "'s Files",
+            'text' => $fileOwner->formatName() . "'s Files",
             'href' => "/my-files",
             'class' => '',
         ],
@@ -99,7 +107,7 @@ if ($this->arg[0] == 'new') {
     $myFileId = $this->arg[0];
 
     $file = $fileHandler->getByID($myFileId);
-    if (!is_array($file)) {
+    if (!is_array($file) || (int)$file['owner'] !== $fileOwner->getId()) {
         error(\Schoolbox\Error\Mapper::ERROR_FILE_NOT_FOUND);
     }
 
@@ -124,14 +132,14 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $file['parent']);
-    renderPublishingOptions($this, $userId, true);
+    renderPublishingOptions($this, $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $user->formatName() . "'s Files",
+            'text' => $fileOwner->formatName() . "'s Files",
             'href' => "/my-files",
             'class' => '',
         ],

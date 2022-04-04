@@ -27,7 +27,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         $componentInstanceMapper       = Component_InstanceMapper::getInstance();
         $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
-        if (is_array($_POST['colors'])) {
+        if (is_array($_POST['colors'] ?? false)) {
             // Update page colours and widths
 
             $color = [];
@@ -37,7 +37,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
 
             $eportfolioHandler->saveDisplayProperties($_POST['colors']);
-        } elseif ($_POST['type'] == 'components') {
+        } elseif (($_POST['type'] ?? '') == 'components') {
             // Drag and drop components
             $columns = [
                 'left'  => $_POST['column1'],
@@ -69,7 +69,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
 
             // Render the component just moved, so it can be re-rendered
-            if ($_POST['movedComponentId']) {
+            if ($_POST['movedComponentId'] ?? false) {
                 $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
                 if (is_object($instance)) {
                     $cClass = $instance->getDefinition()->getClass();
@@ -90,7 +90,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $component = $componentFactory->buildComponent($instance);
                 $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
             }
-        } elseif (is_numeric($_POST['delete'])) {
+        } elseif (is_numeric($_POST['delete'] ?? false)) {
             // Delete the instance and its configuration
 
             /** @var Component_Instance $instance */
@@ -102,7 +102,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
 
             $componentInstanceMapper->delete($instance);
-        } elseif (is_numeric($_POST['add']) || is_numeric($_POST['reload'])) {
+        } elseif (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload'] ?? false)) {
             // Add new component to page and output render of component
 
             if (is_numeric($_POST['add'])) {
@@ -207,7 +207,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             $renderer = new Component_Renderer();
             $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
-        } elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+        } elseif (is_numeric($_POST['leftColWidth'] ?? false) && is_numeric($_POST['rightColWidth'] ?? false)) {
             // Update column widths
 
             $eportfolioHandler->updateGrid(Scrub::text($_POST['leftColWidth']));

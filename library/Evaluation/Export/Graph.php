@@ -133,9 +133,7 @@ class Evaluation_Export_Graph
                         $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['text'] = $answerText;
                     }
 
-                    if (!isset($this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values'])) {
-                        $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values'] = 0;
-                    }
+                    $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values'] ??= 0;
                     $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$individualResponse]['values']++;
                 }
             } elseif ($currentResponse) {
@@ -144,9 +142,7 @@ class Evaluation_Export_Graph
              *
              * Also prevent non-responses from being legendised
              */
-                if (!isset($this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values'])) {
-                    $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values'] = 0;
-                }
+                $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values'] ??= 0;
                 $this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values']++;
             }
         }

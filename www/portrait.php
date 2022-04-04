@@ -44,13 +44,17 @@ if (!($_SESSION['user'] instanceof Schoolbox\User)) {
  */
 $userMapper = \Schoolbox\UserMapper::getInstance();
 
+$user = null;
 try {
     if (isset($_GET['id']) && (int)$_GET['id']) {
         $user = $userMapper->findById($_GET['id']);
-    } else {
+    } elseif (isset($_GET['userId'])) {
         $user = $userMapper->findByExternalId($_GET['userId']);
     }
 } catch (\Schoolbox\Mapper\Exception $e) {
+    // $user will be null
+}
+if (!$user) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
     exit;
 }
