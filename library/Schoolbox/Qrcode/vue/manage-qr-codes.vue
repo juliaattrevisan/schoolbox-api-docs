@@ -272,7 +272,7 @@ export default {
 
         <div v-else class="loader"></div>
 
-        <bottom-drawer :showDrawer="true" :is-always-anchored="false" :unanchor-width="1000" class="bottom-drawer">
+        <bottom-drawer :showDrawer="true" :is-always-anchored="false" :unanchor-width="760" class="bottom-drawer">
             <h3 class="selected-count"><em>{{ selectedStudentsStatus }}</em></h3>
             <button @click.prevent="onToggleStudentSelection" @keyup.enter="onToggleStudentSelection" class="button-toggle-selection">{{ toggleStudentSelectionStatus }}</button>
             <div class="options-list">
@@ -307,6 +307,9 @@ export default {
 
 .manage-qrcodes {
     padding-bottom: 190px; // allow space for bottom-drawer at the bottom
+    @media (max-width: 760px) { //as it will no longer be anchored below this point, we don't need the extra padding
+        padding-bottom: 1rem;
+    }
 }
 
 .selected-count {
@@ -337,7 +340,7 @@ export default {
 
     .options-list__option {
         flex: 1 1 0; //keep both sides equal
-        @media (max-width: 700px) { //move to two columns instead of four
+        @media (max-width: 760px) { //move to two columns instead of four
             flex: 1 0 35%; 
         }
         @media (max-width: 380px) { //and then to one column

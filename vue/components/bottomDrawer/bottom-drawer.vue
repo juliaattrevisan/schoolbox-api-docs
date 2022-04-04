@@ -24,7 +24,9 @@ export default {
             default: false,
         },
         /**
-         * To unanchor the drawer from the bottom of the browser on smaller widths when appropriate
+         * To unanchor the drawer from the bottom of the browser, usually on smaller widths.
+         * This is usually when there's multiple columns of content in the bottom-drawer, so it 
+         * takes up too much height on smaller devices to still be position: fixed
          */
         isAlwaysAnchored: {
             type: Boolean,
@@ -32,7 +34,7 @@ export default {
             default: true,
         },
         /**
-         * Width that the drawer will unanchor and sit in the page instead
+         * Width that the drawer will unanchor and sit position: static in the page instead
          */
         unanchorWidth: {
             type: Number,
