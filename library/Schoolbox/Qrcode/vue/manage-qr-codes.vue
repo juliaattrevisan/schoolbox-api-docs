@@ -272,7 +272,7 @@ export default {
 
         <div v-else class="loader"></div>
 
-        <bottom-drawer :showDrawer="true" class="bottom-drawer">
+        <bottom-drawer :showDrawer="true" :is-always-anchored="false" :unanchor-width="1000" class="bottom-drawer">
             <h3 class="selected-count"><em>{{ selectedStudentsStatus }}</em></h3>
             <button @click.prevent="onToggleStudentSelection" @keyup.enter="onToggleStudentSelection" class="button-toggle-selection">{{ toggleStudentSelectionStatus }}</button>
             <div class="options-list">
@@ -325,6 +325,7 @@ export default {
 .options-list {
     align-items: flex-end; //so the selects and buttons line up at the bottom
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem; //@todo consider safari 14
     select, button {
         margin-bottom: 0;
@@ -336,6 +337,12 @@ export default {
 
     .options-list__option {
         flex: 1 1 0; //keep both sides equal
+        @media (max-width: 700px) {
+            flex: 1 0 35%;
+        }
+        @media (max-width: 380px) {
+            flex: 1 0 100%;
+        }
     }
 
 .students {

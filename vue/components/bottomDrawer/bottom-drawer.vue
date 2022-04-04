@@ -22,13 +22,30 @@ export default {
             type: Boolean,
             required: true,
             default: false,
-        }
+        },
+        /**
+         * To unanchor the drawer from the bottom of the browser on smaller widths when appropriate
+         */
+        isAlwaysAnchored: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
+        /**
+         * Width that the drawer will unanchor and sit in the page instead
+         */
+        unanchorWidth: {
+            type: Number,
+            required: false,
+            default: 1000,
+        },
     },
 
     data () {
         return { 
             width: '', //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
-            left: '' //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
+            left: '', //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
+            position: '', //can be fixed/static when isAlwaysAnchored is set to false
         }
     },
 
@@ -48,11 +65,14 @@ export default {
         /**
          * To keep the width and left position of the bottom-drawer the same as the parent container
          * which will change depending on whether the side menu is opened/closed, browser resized etc
+         * And to also 'unanchor' the drawer from the bottom of the browser window when required
          */
         updatePosition () {
-            this.width = `${ this.$el.getBoundingClientRect().width }px`;
-            this.left = `${ this.$el.getBoundingClientRect().x }px`;
-        }
+            const elementRect = this.$el.getBoundingClientRect();
+            this.width = `${ elementRect.width }px`;
+            this.left = `${ elementRect.x }px`;
+            this.position = elementRect.width <= this.unanchorWidth && !this.isAlwaysAnchored ? `static` : `fixed`;
+        },
 
     }
 
@@ -64,7 +84,7 @@ export default {
     <div>
         <resize-observer @notify="onContainerResize"/>
         <transition name="slide">
-            <div v-show="showDrawer" class="bottom-drawer-container" :style="{ width: width, left: left }">
+            <div v-show="showDrawer" class="bottom-drawer-container">
                 <!-- @slot Default slot, put whatever HTML markup you like in here -->
                 <slot></slot>
             </div>
@@ -79,10 +99,10 @@ export default {
     bottom: 0px;
     box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
     height: auto;
-    left: 0px; /*will be updated by the left data prop */
+    left: v-bind(left); 
     padding: 1rem;
-    position: fixed;
-    width: 100%; /*will be updated by the width data prop */
+    position: v-bind(position);
+    width: v-bind(width); 
 }
 
 .slide-enter-active,
