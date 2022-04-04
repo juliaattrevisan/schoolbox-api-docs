@@ -337,11 +337,11 @@ export default {
 
     .options-list__option {
         flex: 1 1 0; //keep both sides equal
-        @media (max-width: 700px) {
-            flex: 1 0 35%;
+        @media (max-width: 700px) { //move to two columns instead of four
+            flex: 1 0 35%; 
         }
-        @media (max-width: 380px) {
-            flex: 1 0 100%;
+        @media (max-width: 380px) { //and then to one column
+            flex: 1 0 100%; 
         }
     }
 
