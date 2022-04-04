@@ -175,7 +175,11 @@ class Classes implements IStrategy
 
         $studentInvolvements = $this->preloadStudentInvolvements();
 
-        $this->log->debug('Processing lessons.');
+        $this->log->debug(sprintf(
+            'Processing lessons between %s and %s',
+            $this->fromDate,
+            $this->toDate
+        ));
 
         $nextUrl = sprintf(
             'lessons?page=%s&per_page=%s&lessons_start_after=%s&lessons_start_before=%s&include=%s',
