@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 /**
@@ -61,7 +62,7 @@ Planning mode shows you the stuff that would get pruned.
 Perform mode actually prunes; this will silently delete the candidate records.
 
 
-Usage: loginlog.php 
+Usage: loginlog.php
 
 
 HELP;
@@ -74,7 +75,7 @@ HELP;
             /* Planning mode
              */
             $statement = $this->getDatabaseInternal()->executeQuery("
-                SELECT * 
+                SELECT *
                 FROM login_log
                 WHERE login_log.`date` < NOW() - INTERVAL 2 YEAR
             ");
@@ -93,7 +94,7 @@ HELP;
             /* Perform mode
              */
             $this->getDatabaseInternal()->executeQuery("
-                DELETE 
+                DELETE
                 FROM login_log
                 WHERE login_log.`date` < NOW() - INTERVAL 2 YEAR
             ");
