@@ -29,15 +29,8 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
-//        $post = $this->getRequest()->post;
-
         $userId = $user->getId();
-
-//        if (trim($post['body']) === '') {
-//            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
-//        }
-
-        $bob = new NotificationInstanceBuilder();
+        $bob    = new NotificationInstanceBuilder();
         $bob->setTitle('Hi')
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
@@ -48,9 +41,10 @@ class Controller extends Base
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
 
         (new RedisPublisher(
-            Redis::getStorageClientInstance(),
+            Redis::getSignalQueueClientInstance(),
             INSTANCE_ID,
         ))->alertUser($userId, $bob->build());
+
         // Output nothing
     }
 }
