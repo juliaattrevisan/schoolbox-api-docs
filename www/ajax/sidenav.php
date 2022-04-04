@@ -8,7 +8,10 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 if (\in_array($_POST['state'], ['show', 'hide'], true)) {
     try {

@@ -72,7 +72,7 @@ $(function () {
 
         // Update the user's sidebar state in the DB
         var leftnavState = dockState ? 'hide' : 'show';
-        $.post('/ajax/sidenav', {state: leftnavState});
+        $.post('/ajax/sidenav.php', {state: leftnavState});
 
          // Update dock state in the element's data property
          $(this).data('dock-state', !dockState);
