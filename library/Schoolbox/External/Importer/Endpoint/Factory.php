@@ -270,14 +270,13 @@ class Factory implements IFactory
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance()
-                    // /* Timetable pieces
-                    //  */
-                    // TimetableCycleMapper::getInstance(),
-                    // TimetablePeriodMapper::getInstance(),
-                    // ClassEntryMapper::getInstance(),
-                    // ClassInvolvementMapper::getInstance(),
-                    // ClassPeriodMapper::getInstance()
+                    UserProfile\Relationship\Mapper::getInstance(),
+                    /* Timetable pieces
+                     */
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             default:
