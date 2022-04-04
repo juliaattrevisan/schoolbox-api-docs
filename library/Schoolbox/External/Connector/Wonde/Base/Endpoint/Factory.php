@@ -28,7 +28,6 @@ use UnexpectedValueException;
 class Factory
 {
 
-
     /**
      * Get timetable classes occurring this far in the past
      * Measured in months, defaults to -1 month
@@ -187,11 +186,6 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        /* Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         */
-//        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
-
         /* Date range
          */
         $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
@@ -202,37 +196,36 @@ class Factory
         $api = new Api($this->host, $this->key);
 
         return (new GenericCollection(IStrategy::class))
-
             /* Purge previously-imported profile relationships and classes
              */
-//            ->add(new Profile\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
+            ->add(new Profile\Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
