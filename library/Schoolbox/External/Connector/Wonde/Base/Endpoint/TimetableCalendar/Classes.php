@@ -333,7 +333,7 @@ class Classes implements IStrategy
 
     /**
      * Save an involvement for user $externalId, whose name is $name,
-     * for the sis_event $eent
+     * for the sis_event $event
      *
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
