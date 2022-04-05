@@ -40,7 +40,10 @@ class ModelToArray
         return [
             'id'     => $user->getId(),
             'campus' => $user->getCampusCollection()
-                ? $user->getCampusCollection()->map(Closure::fromCallable([$this, 'convertCampus']))->getAll()
+                ? $user->getCampusCollection()
+                       ->map(Closure::fromCallable([$this, 'convertCampus']))
+                       ->reindex()
+                       ->getAll()
                 : null,
             'role'   => $this->convertRole($user->getRole()),
 
