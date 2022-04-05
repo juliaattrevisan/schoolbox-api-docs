@@ -1931,16 +1931,6 @@ parameters:
 			path: library/Evaluation/Attempt.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Evaluation/Export/Graph.php
-
-		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: library/Evaluation/Export/Graph.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Evaluation/Export/Graph.php
@@ -5946,11 +5936,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/ParticipantLinker.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IFeedback\\:\\:getAllFiles\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
@@ -5962,11 +5947,6 @@ parameters:
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
-
-		-
-			message: "#^Variable \\$currentResponse might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
 

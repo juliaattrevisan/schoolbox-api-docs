@@ -38,9 +38,10 @@ if (is_numeric($_REQUEST['cid'])) {
     // TODO undo this hack, properly set return URL in templates
     $_SERVER['REQUEST_URI'] = '/homepage/' . $_REQUEST['cid'];
 
+    $cid = is_numeric($_POST['cid'] ?? false) ? (int)$_POST['cid'] : null;
 
     // AJAX request for drag and drop of components
-    if ($_POST['cid'] && $_POST['type'] == 'components') {
+    if ($cid && ($_POST['type'] ?? '') == 'components') {
         $columns = array(
             'left'  => $_POST['column1'],
             'right' => $_POST['column2'],
@@ -82,7 +83,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
             $page->outputJson(['hasComponentBeenDeleted' => false], false, 200);
         }
-    } elseif ($_POST['cid'] && is_numeric($_POST['delete'])) { // AJAX request to delete component from homepage
+    } elseif ($cid && is_numeric($_POST['delete'] ?? false)) { // AJAX request to delete component from homepage
 // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
@@ -94,25 +95,25 @@ if (is_numeric($_REQUEST['cid'])) {
             $componentInstanceMapper->delete($instance);
         } catch (Schoolbox\Mapper\Exception $e) {
         }
-    } elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
+    } elseif (is_numeric($cid) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
         if (is_numeric($_POST['add'])) {
             $newComp = new Component_Instance();
             $newComp
                 ->setDefinitionId($_POST['add'])
-                ->setIdentifier($_POST['cid'])
+                ->setIdentifier($cid)
                 ->setModule('homepage')
                 ->setSequence(0)
                 ->setPosition('top');
 
             // check perms
-            if (($permission = $groupHandler->getPermission($_POST['cid'])) < UserAccess::ACCESS_WRITE) {
+            if (($permission = $groupHandler->getPermission($cid)) < UserAccess::ACCESS_WRITE) {
                 exit;
             }
 
             $ids        = $componentInstanceMapper->save($newComp);
             $instanceID = $newComp->getId();
 
-            $componentInstanceMapper->cascadeSequence($_POST['cid']);
+            $componentInstanceMapper->cascadeSequence($cid);
         } else {
             $instanceID = $_POST['reload'];
         }
@@ -127,11 +128,11 @@ if (is_numeric($_REQUEST['cid'])) {
             exit("<div class='alert alert-box'>Couldn't create component.</div>");
         }
 
-        $folder   = $folderMapper->findById($_POST['cid']);
+        $folder   = $folderMapper->findById($cid);
         $renderer = new Component_Renderer();
         $renderer->renderHomepageComponent($page, $folder, $component);
-    } elseif ($_POST['cid'] && is_array($_POST['colors'])) { // AJAX Save homepage colours
-            $homepage = new Homepage($_POST['cid']);
+    } elseif ($cid && is_array($_POST['colors'])) { // AJAX Save homepage colours
+            $homepage = new Homepage($cid);
         // Also try to save width
         if (!empty($_POST['width'])) {
             // Mangle width into percentages

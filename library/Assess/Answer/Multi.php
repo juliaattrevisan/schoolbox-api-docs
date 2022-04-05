@@ -81,7 +81,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
         $allAnswers = parent::getAnswersFromAnswerGroup($answerGroup);
         $question   = $this->questionHandler->getByID($answerGroup['question_id']);
         $config     = json_decode($question['config']);
-        if ($config->randomiseOptionOrder) {
+        if ($config->randomiseOptionOrder ?? false) {
             shuffle($allAnswers);
         }
         return $allAnswers;
@@ -145,10 +145,9 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
                             'ANSWER_ICON_TITLE'    => 'Respondent chose correctly',
                             'ANSWER_CHECKED'       => 'checked',
                         ]);
-                    }
-                    /* The respondent did not choose the correct answer
-                     */
-                    else {
+                    } else {
+                        /* The respondent did not choose the correct answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => 'evaluation-unselected-answer-option',
                             'ANSWER_ICON_CLASS'    => 'evaluation-unselected-answer-icon',
@@ -156,10 +155,9 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
                             'ANSWER_CHECKED'       => ''
                         ]);
                     }
-                }
-                /* This answer is not correct
-                 */
-                else {
+                } else {
+                    /* This answer is not correct
+                     */
                     /* The respondent chose this answer
                      */
                     if ($selectedByRespondent) {
@@ -169,10 +167,9 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
                             'ANSWER_ICON_TITLE'    => 'Respondent chose an incorrect answer',
                             'ANSWER_CHECKED'       => 'checked',
                         ]);
-                    }
-                    /* The respondent didn't choose this answer
-                     */
-                    else {
+                    } else {
+                        /* The respondent didn't choose this answer
+                         */
                         $page->setVar([
                             'ANSWER_OPTION_STATUS' => '',
                             'ANSWER_ICON_CLASS'    => '',
@@ -196,7 +193,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
     {
         $options = json_decode($config);
 
-        if ($options->randomiseOptionOrder) {
+        if ($options->randomiseOptionOrder ?? false) {
             $page->setVar(array(
                 'CONFIGURATION_RANDOMISEOPTIONORDER_CHECKED' => 'checked="checked"'
             ));

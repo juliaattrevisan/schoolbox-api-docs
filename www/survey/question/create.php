@@ -26,6 +26,7 @@ $groupHandler = new Group();
 
 /* If a question was submitted
  */
+/** @var SitePage $this */
 if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
     $survey = $surveyHandler->getByID($section['assess_id']);
@@ -177,19 +178,20 @@ if (!empty($_POST)) {
 
     /* If a particular question type has been selected; otherwise ignore it
      */
-    if (is_numeric($this->arg[1])) {
-        $answerHandler = $factory->createAnswerModel($this->arg[1]);
+    $typeId = $this->arg[1] ?? null;
+    if (is_numeric($typeId)) {
+        $answerHandler = $factory->createAnswerModel($typeId);
     }
 
     foreach ($questionTypes as $currentQuestionType) {
-        if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
+        if (is_numeric($typeId) && ($typeId == $currentQuestionType['type_id'])) {
             $selected = 'selected=\'selected\'';
 
             /* Load answer template into answerOption block
              */
             $this->setFile(
                 'answerFormFragment',
-                'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/create.html'
+                'survey/answer/' . $factory->getQuestionType($typeId) . '/create.html'
             );
             $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
@@ -207,7 +209,7 @@ if (!empty($_POST)) {
             if ($currentQuestionType['has_config'] == 'true') {
                 $this->setFile(
                     'answer_configuration_fragment',
-                    'survey/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html'
+                    'survey/answer/' . $factory->getQuestionType($typeId) . '/configuration.html'
                 );
                 $this->setBlock(
                     'answer_configuration_fragment',
@@ -247,7 +249,7 @@ if (!empty($_POST)) {
 
     /* If a particular question type has been selected; otherwise ignore it
      */
-    if (is_numeric($this->arg[1])) {
+    if (is_numeric($typeId)) {
         $this->setVar(
             array(
                 'IMPORT_SELECTED' => '',
@@ -257,11 +259,10 @@ if (!empty($_POST)) {
 
         $this->parse('type_selected_block', 'type_selected');
     } else {
-        if ($this->arg[1] == 'import') {
+        if ($typeId == 'import') {
             $this->setVar(
                 array(
                     'IMPORT_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => ''
                 )
             );
         } else {
@@ -269,7 +270,6 @@ if (!empty($_POST)) {
                 array(
                     'IMPORT_SELECTED' => '',
                     'DISABLED_SELECTED' => 'selected=\'selected\'',
-                    'ANSWER_INPUTS' => $answerTemplate,
                     'SUBMIT_DISABLED' => 'disabled="disabled"'
                 )
             );

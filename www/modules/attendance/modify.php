@@ -360,7 +360,7 @@ if ($class) {
              */
             $this->dropDown(
                 'reason_options',
-                array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]),
+                array_merge($reasonStack[$abscenceCode] ?? [], $reasonStack[INDEX_ALL]),
                 $reasonCode,
                 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')

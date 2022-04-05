@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
+/** @var SitePage $this */
 if (!empty($_POST)) {
     if (!$assessHandler->isValidUrlAccess($_POST['assess_id'])) {
         $this->pageNotFound();
@@ -96,7 +97,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ASSESS_ASSESS_ID'     => $this->arg[0],
         'RETURN_URL_NAME'      => Redirect::RETURN_URL,
-        'RETURN_URL'           => $_GET[Redirect::RETURN_URL],
+        'RETURN_URL'           => $_GET[Redirect::RETURN_URL] ?? null,
         'ASSESS_KIND_LC'       => 'assess',
         'ASSESS_KIND'          => 'Quiz',
         'ASSESS_TITLE'         => Scrub::text($assess['title']),
@@ -116,9 +117,9 @@ if (!empty($_POST)) {
     $trail = new \Schoolbox\Breadcrumbs();
 
     // get a crunchy biscuit base
-    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
+    $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL] ?? '');
 
-    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
+    $returnUrl = ($_GET[Redirect::RETURN_URL] ?? '') != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 
     if ($assessment->getContext() instanceof Project) {
         $crumbs = array_merge($crumbs, [

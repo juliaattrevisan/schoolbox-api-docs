@@ -382,7 +382,7 @@ class Controller extends Base
             ->setBackgroundPosition($post['background_position'])
             ->setHoverColor($colorFactory->build($post['hover_color'] ?: '00000000'));
 
-        if (is_array($post['attachment'])) {
+        if (is_array($post['attachment'] ?? false)) {
             try {
                 $factory = new CollectorFactory();
                 $image   = $factory->build($post['attachment'])->getFirst();

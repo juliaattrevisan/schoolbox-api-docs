@@ -136,7 +136,7 @@ class Module extends BaseModule
 
         // Callback for extracting homepage from route params
         $getHomepageIdCallback = function ($params) {
-            if ($params['layout'] && $params['layout']->getFolder()) {
+            if (($params['layout'] ?? false) && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
             } else if ($params['component'] && $params['component']->getIdentifier()) {
                 return $params['component']->getIdentifier();

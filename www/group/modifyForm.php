@@ -60,7 +60,7 @@ if (isset($_GET['disband'])) {
     SitePage::localRedir('/');
 }
 
-if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
+if (is_numeric($_POST['type'] ?? false) || is_array($_POST['msg'] ?? false)) {
     /** @var \Schoolbox\Resource\Group $group */
     try {
         $group = $groupMapper->findOneByColumn('cid', $categoryId);

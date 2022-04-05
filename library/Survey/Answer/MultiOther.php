@@ -74,7 +74,7 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
         $options = json_decode($config);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+            'CONFIGURATION_MANDATORY_CHECKED' => ($options->mandatory ?? false) ? 'checked="checked"' : ''
         ));
     }
 

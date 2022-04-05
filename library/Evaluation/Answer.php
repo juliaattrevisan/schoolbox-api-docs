@@ -322,7 +322,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
     {
         $data = $this->exportResponseToCSV($attempt_id, $question_id);
 
-        $data['responses'] = $data['responsesData'] = Scrub::text($data['response']);
+        $data['responses'] = $data['responsesData'] = Scrub::text($data['response'] ?? '');
 
         return $data;
     }

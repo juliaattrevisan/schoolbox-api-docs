@@ -235,8 +235,8 @@ abstract class Base
     {
         /** @var Model $article */
         foreach ($articles as $article) {
-            if ($article->getDiscussionThread()) {
-                $article->getMetadata()->setCommentCount((int) $commentCounts[$article->getId()]);
+            if ($article->getDiscussionThread() && isset($commentCounts[$article->getId()])) {
+                $article->getMetadata()->setCommentCount((int)$commentCounts[$article->getId()]);
             }
         }
     }

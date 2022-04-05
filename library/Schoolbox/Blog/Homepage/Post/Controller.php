@@ -156,7 +156,7 @@ class Controller extends Base
 
         $attachments = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId(), ['deleted' => true]);
 
-        if (is_array($post["attachment"])) {
+        if (is_array($post["attachment"] ?? false)) {
             $storages = (new CollectorFactory())->build($post["attachment"])->getAll();
 
             /* Dedupe files that existed concurrently - you dragged file A into the dropzone

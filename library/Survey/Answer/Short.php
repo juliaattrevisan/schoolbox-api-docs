@@ -80,7 +80,7 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
         $options = json_decode($config);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+            'CONFIGURATION_MANDATORY_CHECKED' => ($options->mandatory ?? false) ? 'checked="checked"' : ''
         ));
     }
 

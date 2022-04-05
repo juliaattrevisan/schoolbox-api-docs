@@ -124,7 +124,7 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
         $options = json_decode($config);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+            'CONFIGURATION_MANDATORY_CHECKED' => ($options->mandatory ?? false) ? 'checked="checked"' : ''
         ));
     }
 

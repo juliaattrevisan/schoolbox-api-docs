@@ -56,7 +56,7 @@ class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like
         $options = json_decode($config);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+            'CONFIGURATION_MANDATORY_CHECKED' => ($options->mandatory ?? false) ? 'checked="checked"' : ''
         ));
     }
 

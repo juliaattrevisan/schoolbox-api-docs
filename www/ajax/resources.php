@@ -38,7 +38,7 @@ if (!isset($_GET['mime'])) {
 /* Whether there is a Use This Folder button
  */
 $useFolder = isset($_GET['f']);
-$defaultFolderId = (int)$_GET['fid'];
+$defaultFolderId = (int)($_GET['fid'] ?? 0);
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),

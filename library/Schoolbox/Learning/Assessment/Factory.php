@@ -222,7 +222,9 @@ class Factory
         }
 
         // TODO what should this be?
-        $this->setRubricData($post[$post['formField']]);
+        if (isset($post['formField'], $post[$post['formField']])) {
+            $this->setRubricData($post[$post['formField']]);
+        }
 
         /* Check if any attached files existed in POST data
          * Use their array if it existed

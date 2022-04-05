@@ -186,10 +186,10 @@ class Full
          */
         uasort($users, static function ($a, $b) {
             if ($a['lastname'] === $b['lastname']) {
-                return $a['firstname'] > $b['firstname'];
+                return $a['firstname'] <=> $b['firstname'];
             }
 
-            return ($a['lastname'] > $b['lastname']);
+            return ($a['lastname'] <=> $b['lastname']);
         });
 
         return array_values($users);

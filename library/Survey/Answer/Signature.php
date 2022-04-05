@@ -198,7 +198,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
 
         $page->setVar(
             array(
-                'CONFIGURATION_MANDATORY_CHECKED' => $options->mandatory ? 'checked="checked"' : ''
+                'CONFIGURATION_MANDATORY_CHECKED' => ($options->mandatory ?? false) ? 'checked="checked"' : ''
             )
         );
     }

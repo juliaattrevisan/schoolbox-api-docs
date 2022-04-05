@@ -50,21 +50,25 @@ class Factory
 
         // Add capabilities
         foreach ($postData as $tempCapabilityId => $postedCapability) {
+            $curriculumNodes = ($postedCapability['curriculumCode'] ?? false)
+                ? $this->nodeMapper->findByColumn('id', $postedCapability['curriculumCode'])
+                : $this->nodeMapper->createCollection();
+
             $capability = (new Capability())
                 ->setId(filter_var($postedCapability['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
                 ->setName($postedCapability['name'] ?? '')
-                ->setCurriculumNodes(
-                    $this->nodeMapper->findByColumn('id', $postedCapability['curriculumCode'])
-                );
+                ->setCurriculumNodes($curriculumNodes);
 
             // Add indicators
             foreach ($postedCapability['items'] ?? [] as $tempIndicatorId => $postedIndicator) {
+                $indicatorCurriculumNodes = ($postedIndicator['curriculumCode'] ?? false)
+                    ? $this->nodeMapper->findByColumn('id', $postedIndicator['curriculumCode'])
+                    : $this->nodeMapper->createCollection();
+
                 $indicator = (new Indicator())
                     ->setId(filter_var($postedIndicator['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
                     ->setName($postedIndicator['name'] ?? '')
-                    ->setCurriculumNodes(
-                        $this->nodeMapper->findByColumn('id', $postedIndicator['curriculumCode'])
-                    );
+                    ->setCurriculumNodes($indicatorCurriculumNodes);
                 $capability->getIndicators()[$tempIndicatorId] = $indicator;
             }
 

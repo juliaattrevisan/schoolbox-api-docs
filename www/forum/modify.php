@@ -66,7 +66,7 @@ if (is_numeric($this->arg[0])) {
 
     /* Edit post
      */
-    if (is_numeric($this->arg[2]) && $this->arg[2] > 0) {
+    if (is_numeric($this->arg[2] ?? null) && $this->arg[2] > 0) {
         try {
             $post   = PostMapper::getInstance()->findById($this->arg[2]);
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
@@ -119,7 +119,7 @@ if (is_numeric($this->arg[0])) {
                 'class' => 'active',
             ]
         ]);
-    } elseif (is_numeric($this->arg[1])) {
+    } elseif (is_numeric($this->arg[1] ?? null)) {
         /* Add new reply
          */
         try {

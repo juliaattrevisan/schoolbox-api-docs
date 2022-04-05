@@ -48,7 +48,7 @@ class MetadataDecorator implements IDecorator
         if ($discussionThread) {
             $threadId = $discussionThread->getId();
 
-            if ($this->commentCounts[$threadId]) {
+            if ($this->commentCounts[$threadId] ?? false) {
                 $commentCount = $this->commentCounts[$threadId];
             }
         }

@@ -52,7 +52,8 @@ if (!isset($_REQUEST['mimeFilter'])) {
 try {
     $factory  = new \Schoolbox\Resource\Browser\NodeFactory();
 
-    if ($oAuthToken = $_SESSION['azureAccessToken']) {
+    $oAuthToken = $_SESSION['azureAccessToken'] ?? null;
+    if ($oAuthToken) {
         $conf       = $this->getDi()->get('config');
         $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
         $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);

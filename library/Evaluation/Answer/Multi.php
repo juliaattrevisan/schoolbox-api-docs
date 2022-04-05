@@ -243,7 +243,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_VALUE_FACADE' => $valueFacade,
                     'ANSWER_VALUE' => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                    'ANSWER_AUTO_COMPLETE' => $questionConfig->randomiseOptionOrder ? 'off' : 'on',
+                    'ANSWER_AUTO_COMPLETE' => ($questionConfig->randomiseOptionOrder ?? false) ? 'off' : 'on',
                 ));
 
                 if ($existing['response']) {

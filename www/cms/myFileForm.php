@@ -178,8 +178,8 @@ if (isset($_POST['description'])) {
             }
         }
 
-        if (isset($_POST['return'])) {
-            SitePage::localRedir($_POST['return'] . '&fileID=' . $file->getId());
+        if (isset($_POST['return']) && $_POST['return'] !== '') {
+            SitePage::localRedir($_POST['return']);
         } elseif ($ajax) {
             http_response_code(201);
             die(json_encode(['id' => $affectedIds[0]]));

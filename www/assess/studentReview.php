@@ -244,14 +244,14 @@ $prevSection = $sectionHandler->getBefore($quizId, $section['sequence']);
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
  */
-if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
+if (!is_numeric($nextSection['section_id'] ?? null) && !is_numeric($prevSection['section_id'] ?? null)) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
-    if (is_numeric($nextSection['section_id'])) {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+    * previous button if applicable
+    */
+    if (is_numeric($nextSection['section_id'] ?? null)) {
         $this->setVar(
             array(
                 'NEXT_SECTION_ID' => $nextSection['section_id'],
@@ -265,7 +265,7 @@ else {
 
     /* Conditions where the previous button is available
      */
-    if (is_numeric($prevSection['section_id'])) {
+    if (is_numeric($prevSection['section_id'] ?? null)) {
         $this->setVar(
             array(
                 'PREV_SECTION_ID' => $prevSection['section_id'],

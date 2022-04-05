@@ -25,7 +25,7 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
-        $size = $_GET['size'] ?: 'maxsize';
+        $size = $_GET['size'] ?? 'maxsize';
         $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $fileSystem = $resource->getFilesystem();
 

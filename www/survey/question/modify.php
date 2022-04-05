@@ -144,7 +144,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::html($currentQuestionType['description']),
-        'QUESTIONTYPE_SELECTED' => $selected,
+        'QUESTIONTYPE_SELECTED' => null,
     ));
 /* Render contents of this Survey
      */

@@ -360,7 +360,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         $config = json_decode($question['config']);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+            'CONFIGURATION_MANDATORY' => ($config->mandatory ?? false) ? 'required' : '',
         ));
     }
 }

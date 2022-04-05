@@ -95,7 +95,7 @@ class Module extends BaseModule
      */
     private function preloadUser(array $params): array
     {
-        if ($params['user'] instanceof User) {
+        if (($params['user'] ?? null) instanceof User) {
             return ['user' => $params['user']];
         }
 
