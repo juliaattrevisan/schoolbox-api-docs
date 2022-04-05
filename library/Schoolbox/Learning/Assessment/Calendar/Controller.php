@@ -87,8 +87,8 @@ class Controller extends Base
 
         $inContext = false;
         // If course/folder id is provided, filter to the course/folder
-        if (is_numeric($queryArgs['course']) || is_numeric($queryArgs['folder'])) {
-            $filterType = is_numeric($queryArgs['course']) ? 'course' : 'folder';
+        if (is_numeric($queryArgs['course'] ?? null) || is_numeric($queryArgs['folder'] ?? null)) {
+            $filterType = is_numeric($queryArgs['course'] ?? null) ? 'course' : 'folder';
             $queryArgs  = $this->applyFilter($filterType, (int)$queryArgs[$filterType]);
             $inContext  = true;
             unset($queryArgs[$filterType]);

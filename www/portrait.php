@@ -36,7 +36,7 @@ $kernel->getShutdownHandler()->registerFunction(
 $config = $kernel->getDependencyInjector()->get('config');
 
 /* If current user is not available return permission denied */
-if (!($_SESSION['user'] instanceof Schoolbox\User)) {
+if (!(($_SESSION['user'] ?? null) instanceof Schoolbox\User)) {
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 }
 

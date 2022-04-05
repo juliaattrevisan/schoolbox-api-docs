@@ -80,7 +80,7 @@ class AllRubrics
             foreach ($boxData as $criterionId => $criteria) {
                 $key = $this->buildCriterionArrayKey($criteria['grouping'], $criteria['name']);
                 foreach ($criteria['marks'] as $studentId => $mark) {
-                    if (!is_array($rubricData[$key][$studentId])) {
+                    if (!is_array($rubricData[$key][$studentId] ?? false)) {
                         $rubricData[$key][$studentId] = [];
                     }
                     $rubricData[$key][$studentId][] = $mark;
