@@ -13,15 +13,19 @@ namespace Schoolbox\APIUser;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use HouseMapper;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\CampusMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 class Module extends BaseModule
 {
@@ -68,6 +72,10 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(HouseMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(YearLevelMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
         );
     }
 

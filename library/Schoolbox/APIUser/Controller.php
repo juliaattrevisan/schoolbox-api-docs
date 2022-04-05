@@ -12,6 +12,7 @@ namespace Schoolbox\APIUser;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use HouseMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
@@ -28,13 +29,17 @@ use Schoolbox\APIGroup\ModelToArray as GroupArray;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\YearLevel\Mapper;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Timetable_ColourMapper;
 
 class Controller extends Base
 {
     private GroupsHelper $groupsHelper;
     protected UserMapper $userMapper;
+    protected HouseMapper $houseMapper;
+    protected CampusMapper $campusMapper;
+    protected YearLevelMapper $yearLevelMapper;
+    protected RoleMapper $roleMapper;
 
     /**
      * Controller constructor.
@@ -45,6 +50,10 @@ class Controller extends Base
      * @param Timetable_ColourMapper $timetableColourMapper
      * @param RerouteOverrideMapper  $reRouteOverrideMapper
      * @param UserMapper             $userMapper
+     * @param HouseMapper            $houseMapper
+     * @param CampusMapper           $campusMapper
+     * @param YearLevelMapper        $yearLevelMapper
+     * @param RoleMapper             $roleMapper
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -52,9 +61,17 @@ class Controller extends Base
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        HouseMapper $houseMapper,
+        CampusMapper $campusMapper,
+        YearLevelMapper $yearLevelMapper,
+        RoleMapper $roleMapper
     ) {
         $this->userMapper = $userMapper;
+        $this->houseMapper = $houseMapper;
+        $this->campusMapper = $campusMapper;
+        $this->yearLevelMapper = $yearLevelMapper;
+        $this->roleMapper = $roleMapper;
         $this->groupsHelper = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
@@ -161,11 +178,6 @@ class Controller extends Base
         $newUser->setEnabled(true);
         $newUser->setSuperuser(false);
 
-        $houseMapper = \HouseMapper::getInstance();
-        $campusMapper = CampusMapper::getInstance();
-        $userMapper = UserMapper::getInstance();
-        $yearLevelMapper = Mapper::getInstance();
-        $roleMapper = RoleMapper::getInstance();
         /**
          * build the db check data for the new model.
          */
@@ -173,7 +185,7 @@ class Controller extends Base
             $yearLevel = $data['yearLevel']['id'] ?? null;
             if (null !== $yearLevel) {
                 try {
-                    $data['yearLevel'] = $yearLevelMapper->findById($yearLevel);
+                    $data['yearLevel'] = $this->yearLevelMapper->findById($yearLevel);
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $data['yearLevel'] = null;
                 }
@@ -189,7 +201,7 @@ class Controller extends Base
                 $campusId = $campusEntry['id'] ?? null;
                 if (null !== $campusId) {
                     try {
-                        $campusObj = $campusMapper->findById($campusId);
+                        $campusObj = $this->campusMapper->findById($campusId);
                     } catch (NotFound | Deleted $e) {
                         throw new SchoolboxException("Campus '$campusId' Not Found or has been Deleted");
                     }
@@ -208,7 +220,7 @@ class Controller extends Base
             $schoolHouse = $data['schoolHouse']['id'] ?? null;
             if (null !== $schoolHouse) {
                 try {
-                    $house               = $houseMapper->findById($schoolHouse);
+                    $house               = $this->houseMapper->findById($schoolHouse);
                     $data['schoolHouse'] = $house;
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
@@ -225,7 +237,7 @@ class Controller extends Base
                 $userId = $userEntry['id'] ?? null;
                 if (null !== $userId) {
                     try {
-                        $impUser = $userMapper->findById($userId);
+                        $impUser = $this->userMapper->findById($userId);
                     } catch (NotFound | Deleted $e) {
                         throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
                     }
@@ -245,7 +257,7 @@ class Controller extends Base
             $roleId = $data['role']['id'] ?? null;
             if (null !== $roleId) {
                 try {
-                    $role = $roleMapper->findById($roleId);
+                    $role = $this->roleMapper->findById($roleId);
                     $data['role'] = $role;
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
