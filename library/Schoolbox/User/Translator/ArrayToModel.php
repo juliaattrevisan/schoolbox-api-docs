@@ -27,8 +27,6 @@ class ArrayToModel extends Base
              */
             if ('isEmailDerived' === $label) {
                 $model->setLocalEmail($value);
-            } elseif ('role' === $label) {
-                $model->getRole()->setId($value);
             } elseif ('yearLevel' === $label) {
                 $model->setYear($value);
             } elseif ('flags' === $label) {

@@ -25,6 +25,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\APIGroup\ModelToArray as GroupArray;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper;
@@ -164,6 +165,7 @@ class Controller extends Base
         $campusMapper = CampusMapper::getInstance();
         $userMapper = UserMapper::getInstance();
         $yearLevelMapper = Mapper::getInstance();
+        $roleMapper = RoleMapper::getInstance();
         /**
          * build the db check data for the new model.
          */
@@ -234,6 +236,21 @@ class Controller extends Base
             }
             $data['linkedUser'] = $impersonateCollection;
             unset($data['impersonableUser']);
+        }
+
+        /**
+         * add role object
+         */
+        if (array_key_exists('role', $data)) {
+            $roleId = $data['role']['id'] ?? null;
+            if (null !== $roleId) {
+                try {
+                    $role = $roleMapper->findById($roleId);
+                    $data['role'] = $role;
+                } catch (NotFound | Deleted $e) {
+                    throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
+                }
+            }
         }
 
         /** @var User $model */
