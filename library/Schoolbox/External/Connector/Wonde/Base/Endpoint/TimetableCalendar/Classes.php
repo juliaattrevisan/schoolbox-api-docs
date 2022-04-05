@@ -172,6 +172,7 @@ class Classes implements IStrategy
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -240,7 +241,10 @@ class Classes implements IStrategy
                     }
 
                     /* Wonde gives you this data struct for dates
-
+                     *
+                     * Convert their UTC timezone into our schoolbox instance's timezone
+                     * then save it
+                     *
                         [start_at] => Array
                             (
                                 [date] => 2022-03-28 00:55:00.000000
@@ -254,6 +258,8 @@ class Classes implements IStrategy
                     $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
                         ->setTimezone($this->timezone);
 
+                    /* Cram in everything else
+                     */
                     $event = $this->eventMapper->createModel()
                         ->setTitle($lesson['class']['data']['name'])
                         ->setDetail(null)
@@ -329,6 +335,8 @@ class Classes implements IStrategy
                     continue;
                 }
 
+                /* If you have students, shank them all in too as involvements
+                 */
                 $involvements = $studentInvolvements[$classCode];
 
                 $this->log->debug(sprintf(
