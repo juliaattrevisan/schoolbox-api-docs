@@ -551,15 +551,12 @@ export default {
 .edit {
     display: flex;
     height: 2.5rem;
-    text-align: center;
     width: 5rem;
 }
 
 .edit a {
     color: var(--content-ui-foreground);
-    display: inline-block;
     line-height: 2.5;
-    margin: 0;
     opacity: 0.7;
     padding-left: 8px; //move the pencil into the centre
 }
