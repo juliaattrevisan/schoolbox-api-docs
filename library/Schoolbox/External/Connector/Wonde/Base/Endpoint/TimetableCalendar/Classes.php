@@ -248,10 +248,10 @@ class Classes implements IStrategy
                                 [timezone] => UTC
                             )
                     */
-                    $startAt = (new \Alaress_Date_Format($lesson['start_at']['date'], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['start_at']['timezone'])))
+                    $startAt = (new \Alaress_Date_Format(explode('.', $lesson['start_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['start_at']['timezone'])))
                         ->setTimezone($this->timezone);
 
-                    $finishAt = (new \Alaress_Date_Format($lesson['end_at']['date'], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
+                    $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
                         ->setTimezone($this->timezone);
 
                     $event = $this->eventMapper->createModel()
