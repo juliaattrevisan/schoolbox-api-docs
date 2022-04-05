@@ -108,11 +108,11 @@ class Guardian extends IteratorIterator
 
             $guardian->addStudent($student);
 
-            $guardian->setCustomField1((string)$currentResult['custom_field1']);
-            $guardian->setCustomField2((string)$currentResult['custom_field2']);
-            $guardian->setCustomField3((string)$currentResult['custom_field3']);
-            $guardian->setCustomField4((string)$currentResult['custom_field4']);
-            $guardian->setCustomField5((string)$currentResult['custom_field5']);
+            $guardian->setCustomField1((string)($currentResult['custom_field1'] ?? null));
+            $guardian->setCustomField2((string)($currentResult['custom_field2'] ?? null));
+            $guardian->setCustomField3((string)($currentResult['custom_field3'] ?? null));
+            $guardian->setCustomField4((string)($currentResult['custom_field4'] ?? null));
+            $guardian->setCustomField5((string)($currentResult['custom_field5'] ?? null));
         }
         return $guardian;
     }

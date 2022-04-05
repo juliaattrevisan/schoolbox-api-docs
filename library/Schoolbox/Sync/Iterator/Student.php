@@ -54,7 +54,7 @@ class Student extends IteratorIterator
             ->setLastname($currentResult['student_surname'])
             ->setGender($currentResult['student_gender']);
 
-        $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description']);
+        $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description'] ?? null);
         $student->getForm()->setDescription($currentResult['student_form_description']);
 
         $student->getHouse()->setCode($currentResult['student_house']);
@@ -90,11 +90,11 @@ class Student extends IteratorIterator
 
         $student->getCampus()->add($campus);
 
-        $student->setCustomField1((string)$currentResult['custom_field1']);
-        $student->setCustomField2((string)$currentResult['custom_field2']);
-        $student->setCustomField3((string)$currentResult['custom_field3']);
-        $student->setCustomField4((string)$currentResult['custom_field4']);
-        $student->setCustomField5((string)$currentResult['custom_field5']);
+        $student->setCustomField1((string)($currentResult['custom_field1'] ?? null));
+        $student->setCustomField2((string)($currentResult['custom_field2'] ?? null));
+        $student->setCustomField3((string)($currentResult['custom_field3'] ?? null));
+        $student->setCustomField4((string)($currentResult['custom_field4'] ?? null));
+        $student->setCustomField5((string)($currentResult['custom_field5'] ?? null));
 
         return $student;
     }
