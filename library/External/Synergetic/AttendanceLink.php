@@ -31,6 +31,10 @@ class External_Synergetic_AttendanceLink implements External_AttendanceLinkInter
         if (empty($attendancePeriods)) {
             return '';
         }
+        $campusList->indexBy('id');
+        if (!$campusList->offsetExists($campusId)) {
+            return '';
+        }
         $encodedClass = urlencode(urlencode(urlencode($classCode)));
         $periodLink   = implode(',', $attendancePeriods);
         $classLink    = $campus ? $campus . '/' . $encodedClass : '0/' . $encodedClass;
