@@ -53,7 +53,7 @@ $page->setBlock('can_add_resources', 'resource', 'resource_block');
 $page->setBlock(TEMPLATE_content, 'can_promote_in_principle', 'can_promote_in_principle_block');
 $page->setBlock(TEMPLATE_content, 'can_permission_slip_required', 'can_permission_slip_required_block');
 
-$authenticator = new Authenticator($this);
+$authenticator = new Authenticator($page);
 
 /** @var User $sessionUser */
 $sessionUser = $_SESSION['user'];
@@ -90,11 +90,10 @@ $page->setVar(
 
 /* Modify existing event
  */
-if (is_numeric($_GET['eventID'])) {
+if (is_numeric($_GET['eventID'] ?? null)) {
     $mapper = EventMapper::getInstance();
 
     try {
-        /** @var Event $event */
         $event = $mapper->findById($_GET['eventID']);
     } catch (MapperException $e) {
         error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
@@ -102,6 +101,7 @@ if (is_numeric($_GET['eventID'])) {
 
     /* Edit rules
      */
+    /** @var Event $event */
     $canAdminister     = $authenticator->isEOTCAdministrator($sessionUser, $event);
     $isAuthor          = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator(
         $sessionUser
@@ -116,7 +116,7 @@ if (is_numeric($_GET['eventID'])) {
      * modify it (provided you've the appropriate permissions)
      */
     if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
-        $this->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+        $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
     }
     /* EOTC Administrators and event authors can edit this event
      */
@@ -226,10 +226,10 @@ if (is_numeric($_GET['eventID'])) {
                 'EVENT_LOCATION'                  => $event->getLocation(),
                 'EVENT_DETAIL'                    => $event->getDetail(),
                 'EVENT_REDIRECT'                  => $event->setupRedirect(
-                    $_GET['returnTo'],
+                    $_GET['returnTo'] ?? '',
                     $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                    $_GET['sid'],
-                    $_GET['userId']
+                    $_GET['sid'] ?? null,
+                    $_GET['userId'] ?? null
                 ),
                 'STUDENT_GROUP_TYPE_IDS'          => implode(';', $groupHandler->getStudentGroupTypeIds()),
                 'STAFF_GROUP_TYPE_IDS'            => implode(';', $groupHandler->getStaffGroupTypeIds()),
@@ -324,23 +324,23 @@ if (is_numeric($_GET['eventID'])) {
             $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
 
             if ((int)$externalDbSync->getValue() == 1) {
-                $this->setVar(
+                $page->setVar(
                     [
                         'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired(
                         ) ? 'checked="checked"' : ''
                     ]
                 );
 
-                $this->parse('can_permission_slip_required_block', 'can_permission_slip_required');
+                $page->parse('can_permission_slip_required_block', 'can_permission_slip_required');
             } else {
-                $this->setVar(
+                $page->setVar(
                     [
                         'can_permission_slip_required_block' => ''
                     ]
                 );
             }
         } catch (MapperException $e) {
-            $this->setVar(
+            $page->setVar(
                 [
                     'can_permission_slip_required_block' => ''
                 ]
@@ -376,13 +376,13 @@ if (is_numeric($_GET['eventID'])) {
     } else {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
-} /* Create new event
- */
-elseif ($authenticator->isEOTCCreator($sessionUser)) {
+} elseif ($authenticator->isEOTCCreator($sessionUser)) {
+    /* Create new event
+    */
     /* Set up default dates
      */
     $event = new Event();
-    $event->setupDates($_GET['date']);
+    $event->setupDates($_GET['date'] ?? null);
 
     $metadata = new EventMetadata();
     $event->setMetadata($metadata);
@@ -454,10 +454,10 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
             'EVENT_LOCATION'                  => '',
             'EVENT_DETAIL'                    => '',
             'EVENT_REDIRECT'                  => $event->setupRedirect(
-                $_GET['returnTo'],
+                $_GET['returnTo'] ?? '',
                 $event->getStartDateTime()->getUsingFormat('d-m-Y'),
-                $_GET['sid'],
-                $_GET['userId']
+                $_GET['sid'] ?? null,
+                $_GET['userId'] ?? null
             ),
             'EVENT_ALLDAY_CHECKED'            => $event->getAllDay() ? '1' : '0',
             'EVENT_STATUS_CLASS'              => $status->getStyle(),
@@ -493,23 +493,23 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
         $externalDbSync = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync');
 
         if ((int)$externalDbSync->getValue() == 1) {
-            $this->setVar(
+            $page->setVar(
                 [
                     'EVENT_PERMISSION_SLIP_SELECTED' => $event->getMetadata()->getPermissionSlipRequired(
                     ) ? 'checked="checked"' : ''
                 ]
             );
 
-            $this->parse('can_permission_slip_required_block', 'can_permission_slip_required');
+            $page->parse('can_permission_slip_required_block', 'can_permission_slip_required');
         } else {
-            $this->setVar(
+            $page->setVar(
                 [
                     'can_permission_slip_required_block' => ''
                 ]
             );
         }
     } catch (MapperException $e) {
-        $this->setVar(
+        $page->setVar(
             [
                 'can_permission_slip_required_block' => ''
             ]

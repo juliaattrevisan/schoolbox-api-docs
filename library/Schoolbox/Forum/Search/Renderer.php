@@ -55,8 +55,9 @@ class Renderer extends Handler
             foreach ($result as $forum) {
                 try {
                     $folder = $folderMapper->findCheaplyById($forum['categoryID']);
+                    $forum['breadcrumb'] = '';
 
-                    foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                    foreach ($folderMapper->breadcrumb($folder, true) as $i => $breadcrumb) {
                         $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
                     }
 

@@ -24,16 +24,16 @@ $now = new Alaress_Date_Format(time(), 'U');
 //Does a wiki with this name already exist on this homepage?
 $potentialSlug = '';
 
-$heading = trim($_POST['heading']);
+$heading = trim($_POST['heading'] ?? '');
 $url  = new Url($heading);
 
-if (is_ascii($_POST['heading'])) {
+if (is_ascii($heading)) {
     $potentialSlug = $url->getSlug();
 }
 
 $pb = $wikiMapper->getPredicateBuilder();
-$pb->equals('categoryID', (int)$_POST['categoryID'])
-    ->notEquals('wikiID', (int)$_POST['wikiID'])
+$pb->equals('categoryID', (int)($_POST['categoryID'] ?? 0))
+    ->notEquals('wikiID', (int)($_POST['wikiID'] ?? 0))
     ->equals('deleted', 'false')
     ->equals('slug', $potentialSlug);
 $count = $wikiMapper->countByPredicates($pb);
@@ -154,19 +154,19 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $wikiMapper->save($wiki);
 
     SitePage::localRedir('/wiki/' . $wiki->getCategory()->getId() . '/' . $wiki->getSlug());
-} elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
+} elseif (is_numeric($_GET['revert'] ?? false) && is_numeric($_GET['wikiID'])) {
     // applying a reversion
     $wiki = $wikiHandler->getByID($_GET['wikiID']);
 
     // Check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_WRITE) {
+    if (!$wiki || ($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
     $wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
 
     SitePage::localRedir('/wiki/' . $wiki['categoryID'] . '/' . $wiki['slug']);
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'] ?? false)) {
     // deleting a wiki
     $wiki = $wikiHandler->getByID($_GET['delete']);
 
