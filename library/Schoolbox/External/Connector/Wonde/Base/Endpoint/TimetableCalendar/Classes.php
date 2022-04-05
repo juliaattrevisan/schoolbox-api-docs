@@ -76,12 +76,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
      * @var \DateTimeZone
      */
     private \DateTimeZone $timezone;
@@ -124,7 +118,6 @@ class Classes implements IStrategy
      * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param \DateTimeZone                              $timezone
      * @param \Alaress_Date_Format                       $fromDate
      * @param \Alaress_Date_Format                       $toDate
@@ -136,7 +129,6 @@ class Classes implements IStrategy
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         \DateTimeZone $timezone,
         \Alaress_Date_Format $fromDate,
         \Alaress_Date_Format $toDate
@@ -147,11 +139,6 @@ class Classes implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
-
-        /* Temporarily disabled while we wait for feedback from schools
-         * $this->overridesMapper = $overridesMapper;
-         */
-
         $this->timezone = $timezone;
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
