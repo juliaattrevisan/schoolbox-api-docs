@@ -88,19 +88,15 @@ class Classes implements IStrategy
 
 
     /**
-     * A date string in the format Y-m-d e.g. 2020-10-12
-     *
-     * @var string
+     * @var \Alaress_Date_Format
      */
-    private string $fromDate;
+    private \Alaress_Date_Format $fromDate;
 
 
     /**
-     * A date string in the format Y-m-d e.g. 2020-10-12
-     *
-     * @var string
+     * @var \Alaress_Date_Format
      */
-    private string $toDate;
+    private \Alaress_Date_Format $toDate;
 
 
     /**
@@ -138,8 +134,6 @@ class Classes implements IStrategy
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param \DateTimeZone                              $timezone
-     * @param string                                     $fromDate
-     * @param string                                     $toDate
      */
     public function __construct(
         LoggerInterface $log,
@@ -150,8 +144,8 @@ class Classes implements IStrategy
         ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         \DateTimeZone $timezone,
-        string $fromDate,
-        string $toDate
+        \Alaress_Date_Format $fromDate,
+        \Alaress_Date_Format $toDate
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -183,171 +177,42 @@ class Classes implements IStrategy
 
         $this->log->debug('Preloading student involvements for all the classes.');
 
-        $studentInvolvements = $this->preloadStudentInvolvements();
-
         $this->log->debug(sprintf(
             'Processing lessons between %s and %s',
             $this->fromDate,
             $this->toDate
         ));
 
+        /* Wonde does things by Class, then Lessons
+         * Get all the classes, then process their lessons
+         */
         $nextUrl = sprintf(
-            'lessons?page=%s&per_page=%s&lessons_start_after=%s&lessons_start_before=%s&include=%s',
+            'classes?'. implode('&', [
+                'page=%s',
+                'per_page=%s',
+                'has_students=%s',
+                'has_lessons=%s',
+                'include=%s'
+            ]),
             1,
             self::NUM_PER_PAGE,
-            $this->fromDate,
-            $this->toDate,
+            true,
+            true,
             implode(',', [
-                'class',
-                'employee',
-                'period',
-                'room'
+                'subject',
+                'students',
+                'employees',
+                'lessons',
+                'lessons.room',
+                'lessons.period'
             ])
         );
 
         for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            $lessons = $this->api->retrieve('GET', $nextUrl, []);
+            $classes = $this->api->retrieve('GET', $nextUrl, []);
 
-            foreach ($lessons['data'] as $lesson) {
-                /* Save main event info - see if one already exists
-                 * if it has the same name, place, day, period and time
-                 * If you have five columns the same, you're probably
-                 * looking at an event that we've already loaded before
-                 */
-                $guid = $lesson['id'];
-
-                /* Try to recycle a previous instance
-                 */
-                if (isset($this->seen[$guid])) {
-                    $event = $this->seen[$guid];
-
-                    $this->log->debug(sprintf(
-                        'Reusing previously seen timetable event %s - %s, %s, %s-%s',
-                        $event->getTitle(),
-                        $event->getDay(),
-                        $event->getPeriod(),
-                        $event->getStartAt()->getDatabase(),
-                        $event->getFinishAt()->getDatabase()
-                    ));
-                } else {
-                    $room = null;
-
-                    /* Rooms are optional and come with two data points - name and code
-                     * Example wonde data had a meaningful name in the $code e.g. '3a HomeRoom'
-                     * and a less meaningful name in the $name e.g. '401'
-                     */
-                    if (is_array($lesson['room'])) {
-                        $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
-                    }
-
-                    /* Wonde gives you this data struct for dates
-                     *
-                     * Convert their UTC timezone into our schoolbox instance's timezone
-                     * then save it
-                     *
-                        [start_at] => Array
-                            (
-                                [date] => 2022-03-28 00:55:00.000000
-                                [timezone_type] => 3
-                                [timezone] => UTC
-                            )
-                    */
-                    $startAt = (new \Alaress_Date_Format(explode('.', $lesson['start_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['start_at']['timezone'])))
-                        ->setTimezone($this->timezone);
-
-                    $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
-                        ->setTimezone($this->timezone);
-
-                    /* Cram in everything else
-                     */
-                    $event = $this->eventMapper->createModel()
-                        ->setTitle($lesson['class']['data']['name'])
-                        ->setDetail(null)
-                        ->setLocation($room)
-                        ->setCode($lesson['class']['data']['code'])
-                        ->setDay($lesson['period']['data']['day'])
-                        ->setPeriod($lesson['period']['data']['name'])
-                        ->setStartAt($startAt)
-                        ->setFinishAt($finishAt)
-                        ->setType(null)
-                        ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                        ->setGuid($lesson['id'])
-                        ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
-                }
-
-                if ($this->perform) {
-                    $this->eventMapper->save($event);
-                }
-
-                $this->log->debug(sprintf(
-                    'Creating new timetable event %s - %s, %s, %s-%s',
-                    $event->getTitle(),
-                    $event->getDay(),
-                    $event->getPeriod(),
-                    $event->getStartAt()->getDatabase(),
-                    $event->getFinishAt()->getDatabase()
-                ));
-
-                $this->seen[$guid] = $event;
-
-                /* Save sis_class record
-                 */
-                if (isset($this->classEntries[$event->getCode()])) {
-                    $classEntry = $this->classEntries[$event->getCode()];
-                } else {
-                    $classEntry = $this->classEntryMapper->createModel()
-                        ->setName($lesson['class']['data']['name'])
-                        ->setCode($lesson['class']['data']['code']);
-
-                    if ($this->perform) {
-                        $this->classEntryMapper->save($classEntry);
-                    }
-
-                    $this->classEntries[$event->getCode()] = $classEntry;
-                }
-
-                /* Save sis_class_user involvements
-                 * This is the teacher
-                 */
-                $externalId = $lesson['employee']['data']['mis_id'];
-                $name = sprintf(
-                    '%s %s %s',
-                    $lesson['employee']['data']['title'],
-                    $lesson['employee']['data']['forename'],
-                    $lesson['employee']['data']['surname']
-                );
-
-                $this->saveInvolvement($event, $classEntry, $name, $externalId);
-
-                /* Save sis_class_user involvements
-                 * This is the student(s)
-                 */
-                $classCode = $lesson['class']['data']['code'];
-
-                /* No students involved in $classCode, I guess
-                 */
-                if (!isset($studentInvolvements[$classCode])) {
-                    $this->log->debug(sprintf(
-                        '%s: no students involved',
-                        $classCode
-                    ));
-
-                    continue;
-                }
-
-                /* If you have students, shank them all in too as involvements
-                 */
-                $involvements = $studentInvolvements[$classCode];
-
-                $this->log->debug(sprintf(
-                    '%s: %s students involved',
-                    $classCode,
-                    \count($involvements)
-                ));
-
-                foreach ($involvements as $externalId => $name) {
-                    $this->saveInvolvement($event, $classEntry, $name, (string)$externalId);
-                }
+            foreach ($classes['data'] as $class) {
+                $this->processClass($class);
             }
 
             /* If there's a pagination struct, there's more data to come...
@@ -355,8 +220,213 @@ class Classes implements IStrategy
              */
             $nextUrl = false;
 
-            if (isset($lessons['meta']['pagination'])) {
-                $nextUrl = $lessons['meta']['pagination']['next'] ?? false;
+            if (isset($classes['meta']['pagination'])) {
+                $nextUrl = $classes['meta']['pagination']['next'] ?? false;
+            }
+        }
+    }
+
+
+    /**
+     * For each class, process the lessons and apply student/staff involvements
+     * Ignore lessons that occur outside the [$from, $to] window
+     *
+     * @param array $class
+     * @return void
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function processClass(array $class)
+    {
+        foreach ($class['lessons']['data'] as $lesson) {
+            /* Decide if we need to process this lesson
+             * Outside the window? Skip it
+             *
+             * Wonde gives you this data struct for dates
+             *
+             * Convert their UTC timezone into our schoolbox instance's timezone
+             * then save it
+             *
+                [start_at] => Array
+                    (
+                        [date] => 2022-03-28 00:55:00.000000
+                        [timezone_type] => 3
+                        [timezone] => UTC
+                    )
+            */
+            $startAt = (new \Alaress_Date_Format(explode('.', $lesson['start_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['start_at']['timezone'])))
+                ->setTimezone($this->timezone);
+
+            $finishAt = (new \Alaress_Date_Format(explode('.', $lesson['end_at']['date'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
+                ->setTimezone($this->timezone);
+
+            $this->log->info(sprintf(
+                '%s %s on %s',
+                $class['name'],
+                $class['code'],
+                $startAt->getDatabase()
+            ));
+
+            /* Starts too far in the past
+             */
+            if ($startAt->lt($this->fromDate)) {
+                $this->log->debug(sprintf(
+                    '%s %s (%s %s - %s %s) too far in the past; skipping',
+                    $class['name'],
+                    $class['code'],
+                    $lesson['start_at']['date'],
+                    $lesson['start_at']['timezone'],
+                    $lesson['end_at']['date'],
+                    $lesson['end_at']['timezone'],
+                ));
+
+                continue;
+            }
+
+            /* Starts too far in the future
+             */
+            if ($startAt->gt($this->toDate)) {
+                $this->log->debug(sprintf(
+                    '%s %s (%s %s - %s %s) too far in the future; skipping',
+                    $class['name'],
+                    $class['code'],
+                    $lesson['start_at']['date'],
+                    $lesson['start_at']['timezone'],
+                    $lesson['end_at']['date'],
+                    $lesson['end_at']['timezone'],
+                ));
+
+                continue;
+            }
+
+            /* Try to recycle a previous instance
+             */
+            $room = null;
+
+            /* Rooms are optional and come with two data points - name and code
+             * Example wonde data had a meaningful name in the $code e.g. '3a HomeRoom'
+             * and a less meaningful name in the $name e.g. '401'
+             */
+            if (is_array($lesson['room'])) {
+                $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
+            }
+
+            /* Cram in everything else
+             */
+            $event = $this->eventMapper->createModel()
+                ->setTitle($class['name'])
+                ->setDetail(null)
+                ->setLocation($room)
+                ->setCode($class['code'])
+                ->setDay($lesson['period']['data']['day'])
+                ->setPeriod($lesson['period']['data']['name'])
+                ->setStartAt($startAt)
+                ->setFinishAt($finishAt)
+                ->setType(null)
+                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                ->setGuid($lesson['id'])
+                ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+
+            /* Save it and remember what we saw in case we need to reuse this later
+             */
+            $this->log->debug(sprintf(
+                'Creating new timetable event %s - %s, %s, %s-%s',
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+
+            if ($this->perform) {
+                $this->eventMapper->save($event);
+            }
+
+            /* Save sis_class record
+             */
+            if (isset($this->classEntries[$event->getCode()])) {
+                $classEntry = $this->classEntries[$event->getCode()];
+            } else {
+                $classEntry = $this->classEntryMapper->createModel()
+                    ->setName($class['name'])
+                    ->setCode($class['code']);
+
+                if ($this->perform) {
+                    $this->classEntryMapper->save($classEntry);
+                }
+
+                $this->classEntries[$event->getCode()] = $classEntry;
+            }
+
+            /* Save the involvements
+             */
+            $this->saveInvolvements($class, $lesson, $event, $classEntry);
+        }
+    }
+
+
+    /**
+     * Save all the involvements for a given $class
+     *
+     * @param array                           $class
+     * @param array                           $lesson
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveInvolvements(
+        array $class,
+        array $lesson,
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry
+    ): void {
+        /* Save sis_class_user involvements
+         * This is the teacher(s)
+         */
+        if (!\count($class['employees']['data'])) {
+            $this->log->debug(sprintf(
+                '%s: no staff involved',
+                $class['code']
+            ));
+        } else {
+            foreach ($class['employees']['data'] as $employee) {
+                $externalId = $employee['mis_id'];
+
+                $name = sprintf(
+                    '%s %s %s',
+                    $employee['title'],
+                    $employee['forename'],
+                    $employee['surname']
+                );
+
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
+            }
+        }
+
+        /* Save sis_class_user involvements
+         * This is the student(s)
+         */
+        if (!\count($class['students']['data'])) {
+            $this->log->debug(sprintf(
+                '%s: no students involved',
+                $class['code']
+            ));
+        } else {
+            foreach ($class['students']['data'] as $student) {
+                $externalId = $student['mis_id'];
+
+                $name = sprintf(
+                    '%s %s',
+                    $student['forename'],
+                    $student['surname']
+                );
+
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
         }
     }
@@ -414,78 +484,5 @@ class Classes implements IStrategy
                 $event->getFinishAt()->getDatabase()
             ));
         }
-    }
-
-
-    /**
-     *
-     * FIXME Ask Colin - find a less-wonky way to do this. imho class['subject'] should
-     *  have a value, but doesn't, in the wonde test data (is their bug or valid data?)
-     *
-     * First dig out the Wonde class objects which is where the students live
-     * You can find it by the class name, because you don't get the subject identifier
-     * at the moment, for some reason - normally it lives in [class][data][subject]
-     * from what I can infer (it's just always blank)
-     *
-     * class_name is inconclusive - there are multiple class codes per class name
-     * so you end up having to sift multiple times through the same thing
-     * e.g. "Health and Physical Education 07" has four individual class codes
-     * associated with it - 07HPEDA 07HPEDB 07HPEDC 07HPEDD
-     *
-     * Anyway, since class_subject is often useless and class_name is inconclusive,
-     * just load everything into a set of (student external id, student fullname) tuples
-     *
-     * @return array
-     */
-    private function preloadStudentInvolvements(): array
-    {
-        $nextUrl = sprintf(
-            'classes?'. implode('&', [
-                'page=%s',
-                'per_page=%s',
-                'has_students=%s',
-                'has_lessons=%s',
-                'include=%s'
-            ]),
-            1,
-            self::NUM_PER_PAGE,
-            true,
-            true,
-            implode(',', [
-                'students',
-                'subject'
-            ])
-        );
-
-        $stack = [];
-
-        for ($i = 0; ($nextUrl && $i < self::MAX_CALLS); $i++) {
-            $classes = $this->api->retrieve('GET', $nextUrl, []);
-
-            foreach ($classes['data'] as $class) {
-                $classCode = $class['code'];
-
-                /* Build a big list of students involved with $classCode
-                 */
-                foreach ($class['students']['data'] as $student) {
-                    $stack[$classCode][(string)$student['mis_id']] = sprintf(
-                        '%s %s',
-                        $student['forename'],
-                        $student['surname']
-                    );
-                }
-            }
-
-            /* If there's a pagination struct, there's more data to come...
-             * But make sure that the 'next' element exists before trying to go there
-             */
-            $nextUrl = false;
-
-            if (isset($classes['meta']['pagination'])) {
-                $nextUrl = $classes['meta']['pagination']['next'] ?? false;
-            }
-        }
-
-        return $stack;
     }
 }
