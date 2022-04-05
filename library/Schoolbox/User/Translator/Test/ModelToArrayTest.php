@@ -249,6 +249,46 @@ class ModelToArrayTest extends TestCase
                 ->setDeletedAt(Alaress_Date_Format::now()),
             $deletedUser,
         ];
+
+        // Campus indexed by ID
+        $campusIndexedById           = $emptyResponse;
+        $campusIndexedById['campus'] = [
+            [
+                'id'   => 333,
+                'name' => 'B',
+                'code' => 'C',
+                'days' => 5,
+            ],
+            [
+                'id'   => 555,
+                'name' => 'Z',
+                'code' => '&',
+                'days' => 10,
+            ],
+        ];
+        yield 'campus indexed by ID' => [
+            (clone $emptyUser)
+                ->setCampusCollection(
+                    (new GenericCollection(Campus::class))
+                        ->setOffset(
+                            333,
+                            (new Campus())
+                                ->setId(333)
+                                ->setName('B')
+                                ->setExtTimetableCode('C')
+                            ->setTimetableDay(5)
+                        )
+                        ->setOffset(
+                            555,
+                            (new Campus())
+                                ->setId(555)
+                                ->setName('Z')
+                                ->setExtTimetableCode('&')
+                            ->setTimetableDay(10)
+                        )
+                ),
+            $campusIndexedById,
+        ];
     }
 
 
