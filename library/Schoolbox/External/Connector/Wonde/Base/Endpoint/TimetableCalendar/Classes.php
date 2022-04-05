@@ -100,14 +100,6 @@ class Classes implements IStrategy
 
 
     /**
-     * A list of event guids that we saw previously
-     *
-     * @var array
-     */
-    private array $seen = [];
-
-
-    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -134,6 +126,8 @@ class Classes implements IStrategy
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param \DateTimeZone                              $timezone
+     * @param \Alaress_Date_Format                       $fromDate
+     * @param \Alaress_Date_Format                       $toDate
      */
     public function __construct(
         LoggerInterface $log,
@@ -301,69 +295,113 @@ class Classes implements IStrategy
                 continue;
             }
 
-            /* Try to recycle a previous instance
+            /* Save sis_event record
              */
-            $room = null;
-
-            /* Rooms are optional and come with two data points - name and code
-             * Example wonde data had a meaningful name in the $code e.g. '3a HomeRoom'
-             * and a less meaningful name in the $name e.g. '401'
-             */
-            if (is_array($lesson['room'])) {
-                $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
-            }
-
-            /* Cram in everything else
-             */
-            $event = $this->eventMapper->createModel()
-                ->setTitle($class['name'])
-                ->setDetail(null)
-                ->setLocation($room)
-                ->setCode($class['code'])
-                ->setDay($lesson['period']['data']['day'])
-                ->setPeriod($lesson['period']['data']['name'])
-                ->setStartAt($startAt)
-                ->setFinishAt($finishAt)
-                ->setType(null)
-                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                ->setGuid($lesson['id'])
-                ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
-
-            /* Save it and remember what we saw in case we need to reuse this later
-             */
-            $this->log->debug(sprintf(
-                'Creating new timetable event %s - %s, %s, %s-%s',
-                $event->getTitle(),
-                $event->getDay(),
-                $event->getPeriod(),
-                $event->getStartAt()->getDatabase(),
-                $event->getFinishAt()->getDatabase()
-            ));
-
-            if ($this->perform) {
-                $this->eventMapper->save($event);
-            }
+            $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
 
             /* Save sis_class record
              */
-            if (isset($this->classEntries[$event->getCode()])) {
-                $classEntry = $this->classEntries[$event->getCode()];
-            } else {
-                $classEntry = $this->classEntryMapper->createModel()
-                    ->setName($class['name'])
-                    ->setCode($class['code']);
-
-                if ($this->perform) {
-                    $this->classEntryMapper->save($classEntry);
-                }
-
-                $this->classEntries[$event->getCode()] = $classEntry;
-            }
+            $classEntry = $this->createClassEntry($class, $event);
 
             /* Save the involvements
              */
-            $this->saveInvolvements($class, $lesson, $event, $classEntry);
+            $this->createInvolvements($class, $lesson, $event, $classEntry);
         }
+    }
+
+
+    /**
+     * Create a new SUDS Timetable Event with all the class and lesson pieces
+     *
+     * @param array                $class
+     * @param array                $lesson
+     * @param \Alaress_Date_Format $startAt
+     * @param \Alaress_Date_Format $finishAt
+     * @return \Schoolbox\External\Event\Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createEvent(
+        array $class,
+        array $lesson,
+        \Alaress_Date_Format $startAt,
+        \Alaress_Date_Format $finishAt
+    ): \Schoolbox\External\Event\Model {
+        /* Try to recycle a previous instance
+         */
+        $room = null;
+
+        /* Rooms are optional and come with two data points - name and code
+         * Example wonde data had a meaningful name in the $code e.g. '3a HomeRoom'
+         * and a less meaningful name in the $name e.g. '401'
+         */
+        if (is_array($lesson['room'])) {
+            $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
+        }
+
+        /* Cram in everything else
+         */
+        $event = $this->eventMapper->createModel()
+            ->setTitle($class['name'])
+            ->setDetail(null)
+            ->setLocation($room)
+            ->setCode($class['code'])
+            ->setDay($lesson['period']['data']['day'])
+            ->setPeriod($lesson['period']['data']['name'])
+            ->setStartAt($startAt)
+            ->setFinishAt($finishAt)
+            ->setType(null)
+            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setGuid($lesson['id'])
+            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+
+        /* Save it and remember what we saw in case we need to reuse this later
+         */
+        $this->log->debug(sprintf(
+            'Creating new timetable event %s - %s, %s, %s-%s',
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        if ($this->perform) {
+            $this->eventMapper->save($event);
+        }
+
+        return $event;
+    }
+
+
+    /**
+     * Create (or reuse) a ClassEntry corresponding to $event
+     *
+     * @param array                           $class
+     * @param \Schoolbox\External\Event\Model $event
+     * @return ClassEntry
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
+    {
+        if (isset($this->classEntries[$event->getCode()])) {
+            $classEntry = $this->classEntries[$event->getCode()];
+        } else {
+            $classEntry = $this->classEntryMapper->createModel()
+                ->setName($class['name'])
+                ->setCode($class['code']);
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($classEntry);
+            }
+
+            $this->classEntries[$event->getCode()] = $classEntry;
+        }
+
+        return $classEntry;
     }
 
 
@@ -379,7 +417,7 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveInvolvements(
+    private function createInvolvements(
         array $class,
         array $lesson,
         \Schoolbox\External\Event\Model $event,
