@@ -333,6 +333,17 @@ export default {
         },
 
         /**
+         * Toggle the files visibility to hidden/shown
+         *
+         * @param { Object }
+         */
+        onToggleVisibilitySelected (toggledFile) {
+            //we need to do this as Vue is watching tableData, not each individual file within
+            const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id); 
+            fileInTableData.hidden = !fileInTableData.hidden;
+        },
+
+        /**
          * Add the file to the table, ensuring it's visible by
          * checking on the relevant filter if not already active
          *
@@ -451,6 +462,7 @@ export default {
                     </template>
                     <template #edit="props">
                         <nav class="edit">
+                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view' : 'icon-view-hollow' }`" @click.prevent="onToggleVisibilitySelected(props.row)" title="Toggle file visibility">Toggle file visibility</button>
                             <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                         </nav>
                     </template>
@@ -537,17 +549,27 @@ export default {
 }
 
 .edit {
+    display: flex;
     height: 2.5rem;
     text-align: center;
-    width: 2.5rem;
+    width: 5rem;
 }
 
 .edit a {
     color: var(--content-ui-foreground);
-    display: block;
+    display: inline-block;
     line-height: 2.5;
+    margin: 0;
     opacity: 0.7;
     padding-left: 8px; //move the pencil into the centre
+}
+
+.button-toggle-visibility {
+    background: none;
+    color: var(--content-ui-foreground);
+    font-size: 0rem;
+    line-height: 2.5;
+    padding: 0px 2px 0px 10px;
 }
 
 .date-modified-td {
@@ -562,7 +584,7 @@ export default {
 
 .VueTables__table .edit-td {
     padding-left: 0; //bring it inline with the right side border
-    width: 2.5rem; //keep the edit icon on the right side
+    width: 5rem; //keep the edit icon on the right side
 }
 
 .VueTables__table-footer {
