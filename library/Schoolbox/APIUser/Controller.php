@@ -175,8 +175,57 @@ class Controller extends Base
          * build the user Model object from the POST data
          */
         //set default fields
-        $newUser->setEnabled(true);
-        $newUser->setSuperuser(false);
+
+        $this->setUserFields($newUser, $data);
+    }
+
+    /**
+     * updates all fields for a user
+     *
+     * @api PUT /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPut
+     */
+    public function apiUserPut(User $user)
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        $userModal = $this->userMapper->createModel($user->getId());
+
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+        $this->setUserFields($userModal, $data);
+    }
+
+    /**
+     *  updates selected fields for a user
+     *
+     * @api PATCH /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPATCH
+     */
+    public function apiUserPatch(User $user)
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+        $this->setUserFields($user, $data);
+    }
+
+    /**
+     * @param User $user
+     * @param array $data
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function setUserFields(User $user, array $data): void
+    {
+        $user->setEnabled(true);
+        $user->setSuperuser(false);
 
         /**
          * build the db check data for the new model.
@@ -268,84 +317,6 @@ class Controller extends Base
         /**
          * build the user Model object from the POST data
          */
-        /** @var User $model */
-        $model = (new User\Translator\ArrayToModel())($data, $newUser);
-
-        $this->userMapper->save($model);
-
-        //get hydrated user, or the campus/role/house wont have names, just ids...
-        $user = $this->userMapper->findById($model->getId());
-        $users_groups = $this->groupsHelper->getCurrentGroups($user);
-        $apiGroups = new Collection($users_groups);
-        $groupsArr = $apiGroups->map(new GroupArray());
-        /**
-         * build the whole thing
-         */
-        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
-    }
-
-    /**
-     * updates all fields for a user
-     *
-     * @api PUT /api/user/{userId}
-     * @link http://api.schoolbox.com.au/#operation/userPut
-     */
-    public function apiUserPut(User $user)
-    {
-        $data = json_decode(json_encode($this->request->content->get()), true);
-
-        $userModal = $this->userMapper->createModel($user->getId());
-
-        /**
-         * build the user Model object from the POST data
-         */
-        //set default fields
-        $userModal->setEnabled(true);
-        $userModal->setSuperuser(false);
-
-        /** @var User $model */
-        $model = (new User\Translator\ArrayToModel())($data, $userModal);
-
-        $this->userMapper->save($model);
-
-        //get hydrated user, or the campus/role/house wont have names, just ids...
-        $updatedUser = $this->userMapper->findById($model->getId());
-        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser);
-        $apiGroups = new Collection($users_groups);
-        $groupsArr = $apiGroups->map(new GroupArray());
-        /**
-         * build the whole thing
-         */
-        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
-    }
-
-    /**
-     *  updates selected fields for a user
-     *
-     * @api PATCH /api/user/{userId}
-     * @link http://api.schoolbox.com.au/#operation/userPATCH
-     */
-    public function apiUserPatch(User $user)
-    {
-        $data = json_decode(json_encode($this->request->content->get()), true);
-
-        /**
-         * build the user Model object from the POST data
-         */
-        //set default fields
-        $user->setEnabled(true);
-        $user->setSuperuser(false);
-
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $user);
 
