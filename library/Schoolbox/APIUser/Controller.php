@@ -151,24 +151,6 @@ class Controller extends Base
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
-        //check if what the user is attempting to edit is valid?
-        if (array_key_exists('groups', $data)) {
-            throw new SchoolboxException("groups field is unable to be updated at this endpoint");
-        }
-        if (array_key_exists('students', $data)) {
-            throw new SchoolboxException("students field is unable to be updated at this endpoint");
-        }
-        if (array_key_exists('guardians', $data)) {
-            throw new SchoolboxException("guardians field is unable to be updated at this endpoint");
-        }
-        if (array_key_exists('fullName', $data)) {
-            throw new SchoolboxException("'fullName' is unable to be updated, please use title, firstName, lastname.");
-        }
-        if (array_key_exists('email', $data)) {
-            //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
-            throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
-        }
-
         $newUser = $this->userMapper->createModel($uid);
 
         /**
@@ -224,6 +206,24 @@ class Controller extends Base
      */
     private function setUserFields(User $user, array $data): void
     {
+        //check if what the user is attempting to edit is valid?
+        if (array_key_exists('groups', $data)) {
+            throw new SchoolboxException("groups field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('students', $data)) {
+            throw new SchoolboxException("students field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('guardians', $data)) {
+            throw new SchoolboxException("guardians field is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('fullName', $data)) {
+            throw new SchoolboxException("'fullName' is unable to be updated, please use title, firstName, lastname.");
+        }
+        if (array_key_exists('email', $data)) {
+            //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
+            throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
+        }
+
         $user->setEnabled(true);
         $user->setSuperuser(false);
 
