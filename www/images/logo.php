@@ -122,5 +122,6 @@ try {
     $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
 
     // Temporary Redirect: eventually someone will upload a logo
+    header('cache-control: no-store');
     $cdnPrefixGenerator->redirectTemporary('/images' . $logoSizes[$logo][$size][2]);
 }

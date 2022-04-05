@@ -87,6 +87,9 @@ try {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+} catch (InvalidArgumentException $e){
+    header('Cache-Control: no-store');
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
 } catch (Exception $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
 }

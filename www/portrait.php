@@ -102,8 +102,9 @@ try {
     */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 } catch (\InvalidArgumentException $e) {
-    /* Image/Portrait not found
+    /* Image/Portrait not found / expiry is incorrect
     */
+    header('Cache-Control: no-store');
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 } catch (Exception $e) {
     /* All other exceptions

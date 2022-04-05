@@ -106,6 +106,9 @@ try {
 } catch (Image\Exception\ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();
     \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
+} catch (\InvalidArgumentException $e) {
+    header('Cache-Control: no-store');
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 } catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }

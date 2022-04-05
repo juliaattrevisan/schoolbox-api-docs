@@ -136,6 +136,11 @@ try {
 } catch (Image\Exception\ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::localRedir($path, false, $e->getHttpStatusCode());
+} catch (InvalidArgumentException $e) {
+    header('cache-control: no-store');
+    /** @var PrefixGenerator $prefixGenerator */
+    $prefixGenerator = $kernel->get('cdnPrefixGenerator');
+    $prefixGenerator->redirectTemporary($path);
 } catch (Exception $e) {
     /** @var PrefixGenerator $prefixGenerator */
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');

@@ -64,6 +64,8 @@ try {
 } catch (ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
+} catch (InvalidArgumentException $e){
+    header('Cache-Control: no-store');
 } catch (Exception $e) {
     // fall through
 }
