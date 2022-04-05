@@ -40,7 +40,7 @@ class Controller extends Base
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
-            ->putMeta('title', 'Message from ' . $data['from']['fullName'] ?? 'Unknown User');
+            ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
         (new RedisPublisher(
             Redis::getSignalQueueClientInstance(),
