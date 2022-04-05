@@ -181,7 +181,7 @@ class Classes implements IStrategy
          * Get all the classes, then process their lessons
          */
         $nextUrl = sprintf(
-            'classes?'. implode('&', [
+            'classes?' . implode('&', [
                 'page=%s',
                 'per_page=%s',
                 'has_students=%s',
