@@ -13,7 +13,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -76,7 +76,7 @@ class Profile implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -84,49 +84,49 @@ class Profile implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
-     * @var Api
+     * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
      * @var Registry
      */
-    private $registry;
+    private Registry $registry;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
@@ -134,7 +134,7 @@ class Profile implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param Api                             $api
+     * @param IApi                            $api
      * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -145,7 +145,7 @@ class Profile implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Api $api,
+        IApi $api,
         Registry $registry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -193,6 +193,7 @@ class Profile implements IStrategy
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      */
     private function importStudents(): void
@@ -486,7 +487,6 @@ class Profile implements IStrategy
                 ]);
             }
 
-
             /* Prepare for next page if it exists
              */
             $nextUrl = $payload['links']['next'] ?? null;
@@ -506,7 +506,6 @@ class Profile implements IStrategy
      *
      * @param string $date
      * @return array
-     * @throws \InvalidArgumentException
      */
     private function findAcademicPeriodIds(string $date): array
     {
@@ -603,7 +602,6 @@ class Profile implements IStrategy
      *
      * @param array $student
      * @return array|null
-     * @throws \InvalidArgumentException
      */
     public function findEmergencyContacts(array $student): ?array
     {
@@ -809,7 +807,6 @@ class Profile implements IStrategy
      *
      * @param string $studentExternalId
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function findSpecialNeeds(string $studentExternalId): bool
     {
@@ -875,7 +872,6 @@ class Profile implements IStrategy
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws \InvalidArgumentException
      */
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $contacts): void
     {
@@ -936,7 +932,7 @@ class Profile implements IStrategy
              * If one already exists, load it, update it, then save it
              * Otherwise make a new one for the given id
              */
-            $externalId = (string)$parent['data']['attributes']['externalId'];
+            $externalId = (string)$parent['data']['attributes']['contactCode'];
             $email = (string)$parent['data']['attributes']['email'];
             $firstname = (string)$parent['data']['attributes']['firstName'];
             $lastname = (string)$parent['data']['attributes']['lastName'];
