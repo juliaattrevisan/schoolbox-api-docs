@@ -43,6 +43,10 @@ export default {
             type: Array,
             required: true,
         },
+        selectedRowsCountWithRowName: {
+            type: String,
+            required: true,
+        },
     },
 
     emits: ['updated'],
@@ -76,21 +80,23 @@ export default {
 
         /**
          * To strip the <br> from the log data
+         * 
+         * @return { String }
          */
         updatedLogData () {
             return this.logData[0].replace(/<br\s*\/?>/gi, '');
         },
 
         /**
-         * For proper count display, eg: '1 user' / '4 users'
-         *
-         * @returns {String}
+         * To change when processing
+         * 
+         * @return { String }
          */
-        selectedRowsCountWithRowName () {
-            if (this.selectedRows.length === 1) {
-                return this.selectedRows.length + ' user';
+        updateButtonText () {
+            if (this.isProcessing) {
+                return `<em>Processing, please wait...</em>`;
             } else {
-                return this.selectedRows.length + ' users';
+                return `Update Selected`;
             }
         },
 
@@ -163,7 +169,7 @@ export default {
 </script>
 
 <template>
-    <reveal-modal ref="modal" size="xlarge">
+    <reveal-modal ref="modal" size="xlarge" :close-on-background-click="false" :is-close-disabled="isProcessing">
         <Transition name="fade" mode="out-in">
             <div v-if="hasUpdated" class="new-values">
                 <div class="new-values__full-width">
@@ -285,8 +291,11 @@ export default {
                         <option value="1">Revoke</option>
                     </select>
                 </div>
+                <div v-if="selectedRows.length > 1000" class="new-values__full-width">
+                    <div class="alert-box warning">Please note, as a large number of users has been selected, processing may take some time.</div>
+                </div>
                 <div class="new-values__full-width">
-                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing">Update Selected</button>
+                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing" v-html="updateButtonText"></button>
                 </div>
             </div>
         </Transition>

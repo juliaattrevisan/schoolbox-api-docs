@@ -356,6 +356,7 @@ export default {
             :houses="houses"
             :eportfolio-enabled="eportfolioEnabled"
             :selected-rows="selectedRows"
+            :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
             @updated="onUpdated"
         />
     </div>
