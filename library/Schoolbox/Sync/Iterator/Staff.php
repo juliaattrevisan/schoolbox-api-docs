@@ -92,11 +92,11 @@ class Staff extends IteratorIterator
 
         $staff->getCampus()->add($campus);
 
-        $staff->setCustomField1((string)$currentResult['custom_field1']);
-        $staff->setCustomField2((string)$currentResult['custom_field2']);
-        $staff->setCustomField3((string)$currentResult['custom_field3']);
-        $staff->setCustomField4((string)$currentResult['custom_field4']);
-        $staff->setCustomField5((string)$currentResult['custom_field5']);
+        $staff->setCustomField1((string)($currentResult['custom_field1'] ?? null));
+        $staff->setCustomField2((string)($currentResult['custom_field2'] ?? null));
+        $staff->setCustomField3((string)($currentResult['custom_field3'] ?? null));
+        $staff->setCustomField4((string)($currentResult['custom_field4'] ?? null));
+        $staff->setCustomField5((string)($currentResult['custom_field5'] ?? null));
 
         return $staff;
     }

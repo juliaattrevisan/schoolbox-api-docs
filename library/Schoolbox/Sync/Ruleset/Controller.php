@@ -548,7 +548,7 @@ class Controller extends Base
 
         $response['config']     = $this->updateConfig($roleType, $postData['config'][$roleType]);
         $response['sequence']   = $this->updateRuleSequence(($postData['sequence']));
-        $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule']);
+        $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule'] ?? null);
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
@@ -570,7 +570,7 @@ class Controller extends Base
         $postData = $this->getRequest()->post;
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
-            $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition']);
+            $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition'] ?? null);
             $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect']);
         }
 
