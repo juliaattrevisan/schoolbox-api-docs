@@ -59,8 +59,8 @@ class Javascript extends Base
          */
         $event = [
             'title'     => $title,
-            'start'     => $this->event->getStartTime()->getDatabase(),
-            'end'       => $this->event->getEndTime()->getDatabase(),
+            'start'     => $this->event->getStartTimeForCalendar(),
+            'end'       => $this->event->getEndTimeForCalendar(),
 
             /* Whether you can edit this event or not
              */
