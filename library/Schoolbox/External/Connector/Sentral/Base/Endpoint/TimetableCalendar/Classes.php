@@ -69,12 +69,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
      * A date string in the format Y-m-d e.g. 2020-10-12
      *
      * @var string
@@ -117,16 +111,15 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param Registry                                   $registry
-     * @param Mapper                                     $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param string                                     $fromDate
-     * @param string                                     $toDate
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param IApi                   $api
+     * @param Registry               $registry
+     * @param Mapper                 $eventMapper
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param string                 $fromDate
+     * @param string                 $toDate
      */
     public function __construct(
         LoggerInterface $log,
@@ -136,7 +129,6 @@ class Classes implements IStrategy
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         string $fromDate,
         string $toDate
     ) {
@@ -147,9 +139,6 @@ class Classes implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
-        /* Temporarily disabled while we wait for st gregs
-         * $this->overridesMapper = $overridesMapper;
-         */
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
     }
