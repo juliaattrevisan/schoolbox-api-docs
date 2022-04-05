@@ -264,6 +264,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    Loader::getInstance()->get('date_timezone'),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),

@@ -69,6 +69,18 @@ class Factory
 
 
     /**
+     * The timezone string set in schoolbox instance's Admin area
+     * https://vagrant.dev.schoolbox.cloud/adminv2/setting/Localisation#date_timezone
+     *
+     * This is used to convert the Wonde UTC datetimes' timezone into
+     * wherever your schoolbox instance lives
+     *
+     * @var string
+     */
+    private string $timezone;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -129,6 +141,7 @@ class Factory
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
+     * @param string                                     $timezone
      * @param UserProfile\Mapper                         $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
@@ -144,6 +157,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        string $timezone,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -160,6 +174,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->timezone = $timezone;
 
         /* Profile pieces
          */
@@ -190,6 +205,10 @@ class Factory
          */
         $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
         $to = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
+
+        /* Decide a timezone for all the UTC dates Wonde gives to us
+         */
+        $timezone = new \DateTimeZone($this->timezone);
 
         /* Spawn an Api instance
          */
@@ -242,6 +261,7 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->overridesMapper,
+                $timezone,
                 $from,
                 $to
             ))

@@ -82,6 +82,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var \DateTimeZone
+     */
+    private \DateTimeZone $timezone;
+
+
+    /**
      * A date string in the format Y-m-d e.g. 2020-10-12
      *
      * @var string
@@ -131,6 +137,7 @@ class Classes implements IStrategy
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param \DateTimeZone                              $timezone
      * @param string                                     $fromDate
      * @param string                                     $toDate
      */
@@ -142,6 +149,7 @@ class Classes implements IStrategy
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        \DateTimeZone $timezone,
         string $fromDate,
         string $toDate
     ) {
@@ -156,6 +164,7 @@ class Classes implements IStrategy
          * $this->overridesMapper = $overridesMapper;
          */
 
+        $this->timezone = $timezone;
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
     }
@@ -239,8 +248,11 @@ class Classes implements IStrategy
                                 [timezone] => UTC
                             )
                     */
-                    $startAt = \Alaress_Date_Format::newDatabaseDate($lesson['start_at']['date'], new \DateTimeZone($lesson['start_at']['timezone']));
-                    $finishAt = \Alaress_Date_Format::newDatabaseDate($lesson['end_at']['date'], new \DateTimeZone($lesson['end_at']['timezone']));
+                    $startAt = (new \Alaress_Date_Format($lesson['start_at']['date'], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['start_at']['timezone'])))
+                        ->setTimezone($this->timezone);
+
+                    $finishAt = (new \Alaress_Date_Format($lesson['end_at']['date'], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone($lesson['end_at']['timezone'])))
+                        ->setTimezone($this->timezone);
 
                     $event = $this->eventMapper->createModel()
                         ->setTitle($lesson['class']['data']['name'])
