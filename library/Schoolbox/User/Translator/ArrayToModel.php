@@ -30,16 +30,16 @@ class ArrayToModel extends Base
             } elseif ('yearLevel' === $label) {
                 $model->setYear($value);
             } elseif ('flags' === $label) {
-                //set all the flags...
-                $model->setWebmail($value['showWebmailTab'])
-                      ->setHideContacts($value['showContacts'])
-                      ->setHideTimetable($value['enableTimetable'])
-                      ->setHideSidenav($value['showSideNav'])
-                      ->setHideNotificationsTray($value['showNotificationsPanel'])
-                      ->setDisplayGradeGraph($value['showGradeGraph'])
-                      ->setEportfolioEnable($value['enableEportfolio'])
-                      ->setUseInternalMail($value['useInternalMail'])
-                      ->setCalendarView($value['calendarView']);
+                //set all the flags... if they exist
+                $this->setScalar($value, 'showWebmailTab', $model, 'setWebmail');
+                $this->setScalar($value, 'showContacts', $model, 'setHideContacts');
+                $this->setScalar($value, 'enableTimetable', $model, 'setHideTimetable');
+                $this->setScalar($value, 'showSideNav', $model, 'setHideSidenav');
+                $this->setScalar($value, 'showNotificationsPanel', $model, 'setHideNotificationsTray');
+                $this->setScalar($value, 'showGradeGraph', $model, 'setDisplayGradeGraph');
+                $this->setScalar($value, 'enableEportfolio', $model, 'setEportfolioEnable');
+                $this->setScalar($value, 'useInternalMail', $model, 'setUseInternalMail');
+                $this->setScalar($value, 'calendarView', $model, 'setCalendarView');
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
