@@ -51,21 +51,23 @@ class Helper
                 firstname,
                 lastname,
                 username,
-                groups.name AS gname,
-                groups.id AS gid,
+                `groups`.name AS gname,
+                `groups`.id AS gid,
                 lyl.name AS year,
                 local_email,
                 alt_email,
                 synergy_id';
-        $from = ' FROM user
-            LEFT JOIN groups ON user.group_id = groups.id
-            LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id ';
-        $where = ' WHERE user.deleted_at IS NULL
+        $from = '
+            FROM user
+                LEFT JOIN `groups` ON user.group_id = `groups`.id
+                LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id ';
+        $where = '
+            WHERE user.deleted_at IS NULL
             AND ';
         $params = [];
         if ($keyword != "") {
             if (is_numeric($keyword)) {
-                $params['externalId'] = $this->userMapper->getDatabase()->quote($keyword);
+                $params['externalId'] = $keyword;
                 $where .= "( synergy_id = :externalId  ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
@@ -79,35 +81,35 @@ class Helper
             }
         }
         if ('' !== $username) {
-            $params['usernameExac'] = $this->userMapper->getDatabase()->quote($username);
+            $params['usernameExac'] = $username;
             $where .= "AND username = :usernameExac ";
         }
         if ('' !== $externalId) {
-            $params['externalIdExac'] = $this->userMapper->getDatabase()->quote($externalId);
+            $params['externalIdExac'] = $externalId;
             $where .= "AND synergy_id = :externalIdExac ";
         }
         if ('' !== $email) {
-            $params['email'] = $this->userMapper->getDatabase()->quote($email);
+            $params['email'] = $email;
             $where .= "AND alt_email = :email ";
         }
         if ('' !== $roleType) {
-            $params['roleType'] = $this->userMapper->getDatabase()->quote($roleType);
-            $where .= "AND groups.group_type = :roleType ";
+            $params['roleType'] = $roleType;
+            $where .= "AND `groups`.group_type = :roleType ";
         }
         if ('' !== $role) {
-            $params['role'] = $this->userMapper->getDatabase()->quote($role);
-            $where .= "AND groups.name = :role ";
+            $params['role'] = $role;
+            $where .= "AND `groups`.name = :role ";
         }
         if ('' !== $campus) {
             $select .= "";
             $from .= " JOIN userCampus on userCampus.uid = user.id
                     JOIN luCampus on luCampus.id = userCampus.campus
             ";
-            $params['campus'] = $this->userMapper->getDatabase()->quote($campus);
+            $params['campus'] = $campus;
             $where .= "AND luCampus.name = :campus ";
         }
         if ('' !== $year) {
-            $params['year'] = $this->userMapper->getDatabase()->quote($year);
+            $params['year'] = $year;
             $where .= "AND lyl.name = :year ";
         }
         $where .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
