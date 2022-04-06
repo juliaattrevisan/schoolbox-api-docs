@@ -87,6 +87,9 @@ class Mapper extends \Schoolbox\Mapper
      * This is a scalarised partial payload; you'll have to add the routes and user
      * data separately via decoration
      *
+     * This payload disregards any Historically-added turnitin documents - those
+     * will never appear in the result set
+     *
      * @param int $assessmentId
      * @return array
      * @throws \PDOException
@@ -115,7 +118,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
             INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
             LEFT JOIN storage ON ssf.hash = storage.hash
-            LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
+            LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id AND tr.historical = 0
             WHERE a.id = :assessmentId
             AND tr.id IS NOT NULL
             AND tr.status = :status
