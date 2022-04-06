@@ -105,6 +105,28 @@ class Model
 
 
     /**
+     * @var array
+     */
+    private array $staff = [];
+
+
+    /**
+     * Used in conjunction with findWithCheapStaff() to trickle users
+     *
+     * @param int    $userId
+     * @param string $name
+     * @return void
+     */
+    public function addStaff(int $userId, string $name): void
+    {
+        $this->staff[$userId] = $name;
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string
@@ -360,6 +382,26 @@ class Model
     public function setFolder(?\Schoolbox\Resource\Folder\Model $folder): self
     {
         $this->folder = $folder;
+        return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getStaff(): array
+    {
+        return $this->staff;
+    }
+
+
+    /**
+     * @param array $staff
+     * @return $this
+     */
+    public function setStaff(array $staff): self
+    {
+        $this->staff = $staff;
         return $this;
     }
 }

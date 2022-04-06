@@ -99,6 +99,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -154,6 +156,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
+            $instance->setEventId($timetableEvent->getId());
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($timetableEvent->getTitle());
             $instance->setDetail($timetableEvent->getDetail());
@@ -167,6 +170,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
+            $instance->setStaff($timetableEvent->getStaff());
 
             $stack->add($instance);
         }

@@ -36,6 +36,12 @@ class Event extends Day\Event
 
 
     /**
+     * @var array
+     */
+    private array $staff;
+
+
+    /**
      * @var \Schoolbox\Resource\Folder\Model|null
      */
     private ?\Schoolbox\Resource\Folder\Model $folder;
@@ -130,6 +136,26 @@ class Event extends Day\Event
     public function setFolder(?\Schoolbox\Resource\Folder\Model $folder): self
     {
         $this->folder = $folder;
+        return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getStaff(): array
+    {
+        return $this->staff;
+    }
+
+
+    /**
+     * @param array $staff
+     * @return Event
+     */
+    public function setStaff(array $staff): self
+    {
+        $this->staff = $staff;
         return $this;
     }
 }

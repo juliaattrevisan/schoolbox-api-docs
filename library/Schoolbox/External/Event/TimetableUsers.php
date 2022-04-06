@@ -137,6 +137,8 @@ class TimetableUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      * @throws \UnderflowException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
@@ -148,7 +150,7 @@ class TimetableUsers
          */
         $usualEventIds = $this->generateUsualEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
 
-        $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
+        $events = $this->eventMapper->findWithCheapStaff($usualEventIds)->indexBy('id');
 
         /* Find a list of events which have overrides that might affect $user
          * If there are overrides, process each one specially
@@ -176,6 +178,16 @@ class TimetableUsers
                 $events[$overrideEvent->getId()] = $overrideEvent;
             } else {
                 unset($events[$overrideEvent->getId()]);
+            }
+
+            /* These are the staff members now involved in $event (they're the teachers)
+             * If this event hasn't been kicked out due to your lack of involvement, go
+             * find all the staff members who are now in it due to mutations
+             *
+             * TODO Perhaps find a less expensive way to do this
+             */
+            if (isset($events[$overrideEvent->getId()])) {
+                $events[$overrideEvent->getId()]->setStaff($this->findMutatedStaffInvolvements($mutatedInvolvements));
             }
         }
 
@@ -263,14 +275,16 @@ class TimetableUsers
     /**
      * Get a list of events between $startDatetime and $finishDatetime
      * where each event has some kind of override that can affect $user's
-     * usual involvement via sis_class_user
+     * usual involvement via sis_class_user, or the involvement with other
+     * people (such as multiple staff teaching this class where one staff
+     * is specified via an override)
      *
      * Optionally filters to $folderCode
      *
-     * @param \Schoolbox\User        $user
-     * @param string                 $startDatetime
-     * @param string                 $finishDatetime
+     * @param string          $startDatetime
+     * @param string          $finishDatetime
      * @param GenericCollection|null $folderCodes
+     * @param \Schoolbox\User        $user
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -285,15 +299,12 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
-            AND (seuo.external_id = :externalId OR seuo.action = :actionClear)
         ";
 
         $params = [
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
-            'externalId' => $user->getExternalId(),
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'actionClear' => \Schoolbox\External\Event\Overrides\Model::CLEAR
         ];
 
         if (null === $folderCodes) {
@@ -328,5 +339,56 @@ class TimetableUsers
         }
 
         return $overrideEventIds;
+    }
+
+
+    /**
+     * Find all the staff members in the externalId list $externalIds,
+     * which is a result of override mutation
+     *
+     * Returns a stack of (user id, name) tuples, e.g.
+     * (22, Mr Jack Coles), (24, Ms Rebecca White)
+     *
+     * @param array $externalIds
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     */
+    private function findMutatedStaffInvolvements(array $externalIds): array
+    {
+        $pb = $this->userMapper->getPredicateBuilder();
+        $pb->in('u.synergy_id', $externalIds);
+
+        $where = $pb->getWhere()[0];
+
+        $params = array_merge([
+            'groupType' => \Schoolbox\Role::STAFF
+        ], $pb->getParams());
+
+        $query = "
+            SELECT DISTINCT u.id, u.synergy_id, u.title, u.firstname, u.lastname
+            FROM {$this->userMapper->getTable()} u 
+            INNER JOIN `groups` g on u.group_id = g.id
+            WHERE g.group_type = :groupType
+            AND {$where}
+        ";
+
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $stack[$row['id']] = implode(' ', array_filter([
+                $row['title'],
+                $row['firstname'],
+                $row['lastname']
+            ], static function ($val) {
+                return '' !== trim((string)$val);
+            }));
+        }
+
+        return $stack;
     }
 }

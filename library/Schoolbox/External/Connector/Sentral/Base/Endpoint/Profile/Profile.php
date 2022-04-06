@@ -193,7 +193,7 @@ class Profile implements IStrategy
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \DomainException
      * @throws \InvalidArgumentException
      */
     private function importStudents(): void
@@ -483,7 +483,6 @@ class Profile implements IStrategy
                         'firstname' => $studentBaseProfile->getFirstname(),
                         'lastname' => $studentBaseProfile->getLastname()
                     ],
-                    'timetable' => null
                 ]);
             }
 
@@ -701,7 +700,6 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
     {
@@ -773,7 +771,6 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string
-     * @throws \InvalidArgumentException
      */
     private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): string
     {
@@ -1215,7 +1212,6 @@ class Profile implements IStrategy
                         'firstname' => $staffBaseProfile->getFirstname(),
                         'lastname' => $staffBaseProfile->getLastname()
                     ],
-                    'timetable' => null
                 ]);
             }
 

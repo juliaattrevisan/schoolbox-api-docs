@@ -157,6 +157,9 @@ export default {
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter(button => button?.href),
                 },
+                timetable: {
+                    staff: data?.timetable?.staff
+                },
                 attendance: {
                     payload: this.payload
                 },
@@ -722,6 +725,20 @@ export default {
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
+                <template v-if="eventExtendedProps.timetable.staff">
+                    <meta-item class="icon-staff">
+                        <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
+                            <template v-if="id">
+                                <a :href="'/search/user/' + String(id)">{{ name }}</a>
+                            </template>
+                            <template v-else>
+                                {{ name }}
+                            </template>
+                            <span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
+                        </template>
+                    </meta-item>
+                </template>
+
                 <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
                     Attendance:
                     <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
