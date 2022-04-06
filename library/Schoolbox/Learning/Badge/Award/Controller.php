@@ -219,7 +219,9 @@ class Controller extends Base
             /* For some reason this is initialising as an empty string, not an array
              * You can't use it in an array context unless you init it first
              */
-            $queryArgs[$filter->getId()] ??= [];
+            if (isset($queryArgs[$filter->getId()]) && ('' === $queryArgs[$filter->getId()])) {
+                $queryArgs[$filter->getId()] = [];
+            }
 
             foreach ($targetUsers as $targetUser) {
                 if (!$targetUser->getYear() || isset($queryArgs[$filter->getId()][$targetUser->getYear()->getId()])) {
