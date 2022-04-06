@@ -223,6 +223,10 @@ class Controller extends Base
             //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
         }
+        if (array_key_exists('isDeleted', $data)) {
+            //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
+            throw new SchoolboxException("Unable to Delete a user from this endpoint, please use the DELETE method");
+        }
 
         $user->setEnabled(true);
         $user->setSuperuser(false);
