@@ -353,8 +353,24 @@ class Controller extends Base
      */
     public function apiUserSearch()
     {
-        $search = $this->request->query->get('search');
-        $filter = $this->request->query->get('filter');
+        $search = $this->request->query->get('search', '');
+        if ('' === $search) {
+            $problem = (new ApiProblem('Search must not be blank'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        if (strlen($search) <= 2) {
+            $problem = (new ApiProblem('Search term must be longer than 2 characters'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        $filter = $this->request->query->get('filter', '');
         $userHelper = new Helper($this->userMapper);
         $output = [];
         $ajaxSearch = $userHelper->ajaxSearch($search, $filter);
