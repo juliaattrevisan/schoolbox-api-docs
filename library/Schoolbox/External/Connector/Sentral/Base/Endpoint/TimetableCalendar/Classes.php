@@ -302,7 +302,7 @@ class Classes implements IStrategy
                     $this->eventMapper->save($event);
                 }
 
-                $this->log->debug(sprintf(
+                $this->log->info(sprintf(
                     'Creating new timetable event %s - %s, %s, %s-%s',
                     $event->getTitle(),
                     $event->getDay(),
@@ -354,7 +354,7 @@ class Classes implements IStrategy
 
                 $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
-                $this->log->debug(sprintf(
+                $this->log->info(sprintf(
                     'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
                     $name,
                     $externalId,
