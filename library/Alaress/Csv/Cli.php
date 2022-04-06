@@ -71,14 +71,14 @@ HELP;
         if ($valid->hasBOM()) {
             $this->getLogger()->warning("File has BOM character");
         } else {
-            $this->getLogger()->info("File does not contain a BOM characher");
+            $this->getLogger()->info("File does not contain a BOM character");
         }
 
         //check the header row (excluding BOM character), this is where imports usually fail.
         if ($valid->hasAsciiHeaderRow()) {
             $this->getLogger()->info("Headers are clean of UTF8");
         } else {
-            $this->getLogger()->warning("File has non ASCII charcters in the header row");
+            $this->getLogger()->warning("File has non ASCII characters in the header row");
         }
 
         //dump all locations where UTF8 characters exist, including the BOM and headers.
