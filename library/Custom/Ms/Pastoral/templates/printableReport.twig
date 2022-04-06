@@ -1,8 +1,8 @@
 {% include '@customMeridenPastoral/subTemplates/loadHighcharts.twig' %}
 <script type="text/javascript">
-    // Print immediately on load
-    $(function() {
-        window.print();
+    // Print slightly after load (so that the highcharts can load)
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(window.print, 100);
     });
 </script>
 
