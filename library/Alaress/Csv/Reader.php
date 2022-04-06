@@ -16,15 +16,15 @@ class Reader implements \Iterator
     /**
      * The file name to read from.
      *
-     * @var string
+     * @var null|string
      */
-    protected $filename = '';
+    protected ?string $filename = '';
 
     /**
      * The column list for this reader. Each row returned will be mapped to its
      * corresponding position in this list.
      *
-     * @var bool
+     * @var array
      */
     protected $column_list = array();
 
@@ -86,14 +86,19 @@ class Reader implements \Iterator
      */
     public function __construct($filename)
     {
-        if (is_resource($filename)) {
+        if (\is_resource($filename)) {
+            /* Check if it's a fopen'd resource
+             */
             $this->filename = null;
-            $this->fp       = $filename;
+            $this->fp = $filename;
         } elseif (is_readable($filename)) {
+            /* Otherwise maybe it's a path to a filename
+             */
             $this->filename = $filename;
-        } else {
-            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+            $this->fp = fopen($this->filename, 'r');
         }
+
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
     }
 
     /**
@@ -166,7 +171,7 @@ class Reader implements \Iterator
     {
         $this->cleanup();
         if (!is_resource($this->fp)) {
-            $this->fp = fopen($this->filename, 'r');
+            $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
         }
 
         // Am I loading the column list from the first column?

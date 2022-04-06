@@ -57,6 +57,7 @@ class Csv extends Base
         /* Process rows
          */
         $handle = fopen($this->getFile(), 'r');
+        $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
         $headerRow = fgetcsv($handle, 0, ",");
 
         $eventTypeMapper = new EventTypeMapper();
@@ -172,9 +173,9 @@ class Csv extends Base
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $start_time)) {
                 $startDatetimeString = "{$start_date} {$start_time}";
-            } /* Prescribed 24-hour format from csv, append :00 seconds
+            } elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
+                /* Prescribed 24-hour format from csv, append :00 seconds
              */
-            elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
                 $startDatetimeString = "{$start_date} {$start_time}:00";
             } else {
                 $output[] = array(
@@ -201,9 +202,9 @@ class Csv extends Base
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $finish_time)) {
                 $finishDatetimeString = "{$finish_date} {$finish_time}";
-            } /* Prescribed 24-hour format from csv, append :00 seconds
+            } elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
+                /* Prescribed 24-hour format from csv, append :00 seconds
              */
-            elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
                 $finishDatetimeString = "{$finish_date} {$finish_time}:00";
             } else {
                 $output[] = array(

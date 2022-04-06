@@ -86,10 +86,10 @@ class Bulk_Folder
         if (!is_resource($file)) {
             throw new TypeError(sprintf('$file must be a resource, found: %s', gettype($file)));
         }
-        $this->fp         = $file;
         $this->templateID = $templateID;
         $this->rolePerms  = array_map('\intval', $rolePerms);
         $this->inherit    = $inherit;
+        $this->fp         = (new \Alaress\Csv\ValidCSV($file))->skipBom();
 
         // TODO inject dependencies
         $this->folderMapper         = Folder\Mapper::getInstance();
@@ -264,7 +264,6 @@ class Bulk_Folder
                     $warnings[] = "File {$folderImageHash} is not an image";
                 }
             }
-
         } //end if empty $folderImageHash
 
         // Folder Codes

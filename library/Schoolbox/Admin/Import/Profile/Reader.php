@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
+use Alaress\Csv\ValidCSV;
+
 /**
  * Class Reader
  *
@@ -19,7 +21,6 @@ namespace Schoolbox\Admin\Import\Profile;
  */
 class Reader implements \Iterator
 {
-
     /**
      * Field delimiter for the CSV file
      *
@@ -160,6 +161,8 @@ class Reader implements \Iterator
             $this->fp = fopen($this->filename, 'r');
         }
 
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
+
         // Verify the file pointer is a seekable resource
         if (!is_resource($this->fp)) {
             throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
@@ -213,20 +216,7 @@ class Reader implements \Iterator
     {
         $currentLocation = ftell($this->fp);
 
-        rewind($this->fp);
-
-        /**
-         * check if the start of the file contains BOM character
-         */
-        $bom = "\xef\xbb\xbf";
-        // Progress file pointer and get first 3 characters to compare to the BOM string.
-        if (fgets($this->fp, 4) !== $bom) {
-            // BOM not found - rewind pointer to start of file.
-            rewind($this->fp);
-        }
-        /**
-         * file should now be clean and ready to start using
-         */
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
 
         $header = $this->loadRow();
 
@@ -435,10 +425,8 @@ class Reader implements \Iterator
 
         /* Reopen the file
          */
-        if (!\is_resource($this->fp)) {
-            $this->fp = fopen($this->filename, 'r');
-        } else {
-            rewind($this->fp);
+        if (!is_resource($this->fp)) {
+            $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
         }
 
         /* Read the header row
@@ -459,13 +447,12 @@ class Reader implements \Iterator
      */
     private function cleanup()
     {
-        if (\is_resource($this->fp) && $this->filename) {
+        if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
             $this->fp = null;
         }
-
         $this->currentKey = 0;
-        $this->currentRow = false;
+        $this->currentRow = array();
     }
 
     /**

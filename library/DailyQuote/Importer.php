@@ -44,7 +44,7 @@ class Importer
     public function import()
     {
         $inputFile = fopen($this->getInputFile(), 'r');
-
+        $inputFile = (new \Alaress\Csv\ValidCSV($inputFile))->skipBom();
         while ($row = fgetcsv($inputFile, 4096)) {
             $quote = new \DailyQuote\Quote();
             $quote->setDescription(trim($row[0]));

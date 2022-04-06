@@ -97,30 +97,32 @@ $app = new class extends CliTool\App
 
         $handle = fopen($this->getOpt(self::OPT_SHORT_FILE), 'rb');
 
-        if ($handle) {
-            while (($row = fgetcsv($handle)) !== false) {
-                if (count($row) > 1) {
-                    if (!isset($classes[$row[0]])) {
-                        $classes[$row[0]] = [];
-                    }
-
-                    $n = \count($row);
-
-                    for ($i = 1; $i < $n; $i++) {
-                        $code = $row[$i];
-                        if (strlen(trim($code)) > 0) {
-                            $classes[$row[0]][] = $row[$i];
-                        }
-                    }
-                }
-            }
-
-            fclose($handle);
-        } else {
+        if (is_resource($handle)) {
             // Couldn't read file
             $this->getLogger()->error('Could not locate file to import.');
             exit;
         }
+
+        $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) > 1) {
+                if (!isset($classes[$row[0]])) {
+                    $classes[$row[0]] = [];
+                }
+
+                $n = \count($row);
+
+                for ($i = 1; $i < $n; $i++) {
+                    $code = $row[$i];
+                    if (strlen(trim($code)) > 0) {
+                        $classes[$row[0]][] = $row[$i];
+                    }
+                }
+            }
+        }
+
+        fclose($handle);
 
         if (!$this->perform()) {
             $this->getLogger()->warning('Planning assignation of parents to their students\' folders.');

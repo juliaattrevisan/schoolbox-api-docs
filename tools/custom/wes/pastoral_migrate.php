@@ -52,6 +52,8 @@ $app = new class extends CliTool\App {
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
+
         if (!$this->perform()) {
             $this->getLogger()->info('Running in dry-run mode: run with the `-p` flag to perform the migration.');
         }
