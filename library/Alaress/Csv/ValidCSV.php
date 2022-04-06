@@ -32,7 +32,7 @@ class ValidCSV
         }
 
         $metadata = stream_get_meta_data($this->fp);
-        $seekable = $metadata['seekable'] ?? false;
+        $seekable = $metadata['seekable'];
         if (!$seekable) {
             throw new Exception("File does not support seeking");
         }
