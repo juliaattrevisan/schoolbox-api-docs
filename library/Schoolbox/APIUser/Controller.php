@@ -370,7 +370,7 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early there is a malformed keyword for search
         }
-        $filter = $this->request->query->get('filter', '');
+        $filter = $this->request->query->get('filter', null);
         $userHelper = new Helper($this->userMapper);
         $output = [];
         $ajaxSearch = $userHelper->ajaxSearch($search, $filter);
