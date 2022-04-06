@@ -353,9 +353,8 @@ class Controller extends Base
      */
     public function apiUserSearch()
     {
-        $request = json_decode(json_encode($this->request->content->get()), true);
-        $search = $request['search'] ?? null;
-        $filter = $request['filter'] ?? null;
+        $search = $this->request->query->get('search');
+        $filter = $this->request->query->get('filter');
         $userHelper = new Helper($this->userMapper);
         $output = [];
         $ajaxSearch = $userHelper->ajaxSearch($search, $filter);
