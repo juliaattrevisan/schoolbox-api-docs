@@ -62,55 +62,61 @@ class Helper
             LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id ';
         $where = ' WHERE user.deleted_at IS NULL
             AND ';
-
+        $params = [];
         if ($keyword != "") {
             if (is_numeric($keyword)) {
-                $param = $this->userMapper->getDatabase()->quote($keyword);
-                $where .= "( synergy_id = $param  ) ";
+                $params['externalId'] = $this->userMapper->getDatabase()->quote($keyword);
+                $where .= "( synergy_id = :externalId  ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-//                    $firstName = $this->userMapper->getDatabase()->quote($name[1]);
-//                    $lastName  = $this->userMapper->getDatabase()->quote($name[2]);
-//                    $where .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
-                    $where .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
+                    $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
+                    $params['lastName']  = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
+                    $where .= "( firstname like :firstName and lastname like :lastName ) ";
                 } else {
-//                    $param = $this->userMapper->getDatabase()->quote($keyword);
-                    $where .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+                    $params['username'] = $params['lastName'] = $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
+                    $where .= "( firstname like :firstName or lastname like :lastName or username like :username ) ";
                 }
             }
         }
         if ('' !== $username) {
-            $where .= "AND username = {$this->userMapper->getDatabase()->quote($username)} ";
+            $params['usernameExac'] = $this->userMapper->getDatabase()->quote($username);
+            $where .= "AND username = :usernameExac ";
         }
         if ('' !== $externalId) {
-            $where .= "AND synergy_id = {$this->userMapper->getDatabase()->quote($externalId)} ";
+            $params['externalIdExac'] = $this->userMapper->getDatabase()->quote($externalId);
+            $where .= "AND synergy_id = :externalIdExac ";
         }
         if ('' !== $email) {
-            $where .= "AND alt_email = {$this->userMapper->getDatabase()->quote($email)} ";
+            $params['email'] = $this->userMapper->getDatabase()->quote($email);
+            $where .= "AND alt_email = :email ";
         }
         if ('' !== $roleType) {
-            $where .= "AND groups.group_type = {$this->userMapper->getDatabase()->quote($roleType)} ";
+            $params['roleType'] = $this->userMapper->getDatabase()->quote($roleType);
+            $where .= "AND groups.group_type = :roleType ";
         }
         if ('' !== $role) {
-            $param = $this->userMapper->getDatabase()->quote($role);
-            $where .= "AND groups.name = $param ";
+            $params['role'] = $this->userMapper->getDatabase()->quote($role);
+            $where .= "AND groups.name = :role ";
         }
         if ('' !== $campus) {
             $select .= "";
             $from .= " JOIN userCampus on userCampus.uid = user.id
                     JOIN luCampus on luCampus.id = userCampus.campus
             ";
-            $where .= "AND luCampus.name = {$this->userMapper->getDatabase()->quote($campus)} ";
+            $params['campus'] = $this->userMapper->getDatabase()->quote($campus);
+            $where .= "AND luCampus.name = :campus ";
         }
         if ('' !== $year) {
-            $where .= "AND lyl.name = {$this->userMapper->getDatabase()->quote($year)} ";
+            $params['year'] = $this->userMapper->getDatabase()->quote($year);
+            $where .= "AND lyl.name = :year ";
         }
         $where .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
         if (is_numeric($limit)) {
             $where .= " LIMIT $limit";
         }
-        $statement = $this->userMapper->getDatabase()->query($select . $from . $where);
-        $statement->execute();
+        $stat = $select . $from . $where;
+        $statement = $this->userMapper->getDatabase()->prepare($stat);
+        $statement->execute($params);
         return $statement->fetchAll();
     }
 }
