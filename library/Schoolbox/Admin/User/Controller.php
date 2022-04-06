@@ -830,7 +830,7 @@ class Controller extends Base
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
 
         (new RedisPublisher(
-            Redis::getStorageClientInstance(),
+            Redis::getSignalQueueClientInstance(),
             INSTANCE_ID,
         ))->alertUser($userId, $bob->build());
 

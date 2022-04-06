@@ -11,15 +11,26 @@ namespace Schoolbox\Realtime\Alert;
 
 use Alaress\Async\Notification\Instance\Instance;
 
+/**
+ * Interface for message publishers.
+ */
 interface IPublisher
 {
     /**
-     * Publishes an alert to the given user. Returns the number of recipients
-     * successfully alerted (return values other than 0 or 1 would be...unexpected)
+     * Publishes a push message to the given user.
      *
      * @param int      $userId
      * @param Instance $instance
-     * @return int
+     * @return int the number of recipients successfully pushed to
      */
-    public function alertUser($userId, Instance $instance);
+    public function pushUser(int $userId, Instance $instance): int;
+
+    /**
+     * Publishes an alert to the given user.
+     *
+     * @param int      $userId
+     * @param Instance $instance
+     * @return int the number of recipients successfully alerted
+     */
+    public function alertUser(int $userId, Instance $instance): int;
 }

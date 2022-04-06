@@ -20,7 +20,7 @@ use Schoolbox\L10n\RosettaStone;
 use function sprintf;
 
 /**
- * @see Factory for this filter's description.
+ * @see MessageFactory for this filter's description.
  */
 class Definition extends Filter\AbstractDefinition
 {
