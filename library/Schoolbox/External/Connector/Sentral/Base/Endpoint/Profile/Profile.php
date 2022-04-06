@@ -193,9 +193,7 @@ class Profile implements IStrategy
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      */
     private function importStudents(): void
@@ -773,7 +771,6 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string
-     * @throws \InvalidArgumentException
      */
     private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): string
     {
