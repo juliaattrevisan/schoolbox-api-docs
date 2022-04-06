@@ -264,7 +264,6 @@ class Bulk_Folder
                     $warnings[] = "File {$folderImageHash} is not an image";
                 }
             }
-
         } //end if empty $folderImageHash
 
         // Folder Codes

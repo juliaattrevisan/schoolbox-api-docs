@@ -95,7 +95,7 @@ $app = new class extends CliTool\App {
         }
     }
 
-    function getTypeIdFromName($typeName, $subtypeName, $db)
+    private function getTypeIdFromName($typeName, $subtypeName, $db)
     {
         $query = 'SELECT pt.id as type_id, pst.id as subtype_id FROM lu_pastoral_type pt
             LEFT JOIN lu_pastoral_subtype pst on pst.pastoral_type_id = pt.id
@@ -116,7 +116,7 @@ $app = new class extends CliTool\App {
         return $ids;
     }
 
-    function getRecordIdsFromTypeName($typeName, $subtypeName, $db)
+    private function getRecordIdsFromTypeName($typeName, $subtypeName, $db)
     {
         $query = 'SELECT p.id FROM pastoral p
             JOIN lu_pastoral_type pt on  pt.id = p.type_id
