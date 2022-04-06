@@ -194,7 +194,7 @@ class Factory
 
         /* Date range
          */
-        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM)->getDatabaseDate();
         $to = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
 
         return (new GenericCollection(IStrategy::class))
