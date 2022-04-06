@@ -194,6 +194,8 @@ class Profile implements IStrategy
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
      */
     private function importStudents(): void
@@ -700,7 +702,6 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
     {
