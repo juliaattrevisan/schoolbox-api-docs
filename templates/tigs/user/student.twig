@@ -15,14 +15,13 @@
         </li>
     {% endif %}
 {% endblock buttons %}
+{% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
 
 {% block folderListItemClasses -%}
-    {%- set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) -%}
     {%- if routeSubjectReport %}actions-small-1{% endif -%}
 {%- endblock %}
 
 {% block folderListItemActions %}
-    {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
     {% if routeSubjectReport or hasTeachersWithEmail  %}
     <nav>
         <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
