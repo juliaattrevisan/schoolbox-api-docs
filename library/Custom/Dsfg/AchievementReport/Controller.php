@@ -855,9 +855,25 @@ class Controller extends Base
     {
         /* Default to this year if none specified
          */
-        $selectedYear = $year ?? (int)date('Y');
+        $currentYear  = (int)date('Y');
+        $selectedYear = $year ?? $currentYear;
         $mypBase      = new MYP\Base($user, $externalUser, $db, $selectedYear);
         $mypData      = $mypBase->findData();
+
+        // get historical data
+        $currentYearLevel = (int)$user->getYear()->getName();
+        $historical       = [];
+        foreach ([7, 8, 9, 10] as $yearLevel) {
+            if ($yearLevel === $currentYearLevel) {
+                break;
+            }
+            $historicalYear              = $currentYear - ($currentYearLevel - $yearLevel);
+            $historicalMypBase           = new MYP\Base($user, $externalUser, $db, $historicalYear);
+            $historical[$historicalYear] = [
+                'subjects' => $historicalMypBase->findData(),
+                'grades'   => $historicalMypBase->getMYPGrade(),
+            ];
+        }
 
         $output = [
             'template' => '@myp/index.twig',
@@ -872,6 +888,7 @@ class Controller extends Base
                 'headings'     => $mypData['headings'],
                 'subjects'     => $mypData['data'],
                 'grades'       => $mypBase->getMYPGrade(),
+                'historical'   => $historical
             ],
         ];
         $this->getResponse()->content->set($output);

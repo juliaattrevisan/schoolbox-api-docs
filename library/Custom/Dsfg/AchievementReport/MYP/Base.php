@@ -34,7 +34,7 @@ class Base extends AchievementReportBase
     {
         $params = [
             'externalId' => $this->getExternalUserId(),
-            'year'       => $this->getCurrentYear(),
+            'year'       => $this->year,
         ];
 
         $query = "
@@ -118,7 +118,7 @@ class Base extends AchievementReportBase
     {
         $params = [
             'externalId' => $this->getExternalUserId(),
-            'year'       => $this->getCurrentYear(),
+            'year'       => $this->year,
         ];
 
         $query = "
