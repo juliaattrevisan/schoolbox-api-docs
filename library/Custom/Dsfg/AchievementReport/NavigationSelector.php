@@ -164,7 +164,7 @@ class NavigationSelector
     {
         $availableNavigation = [];
 
-        if ($this->user->getYear()->getName() == 7) {
+        if (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->router->generate('achievementreport.getMyp', [
                     'externalUserId' => $this->externalUser['StudentID'],
