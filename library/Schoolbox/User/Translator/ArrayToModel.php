@@ -3,6 +3,7 @@
 namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class ArrayToModel extends Base
 {
@@ -43,7 +44,11 @@ class ArrayToModel extends Base
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
-                $this->setScalar([$label => $value], $label, $model, $function);
+                if (method_exists($model, $function)) {
+                    $this->setScalar([$label => $value], $label, $model, $function);
+                } else {
+                    throw new SchoolboxException("$label is not a field you are able to set on the User Object");
+                }
             }
         }
         return $model;
