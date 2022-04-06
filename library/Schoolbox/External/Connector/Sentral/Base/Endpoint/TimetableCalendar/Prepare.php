@@ -17,7 +17,6 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
 
-
 /**
  * Class Prepare
  *
