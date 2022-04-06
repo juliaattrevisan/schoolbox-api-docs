@@ -111,6 +111,22 @@ class Model
 
 
     /**
+     * Used in conjunction with findWithCheapStaff() to trickle users
+     *
+     * @param int    $userId
+     * @param string $name
+     * @return void
+     */
+    public function addStaff(int $userId, string $name): void
+    {
+        $this->staff[$userId] = $name;
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string

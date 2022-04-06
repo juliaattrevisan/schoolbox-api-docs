@@ -137,6 +137,8 @@ class TimetableUsers
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      * @throws \UnderflowException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
@@ -148,13 +150,7 @@ class TimetableUsers
          */
         $usualEventIds = $this->generateUsualEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
 
-        $events = $this->eventMapper->findByColumn('id', $usualEventIds)->indexBy('id');
-
-        /* TODO Perhaps find a less expensive way to do this
-         */
-        foreach ($events as $event) {
-            $event->setStaff($this->findStaffInvolvements($event->getCode()));
-        }
+        $events = $this->eventMapper->findWithCheapStaff($usualEventIds)->indexBy('id');
 
         /* Find a list of events which have overrides that might affect $user
          * If there are overrides, process each one specially
@@ -343,50 +339,6 @@ class TimetableUsers
         }
 
         return $overrideEventIds;
-    }
-
-
-    /**
-     * Find all the staff members assiated with $classCode
-     *
-     * Returns a stack of (user id, name) tuples, e.g.
-     * (22, Mr Jack Coles), (24, Ms Rebecca White)
-     *
-     * @param string $classCode
-     * @return array
-     * @throws \PDOException
-     */
-    private function findStaffInvolvements(string $classCode): array
-    {
-        $query = "
-            SELECT DISTINCT u.id, u.synergy_id, u.title, u.firstname, u.lastname
-            FROM {$this->classInvolvementMapper->getTable()} scu
-            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
-            INNER JOIN `{$this->userMapper->getTable()}` u ON scu.external_id = u.synergy_id
-            INNER JOIN `groups` g on u.group_id = g.id
-            WHERE g.group_type = :groupType
-            AND sc.code = :classCode
-        ";
-
-        $statement = $this->classInvolvementMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'groupType' => \Schoolbox\Role::STAFF,
-            'classCode' => $classCode,
-        ]);
-
-        $stack = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $stack[$row['id']] = implode(' ', array_filter([
-                $row['title'],
-                $row['firstname'],
-                $row['lastname']
-            ], static function($val) {
-                return '' !== trim((string)$val);
-            }));
-        }
-
-        return $stack;
     }
 
 
