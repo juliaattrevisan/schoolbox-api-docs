@@ -117,10 +117,9 @@ if (is_numeric($_GET['eventID'] ?? null)) {
      */
     if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
         $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
-    }
-    /* EOTC Administrators and event authors can edit this event
-     */
-    elseif ($canAdminister || $isAuthor || $isTeacherInCharge) {
+    } elseif ($canAdminister || $isAuthor || $isTeacherInCharge) {
+        /* EOTC Administrators and event authors can edit this event
+         */
         /* Do a check for missing metadata
          */
         if (!$event->getMetadata()) {
@@ -539,9 +538,9 @@ if (is_numeric($_GET['eventID'] ?? null)) {
             'can_promote_in_principle_block' => ''
         ]
     );
-} /* Nobody else should be here
- */
-else {
+} else {
+    /* Nobody else should be here
+    */
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
