@@ -961,7 +961,7 @@ class Controller extends Base
 
         $availableYearsAndMonths = $partialData['yearsAndMonths'];
         // Default to filtering by the most recent year if none is provided
-        if (null === $year) {
+        if (null === $year && is_array($availableYearsAndMonths) && count($availableYearsAndMonths) > 0) {
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
