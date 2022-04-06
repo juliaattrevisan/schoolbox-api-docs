@@ -195,6 +195,8 @@ class Factory implements IFactory
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
