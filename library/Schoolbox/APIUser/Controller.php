@@ -343,4 +343,36 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * Searches for a user based on a filter list
+     * param: {search: search basic term} {filter: extra parameters for determining how to filter the search results}
+     *
+     * @api /api/user
+     * @link http://api.schoolbox.com.au/#operation/userSearch
+     */
+    public function apiUserSearch()
+    {
+        $request = json_decode(json_encode($this->request->content->get()), true);
+        $search = $request['search'] ?? null;
+        $filter = $request['filter'] ?? null;
+        $userHelper = new Helper($this->userMapper);
+
+        $output = $userHelper->ajaxSearch($search);
+        $userReturn = [];
+        foreach ($output as $item) {
+            $user = [];
+            foreach ($item as $label => $value) {
+                if (!is_numeric($label)) {
+                    $user[$label] = $value;
+                }
+            }
+            $userReturn[] = $user;
+        }
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $userReturn
+            )
+        );
+    }
 }
