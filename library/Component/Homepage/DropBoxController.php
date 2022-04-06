@@ -39,7 +39,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
             $this->setVar('drop_success_block', '');
             $this->setVar('empty_state_block', '');
 
-            if ($_SESSION['dropSuccess']) {
+            if ($_SESSION['dropSuccess'] ?? false) {
                 $this->parse('drop_success_block', 'drop_success', true);
                 unset($_SESSION['dropSuccess']);
             }

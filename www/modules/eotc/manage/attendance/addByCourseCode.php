@@ -23,7 +23,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     /* If a course code was provided, find all the students in it
      */
-    if (strlen($_POST['courseCode'])) {
+    if (strlen($_POST['courseCode'] ?? '')) {
         $externalHandler = new \External_Synergetic_Class();
         $allStudents = $externalHandler->getStudents($_POST['courseCode']);
 

@@ -137,7 +137,7 @@ class Report_Activity extends Report_Abstract implements Report_IReport
             }
         }
 
-        $resultFilter['after'] = $resultFilter['after'] ?: date('Y-m-d', strtotime('-30 days'));
+        $resultFilter['after'] = $resultFilter['after'] ?? date('Y-m-d', strtotime('-30 days'));
 
         $this->filter = $resultFilter;
 
@@ -342,7 +342,6 @@ OR ml.name        LIKE :keyword
                         'DATE'     => $log['time'],
                         'USERNAME' => Scrub::text($displayName),
                         'ACTION'   => $actionString,
-                        'IP'       => $log['ip']
                     )
                 );
 
@@ -414,7 +413,7 @@ OR ml.name        LIKE :keyword
                 'FILTER_ID'          => $field,
                 'FILTER_NAME'        => ucwords($field),
                 'FILTER_PLACEHOLDER' => '', // not used
-                'FILTER_VALUE'       => $this->filter[$field],
+                'FILTER_VALUE'       => $this->filter[$field] ?? '',
             );
 
             $page->setVar($output);

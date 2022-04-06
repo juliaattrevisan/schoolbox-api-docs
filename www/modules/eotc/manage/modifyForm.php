@@ -80,6 +80,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
         $isAuthor = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator($owner));
         $canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
 
+        /** @var \EOTC\Event $event **/
         if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
             $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
         }
@@ -167,7 +168,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
      */
     $staffCollection = new Collection();
 
-    if (is_array($_POST['staff']) && count($_POST['staff'])) {
+    if (is_array($_POST['staff'] ?? false) && count($_POST['staff'])) {
         $staffCollection = $userMapper->findByColumn('id', $_POST['staff']);
     }
 
@@ -189,7 +190,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
      */
     $metadata->setRamsFiles(new Collection());
 
-    if (is_array($_POST['attachment']) && count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
+    if (is_array($_POST['attachment'] ?? false) && count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
         try {
             $factory = new CollectorFactory();
             $files   = $factory->build($_POST['attachment'])->getAll();

@@ -93,7 +93,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // slug to title: let's just say all - convert to spaces, and capitalize all words
-    $slug  = strlen($this->arg[3]) ? $this->arg[3] : '';
+    $slug  = strlen($this->arg[3] ?? '') ? $this->arg[3] : '';
     $title = ucwords(str_replace('-', ' ', $slug));
 
     //Collate the slugs of wikis on this page - used for validation

@@ -181,7 +181,7 @@ class Controller extends Base
             }
 
             // The file that's being reviewed
-            $file = $response ? $this->getFile($response, $this->getRequest()->query['hash']) : null;
+            $file = $this->getFile($response, $this->getRequest()->query->get('hash'));
 
             // Self-assessed feedback (published only)
             $selfAssessmentFeedback = $response->findMostRecentSelfAssessedPublishedFeedback();

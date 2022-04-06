@@ -357,41 +357,31 @@ class Event implements ISoftDeletable
     /**
      * Derive start and end dates from a date.
      *
-     * @param string $date A string in either "d-m-Y" or "d-m-Y H:i" format.
+     * @param string|null $date A string in either "d-m-Y" or "d-m-Y H:i" format.
      * @throws InvalidArgumentException
      */
-    public function setupDates($date): void
+    public function setupDates(?string $date): void
     {
-        if (
-            preg_match(
-                '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
-                $date,
-                $matches
-            )
-        ) {
-            $year = $matches['y'];
-            $month = $matches['m'];
-            $day = $matches['d'];
-            $hour = $matches['h'];
-            $minute = $matches['i'];
-            $this->setAllDay(false);
-        } else {
-            [$day, $month, $year] = explode("-", $date);
-            $hour = 0;
-            $minute = 0;
-            $this->setAllDay(true);
-        }
-        $selectedDate = @mktime($hour, $minute, 0, $month, $day, $year);
-
-        if ($selectedDate <= 0) {
-            $selectedDate = time();
+        if ($date) {
+            try {
+                $selectedDate = new Alaress_Date_Format($date, 'd-m-Y H:i');
+                $this->setAllDay(false);
+            } catch (\Exception $e) {
+                try {
+                    $selectedDate = new Alaress_Date_Format($date, 'd-m-Y');
+                    $this->setAllDay(true);
+                } catch (\Exception $e) {
+                    // noop
+                }
+            }
         }
 
-        $startDate = new Alaress_Date_Format($selectedDate, 'U');
-        $endDate = new Alaress_Date_Format($selectedDate, 'U');
+        if (!isset($selectedDate)) {
+            $selectedDate = Alaress_Date_Format::now();
+        }
 
-        $this->setStartDateTime($startDate);
-        $this->setEndDateTime($endDate);
+        $this->setStartDateTime($selectedDate);
+        $this->setEndDateTime($selectedDate);
     }
 
 

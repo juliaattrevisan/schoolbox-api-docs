@@ -118,8 +118,8 @@ try {
     $token              = $_GET['token'];
     $export_type        = $_GET['export'];
     $filename           = 'calendar';
-    $resourceId         = (int)$_GET['resource_id'];
-    $resourceCategoryId = (int)$_GET['resource_category_id'];
+    $resourceId         = (int)($_GET['resource_id'] ?? 0);
+    $resourceCategoryId = (int)($_GET['resource_category_id'] ?? 0);
     $eventTypeId        = (int)$_GET['event_type'];
     if ($resourceId > 0) {
         $export_type = 'resource';
@@ -164,8 +164,8 @@ try {
         $endTimestamp = Alaress_Date_Format::newFromTimestamp($endTimestamp)->endOfDay()->getUnixTimeStamp();
     }
     // Default start and end times
-    $startTimestamp = $startTimestamp ?: \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
-    $endTimestamp   = $endTimestamp ?: \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
+    $startTimestamp = $startTimestamp ?? \strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
+    $endTimestamp   = $endTimestamp ?? \strtotime("+{$forward} months", $_SERVER['REQUEST_TIME']);
 
     // Ensure the requested period is not greater than what is configured in the admin so students don't bring down server
     if (isset($_GET['start']) || isset($_GET['end'])) {

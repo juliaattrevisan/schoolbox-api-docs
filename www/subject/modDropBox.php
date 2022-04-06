@@ -13,7 +13,7 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 $page->setAjax(true);
 
-if (is_numeric($_GET['delete'])) {
+if (is_numeric($_GET['delete'] ?? false)) {
     try {
         $file = $dropbox->findById($_GET['delete']);
         $cid  = $file->getFolder()->getId();
@@ -24,7 +24,7 @@ if (is_numeric($_GET['delete'])) {
         exit;
     }
     $page->localRedir("/homepage/$cid");
-} elseif (is_numeric($_GET['id'])) {
+} elseif (is_numeric($_GET['id'] ?? false)) {
     try {
         $file = $dropbox->findById($_GET['id']);
 
@@ -38,7 +38,7 @@ if (is_numeric($_GET['delete'])) {
             error(5);
         }
 
-        if (!$file->getStorage()->getMimetype()->getInline() || $_GET['save']) {
+        if (!$file->getStorage()->getMimetype()->getInline() || ($_GET['save'] ?? false)) {
             $attach = "attachment;";
         } else {
             $attach = "";

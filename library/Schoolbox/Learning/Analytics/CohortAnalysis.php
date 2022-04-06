@@ -327,6 +327,11 @@ class CohortAnalysis
 
             foreach ($assessmentCompletions as $assessmentId => $studentCompletions) {
                 foreach ($studentCompletions as $userId => $completion) {
+                    $countUnitAssessmentsInvolved[$userId]   ??= 0;
+                    $countCourseAssessmentsInvolved[$userId] ??= 0;
+                    $countUnitAssessmentsComplete[$userId]   ??= 0;
+                    $countCourseAssessmentsComplete[$userId] ??= 0;
+
                     $countUnitAssessmentsInvolved[$userId]++;
                     $countCourseAssessmentsInvolved[$userId]++;
 
@@ -400,23 +405,15 @@ class CohortAnalysis
             }
 
             // First time we've encountered this unitSpec ?
-            if (!is_array($this->completions[$unitSpecId])) {
-                $this->completions[$unitSpecId] = [];
-            }
-            if (!is_array($this->grades[$unitSpecId])) {
-                $this->grades[$unitSpecId] = [];
-            }
+            $this->completions[$unitSpecId] ??= [];
+            $this->grades[$unitSpecId]      ??= [];
 
             // If AssessmentSpec if at Cohort level, AssessmentImpl if at Class level
             $assessmentId = null === $this->classFolder ? $assessmentSpec->getId() : $assessmentImpl->getId();
 
             // First time we've encountered this Assessment (or any of its implementations)?
-            if (!is_array($this->completions[$unitSpecId][$assessmentId])) {
-                $this->completions[$unitSpecId][$assessmentId] = [];
-            }
-            if (!is_array($this->grades[$unitSpecId][$assessmentId])) {
-                $this->grades[$unitSpecId][$assessmentId] = [];
-            }
+            $this->completions[$unitSpecId][$assessmentId] ??= [];
+            $this->grades[$unitSpecId][$assessmentId]      ??= [];
 
 
             foreach ($assessmentImpl->getAllParticipants() as $participant) {
