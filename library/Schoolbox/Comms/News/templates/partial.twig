@@ -141,7 +141,7 @@
             {% if not createRoute %}
                 <p>There is no {{ locale.news }} to view at this time.</p>
                 {% if archiveRoute and showArchiveNewsLink %}
-                    <p><a href="{{ archiveRoute ~ '?' ~archiveRouteSuffix }}">View the news archive.</a></p>
+                    <p><a href="{{ archiveRoute ~ '?' ~archiveRouteSuffix }}">View the {{ locale.news }} archive.</a></p>
                 {% endif %}
             {% else %}
                 {% set createNewsQuerystringParams = [

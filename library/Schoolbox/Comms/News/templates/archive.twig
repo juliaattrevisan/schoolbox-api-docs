@@ -40,7 +40,10 @@
     {% set subheading = selectedDate|date('F Y') %}
 {% elseif year %}
     {% set subheading = year %}
+{% else %}
+    {% set subheading = '' %}
 {% endif %}
+
 
 {% block newsTitle %}{{ locale.news.proper }} Archive{% endblock %}
 
