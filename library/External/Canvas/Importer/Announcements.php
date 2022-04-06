@@ -17,6 +17,7 @@ use Schoolbox\Comms\News\ValidDateOffset;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 use Symfony\Component\Lock\LockInterface;
 
@@ -542,11 +543,10 @@ class Announcements
                 $publishedAt = \Alaress_Date_Format::newFromTimestamp(strtotime($announcement['delayed_post_at']));
             }
 
-            // need to save draft before publishing to trigger notification
-            // set trigger effector first
-            $this->newsMapper->setSessionData(['user' => $author]);
             // save draft
+            $this->newsMapper->suppressNotification();
             $this->newsMapper->save($article);
+            $draft = clone $article;
 
             $article
                 ->setSubmittedAt($postedAt)
@@ -554,11 +554,19 @@ class Announcements
                 ->setAcceptedBy($author)
                 ->setPublishAt($publishedAt)
                 ->setExpiresAt($expiresAt);
-            // finally publish
-            $this->newsMapper->save($article);
 
             /* Shank it into comms_news_article
              */
+            $this->newsMapper->save($article);
+            $this->newsMapper->restoreNotification();
+
+            $this->newsMapper->getEventPropagator()->propagate(
+                $author,
+                Mapper::METHOD_UPDATE,
+                $article,
+                $this->newsMapper,
+                $this->newsMapper->diff($article, $draft)
+            );
 
             /* Update the article source table so we know this article's origins
              * That allows us to skip over it faster next time
