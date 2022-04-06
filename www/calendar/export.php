@@ -218,12 +218,14 @@ try {
                 throw new SchoolboxException('A group ID must be provided', 400);
             }
 
-            $api = buildApiClass(
+            $api = new Calendar_Api_Composite();
+
+            $api->add(buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Group::class,
                 [$user, $viewer, $export_id],
                 true,
                 $sentry
-            );
+            ));
 
             /* SUDS Timetable
              */
@@ -415,12 +417,14 @@ try {
                 ExternalConnectorFactory::EXTERNAL_EVENTS
             );
 
-            $api = buildApiClass(
+            $api = new Calendar_Api_Composite();
+
+            $api->add(buildApiClass(
                 Calendar_Api_EventType_Event_External_Default::class,
                 [$user, $viewer, $externalEvents],
                 true,
                 $sentry
-            );
+            ));
 
             /* Fixtures
              */

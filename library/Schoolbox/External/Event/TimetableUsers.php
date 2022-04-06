@@ -136,6 +136,7 @@ class TimetableUsers
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \UnderflowException
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
@@ -193,8 +194,10 @@ class TimetableUsers
      * @param string                 $finishDatetime
      * @param GenericCollection|null $folderCodes
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
      */
     private function generateUsualEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
     {
@@ -222,9 +225,14 @@ class TimetableUsers
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
         ];
 
-        /* Optionally filter by foldercodes
-         */
-        if ($folderCodes && $folderCodes->count()) {
+        if (null === $folderCodes) {
+            /* $folderCodes was never set; you're looking for data via the main calendar
+             * No filtering required
+             */
+        } elseif ($folderCodes->count()) {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which do have a code should be filtered to that code specifically
+             */
             $pb = $this->eventMapper->getPredicateBuilder();
             $pb->in('se.code', $folderCodes->keys());
 
@@ -232,6 +240,11 @@ class TimetableUsers
             $params = array_merge($params, $pb->getParams());
 
             $query .= " AND {$where}";
+        } else {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which don't have a code should display nothing from this subscription
+             */
+            return [];
         }
 
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
@@ -259,7 +272,9 @@ class TimetableUsers
      * @param string                 $finishDatetime
      * @param GenericCollection|null $folderCodes
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
+     * @throws \UnderflowException
      */
     private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
     {
@@ -281,9 +296,14 @@ class TimetableUsers
             'actionClear' => \Schoolbox\External\Event\Overrides\Model::CLEAR
         ];
 
-        /* Optionally filter by foldercodes
-         */
-        if ($folderCodes && $folderCodes->count()) {
+        if (null === $folderCodes) {
+            /* $folderCodes was never set; you're looking for data via the main calendar
+             * No filtering required
+             */
+        } elseif ($folderCodes->count()) {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which do have a code should be filtered to that code specifically
+             */
             $pb = $this->eventMapper->getPredicateBuilder();
             $pb->in('se.code', $folderCodes->keys());
 
@@ -291,6 +311,11 @@ class TimetableUsers
             $params = array_merge($params, $pb->getParams());
 
             $query .= " AND {$where}";
+        } else {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which don't have a code should display nothing from this subscription
+             */
+            return [];
         }
 
         $statement = $this->overrideMapper->getDatabase()->prepare($query);
