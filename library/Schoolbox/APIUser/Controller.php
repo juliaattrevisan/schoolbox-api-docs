@@ -151,6 +151,61 @@ class Controller extends Base
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
+        $newUser = $this->userMapper->createModel($uid);
+
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+
+        $this->setUserFields($newUser, $data);
+    }
+
+    /**
+     * updates all fields for a user
+     *
+     * @api PUT /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPut
+     */
+    public function apiUserPut(User $user)
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        $userModal = $this->userMapper->createModel($user->getId());
+
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+        $this->setUserFields($userModal, $data);
+    }
+
+    /**
+     *  updates selected fields for a user
+     *
+     * @api PATCH /api/user/{userId}
+     * @link http://api.schoolbox.com.au/#operation/userPATCH
+     */
+    public function apiUserPatch(User $user)
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        /**
+         * build the user Model object from the POST data
+         */
+        //set default fields
+        $this->setUserFields($user, $data);
+    }
+
+    /**
+     * @param User $user
+     * @param array $data
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function setUserFields(User $user, array $data): void
+    {
         //check if what the user is attempting to edit is valid?
         if (array_key_exists('groups', $data)) {
             throw new SchoolboxException("groups field is unable to be updated at this endpoint");
@@ -168,15 +223,13 @@ class Controller extends Base
             //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             throw new SchoolboxException("'email' is unable to be updated. 'email' field is based on isEmailDerived, or altEmail.");
         }
+        if (array_key_exists('isDeleted', $data)) {
+            //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
+            throw new SchoolboxException("Unable to Delete a user from this endpoint, please use the DELETE method");
+        }
 
-        $newUser = $this->userMapper->createModel($uid);
-
-        /**
-         * build the user Model object from the POST data
-         */
-        //set default fields
-        $newUser->setEnabled(true);
-        $newUser->setSuperuser(false);
+        $user->setEnabled(true);
+        $user->setSuperuser(false);
 
         /**
          * build the db check data for the new model.
@@ -239,11 +292,11 @@ class Controller extends Base
                     try {
                         $impUser = $this->userMapper->findById($userId);
                     } catch (NotFound | Deleted $e) {
-                        throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                        throw new SchoolboxException("Impersonate User '$userId' Not Found or has been Deleted");
                     }
                     $impersonateCollection->add($impUser);
                 } else {
-                    throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                    throw new SchoolboxException("Impersonate User '$userId' Not Found or has been Deleted");
                 }
             }
             $data['linkedUser'] = $impersonateCollection;
@@ -262,23 +315,28 @@ class Controller extends Base
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
                 }
+            } else {
+                throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
             }
         }
 
+        /**
+         * build the user Model object from the POST data
+         */
         /** @var User $model */
-        $model = (new User\Translator\ArrayToModel())($data, $newUser);
+        $model = (new User\Translator\ArrayToModel())($data, $user);
 
         $this->userMapper->save($model);
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
-        $user = $this->userMapper->findById($model->getId());
-        $users_groups = $this->groupsHelper->getCurrentGroups($user);
+        $updatedUser = $this->userMapper->findById($model->getId());
+        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser);
         $apiGroups = new Collection($users_groups);
         $groupsArr = $apiGroups->map(new GroupArray());
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
+        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output

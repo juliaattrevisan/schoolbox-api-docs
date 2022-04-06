@@ -3,6 +3,7 @@
 namespace Schoolbox\User\Translator;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class ArrayToModel extends Base
 {
@@ -30,20 +31,24 @@ class ArrayToModel extends Base
             } elseif ('yearLevel' === $label) {
                 $model->setYear($value);
             } elseif ('flags' === $label) {
-                    //set all the flags...
-                    $model->setWebmail($value['showWebmailTab'])
-                        ->setHideContacts($value['showContacts'])
-                        ->setHideTimetable($value['enableTimetable'])
-                        ->setHideSidenav($value['showSideNav'])
-                        ->setHideNotificationsTray($value['showNotificationsPanel'])
-                        ->setDisplayGradeGraph($value['showGradeGraph'])
-                        ->setEportfolioEnable($value['enableEportfolio'])
-                        ->setUseInternalMail($value['useInternalMail'])
-                        ->setCalendarView($value['calendarView']);
+                //set all the flags... if they exist
+                $this->setScalar($value, 'showWebmailTab', $model, 'setWebmail');
+                $this->setScalar($value, 'showContacts', $model, 'setHideContacts');
+                $this->setScalar($value, 'enableTimetable', $model, 'setHideTimetable');
+                $this->setScalar($value, 'showSideNav', $model, 'setHideSidenav');
+                $this->setScalar($value, 'showNotificationsPanel', $model, 'setHideNotificationsTray');
+                $this->setScalar($value, 'showGradeGraph', $model, 'setDisplayGradeGraph');
+                $this->setScalar($value, 'enableEportfolio', $model, 'setEportfolioEnable');
+                $this->setScalar($value, 'useInternalMail', $model, 'setUseInternalMail');
+                $this->setScalar($value, 'calendarView', $model, 'setCalendarView');
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
-                $this->setScalar([$label => $value], $label, $model, $function);
+                if (method_exists($model, $function)) {
+                    $this->setScalar([$label => $value], $label, $model, $function);
+                } else {
+                    throw new SchoolboxException("$label is not a field you are able to set on the User Object");
+                }
             }
         }
         return $model;
