@@ -192,6 +192,24 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Historical Turnitin documents, while they have a Complete status
+     * and also a turnitin_submission_id, do not come with an actual Report
+     * that humans can see. Historical Turnitin documents only get their
+     * contents added to the turnitin brain
+     *
+     * This method decides whether a link can be shown to the user -
+     * it must be a normal non-historical turnitin document that got to
+     * Complete status
+     *
+     * @return bool
+     */
+    public function hasReport(): bool
+    {
+        return $this->isComplete() && !$this->getHistorical();
+    }
+
+
+    /**
      * Turnitin report finished processing
      *
      * @return bool

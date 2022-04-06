@@ -5602,7 +5602,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\IMapper\\:\\:generateException\\(\\)\\.$#"
-			count: 11
+			count: 12
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Module.php
 
 		-
