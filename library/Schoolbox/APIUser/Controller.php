@@ -288,11 +288,11 @@ class Controller extends Base
                     try {
                         $impUser = $this->userMapper->findById($userId);
                     } catch (NotFound | Deleted $e) {
-                        throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                        throw new SchoolboxException("Impersonate User '$userId' Not Found or has been Deleted");
                     }
                     $impersonateCollection->add($impUser);
                 } else {
-                    throw new SchoolboxException("User '$userId' Not Found or has been Deleted");
+                    throw new SchoolboxException("Impersonate User '$userId' Not Found or has been Deleted");
                 }
             }
             $data['linkedUser'] = $impersonateCollection;
@@ -311,6 +311,8 @@ class Controller extends Base
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
                 }
+            } else {
+                throw new SchoolboxException("Role '$roleId' Not Found or has been Deleted");
             }
         }
 
