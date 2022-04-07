@@ -223,7 +223,7 @@ class Factory
     {
         /* Date range
          */
-        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM);
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* Decide a timezone for all the UTC dates Wonde gives to us
