@@ -170,6 +170,25 @@ class Controller extends Base
     public function apiUserPut(User $user)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+        if (null === $data) {
+            throw new SchoolboxException("PUT Body is empty");
+        }
+
+        if (!array_key_exists('username', $data)) {
+            throw new SchoolboxException("username unable to be null");
+        }
+        if (!array_key_exists('firstName', $data)) {
+            throw new SchoolboxException("firstName unable to be null");
+        }
+        if (!array_key_exists('altEmail', $data)) {
+            throw new SchoolboxException("altEmail unable to be null");
+        }
+        if (!array_key_exists('campus', $data)) {
+            throw new SchoolboxException("Campus unable to be null");
+        }
+        if (!array_key_exists('role', $data)) {
+            throw new SchoolboxException("Role unable to be null");
+        }
 
         $userModal = $this->userMapper->createModel($user->getId());
 
@@ -189,6 +208,10 @@ class Controller extends Base
     public function apiUserPatch(User $user)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+
+        if (null === $data) {
+            throw new SchoolboxException("PATCH Body is empty");
+        }
 
         /**
          * build the user Model object from the POST data
