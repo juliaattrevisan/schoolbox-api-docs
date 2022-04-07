@@ -155,19 +155,19 @@ class Controller extends Base
         }
 
         if (!array_key_exists('username', $data)) {
-            throw new SchoolboxException("username unable to be null");
+            throw new SchoolboxException("username is a required field");
         }
         if (!array_key_exists('firstName', $data)) {
-            throw new SchoolboxException("firstName unable to be null");
+            throw new SchoolboxException("firstName is a required field");
         }
         if (!array_key_exists('altEmail', $data)) {
-            throw new SchoolboxException("altEmail unable to be null");
+            throw new SchoolboxException("altEmail is a required field");
         }
         if (!array_key_exists('campus', $data)) {
-            throw new SchoolboxException("Campus unable to be null");
+            throw new SchoolboxException("Campus is a required field");
         }
         if (!array_key_exists('role', $data)) {
-            throw new SchoolboxException("Role unable to be null");
+            throw new SchoolboxException("Role is a required field");
         }
 
         $newUser = $this->userMapper->createModel($uid);
