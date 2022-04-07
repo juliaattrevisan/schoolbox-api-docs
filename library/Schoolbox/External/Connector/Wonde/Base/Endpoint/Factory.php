@@ -12,8 +12,10 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
 
@@ -129,6 +131,18 @@ class Factory
 
 
     /**
+     * @var ClassPeriodMapper
+     */
+    private ClassPeriodMapper $classPeriodMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
      * @var \Schoolbox\External\Event\Overrides\Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
@@ -150,6 +164,8 @@ class Factory
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
@@ -168,6 +184,8 @@ class Factory
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
@@ -189,6 +207,8 @@ class Factory
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
         $this->overridesMapper = $overridesMapper;
     }
 
@@ -251,6 +271,8 @@ class Factory
                 $this->eventMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
                 $this->overridesMapper
             ))
             ->add(new TimetableCalendar\Classes(

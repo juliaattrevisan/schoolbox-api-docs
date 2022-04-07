@@ -12,8 +12,11 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint\TimetableCalendar;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetablePeriodMapper;
+
 
 /**
  * Class Prepare
@@ -62,6 +65,18 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var ClassPeriodMapper
+     */
+    private ClassPeriodMapper $classPeriodMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
      * @var \Schoolbox\External\Event\Overrides\Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
@@ -75,6 +90,8 @@ class Prepare implements IStrategy
      * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
@@ -83,6 +100,8 @@ class Prepare implements IStrategy
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
@@ -90,6 +109,8 @@ class Prepare implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
         $this->overridesMapper = $overridesMapper;
     }
 
@@ -113,13 +134,14 @@ class Prepare implements IStrategy
                 \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
             ));
 
-            $this->classInvolvementMapper->truncate();
-            $this->log->debug('Purged classInvolvement relations');
-
+            /* Truncate other data entirely
+             */
             $this->classEntryMapper->truncate();
-            $this->log->debug('Purged classEntry');
+            $this->classInvolvementMapper->truncate();
+            $this->classPeriodMapper->truncate();
+            $this->periodMapper->truncate();
 
-            $this->log->info('Purged existing timetable events, classEntry, classInvolvement, and overrides data');
+            $this->log->info('Purged existing timetable events, classEntry, classInvolvement, classPeriod, period and overrides data');
         }
     }
 }
