@@ -173,6 +173,13 @@ class Controller extends Base
         $newUser = $this->userMapper->createModel($uid);
 
         /**
+         * set sane defaults
+         */
+        $newUser->setEnabled(true)
+            ->setSuperuser(false)
+            ->setLocalEmail(false);
+
+        /**
          * build the user Model object from the POST data
          */
         //set default fields
@@ -253,9 +260,6 @@ class Controller extends Base
             //noop if email field with either be based on the username `isEmailDerived` or will be the `altEmail`
             throw new SchoolboxException("Unable to Delete a user from this endpoint, please use the DELETE method");
         }
-
-        $user->setEnabled(true);
-        $user->setSuperuser(false);
 
         /**
          * build the db check data for the new model.
