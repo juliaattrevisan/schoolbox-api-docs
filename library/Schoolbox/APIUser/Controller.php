@@ -154,22 +154,6 @@ class Controller extends Base
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
-        if (!array_key_exists('username', $data)) {
-            throw new SchoolboxException("username is a required field");
-        }
-        if (!array_key_exists('firstName', $data)) {
-            throw new SchoolboxException("firstName is a required field");
-        }
-        if (!array_key_exists('altEmail', $data)) {
-            throw new SchoolboxException("altEmail is a required field");
-        }
-        if (!array_key_exists('campus', $data)) {
-            throw new SchoolboxException("Campus is a required field");
-        }
-        if (!array_key_exists('role', $data)) {
-            throw new SchoolboxException("Role is a required field");
-        }
-
         $newUser = $this->userMapper->createModel($uid);
 
         /**
