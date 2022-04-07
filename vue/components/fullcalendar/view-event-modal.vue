@@ -705,6 +705,9 @@ export default {
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
             </template>
             <meta-list>
+                <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
+                    <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
+                </template>
                 <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
                     {{ eventExtendedProps.booking.status.name }}
                 </meta-item>
@@ -739,10 +742,6 @@ export default {
                         </template>
                     </meta-item>
                 </template>
-                <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
-                    <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
-                </template>
-
                 <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
                     Attendance:
                     <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
