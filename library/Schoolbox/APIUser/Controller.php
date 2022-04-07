@@ -355,7 +355,7 @@ class Controller extends Base
     {
         $search = $this->request->query->get('search', '');
         $cursor = (int)$this->request->query->get('cursor', null);
-        $limit = (int)$this->request->query->get('limit', null);
+        $limit = (int)$this->request->query->get('limit', 5);
         if ('' === $search) {
             $problem = (new ApiProblem('Search must not be blank'))
                 ->setStatus(401)
