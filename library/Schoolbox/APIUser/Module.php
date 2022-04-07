@@ -60,7 +60,6 @@ class Module extends BaseModule
         $this->register('PUT', '/{userId}', 'apiUserPut', $hasApiAccess, $preloadUser);
         $this->register('PATCH', '/{userId}', 'apiUserPatch', $hasApiAccess, $preloadUser);
         $this->register('GET', '', 'apiUserSearch', $hasApiAccess);
-
     }
 
 
