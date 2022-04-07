@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 $codeception_data_folder = './test/codeception/_data/';

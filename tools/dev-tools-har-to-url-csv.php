@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 $longopts = array('debug::', 'help::');
