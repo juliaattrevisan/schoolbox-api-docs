@@ -16,6 +16,8 @@ $page->initSession();
 $forumHandler = new Forum();
 $groupHandler = new Group();
 $access = Access::getInstance();
+$threadMapper = ThreadMapper::getInstance();
+$postMapper = PostMapper::getInstance();
 
 if (is_numeric($_POST['categoryID'] ?? false)) {
     /* Category exists
@@ -46,7 +48,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
      */
     if (is_numeric($_POST['postID'])) {
         try {
-            $post = PostMapper::getInstance()->findById($_POST['postID']);
+            $post = $postMapper->findById($_POST['postID']);
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
@@ -62,7 +64,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         }
 
         try {
-            $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+            $thread = $threadMapper->findById($post->getThread()->getId());
         } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -74,12 +76,18 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
+        $threadMapper->getDatabase()->beginTransaction();
         /* modify thread
          */
         if ($thread->getFirstPost()->getId() == $post->getId()) {
             $thread->setTitle($_POST['title']);
 
-            ThreadMapper::getInstance()->save($thread);
+            try {
+                $threadMapper->save($thread);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $threadMapper->getDatabase()->rollback();
+                error($e->getCode(), $e->getMessage());
+            }
         }
 
         /* modify post
@@ -87,21 +95,33 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
 
         $post->setBody($_POST['body']);
 
-        PostMapper::getInstance()->save($post);
+        try {
+            $postMapper->save($post);
+            $threadMapper->getDatabase()->commit();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $threadMapper->getDatabase()->rollback();
+            error($e->getCode(), $e->getMessage());
+        }
     } else {
         /* create thread
          */
+        $threadMapper->getDatabase()->beginTransaction();
         if (!is_numeric($_POST['threadID'])) {
             /** @var \Schoolbox\Forum\Thread $thread */
-            $thread = ThreadMapper::getInstance()->createModel();
+            $thread = $threadMapper->createModel();
             $thread->setCategory(FolderMapper::getInstance()->createModel()->setId($_POST['categoryID']));
             $thread->setUser($_SESSION['user']);
             $thread->setTitle($_POST['title']);
 
-            ThreadMapper::getInstance()->save($thread);
+            try {
+                $threadMapper->save($thread);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $threadMapper->getDatabase()->rollback();
+                error($e->getCode(), $e->getMessage());
+            }
         } else {
             try {
-                $thread = ThreadMapper::getInstance()->findById($_POST['threadID']);
+                $thread = $threadMapper->findById($_POST['threadID']);
             } catch (Exception $e) {
                 error(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
@@ -118,22 +138,33 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
          * create post
          * @var \Schoolbox\Forum\Post $post
          */
-        $post = PostMapper::getInstance()->createModel();
+        $post = $postMapper->createModel();
         $post->setOwner($_SESSION['user']);
         $post->setBody($_POST['body']);
         $post->setThread($thread);
 
         if ($_POST['quoteID']) {
-            $post->setParent(PostMapper::getInstance()->createModel()->setId($_POST['quoteID']));
+            $post->setParent($postMapper->createModel()->setId($_POST['quoteID']));
         }
 
-        PostMapper::getInstance()->save($post);
+        try {
+            $postMapper->save($post);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $threadMapper->getDatabase()->rollback();
+            error($e->getCode(), $e->getMessage());
+        }
 
         /* update thread */
         $thread->setLastPostUser($_SESSION['user']);  //this probably should be deprecated can be retrieved from post ID
         $thread->setLastPostDate(Alaress_Date_Format::now()); //this probably should be deprecated can be retrieved from post ID
         $thread->setLastPost($post);
-        ThreadMapper::getInstance()->save($thread);
+        try {
+            $threadMapper->save($thread);
+            $threadMapper->getDatabase()->commit();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $threadMapper->getDatabase()->rollback();
+            error($e->getCode(), $e->getMessage());
+        }
     }
 
     SitePage::localRedir('/forum/thread/' . $thread->getId() . '/' . $forumHandler->getPageNumber($post->getId()) . '/#' . $post->getId());
@@ -141,7 +172,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     /* thread exists
      */
     try {
-        $thread = ThreadMapper::getInstance()->findById($_GET['toggleLock']);
+        $thread = $threadMapper->findById($_GET['toggleLock']);
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -165,14 +196,14 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
 
     $thread->setLocked($thread->isLocked() ? false : true);
 
-    ThreadMapper::getInstance()->save($thread);
+    $threadMapper->save($thread);
 
     $page->backToTheFuture(1);
 } elseif (is_numeric($_GET['deleteThread'])) {
     /* thread exists
      */
     try {
-        $thread = ThreadMapper::getInstance()->findById($_GET['deleteThread']);
+        $thread = $threadMapper->findById($_GET['deleteThread']);
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -194,7 +225,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    ThreadMapper::getInstance()->delete($thread);
+    $threadMapper->delete($thread);
 
     SitePage::localRedir('/forum/' . $thread->getCategory()->getId());
 } elseif (is_array($_POST['deleteThreads'])) {
@@ -203,7 +234,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
          */
         try {
             /** @var \Schoolbox\Forum\Thread $thread */
-            $thread = ThreadMapper::getInstance()->findById($threadID);
+            $thread = $threadMapper->findById($threadID);
 
             /* check permissions
              */
@@ -217,7 +248,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
 
             $categoryID = $thread->getCategory()->getId();
 
-            ThreadMapper::getInstance()->delete($thread);
+            $threadMapper->delete($thread);
         } catch (Exception $e) {
         }
     }
@@ -227,11 +258,11 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     /* post exists
      */
     try {
-        $post   = PostMapper::getInstance()->findById($_GET['deletePost']);
+        $post   = $postMapper->findById($_GET['deletePost']);
 
-        $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+        $thread = $threadMapper->findById($post->getThread()->getId());
 
-        $earliestPost  = PostMapper::getInstance()->findFirstPost($post->getThread()->getId());
+        $earliestPost  = $postMapper->findFirstPost($post->getThread()->getId());
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -259,7 +290,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
 
     /** @var \Schoolbox\Forum\Thread $earliestPost */
     if ($earliestPost->getId() !== $post->getId()) {
-        PostMapper::getInstance()->delete($post);
+        $postMapper->delete($post);
     } else {
         error(ErrorMapper::ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED);
     }
