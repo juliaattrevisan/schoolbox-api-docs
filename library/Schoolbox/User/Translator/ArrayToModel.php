@@ -33,14 +33,29 @@ class ArrayToModel extends Base
             } elseif ('flags' === $label) {
                 //set all the flags... if they exist
                 $this->setScalar($value, 'showWebmailTab', $model, 'setWebmail');
-                $this->setScalar($value, 'showContacts', $model, 'setHideContacts');
-                $this->setScalar($value, 'enableTimetable', $model, 'setHideTimetable');
-                $this->setScalar($value, 'showSideNav', $model, 'setHideSidenav');
-                $this->setScalar($value, 'showNotificationsPanel', $model, 'setHideNotificationsTray');
                 $this->setScalar($value, 'showGradeGraph', $model, 'setDisplayGradeGraph');
                 $this->setScalar($value, 'enableEportfolio', $model, 'setEportfolioEnable');
                 $this->setScalar($value, 'useInternalMail', $model, 'setUseInternalMail');
                 $this->setScalar($value, 'calendarView', $model, 'setCalendarView');
+                /**
+                 * weird reverse magic
+                 */
+                if (array_key_exists('showContacts', $value)) {
+                    $value['showContacts'] = !$value['showContacts'];
+                }
+                if (array_key_exists('enableTimetable', $value)) {
+                    $value['enableTimetable'] = !$value['enableTimetable'];
+                }
+                if (array_key_exists('showSideNav', $value)) {
+                    $value['showSideNav'] = !$value['showSideNav'];
+                }
+                if (array_key_exists('showNotificationsPanel', $value)) {
+                    $value['showNotificationsPanel'] = !$value['showNotificationsPanel'];
+                }
+                $this->setScalar($value, 'showContacts', $model, 'setHideContacts');
+                $this->setScalar($value, 'enableTimetable', $model, 'setHideTimetable');
+                $this->setScalar($value, 'showSideNav', $model, 'setHideSidenav');
+                $this->setScalar($value, 'showNotificationsPanel', $model, 'setHideNotificationsTray');
             } elseif ('isBoarder' === $label) {
                 $model->setBoardingStatus($value);
             } else {
