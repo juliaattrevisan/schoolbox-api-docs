@@ -725,7 +725,7 @@ export default {
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <template v-if="eventExtendedProps.timetable.staff">
+                <template v-if="eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length">
                     <meta-item class="icon-staff">
                         <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
                             <template v-if="id">

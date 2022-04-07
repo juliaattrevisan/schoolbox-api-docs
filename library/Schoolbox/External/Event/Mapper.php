@@ -180,7 +180,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$folderColumnString}, 
                 {$folderCodeColumnString},
-                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`
+                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`, 
+                g.group_type as `g.group_type`
             FROM {$this->getTable()}
             LEFT JOIN {$this->folderCodeMapper->getTable()} fc ON {$this->getTable()}.code = fc.code AND fc.deleted_at IS NULL
             LEFT JOIN {$this->folderMapper->getTable()} f ON fc.folder_id = f.id AND f.deleted_at IS NULL
@@ -188,12 +189,13 @@ class Mapper extends \Schoolbox\Mapper
             LEFT JOIN sis_class_user scu ON sc.id = scu.class_id
             LEFT JOIN `user` u ON scu.external_id = u.synergy_id
             LEFT JOIN `groups` g ON u.group_id = g.id
-            WHERE group_type = :staffRoleType
-            AND {$where}
+            WHERE {$where}
+            AND (group_type = :studentRoleType OR group_type = :staffRoleType)
         ";
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array_merge([
+            'studentRoleType' => \Schoolbox\Role::STUDENT,
             'staffRoleType' => \Schoolbox\Role::STAFF
         ], $params));
 
@@ -223,20 +225,26 @@ class Mapper extends \Schoolbox\Mapper
             }
 
             /* Populate staff members in a cheap hydraty way
+             * Note that some classes could potentially have students-only; if we use
+             * WHERE group_type = 'staff' these students-only classes won't appear in
+             * the result set
              */
             $id = (int)$row['u.id'];
+            $groupType = (string)$row['g.group_type'];
 
-            $name = implode(' ', array_filter([
-                $row['u.title'],
-                $row['u.firstname'],
-                $row['u.lastname']
-            ], static function ($val) {
-                return '' !== trim((string)$val);
-            }));
+            if (\Schoolbox\Role::STAFF === $groupType) {
+                $name = implode(' ', array_filter([
+                    $row['u.title'],
+                    $row['u.firstname'],
+                    $row['u.lastname']
+                ], static function ($val) {
+                    return '' !== trim((string)$val);
+                }));
 
-            /* Trickle it in
-             */
-            $stack->getOffset($row['id'])->addStaff($id, $name);
+                /* Trickle it in
+                 */
+                $stack->getOffset($row['id'])->addStaff($id, $name);
+            }
         }
 
         return $stack;
