@@ -254,6 +254,10 @@ class ClassResults
          * so we can ASSUME something here about the sequence of $assessment
          */
         foreach ($this->assessments as $assessment) {
+            if (!key_exists($assessment->getId(), $this->tuples)) {
+                // this assessment is not for cohort
+                continue;
+            }
             $specificationId = $this->tuples[$assessment->getId()];
 
             /* Remember the unique titles of each $assessment we encountered, for highcharts

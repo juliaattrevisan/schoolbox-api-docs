@@ -467,7 +467,7 @@ class Controller extends BaseController
                 'source'    => $source,
                 'role'      => $role,
                 'perms'     => $this->getConfig()->getPermissionList(),
-                'roletype'  => $q['roletype'] ?: '',
+                'roletype'  => $q['roletype'] ?? '',
             ],
             'format'   => 'nochrome',
         ]);

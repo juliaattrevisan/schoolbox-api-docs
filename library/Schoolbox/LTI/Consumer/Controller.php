@@ -190,7 +190,7 @@ class Controller extends Base
             'data'   => [
                 'result'       => 'OK',
                 'providerName' => $provider->getName(),
-                'url'          => $post['url'],
+                'url'          => $post['url'] ?? null,
             ],
         ]);
     }

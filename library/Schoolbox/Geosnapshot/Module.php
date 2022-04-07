@@ -78,7 +78,7 @@ class Module extends BaseModule
 
         return [
             'viewee' => $user,
-            'url' => Redirect::decode($params['url'])
+            'url' => isset($params['url']) ? Redirect::decode($params['url']) : '',
         ];
     }
 
@@ -94,6 +94,9 @@ class Module extends BaseModule
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
+                    if (!isset($params['id'])) {
+                        throw new NotFound();
+                    }
                     try {
                         $viewee = $this->getUserMapper()->findById($params['id']);
                     } catch (MapperException $e) {

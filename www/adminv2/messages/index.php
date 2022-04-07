@@ -25,7 +25,7 @@ if (!$_SESSION['user']->isSuperuser()) {
 
 /** @var SitePage $this */
 
-if (in_array($this->arg[0], array('enable','disable'))) {
+if (in_array($this->arg[0] ?? false, array('enable','disable'))) {
     $this->localRedir('/adminv2/messages/indexForm.php?enabled=' . $this->arg[0]);
 }
 
