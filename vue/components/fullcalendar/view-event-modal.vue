@@ -158,6 +158,7 @@ export default {
                     actions: (data?.booking?.buttons || []).filter(button => button?.href),
                 },
                 timetable: {
+                    code: data?.timetable?.code,
                     staff: data?.timetable?.staff
                 },
                 attendance: {
@@ -737,6 +738,9 @@ export default {
                             <span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
                         </template>
                     </meta-item>
+                </template>
+                <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
+                    <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
                 </template>
 
                 <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
