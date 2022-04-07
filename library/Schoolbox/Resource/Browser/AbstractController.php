@@ -100,9 +100,6 @@ abstract class AbstractController extends BaseController
 
         // retrieve folder data
         $folder = $this->getFolder($folderId);
-        if (!$folder instanceof IFolder) {
-            throw new Resource\Exception("Requested folder is not a folder");
-        }
 
         try {
             // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
@@ -460,12 +457,15 @@ abstract class AbstractController extends BaseController
     /**
      * @param int $fileId
      * @return FileInterface
-     * @throws Mapper\Exception
+     * @throws Mapper\Exception if something went wrong in the mapper
+     * @throws Resource\Exception if somehow this fetches a non-file
      */
     protected function getFile($fileId)
     {
-        /** @var FileInterface $file */
         $file = $this->fileMapper->findById($fileId);
+        if (!$file instanceof FileInterface) {
+            throw new Resource\Exception("Requested file is not a file");
+        }
 
         // urgh...
         if (method_exists($file, 'setOwner')) {
@@ -501,11 +501,16 @@ abstract class AbstractController extends BaseController
     /**
      * @param int $folderId
      * @return FolderInterface
-     * @throws Mapper\Exception
+     * @throws Mapper\Exception if something went wrong in the mapper
+     * @throws Resource\Exception if somehow this fetches a non-folder
      */
     protected function getFolder($folderId)
     {
-        return $this->folderMapper->findById($folderId);
+        $folder = $this->folderMapper->findById($folderId);
+        if (!$folder instanceof FolderInterface) {
+            throw new Resource\Exception("Requested folder is not a folder");
+        }
+        return $folder;
     }
 
 
