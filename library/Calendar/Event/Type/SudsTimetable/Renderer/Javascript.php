@@ -110,6 +110,7 @@ class Javascript extends Base
                 /* Timetable-related nodes
                  */
                 'timetable' => [
+                    'code' => $this->event->getCode(),
                     'staff' => $this->event->getStaff()
                 ],
 

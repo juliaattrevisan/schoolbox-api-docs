@@ -158,6 +158,7 @@ export default {
                     actions: (data?.booking?.buttons || []).filter(button => button?.href),
                 },
                 timetable: {
+                    code: data?.timetable?.code,
                     staff: data?.timetable?.staff
                 },
                 attendance: {
@@ -704,6 +705,9 @@ export default {
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
             </template>
             <meta-list>
+                <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
+                    <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
+                </template>
                 <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
                     {{ eventExtendedProps.booking.status.name }}
                 </meta-item>
@@ -725,7 +729,7 @@ export default {
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <template v-if="eventExtendedProps.timetable.staff">
+                <template v-if="eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length">
                     <meta-item class="icon-staff">
                         <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
                             <template v-if="id">
@@ -738,7 +742,6 @@ export default {
                         </template>
                     </meta-item>
                 </template>
-
                 <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
                     Attendance:
                     <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>

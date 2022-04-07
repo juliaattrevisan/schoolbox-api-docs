@@ -264,20 +264,22 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    Loader::getInstance()->get('date_timezone'),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),
                     UserProfile\Student\Mapper::getInstance(),
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance()
-                    // /* Timetable pieces
-                    //  */
-                    // TimetableCycleMapper::getInstance(),
-                    // TimetablePeriodMapper::getInstance(),
-                    // ClassEntryMapper::getInstance(),
-                    // ClassInvolvementMapper::getInstance(),
-                    // ClassPeriodMapper::getInstance()
+                    UserProfile\Relationship\Mapper::getInstance(),
+                    /* Timetable pieces
+                     */
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    ClassEntryMapper::getInstance(),
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             default:
