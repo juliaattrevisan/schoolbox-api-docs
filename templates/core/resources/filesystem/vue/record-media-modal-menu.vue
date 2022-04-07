@@ -61,7 +61,6 @@ export default {
          *
          */
         updateContainerHeight () {
-            // debugger;
             const targetHeight = this.$refs.pseudoVideo.getBoundingClientRect().width * 0.5625; //so there's no height jumps on moving to selected record method
             this.$refs.pseudoVideo.style.height = targetHeight + 'px';
         },
