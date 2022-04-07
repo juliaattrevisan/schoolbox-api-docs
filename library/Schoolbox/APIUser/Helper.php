@@ -90,7 +90,7 @@ class Helper
         }
         if ('' !== $email) {
             $params['email'] = $email;
-            $where .= "AND alt_email = :email ";
+            $where .= "AND if( user.local_email , CONCAT(user.username, '@', (SELECT value from config where name = 'mail_address')), alt_email) = :email ";
         }
         if ('' !== $roleType) {
             $params['roleType'] = $roleType;
