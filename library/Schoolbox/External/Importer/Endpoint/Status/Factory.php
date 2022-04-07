@@ -25,7 +25,7 @@ class Factory
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -33,7 +33,7 @@ class Factory
      *
      * @var string
      */
-    private $key;
+    private string $key;
 
 
     /**
@@ -73,6 +73,9 @@ class Factory
 
             case Endpoint\Factory::COMPASS:
                 return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key);
+
+            case Endpoint\Factory::WONDE:
+                return new Connector\Wonde\Base\Endpoint\Status($this->host, $this->key);
 
             default:
                 // Use manual csv imports
