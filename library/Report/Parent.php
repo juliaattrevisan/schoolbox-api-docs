@@ -303,7 +303,7 @@ class Report_Parent extends Report_Abstract
     protected function getChildrensYears()
     {
         $allYears = array();
-        if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+        if (is_array($_SESSION['children'] ?? null) && count($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $currentChild) {
                 $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
                 $allYears[$student['StudentYearLevel']] = true;
@@ -369,7 +369,7 @@ class Report_Parent extends Report_Abstract
 
             $count = count($allContacts);
 
-            for ($lastID = -1, $i = 0; $i <= $count; $i++) {
+            for ($lastID = -1, $i = 0; $i < $count; $i++) {
                 $currentContact = $allContacts[$i];
 
                 /* New student, or first student
@@ -554,7 +554,7 @@ class Report_Parent extends Report_Abstract
 
                     $this->getPage()->setVar(
                         array(
-                            'SPOUSE_CONTACT_TYPE'   => Scrub::text($currentContact['StudentContactSpouseType']),
+                            'SPOUSE_CONTACT_TYPE'   => Scrub::text($currentContact['StudentContactSpouseType'] ?? ''),
                             'SPOUSE_TITLE'          => Scrub::text($currentContact['StudentContactSpouseTitle']),
                             'SPOUSE_FIRSTNAME'      => Scrub::text($firstname),
                             'SPOUSE_SURNAME'        => Scrub::text($currentContact['StudentContactSpouseSurname']),

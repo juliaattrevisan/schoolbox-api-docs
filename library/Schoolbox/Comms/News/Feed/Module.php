@@ -117,7 +117,7 @@ class Module extends BaseModule
      */
     private function preloadFolder(array $params): array
     {
-        if ($params['folder'] instanceof Folder\Model) {
+        if (($params['folder'] ?? null) instanceof Folder\Model) {
             return ['folder' => $params['folder']];
         }
 
