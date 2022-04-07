@@ -100,6 +100,9 @@ abstract class AbstractController extends BaseController
 
         // retrieve folder data
         $folder = $this->getFolder($folderId);
+        if (!$folder instanceof IFolder) {
+            throw new Resource\Exception("Requested folder is not a folder");
+        }
 
         try {
             // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
