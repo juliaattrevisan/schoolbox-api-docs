@@ -137,6 +137,9 @@ class Controller extends Base
     public function apiUserPost()
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+        if (null === $data) {
+            throw new SchoolboxException("POST Body is empty");
+        }
         /**
          * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
          * that should be done at the PUT/PATCH method
@@ -149,6 +152,22 @@ class Controller extends Base
             $this->getResponse()->status->setCode(404);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
+        }
+
+        if (!array_key_exists('username', $data)) {
+            throw new SchoolboxException("username unable to be null");
+        }
+        if (!array_key_exists('firstName', $data)) {
+            throw new SchoolboxException("firstName unable to be null");
+        }
+        if (!array_key_exists('altEmail', $data)) {
+            throw new SchoolboxException("altEmail unable to be null");
+        }
+        if (!array_key_exists('campus', $data)) {
+            throw new SchoolboxException("Campus unable to be null");
+        }
+        if (!array_key_exists('role', $data)) {
+            throw new SchoolboxException("Role unable to be null");
         }
 
         $newUser = $this->userMapper->createModel($uid);
