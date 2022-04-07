@@ -130,15 +130,16 @@ if (is_numeric($this->arg[0])) {
 
         /* Check locked
          */
+        /** @var \Schoolbox\Forum\Thread $thread */
         if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
             error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* Only inject a blockquote when creating a new reply
          */
-        $quotePostID = $this->arg[3];
+        $quotePostID = $this->arg[3] ?? null;
 
-        if (!is_numeric($quotePostID) && $this->arg[1]) {
+        if (!is_numeric($quotePostID)) {
             //Gets the oldest post to use as a thread reply
             $quotePostID = $thread->getFirstPost()->getId();
         }
