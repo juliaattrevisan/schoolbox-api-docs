@@ -174,22 +174,6 @@ class Controller extends Base
             throw new SchoolboxException("PUT Body is empty");
         }
 
-        if (!array_key_exists('username', $data)) {
-            throw new SchoolboxException("username is a required field");
-        }
-        if (!array_key_exists('firstName', $data)) {
-            throw new SchoolboxException("firstName is a required field");
-        }
-        if (!array_key_exists('altEmail', $data)) {
-            throw new SchoolboxException("altEmail is a required field");
-        }
-        if (!array_key_exists('campus', $data)) {
-            throw new SchoolboxException("Campus is a required field");
-        }
-        if (!array_key_exists('role', $data)) {
-            throw new SchoolboxException("Role is a required field");
-        }
-
         $userModal = $this->userMapper->createModel($user->getId());
 
         /**
@@ -349,7 +333,11 @@ class Controller extends Base
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $user);
 
-        $this->userMapper->save($model);
+        try {
+            $this->userMapper->save($model);
+        } catch (\UnexpectedValueException $e) {
+            throw new SchoolboxException($e->getMessage(), 400, $e);
+        }
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
         $updatedUser = $this->userMapper->findById($model->getId());
