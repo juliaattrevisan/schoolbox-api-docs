@@ -101,10 +101,10 @@ class Helper
         }
         if ('' !== $role) {
             if (array_key_exists('name', $role)) {
-                $params['role'] = $role;
+                $params['role'] = $role['name'];
                 $where          .= "AND `groups`.name = :role ";
             } elseif (array_key_exists('id', $role)) {
-                $params['role'] = $role;
+                $params['role'] = $role['id'];
                 $where          .= "AND `groups`.id = :role ";
             }
         }
@@ -114,22 +114,22 @@ class Helper
                 $from             .= " JOIN userCampus on userCampus.uid = user.id
                     JOIN luCampus on luCampus.id = userCampus.campus
             ";
-                $params['campus'] = $campus;
+                $params['campus'] = $campus['name'];
                 $where            .= "AND luCampus.name = :campus ";
             } elseif (array_key_exists('id', $campus)) {
                 $select           .= "";
                 $from             .= " JOIN userCampus on userCampus.uid = user.id
             ";
-                $params['campus'] = $campus;
+                $params['campus'] = $campus['id'];
                 $where            .= "AND userCampus.campus = :campus ";
             }
         }
         if ('' !== $year) {
             if (array_key_exists('name', $year)) {
-                $params['year'] = $year;
+                $params['year'] = $year['name'];
                 $where          .= "AND lyl.name = :year ";
             } elseif (array_key_exists('id', $year)) {
-                $params['year'] = $year;
+                $params['year'] = $year['id'];
                 $where          .= "AND lyl.id = :year ";
             }
         }
