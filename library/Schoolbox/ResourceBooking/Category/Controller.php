@@ -54,7 +54,7 @@ class Controller extends Base
     public function browse()
     {
 
-        $page  = max(intval($this->getRequest()->query['page']), 1);
+        $page  = max(intval($this->getRequest()->query->get('page')), 1);
         $total = $this->mapper->countAll();
         $this->paginator->setTotal($total);
 

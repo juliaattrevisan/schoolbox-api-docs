@@ -223,8 +223,8 @@ class Validation
                     $existingBooking,
                     $startDate,
                     $endDate,
-                    $postData['related_item'],
-                    $postData['efficacy']
+                    $postData['related_item'] ?? null,
+                    $postData['efficacy'] ?? null
                 ) as $check
             ) {
                 /** @var Item\Model $thisResource */

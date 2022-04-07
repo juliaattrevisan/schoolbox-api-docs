@@ -5,10 +5,10 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 /* Routing */
 $leaveController = new Leave_Controller($this);
 
-$method = $this->arg[0];
+$method = $this->arg[0] ?? null;
 
 try {
-    if (!isset($method) && empty($this->arg)) {
+    if (!$method && empty($this->arg)) {
         $leaveController->renderSummary();
     } else if ($method == 'create') {
         $data = $leaveController->executeCreateRequest();
@@ -96,7 +96,7 @@ try {
                 if ($method == 'report' && $this->arg[1] == 'catering') {
                     $date = date('d/m/Y', time());
 
-                    if (is_string($this->arg[2]) && strlen($this->arg[2]) > 0 && $this->arg[2] != 'export') {
+                    if (is_string($this->arg[2] ?? null) && strlen($this->arg[2]) > 0 && $this->arg[2] != 'export') {
                         $date = str_replace('-', '/', $this->arg[2]);
                     }
 

@@ -249,7 +249,7 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
                     /* Render out each authorisation user -_-
                      */
-                    if (is_array($currentPerson['request_authorisation_user_id']) && count($currentPerson['request_authorisation_user_id'])) {
+                    if (is_array($currentPerson['request_authorisation_user_id'] ?? null) && count($currentPerson['request_authorisation_user_id'])) {
                         foreach ($currentPerson['request_authorisation_user_id'] as $id => $name) {
                             $this->getPage()->setVar(
                                 array(
