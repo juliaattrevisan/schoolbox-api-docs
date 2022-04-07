@@ -61,6 +61,7 @@ export default {
          *
          */
         updateContainerHeight () {
+            // debugger;
             const targetHeight = this.$refs.pseudoVideo.getBoundingClientRect().width * 0.5625; //so there's no height jumps on moving to selected record method
             this.$refs.pseudoVideo.style.height = targetHeight + 'px';
         },
@@ -185,7 +186,7 @@ export default {
 </script>
 
 <template>
-    <div class="pseudo-video" ref="pseudoVideo" v-if="hasChecked">
+    <div v-if="hasChecked" class="pseudo-video" ref="pseudoVideo">
         <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
