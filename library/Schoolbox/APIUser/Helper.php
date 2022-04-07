@@ -100,20 +100,38 @@ class Helper
             $where .= "AND `groups`.group_type = :roleType ";
         }
         if ('' !== $role) {
-            $params['role'] = $role;
-            $where .= "AND `groups`.name = :role ";
+            if (array_key_exists('name', $role)) {
+                $params['role'] = $role;
+                $where          .= "AND `groups`.name = :role ";
+            } elseif (array_key_exists('id', $role)) {
+                $params['role'] = $role;
+                $where          .= "AND `groups`.id = :role ";
+            }
         }
         if ('' !== $campus) {
-            $select .= "";
-            $from .= " JOIN userCampus on userCampus.uid = user.id
+            if (array_key_exists('name', $campus)) {
+                $select           .= "";
+                $from             .= " JOIN userCampus on userCampus.uid = user.id
                     JOIN luCampus on luCampus.id = userCampus.campus
             ";
-            $params['campus'] = $campus;
-            $where .= "AND luCampus.name = :campus ";
+                $params['campus'] = $campus;
+                $where            .= "AND luCampus.name = :campus ";
+            } elseif (array_key_exists('id', $campus)) {
+                $select           .= "";
+                $from             .= " JOIN userCampus on userCampus.uid = user.id
+            ";
+                $params['campus'] = $campus;
+                $where            .= "AND userCampus.campus = :campus ";
+            }
         }
         if ('' !== $year) {
-            $params['year'] = $year;
-            $where .= "AND lyl.name = :year ";
+            if (array_key_exists('name', $year)) {
+                $params['year'] = $year;
+                $where          .= "AND lyl.name = :year ";
+            } elseif (array_key_exists('id', $year)) {
+                $params['year'] = $year;
+                $where          .= "AND lyl.id = :year ";
+            }
         }
         if (0 !== $cursor) {
             $where .= " AND user.id > :cursor ";
