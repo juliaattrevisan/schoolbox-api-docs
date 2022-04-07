@@ -51,7 +51,7 @@ class Specification
              * Student Profile nodes
              */
             [
-                'name' => 'Student Profiles with includes',
+                'name' => 'Student + Parent Profiles with includes',
                 'func' => function () {
                     $errorMessage = '';
                     $result = true;
