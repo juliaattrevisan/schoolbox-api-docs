@@ -354,6 +354,8 @@ class Controller extends Base
     public function apiUserSearch()
     {
         $search = $this->request->query->get('search', '');
+        $cursor = (int)$this->request->query->get('cursor', null);
+        $limit = (int)$this->request->query->get('limit', null);
         if ('' === $search) {
             $problem = (new ApiProblem('Search must not be blank'))
                 ->setStatus(401)
@@ -373,7 +375,7 @@ class Controller extends Base
         $filter = $this->request->query->get('filter', null);
         $userHelper = new Helper($this->userMapper);
         $output = [];
-        $ajaxSearch = $userHelper->ajaxSearch($search, $filter);
+        $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
         $userIds = [];
         foreach ($ajaxSearch as $item) {
             foreach ($item as $label => $value) {

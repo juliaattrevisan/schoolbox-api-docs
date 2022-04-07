@@ -2,6 +2,7 @@
 
 namespace Schoolbox\APIUser;
 
+use PDO;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
@@ -25,13 +26,15 @@ class Helper
      * @param string     $keyword
      * @param array|null $filter
      * @param int|null   $limit
+     * @param int|null   $cursor
      * @return array|bool
      * @throws \Exception
      */
     public function ajaxSearch(
         string $keyword,
         ?array $filter,
-        ?int $limit = null
+        ?int $limit = null,
+        ?int $cursor = null
     ) {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
@@ -112,13 +115,25 @@ class Helper
             $params['year'] = $year;
             $where .= "AND lyl.name = :year ";
         }
-        $where .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
-        if (is_numeric($limit)) {
-            $where .= " LIMIT $limit";
+        if (0 !== $cursor) {
+            $where .= " AND user.id > :cursor ";
+        }
+        $where .= "ORDER BY user.id, lyl.sequence, lastname, firstname";
+        if (0 !== $limit) {
+            $where .= " LIMIT :limit";
         }
         $stat = $select . $from . $where;
         $statement = $this->userMapper->getDatabase()->prepare($stat);
-        $statement->execute($params);
+        if (0 !== $limit) {
+            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if (0 !== $cursor) {
+            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
+        }
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
         return $statement->fetchAll();
     }
 }
