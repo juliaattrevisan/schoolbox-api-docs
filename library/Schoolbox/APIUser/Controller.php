@@ -270,8 +270,10 @@ class Controller extends Base
                 try {
                     $data['yearLevel'] = $this->yearLevelMapper->findById($yearLevel);
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $data['yearLevel'] = null;
+                    throw new SchoolboxException("Year '$yearLevel' Not Found");
                 }
+            } else {
+                $data['yearLevel'] = null;
             }
         }
         /**
