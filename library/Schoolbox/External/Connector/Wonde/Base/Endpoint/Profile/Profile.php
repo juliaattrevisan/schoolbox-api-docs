@@ -202,7 +202,8 @@ class Profile implements IStrategy
                 'sen_needs',
                 'identifiers',
                 'contacts',
-                'contacts.contact_details'
+                'contacts.contact_details',
+                'permissions'
             ])
         );
 
@@ -242,14 +243,15 @@ class Profile implements IStrategy
                     $student['contact_details']['data']['emails']['email'],
                 ]);
 
-                $firstname   = trim((string)$student['forename']);
-                $form        = '';
-                $gender      = trim((string)$student['gender']);
-                $lastname    = trim((string)$student['surname']);
-                $mobile      = '';
-                $studiesCode = trim((string)$student['education_details']['data']['learner_number']);
-                $title       = '';
-                $tutorGroup  = '';
+                $firstname      = trim((string)$student['forename']);
+                $form           = '';
+                $gender         = trim((string)$student['gender']);
+                $lastname       = trim((string)$student['surname']);
+                $mobile         = '';
+                $photoRedacted  = (bool)$student['permissions']['data']['photograph_student'];
+                $studiesCode    = trim((string)$student['education_details']['data']['learner_number']);
+                $title          = '';
+                $tutorGroup     = '';
 
                 /* There's a Username in the identifiers object, but it's not always set
                  * I guess we take a punt about meaningful values, though there's this other
@@ -381,6 +383,7 @@ class Profile implements IStrategy
                     ->setHouseName($academicHouse)
                     ->setLeavingDate($leavingDate)
                     ->setMobile($mobile)
+                    ->setPhotoRedacted($photoRedacted)
                     ->setStudiesCode($studiesCode)
                     ->setTutorGroup($tutorGroup)
                     ->setTutorTeacherId($tutor['id'])

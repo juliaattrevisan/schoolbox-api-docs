@@ -157,6 +157,7 @@ class Profile implements IStrategy
             $gender = '';
             $lastname = '';
             $mobile = '';
+            $photoRedacted = false;
             $studiesCode = '';
             $title = '';
             $tutor = '';
@@ -275,6 +276,7 @@ class Profile implements IStrategy
                 ->setHouseName($academicHouse)
                 ->setLeavingDate($leaving)
                 ->setMobile($mobile)
+                ->setPhotoRedacted($photoRedacted)
                 ->setStudiesCode($studiesCode)
                 ->setTutorGroup($tutorGroup)
                 ->setTutorTeacherId($tutor['id'])
