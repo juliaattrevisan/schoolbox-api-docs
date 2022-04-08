@@ -170,6 +170,9 @@ class Controller extends Base
     public function apiUserPut(User $user)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+        if (null === $data) {
+            throw new SchoolboxException("PUT Body is empty");
+        }
 
         $userModal = $this->userMapper->createModel($user->getId());
 
@@ -189,6 +192,10 @@ class Controller extends Base
     public function apiUserPatch(User $user)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+
+        if (null === $data) {
+            throw new SchoolboxException("PATCH Body is empty");
+        }
 
         /**
          * build the user Model object from the POST data
@@ -326,7 +333,11 @@ class Controller extends Base
         /** @var User $model */
         $model = (new User\Translator\ArrayToModel())($data, $user);
 
-        $this->userMapper->save($model);
+        try {
+            $this->userMapper->save($model);
+        } catch (\UnexpectedValueException $e) {
+            throw new SchoolboxException($e->getMessage(), 400, $e);
+        }
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
         $updatedUser = $this->userMapper->findById($model->getId());
