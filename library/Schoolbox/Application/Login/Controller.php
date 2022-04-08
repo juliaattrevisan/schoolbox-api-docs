@@ -160,6 +160,7 @@ class Controller extends Base
                 // then check if they checked the terms and conditions checkbox
                 $message = $this->getConfigLoader()->get('login_terms_and_conditions_error');
             } else {
+                $authenticated = false;
                 try {
                     $user = $sessionHandler->authenticate($username, $password);
                     if ($user instanceof User) {

@@ -243,7 +243,7 @@ class GDriveFetcher implements FetcherInterface
             return $permission;
         }
         // This can be recursively called, but I don't like recursive ...
-        while ($permissions['nextPageToken']) {
+        while ($permissions['nextPageToken'] ?? false) {
             $permissions = $this->callListPermissions($fileId, $permissions['nextPageToken']);
             foreach ($permissions as $permission) {
                 if ($permission['emailAddress'] !== $email) {
