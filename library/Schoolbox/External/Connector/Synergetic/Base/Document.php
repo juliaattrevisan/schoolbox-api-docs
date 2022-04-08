@@ -106,7 +106,7 @@ class Document extends Base implements IDocument
                 $dateA = $a['CreatedDate'];
                 /** @var Alaress_Date_Format $dateB */
                 $dateB = $b['CreatedDate'];
-                return $dateA->lt($dateB);
+                return $dateB->compare($dateA);
             });
         return $documentCollection->getAll();
     }
