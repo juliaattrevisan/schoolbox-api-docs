@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Geosnapshot\Api;
+use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
+
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -37,12 +39,33 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --raw
+     *
+     * Show the actual data payload that we send
+     */
+    private const OPT_LONG_RAW = 'raw:';
+
+
+    /**
+     * Show the raw redaction payload as php arrays
+     */
+    private const OUTPUT_PHP = 'php';
+
+
+    /**
+     * Show the raw redaction payload as json-encoded string
+     */
+    private const OUTPUT_JSON = 'json';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_RAW
         ];
     }
 
@@ -61,6 +84,14 @@ had their pictures redacted via the sis. Also transmits some additional metadata
 The redaction list consists of current students only.
 
 Usage: php redaction.php [--perform]
+
+You can also specify a raw output format so you can see the actual payload data that
+we send to Geosnapshot. You can use this to do a deeper debug dive or when Geosnapshot
+needs a little extra help from you.
+
+Usage: php redaction.php [--raw=[php,json]]
+Ex. php redaction.php --raw=php
+Ex. php redaction.php --raw=json
 
 
 HELP;
@@ -143,6 +174,24 @@ HELP;
              */
             (new Api($this->getConfig()->get('geosnapshot_api_key')))
                 ->transmitRedactionPhotos($fqdn, $redactionList);
+        }
+
+        /* If the cli option was set, also produce a raw actual data payload
+         */
+        $raw = $this->getOpt(self::OPT_LONG_RAW);
+
+        if ($raw) {
+            $payload = (new RedactedPhotoList($fqdn))->build($redactionList);
+
+            echo "\n";
+
+            if (self::OUTPUT_PHP === $raw) {
+                print_r($payload);
+            } elseif (self::OUTPUT_JSON === $raw) {
+                print_r(json_encode($payload));
+            }
+
+            echo "\n\n";
         }
     }
 
