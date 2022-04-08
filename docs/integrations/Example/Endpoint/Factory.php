@@ -32,6 +32,21 @@ use UnexpectedValueException;
 class Factory
 {
 
+
+    /**
+     * Get timetable classes occurring this far in the past
+     * Measured in months, defaults to -1 month
+     */
+    private const FROM = -1;
+
+
+    /**
+     * Get timetable classes up to this far into the future
+     * Measured in months, defaults to 6 months
+     */
+    private const TO = 6;
+
+
     /**
      * @var LoggerInterface
      */
@@ -56,6 +71,12 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var string
+     */
+    private string $timezone;
 
 
     /**
@@ -125,29 +146,44 @@ class Factory
 
 
     /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * Factory constructor.
      *
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param string                          $host
-     * @param string                          $key
-     * @param UserProfile\Mapper              $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param CampusMapper                    $campusMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param string                                     $host
+     * @param string                                     $key
+     * @param string                                     $timezone
+     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param UserProfile\Student\Mapper                 $studentProfileMapper
+     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
+     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper            $relationshipMapper
+     * @param CampusMapper                               $campusMapper
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         string $host,
         string $key,
+        string $timezone,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -156,16 +192,21 @@ class Factory
         UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
         CampusMapper $campusMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+
+        /* Choose a timezone for startAt/finishAt datetimes
+         */
+        $this->timezone = $timezone;
 
         /* Profile pieces
          */
@@ -178,11 +219,12 @@ class Factory
         /* Timetable pieces
          */
         $this->campusMapper = $campusMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -192,10 +234,19 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        /* Cache a list of known users and periods
+        /* Classical Grid: Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
+
+        /* SUDS Timetable Events: Date Range
+         */
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
+
+        /* Decide a timezone for all the UTC dates sis gives to us
+         */
+        $timezone = new \DateTimeZone($this->timezone);
 
         /* Spawn an Api instance
          */
@@ -232,6 +283,8 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
+            /* Classical timetable grid
+             */
             ->add(new Timetable\Prepare(
                 $this->log,
                 $this->perform,
@@ -253,6 +306,29 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
+            ))
+            /* SUDS Timetable Events
+             */
+            ->add(new TimetableCalendar\Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper
+            ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $timezone,
+                $from,
+                $to
             ))
             ->add(new ApiStatistics(
                 $this->log,
