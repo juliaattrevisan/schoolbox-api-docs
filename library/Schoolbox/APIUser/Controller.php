@@ -354,4 +354,75 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * Searches for a user based on a filter list
+     * param: {search: search basic term} {filter: extra parameters for determining how to filter the search results}
+     *
+     * @api /api/user
+     * @link http://api.schoolbox.com.au/#operation/userSearch
+     */
+    public function apiUserSearch()
+    {
+        $search = $this->request->query->get('search', '');
+        $cursor = (int)$this->request->query->get('cursor', null);
+        $limit = (int)$this->request->query->get('limit', 5);
+        if ('' === $search) {
+            $problem = (new ApiProblem('Search must not be blank'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        if (strlen($search) <= 2) {
+            $problem = (new ApiProblem('Search term must be longer than 2 characters'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        $userHelper = new Helper($this->userMapper);
+        $output = [];
+        $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+        $userIds = [];
+        foreach ($ajaxSearch as $item) {
+            foreach ($item as $label => $value) {
+                if ('uid' === $label) {
+                    $userIds[] = $value;
+                }
+            }
+        }
+        /**
+         * now we have the user id's that match the search result, create the standard user array with hydration.
+         */
+        $users = $this->userMapper->findByColumn('id', $userIds);
+        foreach ($users as $user) {
+            $users_groups = $this->groupsHelper->getCurrentGroups($user);
+            $apiGroups = new Collection($users_groups);
+            $groupsArr = $apiGroups->map(new GroupArray());
+
+            //load parents and students / children for export.
+            $user->loadParents()
+                 ->loadStudents();
+
+            /**
+             * build the whole thing
+             */
+            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
+        }
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                [
+                    'data'  =>  $output,
+                    'metadata'  => [
+                        'count' => count($output),
+                        'cursor' => end($output)['id']
+                    ]
+                ]
+            )
+        );
+    }
 }
