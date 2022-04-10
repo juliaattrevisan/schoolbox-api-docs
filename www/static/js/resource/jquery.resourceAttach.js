@@ -475,50 +475,10 @@
      * Essentially though, both the relevant menu ('#attachment-browser-filesystems') and panel ('#attachment-browser-panel-container')
      * are injected into the modal window when the Modal Window is clicked.
      * This ensures that the appropriate upload count / mime types are respected
-     * The relevant code/events are then set up once again - these being pulled out of templates/core/resources/attach-browser.html
      */
     ResourceAttach.prototype.initAttachmentBrowser = function () {
-
         singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
         singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
-
-        $(document).foundation();
-
-        let filesystems = $('#attachment-browser-filesystems');
-        const MAX_IFRAME_HEIGHT = 500;
-
-        filesystems.find('[data-source]').on('click', function(event) {
-
-            let source = $(this).attr('data-source');
-            let panel = $('#' + source + '-panel');
-
-            let url = $(this).attr('data-url');
-            let method = $(this).attr('data-method');
-
-            /* Use the $method var to decide whether this is inline content
-            * such as all our internal file upload dropzone options, recorder
-            * my files, resources, etc.
-            *
-            * or whether it should be loaded into an iframe, such as with third
-            * parties like ms teams, goggle drive, office 365 etc.
-            *
-            * Inline content starts with a preloader class which should be removed
-            * once content has loaded
-            */
-
-            if (method === 'inline') {
-                fetch(url).then((response) => {
-                    response.text().then((text) => {
-                        panel.html(text);
-                    });
-                });
-            } else if (method === 'iframe') {
-                panel.html($('<iframe></iframe>').attr('src', url).height(MAX_IFRAME_HEIGHT));
-            }
-
-        });
-
-
     };
 
 
