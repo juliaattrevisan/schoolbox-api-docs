@@ -104,7 +104,7 @@ export default {
             <label>Year Level</label>
             <select @change="onYearChange($event)">
                 <option value="">Any</option>
-                <option value="0">Not set</option>
+                <option value="null">Not set</option>
                 <option v-for="yearLevel in yearLevels" :value="yearLevel.name" :key="yearLevel.id">
                     {{ yearLevel.name }}
                 </option>
