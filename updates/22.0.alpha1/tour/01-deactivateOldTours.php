@@ -18,7 +18,6 @@ $app = new class extends CliTool\App {
         $tourMapper->deleteByColumn('title', '21.0 Release');
         $tourMapper->deleteByColumn('title', '21.1 Release');
         $tourMapper->deleteByColumn('title', '22.0 Release');
-
     }
 };
 
