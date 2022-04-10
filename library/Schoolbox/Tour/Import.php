@@ -52,7 +52,7 @@ HELP
 
         foreach ($steps as $step) {
             $step   = $step['step'];
-            $stepID = $this->createStep($tourID, $stepID, $step['type'], $step['title'], $step['content'], $step['class'], $step['selector'], $step['events']);
+            $stepID = $this->createStep($tourID, $stepID, $step['type'], $step['title'], $step['content'], $step['class'], $step['selector'] ?? null, $step['events'] ?? null);
         }
 
         if ($this->perform()) {
