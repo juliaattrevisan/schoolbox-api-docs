@@ -21,7 +21,8 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new BasicRequest\Kernel();
 
-$browserCacheTimeoutConfigName = $_GET['transform_type'] === 'portrait'
+$transformType = $_GET['transform_type'] ?? '';
+$browserCacheTimeoutConfigName = $transformType === 'portrait'
     ? ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT
     : ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT;
 
@@ -61,7 +62,7 @@ switch ($code) {
 //
 // Build the transformation.
 // If there's no valid transformation, then transform to a given size.
-switch ($_GET['transform_type']) {
+switch ($transformType) {
     case Image\Transformation\Portrait::getSlug():
         $path       = '/images/placeholders/portrait.png';
         $hash       = '4ffb9e38f95e5fbafe0277c6a424e2b47b38d997';

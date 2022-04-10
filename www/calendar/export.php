@@ -120,7 +120,7 @@ try {
     $filename           = 'calendar';
     $resourceId         = (int)($_GET['resource_id'] ?? 0);
     $resourceCategoryId = (int)($_GET['resource_category_id'] ?? 0);
-    $eventTypeId        = (int)$_GET['event_type'];
+    $eventTypeId        = (int)($_GET['event_type'] ?? 0);
     if ($resourceId > 0) {
         $export_type = 'resource';
     }
