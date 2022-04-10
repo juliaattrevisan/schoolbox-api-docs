@@ -21,6 +21,6 @@ tour:
                   <h3>Redesigned Student Self-Reflection</h3>
                   <p>To simplify the due work submission process for students, the file upload and self-reflection steps have been merged into a single step.</p>
                   <h3>Rubric Markdown</h3>
-                  <p>Improve the style of your rubric descriptors using markdown formatting. Add bold, underline, dot point lists and even links to other pages</p>
+                  <p>Improve the style of your rubric descriptors using markdown formatting. Add bold, underline, dot point lists and even links to other pages.</p>
                   <p><a href='/help/sso/send?returnUrl=/homepage/3299'>Find out more via our release notes.</a><br />"
         class: introjs-newsmodal
