@@ -30,16 +30,16 @@ abstract class SimpleStrategy implements ISimpleStrategy
 {
 
     /** @var UserAccessMapper */
-    private $userAccessMapper;
+    protected UserAccessMapper $userAccessMapper;
 
     /** @var Access */
-    private $access;
+    protected Access $access;
 
     /** @var bool */
-    private $staffCanPost;
+    protected bool $staffCanPost;
 
     /** @var bool */
-    private $moderationRequired;
+    protected bool $moderationRequired;
 
 
     /**

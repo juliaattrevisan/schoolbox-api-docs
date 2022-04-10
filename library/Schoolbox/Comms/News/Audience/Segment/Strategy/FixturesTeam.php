@@ -18,6 +18,7 @@ use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
@@ -45,6 +46,40 @@ class FixturesTeam extends SimpleStrategy
 
 
     /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityType(User $user): bool
+    {
+        return
+            $user->isSuperuser() ||
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
+            $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE ||
+            $user->getRole()->isStaff();
+    }
+
+
+    /**
+     * @@inheritdoc
+     */
+    public function canModerate(User $user, ?string $entityValue): bool
+    {
+        if (
+            $user->isSuperuser() ||
+            $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE ||
+            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE)
+        ) {
+            return true;
+        }
+
+        // No other user can moderate if value not set
+        if (null === $entityValue) {
+            return false;
+        }
+        return $user->getRole()->isStaff();
+    }
+
+
+    /**
      * @inheritDoc
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
@@ -54,10 +89,10 @@ class FixturesTeam extends SimpleStrategy
         $entityType = self::getEntityType();
 
         return "
-            SELECT 
-                st.id, 
-                CONCAT(st.name, ' (', sd.name, ', ', ss.name, ')') AS name, 
-                '{$entityType}' AS entity_type, 
+            SELECT
+                st.id,
+                CONCAT(st.name, ' (', sd.name, ', ', ss.name, ')') AS name,
+                '{$entityType}' AS entity_type,
                 NULL as entity_meta
             FROM sportsfixtures_team st
             INNER JOIN sportsfixtures_division sd ON st.division_id = sd.id
@@ -85,7 +120,7 @@ class FixturesTeam extends SimpleStrategy
         /* This connects up to sql pieces in UserResolver.php
          */
         $join = "
-            INNER JOIN sportsfixtures_team_user {$teamAlias} 
+            INNER JOIN sportsfixtures_team_user {$teamAlias}
             ON {$teamAlias}.user_id = {$userTableAlias}.id
         ";
 
@@ -140,9 +175,9 @@ class FixturesTeam extends SimpleStrategy
         $bindings = Builder::getBindings($userIds, 'user');
 
         $query = "
-            SELECT stu.team_id 
+            SELECT stu.team_id
             FROM sportsfixtures_team_user stu
-            INNER JOIN sportsfixtures_team st ON st.id = stu.team_id 
+            INNER JOIN sportsfixtures_team st ON st.id = stu.team_id
             WHERE user_id IN ({$bindings->getPlaceholder()})
             AND st.deleted_at IS NULL
         ";
