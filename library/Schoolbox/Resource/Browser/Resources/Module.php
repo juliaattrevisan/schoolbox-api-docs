@@ -30,6 +30,7 @@ class Module extends AbstractModule
         parent::initRoutes($router, $basePath);
         $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens([ 'linkId' => '\d+' ]);
         $this->addGetRoute($router, 'showFiles', $basePath, '/folder/{componentID}/files/{sourceFolderID}')->addTokens([ 'componentID' => '\d+', 'sourceFolderID' => '\d+' ]);
+        $router->getRoutes()->addPatch($this->basename . '.' . 'patchFileInfo', $basePath . '/file/{fileId}/ajax')->addTokens([ 'fileId' => '\d+' ]);
     }
 
     /**

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -17,6 +18,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
+use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Component_InstanceMapper;
 use Schoolbox\Mapper;
@@ -234,5 +236,62 @@ class Controller extends AbstractController
     {
         // find out if we have access to the requested folder
         return Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId);
+    }
+
+    /**
+     * @param int $fileId
+     * @api   PATCH /resources/file/:fileId/ajax
+     * @since 22.0
+     * @throws Mapper\Exception|Resource\Exception|SchoolboxException
+     */
+    public function patchFileInfo($fileId)
+    {
+        $file = $this->fileMapper->findById($fileId);
+        if (!$file instanceof FileInterface) {
+            throw new Resource\Exception("Requested file is not a file");
+        }
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        if (array_key_exists('mimeType', $data)) {
+            throw new SchoolboxException("mimeType is unable to be updated at this endpoint");
+        }
+        if (array_key_exists('filesize', $data)) {
+            throw new SchoolboxException("filesize is unable to be updated at this endpoint");
+        }
+        /**
+         * start setting changed values
+         */
+        if (array_key_exists('title', $data)) {
+            $file->setTitle($data['title']);
+        }
+
+        if (array_key_exists('fileName', $data)) {
+            $file->setFilename($data['fileName']);
+        }
+
+        if (array_key_exists('hidden', $data)) {
+            $file->setHidden($data['hidden']);
+        }
+
+        if (array_key_exists('description', $data)) {
+            $file->setDescription($data['description']);
+        }
+        /**
+         * save new object
+         */
+        $this->fileMapper->save($file);
+
+        $data = [
+            'title'         => $file->getTitle(),
+            'fileName'      => $file->getFilename(),
+            'description'   => $file->getDescription(),
+            'mimeType'      => $file->getMime(),
+            'filesize'      => $file->getSize(),
+            'hidden'        => $file->isHidden(),
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput($data)
+        );
     }
 }
