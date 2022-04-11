@@ -69,6 +69,11 @@ if (isset($_GET['componentInstanceId']) && (int)$_GET['componentInstanceId']) {
     $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById((int)$_GET['folderId']);
 
     $api = $this->getDi()->get('calendarApiFactory')->produceForFolder($folder, $user, $viewer);
+} elseif (isset($_GET['timetableCalendar'])) {
+    /* These are hardcoded subscriptions that are somehow Timetable-related
+     * Includes both SUDS Timetable and all the live connector ones
+     */
+    $api = $this->getDi()->get('calendarApiFactory')->produceForTimetableCalendar($user, $viewer);
 } else {
     /* Otherwise just get the set of events relevant to a particular user
      */

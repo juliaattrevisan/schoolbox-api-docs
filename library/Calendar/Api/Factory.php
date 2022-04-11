@@ -195,6 +195,70 @@ class Calendar_Api_Factory
 
 
     /**
+     * Only show the Timetable related subscriptions, if enabled
+     * This is used specifically for the special Timetable Calendar representation
+     *
+     * TODO: Might be a cheaper way to do all this
+     *
+     * @param User                             $user
+     * @param User                             $viewer
+     * @return Calendar_Api_EventType_Interface
+     */
+    public function produceForTimetableCalendar(User $user, User $viewer): Calendar_Api_EventType_Interface
+    {
+        $composite = new Calendar_Api_Composite();
+
+        /* SUDS Timetable
+         */
+        $sudsTimetableConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_SudsTimetable_Schoolbox_Default::class);
+
+        if ($sudsTimetableConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                $sudsTimetableConfig->getId(),
+                $user,
+                $viewer,
+                null,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Timetable_ColourMapper::getInstance()
+            ));
+        }
+
+        /* Live connector timetable subscription: Timetable/ExternalConstrained
+         */
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class);
+
+        if ($calendarConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($calendarConfig->getId(), $user, $viewer, $this->configLoader, \Schoolbox\Calendar\EventTypeMapper::getInstance()));
+        }
+
+        /* Live connector timetable subscription: Timetable/TimetableDays
+         * (Not sure where this comes from, but it was a thing)
+         */
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_TimetableDays_External_Default::class);
+
+        if ($calendarConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_TimetableDays_External_Default($calendarConfig->getId(), $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()));
+        }
+
+        /* Live connector timetable subscription: Timetable/Room
+         * (Not sure where this comes from, but it was a thing)
+         */
+        $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Timetable_Room::class);
+
+        if ($calendarConfig->isActive()) {
+            $composite->add(new Calendar_Api_EventType_Timetable_Room($calendarConfig->getId(), $user, $viewer, new External_Timetable()));
+        }
+
+        return $composite;
+    }
+
+
+    /**
      * Handle unique construction logic for each variant of the calendar connector.
      *
      * @param Calendar_Api_Config_Record $config
