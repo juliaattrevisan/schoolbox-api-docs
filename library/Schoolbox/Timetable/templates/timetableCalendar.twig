@@ -5,6 +5,7 @@
             userId:             Number('{{ user.id }}'),
             dateDisplayFormats: dateDisplayFormats,
             defaultView:        'timeGridWeek',
+            defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
             weekends:           {{ weekends }}
         };
     </script>

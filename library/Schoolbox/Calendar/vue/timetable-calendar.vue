@@ -682,7 +682,11 @@ export default {
          * I'm not sure if we can use it..
          */
         updateListViewDateRangeField(start, end = null) {
-            window.history.pushState('', '', '/calendar/' + dayjs(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+            /* This is the next/previous button on the date selector
+             * It needs to go to the new /timetable/calendar/... route
+             */
+            window.history.pushState('', '', '/timetable/calendar/' + dayjs(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = dayjs(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
 

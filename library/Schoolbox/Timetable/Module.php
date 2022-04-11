@@ -44,7 +44,8 @@ class Module extends BaseModule
             return $this->preloadUser($params);
         };
 
-        $this->register('GET', '/calendar/{userId}', 'getTimetableCalendar', $getPerms, $preloadUser);
+        $this->register('GET', '/calendar/{date}/{userId}', 'getTimetableCalendar', $getPerms, $preloadUser);
+        $this->register('GET', '/calendar/{userId}', 'getTimetableCalendarRedirect', $getPerms, $preloadUser);
     }
 
 
