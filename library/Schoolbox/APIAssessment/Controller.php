@@ -10,28 +10,22 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIAssessment;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
 
 
-    protected AssessmentMapperProxy $mapperProxy;
+    protected IConnector $dbMapper;
     /**
      * Controller constructor.
      *
      */
-    public function __construct(AssessmentMapperProxy $mapperProxy)
+    public function __construct()
     {
-        $this->mapperProxy = $mapperProxy;
     }
 
     /**
@@ -40,85 +34,48 @@ class Controller extends Base
      * @api /api/assessment/{assessmentId}
      * @link TODO:
      */
-    public function apiAssessmentGet(IAssessable $assessment)
+    public function apiAssessmentGet(string $assessmentId)
     {
+        if (!is_numeric($assessmentId)) {
+            $problem = (new ApiProblem('Assessment not found, ID must be a number'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
         //get all assessment info for object
 
-        $time_start = microtime(true);
+        $query  = "
+SELECT
+    assessment.id, assessment.title, assessment.weight,
+    COALESCE(task_completion.completion_date, submission_return.created_at) as `CompletionDate`,
+    v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
+    task_completion.completion_status, task_completion.task_id, task_completion.completion_date,
+    submission_return.review_route, submission_return.comment, submission_return.mark, submission_return.norm_mark
+
+FROM v_most_recent_feedback
+
+JOIN assessment on v_most_recent_feedback.assessment_id = assessment.id
+
+LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
+
+LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
+
+WHERE v_most_recent_feedback.assessment_id = :id";
+
+        $mapper = UserMapper::getInstance()->getDatabase();
+        $statement = $mapper->prepare($query);
+        $statement->execute(['id' => $assessmentId]);
         /**
          * build the whole thing
          */
-        $output = $this->getAssessment($assessment);
-        $time_end = microtime(true);
-        $execution_time = ($time_end - $time_start) / 60;
+        $output = $statement->fetchAll();
         $this->response->content->set(
             $this->buildJsonOutput(
-                array_merge(
-                    ['start' => $time_start, 'end' => $time_end, 'diff' => $execution_time],
-                    $output
-                )
+                $output
             )
         );
-    }
-
-    /**
-     * dummy endpoint to grab all assignments for load testing
-     */
-    public function apiAssessmentGetAll()
-    {
-        $time_start = microtime(true);
-
-        /**
-         * grab list of all assignments in the system
-         */
-        $mapper = UserMapper::getInstance()->getDatabase();
-        $query = $mapper->query("SELECT id from assessment");
-        $output = $query->fetchAll();
-
-        /**
-         * break the system by getting all assessments and dumping contents
-         */
-        $assessments = [];
-        $assessmentIds = [];
-        foreach ($output as $item) {
-            $assessmentIds[] = $item['id'];
-            try {
-                $assessments[] = $this->getAssessment($this->mapperProxy->findByIdForReview($item['id']));
-            } catch (MapperException $e) {
-                //noop
-            }
-        }
-
-        $time_end = microtime(true);
-        $execution_time = ($time_end - $time_start) / 60;
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                array_merge(
-                    ['start' => $time_start, 'end' => $time_end, 'diff' => $execution_time],
-                    $assessments
-                )
-            )
-        );
-    }
-
-    /**
-     * build the assessment object
-     */
-    public function getAssessment(IAssessable $assessment): array
-    {
-        switch (AssessmentType::objectToString($assessment)) {
-            case 'quiz':
-                return (new \Schoolbox\Learning\Assessment\Quiz\ModalToArray())($assessment);
-            case 'dueWork':
-                return (new \Schoolbox\Learning\Assessment\DueWork\ModalToArray())($assessment);
-            case 'lti':
-                return (new \Schoolbox\Learning\Assessment\Lti\ModalToArray())($assessment);
-            case 'project':
-                return (new \Schoolbox\Learning\Assessment\Project\ModalToArray())($assessment);
-            case 'task':
-                return (new \Schoolbox\Learning\Assessment\Task\ModalToArray())($assessment);
-            default:
-                return (new \Schoolbox\Learning\Assessment\ModelToArray())($assessment);
-        }
     }
 }

@@ -55,7 +55,7 @@ class Module extends BaseModule
             return $this->preloadAssessment($params);
         };
 
-        $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess, $preloadAssessment);
+        $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess);
         $this->register('GET', '', 'apiAssessmentGetAll', $hasApiAccess);
     }
 
@@ -65,7 +65,9 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getAssessmentMapperProxy());
+        return new Controller(
+
+        );
     }
 
     /**
@@ -94,32 +96,5 @@ class Module extends BaseModule
         return [
             'assessment' => $assessment
         ];
-    }
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
-    }
-
-    /**
-     * @return GroupMapper
-     */
-    protected function getGroupMapper(): GroupMapper
-    {
-        return $this->getMapperFactory()->get(GroupMapper::class);
-    }
-
-    /**
-     * @return object|AssessmentMapperProxy
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    protected function getAssessmentMapperProxy()
-    {
-        return $this->injector->get('assessmentDataSource');
     }
 }
