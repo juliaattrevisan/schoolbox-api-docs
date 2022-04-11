@@ -868,4 +868,8 @@ export default {
 
 <style lang="scss">
 @import "@schoolboxVue/components/fullcalendar/styles/calendar";
+
+.fc-direction-ltr .fc-timegrid-col-events {
+    margin: 0
+}
 </style>
