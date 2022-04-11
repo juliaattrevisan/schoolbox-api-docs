@@ -872,4 +872,12 @@ export default {
 .fc-direction-ltr .fc-timegrid-col-events {
     margin: 0
 }
+
+.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end.fc-event-future {
+    padding: 0.5rem;
+}
+
+.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end.fc-event-future .fc-event-title {
+    padding-left: 0;
+}
 </style>
