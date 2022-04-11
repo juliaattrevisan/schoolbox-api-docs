@@ -32,6 +32,26 @@ class Controller extends Base
         $this->setExternalTimetableHandler($externalTimetable);
     }
 
+
+    /**
+     * This screen is a FullCalendar view of all timetable-related subscriptions
+     * for a specific user, $user
+     *
+     * @param \Schoolbox\User $user
+     * @return void
+     * @throws \DebugBar\DebugBarException
+     */
+    public function getTimetableCalendar(\Schoolbox\User $user): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@timetable/timetableCalendar.twig', [
+            'user' => $user,
+        ])->setTitle(sprintf(
+            'Timetable Calendar for %s',
+            $user->getFullName()
+        )));
+    }
+
+
     /**
      * Outputs a response for getting the next or previous occurence of a
      * timetable day.
