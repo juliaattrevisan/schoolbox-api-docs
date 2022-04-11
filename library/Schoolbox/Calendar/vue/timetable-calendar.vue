@@ -283,6 +283,7 @@ export default {
 
                 this.calendarApi.setOption('slotMinTime', slots.slotMinTime);
                 this.calendarApi.setOption('slotMaxTime', slots.slotMaxTime);
+                this.calendarApi.setOption('allDaySlot', false);
             } );
             // Fail callback: consider a message saying something failed
         },
@@ -324,8 +325,8 @@ export default {
             }
 
             return {
-                slotMinTime: slotMinTime,
-                slotMaxTime: slotMaxTime
+                slotMinTime: slotMinTime ?? '00:00:00',
+                slotMaxTime: slotMaxTime ?? '23:59:59'
             }
         },
 
