@@ -1,5 +1,28 @@
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        window.fullCalendarConfig = {
+            schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
+            userId:             Number('{{ user.id }}'),
+            dateDisplayFormats: dateDisplayFormats,
+            defaultView:        'timeGridWeek',
+        };
+    </script>
+{% endautoescape %}
+
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Timetable for {{ user.fullname }}, {{ user.year.longName }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="timetable-calendar">
+                <timetable-calendar />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/timetableCalendar.js?v={{ config.site_version }}"></script>
+        </section>
     </div>
 </div>
