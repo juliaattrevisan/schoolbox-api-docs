@@ -123,6 +123,7 @@ export default {
              * For now make this a configurable option
              */
             weekends: this.config.weekends,
+            expandRows: true,
             views: {
                 /* Only the Week view is used in Timetable Calendar
                  * Disabled the other two
@@ -277,9 +278,57 @@ export default {
                 callback(response.data.filter((v) => {
                     return 'start' in v;
                 }));
+
+                console.log(response.data);
+                console.log(this.findSlots(response.data));
             } );
             // Fail callback: consider a message saying something failed
         },
+
+
+        /**
+         * Find the earliest time and the latest time in a set of events
+         * Used to configure slotMinTime and slotMaxTime
+         *
+         * @param data
+         */
+        findSlotBoundaries (data) {
+            let slotMinTime = null;
+            let slotMaxTime = null;
+
+            for (let i = 0; i < data.length; i++) {
+                /* Don't care about all-day events; they don't alter
+                 * the way we set slotMinTime and slotMaxTime
+                 */
+                if (data[i].allDay) {
+                    continue;
+                }
+
+                /* Remember the earliest time we saw
+                 */
+                let start = new Date(data[i].start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                if (null === slotMinTime || slotMinTime > start) {
+                    slotMinTime = start;
+                }
+
+                /* Remember the latest time we saw
+                 */
+                let finish = new Date(data[i].end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                if (null === slotMaxTime || slotMaxTime < finish) {
+                    slotMaxTime = finish;
+                }
+
+                console.log(slotMinTime, slotMaxTime);
+            }
+
+            return {
+                slotMinTime: slotMinTime,
+                slotMaxTime: slotMaxTime
+            }
+        },
+
 
         /**
          * Callback for when the calendar view changes: preserve the
