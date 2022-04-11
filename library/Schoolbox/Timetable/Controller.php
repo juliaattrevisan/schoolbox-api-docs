@@ -48,30 +48,9 @@ class Controller extends Base
          */
         $selectedDate = (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate();
 
-        /* Unique timezone check
-         * If you're in the Middle East, show weekends
-         * Otherwise, nobody works on a weekend (hide those columns)
-         *
-         * Note this value gets shanked right into twig, so it has to be
-         * a string ('false' equivalent would be empty, causing js crash)
+        /* TODO: Figure out what happens when school weeks start on a weekend
          */
-        $weekends = \in_array($this->getConfigLoader()->get('date_timezone'), [
-            'Asia/Aden',
-            'Asia/Baghdad',
-            'Asia/Muscat',
-            'Asia/Riyadh',
-            'Asia/Bahrain',
-            'Asia/Beirut',
-            'Asia/Gaza',
-            'Asia/Jerusalem',
-            'Asia/Qatar',
-            'Asia/Amman',
-            'Asia/Dubai',
-            'Asia/Hebron',
-            'Asia/Tehran',
-            'Asia/Damascus',
-            'Asia/Kuwait',
-        ], true) ? 'true' : 'false';
+        $weekends = 'false';
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@timetable/timetableCalendar.twig', [
             'user' => $user,

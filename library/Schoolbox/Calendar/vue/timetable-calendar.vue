@@ -119,6 +119,9 @@ export default {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
+            /* Some schools start on saturday/sundays, some don't
+             * For now make this a configurable option
+             */
             weekends: this.config.weekends,
             views: {
                 /* Only the Week view is used in Timetable Calendar
