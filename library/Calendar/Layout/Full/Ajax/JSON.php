@@ -26,7 +26,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
      */
     public function render(): void
     {
-//        header('Content-type: application/json');
+        header('Content-type: application/json');
 
         $startSequence = new Alaress_Date_Format($_GET['start'], 'U');
         $endSequence   = new Alaress_Date_Format($_GET['end'], 'U');
