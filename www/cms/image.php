@@ -20,6 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -72,7 +73,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,
-            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
             $myImage->getTranscodePath($resourcePath, $cacheKey)
         );
 
@@ -82,7 +83,7 @@ try {
     $transform      = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
     $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
-} catch (ConcurrentTransformationException $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {

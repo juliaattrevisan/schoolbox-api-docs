@@ -18,6 +18,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -92,7 +93,7 @@ try {
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
                 $resource,
-                Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+                Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
                 ($key && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $key : $resourcePath
             );
 
@@ -106,10 +107,10 @@ try {
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
     exit;
-} catch (ConcurrentTransformationException $e) {
+} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     $responseCode = $e->getHttpStatusCode();
-    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+    $placeHolderFile = WEB_root . "/static/images" . $logoSizes[$logo][$size][2];
     if (is_readable($placeHolderFile)) {
         header('Content-type: image/png');
         readfile($placeHolderFile);
@@ -122,5 +123,6 @@ try {
     $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
 
     // Temporary Redirect: eventually someone will upload a logo
+    header('cache-control: no-store');
     $cdnPrefixGenerator->redirectTemporary('/images' . $logoSizes[$logo][$size][2]);
 }

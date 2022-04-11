@@ -76,6 +76,14 @@ class PreSignedUrlService
         string $mimeTypeOverride = null,
         string $fileNameOverride = null
     ): PreSignedUrlDataObject {
+        $duration = $expireAt->getUnixTimeStamp() - time();
+        if ($duration < 0) {
+            throw new InvalidPresignedUrlDurationExecption("Presigned URL duration must be greater than 0");
+        }
+
+        if ($duration > 604800) { // 60 * 60 * 24 * 7 = 604800 = 7 days
+            throw new InvalidPresignedUrlDurationExecption("Presigned URL duration must be less than 7 days");
+        }
         $expires  = $expireAt->__toString();
         $fileName = utf8_encode($fileNameOverride ?? $storage->getBasename());
         $cacheControl = implode(',', $cacheControlItems);

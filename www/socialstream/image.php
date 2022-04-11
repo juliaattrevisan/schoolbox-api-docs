@@ -11,6 +11,7 @@
 namespace SocialStream;
 
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\ResourceLimitExceededHandler;
@@ -20,6 +21,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -94,7 +96,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
-            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
             $transforms->getTranscodePath($resourcePath, $transforms->getCacheKey($size))
         );
 
@@ -103,7 +105,7 @@ try {
 
     $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
     $processor->load()->stream();
-} catch (Image\Exception\ConcurrentTransformationException $e) {
+} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {
