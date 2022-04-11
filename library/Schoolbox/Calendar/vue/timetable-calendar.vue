@@ -279,8 +279,10 @@ export default {
                     return 'start' in v;
                 }));
 
-                console.log(response.data);
-                console.log(this.findSlots(response.data));
+                let slots = this.findSlotBoundaries(response.data);
+
+                this.calendarApi.setOption('slotMinTime', slots.slotMinTime);
+                this.calendarApi.setOption('slotMaxTime', slots.slotMaxTime);
             } );
             // Fail callback: consider a message saying something failed
         },
@@ -319,8 +321,6 @@ export default {
                 if (null === slotMaxTime || slotMaxTime < finish) {
                     slotMaxTime = finish;
                 }
-
-                console.log(slotMinTime, slotMaxTime);
             }
 
             return {
