@@ -25,21 +25,4 @@ class InvalidPresignedUrlDurationExecption extends \InvalidArgumentException
     {
         return 503;
     }
-
-    /**
-     * Returns header to not cache
-     * @return string
-     */
-    public function getHeader(): string
-    {
-        return 'Cache-Control: no-store';
-    }
-
-    /**
-     * sets message
-     */
-    public function __construct(string $message = 'Presigned url duration must be less than 7 days')
-    {
-        parent::__construct($message);
-    }
 }
