@@ -12,7 +12,8 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Timetable for {{ user.fullname }}, {{ user.year.longName }}</h1>
+        <h1>Timetable for {{ user.fullname }}{% if user.year and user.year.longName|length %}, {{ user.year.longName }}{% endif %}
+        </h1>
     </div>
 </div>
 
