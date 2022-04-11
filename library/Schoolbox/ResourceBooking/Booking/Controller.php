@@ -709,7 +709,7 @@ class Controller extends Base
                     'item'              => $item,
                     'resource'          => $item->getResource(),
                     'campusList'        => $this->getCampusList(),
-                    'returnUrl'         => $this->getRequest()->query['returnUrl'],
+                    'returnUrl'         => $this->getRequest()->query->get('returnUrl'),
                     'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),

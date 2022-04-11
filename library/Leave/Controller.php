@@ -265,9 +265,8 @@ class Leave_Controller extends Controller
             foreach ($colourList as $i => $colour) {
                 $colourArray[$i] = $colour->getHexColour();
             }
-        }
-        //if no timetable colours are available - use white, or we can use Primary BG colour (together with Body Text colour).
-        else {
+        } else {
+            //if no timetable colours are available - use white, or we can use Primary BG colour (together with Body Text colour).
             $colourArray[0] = '#ffffff';
         }
         //Rotating available colours to set 5 different styles
@@ -1572,6 +1571,9 @@ class Leave_Controller extends Controller
                 */
             $totals = array();
 
+            $totals['present_morning'] = 0;
+            $totals['present_day']     = 0;
+            $totals['present_night']   = 0;
             foreach ($allHouses as $currentHouse) {
                 $totals['present_morning'] += $currentHouse['present_morning'];
                 $totals['present_day'] += $currentHouse['present_day'];

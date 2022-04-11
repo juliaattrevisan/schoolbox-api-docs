@@ -523,6 +523,7 @@ class Bulk_Folder
     {
         $counts = [];
         foreach (array_merge(...$columnIndexes) as $index) {
+            $counts[$index] ??= 0;
             $counts[$index]++;
         }
         $duplicates = [];

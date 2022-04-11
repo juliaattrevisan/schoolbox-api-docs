@@ -194,7 +194,7 @@ class Controller extends Base
 
                     /* Actually persist changes
                      */
-                    if ((bool)$this->getRequest()->query['perform']) {
+                    if ((bool)$this->getRequest()->query->get('perform')) {
                         $importer->setPerform(true);
                     }
 
@@ -214,7 +214,7 @@ class Controller extends Base
             'errors' => $errors,
             'logs' => $logs,
             'file' => $this->getRequest()->post['file'],
-            'perform' => (bool)$this->getRequest()->query['perform']
+            'perform' => (bool)$this->getRequest()->query->get('perform')
         ])->setTitle('Import User Profile'));
     }
 

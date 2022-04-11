@@ -249,7 +249,7 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
                     /* Render out each authorisation user -_-
                      */
-                    if (is_array($currentPerson['request_authorisation_user_id']) && count($currentPerson['request_authorisation_user_id'])) {
+                    if (is_array($currentPerson['request_authorisation_user_id'] ?? null) && count($currentPerson['request_authorisation_user_id'])) {
                         foreach ($currentPerson['request_authorisation_user_id'] as $id => $name) {
                             $this->getPage()->setVar(
                                 array(
@@ -320,9 +320,9 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                     $this->getPage()->setVar('request_authorisation_block', '');
                 }
             }
-        } /* This condition never occurs because of left join on users.
-         */
-        else {
+        } else {
+            /* This condition never occurs because of left join on users.
+             */
             $this->getPage()->parse('no_requests_block', 'no_requests');
             $this->getPage()->setVar('row_block', '');
         }

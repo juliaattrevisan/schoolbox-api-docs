@@ -990,7 +990,7 @@ class Controller extends Base\Base
                 }
                 $unitImpl = $this->importFactory->importUnit($courseImpl, $unitSpec, $unitImplOpenDate, $unitImplCloseDate);
 
-                if (is_array($unitPair['a'])) {
+                if (is_array($unitPair['a'] ?? false)) {
                     // Create/Update AssessmentImpls
                     foreach ($unitPair['a'] as $aData) {
                         $this->parseAssessmentForm($unitImpl, $aData);

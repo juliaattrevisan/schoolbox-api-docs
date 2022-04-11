@@ -28,7 +28,7 @@ $searchYear = '';
 if (isset($_GET['searchYear'])) {
     $searchYear = $_GET['searchYear'];
 } else {
-    $searchYear = $this->arg[0];
+    $searchYear = $this->arg[0] ?? '';
 }
 
 /* Search by name

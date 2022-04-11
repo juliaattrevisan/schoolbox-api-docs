@@ -431,7 +431,7 @@ class Controller extends Base
                 'success'      => true,
                 'articleId'    => $article->getId(),
                 'url'          => $url,
-                'returnUrl'    => $data[Querystring::RETURN_URL],
+                'returnUrl'    => $data[Querystring::RETURN_URL] ?? null,
                 'updateRoute'  => $updateRoute,
                 'submitRoute'  => $submitRoute,
                 'approveRoute' => $approveRoute
