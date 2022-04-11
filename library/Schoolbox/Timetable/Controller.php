@@ -55,9 +55,7 @@ class Controller extends Base
          * Note this value gets shanked right into twig, so it has to be
          * a string ('false' equivalent would be empty, causing js crash)
          */
-        $weekends = 'false';
-
-        if (\in_array($this->getConfigLoader()->get('date_timezone'), [
+        $weekends =\in_array($this->getConfigLoader()->get('date_timezone'), [
             'Asia/Aden',
             'Asia/Baghdad',
             'Asia/Muscat',
@@ -73,9 +71,7 @@ class Controller extends Base
             'Asia/Tehran',
             'Asia/Damascus',
             'Asia/Kuwait',
-        ], true)) {
-            $weekends = 'true';
-        }
+        ], true) ? 'true' : 'false';
         
         $this->getResponse()->content->set($this->buildHtmlOutput('@timetable/timetableCalendar.twig', [
             'user' => $user,
