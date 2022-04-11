@@ -161,6 +161,7 @@ module.exports = {
 
         //Calendars
         sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
+        timetableCalendar: './library/Schoolbox/Calendar/vue/timetableCalendar.js',
         assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
         upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js',
         resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js',
