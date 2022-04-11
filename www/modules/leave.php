@@ -3,6 +3,7 @@
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 
 /* Routing */
+/** @var SitePage $this */
 $leaveController = new Leave_Controller($this);
 
 $method = $this->arg[0] ?? null;
@@ -10,28 +11,26 @@ $method = $this->arg[0] ?? null;
 try {
     if (!$method && empty($this->arg)) {
         $leaveController->renderSummary();
-    } else if ($method == 'create') {
+    } elseif ($method == 'create') {
         $data = $leaveController->executeCreateRequest();
         $leaveController->renderCreateRequest($data);
-    } else if ($method == 'modify' && is_numeric($this->arg[1])) {
+    } elseif ($method == 'modify' && is_numeric($this->arg[1])) {
         $data = $leaveController->executeModifyRequest($this->arg[1]);
         $leaveController->renderModifyRequest($data);
-    } else if ($method == 'view' && is_numeric($this->arg[1])) {
+    } elseif ($method == 'view' && is_numeric($this->arg[1])) {
         $data = $leaveController->executeModifyRequest($this->arg[1]);
         $leaveController->renderViewRequest($data);
-    } else if ($method == 'student' && is_numeric($this->arg[1])) {
+    } elseif ($method == 'student' && is_numeric($this->arg[1])) {
         $data = $leaveController->executeUserRequestList($this->arg[1]);
         $leaveController->renderUserRequestList($data);
-    }
-    /* Export a csv history of a particular student's leave requests
-     */
-    else if (($method == 'student') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
+    } elseif (($method == 'student') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
+        /* Export a csv history of a particular student's leave requests
+         */
         $data = $leaveController->executeUserRequestList($this->arg[2]);
         $leaveController->exportUserRequestList($data);
-    }
-    /* Export a csv history of a particular house's leave requests
-     */
-    else if (($method == 'house') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
+    } elseif (($method == 'house') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
+        /* Export a csv history of a particular house's leave requests
+         */
         $data = $leaveController->executeHouseRequestList($this->arg[2]);
         $leaveController->exportHouseRequestList($data);
     } else {
@@ -81,15 +80,13 @@ try {
                  */
                 if ($this->arg[$argumentCount - 1] == 'export') {
                     $leaveController->exportHouseReport($data);
-                }
-                /* Print view
-                 */
-                else if ($this->arg[$argumentCount - 1] == 'print') {
+                } elseif ($this->arg[$argumentCount - 1] == 'print') {
+                    /* Print view
+                     */
                     $leaveController->printHouseReport($data);
-                }
-                /* Web view
-                 */
-                else {
+                } else {
+                    /* Web view
+                     */
                     $leaveController->renderHouseReport($data);
                 }
             } else {
@@ -112,11 +109,11 @@ try {
                 } else {
                     if ($method == 'processCreate') {
                         $leaveController->processCreateRequest($_POST);
-                    } else if ($method == 'processModify') {
+                    } elseif ($method == 'processModify') {
                         $leaveController->processModifyRequest($_POST);
-                    } else if ($method == 'processModifyList') {
+                    } elseif ($method == 'processModifyList') {
                         $leaveController->processModifyRequestList($_POST);
-                    } else if ($method == 'test') {
+                    } elseif ($method == 'test') {
                         $leaveController->executeEmailTest();
                     } else {
                         $data = $leaveController->executeHouseRequestList($_SESSION['houseId']);

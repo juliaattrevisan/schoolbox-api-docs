@@ -320,9 +320,9 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                     $this->getPage()->setVar('request_authorisation_block', '');
                 }
             }
-        } /* This condition never occurs because of left join on users.
-         */
-        else {
+        } else {
+            /* This condition never occurs because of left join on users.
+             */
             $this->getPage()->parse('no_requests_block', 'no_requests');
             $this->getPage()->setVar('row_block', '');
         }
