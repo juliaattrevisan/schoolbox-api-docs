@@ -19,6 +19,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\UserMapper;
 
@@ -98,7 +99,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
-            Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
             $portrait->getTranscodePath($portraitPath, $cacheKey)
         );
 
@@ -107,7 +108,7 @@ try {
 
     $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve(TRANSFORM_KEY));
     $image->load()->stream();
-} catch (ConcurrentTransformationException $e) {
+} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, $e->getHttpStatusCode());
@@ -116,9 +117,8 @@ try {
     */
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 403);
 } catch (\InvalidArgumentException $e) {
-    /* Image/Portrait not found / expiry date is invalid
+    /* Image/Portrait not found
     */
-    header('Cache-Control: no-store');
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 404);
 } catch (Exception $e) {
     /* All other exceptions

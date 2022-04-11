@@ -16,6 +16,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -117,7 +118,7 @@ try {
         $storage                = (new Storage\Model())->setHash($hash);
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
-            Alaress_Date_Format::now()->addSeconds($config->get($browserCacheTimeoutConfigName)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get($browserCacheTimeoutConfigName)),
             $transforms->getTranscodePath(Storage\Manager::getPathFromHash($hash), $cache_key),
             ['private', 'must-revalidate'],
             PreSignedUrlService::DISPOSITION_INLINE,
@@ -133,12 +134,8 @@ try {
         $transform
     );
     $imageProcessor->load()->stream();
-} catch (Image\Exception\ConcurrentTransformationException $e) {
+} catch (Image\Exception\ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::localRedir($path, false, $e->getHttpStatusCode());
-} catch (InvalidArgumentException $e) {
-    header('cache-control: no-store');
-    /** @var PrefixGenerator $prefixGenerator */
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');
     $prefixGenerator->redirectTemporary($path);
 } catch (Exception $e) {

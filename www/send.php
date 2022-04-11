@@ -11,6 +11,7 @@
 //rather than just octet stream
 
 //includes
+use Alaress\Exception\UnreachableException;
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
@@ -21,6 +22,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -88,14 +90,17 @@ if (is_numeric($_GET['id'])) {
 
         if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
-
-            $preSignedUrlDataObject = $preSignedUrlService->generate(
-                $storage,
-                Alaress_Date_Format::now()->addDays(1),
-                $storage->getPath(),
-                $cacheControl,
-                $disposition
-            );
+            try {
+                $preSignedUrlDataObject = $preSignedUrlService->generate(
+                    $storage,
+                    Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
+                    $storage->getPath(),
+                    $cacheControl,
+                    $disposition
+                );
+            } catch (InvalidPresignedUrlDurationExecption $e) {
+                throw new UnreachableException($e);
+            }
 
             $preSignedUrlService->download($preSignedUrlDataObject);
         }

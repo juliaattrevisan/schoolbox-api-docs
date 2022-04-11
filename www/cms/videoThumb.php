@@ -15,6 +15,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Resource\Storage\Transform;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
@@ -102,7 +103,7 @@ if (isset($type, $id)) {
 
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $videoQueue->getStorage()->setMimetype(new Mimetype()),
-                    Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+                    Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
                     $imageFilename,
                     ['private', 'must-revalidate'],
                     PreSignedUrlService::DISPOSITION_INLINE,
@@ -131,7 +132,9 @@ if (isset($type, $id)) {
             }
 
             // No thumbnail found in storage: fall through to sad mountain
-        } catch (Exception $e) {
+        } catch (InvalidPresignedUrlDurationExecption $e) {
+            $kernel->outputCacheControlMaxAgeHeader(0);
+        } catch (\Exception $e) {
             // If anything else goes wrong, fall through to sad mountain
         }
     }

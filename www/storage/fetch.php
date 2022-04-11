@@ -8,12 +8,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Exception\UnreachableException;
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -57,14 +59,17 @@ try {
 
             if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService = new PreSignedUrlService($config);
-
-                $preSignedUrlDataObject = $preSignedUrlService->generate(
-                    $resource,
-                    Alaress_Date_Format::now()->addDays(1),
-                    $resource->getPath(),
-                    $cacheControl,
-                    $disposition
-                );
+                try {
+                    $preSignedUrlDataObject = $preSignedUrlService->generate(
+                        $resource,
+                        Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
+                        $resource->getPath(),
+                        $cacheControl,
+                        $disposition
+                    );
+                } catch (InvalidPresignedUrlDurationExecption $e) {
+                    throw new UnreachableException($e);
+                }
 
                 $preSignedUrlService->download($preSignedUrlDataObject);
             }

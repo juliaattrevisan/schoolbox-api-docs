@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Exception\UnreachableException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
@@ -17,6 +18,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Video\Factory\Video as VideoFactory;
 use Schoolbox\Video\ResourceVideo;
@@ -110,14 +112,18 @@ if (isset($type) && isset($id)) {
 
         $preSignedUrlService = new PreSignedUrlService($config);
 
-        $preSignedUrlDataObject = $preSignedUrlService->generate(
-            $video->getStorage(),
-            Alaress_Date_Format::now()->addDays(1),
-            $video->getTranscodePath(),
-            $cacheControl,
-            PreSignedUrlService::DISPOSITION_INLINE,
-            $mimeType
-        );
+        try {
+            $preSignedUrlDataObject = $preSignedUrlService->generate(
+                $video->getStorage(),
+                Alaress_Date_Format::now()->addDays(1),
+                $video->getTranscodePath(),
+                $cacheControl,
+                PreSignedUrlService::DISPOSITION_INLINE,
+                $mimeType
+            );
+        } catch (InvalidPresignedUrlDurationExecption $e) {
+            throw new UnreachableException($e);
+        }
 
         $preSignedUrlService->download($preSignedUrlDataObject);
         exit;
