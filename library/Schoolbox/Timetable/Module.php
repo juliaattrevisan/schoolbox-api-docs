@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
-
 class Module extends BaseModule
 {
 
