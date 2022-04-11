@@ -27,6 +27,7 @@ class Scheduler
     public const HOURLY      = 'hourly';
     public const TWICE_DAILY = 'twiceDaily';
     public const DAILY       = 'daily';
+    public const NONE        = 'none';
 
 
     /**
