@@ -76,6 +76,9 @@ export default {
                     {
                         name: FilterEvents.YEAR,
                         callback: (row, query) => {
+                            if (query === 'null') {
+                                query = null; //cast to proper null here to match 
+                            }
                             return row.year === query; 
                         }
                     },
