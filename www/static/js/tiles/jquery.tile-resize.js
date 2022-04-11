@@ -26,7 +26,10 @@
         var settings = $.extend({}, defaults, options);
         $(this).each(function() {
             var tile      = $(this);
-            var tileTitle = tile.find(settings.titleSelector)
+            var tileTitle = tile.find(settings.titleSelector);
+            if (tile.height() <= 60) { //prevent the aspect ratio of the tile from going to small
+                tile.css( { height: 60 } );
+            }
             var width     = Math.max(
                 settings.minSize,
                 Math.min(
@@ -35,7 +38,7 @@
                 )
             );
             tileTitle.css({
-                fontSize: String(width)+settings.unit,
+                fontSize: `clamp(${settings.minSize}em, 2vw, ${settings.maxSize}em)`, 
                 padding: String(width/4)+settings.unit
             });
 
