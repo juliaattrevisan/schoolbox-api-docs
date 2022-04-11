@@ -119,6 +119,7 @@ export default {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
+            weekends: this.config.weekends,
             views: {
                 /* Only the Week view is used in Timetable Calendar
                  * Disabled the other two
