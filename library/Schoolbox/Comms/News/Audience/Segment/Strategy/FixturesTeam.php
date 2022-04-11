@@ -52,9 +52,9 @@ class FixturesTeam extends SimpleStrategy
     {
         return
             $user->isSuperuser() ||
+            $user->getRole()->isStaff() ||
             $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
-            $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE ||
-            $user->getRole()->isStaff();
+            $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE;
     }
 
 
