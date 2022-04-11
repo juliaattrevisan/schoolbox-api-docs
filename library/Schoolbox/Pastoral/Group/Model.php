@@ -108,6 +108,12 @@ class Model implements ISoftDeletable, ValueLabelInterface
         }
         return $this->members->filter(static function (Member\Model $member) {
             return !$member->getUser()->getRole()->isStaff() || $member->getUser()->isStaffWithPastoralAccess();
+        })->sortByCallback(static function (Member\Model $a, Member\Model $b) {
+            $cmp = strnatcasecmp($a->getUser()->getLastname() ?? '', $b->getUser()->getLastname() ?? '');
+            if ($cmp === 0) {
+                $cmp = strnatcasecmp($a->getUser()->getFirstname(), $b->getUser()->getFirstname());
+            }
+            return $cmp;
         });
     }
 
