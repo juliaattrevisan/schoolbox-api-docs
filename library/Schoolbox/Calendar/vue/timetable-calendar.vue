@@ -283,7 +283,7 @@ export default {
 
                 this.calendarApi.setOption('slotMinTime', slots.slotMinTime);
                 this.calendarApi.setOption('slotMaxTime', slots.slotMaxTime);
-                this.calendarApi.setOption('allDaySlot', false);
+                this.calendarApi.setOption('allDaySlot', slots.allDaySlot);
             } );
             // Fail callback: consider a message saying something failed
         },
@@ -298,12 +298,17 @@ export default {
         findSlotBoundaries (data) {
             let slotMinTime = null;
             let slotMaxTime = null;
+            let allDaySlot = false;
 
             for (let i = 0; i < data.length; i++) {
                 /* Don't care about all-day events; they don't alter
                  * the way we set slotMinTime and slotMaxTime
+                 *
+                 * If there aren't any all-day events, hide the ui thing
                  */
                 if (data[i].allDay) {
+                    allDaySlot = true;
+
                     continue;
                 }
 
@@ -326,7 +331,8 @@ export default {
 
             return {
                 slotMinTime: slotMinTime ?? '00:00:00',
-                slotMaxTime: slotMaxTime ?? '23:59:59'
+                slotMaxTime: slotMaxTime ?? '23:59:59',
+                allDaySlot: allDaySlot
             }
         },
 
