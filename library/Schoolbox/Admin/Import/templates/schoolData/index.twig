@@ -150,6 +150,13 @@
             });
 
             toggleCustomHours();
+
+            /* Decide which fragment we're showing here
+             * Hide all fragments and show the one we just chose
+             */
+            const dataSource = $('#schooldata_import_data_source-field').val();
+            $('[data-data-source]').hide();
+            $('[data-data-source="'+dataSource+'"]').show();
         }
     });
 </script>
@@ -167,7 +174,7 @@
                 <h2 class="subheader">School Data Import</h2>
             </div>
 
-            {% include '@settings/moduleConfig.twig' with configContext only %}
+            {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
 
             <div class="small-12 island" id="status-island">
                 <div class="row">

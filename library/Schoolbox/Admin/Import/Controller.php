@@ -110,7 +110,12 @@ class Controller extends ConfigController
     public function postSchoolDataOptions(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+
+        /* Check the DSN assembly here
+         */
+
+
+//        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 
