@@ -123,7 +123,14 @@ export default {
              * For now make this a configurable option
              */
             weekends: this.config.weekends,
+            /* Make all the rows fill the full height of the container element such
+             * that the last row isn't hilariously tall
+             */
             expandRows: true,
+            /* Show a red line to indicate the current day/time - this used to be a
+             * blue bordered outline in the classical grid
+             */
+            nowIndicator: true,
             views: {
                 /* Only the Week view is used in Timetable Calendar
                  * Disabled the other two
@@ -869,15 +876,35 @@ export default {
 <style lang="scss">
 @import "@schoolboxVue/components/fullcalendar/styles/calendar";
 
+/* Make each event dig go to the edges of their container columns
+ */
 .fc-direction-ltr .fc-timegrid-col-events {
     margin: 0
 }
 
-.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end.fc-event-future {
+/* Make each event div not go all the way to the edge
+ */
+.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end {
     padding: 0.5rem;
 }
 
+/* Remove weird left padding which indents the time, but not any wrapping text
+ * This might have been added for the list view, but manifests here
+ */
 .fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end.fc-event-future .fc-event-title {
     padding-left: 0;
+}
+
+/* Indicator line - make it a bit easier to see, and translucent
+ */
+.fc .fc-timegrid-now-indicator-line {
+    border-width: 2px 0 0;
+    opacity: 0.75;
+}
+
+/* Indicator arrow - make it a bit easier to see
+ */
+.fc-direction-ltr .fc-timegrid-now-indicator-arrow {
+    border-width: 7px 0 7px 8px;
 }
 </style>
