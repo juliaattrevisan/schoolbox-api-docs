@@ -763,13 +763,13 @@ class Importer
              * relationship csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)
              */
-            if (!$cache[Role::PARENT ][$row['Guardian ID']]) {
+            if (!($cache[Role::PARENT ][$row['Guardian ID']] ?? null)) {
                 $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: guardian {$row['Guardian ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;
             }
 
-            if (!$cache[Role::STUDENT ][$row['Student ID']]) {
+            if (!($cache[Role::STUDENT ][$row['Student ID']] ?? null)) {
                 $this->log("Relationship between guardian {$row['Guardian ID']} and student {$row['Student ID']}: student {$row['Student ID']} doesn't exist", self::LOG_SKIP);
 
                 continue;

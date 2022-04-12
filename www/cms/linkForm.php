@@ -17,7 +17,7 @@ $groupHandler = new Group();
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
+if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
     $url = new Url($_POST['url']);
     try {
         $url->normalise();
@@ -89,7 +89,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 
     $page->backToTheFuture(2);
 } else {
-    if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+    if (is_numeric($_POST['move'] ?? null) && is_numeric($_POST['categoryID'])) {
         /* Move link from one category to another, after checking permission on both from and to categories
          */
         try {

@@ -10,6 +10,7 @@
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, '/homepage/chatArchive.html');
 $this->setBlock(TEMPLATE_content, 'add_chat', 'add_chat_block');
 $this->setBlock(TEMPLATE_content, 'category_header', 'category_header_block');
@@ -29,12 +30,16 @@ $groupHandler = new Group();
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $chatHandler = new Chat();
 
+if (!is_numeric($this->arg[0] ?? null)) {
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+}
+
 // setup filters
 $filter = array(
     'folder' => $this->arg[0],
-    'year' => $this->arg[1],
-    'month' => $this->arg[2],
-    'page' => $this->arg[3]
+    'year' => $this->arg[1] ?? date('Y'),
+    'month' => $this->arg[2] ?? date('m'),
+    'page' => $this->arg[3] ?? 1
 );
 
 // if the category doesn't exist, throw an error
