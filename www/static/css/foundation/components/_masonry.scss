@@ -424,3 +424,7 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-lti;
     color: $icon-color-lti;
 }
+.icon-masonry-Schoolbox_Intellischool_Component_Dashboard_Controller:before {
+    @extend .icon-intellischool;
+    color: $icon-color-intellischool;
+}

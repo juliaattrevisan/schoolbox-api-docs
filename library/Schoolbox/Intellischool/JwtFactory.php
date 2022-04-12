@@ -258,4 +258,16 @@ class JwtFactory
         );
         return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
     }
+
+    /**
+     * Build a JWT for the Dashboard Component
+     * @link https://analytics.intellischool.cloud/console/schoolbox
+     * @return string
+     */
+    public function buildForDashboardComponent(User $currentUser): string
+    {
+        $claims = $this->buildBaseClaims($currentUser);
+        $claims['https://purl.imsglobal.org/spec/lti/claim/target_link_uri'] = 'https://analytics.intellischool.cloud/console/schoolbox';
+        return JWT::encode($claims, $this->privateKey, $this->privateKeySigningAlgorithm);
+    }
 }
