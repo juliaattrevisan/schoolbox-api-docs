@@ -89,12 +89,10 @@ class Controller extends ConfigController
 
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * decode the parts, then provide it to the ui elements
+         *
+         * Shank it directly into configContext because that was a thing
          */
-        $dsnParts = (new DSNFactory())->produceDSNParts($dataSource, $key);
-
-        /* Shank it directly into configContext because that was a thing
-         */
-        $configContext['dsn'][$dataSource] = $dsnParts;
+        $configContext['dsn'][$dataSource] = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
@@ -102,7 +100,6 @@ class Controller extends ConfigController
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $dataSource,
             'configContext' => $configContext,
-            'dsnParts' => $dsnParts,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
             'importLogs' => $this->importLogMapper->findLogsWithDuration()
