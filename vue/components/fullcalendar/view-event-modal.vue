@@ -708,27 +708,11 @@ export default {
                 <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
                     <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
                 </template>
-                <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
-                    {{ eventExtendedProps.booking.status.name }}
-                </meta-item>
-                <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">
-                    {{ eventExtendedProps.dateSpan }}
-                </meta-item>
-                <meta-item class="icon-location" v-if="eventExtendedProps.location">
-                    {{ eventExtendedProps.location }}
-                </meta-item>
-                <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">
-                    Posted by
-                    <a :href="'/search/user/' + String(eventExtendedProps.author.id)">
-                        {{ eventExtendedProps.author.name }}
-                    </a>
-                </meta-item>
-                <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">
-                    Reviewed by
-                    <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
-                        {{ eventExtendedProps.reviewer.name }}
-                    </a>
-                </meta-item>
+                <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{ eventExtendedProps.booking.status.name }}</meta-item>
+                <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{ eventExtendedProps.dateSpan }}</meta-item>
+                <meta-item class="icon-location" v-if="eventExtendedProps.location">{{ eventExtendedProps.location }}</meta-item>
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">Posted by <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{ eventExtendedProps.author.name }}</a></meta-item>
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">Reviewed by <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{ eventExtendedProps.reviewer.name }}</a></meta-item>
                 <template v-if="eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length">
                     <meta-item class="icon-staff">
                         <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
@@ -774,8 +758,7 @@ export default {
                 <h3>Related Bookings</h3>
                 <ul>
                     <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
-                        ({{ relatedBooking.status.name }})
-                        <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
+                        ({{ relatedBooking.status.name }}) <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
                     </li>
                 </ul>
             </template>
