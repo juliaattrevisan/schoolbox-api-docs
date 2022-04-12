@@ -124,12 +124,10 @@ class Controller extends ConfigController
 
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * encode the parts, modify $postData, then save it
+         *
+         * This is the schooldata endpoint key which we would have assembled manually
          */
-        $dsn = (new DSNFactory())->produceDSNString($postData['schooldata_import_data_source'], $postData['dsn']);
-
-        /* This is the schooldata endpoint key which we would have assembled manually
-         */
-        $postData['schooldata_import_endpoint_key'] = $dsn;
+        $postData['schooldata_import_endpoint_key'] = (new DSNFactory())->produceDSNString($postData['schooldata_import_data_source'], $postData['dsn']);
 
         /* We don't need this array element which has no corresponding db rows
          */
