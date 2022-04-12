@@ -52,8 +52,10 @@ SELECT
     assessment.id, assessment.title, assessment.weight,
     COALESCE(task_completion.completion_date, submission_return.created_at) as `CompletionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
-    task_completion.completion_status, task_completion.task_id, task_completion.completion_date,
-    submission_return.review_route, submission_return.comment, submission_return.mark, submission_return.norm_mark
+
+    COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
+    COALESCE(submission_return.mark, lti_assessment_score.score_given) as `mark`,
+    submission_return.norm_mark
 
 FROM v_most_recent_feedback
 
@@ -62,6 +64,8 @@ JOIN assessment on v_most_recent_feedback.assessment_id = assessment.id
 LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
 
 LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
+
+LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
 
 WHERE v_most_recent_feedback.assessment_id = :id";
 
