@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
@@ -32,6 +33,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'user'           => $this->getUser(),
                 'folder'         => $this->getContext(),
                 'canCreateEvent' => ($this->getContentPermission() >= UserAccess::ACCESS_WRITE),
+                'returnUrl'      => Redirect::encode(sprintf('/homepage/%d', $this->getInstance()->getIdentifier()))
             ],
             !$this->getConfig('compactMode')
         );

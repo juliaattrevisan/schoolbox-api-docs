@@ -11,7 +11,7 @@
             days: Math.min(Math.max(1, Number('{{ component.config.days }}') || 365), 365),
             dateDisplayFormats: dateDisplayFormats,
             limit: Number('{{ component.config.size }}') || null,
-            createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}&level=2&homepageId={{ folder.id }}",
+            createEventUrl: "{{ routeLookup('calendarEvent.getCreate') }}?{{ RETURN_URL.name }}={{ returnUrl }}&level=2&homepageId={{ folder.id }}",
             exportUrl: $.fn.getExportCalendarLink(
                 "{{ user.key }}",
                 {
