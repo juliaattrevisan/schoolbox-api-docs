@@ -25,13 +25,16 @@ class DSNFactory
      * Produces a specific DSN codec for the selected suds importer
      *
      * @param string $type
-     * @return \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN|null
+     * @return TassApi\Base\Endpoint\Codec\DSN|Wonde\Base\Endpoint\Codec\DSN|null
      */
-    public function produce(string $type): ?Wonde\Base\Endpoint\Codec\DSN
+    public function produce(string $type)
     {
         switch ($type) {
             case \Schoolbox\External\Importer\Endpoint\Factory::WONDE:
                 return new \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN();
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
+                return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN();
         }
 
         return null;
