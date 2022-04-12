@@ -7,15 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
+namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec;
 
 use DomainException;
 use Schoolbox\External\Importer\Endpoint\IDSN;
 
 /**
- * Class DSNCodec
+ * Class DSN
  *
- * Encodes/decodes a dsn format for the Sentral Endpoint configuration.
+ * Encodes/decodes a DSN format for the Sentral Endpoint configuration.
  * Sentral uses three pieces to authenticate access to their api:
  *   api host, api tenant, api key
  *
@@ -23,9 +23,9 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  * With the $host, ensure it has a trailing slash; sentral hasn't figured out
  * how to tell you this is required
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
+ * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec
  */
-class DSNCodec implements IDSN
+class DSN implements IDSN
 {
 
     /**

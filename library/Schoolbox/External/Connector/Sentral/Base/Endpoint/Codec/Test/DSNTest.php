@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ApiTest
+ * DSNest
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
@@ -10,18 +10,18 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Test;
+namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\Test;
 
 use DomainException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\DSN;
 
 /**
- * Class ApiTest
+ * Class DSNTest
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Test
+ * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\Test
  */
-class ApiTest extends TestCase
+class DSNTest extends TestCase
 {
 
     /**
@@ -34,7 +34,7 @@ class ApiTest extends TestCase
      */
     public function testValidDSNDecode(string $dsn, array $expected): void
     {
-        $codec = new DSNCodec();
+        $codec = new DSN();
 
         $this->assertEquals($expected, $codec->decode($dsn));
     }
@@ -70,7 +70,7 @@ class ApiTest extends TestCase
     public function testInvalidDSNDecode(string $dsn): void
     {
         $this->expectException(DomainException::class);
-        $codec = new DSNCodec();
+        $codec = new DSN();
         $codec->decode($dsn);
     }
 

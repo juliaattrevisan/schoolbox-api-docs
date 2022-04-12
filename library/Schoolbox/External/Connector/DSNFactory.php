@@ -39,7 +39,7 @@ class DSNFactory
                 return new \Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec\DSN();
 
             case \Schoolbox\External\Importer\Endpoint\Factory::SENTRAL:
-                return new \Schoolbox\External\Connector\Sentral\Base\Endpoint\DSNCodec();
+                return new \Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\DSN();
 
             case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
                 return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN();

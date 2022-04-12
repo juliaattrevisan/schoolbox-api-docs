@@ -121,7 +121,7 @@ class Api implements IApi
 
         /* Dig out the key and tenant values
          */
-        $credentials = (new DSNCodec())->decode($key);
+        $credentials = (new Codec\DSN())->decode($key);
 
         $headers = [
             'X-API-KEY' => $credentials['key'],
