@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec;
 
 use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
 
 /**
  * Class DSN
@@ -18,7 +19,7 @@ use DomainException;
  *
  * @package Schoolbox\External\Connector\Kamar\Base\Endpoint
  */
-class DSN
+class DSN implements IDSN
 {
 
     /**

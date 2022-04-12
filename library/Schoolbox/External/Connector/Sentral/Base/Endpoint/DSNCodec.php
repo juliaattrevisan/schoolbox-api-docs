@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
 use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
 
 /**
  * Class DSNCodec
@@ -24,7 +25,7 @@ use DomainException;
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
  */
-class DSNCodec
+class DSNCodec implements IDSN
 {
 
     /**

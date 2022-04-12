@@ -11,10 +11,11 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use DomainException;
 
+use Schoolbox\External\Importer\Endpoint\IDSN;
 use function count;
 
 /**
- * Class DSNCodec
+ * Class DSN
  *
  * Encodes/decodes a dsn format for the Tass Api Endpoint configuration.
  * Tass uses three pieces to authenticate access to their api:
@@ -30,7 +31,7 @@ use function count;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
-class DSN
+class DSN implements IDSN
 {
 
     /**

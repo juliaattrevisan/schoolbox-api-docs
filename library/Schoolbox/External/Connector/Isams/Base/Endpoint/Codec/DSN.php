@@ -10,15 +10,16 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Codec;
 
 use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
 
 /**
- * Class DSNCodec
+ * Class DSN
  *
  * The api key provided is the only data isams needs; no mutations required
  *
  * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class DSN
+class DSN implements IDSN
 {
 
     /**
