@@ -9,6 +9,12 @@ export default {
         showDrawer: { 
             type: { required: true },
         },
+        isAlwaysAnchored: { 
+            type: { required: false },
+        },
+        unanchorWidth: { 
+            type: { required: false },
+        },
         default: {
             control: { type: 'text' },
             defaultValue: '<strong>Bottom drawer content</strong>',
@@ -37,4 +43,11 @@ export const Default = Template.bind({});
 // More on args: https://storybook.js.org/docs/vue/writing-stories/args
 Default.args = {
     showDrawer: false,
+};
+
+export const Unanchored = Template.bind({});
+Unanchored.args = {
+    showDrawer: true,
+    isAlwaysAnchored: false,
+    unanchorWidth: 2000,
 };
