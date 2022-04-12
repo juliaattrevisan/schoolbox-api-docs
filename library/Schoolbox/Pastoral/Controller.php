@@ -1503,9 +1503,6 @@ class Controller extends Base
     private function determineAllowedRoles(): GenericCollection
     {
         $allowedRoleTypes = [Role::STAFF];
-        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::PARENT;
-        }
         return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
     }
 
@@ -1517,6 +1514,9 @@ class Controller extends Base
         $allowedRoleTypes = [];
         if ($this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
             $allowedRoleTypes[] = Role::STUDENT;
+        }
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::PARENT;
         }
         return $allowedRoleTypes;
     }

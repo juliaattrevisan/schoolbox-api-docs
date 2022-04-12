@@ -203,10 +203,6 @@ class Controller extends Base
     {
         $staffPb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF)->equals('access_pastoral', 1);
         $pb = $this->roleMapper->getPredicateBuilder()->all($staffPb);
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $pb->equals('group_type', Role::PARENT);
-            $pb = $this->roleMapper->getPredicateBuilder()->any($pb);
-        }
 
         $roles     = $this->roleMapper->findByPredicates($pb, ['order' => ['name' => 'ASC']]);
         $roleUsers = [];
@@ -265,9 +261,7 @@ class Controller extends Base
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
-                'roleTypes'       => $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)
-                    ? [Role::STUDENT]
-                    : [],
+                'roleTypes'       => $this->determineAllowedRoleTypes(),
                 'roleUserCounts'  => $roleUsers,
                 'rolesWithUsers'  => $roleUsers,
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
@@ -494,5 +488,20 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function determineAllowedRoleTypes(): array
+    {
+        $allowedRoleTypes = [];
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::STUDENT;
+        }
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::PARENT;
+        }
+        return $allowedRoleTypes;
     }
 }
