@@ -81,11 +81,17 @@ class DSNFactory
      * Using the suds data source $type,
      * Spawn a DSN codec and encode the pieces $dsnParts into its corresponding dsn string
      *
-     * @param string $type
-     * @param array  $dsnParts
+     * $dsnParts will be null if you chose csv files in suds
+     *
+     * @param string     $type
+     * @param array|null $dsnParts
      * @return string|null
      */
-    public function produceDSNString(string $type, array $dsnParts): ?string {
+    public function produceDSNString(string $type, ?array $dsnParts): ?string {
+        if (null === $dsnParts) {
+            return null;
+        }
+
         $dsn = $this->produce($type);
 
         if ($dsn) {

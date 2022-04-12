@@ -136,6 +136,11 @@
             });
 
             toggleCustomHours();
+
+            /* Hide all fragments and disable all their inputs
+             */
+            $('[data-data-source]').hide();
+            $('[data-data-source] input').prop('disabled', true)
         }
 
 
@@ -152,12 +157,14 @@
             toggleCustomHours();
 
             /* Decide which fragment we're showing here
-             * Hide all fragments and show the one we just chose
+             * Hide all fragments and disable all their inputs
              */
-            const dataSource = $('#schooldata_import_data_source-field').val();
-
             $('[data-data-source]').hide();
             $('[data-data-source] input').prop('disabled', true)
+
+            /* Then show the one we chose
+             */
+            const dataSource = $('#schooldata_import_data_source-field').val();
 
             $('[data-data-source="'+dataSource+'"]').show();
             $('[data-data-source="'+dataSource+'"] input').prop('disabled', false);
