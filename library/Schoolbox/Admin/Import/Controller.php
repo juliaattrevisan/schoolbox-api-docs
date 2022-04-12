@@ -21,6 +21,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\Mapper\Exception;
@@ -109,14 +110,28 @@ class Controller extends ConfigController
      */
     public function postSchoolDataOptions(): void
     {
-        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $postData = $this->request->post->get();
 
-        /* Check the DSN assembly here
+        /* Check the DSN assembly here - produce the corresponding DSN codec,
+         * encode the parts, modify $postData, then save it
          */
+        $dsn = (new DSNFactory())->produce($postData['schooldata_import_data_source']);
 
-        new \Alaress_Probe($this->request->post->get());
+        /* This is the schooldata endpoint key which we would have assembled manually
+         */
+        $postData['schooldata_import_endpoint_key'] = $dsn->encode($postData['dsn']);
 
-//        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+        /* We don't need this array element which has no corresponding db rows
+         */
+        unset($postData['dsn']);
+
+        /* Save it
+         */
+        $this->updateConfig($postData, $this->buildConfigPredicate());
+
+        /* Go back to the place from whence you came
+         */
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
     }
 
 
