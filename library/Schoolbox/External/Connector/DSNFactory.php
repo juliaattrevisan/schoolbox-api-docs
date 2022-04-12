@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector;
 
+use Schoolbox\External\Importer\Endpoint\IDSN;
+
 /**
  * This generally manages the production of DSN-related stuff like
  * a DSN codec itself, or the constituent pieces of their DSN strings;
@@ -25,9 +27,9 @@ class DSNFactory
      * Produces a specific DSN codec for the selected suds importer
      *
      * @param string $type
-     * @return Compass\Base\Endpoint\Codec\DSN|Isams\Base\Endpoint\Codec\DSN|Kamar\Base\Endpoint\Codec\DSN|Sentral\Base\Endpoint\DSNCodec|TassApi\Base\Endpoint\Codec\DSN|Wonde\Base\Endpoint\Codec\DSN|null
+     * @return IDSN|null
      */
-    public function produce(string $type)
+    public function produce(string $type): ?IDSN
     {
         switch ($type) {
             case \Schoolbox\External\Importer\Endpoint\Factory::ISAMS:
