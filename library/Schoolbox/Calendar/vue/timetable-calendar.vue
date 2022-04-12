@@ -891,7 +891,7 @@ export default {
 /* Remove weird left padding which indents the time, but not any wrapping text
  * This might have been added for the list view, but manifests here
  */
-.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end.fc-event-future .fc-event-title {
+.fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end .fc-event-title {
     padding-left: 0;
 }
 
