@@ -78,9 +78,22 @@ class DSN implements IDSN
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
 
+            $suppliedPieces = array_filter([
+                $matches[2] ?? null,
+                $matches[3] ?? null,
+                $matches[4] ?? null
+            ]);
+
+            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
+             * If schoolcalendarandnotices had no credentials; skip it
+             */
+            if (isset($matches[1]) && self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count($suppliedPieces)) {
+                continue;
+            }
+
             /* Check the dsn format matches correctly
              */
-            if (!count($matches)) {
+            if (!count($suppliedPieces)) {
                 throw new DomainException('Tass API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
             }
 
@@ -90,15 +103,6 @@ class DSN implements IDSN
              */
             if (count($matches) !== count(self::EXPECTED_TUPLE) + 2) {
                 throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
-            }
-
-            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
-             * If schoolcalendarandnotices had no credentials; skip it
-             */
-            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count(array_filter([
-                $matches[2], $matches[3], $matches[4]
-            ]))) {
-                continue;
             }
 
             $struct[$matches[1]] = [
