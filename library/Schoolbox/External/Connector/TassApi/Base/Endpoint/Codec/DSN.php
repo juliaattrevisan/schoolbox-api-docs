@@ -52,7 +52,7 @@ class DSN implements IDSN
      * followed by key-value pairs
      * separated by comma
      */
-    private const DSN_FORMAT = '/([^:]+):companycode=([^;]+);appcode=([^;]+);token=([^;,]+)/';
+    private const DSN_FORMAT = '/([^:]+):companycode=([^;]*);appcode=([^;]*);token=([^;,]*)/';
 
 
     /**
@@ -92,6 +92,15 @@ class DSN implements IDSN
                 throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
+            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
+             * If schoolcalendarandnotices had no credentials; skip it
+             */
+            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count(array_filter([
+                $matches[2], $matches[3], $matches[4]
+            ]))) {
+                continue;
+            }
+
             $struct[$matches[1]] = [
                 'companycode' => $matches[2],
                 'appcode' => $matches[3],
@@ -116,6 +125,15 @@ class DSN implements IDSN
         $struct = [];
 
         foreach ($parts as $module => $pairs) {
+            /* Skip encoding of the optional schoolcalendarandnotices
+             * if none of its parts were meaningful
+             */
+            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $module && !\count(array_filter([
+                $pairs['companycode'], $pairs['appcode'], $pairs['token']
+            ]))) {
+                continue;
+            }
+
             $module = "{$module}:";
 
             $tuples = [];
