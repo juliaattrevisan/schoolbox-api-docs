@@ -55,8 +55,11 @@
                 const maxFontSize = baseFontSize * settings.maxSize;
                 const fontSizeVariation = maxFontSize - minFontSize;
                 const fontScaleFactor = fontSizeVariation / windowSizeVariation; //the factor that fits between the min/max range
-
-                //Consider the tiles width in addition to factoring in the windows width 
+                
+                /**
+                 * Consider the tiles width in addition to factoring in the windows width, 
+                 * so the smaller the tile, the more the text size will be decreased
+                 */
                 const tileSizeFactor = window.innerWidth - ( minWindowSize + ( window.innerWidth - tile.getBoundingClientRect().width ) );
 
                 /**
