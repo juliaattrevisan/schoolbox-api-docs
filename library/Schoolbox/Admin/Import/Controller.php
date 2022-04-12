@@ -89,13 +89,7 @@ class Controller extends ConfigController
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * decode the parts, then provide it to the ui elements
          */
-        $dsn = (new DSNFactory())->produce($this->getConfigLoader()->get('schooldata_import_data_source'));
-
-        if ($dsn) {
-            $dsnParts = $dsn->decode($key);
-        } else {
-            $dsnParts = [];
-        }
+        $dsnParts = (new DSNFactory())->produceDSNParts($this->getConfigLoader()->get('schooldata_import_data_source'), $key);
 
         /* Shank it directly into configContext because that was a thing
          */
@@ -131,11 +125,11 @@ class Controller extends ConfigController
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * encode the parts, modify $postData, then save it
          */
-        $dsn = (new DSNFactory())->produce($postData['schooldata_import_data_source']);
+        $dsn = (new DSNFactory())->produceDSNString($postData['schooldata_import_data_source'], $postData['dsn']);
 
         /* This is the schooldata endpoint key which we would have assembled manually
          */
-        $postData['schooldata_import_endpoint_key'] = $dsn->encode($postData['dsn']);
+        $postData['schooldata_import_endpoint_key'] = $dsn;
 
         /* We don't need this array element which has no corresponding db rows
          */

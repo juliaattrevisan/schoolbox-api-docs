@@ -31,6 +31,42 @@ class DSNFactory
         return null;
     }
 
-    public function produceDSNParts() {}
-    public function produceDSNString() {}
+
+    /**
+     * Using the suds data source $type,
+     * Spawn a DSN codec and decode the string $key into its corresponding pieces
+     *
+     * @param string $type
+     * @param string $key
+     * @return array|null
+     * @throws \DomainException
+     */
+    public function produceDSNParts(string $type, string $key): ?array {
+        $dsn = $this->produce($type);
+
+        if ($dsn) {
+            return $dsn->decode($key);
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Using the suds data source $type,
+     * Spawn a DSN codec and encode the pieces $dsnParts into its corresponding dsn string
+     *
+     * @param string $type
+     * @param array  $dsnParts
+     * @return string|null
+     */
+    public function produceDSNString(string $type, array $dsnParts): ?string {
+        $dsn = $this->produce($type);
+
+        if ($dsn) {
+            return $dsn->encode($dsnParts);
+        }
+
+        return null;
+    }
 }
