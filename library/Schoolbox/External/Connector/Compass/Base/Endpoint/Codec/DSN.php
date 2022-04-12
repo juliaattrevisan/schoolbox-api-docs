@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Codec;
 
 use DomainException;
 use Schoolbox\External\Importer\Endpoint\IDSN;
+
 use function count;
 
 /**
