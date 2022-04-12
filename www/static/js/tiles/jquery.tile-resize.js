@@ -38,9 +38,19 @@
                 const windowSizeVariation = maxWindowSize - minWindowSize;
                 
                 /**
+                 * Get and set the base font size for possible resizing
+                 */
+                let baseFontSize;
+                if (tileTitle.hasAttribute('data-base-font-size')) {
+                    baseFontSize = tileTitle.getAttribute('data-base-font-size');
+                } else {
+                    baseFontSize = parseInt(window.getComputedStyle(tileTitle).fontSize);
+                    tileTitle.setAttribute('data-base-font-size', baseFontSize);
+                }
+
+                /**
                  * To move between the min/max font size range
                  */
-                const baseFontSize = 32;
                 const minFontSize = baseFontSize * settings.minSize;
                 const maxFontSize = baseFontSize * settings.maxSize;
                 const fontSizeVariation = maxFontSize - minFontSize;
