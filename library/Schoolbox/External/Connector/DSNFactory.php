@@ -45,13 +45,17 @@ class DSNFactory
      * @param string $type
      * @param string $key
      * @return array|null
-     * @throws \DomainException
      */
     public function produceDSNParts(string $type, string $key): ?array {
         $dsn = $this->produce($type);
 
         if ($dsn) {
-            return $dsn->decode($key);
+            try {
+                return $dsn->decode($key);
+            } catch (\DomainException $e) {
+                // noop - bad configuration is now something users can fix
+                // since there's a ui to supply the dsn parts
+            }
         }
 
         return null;
