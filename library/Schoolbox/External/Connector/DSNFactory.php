@@ -90,14 +90,14 @@ class DSNFactory
      * @return string|null
      */
     public function produceDSNString(string $type, ?array $dsnParts): ?string {
-        if (null === $dsnParts) {
+        if (null === $dsnParts[$type]) {
             return null;
         }
 
         $dsn = $this->produce($type);
 
         if ($dsn) {
-            return $dsn->encode($dsnParts);
+            return $dsn->encode($dsnParts[$type]);
         }
 
         return null;
