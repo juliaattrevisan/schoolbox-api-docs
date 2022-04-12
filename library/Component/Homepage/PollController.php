@@ -98,7 +98,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                 $pollData = $pollHandler->getData($poll['id']);
 
-                if ($pollHandler->hasVoted($poll['id']) || !$pollHandler->open($poll['id']) || $this->getSitePage()->arg[1] == 'pollResults') {
+                if ($pollHandler->hasVoted($poll['id']) || !$pollHandler->open($poll['id']) || ($this->getSitePage()->arg[1] ?? '') == 'pollResults') {
                     /* Show poll as user has voted or the poll has closed to votes */
 
                     $this->setVar(
