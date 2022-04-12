@@ -10,7 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector;
 
 /**
- * Spawns a DSN instance based on your selection
+ * This generally manages the production of DSN-related stuff like
+ * a DSN codec itself, or the constituent pieces of their DSN strings;
+ * this factory spawns:
+ *
+ *     - the DSN instance based on your selection
+ *     - the DSN pieces for a given DSN string
+ *     - the DSN string for a given set of DSN pieces.
  */
 class DSNFactory
 {
