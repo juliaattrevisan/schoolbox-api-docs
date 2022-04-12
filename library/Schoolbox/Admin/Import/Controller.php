@@ -86,12 +86,28 @@ class Controller extends ConfigController
 
         $hasIndicator = $host !== '' && $key !== '';
 
+        /* Check the DSN assembly here - produce the corresponding DSN codec,
+         * decode the parts, then provide it to the ui elements
+         */
+        $dsn = (new DSNFactory())->produce($this->getConfigLoader()->get('schooldata_import_data_source'));
+
+        if ($dsn) {
+            $dsnParts = $dsn->decode($key);
+        } else {
+            $dsnParts = [];
+        }
+
+        /* Shank it directly into configContext because that was a thing
+         */
+        $configContext['dsn'] = $dsnParts;
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'configContext' => $configContext,
+            'dsnParts' => $dsnParts,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
             'importLogs' => $this->importLogMapper->findLogsWithDuration()

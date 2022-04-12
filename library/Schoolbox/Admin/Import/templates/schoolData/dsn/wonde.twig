@@ -1,3 +1,8 @@
+{##
+ # Wonde SUDS Configuration fragment
+ #
+ # @param array $dsn  A list of dsn pieces for this suds connector
+ #}
 <div data-data-source="wonde" style="display:none">
     <section>
         <fieldset class="content">
@@ -5,10 +10,10 @@
                 <h3>Wonde Configuration</h3>
 
                 <label>School Identifier <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[school]" value="" />
+                <input type="text" name="dsn[school]" value="{{ school }}" />
 
                 <label>Token <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[token]" value="" />
+                <input type="text" name="dsn[token]" value="{{ token }}" />
             </div>
         </fieldset>
     </section>

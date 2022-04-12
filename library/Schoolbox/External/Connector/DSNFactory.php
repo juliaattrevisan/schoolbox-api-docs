@@ -14,7 +14,10 @@ namespace Schoolbox\External\Connector;
  */
 class DSNFactory
 {
+
     /**
+     * Produces a specific DSN codec for the selected suds importer
+     *
      * @param string $type
      * @return \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN|null
      */
@@ -24,5 +27,10 @@ class DSNFactory
             case \Schoolbox\External\Importer\Endpoint\Factory::WONDE:
                 return new \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN();
         }
+
+        return null;
     }
+
+    public function produceDSNParts() {}
+    public function produceDSNString() {}
 }
