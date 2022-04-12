@@ -10,10 +10,10 @@
                 <h3>Wonde Configuration</h3>
 
                 <label>School Identifier <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[school]" value="{{ school }}" />
+                <input type="text" name="dsn[school]" value="{{ school ?? ''}}" />
 
                 <label>Token <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[token]" value="{{ token }}" />
+                <input type="text" name="dsn[token]" value="{{ token ?? ''}}" />
             </div>
         </fieldset>
     </section>

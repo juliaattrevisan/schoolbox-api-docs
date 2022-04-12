@@ -83,23 +83,24 @@ class Controller extends ConfigController
 
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
 
         $hasIndicator = $host !== '' && $key !== '';
 
         /* Check the DSN assembly here - produce the corresponding DSN codec,
          * decode the parts, then provide it to the ui elements
          */
-        $dsnParts = (new DSNFactory())->produceDSNParts($this->getConfigLoader()->get('schooldata_import_data_source'), $key);
+        $dsnParts = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
         /* Shank it directly into configContext because that was a thing
          */
-        $configContext['dsn'] = $dsnParts;
+        $configContext['dsn'][$dataSource] = $dsnParts;
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
-            'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
+            'dataSource' => $dataSource,
             'configContext' => $configContext,
             'dsnParts' => $dsnParts,
             'hasIndicator' => $hasIndicator,
