@@ -333,14 +333,46 @@ export default {
         },
 
         /**
+         * Perform on any further user interaction, like updating filters, sorting or searching
+         * Otherwise the animation used to clearly show where new files have been added will be
+         * replayed on any state change
+         *
+         * @param { Object }
+         * 
+         * @returns { String }
+         */
+        getVisibilityAction (file) {
+            if (file.hidden) {
+                return 'Show file';
+            } else {
+                return 'Hide file';
+            }
+        },
+
+        /**
          * Toggle the files visibility to hidden/shown
          *
          * @param { Object }
          */
-        onToggleVisibilitySelected (toggledFile) {
+        async onToggleVisibilitySelected (toggledFile) {
             //we need to do this as Vue is watching tableData, not each individual file within
-            const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id); 
-            fileInTableData.hidden = !fileInTableData.hidden;
+            const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id);
+            try {
+                const invertedFileHidden = !fileInTableData.hidden; //to pass through to the endpoint
+                const response = await fetch(`/resources/file/${toggledFile.id}/ajax`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'hidden': invertedFileHidden,
+                    }),
+                });
+                const responseData = await response.json();
+                fileInTableData.hidden = responseData.hidden;
+            } catch (error) {
+                console.warn(error);
+            } 
         },
 
         /**
@@ -462,7 +494,7 @@ export default {
                     </template>
                     <template #edit="props">
                         <nav class="edit">
-                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view' : 'icon-view-hollow' }`" @click.prevent="onToggleVisibilitySelected(props.row)" title="Toggle file visibility">Toggle file visibility</button>
+                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view' : 'icon-view-hollow' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
                             <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                         </nav>
                     </template>
@@ -477,7 +509,7 @@ export default {
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div class="component-action">
                             <section>
-                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`">Select a file</a> or drag and drop multiple onto this component</p>
+                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file">Select a file</a> or drag and drop multiple onto this component</p>
                             </section>
                         </div>
                     </template>
