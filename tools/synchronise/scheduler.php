@@ -80,7 +80,19 @@ HELP;
          */
         $host        = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key         = $this->getConfig()->get('schooldata_import_endpoint_key');
-        $frequency   = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
+
+        /* Detect frequency. "select an option" and "none" mean we should just exit early
+         */
+        $frequency = (string)$this->getConfig()->get('schooldata_import_frequency');
+
+        if ('' === $frequency || Endpoint\Scheduler::NONE === $frequency) {
+            $this->getLogger()->debug(sprintf(
+                'Frequency set to "%s"; nothing to do. Exiting.',
+                $frequency ?: 'select an option'
+            ));
+            exit(1);
+        }
+
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
         $file        = null;
