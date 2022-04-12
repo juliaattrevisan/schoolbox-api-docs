@@ -77,7 +77,7 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider providerInvalidDSNDecode
+     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param string $expected
      * @throws DomainException
