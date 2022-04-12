@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use DomainException;
-
 use Schoolbox\External\Importer\Endpoint\IDSN;
 use function count;
 
@@ -132,9 +131,7 @@ class DSN implements IDSN
             /* Skip encoding of the optional schoolcalendarandnotices
              * if none of its parts were meaningful
              */
-            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $module && !\count(array_filter([
-                $pairs['companycode'], $pairs['appcode'], $pairs['token']
-            ]))) {
+            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $module && !\count(array_filter([ $pairs['companycode'], $pairs['appcode'], $pairs['token'] ]))) {
                 continue;
             }
 

@@ -16,7 +16,6 @@ use Laminas\Uri\Exception;
 use Laminas\Uri\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
-
 /**
  * Class Api
  *

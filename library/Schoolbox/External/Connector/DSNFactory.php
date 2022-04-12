@@ -63,7 +63,8 @@ class DSNFactory
      * @param string $key
      * @return array|null
      */
-    public function produceDSNParts(string $type, string $key): ?array {
+    public function produceDSNParts(string $type, string $key): ?array
+    {
         $dsn = $this->produce($type);
 
         if ($dsn) {
@@ -89,7 +90,8 @@ class DSNFactory
      * @param array|null $dsnParts
      * @return string|null
      */
-    public function produceDSNString(string $type, ?array $dsnParts): ?string {
+    public function produceDSNString(string $type, ?array $dsnParts): ?string
+    {
         if (null === $dsnParts[$type]) {
             return null;
         }
