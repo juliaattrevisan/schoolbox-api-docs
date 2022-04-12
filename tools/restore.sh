@@ -819,7 +819,11 @@ fi
 ## Run SQL updates to current install
 echo "";
 setsqlconfig
-INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/"$destination_instance_id"/upgrade.log;
+set -o pipefail
+if ! INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/"$destination_instance_id"/upgrade.log; then
+  exit 1
+fi
+set +o pipefail
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {

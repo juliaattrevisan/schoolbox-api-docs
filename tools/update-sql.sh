@@ -81,15 +81,38 @@ check_sql_versions(){
     exit 1;
   fi
 
+  if [ "$sql_ver" == "$new_ver" ]; then
+    log "No updates required";
+    exit;
+  fi
+
   # Ensure all required update dirs are present in this package. Never allow this.
   if [[ ! -e /usr/share/schoolbox/updates/"$sql_ver" ]]; then
-    error "Current SQL version update dir not found: '/usr/share/schoolbox/updates/$sql_ver'"
-    error "Cannot guarantee all required intervening update dirs are present!"
-    error "You are probably trying to upgrade a dataset that is too old for this code version."
-    error " * Upgrades:        You must only upgrade a single major version at a time."
-    error " * Prd-to-Stg sync: The PRD version is too old, and no longer supported."
-    error " * restore.sh:      Select a newer backup, or deploy older package."
-    error " * Vagrant:         Checkout older codebase, provision, save dataset, checkout desired version, re-provision"
+
+    # There are two scenarios where this may occur.
+    if [[ $(echo -e "$new_ver\n$sql_ver" | sort -V | tail -n 1 ) != "$new_ver" ]]; then
+      # Case 1. PRD-to-STG sync but PRD is in front of STG or package has been rolled back
+      error "Current SQL version is in front of Package SQL version."
+      error "This is typically due to:"
+      error "  1. PRD-to-STG sync where STG package is behind PRD package, or"
+      error "  2. Package has been rolled back and SQL is behind SQL version"
+      error "If this is a PRD-to-STG sync, you must:"
+      error "  a. Restore from a local STG backup"
+      error "  b. Upgrade the STG site"
+      error "  c. Re-execute the PRD-to-STG sync"
+      error "If you have rolled back the package, you must either:"
+      error "  a. Upgrade the package version, or"
+      error "  b. Restore from an earlier SQL backup file"
+    else
+      # Case 2. SQL is so old that package no longer supports upgrade from it
+      error "Current SQL version update dir not found: '/usr/share/schoolbox/updates/$sql_ver'"
+      error "Cannot guarantee all required intervening update dirs are present!"
+      error "You are probably trying to upgrade a dataset that is too old for this code version."
+      error " * Upgrades:        You must only upgrade a single major version at a time."
+      error " * Prd-to-Stg sync: The PRD version is too old, and no longer supported."
+      error " * restore.sh:      Select a newer backup, or deploy older package."
+      error " * Vagrant:         Checkout older codebase, provision, save dataset, checkout desired version, re-provision"
+    fi
     exit 1
   fi
 
@@ -113,10 +136,7 @@ check_sql_versions(){
     fi
   fi
 
-  if [ "$sql_ver" == "$new_ver" ]; then
-    log "No updates required";
-    exit;
-  fi
+
 }
 
 # Execute a single SQL/PHP update script
