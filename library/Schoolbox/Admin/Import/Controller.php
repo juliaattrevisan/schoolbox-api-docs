@@ -114,6 +114,7 @@ class Controller extends ConfigController
         /* Check the DSN assembly here
          */
 
+        new \Alaress_Probe($this->request->post->get());
 
 //        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
     }
