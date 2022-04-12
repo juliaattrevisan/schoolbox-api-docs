@@ -13,11 +13,16 @@
             <div class="small-12 columns">
                 <h3>Wonde Configuration</h3>
 
-                <label>School Identifier <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[school]" value="{{ school ?? ''}}" />
-
-                <label>Token <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
-                <input type="text" name="dsn[token]" value="{{ token ?? ''}}" />
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <label>School Identifier <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
+                        <input type="text" name="dsn[school]" value="{{ school ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-8 columns">
+                        <label>Token <span class="hint has-tip tip-top" title="" data-tooltip>?</span></label>
+                        <input type="text" name="dsn[token]" value="{{ token ?? ''}}" />
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>
