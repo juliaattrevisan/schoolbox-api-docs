@@ -58,12 +58,11 @@ class DSNCodec
     /**
      * Encode a dsn string
      *
-     * @param string $key
-     * @param string $tenant
+     * @param array $parts
      * @return string
      */
-    public function encode(string $key, string $tenant): string
+    public function encode(array $parts): string
     {
-        return "key={$key};tenant={$tenant}";
+        return "key={$parts['key']};tenant={$parts['tenant']}";
     }
 }
