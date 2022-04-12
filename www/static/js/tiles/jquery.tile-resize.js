@@ -7,8 +7,6 @@
  *                     Defaults to a range of 1-6 em
  * * unit:             the unit minSize, maxSize and getSize are measured in.
  *                     Defaults to em.
- * * getSize:          a callback for retrieving the font size
- *                     Defaults to width of the tile in px, / 120
  * * titleSelector:    a selector for getting the title from the tile.
  *                     Defaults to ".title"
  */
@@ -17,43 +15,54 @@
         var defaults = {
             minSize: 1,
             maxSize: 6,
-            unit:    'em',
-            getSize: function(tile, settings) {
-                return tile.width() / 120;
-            },
+            unit:    'rem',
             titleSelector: '.title'
         };
         var settings = $.extend({}, defaults, options);
         $(this).each(function() {
-            var tile      = $(this);
-            var tileTitle = tile.find(settings.titleSelector);
-            if (tile.height() <= 60) { //prevent the aspect ratio of the tile from going to small
-                tile.css( { height: 60 } );
-            }
-            var width     = Math.max(
-                settings.minSize,
-                Math.min(
-                    settings.getSize(tile, settings),
-                    settings.maxSize
-                )
-            );
-            tileTitle.css({
-                fontSize: `clamp(${settings.minSize}em, 2vw, ${settings.maxSize}em)`, 
-                padding: String(width/4)+settings.unit
-            });
+            
+            const tile = $(this)[0];
+            const tileTitle = tile.querySelector(settings.titleSelector);
+            
+            if (tileTitle && tileTitle.innerText !== '') { //ignore those tiles without any text
+                
+                if (tile.getBoundingClientRect().height <= 60) { //prevent the aspect ratio of the tile from going to small
+                    tile.style.height = `60px`;
+                }
 
-            // If the title is taller than the tile:
-            // reduce the tile's top and bottom padding so it fits.
-            var titleHeight = tileTitle.outerHeight();
-            var tileHeight  = tile.outerHeight();
-            if (titleHeight > tileHeight) {
-                var heightDifference = tileHeight - tileTitle.height();
-                var newPadding       = String(heightDifference / 2)+'px';
-                tileTitle.css({
-                    paddingTop: newPadding,
-                    paddingBottom: newPadding
-                })
+                /**
+                 * Set up some reasonable min/max window constraints for the min/max text size to move between 
+                 */
+                const minWindowSize = 400;
+                const maxWindowSize = 1800;
+                const windowSizeVariation = maxWindowSize - minWindowSize;
+                
+                /**
+                 * To move between the min/max font size range
+                 */
+                const baseFontSize = 32;
+                const minFontSize = baseFontSize * settings.minSize;
+                const maxFontSize = baseFontSize * settings.maxSize;
+                const fontSizeVariation = maxFontSize - minFontSize;
+                const fontScaleFactor = fontSizeVariation / windowSizeVariation; //the factor that fits between the min/max range
+
+                //Consider the tiles width in addition to factoring in the windows width 
+                const tileSizeFactor = window.innerWidth - ( minWindowSize + ( window.innerWidth - tile.getBoundingClientRect().width ) );
+
+                /**
+                 * Ensure we don't go below or above our min/max text ranges
+                 */
+                let fontSize = minFontSize + (fontScaleFactor * tileSizeFactor);
+                if (fontSize < minFontSize) {
+                    fontSize = minFontSize;
+                } else if (fontSize > maxFontSize) {
+                    fontSize = maxFontSize;
+                }
+
+                tileTitle.style.fontSize = `${fontSize}px`;
+
             }
+
         })
     };
 })(jQuery);
