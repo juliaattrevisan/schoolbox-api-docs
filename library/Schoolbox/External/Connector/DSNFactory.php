@@ -30,8 +30,14 @@ class DSNFactory
     public function produce(string $type)
     {
         switch ($type) {
-            case \Schoolbox\External\Importer\Endpoint\Factory::WONDE:
-                return new \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN();
+            case \Schoolbox\External\Importer\Endpoint\Factory::ISAMS:
+                return new \Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN();
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::KAMAR:
+                return new \Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec\DSN();
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::SENTRAL:
+                return new \Schoolbox\External\Connector\Sentral\Base\Endpoint\DSNCodec();
 
             case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
                 return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN();
@@ -39,14 +45,8 @@ class DSNFactory
             case \Schoolbox\External\Importer\Endpoint\Factory::COMPASS:
                 return new \Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\DSN();
 
-            case \Schoolbox\External\Importer\Endpoint\Factory::SENTRAL:
-                return new \Schoolbox\External\Connector\Sentral\Base\Endpoint\DSNCodec();
-
-            case \Schoolbox\External\Importer\Endpoint\Factory::ISAMS:
-                return new \Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN();
-
-            case \Schoolbox\External\Importer\Endpoint\Factory::KAMAR:
-                return new \Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec\DSN();
+            case \Schoolbox\External\Importer\Endpoint\Factory::WONDE:
+                return new \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN();
         }
 
         return null;
