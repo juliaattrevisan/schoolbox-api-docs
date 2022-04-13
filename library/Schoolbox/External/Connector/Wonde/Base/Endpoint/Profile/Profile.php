@@ -193,16 +193,16 @@ class Profile implements IStrategy
             self::NUM_PER_PAGE,
             implode(',', [
                 'contact_details',
-                'house',
-                'year',
-                'medical_conditions',
-                'education_details',
-                'extended_details',
-                'sen_needs',
-                'identifiers',
                 'contacts',
                 'contacts.contact_details',
-                'permissions'
+                'education_details',
+                'extended_details',
+                'house',
+                'identifiers',
+                'medical_conditions',
+                'permissions',
+                'sen_needs',
+                'year',
             ])
         );
 
@@ -828,8 +828,8 @@ class Profile implements IStrategy
                 'contact_details',
                 'employment_details',
                 'groups',
-                'roles',
                 'identifiers',
+                'roles',
             ])
         );
 

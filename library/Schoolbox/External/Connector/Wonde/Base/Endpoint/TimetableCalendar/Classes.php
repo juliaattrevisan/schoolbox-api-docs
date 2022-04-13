@@ -180,12 +180,12 @@ class Classes implements IStrategy
             true,
             true,
             implode(',', [
-                'subject',
-                'students',
                 'employees',
                 'lessons',
                 'lessons.room',
-                'lessons.period'
+                'lessons.period',
+                'subject',
+                'students',
             ])
         );
 
