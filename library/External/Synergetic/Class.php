@@ -40,20 +40,23 @@ class External_Synergetic_Class implements External_ClassInterface
      * Gets the class code part of a query.
      *
      * @param string $subCode
-     *
+     * @param string $tableName
      * @return string
      */
-    protected function getClassCodeQuery($subCode)
+    public function getClassCodeQuery(string $subCode, string $tableName = ''): string
     {
+        if ($tableName !== '') {
+            $tableName = $tableName . '.';
+        }
         $classQuery = '(';
         $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
-                $classQuery .= "( ClassCode = {$this->database->legacyQuote($codeArray[1])} AND ClassCampus = {$this->database->legacyQuote($codeArray[0])}) OR ";
+                $classQuery .= "( {$tableName}ClassCode = {$this->database->legacyQuote($codeArray[1])} AND {$tableName}ClassCampus = {$this->database->legacyQuote($codeArray[0])}) OR ";
             }
             // SB class code may or may not have the SIS campus code prefixed, a '/' char is not conclusive as a class code can contain this.
-            $classQuery .= "ClassCode = {$this->database->legacyQuote($code)} OR ";
+            $classQuery .= "{$tableName}ClassCode = {$this->database->legacyQuote($code)} OR ";
         }
 
         return substr($classQuery, 0, -3) . ')';
