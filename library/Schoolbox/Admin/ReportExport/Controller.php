@@ -344,20 +344,18 @@ class Controller extends ConfigController
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
         );
-
     }
+
     /**
      * Returns a predicate suitable for finding config for this module
      *
-     * @param string $typeLabel
      * @return Predicate\Builder
-     * @throws Predicate\InvalidColumnException
      */
     private function buildConfigPredicate(): Predicate\Builder
     {
         return $this->getConfigMapper()
-                   ->getPredicateBuilder()
-                   ->equals('lct.type', 'Report Export')
-                   ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
+                    ->getPredicateBuilder()
+                    ->equals('lct.type', 'Report Export')
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
     }
 }
