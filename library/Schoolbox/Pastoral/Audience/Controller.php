@@ -55,6 +55,11 @@ class Controller extends Base
     private Pastoral\Action\Mapper $pastoralActionMapper;
 
     /**
+     * @var Pastoral\Access\Mapper
+     */
+    private Pastoral\Access\Mapper $pastoralAccessMapper;
+
+    /**
      * Icon mapper: the list of icons is fetched from here.
      */
     private IconMapper $iconMapper;
@@ -93,7 +98,8 @@ class Controller extends Base
         Pastoral\Action\Mapper $pastoralActionMapper,
         IconMapper $iconMapper,
         RosettaStone $rosettaStone,
-        ColorFactory $colorFactory
+        ColorFactory $colorFactory,
+        Pastoral\Access\Mapper $pastoralAccessMapper
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
@@ -105,6 +111,7 @@ class Controller extends Base
         $this->iconMapper             = $iconMapper;
         $this->rosettaStone           = $rosettaStone;
         $this->colorFactory           = $colorFactory;
+        $this->pastoralAccessMapper   = $pastoralAccessMapper;
     }
 
 
@@ -261,7 +268,7 @@ class Controller extends Base
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
-                'roleTypes'       => $this->determineAllowedRoleTypes(),
+                'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                 'roleUserCounts'  => $roleUsers,
                 'rolesWithUsers'  => $roleUsers,
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
@@ -488,20 +495,5 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
-    }
-
-    /**
-     * @return array<string>
-     */
-    private function determineAllowedRoleTypes(): array
-    {
-        $allowedRoleTypes = [];
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::STUDENT;
-        }
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::PARENT;
-        }
-        return $allowedRoleTypes;
     }
 }

@@ -715,7 +715,7 @@ class Controller extends Base
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
-                    'roleTypes'         => $this->determineAllowedRoleTypes(),
+                    'roleTypes'         => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                     'roleUserCounts'    => $roleUserCounts,
                     'rolesWithUsers'    => $rolesWithUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
@@ -859,7 +859,7 @@ class Controller extends Base
         if (is_array($post["role"] ?? null)) {
             $foundRoles       = [];
             $allowedRoles     = $this->determineAllowedRoles();
-            $allowedRoleTypes = $this->determineAllowedRoleTypes();
+            $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post["role"] as $roleId => $accessLevel) {
                 if (in_array($roleId, $foundRoles)) {
                     // should not happen
@@ -1504,21 +1504,6 @@ class Controller extends Base
     {
         $allowedRoleTypes = [Role::STAFF];
         return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
-    }
-
-    /**
-     * @return array<string>
-     */
-    private function determineAllowedRoleTypes(): array
-    {
-        $allowedRoleTypes = [];
-        if ($this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::STUDENT;
-        }
-        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::PARENT;
-        }
-        return $allowedRoleTypes;
     }
 }
 
