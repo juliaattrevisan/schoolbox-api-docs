@@ -419,7 +419,7 @@ class Controller extends Base
                     'data'  =>  $output,
                     'metadata'  => [
                         'count' => count($output),
-                        'cursor' => end($output)['id']
+                        'cursor' => end($output)['id'] ?? null
                     ]
                 ]
             )
