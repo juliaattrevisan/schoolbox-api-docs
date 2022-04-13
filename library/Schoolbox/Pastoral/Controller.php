@@ -587,7 +587,7 @@ class Controller extends Base
         $roleUserCounts = [];
         $rolesWithUsers = [];
 
-        $allowedRoles   = $this->determineAllowedRoles();
+        $allowedRoles   = $this->pastoralAccessMapper->determineAllowedRoles();
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
@@ -858,7 +858,7 @@ class Controller extends Base
 
         if (is_array($post["role"] ?? null)) {
             $foundRoles       = [];
-            $allowedRoles     = $this->determineAllowedRoles();
+            $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post["role"] as $roleId => $accessLevel) {
                 if (in_array($roleId, $foundRoles)) {
@@ -1494,16 +1494,6 @@ class Controller extends Base
             $this->getResponse()->status->setCode(400);
         }
         $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-
-    /**
-     * @return GenericCollection<Role>
-     */
-    private function determineAllowedRoles(): GenericCollection
-    {
-        $allowedRoleTypes = [Role::STAFF];
-        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
     }
 }
 

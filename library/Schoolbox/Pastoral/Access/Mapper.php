@@ -143,6 +143,16 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * @return GenericCollection<Role>
+     */
+    public function determineAllowedRoles(): GenericCollection
+    {
+        $allowedRoleTypes = [Role::STAFF];
+        $roleMapper = RoleMapper::getInstance();
+        return $roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
+    }
+
+    /**
      * @return array<string>
      */
     public function determineAllowedRoleTypes(): array
