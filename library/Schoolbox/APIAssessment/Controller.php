@@ -13,6 +13,7 @@ namespace Schoolbox\APIAssessment;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use PDO;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -50,7 +51,7 @@ class Controller extends Base
         $query  = "
 SELECT
     assessment.id, assessment.title, assessment.weight,
-    COALESCE(task_completion.completion_date, submission_return.created_at) as `CompletionDate`,
+    COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
 
     COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
@@ -71,11 +72,30 @@ WHERE v_most_recent_feedback.assessment_id = :id";
 
         $mapper = UserMapper::getInstance()->getDatabase();
         $statement = $mapper->prepare($query);
-        $statement->execute(['id' => $assessmentId]);
+        $statement->bindValue('id', $assessmentId);
+
+        $statement->execute();
+        $output = [];
+        $output['participants'] = [];
         /**
          * build the whole thing
          */
-        $output = $statement->fetchAll();
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $output['id'] = $row['id'];
+            $output['title'] = $row['title'];
+            $output['weight'] = $row['weight'];
+            $output['participants'][] = [
+                'userId' => $row['student_id'],
+                'mark'  => $row['mark'],
+                'normalisedMark' => $row['norm_mark'],
+                'comment' => $row['comment'],
+                'date'  => $row['completionDate'],
+
+            ];
+        }
+        /**
+         * build the whole thing
+         */
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
