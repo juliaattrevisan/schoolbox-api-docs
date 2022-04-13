@@ -145,6 +145,16 @@ WHERE
                 $params['workTypeName'] = $filter['workType']['name'];
             }
         }
+        if (array_key_exists('dueDate', $filter)) {
+            if (array_key_exists('from', $filter['dueDate'])) {
+                $where             .= " AND due_date >= :dueFrom ";
+                $params['dueFrom'] = $filter['dueDate']['from'];
+            }
+            if (array_key_exists('to', $filter['dueDate'])) {
+                $where             .= " AND due_date <= :dueTo ";
+                $params['dueTo'] = $filter['dueDate']['to'];
+            }
+        }
 
         if (0 !== $cursor) {
             $where .= " AND assessment.id > :cursor ";
