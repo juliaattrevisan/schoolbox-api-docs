@@ -9,11 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\ReportExport;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\ConfigController;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Grades\Helper;
@@ -24,6 +28,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Alaress\Database\Predicate;
 
 /**
  * Class Controller
@@ -32,7 +37,7 @@ use Schoolbox\YearLevel\Mapper as YearLevelMapper;
  *
  * @package Schoolbox\Admin\ReportExport
  */
-class Controller extends Base
+class Controller extends ConfigController
 {
 
     private TermMapper $termMapper;
@@ -65,8 +70,11 @@ class Controller extends Base
         WorkTypeMapper $workTypeMapper,
         FolderMapper $folderMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
-        Access $access
+        Access $access,
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory
     ) {
+        parent::__construct($configMapper, $fieldStrategyFactory);
         $this->termMapper            = $termMapper;
         $this->yearLevelMapper       = $yearLevelMapper;
         $this->campusMapper          = $campusMapper;
@@ -82,8 +90,15 @@ class Controller extends Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @api GET /adminv2/report-export
      */
-    public function getIndex()
+    public function getIndex(): void
     {
+        $configContext = $this->buildConfigContext(
+            $this->buildConfigPredicate(),
+            $this->router->generate('adminReportExport.postConfig'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
+        );
+
+
         $summaryPageOptions = [
             [
                 'id'   => 'showOverallGrades',
@@ -136,9 +151,22 @@ class Controller extends Base
                     'summaryPageOptions' => $summaryPageOptions,
                     'classPageOptions'   => $classPageOptions,
                     'assessmentOptions'  => $assessmentOptions,
+                    'configContext'      => $configContext,
                 ],
             ]
         );
+    }
+
+    /**
+     * Save settings
+     *
+     * @throws RouteNotFound
+     * @throws MapperException
+     */
+    public function postConfig(): void
+    {
+        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $this->response->redirect->afterPost($this->router->generate('adminReportExport.getIndex'));
     }
 
     /**
@@ -316,5 +344,20 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
         );
+
+    }
+    /**
+     * Returns a predicate suitable for finding config for this module
+     *
+     * @param string $typeLabel
+     * @return Predicate\Builder
+     * @throws Predicate\InvalidColumnException
+     */
+    private function buildConfigPredicate(): Predicate\Builder
+    {
+        return $this->getConfigMapper()
+                   ->getPredicateBuilder()
+                   ->equals('lct.type', 'Report Export')
+                   ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
     }
 }

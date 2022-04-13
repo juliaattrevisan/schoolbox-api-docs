@@ -11,6 +11,7 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        {% include '@settings/moduleConfig.twig' with configContext only %}
         <div class="small-12 island" id="formReportExport">
             <form class="top" id="reportExportForm" method="post" enctype="multipart/form-data" action="">
                 <section>

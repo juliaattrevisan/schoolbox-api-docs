@@ -18,10 +18,13 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\CampusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -41,6 +44,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
         $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
         $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
+        $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
     }
 
     /**
@@ -79,6 +83,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
         );
     }
 

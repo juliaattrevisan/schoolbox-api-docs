@@ -147,6 +147,10 @@
         margin-bottom: 1rem;
     }
 
+    .logo {
+        float:right;
+    }
+
     @page {
         counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
@@ -174,6 +178,12 @@
     <section class="content">
         <div class="row row__margin-bottom">
             <h1 class="heading__primary">{{ config.school_name }}</h1>
+            <img src="/images/logo.php?logo=skin_logo_large&amp;size=normal"
+                 srcset="/images/logo.php?logo=skin_logo_large&amp;size=normal 1x,/images/logo.php?logo=skin_logo_large&amp;size=normal 2x"
+                 alt="{{ config.school_name }}" class="logo">
+        </div>
+        <div class="row row__margin-bottom">
+            {{ config.report_export_introduction }}
         </div>
         <div class="row row__margin-bottom">
             <div class="card small-12">
