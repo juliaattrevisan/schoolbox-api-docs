@@ -194,7 +194,6 @@ class Profile implements IStrategy
             implode(',', [
                 'contact_details',
                 'house',
-                'house.employees',
                 'year',
                 'medical_conditions',
                 'education_details',
