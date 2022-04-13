@@ -186,8 +186,10 @@ WHERE
             $output[] = [
                 'assessmentId'  => $row['id'],
                 'title'         => $row['title'],
-                'workTypeName'  => $row['workTypeName'],
-                'workTypeId'    => $row['workTypeId'],
+                'workType'      => [
+                                    'name'  => $row['workTypeName'],
+                                    'id'    => $row['workTypeId']
+                                ],
                 'folderId'      => $row['folderId'],
                 'weighted'      => $weighted,
                 'due_date'      => $row['due_date'],
