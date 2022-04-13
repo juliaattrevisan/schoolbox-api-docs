@@ -106,11 +106,16 @@ SELECT
     lu_work_type.id as `workTypeId`,
     v_assessment_relation.folder_id as `folderId`,
     assessment.weight as `weighted`,
-    assessment.due_date
+    assessment.due_date,
+    GROUP_CONCAT( lu_year_level.id ORDER BY lu_year_level.id) as `yearLevelId`,
+    GROUP_CONCAT( lu_year_level.name ORDER BY lu_year_level.id) as `yearLevelName`
 ";
         $from = "FROM v_assessment_relation
 JOIN assessment on v_assessment_relation.assessment_id = assessment.id
 LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
+LEFT JOIN folder_year_level on v_assessment_relation.folder_id = folder_year_level.folder_id
+LEFT JOIN lu_year_level on folder_year_level.year_level_id = lu_year_level.id
+
 ";
         $where = "
 WHERE
@@ -155,6 +160,15 @@ WHERE
                 $params['dueTo'] = $filter['dueDate']['to'];
             }
         }
+        if (array_key_exists('yearLevel', $filter)) {
+            if (array_key_exists('id', $filter['yearLevel'])) {
+                $where .= " AND lu_year_level.id = :yearLevelId ";
+                $params['yearLevelId'] = $filter['yearLevel']['id'];
+            } elseif (array_key_exists('name', $filter['yearLevel'])) {
+                $where .= " AND lu_year_level.name = :yearLevelName ";
+                $params['yearLevelName'] = $filter['yearLevel']['name'];
+            }
+        }
 
         if (0 !== $cursor) {
             $where .= " AND assessment.id > :cursor ";
@@ -183,6 +197,18 @@ WHERE
             if ('0.00' !== $row['weighted']) {
                 $weighted = true;
             }
+            $yearLevel = null;
+            if (null !== $row['yearLevelName']) {
+                $names = explode(',', $row['yearLevelName']);
+                $ids = explode(',', $row['yearLevelId']);
+                $yearLevel = [];
+                foreach ($names as $id => $name) {
+                    $yearLevel[] = [
+                        'id'    => $ids[$id],
+                        'name'    => $name,
+                    ];
+                }
+            }
             $output[] = [
                 'assessmentId'  => $row['id'],
                 'title'         => $row['title'],
@@ -190,6 +216,7 @@ WHERE
                                     'name'  => $row['workTypeName'],
                                     'id'    => $row['workTypeId']
                                 ],
+                'yearLevel'     => $yearLevel,
                 'folderId'      => $row['folderId'],
                 'weighted'      => $weighted,
                 'due_date'      => $row['due_date'],
