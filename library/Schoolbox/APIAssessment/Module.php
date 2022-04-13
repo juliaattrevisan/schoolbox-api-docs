@@ -40,7 +40,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess);
-        $this->register('GET', '', 'apiAssessmentGetAll', $hasApiAccess);
+        $this->register('GET', '', 'apiAssessmentSearch', $hasApiAccess);
     }
 
 

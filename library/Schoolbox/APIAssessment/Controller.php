@@ -58,4 +58,148 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * @api GET /api/assessment
+     * @link TODO
+     */
+    public function apiAssessmentSearch()
+    {
+        $search = $this->request->query->get('search', '');
+        $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        $cursor = (int)$this->request->query->get('cursor', null);
+        $limit = (int)$this->request->query->get('limit', 5);
+        if ('' === $search) {
+            $problem = (new ApiProblem('Search must not be blank'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        if (null === $filter) {
+            $problem = (new ApiProblem('Filter must not be blank'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+        if (strlen($search) <= 2) {
+            $problem = (new ApiProblem('Search term must be longer than 2 characters'))
+                ->setStatus(401)
+                ->asArray();
+            $this->getResponse()->status->setCode(401);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early there is a malformed keyword for search
+        }
+
+        $output = [];
+        $params = [];
+
+
+        $select  = "
+SELECT
+    assessment.id,
+    assessment.title,
+    lu_work_type.name as `workTypeName`,
+    lu_work_type.id as `workTypeId`,
+    v_assessment_relation.folder_id as `folderId`,
+    assessment.weight as `weighted`,
+    assessment.due_date
+";
+        $from = "FROM v_assessment_relation
+JOIN assessment on v_assessment_relation.assessment_id = assessment.id
+LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
+";
+        $where = "
+WHERE
+    assessment.deleted_at is null
+";
+        if (array_key_exists('assessmentId', $filter)) {
+            $where .= " AND v_assessment_relation.assessment_id = :assessmentId ";
+            $params['assessmentId'] = $filter['assessmentId'];
+        }
+        if (array_key_exists('title', $filter)) {
+            $where .= " AND assessment.title = :title ";
+            $params['title'] = $filter['title'];
+        }
+        if (array_key_exists('contextId', $filter)) {
+            $where .= " AND v_assessment_relation.folder_id = :contextId ";
+            $params['contextId'] = $filter['contextId'];
+        }
+        if (array_key_exists('weighted', $filter)) {
+            $where .= " AND assessment.weight";
+            if ($filter['weighted'] === true) {
+                $where .= " != 0.00 ";
+            } else {
+                $where .= " = 0.00 ";
+            }
+        }
+        if (array_key_exists('workType', $filter)) {
+            if (array_key_exists('id', $filter['workType'])) {
+                $where .= " AND assessment.work_type_id = :workTypeID ";
+                $params['workTypeID'] = $filter['workType']['id'];
+            } elseif (array_key_exists('name', $filter['workType'])) {
+                $where .= " AND lu_work_type.name = :workTypeName ";
+                $params['workTypeName'] = $filter['workType']['name'];
+            }
+        }
+
+        if (0 !== $cursor) {
+            $where .= " AND assessment.id > :cursor ";
+        }
+        $where .= "ORDER BY assessment.id";
+        if (0 !== $limit) {
+            $where .= " LIMIT :limit";
+        }
+        $mapper = UserMapper::getInstance()->getDatabase();
+        $statement = $mapper->prepare($select . $from . $where);
+        if (0 !== $limit) {
+            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if (0 !== $cursor) {
+            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
+        }
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
+        /**
+         * build the whole thing
+         */
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $weighted = false;
+            if ('0.00' !== $row['weighted']) {
+                $weighted = true;
+            }
+            $output[] = [
+                'assessmentId'  => $row['id'],
+                'title'         => $row['title'],
+                'workTypeName'  => $row['workTypeName'],
+                'workTypeId'    => $row['workTypeId'],
+                'folderId'      => $row['folderId'],
+                'weighted'      => $weighted,
+                'due_date'      => $row['due_date'],
+
+            ];
+        }
+
+
+        /**
+         * now we have the user id's that match the search result, create the standard user array with hydration.
+         */
+
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                [
+                    'data'  =>  $output,
+                    'metadata'  => [
+                        'count' => count($output),
+                        'cursor' => end($output)['id']
+                    ]
+                ]
+            )
+        );
+    }
 }
