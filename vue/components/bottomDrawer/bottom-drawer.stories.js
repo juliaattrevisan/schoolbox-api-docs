@@ -17,7 +17,7 @@ export default {
         },
         default: {
             control: { type: 'text' },
-            defaultValue: '<strong>Bottom drawer content</strong>',
+            defaultValue: '<strong>Bottom drawer content goes here</strong>',
         },
     },
     //wrap the component in some html: https://storybook.js.org/docs/vue/writing-stories/introduction#using-decorators
