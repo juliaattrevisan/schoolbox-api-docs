@@ -29,12 +29,11 @@ class ReadCache implements ReadableCache
 
     /**
      * @param ClientInterface $redis
-     * @param LoggerInterface $log
      */
-    public function __construct(ClientInterface $redis, LoggerInterface $log)
+    public function __construct(ClientInterface $redis)
     {
         $this->redis = $redis;
-        $this->log = $log;
+        $this->log = new \Psr\Log\NullLogger();
     }
 
     /**

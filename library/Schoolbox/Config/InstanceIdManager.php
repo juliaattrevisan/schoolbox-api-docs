@@ -17,6 +17,7 @@ use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\MQ;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
@@ -269,8 +270,9 @@ class InstanceIdManager extends CliTool\App
     private function rebuildSubscriptionCache(string $newInstanceId): void
     {
         $this->getLogger()->notice('Rebuilding subscription cache');
-        /** @var WritableCache $cache */
+        /** @var WriteCache $cache */
         $cache = $this->getDi()->get('subscriptionCache');
+        $cache->setLog($this->getLogger());
         $cache->cacheAllUsers($newInstanceId);
     }
 
