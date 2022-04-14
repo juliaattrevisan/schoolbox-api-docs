@@ -6,7 +6,8 @@ data/
 www/test.xml
 .vagrant
 Vagrantfile
-www/static/css/core/chromeFoundation.css
+#Chromatic requires the CSS styles to run in github actions
+#www/static/css/core/chromeFoundation.css
 www/static/css/core/editor.css
 *.log
 vendor/
