@@ -35,8 +35,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
     // These prefixes are prefixed on the "markbook abbreviated heading 2"
     // to signify which table the ID which follows it relate to
-    private const ASSESSMENT_PREFIX = 'Q413-';
-    private const SUBMISSION_PREFIX = 'W413-';
+    private const ASSESSMENT_PREFIX = 'Q-';
+    private const SUBMISSION_PREFIX = 'W-';
 
     /** @const int NO_MARK_GIVEN Magic number to represent 'No Mark' when nulls not permitted */
     private const NO_MARK_GIVEN = -1;
