@@ -11,6 +11,7 @@ use Alaress\Async\Synchroniser;
 use Alaress\Routing\FlatRouter;
 use Alaress_Byte_Format;
 use Predis\ClientInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use UnderflowException;
@@ -137,6 +138,15 @@ class WriteCache extends ReadCache implements WritableCache
         $this->writeCache($router, $this->getCacheKey($instanceId));
 
         $this->broadcastReload($instanceId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLog(LoggerInterface $log): ReadCache
+    {
+        $this->loaderFactory->setLog($log);
+        return parent::setLog($log);
     }
 
     /**
