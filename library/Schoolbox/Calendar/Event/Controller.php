@@ -809,8 +809,18 @@ class Controller extends Base
         /* Calculate redirect for async javascript
          */
         if ($this->request->isXhr()) {
+            /* If you try to return to a place that no longer exists,
+             * just go back to the main calendar view; this occurs
+             * when you delete from the modify screen
+             */
+            $route = $this->getRouter()->generate('calendarEvent.getEvent', ['eventId' => $event->getId()]);
+
+            if ($route === $redirect) {
+                $redirect = $this->getRouter()->generate('calendar.getOwnCalendar');
+            }
+
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'returnUrl' => $redirect
+                'callbackUrl' => $redirect
             ]));
         } else {
             $this->response->redirect->to($redirect);
