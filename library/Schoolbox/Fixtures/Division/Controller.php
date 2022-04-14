@@ -249,6 +249,15 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Division $division): void
     {
+        $selectedUsers = $this->getRequest()->post->get('userId');
+
+        /* You didn't add anyone
+         */
+        if (null === $selectedUsers) {
+            $this->renderPostAddPlayersResponse($division);
+            return;
+        }
+
         $involvements = $this->divisionUserMapper
             ->findByColumn('division_id', $division->getId())
             ->indexByCallback(
@@ -260,7 +269,7 @@ class Controller extends AbstractController
         /* Find the people who were chosen but aren't already in this division somewhere
          * This is the diff of who you chose vs who's already here
          */
-        $uninvolvedUsers = array_diff($this->getRequest()->post->get('userId'), $involvements);
+        $uninvolvedUsers = array_diff($selectedUsers, $involvements);
 
         /* Hydrate only the guys you need
          */
