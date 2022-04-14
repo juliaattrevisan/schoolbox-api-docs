@@ -24,4 +24,5 @@ const Template = (args, { argTypes }) => ({
 export const Default = Template.bind({});
 Default.parameters = {
     controls: { hideNoControlsWarning: true },
+    chromatic: { disableSnapshot: true }, // disables Chromatic's snapshotting, as animation will always trigger visual changes
 };
