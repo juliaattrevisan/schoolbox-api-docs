@@ -133,6 +133,7 @@ parse_args(){
 # Check we are saving data from a stable release point
 check_is_stable(){
   cd /usr/share/schoolbox || exit 1
+  git config --global --add safe.directory /usr/share/schoolbox
   tag=$(git log --oneline --decorate -n 1 | grep -oE 'tag: [0-9a-zA-Z.-]+')
   if [[ -n $tag ]]; then
     echo "Branch HEAD appears to be stable. $tag"
