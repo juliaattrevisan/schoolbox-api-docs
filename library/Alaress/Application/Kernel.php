@@ -1592,27 +1592,32 @@ abstract class Kernel
 
 
         // install sentry
-        $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
-        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
         $sentryClient  = null;
         // `$sentryToken` and `$sentryProject` are never defined in PHPStan
+        $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
+        $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
         /** @phpstan-ignore-next-line */
         if (\strlen($sentryToken) && \strlen($sentryProject)) {
-            try {
-                /** @var Instance $sb */
-                $sb           = $di->get('instance');
-                $sentryClient = (new \Alaress\Sentry\Factory())->build(
-                    $sb,
-                    Instance::APPLICATION_NAME,
-                    $sentryToken,
-                    $sentryProject
-                );
-            } catch (Di\Exception\ServiceNotFound $e) {
-                // do nothing; sentry is not installed
-            }
-
             // add sentry to the DI
-            $di->set('sentry', $sentryClient);
+            $di->set(
+                'sentry',
+                $di->lazy(
+                    static function () use ($di, $sentryToken, $sentryProject) {
+                        try {
+                            /** @var Instance $sb */
+                            $sb = $di->get('instance');
+                            return (new \Alaress\Sentry\Factory())->build(
+                                $sb,
+                                Instance::APPLICATION_NAME,
+                                $sentryToken,
+                                $sentryProject
+                            );
+                        } catch (Di\Exception\ServiceNotFound $e) {
+                            // do nothing; sentry is not installed
+                        }
+                    }
+                )
+            );
         }
 
 
