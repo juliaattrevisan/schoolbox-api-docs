@@ -245,14 +245,30 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Division $division)
     {
-        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+        $involvements = $this->divisionUserMapper
+            ->findByColumn('division_id', $division->getId())
+            ->indexByCallback(
+                static function (DivisionUser $divisionUser) {
+                    return $divisionUser->getUser()->getId();
+                }
+            )->keys();
+
+        $users = $this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId'));
+
+        foreach ($users as $user) {
+            /* Player is already here
+             */
+            if (\in_array($user->getId(), $involvements, true)) {
+                continue;
+            }
+
             // Don't re-add any players already in the division
             try {
                 $this->divisionUserMapper->save(
                     $this->divisionUserMapper->createModel()
-                                             ->setDivision($division)
-                                             ->setUser($user)
-                                             ->setSequence(0)
+                         ->setDivision($division)
+                         ->setUser($user)
+                         ->setSequence(0)
                 );
             } catch (MapperException $e) {
                 // Probably a duplicate key. That is fine
