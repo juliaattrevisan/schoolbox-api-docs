@@ -238,12 +238,16 @@ class Controller extends AbstractController
         }
     }
 
+
     /**
      * Add players to a Division
      *
      * @param Division $division
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function postAddPlayers(Division $division)
+    public function postAddPlayers(Division $division): void
     {
         $involvements = $this->divisionUserMapper
             ->findByColumn('division_id', $division->getId())
