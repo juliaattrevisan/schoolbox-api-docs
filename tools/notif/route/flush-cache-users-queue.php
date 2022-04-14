@@ -36,7 +36,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     // If no instance ID is provided, fall back to default if it exists
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
 
-    /** @var WritableCache $cache */
+    /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
     $cache = $di->get('subscriptionCache');
+    $cache->setLog($log);
     $cache->flushCacheUsersQueue($instanceId);
 });

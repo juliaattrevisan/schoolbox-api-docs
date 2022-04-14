@@ -17,7 +17,6 @@
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../../conf/core/require.php';
@@ -35,8 +34,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
     $userId     = $opts['userId'] ?? null;
 
-    /** @var WritableCache $cache */
+    /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
     $cache = $di->get('subscriptionCache');
+    $cache->setLog($log);
 
     if ($userId) {
         $cache->cacheUsers($instanceId, [$userId]);

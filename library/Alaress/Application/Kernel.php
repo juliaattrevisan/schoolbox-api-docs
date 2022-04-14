@@ -1553,12 +1553,10 @@ abstract class Kernel
                 WriteCache::class,
                 [
                     'redis'         => $di->lazyGet('redis.storage'),
-                    'log'           => $di->lazyValue('logger'),
                     'loaderFactory' => $di->lazyNew(
                         \Schoolbox\Realtime\Routing\Subscription\Loader\Factory::class,
                         [
                             'redis' => $di->lazyGet('redis.storage'),
-                            'log'   => $di->lazyValue('logger')
                         ],
                         [
                             'setUserMapper' => $mapperFactory->getLazy(UserMapper::class),
@@ -1585,7 +1583,6 @@ abstract class Kernel
                 ReadCache::class,
                 [
                     'redis' => $di->lazyGet('redis.storage'),
-                    'log'   => $di->lazyValue('logger'),
                 ]
             )
         );

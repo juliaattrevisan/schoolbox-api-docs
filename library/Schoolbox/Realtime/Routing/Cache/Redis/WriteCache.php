@@ -11,7 +11,6 @@ use Alaress\Async\Synchroniser;
 use Alaress\Routing\FlatRouter;
 use Alaress_Byte_Format;
 use Predis\ClientInterface;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use UnderflowException;
@@ -37,19 +36,18 @@ class WriteCache extends ReadCache implements WritableCache
      * Constructor
      *
      * @param ClientInterface             $redis
-     * @param LoggerInterface             $log
      * @param Subscription\Loader\Factory $loaderFactory
      * @param ClientInterface             $redisQueue
      */
     public function __construct(
         ClientInterface $redis,
-        LoggerInterface $log,
         Subscription\Loader\Factory $loaderFactory,
         ClientInterface $redisQueue
     ) {
-        parent::__construct($redis, $log);
+        parent::__construct($redis);
         $this->loaderFactory = $loaderFactory;
         $this->redisQueue    = $redisQueue;
+        $this->log = new \Psr\Log\NullLogger();
     }
 
 
