@@ -9,16 +9,21 @@ import Repo from './assets/repo.svg';
 import StackAlt from './assets/stackalt.svg';
 import SchoolboxLogo from './assets/sb-logo-blue.png';
 import StorybookLogo from './assets/storybook.svg';
+import AddingSecret from './assets/adding-secret.png';
+import GithubActions from './assets/github-actions.png';
 
 <Meta title="Introduction" />
 
 <style>{`
+
+  .sbdocs {
+    font-size: 16px;
+  }
+
   .subheading {
     --mediumdark: '#999999';
     font-weight: 900;
-    font-size: 13px;
-    color: #999;
-    letter-spacing: 6px;
+    font-size: 16px;
     line-height: 24px;
     text-transform: uppercase;
     margin-bottom: 12px;
@@ -129,6 +134,12 @@ import StorybookLogo from './assets/storybook.svg';
     width: auto;
   }
 
+  .adding-secret,
+  .github-actions {
+    height: 300px;
+    width: auto;
+  }
+
   
 `}</style>
 
@@ -141,8 +152,32 @@ import StorybookLogo from './assets/storybook.svg';
 _Storybook helps you build UI components in isolation from your app's business logic, data, and context.
 That makes it easy to develop hard-to-reach states. Save these UI states as **stories** to revisit during development, testing, or QA._
 
-The ultimate goal is for Storybook to eventually replace [**The Pantry**](https://demo.schoolbox.com.au/pantry) as our single source of truth for UI Design. 
-Moving forward, new UI will first be designed in Storybook so one day it will contain our entire [**Design System.**](https://storybook.js.org/tutorials/design-systems-for-developers/react/en/introduction/) 
+The ultimate goal is for Storybook to one day replace [**The Pantry**](https://demo.schoolbox.com.au/pantry) as our single source of truth for Schoolbox's entire [**Design System.**](https://storybook.js.org/tutorials/design-systems-for-developers/react/en/introduction/) 
+Moving forward new UI will first be designed and developed in Storybook so we can take advantage of all the handy features it offers. 
+
+<div className="subheading">Getting Started</div>
+
+To run Storybook locally use: `npm run storybook` 
+
+This will fire up a copy of Storybook in your Browser so you can develop your new UI in isolation with the added benefit of live reloading.
+Be sure to add the relevant documentation and stories to new components. The links at the bottom of this page and looking through existing stories should help you get started. 
+
+<div className="subheading">Sharing Stories</div>
+
+Before sharing your first story via [**Chromatic**](https://www.chromatic.com/) you'll need to add an Actions secret to your Github. Within your forked `alaress/schoolbox` repo, select _Settings > Secrets > Actions > New repository secret._
+The secret key value is stored in LastPass under: `CHROMATIC_PROJECT_TOKEN`
+
+<a href="static/media/stories/assets/adding-secret.png" target="_blank"><img src={AddingSecret} alt="Adding Github Actions secret" className="adding-secret" /></a>
+
+With this setup, ensure your branch contains `-sb` in its name. For example: `task-develop-sb/SA-13017`
+
+Branches so marked will update our online [**Storybook**](https://www.chromatic.com/builds?appId=619b379b58fbbb003a84d74d) with your latest changes whenever pushed. 
+To confirm that the branch is updating our Storybook, view the checks list on the pull request:
+
+<img src={GithubActions} alt="Github actions" className="github-actions" />
+
+Once Storybook has been rebuilt and pushed to Chromatic, your changes will be visible in the latest Build. Now you can prompt others for feedback on your work. 
+To always be notified of our latest changes, be sure to join the _#storybook-updates_ Slack channel. 
 
 <div className="subheading">Learn</div>
 
@@ -224,9 +259,4 @@ Moving forward, new UI will first be designed in Storybook so one day it will co
       Providers and mocking for data libraries
     </span>
   </a>
-</div>
-
-<div className="tip-wrapper">
-  <span className="tip">Tip</span>Edit the Markdown of this page in{' '}
-  <code>stories/Introduction.stories.mdx</code>
 </div>
