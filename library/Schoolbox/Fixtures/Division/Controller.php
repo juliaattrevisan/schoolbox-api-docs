@@ -253,15 +253,16 @@ class Controller extends AbstractController
                 }
             )->keys();
 
-        $users = $this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId'));
+        /* Find the people who were chosen but aren't already in this division somewhere
+         * This is the diff of who you chose vs who's already here
+         */
+        $uninvolvedUsers = array_diff($this->getRequest()->post->get('userId'), $involvements);
+
+        /* Hydrate only the guys you need
+         */
+        $users = $this->getUserMapper()->findByColumn('id', $uninvolvedUsers);
 
         foreach ($users as $user) {
-            /* Player is already here
-             */
-            if (\in_array($user->getId(), $involvements, true)) {
-                continue;
-            }
-
             // Don't re-add any players already in the division
             try {
                 $this->divisionUserMapper->save(
