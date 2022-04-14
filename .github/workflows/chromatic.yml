@@ -4,7 +4,11 @@
 name: 'Chromatic'
 
 # Event for the workflow
-on: push
+on: 
+  push:
+    #Branch must contain the -sb in the branch name
+    branches:
+      - '*-sb'
 
 # List of jobs
 jobs:
