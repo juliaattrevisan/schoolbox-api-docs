@@ -12,7 +12,6 @@ namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Notif\Queue\Bindings\GeneratorInterface;
 use Schoolbox\Resource\Folder;
@@ -41,11 +40,12 @@ class Factory
 
     /**
      * @param ClientInterface $redis
+     * @param LoggerInterface $log
      */
-    public function __construct(ClientInterface $redis)
+    public function __construct(ClientInterface $redis, LoggerInterface $log)
     {
         $this->redis = $redis;
-        $this->log   = new NullLogger();
+        $this->log   = $log;
     }
 
 
@@ -76,17 +76,6 @@ class Factory
     public function getNoCache()
     {
         return new BindingLoader($this->getGenerator(), $this->getUserMapper(), $this->getFolderMapper(), $this->log);
-    }
-
-
-    /**
-     * @param LoggerInterface $log
-     * @return $this
-     */
-    public function setLog(LoggerInterface $log): self
-    {
-        $this->log = $log;
-        return $this;
     }
 
 

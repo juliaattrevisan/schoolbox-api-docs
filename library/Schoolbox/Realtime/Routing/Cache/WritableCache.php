@@ -9,8 +9,6 @@
 
 namespace Schoolbox\Realtime\Routing\Cache;
 
-use Psr\Log\LoggerInterface;
-use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use UnderflowException;
 
 interface WritableCache

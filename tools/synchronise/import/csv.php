@@ -147,9 +147,8 @@ if (isset($options['enrolment'])) {
 if (isset($options['user']) || isset($options['enrolment'])) {
     // reload the subscriptions if either users or enrolments were altered
     try {
-        /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
+        /** @var WritableCache $cache */
         $cache = $kernel->get('subscriptionCache');
-        $cache->setLog($logger);
         $cache->cacheAllUsers(INSTANCE_ID);
     } catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
         $logger->error($e->getMessage(), [ 'exception' => $e ]);
