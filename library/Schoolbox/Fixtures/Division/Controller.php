@@ -263,18 +263,14 @@ class Controller extends AbstractController
         $users = $this->getUserMapper()->findByColumn('id', $uninvolvedUsers);
 
         foreach ($users as $user) {
-            // Don't re-add any players already in the division
-            try {
-                $this->divisionUserMapper->save(
-                    $this->divisionUserMapper->createModel()
-                         ->setDivision($division)
-                         ->setUser($user)
-                         ->setSequence(0)
-                );
-            } catch (MapperException $e) {
-                // Probably a duplicate key. That is fine
-            }
+            $this->divisionUserMapper->save(
+                $this->divisionUserMapper->createModel()
+                     ->setDivision($division)
+                     ->setUser($user)
+                     ->setSequence(0)
+            );
         }
+
         $this->renderPostAddPlayersResponse($division);
     }
 
