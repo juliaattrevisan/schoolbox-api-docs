@@ -64,14 +64,14 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="sentiment">Sentiment</label>
-                            {% set sentiment  = (subtype ? subtype.sentiment : type.sentiment) %}
+                            {% set currentSentiment  = (subtype ? subtype.sentiment : type.sentiment) %}
                             <div class="row">
                                 <div class="small-12 columns">
                                     <select id="sentiment" name="sentiment">
                                         {% for sentiment in sentiments %}
                                             <option value="{{ sentiment }}"
                                                     label="{{ sentiment | capitalize }}"
-                                                    {% if (subtype ? subtype.sentiment : type.sentiment) == sentiment %}selected{% endif %}
+                                                    {% if sentiment == currentSentiment %}selected{% endif %}
                                             >{{ sentiment | capitalize }}</option>
                                         {% endfor %}
                                     </select>
