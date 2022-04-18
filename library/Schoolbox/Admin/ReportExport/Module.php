@@ -19,6 +19,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\CampusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -82,6 +83,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(WorkTypeMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
             $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
