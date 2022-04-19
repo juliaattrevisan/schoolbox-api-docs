@@ -31,6 +31,6 @@ class CourseModify
      */
     public static function getUrl(int $courseId): string
     {
-        return strtr(static::URL, ['{course_id}' => $courseId]);
+        return str_replace([self::URL_ID_FRAGMENT], [$courseId], self::URL);
     }
 }

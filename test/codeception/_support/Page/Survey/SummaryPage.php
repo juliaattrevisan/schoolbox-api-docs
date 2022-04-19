@@ -41,7 +41,7 @@ class SummaryPage
      */
     public function generateRoute(int $assessId): string
     {
-        return strtr(static::URL, ['{assess_id}' => $assessId]);
+        return str_replace(['{assess_id}'], [$assessId], self::URL);
     }
 
     /**
