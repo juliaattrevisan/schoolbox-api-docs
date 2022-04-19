@@ -587,7 +587,7 @@ class Controller extends Base
         $roleUserCounts = [];
         $rolesWithUsers = [];
 
-        $allowedRoles   = $this->determineAllowedRoles();
+        $allowedRoles   = $this->pastoralAccessMapper->determineAllowedRoles();
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
@@ -715,7 +715,7 @@ class Controller extends Base
                     'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
-                    'roleTypes'         => $this->determineAllowedRoleTypes(),
+                    'roleTypes'         => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                     'roleUserCounts'    => $roleUserCounts,
                     'rolesWithUsers'    => $rolesWithUsers,
                     'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
@@ -858,8 +858,8 @@ class Controller extends Base
 
         if (is_array($post["role"] ?? null)) {
             $foundRoles       = [];
-            $allowedRoles     = $this->determineAllowedRoles();
-            $allowedRoleTypes = $this->determineAllowedRoleTypes();
+            $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
+            $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post["role"] as $roleId => $accessLevel) {
                 if (in_array($roleId, $foundRoles)) {
                     // should not happen
@@ -1494,31 +1494,6 @@ class Controller extends Base
             $this->getResponse()->status->setCode(400);
         }
         $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-
-    /**
-     * @return GenericCollection<Role>
-     */
-    private function determineAllowedRoles(): GenericCollection
-    {
-        $allowedRoleTypes = [Role::STAFF];
-        if ($this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::PARENT;
-        }
-        return $this->roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
-    }
-
-    /**
-     * @return array<string>
-     */
-    private function determineAllowedRoleTypes(): array
-    {
-        $allowedRoleTypes = [];
-        if ($this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
-            $allowedRoleTypes[] = Role::STUDENT;
-        }
-        return $allowedRoleTypes;
     }
 }
 

@@ -302,6 +302,7 @@ class User extends DeprecatedModel
                 lastname,
                 username,
                 groups.name AS gname,
+                groups.group_type as gtype,
                 groups.id AS gid,
                 lyl.name AS year,
                 local_email,

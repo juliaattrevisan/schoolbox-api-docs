@@ -161,6 +161,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     'last_name' => $user['lastname'],
                     'role' => $user['gname'],
                     'role_id' => $user['gid'],
+                    'roleType' => $user['gtype'],
                     'external_id' => $user['synergy_id']
                 ];
             }

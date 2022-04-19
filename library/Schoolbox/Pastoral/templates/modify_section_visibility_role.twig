@@ -9,12 +9,12 @@
         {% if record.id != '' %}
             {% for userAccess in record.accessWithPermission|filter(userAccess => userAccess.role or userAccess.roleType) %}
                 {% set roleId = null %}
-                {% if userAccess.role %}
-                    {% set roleId = userAccess.role.id %}
-                    {% set roleName = userAccess.role.name %}
-                {% elseif userAccess.roleType %}
+                {% if userAccess.roleType %}
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
                     {% set roleName = userAccess.roleType | capitalize %}
+                {% elseif userAccess.role %}
+                    {% set roleId = userAccess.role.id %}
+                    {% set roleName = userAccess.role.name %}
                 {% endif %}
 
                 {% if roleId %}

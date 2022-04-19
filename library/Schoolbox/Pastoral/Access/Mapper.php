@@ -14,6 +14,7 @@ namespace Schoolbox\Pastoral\Access;
 
 use PDO;
 use PDOStatement;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -139,5 +140,30 @@ class Mapper extends BaseMapper
     public function raiseNotification($object, $verb, $previous = null)
     {
         return true;
+    }
+
+    /**
+     * @return GenericCollection<Role>
+     */
+    public function determineAllowedRoles(): GenericCollection
+    {
+        $allowedRoleTypes = [Role::STAFF];
+        $roleMapper = RoleMapper::getInstance();
+        return $roleMapper->findByColumn('group_type', $allowedRoleTypes)->indexBy('id');
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function determineAllowedRoleTypes(): array
+    {
+        $allowedRoleTypes = [];
+        if ($this->config_loader->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::STUDENT;
+        }
+        if ($this->config_loader->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+            $allowedRoleTypes[] = Role::PARENT;
+        }
+        return $allowedRoleTypes;
     }
 }

@@ -55,6 +55,11 @@ class Controller extends Base
     private Pastoral\Action\Mapper $pastoralActionMapper;
 
     /**
+     * @var Pastoral\Access\Mapper
+     */
+    private Pastoral\Access\Mapper $pastoralAccessMapper;
+
+    /**
      * Icon mapper: the list of icons is fetched from here.
      */
     private IconMapper $iconMapper;
@@ -93,7 +98,8 @@ class Controller extends Base
         Pastoral\Action\Mapper $pastoralActionMapper,
         IconMapper $iconMapper,
         RosettaStone $rosettaStone,
-        ColorFactory $colorFactory
+        ColorFactory $colorFactory,
+        Pastoral\Access\Mapper $pastoralAccessMapper
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
@@ -105,6 +111,7 @@ class Controller extends Base
         $this->iconMapper             = $iconMapper;
         $this->rosettaStone           = $rosettaStone;
         $this->colorFactory           = $colorFactory;
+        $this->pastoralAccessMapper   = $pastoralAccessMapper;
     }
 
 
@@ -203,10 +210,6 @@ class Controller extends Base
     {
         $staffPb = $this->roleMapper->getPredicateBuilder()->equals('group_type', Role::STAFF)->equals('access_pastoral', 1);
         $pb = $this->roleMapper->getPredicateBuilder()->all($staffPb);
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
-            $pb->equals('group_type', Role::PARENT);
-            $pb = $this->roleMapper->getPredicateBuilder()->any($pb);
-        }
 
         $roles     = $this->roleMapper->findByPredicates($pb, ['order' => ['name' => 'ASC']]);
         $roleUsers = [];
@@ -265,9 +268,7 @@ class Controller extends Base
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
-                'roleTypes'       => $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)
-                    ? [Role::STUDENT]
-                    : [],
+                'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                 'roleUserCounts'  => $roleUsers,
                 'rolesWithUsers'  => $roleUsers,
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
