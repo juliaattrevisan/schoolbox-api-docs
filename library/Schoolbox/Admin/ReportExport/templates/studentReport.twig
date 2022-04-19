@@ -190,7 +190,9 @@
     <section class="content">
         <div class="row row__margin-bottom">
             <h1 class="heading__primary">{{ config.school_name }}</h1>
+            {% if config.report_school_logo %}
             <img src="/storage/image.php?hash={{ config.report_school_logo }}&size=square128" alt="{{ config.school_name }}" class="logo" />
+            {% endif %}
         </div>
         <div class="row row__margin-bottom">
             {{ config.report_export_introduction | purify }}
@@ -199,7 +201,7 @@
             <div class="card small-12">
                 <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}"/>
                 <h2 class="heading__secondary">{{ student.fullname }}</h2>
-                <h3 class="heading__tertiary">{{ student.year.name ?? '' }}</h3>
+                <h3 class="heading__tertiary">{{ student.year.longName ?? '' }}</h3>
             </div>
         </div>
         {# Summary #}

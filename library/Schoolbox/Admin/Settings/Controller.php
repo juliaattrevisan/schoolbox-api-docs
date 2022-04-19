@@ -88,24 +88,27 @@ class Controller extends ConfigController
 
         $jsonPayload = [];
 
+        // Configs which is in settings or has different url from the module name
+        // For the other configs, the url will be /adminv2/<module name>
         $module = [
             'settings'   => '/adminv2/setting/%s',
             'comms'      => '/adminv2/news',
-            'lti'        => '/adminv2/lti',
-            'oauth'      => '/adminv2/oauth',
-            'schoolData' => '/adminv2/import/schoolDataImport'
+            'schoolData' => '/adminv2/import/schoolDataImport',
         ];
 
         foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
+            $url = isset($module[$config->getModule()])
+                ? sprintf($module[$config->getModule()], $type)
+                : sprintf("/adminv2/%s", $config->getModule());
 
             $jsonPayload[] = [
                 'name'          => $config->getName(),
                 'title'         => $config->getTitle(),
                 'description'   => $config->getDescription(),
                 'module'        => $config->getModule(),
-                'url'           => sprintf($module[$config->getModule()], $type) . '#' . $config->getName()
+                'url'           => $url . '#' . $config->getName()
             ];
         }
 

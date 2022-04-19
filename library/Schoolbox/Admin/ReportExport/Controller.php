@@ -383,6 +383,9 @@ class Controller extends ConfigController
                     continue;
                 }
                 $participant = $assessment->getParticipantIfExtant($student);
+                if (!$participant) {
+                    continue;
+                }
                 $feedback    = $participant->findMostRecentInstructorGivenPublishedFeedback();
                 if (
                     $includeRubric
@@ -412,7 +415,6 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
-                    ->equals('lct.type', 'Report Export')
-                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_REPORT_EXPORT);
     }
 }

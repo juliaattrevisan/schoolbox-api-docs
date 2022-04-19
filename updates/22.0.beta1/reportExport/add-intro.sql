@@ -1,30 +1,30 @@
-INSERT INTO `lu_config_type` (`type`, `sequence`)
-VALUES ('Report Export', (SELECT MAX(sequence) + 1 FROM lu_config_type lct));
+ALTER TABLE config
+    MODIFY COLUMN `module` ENUM ('settings','comms','custom','oauth','schoolData','lti','report-export') COLLATE utf8mb4_unicode_ci DEFAULT 'settings';
 -- report introduction message
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`,
                       `required`, `module`, `sequence`)
 VALUES ('report_school_logo',
         '',
         'Report school logo',
-        '',
+        'If provided, this image will be displayed at the top of exported reports.',
         (SELECT id FROM lu_config_field WHERE field = 'file'),
         NULL,
-        (SELECT id FROM lu_config_type WHERE type = 'Report Export'),
+        NULL,
         'true',
         'false',
         'false',
-        'settings',
+        'report-export',
         1),
        ('report_export_introduction',
         '',
         'Introduction message',
-        '',
+        'If provided, this text will be displayed at the beginning of exported reports.',
         (SELECT id FROM lu_config_field WHERE field = 'html'),
         NULL,
-        (SELECT id FROM lu_config_type WHERE type = 'Report Export'),
+        NULL,
         'true',
         'false',
         'false',
-        'settings',
+        'report-export',
         2);
 
