@@ -35,7 +35,7 @@
 {% endif %}
 
 {% set deleteRoute = routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', {assessment: currentInteraction.assessable, assessmentId: currentInteraction.assessable.id, participant: participant, studentId: participant.user.id, responseId: currentInteraction.id, response: currentInteraction}) %}
-<ul class="information-list threaded {% if not currentInteraction.isSubmitted %}draftSubmission{% endif %}">
+<ul class="information-list threaded {% if currentInteraction.isDraft %}draftSubmission{% endif %}">
     <li class="actions-small-1">
         <ul class="action-list">
             <li class="actions-small-1">
