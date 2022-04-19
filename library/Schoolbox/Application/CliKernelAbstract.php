@@ -397,8 +397,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     protected function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
-
-        $di->values['logger'] = $this->logger();
         return $di;
     }
 

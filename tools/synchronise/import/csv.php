@@ -103,9 +103,6 @@ $logger = new Logger(
     true
 );
 
-// attach the logger
-$kernel->getDependencyInjector()->values['logger'] = $logger;
-
 if (isset($options['user'])) {
     // User import does not fill down - the others do
     $logger->info('Starting user import...');
@@ -147,8 +144,9 @@ if (isset($options['enrolment'])) {
 if (isset($options['user']) || isset($options['enrolment'])) {
     // reload the subscriptions if either users or enrolments were altered
     try {
-        /** @var WritableCache $cache */
+        /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
         $cache = $kernel->get('subscriptionCache');
+        $cache->setLog($logger);
         $cache->cacheAllUsers(INSTANCE_ID);
     } catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
         $logger->error($e->getMessage(), [ 'exception' => $e ]);

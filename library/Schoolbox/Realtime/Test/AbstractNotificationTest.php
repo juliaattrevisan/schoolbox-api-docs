@@ -279,18 +279,18 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function cacheSubscriptions()
     {
-        $loaderFactory = new Subscription\Loader\Factory($this->redis, $this->log);
+        $loaderFactory = new Subscription\Loader\Factory($this->redis);
+        $loaderFactory->setLog($this->log);
 
         // TODO replace with $di('subscriptionCache')
         // (I'd inject the queue instance as well, but the standard Redis
         //  instance is created with getClientInstance too)
         $cache = new WriteCache(
             $this->redis,
-            $this->log,
             $loaderFactory,
             $this->redisQueue,
         );
-        $cache->cacheAllUsers(INSTANCE_ID);
+        $cache->setLog($this->log)->cacheAllUsers(INSTANCE_ID);
     }
 
     /**

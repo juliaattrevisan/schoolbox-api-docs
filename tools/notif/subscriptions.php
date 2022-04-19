@@ -78,16 +78,19 @@ try {
             $subscriptionCache->setLog($log);
             $this->subscriptionCache = $subscriptionCache;
 
-            if ($opts['user'] && $opts['pattern']) {
+            $searchUser = $opts['user'] ?? null;
+            $pattern = $opts['pattern'] ?? null;
+
+            if ($searchUser && $pattern) {
                 $log->alert('Specify ONLY one of --user=:id or --pattern=:string');
                 return;
             }
 
             try {
-                if ($opts['user']) {
-                    $count = $this->findByUser($opts['user']);
-                } elseif ($opts['pattern']) {
-                    $count = $this->findByPattern($opts['pattern']);
+                if ($searchUser) {
+                    $count = $this->findByUser($searchUser);
+                } elseif ($pattern) {
+                    $count = $this->findByPattern($pattern);
                 } else {
                     echo HALP;
                     return;

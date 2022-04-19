@@ -78,9 +78,9 @@ $kernel->run(
 
         if ($perform) {
             // we need to manually refresh the routing cache now
-            /** @var WritableCache $cache */
+            /** @var \Schoolbox\Realtime\Routing\Cache\Redis\WriteCache $cache */
             $cache = $di->get('subscriptionCache');
-
+            $cache->setLog($log);
             $cache->cacheAllUsers($instanceId);
         }
     }

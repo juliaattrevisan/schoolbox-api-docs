@@ -8,7 +8,6 @@
  */
 
 use Alaress\Redis;
-use Psr\Log\NullLogger;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
@@ -186,12 +185,11 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         // The routing subscription loader is stored in Redis, not jst cached
         // TODO desingleton these
         $redis      = Redis::getCacheClientInstance();
-        $log        = new NullLogger();
         $redisQueue = Redis::getSignalQueueClientInstance();
 
         // update the cache
         // TODO replace with $di('subscriptionCache')
-        $cache = new WriteCache($redis, $log, new Loader\Factory($redis, $log), $redisQueue);
+        $cache = new WriteCache($redis, new Loader\Factory($redis), $redisQueue);
 
         $cache->cacheRedirects(INSTANCE_ID);
     }

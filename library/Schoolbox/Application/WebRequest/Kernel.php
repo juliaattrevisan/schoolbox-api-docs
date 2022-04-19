@@ -523,9 +523,6 @@ class Kernel extends WebKernelAbstract
     protected function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
-
-        // register an empty logger to maintain interfaces as required
-        $di->values['logger'] = new NullLogger();
         return $di;
     }
 
