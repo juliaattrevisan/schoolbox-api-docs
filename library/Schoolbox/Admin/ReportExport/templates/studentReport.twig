@@ -190,12 +190,10 @@
     <section class="content">
         <div class="row row__margin-bottom">
             <h1 class="heading__primary">{{ config.school_name }}</h1>
-            <img src="/images/logo.php?logo=skin_logo_large&amp;size=normal"
-                 srcset="/images/logo.php?logo=skin_logo_large&amp;size=normal 1x,/images/logo.php?logo=skin_logo_large&amp;size=normal 2x"
-                 alt="{{ config.school_name }}" class="logo">
+            <img src="/storage/image.php?hash={{ config.report_school_logo }}&size=square128" alt="{{ config.school_name }}" class="logo" />
         </div>
         <div class="row row__margin-bottom">
-            {{ config.report_export_introduction }}
+            {{ config.report_export_introduction | purify }}
         </div>
         <div class="row row__margin-bottom">
             <div class="card small-12">
