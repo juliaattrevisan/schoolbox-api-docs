@@ -226,9 +226,6 @@ class Kernel extends WebKernelAbstract
         $mapperFactory = new MapperFactory($di);
         $di->set('mapperFactory', $mapperFactory);
 
-        // register an empty logger to maintain interfaces as required
-        $di->values['logger'] = new NullLogger();
-
         // install sentry
         $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';

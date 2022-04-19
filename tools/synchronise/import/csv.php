@@ -103,9 +103,6 @@ $logger = new Logger(
     true
 );
 
-// attach the logger
-$kernel->getDependencyInjector()->values['logger'] = $logger;
-
 if (isset($options['user'])) {
     // User import does not fill down - the others do
     $logger->info('Starting user import...');
