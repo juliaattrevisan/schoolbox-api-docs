@@ -60,7 +60,7 @@ if ($mimes->count()) {
             'FILE_DESC'                => Scrub::text($mime->getDescription()),
             'FILE_MIME'                => $mime->getMime(),
             'FILE_EXTENSION_CSV'       => $extensionCSV,
-            'FILE_ICON'                => $mime->getIconFile(),
+            'FILE_ICON'                => urlencode($mime->getIconFile()),
             'FILE_MAXSIZE'             => $mime->getMaxFileSize() ? $max_size_output : "<em>$placeholder</em>",
             'FILE_MAXSIZE_INPUT'       => $mime->getMaxFileSize() ? $max_size_output : '',
             'FILE_MAXSIZE_PLACEHOLDER' => htmlspecialchars($placeholder, ENT_QUOTES),
@@ -78,7 +78,7 @@ $iconList = $allowedFile->getIconList();
 
 if (is_array($iconList)) {
     foreach ($iconList as $icon) {
-        $this->setVar('IMAGE_FILE', $icon);
+        $this->setVar('IMAGE_FILE', urlencode($icon));
         $this->parse('image_block', 'image', true);
     }
 }
