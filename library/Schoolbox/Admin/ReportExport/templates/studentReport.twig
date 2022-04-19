@@ -98,6 +98,16 @@
         margin-bottom: 2rem;
     }
 
+    .row__flex { 
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .row__flex:before,
+        .row__flex:after {
+            content: none;
+        }
+
     .row__subject-summary-result,
     .row__subject-summary-details {
         border: 1px solid black;
@@ -132,23 +142,19 @@
     }
 
     .heading__primary {
-        font-size: 2rem;
-    }
-
-    .heading__secondary {
         font-size: 1.4rem;
     }
 
-    .heading__tertiary {
+    .heading__secondary {
         font-size: 1.2rem;
+    }
+
+    .heading__tertiary {
+        font-size: 1rem;
     }
 
     .heading__subject {
         margin-bottom: 1rem;
-    }
-
-    .logo {
-        float: right;
     }
 
     /* rubric */
@@ -188,7 +194,7 @@
 </style>
 <div class="small-12 island">
     <section class="content">
-        <div class="row row__margin-bottom">
+        <div class="row row__margin-bottom row__flex">
             <h1 class="heading__primary">{{ config.school_name }}</h1>
             {% if config.report_school_logo %}
             <img src="/storage/image.php?hash={{ config.report_school_logo }}&size=square128" alt="{{ config.school_name }}" class="logo" />
