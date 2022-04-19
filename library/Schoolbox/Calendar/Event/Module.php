@@ -75,7 +75,7 @@ class Module extends BaseModule
                          */
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
-                            $isOwner        = $event->getAuthor()->getId() === $loggedInUser->getId();
+                            $isOwner        = $event->getOwner()->getId() === $loggedInUser->getId();
                             $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
 
                             /* I suppose if you're on the invited list,
