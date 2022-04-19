@@ -12,11 +12,11 @@ namespace Schoolbox\Resource\Browser\Resources;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\UserMapper;
@@ -98,8 +98,8 @@ class Module extends AbstractModule
     {
         try {
             $file = $this->getMapperFactory()->get(FileMapper::class)->findById($params['fileId']);
-        } catch (MapperException\NotFound $e) {
-            throw new SchoolboxException('File Does not Exist', 404, null, 404);
+        } catch (MapperException $e) {
+            throw new NotFound();
         }
         if (!$file instanceof Resource\File\Model) {
             throw new Resource\Exception("Requested file is not a file");
