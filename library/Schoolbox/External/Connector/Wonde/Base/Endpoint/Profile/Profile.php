@@ -60,8 +60,8 @@ class Profile implements IStrategy
      * guaranteed to be populated, so you might have to fall
      * back to this previous implementation
      */
-//    private const EMPLOYEE = 'employee';
-//    private const TEACHER = 'teacher';
+    private const EMPLOYEE = 'employee';
+    private const TEACHER = 'teacher';
 
 
     /**
@@ -828,8 +828,7 @@ class Profile implements IStrategy
                 'contact_details',
                 'employment_details',
                 'groups',
-                'identifiers',
-                'roles',
+                'identifiers'
             ])
         );
 
@@ -865,7 +864,11 @@ class Profile implements IStrategy
                  * $category manifests as meta.category.type in code
                  * which corresponds to Category Type in the UPS ui
                  */
-                $category = $this->findRoleCodes($staff['roles']);
+                $category = self::EMPLOYEE;
+
+                if ($staff['employment_details']['data']['teaching_staff']) {
+                    $category = self::TEACHER;
+                }
 
                 /* Departments are a kind of Wonde Group
                  */
