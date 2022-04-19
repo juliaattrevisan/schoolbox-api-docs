@@ -12,16 +12,16 @@
         vertical-align: middle;
     }
 
-    p, 
-    h1, 
-    h2, 
+    p,
+    h1,
+    h2,
     h3 {
         color: black;
     }
 
     p,
     .rb-value {
-        font-size: 0.825rem;
+        font-size: 0.625rem;
     }
 
     .small-12 {
@@ -61,7 +61,7 @@
         margin-bottom: 1rem;
     }
 
-    .row__flex { 
+    .row__flex {
         display: flex;
         justify-content: space-between;
     }
@@ -74,9 +74,14 @@
     .row__subject-summary-result,
     .row__subject-summary-details,
     .row__subject-details {
-        border: 1px solid black;
+        border-bottom: 1px solid black;
+        border-top: 1px solid black;
         margin-top: -1px; /*to avoid 2px borders */
         padding: 0.5rem 0;
+    }
+
+    .row__subject-details:last-of-type {
+        border-bottom: none;
     }
 
     .row__subject-summary-details {
@@ -116,8 +121,8 @@
         margin-bottom: 0;
     }
 
-    .card img, .card .img {
-        width: 4rem;
+    .compact img {
+        width: 2rem;
     }
 
     .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
@@ -158,7 +163,7 @@
     }
 
     .heading__primary {
-        font-size: 1.4rem;
+        font-size: 1.6rem;
     }
 
     .heading__secondary {
@@ -166,7 +171,7 @@
     }
 
     .heading__tertiary {
-        font-size: 1rem;
+        font-size: 0.8rem;
     }
 
     .heading__subject {
@@ -229,10 +234,13 @@
         </div>
         <div class="row row__margin-bottom">
             <div class="card small-12">
-                <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}"/>
+                <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
                 <h2 class="heading__secondary">{{ student.fullname }}</h2>
                 <h3 class="heading__tertiary">{{ student.year.longName ?? '' }}</h3>
             </div>
+        </div>
+        <div class="row row__margin-bottom">
+            {{ config.report_export_introduction }}
         </div>
         {# Summary #}
         {% if showSummary %}
@@ -278,7 +286,7 @@
                         <h2 class="heading__secondary heading__subject">{{ folder.title }}</h2>
                         {% for teacher in folder.teachers %}
                             <div class="card compact">
-                                <img src="/portrait.php?id={{ teacher.id }}&size=square32"/>
+                                <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
                                 <h2 class="heading__tertiary">{{ teacher.fullname }}</h2>
                             </div>
                         {% endfor %}
