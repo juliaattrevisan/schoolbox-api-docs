@@ -16,7 +16,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
-use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
@@ -99,10 +98,10 @@ class Module extends AbstractModule
     {
         try {
             $file = $this->getMapperFactory()->get(FileMapper::class)->findById($params['fileId']);
-        } catch (MapperException $e) {
+        } catch (MapperException | MapperException\Deleted $e) {
             throw new SchoolboxException('File Does not Exist', 404, null, 404);
         }
-        if (!$file instanceof FileInterface) {
+        if (!$file instanceof Resource\File\Model) {
             throw new Resource\Exception("Requested file is not a file");
         }
 

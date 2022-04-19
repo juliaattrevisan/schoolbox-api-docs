@@ -18,7 +18,6 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractController;
-use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Component_InstanceMapper;
 use Schoolbox\Mapper;
@@ -239,12 +238,12 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param FileInterface $file
+     * @param Resource\File\Model $file
      * @api   PATCH /resources/file/:fileId/ajax
      * @since 22.0
      * @throws Mapper\Exception|Resource\Exception|SchoolboxException
      */
-    public function patchFileInfo(FileInterface $file)
+    public function patchFileInfo(Resource\File\Model $file)
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (isset($data['hidden'])) {
