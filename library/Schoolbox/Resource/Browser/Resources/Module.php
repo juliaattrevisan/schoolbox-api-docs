@@ -98,7 +98,7 @@ class Module extends AbstractModule
     {
         try {
             $file = $this->getMapperFactory()->get(FileMapper::class)->findById($params['fileId']);
-        } catch (MapperException | MapperException\Deleted $e) {
+        } catch (MapperException\NotFound $e) {
             throw new SchoolboxException('File Does not Exist', 404, null, 404);
         }
         if (!$file instanceof Resource\File\Model) {
