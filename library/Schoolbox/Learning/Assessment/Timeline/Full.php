@@ -84,7 +84,7 @@ class Full
      */
     public function getForTeacher()
     {
-        return $this->getTimeline(false, true, false, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
+        return $this->getTimeline(false, true, true, AbstractAssessment::MARK_VISIBILITY_PRIVATE);
     }
 
 
