@@ -239,42 +239,18 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param int $fileId
+     * @param FileInterface $file
      * @api   PATCH /resources/file/:fileId/ajax
      * @since 22.0
      * @throws Mapper\Exception|Resource\Exception|SchoolboxException
      */
-    public function patchFileInfo($fileId)
+    public function patchFileInfo(FileInterface $file)
     {
-        $file = $this->fileMapper->findById($fileId);
-        if (!$file instanceof FileInterface) {
-            throw new Resource\Exception("Requested file is not a file");
-        }
         $data = json_decode(json_encode($this->request->content->get()), true);
-
-        if (array_key_exists('mimeType', $data)) {
-            throw new SchoolboxException("mimeType is unable to be updated at this endpoint");
-        }
-        if (array_key_exists('filesize', $data)) {
-            throw new SchoolboxException("filesize is unable to be updated at this endpoint");
-        }
-        /**
-         * start setting changed values
-         */
-        if (array_key_exists('title', $data)) {
-            $file->setTitle($data['title']);
-        }
-
-        if (array_key_exists('fileName', $data)) {
-            $file->setFilename($data['fileName']);
-        }
-
-        if (array_key_exists('hidden', $data)) {
+        if (isset($data['hidden'])) {
             $file->setHidden($data['hidden']);
-        }
-
-        if (array_key_exists('description', $data)) {
-            $file->setDescription($data['description']);
+        } else {
+            throw new SchoolboxException("Only able to update Hidden option");
         }
         /**
          * save new object
