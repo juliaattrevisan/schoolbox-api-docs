@@ -238,26 +238,52 @@ class Controller extends AbstractController
         }
     }
 
+
     /**
      * Add players to a Division
      *
      * @param Division $division
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function postAddPlayers(Division $division)
+    public function postAddPlayers(Division $division): void
     {
-        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            // Don't re-add any players already in the division
-            try {
-                $this->divisionUserMapper->save(
-                    $this->divisionUserMapper->createModel()
-                                             ->setDivision($division)
-                                             ->setUser($user)
-                                             ->setSequence(0)
-                );
-            } catch (MapperException $e) {
-                // Probably a duplicate key. That is fine
-            }
+        $selectedUsers = $this->getRequest()->post->get('userId');
+
+        /* You didn't add anyone
+         */
+        if (null === $selectedUsers) {
+            $this->renderPostAddPlayersResponse($division);
+            return;
         }
+
+        $involvements = $this->divisionUserMapper
+            ->findByColumn('division_id', $division->getId())
+            ->indexByCallback(
+                static function (DivisionUser $divisionUser) {
+                    return $divisionUser->getUser()->getId();
+                }
+            )->keys();
+
+        /* Find the people who were chosen but aren't already in this division somewhere
+         * This is the diff of who you chose vs who's already here
+         */
+        $uninvolvedUsers = array_diff($selectedUsers, $involvements);
+
+        /* Hydrate only the guys you need
+         */
+        $users = $this->getUserMapper()->findByColumn('id', $uninvolvedUsers);
+
+        foreach ($users as $user) {
+            $this->divisionUserMapper->save(
+                $this->divisionUserMapper->createModel()
+                     ->setDivision($division)
+                     ->setUser($user)
+                     ->setSequence(0)
+            );
+        }
+
         $this->renderPostAddPlayersResponse($division);
     }
 
