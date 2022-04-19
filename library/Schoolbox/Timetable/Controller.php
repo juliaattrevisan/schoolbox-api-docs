@@ -32,6 +32,50 @@ class Controller extends Base
         $this->setExternalTimetableHandler($externalTimetable);
     }
 
+
+    /**
+     * This screen is a FullCalendar view of all timetable-related subscriptions
+     * for a specific user, $user
+     *
+     * @param \Schoolbox\User $user
+     * @param string          $date
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function getTimetableCalendar(\Schoolbox\User $user, string $date): void
+    {
+        /* Selected date
+         */
+        $selectedDate = (new \Alaress_Date_Format($date, 'd-m-Y'))->getDatabaseDate();
+
+        /* TODO: Figure out what happens when school weeks start on a weekend
+         */
+        $weekends = 'false';
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@timetable/timetableCalendar.twig', [
+            'user' => $user,
+            'selectedDate' => $selectedDate,
+            'weekends' => $weekends
+        ])->setTitle(sprintf(
+            'Timetable Calendar for %s',
+            $user->getFullName()
+        )));
+    }
+
+
+    /**
+     * Redirect to today's date
+     *
+     * @param \Schoolbox\User $user
+     * @return void
+     * @throws \InvalidArgumentException
+     */
+    public function getTimetableCalendarRedirect(\Schoolbox\User $user): void
+    {
+        $this->getTimetableCalendar($user, \Alaress_Date_Format::now()->getUsingFormat('d-m-Y'));
+    }
+
+
     /**
      * Outputs a response for getting the next or previous occurence of a
      * timetable day.

@@ -17,11 +17,68 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
 use External_Timetable;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
 
     protected $basename = 'timetable';
+
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes(): void
+    {
+        $getPerms = new Rule\All(
+            new Rule\IsLoggedIn()
+        );
+
+        $preloadUser = function ($params) {
+            return $this->preloadUser($params);
+        };
+
+        $this->register('GET', '/calendar/{date}/{userId}', 'getTimetableCalendar', $getPerms, $preloadUser);
+        $this->register('GET', '/calendar/{userId}', 'getTimetableCalendarRedirect', $getPerms, $preloadUser);
+    }
+
+
+    /**
+     * Preload a User instance
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUser(array $params): array
+    {
+        try {
+            $user = $this->getUserMapper()->findById($params['userId']);
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'user' => $user,
+        ];
+    }
+
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\UserMapper::class);
+    }
+
 
     /**
      * {@inheritdoc}
@@ -34,6 +91,7 @@ class Module extends BaseModule
         ;
     }
 
+
     /**
      * Currently, any logged in user may access any part of the timetable module.
      *
@@ -44,6 +102,7 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
     }
 
+
     /**
      * @inheritdoc
      */
@@ -53,6 +112,7 @@ class Module extends BaseModule
         $timetable = $this->getExternalTimetable();
         return new Controller($timetable);
     }
+
 
     /**
      * @inheritdoc

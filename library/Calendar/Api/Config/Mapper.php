@@ -76,6 +76,44 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         return $this->findOneByColumnList(['event_type' => $eventType, 'connector_class' => $connectorClass]);
     }
 
+
+    /**
+     * Find all the active timetable-related subscriptions
+     *
+     * @return \Schoolbox\GenericCollection
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    public function findActiveTimetableSubscriptions(): \Schoolbox\GenericCollection
+    {
+        /* This is a specific combination of tuples which isn't specifically
+         * defined anywhere conveniently
+         */
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()}
+            WHERE status = 1
+            AND (
+                (event_type = 'SudsTimetable' AND connector_class = 'Schoolbox') OR
+                (event_type = 'Timetable' AND connector_class = 'ExternalConstrained') OR
+                (event_type = 'TimetableDays' AND connector_class = 'External')
+            )
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $stack = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $stack->add($this->hydrate($row));
+        }
+
+        return $stack;
+    }
+
+
     /**
      * The provided eventType and connectorClass combination is an active source
      * in Calendar subscription
