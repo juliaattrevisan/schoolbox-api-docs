@@ -277,6 +277,7 @@ class Controller extends Base
                 'actions'         => $this->pastoralActionMapper->findAll(),
                 'typeActions'     => $subType ? $this->pastoralActionMapper->findForSubtype($subType) : $this->pastoralActionMapper->findforType($type),
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
+                'sentiments'      => Pastoral\Type\Model::SENTIMENT_VALUES,
                 'flagColors'  => [
                     'foreground' => $foregroundColor->getAsRgba(),
                     'background' => $backgroundColor->getAsRgba(),
@@ -353,6 +354,9 @@ class Controller extends Base
             $subType->setTemplate($post['template']);
             $subType->setTemplatePrivate($post['templatePrivate']);
             $subType->setIcon($post['icon'] ?: null);
+            if (in_array($post['sentiment'], Pastoral\Type\Model::SENTIMENT_VALUES)) {
+                $subType->setSentiment($post['sentiment']);
+            }
             $subType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $subType->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralSubTypeMapper->save($subType);
@@ -374,6 +378,9 @@ class Controller extends Base
             $type->setTemplate($post['template']);
             $type->setTemplatePrivate($post['templatePrivate']);
             $type->setIcon($post['icon'] ?: null);
+            if (in_array($post['sentiment'], Pastoral\Type\Model::SENTIMENT_VALUES)) {
+                $type->setSentiment($post['sentiment']);
+            }
             $type->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $type->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralTypeMapper->save($type);

@@ -6,10 +6,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral\Type;
 
 use Alaress\Color\Color;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -28,8 +29,21 @@ class Model implements ISoftDeletable, Sequential
     use ModelTrait\UpdatedBy;
     use ModelTrait\HasSequence;
 
-    /** @var string */
-    protected $name;
+    /**
+     * Sentiment (shared with subtype)
+     */
+    public const SENTIMENT_POSITIVE = 'positive';
+    public const SENTIMENT_NEUTRAL  = 'neutral';
+    public const SENTIMENT_NEGATIVE = 'negative';
+
+    public const SENTIMENT_VALUES = [
+        self::SENTIMENT_POSITIVE,
+        self::SENTIMENT_NEUTRAL,
+        self::SENTIMENT_NEGATIVE,
+    ];
+
+    /** @var string|null */
+    protected ?string $name = null;
 
 
     /**
@@ -56,13 +70,17 @@ class Model implements ISoftDeletable, Sequential
 
 
     /** @var DocumentClassification|null */
-    protected $documentClassification;
+    protected ?DocumentClassification $documentClassification = null;
 
-    /** @var string */
-    protected $externalCode;
+    /**
+     * Optional. Null if not linked to SIS
+     *
+     * @var null|string
+     */
+    private ?string $externalCode = null;
 
     /** @var GenericCollection|Pastoral\SubType\Model[] */
-    private $subTypes;
+    private GenericCollection $subTypes;
 
     /**
      * Visibility locked
@@ -70,22 +88,27 @@ class Model implements ISoftDeletable, Sequential
      */
     private bool $visibilityLocked = false;
 
-    /** @var Collection|Action[] */
-    private $actions;
+    /**
+     * Sentiment 'positive', 'neutral', 'negative'
+     */
+    private string $sentiment = Model::SENTIMENT_NEUTRAL;
+
+    /** @var GenericCollection|Action[] */
+    private GenericCollection $actions;
 
     public function __construct()
     {
         $this->subTypes = new GenericCollection(Pastoral\SubType\Model::class);
-        $this->actions = new GenericCollection(Action::class);
+        $this->actions  = new GenericCollection(Action::class);
     }
 
 
     /**
-     * @param DocumentClassification $documentClassification
+     * @param DocumentClassification|null $documentClassification
      *
      * @return self
      */
-    public function setDocumentClassification($documentClassification)
+    public function setDocumentClassification(?DocumentClassification $documentClassification): self
     {
         $this->documentClassification = $documentClassification;
 
@@ -95,7 +118,7 @@ class Model implements ISoftDeletable, Sequential
     /**
      * @return DocumentClassification|null
      */
-    public function getDocumentClassification()
+    public function getDocumentClassification(): ?DocumentClassification
     {
         return $this->documentClassification;
     }
@@ -105,7 +128,7 @@ class Model implements ISoftDeletable, Sequential
      *
      * @return self
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -113,19 +136,19 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $externalCode
+     * @param null|string $externalCode
      *
      * @return self
      */
-    public function setExternalCode($externalCode)
+    public function setExternalCode(?string $externalCode = null): self
     {
         $this->externalCode = $externalCode;
 
@@ -133,9 +156,9 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getExternalCode()
+    public function getExternalCode(): ?string
     {
         return $this->externalCode;
     }
@@ -151,11 +174,11 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * @param Collection|Pastoral\SubType\Model[] $subTypes
-     * @return $this
+     * @param GenericCollection|Pastoral\SubType\Model[] $subTypes
+     * @return self
      * @throws DomainException
      */
-    public function setSubTypes(Collection $subTypes): self
+    public function setSubTypes(GenericCollection $subTypes): self
     {
         $this->subTypes->replaceWith($subTypes);
         return $this;
@@ -180,7 +203,6 @@ class Model implements ISoftDeletable, Sequential
         $this->template = $template;
         return $this;
     }
-
 
     /**
      * @return string|null
@@ -252,7 +274,25 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return Collection|Action[]
+     * @return string
+     */
+    public function getSentiment(): string
+    {
+        return $this->sentiment;
+    }
+
+    /**
+     * @param string $sentiment
+     * @return static
+     */
+    public function setSentiment(string $sentiment): self
+    {
+        $this->sentiment = $sentiment;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|Action[]
      */
     public function getActions()
     {
@@ -260,11 +300,11 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @param Collection|Action[] $actions
+     * @param GenericCollection|Action[] $actions
      *
      * @return self
      */
-    public function setActions(Collection $actions): self
+    public function setActions(GenericCollection $actions): self
     {
         $this->actions = $actions;
 

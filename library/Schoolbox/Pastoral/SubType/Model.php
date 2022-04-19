@@ -6,16 +6,17 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral\SubType;
 
 use Alaress\Color\Color;
 use JsonSerializable;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Pastoral\Action\Model as Action;
-use Schoolbox\Pastoral\Type as PastoralType;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Sequential;
 
 class Model implements ISoftDeletable, JsonSerializable, Sequential
@@ -28,14 +29,14 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     use ModelTrait\HasSequence;
 
     /**
-     * @var PastoralType\Model
+     * @var PastoralType
      */
     private $pastoralType;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $name;
+    private ?string $name = null;
 
 
     /**
@@ -65,7 +66,7 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      *
      * @var null|string
      */
-    private $externalCode;
+    private ?string $externalCode = null;
 
 
     /**
@@ -74,8 +75,13 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      */
     private bool $visibilityLocked = false;
 
-    /** @var Collection|Action[] */
-    private $actions;
+    /**
+     * Sentiment 'positive', 'neutral', 'negative'
+     */
+    private string $sentiment = PastoralType::SENTIMENT_NEUTRAL;
+
+    /** @var GenericCollection|Action[] */
+    private GenericCollection $actions;
 
     public function __construct()
     {
@@ -85,9 +91,9 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * @param string $name
      *
-     * @return $this
+     * @return self
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -95,19 +101,19 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param PastoralType\Model $pastoralType
+     * @param PastoralType $pastoralType
      *
-     * @return $this
+     * @return self
      */
-    public function setPastoralType($pastoralType)
+    public function setPastoralType($pastoralType): self
     {
         $this->pastoralType = $pastoralType;
 
@@ -115,7 +121,7 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     }
 
     /**
-     * @return PastoralType\Model
+     * @return PastoralType
      */
     public function getPastoralType()
     {
@@ -125,9 +131,9 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * @param null|string $externalCode
      *
-     * @return $this
+     * @return self
      */
-    public function setExternalCode($externalCode = null)
+    public function setExternalCode(?string $externalCode = null): self
     {
         $this->externalCode = $externalCode;
 
@@ -137,7 +143,7 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * @return null|string
      */
-    public function getExternalCode()
+    public function getExternalCode(): ?string
     {
         return $this->externalCode;
     }
@@ -147,7 +153,7 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id'   => $this->getId(),
@@ -244,7 +250,25 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     }
 
     /**
-     * @return Collection|Action[]
+     * @return string
+     */
+    public function getSentiment(): string
+    {
+        return $this->sentiment;
+    }
+
+    /**
+     * @param string $sentiment
+     * @return static
+     */
+    public function setSentiment(string $sentiment): self
+    {
+        $this->sentiment = $sentiment;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection|Action[]
      */
     public function getActions()
     {
@@ -252,11 +276,11 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     }
 
     /**
-     * @param Collection|Action[] $actions
+     * @param GenericCollection|Action[] $actions
      *
      * @return self
      */
-    public function setActions(Collection $actions): self
+    public function setActions(GenericCollection $actions): self
     {
         $this->actions = $actions;
 

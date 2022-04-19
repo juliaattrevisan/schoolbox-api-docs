@@ -61,6 +61,24 @@
                             </div>
                         </div>
                     </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="sentiment">Sentiment</label>
+                            {% set currentSentiment  = (subtype ? subtype.sentiment : type.sentiment) %}
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <select id="sentiment" name="sentiment">
+                                        {% for sentiment in sentiments %}
+                                            <option value="{{ sentiment }}"
+                                                    label="{{ sentiment | capitalize }}"
+                                                    {% if sentiment == currentSentiment %}selected{% endif %}
+                                            >{{ sentiment | capitalize }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">
                         <div class="small-12 columns">
