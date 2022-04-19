@@ -7,7 +7,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Database\Predicate;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -67,6 +66,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     /** @var External_UserInterface */
     private $externalUser;
 
+    private External_Synergetic_Class $externalClass;
+
     /** @var int|null */
     private $fileYearOverride;
 
@@ -117,6 +118,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
         $this->setupDatabase();
         $this->externalUser         = new External_User();
+        $this->externalClass        = new External_Synergetic_Class();
         $this->markType             = $markType;
         $this->fileYearOverride     = $fileYearOverride;
         $this->fileSemesterOverride = $fileSemesterOverride;
@@ -254,22 +256,20 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
-
         $sql = "
             SELECT    COUNT(*) AS result
             FROM      StaffAssessmentMarkBook
             WHERE     HdgAbbrev2 = :markbookIdentifier AND
                       FileYear = :fileYear AND
                       FileSemester = :fileSemester AND
-                      ClassCode IN ({$folderCodeBindings->getPlaceholder()})
+                      {$this->externalClass->getClassCodeQuery(implode(',', $folderCodes))}
         ";
 
-        $params = array_merge([
+        $params = [
             'markbookIdentifier' => $markbookId,
             'fileYear'           => $this->getSystemFileYear(),
             'fileSemester'       => $this->getSystemFileSemester(),
-        ], $folderCodeBindings->getParams());
+        ];
 
         $statement = $this->getConnector()->executeQuery($sql, $params);
 
@@ -304,7 +304,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $fileSemester         = 'fileSemester';
 
         // Delete results from the markbook
-        $bindings = Predicate\Builder::getBindings($folderCodes, 'code');
         $sql      = "
             DELETE      studentBook
             FROM        StudentAssessmentMarkBook studentBook
@@ -317,14 +316,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE       staffBook.HdgAbbrev2 = :{$headingAbbreviation2} AND
                         studentBook.FileYear = :{$fileYear} AND
                         studentBook.FileSemester = :{$fileSemester} AND
-                        staffBook.ClassCode IN ({$bindings->getPlaceholder()})
+                        {$this->externalClass->getClassCodeQuery(implode(',', $folderCodes), 'staffBook')}
         ";
 
-        $params = array_merge([
+        $params = [
             $headingAbbreviation2 => $markbookId,
             $fileYear             => $this->getSystemFileYear(),
             $fileSemester         => $this->getSystemFileSemester(),
-        ], $bindings->getParams());
+        ];
 
         $this->getConnector()->executeQuery($sql, $params);
 
@@ -335,7 +334,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE       staffBook.HdgAbbrev2 = :{$headingAbbreviation2} AND
                         FileYear = :{$fileYear} AND
                         FileSemester = :{$fileSemester} AND
-                        staffBook.ClassCode IN ({$bindings->getPlaceholder()})
+                        {$this->externalClass->getClassCodeQuery(implode(',', $folderCodes), 'staffBook')}
         ";
 
         $statement = $this->getConnector()->prepareQuery($sql);
@@ -439,8 +438,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $externalClass = new External_Synergetic_Class();
-        $class         = $externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
+        $class = $this->externalClass->getClass($classCode, $owner, $fileYear, $fileSemester);
 
         if (empty($class)) {
             $this->logger->warning("Unable to create staff markbook for assessment {$assessment->getId()}: Could not get class {$classCode}");
@@ -635,6 +633,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             if (
                 !in_array(
                     $this->normalizeClassCode($assessmentRemote['ClassCode']),
+                    $markbookFolderCodes,
+                    true
+                ) &&
+                !in_array(
+                    $this->normalizeClassCode("{$assessmentRemote['ClassCampus']}/{$assessmentRemote['ClassCode']}"),
                     $markbookFolderCodes,
                     true
                 )
@@ -932,10 +935,13 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
-        $remoteFolderCodes    = array_column($remoteAssessmentList, 'ClassCode');
+
+        $remoteFolderCodes = array_column($remoteAssessmentList, 'ClassCode');
+        $remoteCampusCodes = array_column($remoteAssessmentList, 'ClassCampus');
+
         $codesNotInRemote     = array_diff(
             $this->normalizeClassCodes($folderCodes),
-            $this->normalizeClassCodes($remoteFolderCodes)
+            $this->normalizeClassCodes($remoteFolderCodes, $remoteCampusCodes)
         );
         $resultType           = $this->getResultType($activity);
         $isCreated            = false;
@@ -1029,8 +1035,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId];
         }
 
-        $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
-
         $sql = "
             SELECT    FileType,
                       FileYear,
@@ -1049,14 +1053,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             WHERE     HdgAbbrev2 = :markbookIdentifier AND
                       FileYear = :fileYear AND
                       FileSemester = :fileSemester AND
-                      ClassCode IN ({$folderCodeBindings->getPlaceholder()})
+                      {$this->externalClass->getClassCodeQuery(implode(',', $folderCodes))}
         ";
 
-        $params = array_merge([
+        $params = [
             'markbookIdentifier' => $markbookId,
             'fileYear'           => $fileYear,
             'fileSemester'       => $fileSemester,
-        ], $folderCodeBindings->getParams());
+        ];
 
         $result = $this->getConnector()->executeQuery($sql, $params)->fetchAll();
         if (count($result)) {
@@ -1220,10 +1224,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * case-sensitive.
      *
      * @param array&string[] $classCodes
+     * @param array|null     $campusCodes
      * @return array
      */
-    private function normalizeClassCodes(array $classCodes): array
+    private function normalizeClassCodes(array $classCodes, ?array $campusCodes = null): array
     {
-        return array_map([$this, 'normalizeClassCode'], $classCodes);
+        $normalizedClassCodes = array_map([$this, 'normalizeClassCode'], $classCodes);
+        if (!is_array($campusCodes) || count($classCodes) !== count($campusCodes)) {
+            return $normalizedClassCodes;
+        }
+        $codeWithCampus = [];
+        for ($i = 0; $i < count($classCodes); $i++) {
+            $codeWithCampus[] = "{$campusCodes[$i]}/{$classCodes[$i]}";
+        }
+        return array_merge(
+            $normalizedClassCodes,
+            array_map([$this, 'normalizeClassCode',], array_unique($codeWithCampus))
+        );
     }
 }
