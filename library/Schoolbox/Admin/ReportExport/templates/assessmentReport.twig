@@ -1,0 +1,36 @@
+{#
+assessment
+#}
+<div class="row row__{{ page }}-details">
+    <div class="small-10 columns">
+        <h3 class="heading__tertiary">{{ assessment.title }}</h3>
+    </div>
+    <div class="small-2 columns">
+        {% if feedback %}
+            {% set grade = feedback.humanReadableMark %}
+            {% if showGrades and grade %}
+                <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="small-12 columns">
+        {% if showRubrics and feedback and feedback.rubricMarkedGrid %}
+            <div class="rubric-wrap">
+                {% include '@rubric/grid.twig' with {
+                    rubricGrid:       feedback.rubricMarkedGrid.grid,
+                    rubricMarkedGrid: feedback.rubricMarkedGrid,
+                    learner: student,
+                    showDescriptorValue: true,
+                    showGroupTotal: true,
+                    showRubricTotal: true,
+                    selfAssessmentFeedback: null
+                } only %}
+            </div>
+        {% endif %}
+        {% if showComments and feedback and feedback.comment %}
+            <div class="small-12 columns">
+                <p>{{ feedback.comment | linkify | nl2br }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

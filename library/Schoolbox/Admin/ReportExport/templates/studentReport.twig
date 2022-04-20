@@ -147,6 +147,22 @@
         margin-bottom: 1rem;
     }
 
+    .logo {
+        float: right;
+    }
+
+    /* rubric */
+    .rb th, .rb td {
+        border: solid 1px #8c8c8c;
+    }
+    .rb-description, .rb-value {
+        color: #acacac;
+    }
+
+    .rb-selected .rb-description, .rb-selected .rb-value {
+        color: #000000;
+    }
+
     @page {
         counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
@@ -174,12 +190,18 @@
     <section class="content">
         <div class="row row__margin-bottom">
             <h1 class="heading__primary">{{ config.school_name }}</h1>
+            {% if config.report_school_logo %}
+            <img src="/storage/image.php?hash={{ config.report_school_logo }}&size=square128" alt="{{ config.school_name }}" class="logo" />
+            {% endif %}
+        </div>
+        <div class="row row__margin-bottom">
+            {{ config.report_export_introduction | purify }}
         </div>
         <div class="row row__margin-bottom">
             <div class="card small-12">
                 <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}"/>
                 <h2 class="heading__secondary">{{ student.fullname }}</h2>
-                <h3 class="heading__tertiary">{{ student.year.name ?? '' }}</h3>
+                <h3 class="heading__tertiary">{{ student.year.longName ?? '' }}</h3>
             </div>
         </div>
         {# Summary #}
@@ -198,28 +220,17 @@
                 </div>
                 {% if (summaryAssessments[folder.id] ?? [])| length %}
                     {% for assessment in summaryAssessments[folder.id] %}
-                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                        <div class="row row__subject-summary-details">
-                            <div class="small-10 columns">
-                                <h3 class="heading__tertiary">{{ assessment.title }}</h3>
-                            </div>
-                            <div class="small-2 columns">
-                                {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-                                    {% set grade = assessment.humanReadableMark(participant, true) %}
-                                    {% if showSummaryGrades and grade %}
-                                        <h3 class="heading__tertiary text-center">{{ grade }}</h3>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-                                {% if showSummaryComments and feedback and feedback.comment %}
-                                    <div class="small-12 columns">
-                                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        </div>
+                        {#                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %} #}
+                        {% include '@adminReportExport/assessmentReport.twig' with
+                            {
+                                student: student,
+                                assessment: assessment,
+                                feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
+                                showGrades: showSummaryGrades,
+                                showComments: showSummaryComments,
+                                showRubrics: showSummaryRubrics,
+                                page: 'subject-summary'
+                            } only %}
                     {% endfor %}
                 {% endif %}
             {% endfor %}
@@ -253,28 +264,16 @@
                 </div>
                 {% if (classAssessments[folder.id] ?? [])| length %}
                     {% for assessment in classAssessments[folder.id] %}
-                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                        <div class="row row__subject-detail">
-                            <div class="small-10 columns">
-                                <h3 class="heading__tertiary">{{ assessment.title }}</h3>
-                            </div>
-                            <div class="small-2 columns">
-                                {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-                                    {% set grade = assessment.humanReadableMark(participant, true) %}
-                                    {% if showClassGrades and grade %}
-                                        <h3 class="heading__tertiary text-right">{{ grade }}</h3>
-                                    {% endif %}
-                                {% endif %}
-                            </div>
-                            {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-                                {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-                                {% if showClassComments and feedback and feedback.comment %}
-                                    <div class="small-12 columns">
-                                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        </div>
+                        {% include '@adminReportExport/assessmentReport.twig' with
+                            {
+                                student: student,
+                                assessment: assessment,
+                                feedback: classAssessmentFeedbacks[assessment.id] ?? null,
+                                showGrades: showClassGrades,
+                                showComments: showClassComments,
+                                showRubrics: showClassRubrics,
+                                page: 'subject'
+                            } only %}
                     {% endfor %}
                 {% endif %}
             {% endfor %}
