@@ -99,6 +99,7 @@ class Controller extends Base
                 'template' => '@pastoralManagement/groups_modify.twig',
                 'data'     => [
                     'group'               => $group,
+                    'roleTypes'           => null,
                     'roles'               => $roles,
                     'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                     'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
