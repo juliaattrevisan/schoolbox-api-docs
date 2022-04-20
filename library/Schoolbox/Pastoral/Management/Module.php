@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
@@ -56,6 +57,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Member\Mapper::class),
+            $this->getMapperFactory()->get(PastoralAccessMapper::class),
         );
     }
 

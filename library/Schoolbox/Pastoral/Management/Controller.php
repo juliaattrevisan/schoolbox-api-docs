@@ -9,6 +9,7 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
@@ -27,6 +28,9 @@ class Controller extends Base
     /** PastoralGroupMemberMapper */
     private PastoralGroupMemberMapper $pastoralGroupMemberMapper;
 
+    /** @var PastoralAccessMapper $pastoralAccessMapper */
+    protected PastoralAccessMapper $pastoralAccessMapper;
+
     /** UserMapper */
     private UserMapper $userMapper;
 
@@ -41,17 +45,20 @@ class Controller extends Base
      * @param RoleMapper                $roleMapper
      * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     * @param PastoralAccessMapper      $pastoralAccessMapper
      */
     public function __construct(
         UserMapper $userMapper,
         RoleMapper $roleMapper,
         PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper
+        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
+        PastoralAccessMapper $pastoralAccessMapper
     ) {
         $this->userMapper                = $userMapper;
         $this->roleMapper                = $roleMapper;
         $this->pastoralGroupMapper       = $pastoralGroupMapper;
         $this->pastoralGroupMemberMapper = $pastoralGroupMemberMapper;
+        $this->pastoralAccessMapper      = $pastoralAccessMapper;
     }
 
     /**
@@ -99,6 +106,7 @@ class Controller extends Base
                 'template' => '@pastoralManagement/groups_modify.twig',
                 'data'     => [
                     'group'               => $group,
+                    'roleTypes'           => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                     'roles'               => $roles,
                     'moderatorIds'        => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                     'minimumSearchLength' => Results::MIN_SEARCH_LENGTH,
