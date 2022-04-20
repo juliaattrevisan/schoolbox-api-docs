@@ -55,12 +55,22 @@ SELECT
     assessment.id, assessment.title, assessment.weight,
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
+    student.title as `studentTitle`,
+    student.firstname as `studentFirstname`,
+    student.lastname as `studentLastname`,
+    student.synergy_id as `studentExternalId`,
 
     COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
     COALESCE(submission_return.mark, lti_assessment_score.score_given) as `mark`,
     submission_return.norm_mark,
     submission_return.resubmission_required as `resubmission_required`,
-    COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) as `instructorFeedback`
+
+    staff.id as `staffId`,
+    staff.title as `staffTitle`,
+    staff.firstname as `staffFirstname`,
+    staff.lastname as `staffLastname`,
+    staff.synergy_id as `staffExternalId`
+
 
 FROM v_most_recent_feedback
 
@@ -71,6 +81,10 @@ LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completi
 LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
 
 LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
+
+LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
+
+LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
 
 WHERE v_most_recent_feedback.assessment_id = :id";
 
@@ -89,13 +103,25 @@ WHERE v_most_recent_feedback.assessment_id = :id";
             $output['title'] = $row['title'];
             $output['weight'] = $row['weight'];
             $output['participants'][] = [
-                'userId' => $row['student_id'],
+                'student' => [
+                    'id' => $row['student_id'],
+                    'title' => $row['studentTitle'],
+                    'firstName' => $row['studentFirstname'],
+                    'lastName' => $row['studentLastname'],
+                    'externalId' => $row['studentExternalId'],
+                ],
                 'mark'  => $row['mark'],
                 'normalisedMark' => $row['norm_mark'],
                 'comment' => $row['comment'],
                 'date'  => $row['completionDate'],
                 'resubmissionRequired'  => $this->helper->castToBool($row['resubmission_required']),
-                'assessorId'            => $row['instructorFeedback']
+                'assessor'            => [
+                    'id' => $row['staffId'],
+                    'title' => $row['staffTitle'],
+                    'firstName' => $row['staffFirstname'],
+                    'lastName' => $row['staffLastname'],
+                    'externalId' => $row['staffExternalId'],
+                ]
 
             ];
         }
