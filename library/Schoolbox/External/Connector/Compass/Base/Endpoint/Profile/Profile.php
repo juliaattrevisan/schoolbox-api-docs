@@ -807,9 +807,40 @@ class Profile implements IStrategy
                 continue;
             }
 
-            /* TODO Waht about emailAllowed field?
+            $email = '';
+            $phoneHome = '';
+            $phoneMobile = '';
+
+            /* This doesn't exist for Compass parents
              */
-            $email = trim((string)$parent['emailAddress']);
+            $phoneWork = '';
+
+            /* Do Not Contact
+             * If this is ticked in the compass ui, don't get any phone/email info
+             * The Compass API puts it out in a non-double-negative manner, 'contactable'
+             */
+            if ($parent['contactable']) {
+                /* If Email Allowed is ticked, get their email address
+                 */
+                if ($parent['emailAllowed']) {
+                    $email = trim((string)$parent['emailAddress']);
+                }
+
+                $phoneHome = trim((string)$parent['homePhoneNumber']);
+
+                /* If SMS Allowed is ticked, get their mobile number
+                 */
+                if ($parent['smsAllowed']) {
+                    $phoneMobile = trim((string)$parent['mobileNumber']);
+                }
+            } else {
+                $this->log->debug(sprintf(
+                    'Parent %s %s (externalId %s) is not contactable; disregarding email and phone fields.',
+                    $parent['firstName'],
+                    $parent['lastName'],
+                    $externalId
+                ));
+            }
 
             /* Prioritise preferred names over official names
              */
@@ -825,9 +856,6 @@ class Profile implements IStrategy
                 $parent['lastName']
             ]);
 
-            $phoneHome = trim((string)$parent['homePhoneNumber']);
-            $phoneMobile = trim((string)$parent['mobileNumber']);
-            $phoneWork = '';
             $relationship = trim((string)$relationship['type']);
             $title = trim((string)$parent['title']);
             $username = trim((string)$parent['username']);
