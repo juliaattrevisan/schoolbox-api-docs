@@ -73,7 +73,7 @@ class AssessmentAudit
 
         course_implementation.folder_id as course_implementation_folder_id,
         course_unit_implementation_out.folder_id as course_unit_implementation_folder_id,
-        course_specification.folder_id AS course_specification_folder_id,
+        COALESCE(course_specification.folder_id, course_imp_spec.folder_id) AS course_specification_folder_id,
         course_unit_specification.folder_id as course_unit_specification_folder_id,
 
         submission_box.accept_submission AS acceptSubmission,
@@ -91,7 +91,8 @@ class AssessmentAudit
         assessment.publish_date as publishDate,
         assessment.due_date as dueDate,
         unit_spec_folder.name as unitSpecName,
-        unit_imp_folder.name as unitImpName
+        unit_imp_folder.name as unitImpName,
+        COALESCE(course_spec_folder.name, course_imp_spec_folder.name) as courseName
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -105,18 +106,21 @@ class AssessmentAudit
         LEFT JOIN assessment_course_unit_implementation on v_assessment_relation.assessment_id = assessment_course_unit_implementation.assessment_id
         LEFT JOIN course_specification on v_assessment_relation.course_specification_id = course_specification.id
         LEFT JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
+        LEFT JOIN course_specification course_imp_spec on course_implementation.course_specification_id = course_imp_spec.id
         LEFT JOIN course_unit_specification on v_assessment_relation.course_unit_specification_id = course_unit_specification.id
         LEFT JOIN course_unit_implementation on v_assessment_relation.course_unit_implementation_id = course_unit_implementation.id
         LEFT JOIN course_unit_specification as course_unit_implementation_out on course_unit_implementation.course_unit_specification_id = course_unit_implementation_out.id
         LEFT JOIN folder as unit_spec_folder on course_unit_specification.folder_id = unit_spec_folder.id
         LEFT JOIN folder as unit_imp_folder on course_unit_implementation_out.folder_id = unit_imp_folder.id
+        LEFT JOIN folder as course_imp_spec_folder on course_imp_spec.folder_id = course_imp_spec_folder.id
+        LEFT JOIN folder as course_spec_folder on course_specification.folder_id = course_spec_folder.id
 
         WHERE v_assessment_relation.folder_id IN (" . implode(',', $allFolders->getPropertyValues('id')) . ")
         AND assessment.deleted_at IS NULL");
 
 
         //build the csv
-        $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId',
+        $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
                         'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility'];
         header('Content-type: text/csv; charset=utf-8');
@@ -189,6 +193,7 @@ class AssessmentAudit
                 implode(',', $allFolders[$row['folderID']]->getYearLevels()->getPropertyValues('name')),
                 $allFolders[$row['folderID']]->getCodeString(),
                 $courseFolderId,
+                $row['courseName'],
                 $unitCourseFolderId,
                 $unitFolderName,
                 $row['assessmentWorkType'],
