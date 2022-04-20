@@ -19,6 +19,7 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
 
+    protected Helper $helper;
 
     protected IConnector $dbMapper;
     /**
@@ -27,6 +28,7 @@ class Controller extends Base
      */
     public function __construct()
     {
+        $this->helper = new Helper();
     }
 
     /**
@@ -56,7 +58,9 @@ SELECT
 
     COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
     COALESCE(submission_return.mark, lti_assessment_score.score_given) as `mark`,
-    submission_return.norm_mark
+    submission_return.norm_mark,
+    submission_return.resubmission_required as `resubmission_required`,
+    COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) as `instructorFeedback`
 
 FROM v_most_recent_feedback
 
@@ -90,6 +94,8 @@ WHERE v_most_recent_feedback.assessment_id = :id";
                 'normalisedMark' => $row['norm_mark'],
                 'comment' => $row['comment'],
                 'date'  => $row['completionDate'],
+                'resubmissionRequired'  => $this->helper->castToBool($row['resubmission_required']),
+                'assessorId'            => $row['instructorFeedback']
 
             ];
         }
