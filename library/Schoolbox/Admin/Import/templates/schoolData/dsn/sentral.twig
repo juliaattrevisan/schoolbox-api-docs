@@ -1,0 +1,29 @@
+{##
+ # Sentral SUDS Configuration fragment
+ #
+ # A list of dsn pieces for this suds connector are provided by their key names already
+ # via the include of this template
+ #
+ # @param string|null $key
+ # @param string|null $tenant
+ #}
+<div data-data-source="sentral" style="display:none">
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <h3>Sentral Configuration</h3>
+
+                <div class="row">
+                    <div class="small-12 medium-8 columns">
+                        <label class="required">Key</label>
+                        <input type="text" class='required' name="dsn[sentral][key]" value="{{ key ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-4 columns">
+                        <label class="required">Tenant</label>
+                        <input type="text" class='required' name="dsn[sentral][tenant]" value="{{ tenant ?? ''}}" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </section>
+</div>

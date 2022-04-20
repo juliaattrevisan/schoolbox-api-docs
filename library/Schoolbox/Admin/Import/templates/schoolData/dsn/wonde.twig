@@ -1,0 +1,29 @@
+{##
+ # Wonde SUDS Configuration fragment
+ #
+ # A list of dsn pieces for this suds connector are provided by their key names already
+ # via the include of this template
+ #
+ # @param string|null $school
+ # @param string|null $token
+ #}
+<div data-data-source="wonde" style="display:none">
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <h3>Wonde Configuration</h3>
+
+                <div class="row">
+                    <div class="small-12 medium-4 columns">
+                        <label class="required">School Identifier</label>
+                        <input type="text" class='required' name="dsn[wonde][school]" value="{{ school ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-8 columns">
+                        <label class="required">Token</label>
+                        <input type="text" class='required' name="dsn[wonde][token]" value="{{ token ?? ''}}" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </section>
+</div>

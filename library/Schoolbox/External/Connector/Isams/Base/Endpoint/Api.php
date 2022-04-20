@@ -14,6 +14,7 @@ use Alaress_Curl_Url;
 use RuntimeException;
 use Laminas\Uri\Exception;
 use Laminas\Uri\Uri;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
 /**
  * Class Api
@@ -93,16 +94,18 @@ class Api implements IApi
      *
      * @return Uri
      * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @throws Exception\InvalidUriPartException|\DomainException
      */
     public function getUrl(): Uri
     {
+        $credentials = (new DSN())->decode($this->apiKey);
+
         if (!$this->url) {
             $this->url = (new Uri())
                 ->setScheme('https')
                 ->setHost($this->host)
                 ->setPath('/api/batch/1.0/xml.ashx')
-                ->setQuery(['apikey' => $this->apiKey]);
+                ->setQuery(['apikey' => $credentials['key']]);
         }
 
         return $this->url;

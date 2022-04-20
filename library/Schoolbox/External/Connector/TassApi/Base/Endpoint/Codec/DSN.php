@@ -10,11 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
 
 use function count;
 
 /**
- * Class DSNCodec
+ * Class DSN
  *
  * Encodes/decodes a dsn format for the Tass Api Endpoint configuration.
  * Tass uses three pieces to authenticate access to their api:
@@ -30,7 +31,7 @@ use function count;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
-class DSN
+class DSN implements IDSN
 {
 
     /**
@@ -51,7 +52,7 @@ class DSN
      * followed by key-value pairs
      * separated by comma
      */
-    private const DSN_FORMAT = '/([^:]+):companycode=([^;]+);appcode=([^;]+);token=([^;,]+)/';
+    private const DSN_FORMAT = '/([^:]+):companycode=([^;]*);appcode=([^;]*);token=([^;,]*)/';
 
 
     /**
@@ -77,9 +78,22 @@ class DSN
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
 
+            $suppliedPieces = array_filter([
+                $matches[2] ?? null,
+                $matches[3] ?? null,
+                $matches[4] ?? null
+            ]);
+
+            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
+             * If schoolcalendarandnotices had no credentials; skip it
+             */
+            if (isset($matches[1]) && self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count($suppliedPieces)) {
+                continue;
+            }
+
             /* Check the dsn format matches correctly
              */
-            if (!count($matches)) {
+            if (!count($suppliedPieces)) {
                 throw new DomainException('Tass API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
             }
 
@@ -115,6 +129,13 @@ class DSN
         $struct = [];
 
         foreach ($parts as $module => $pairs) {
+            /* Skip encoding of the optional schoolcalendarandnotices
+             * if none of its parts were meaningful
+             */
+            if (self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $module && !\count(array_filter([ $pairs['companycode'], $pairs['appcode'], $pairs['token'] ]))) {
+                continue;
+            }
+
             $module = "{$module}:";
 
             $tuples = [];

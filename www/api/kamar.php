@@ -31,7 +31,8 @@ $cacheDir = $setup->getCacheDir();
 /* Authentication
  * A username/password tuple, colon separated
  */
-$apiKey = Loader::getInstance()->get('schooldata_import_endpoint_key');
+$apiKey = (new \Schoolbox\External\Connector\Kamar\Base\Endpoint\Codec\DSN())
+    ->decode(Loader::getInstance()->get('schooldata_import_endpoint_key'))['key'];
 
 /* Testing independently of a Kamar push
  *

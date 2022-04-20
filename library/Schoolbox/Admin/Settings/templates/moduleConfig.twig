@@ -137,6 +137,10 @@
                     {% endfor %}
             </fieldset>
         </section>
+
+        {% block secondarySection %}
+        {% endblock %}
+
         {% if isEditable %}
             {% if hasColourPicker or hasAttachzone %}
                 {% set usePolling = 1 %}

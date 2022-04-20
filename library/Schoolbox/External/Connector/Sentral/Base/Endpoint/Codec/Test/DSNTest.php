@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ApiTest
+ * DSNest
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
@@ -10,31 +10,31 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Test;
+namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\Test;
 
 use DomainException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\DSN;
 
 /**
- * Class ApiTest
+ * Class DSNTest
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Test
+ * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\Test
  */
-class ApiTest extends TestCase
+class DSNTest extends TestCase
 {
 
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecode
+     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
      */
     public function testValidDSNDecode(string $dsn, array $expected): void
     {
-        $codec = new DSNCodec();
+        $codec = new DSN();
 
         $this->assertEquals($expected, $codec->decode($dsn));
     }
@@ -45,7 +45,7 @@ class ApiTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecode(): array
+    public function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1' => [
@@ -62,7 +62,7 @@ class ApiTest extends TestCase
     /**
      * Test invalid DSN strings (these throw DomainExceptions)
      *
-     * @dataProvider provider_invalidDSNDecode
+     * @dataProvider providerInvalidDSNDecode
      * @param string $dsn
      * @throws DomainException
      *
@@ -70,7 +70,7 @@ class ApiTest extends TestCase
     public function testInvalidDSNDecode(string $dsn): void
     {
         $this->expectException(DomainException::class);
-        $codec = new DSNCodec();
+        $codec = new DSN();
         $codec->decode($dsn);
     }
 
@@ -81,7 +81,7 @@ class ApiTest extends TestCase
      *
      * @return array
      */
-    public function provider_invalidDSNDecode(): array
+    public function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1' => [

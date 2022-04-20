@@ -21,6 +21,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\Mapper\Exception;
@@ -82,14 +83,22 @@ class Controller extends ConfigController
 
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
+        $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
 
         $hasIndicator = $host !== '' && $key !== '';
+
+        /* Check the DSN assembly here - produce the corresponding DSN codec,
+         * decode the parts, then provide it to the ui elements
+         *
+         * Shank it directly into configContext because that was a thing
+         */
+        $configContext['dsn'][$dataSource] = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
-            'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
+            'dataSource' => $dataSource,
             'configContext' => $configContext,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
@@ -109,7 +118,25 @@ class Controller extends ConfigController
      */
     public function postSchoolDataOptions(): void
     {
-        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
+        $postData = $this->request->post->get();
+
+        /* Check the DSN assembly here - produce the corresponding DSN codec,
+         * encode the parts, modify $postData, then save it
+         *
+         * This is the schooldata endpoint key which we would have assembled manually
+         */
+        $postData['schooldata_import_endpoint_key'] = (new DSNFactory())->produceDSNString($postData['schooldata_import_data_source'], $postData['dsn']);
+
+        /* We don't need this array element which has no corresponding db rows
+         */
+        unset($postData['dsn']);
+
+        /* Save it
+         */
+        $this->updateConfig($postData, $this->buildConfigPredicate());
+
+        /* Go back to the place from whence you came
+         */
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
     }
 

@@ -1,0 +1,13 @@
+{% extends '@settings/moduleConfig.twig' %}
+
+{# An arsenal of configs that we can dynamically populate
+ # Injected straight into moduleConfig.twig
+ #}
+{% block secondarySection %}
+    {% include '@adminImportIndex/schoolData/dsn/wonde.twig' with (dsn.wonde ?? {}) only %}
+    {% include '@adminImportIndex/schoolData/dsn/tassapi.twig' with (dsn.tassapi ?? {}) only %}
+    {% include '@adminImportIndex/schoolData/dsn/compass.twig' with (dsn.compass ?? {}) only %}
+    {% include '@adminImportIndex/schoolData/dsn/sentral.twig' with (dsn.sentral ?? {}) only %}
+    {% include '@adminImportIndex/schoolData/dsn/isams.twig' with (dsn.isams ?? {}) only %}
+    {% include '@adminImportIndex/schoolData/dsn/kamar.twig' with (dsn.kamar ?? {}) only %}
+{% endblock %}

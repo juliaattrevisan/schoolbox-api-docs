@@ -10,11 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec;
 
 use DomainException;
+use Schoolbox\External\Importer\Endpoint\IDSN;
 
 use function count;
 
 /**
- * Class DSNCodec
+ * Class DSN
  *
  * Wonde configuration requires two identifying pieces:
  *  - School id, in the format A1234567...
@@ -22,9 +23,9 @@ use function count;
  *
  * The school id is used in every endpoint request.
  *
- * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
+ * @package Schoolbox\External\Connector\Wonde\Base\Endpoint
  */
-class DSN
+class DSN implements IDSN
 {
 
     /**
@@ -75,7 +76,7 @@ class DSN
     /**
      * Encode a dsn string for a particular tass product
      *
-     * $parts consists of module, companycode, appcode, token strings and pairs
+     * $parts consists of (school, token) pairs
      *
      * @param array $parts
      * @return string

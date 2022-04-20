@@ -136,6 +136,11 @@
             });
 
             toggleCustomHours();
+
+            /* Hide all fragments and disable all their inputs
+             */
+            $('[data-data-source]').hide();
+            $('[data-data-source] input').prop('disabled', true)
         }
 
 
@@ -150,6 +155,19 @@
             });
 
             toggleCustomHours();
+
+            /* Decide which fragment we're showing here
+             * Hide all fragments and disable all their inputs
+             */
+            $('[data-data-source]').hide();
+            $('[data-data-source] input').prop('disabled', true)
+
+            /* Then show the one we chose
+             */
+            const dataSource = $('#schooldata_import_data_source-field').val();
+
+            $('[data-data-source="'+dataSource+'"]').show();
+            $('[data-data-source="'+dataSource+'"] input').prop('disabled', false);
         }
     });
 </script>
@@ -167,7 +185,7 @@
                 <h2 class="subheader">School Data Import</h2>
             </div>
 
-            {% include '@settings/moduleConfig.twig' with configContext only %}
+            {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
 
             <div class="small-12 island" id="status-island">
                 <div class="row">
