@@ -20,11 +20,9 @@ $app = new class extends CliTool\App {
     {
         return [
             'help',
-            'user:',
             'role:',
             'roletype:',
             'namespace:',
-            'all',
         ];
     }
 
