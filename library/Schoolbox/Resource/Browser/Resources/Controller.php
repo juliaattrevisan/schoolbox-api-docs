@@ -110,7 +110,7 @@ class Controller extends AbstractController
      */
     public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper);
+        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper, $this->getRouter());
         $homepage_id = $filesBuilder->getHomepage($componentID);
         $homepage = $this->folderMapper->findById($homepage_id);
 

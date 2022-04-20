@@ -338,7 +338,7 @@ export default {
          * replayed on any state change
          *
          * @param { Object }
-         * 
+         *
          * @returns { String }
          */
         getVisibilityAction (file) {
@@ -359,7 +359,7 @@ export default {
             const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id);
             try {
                 const invertedFileHidden = !fileInTableData.hidden; //to pass through to the endpoint
-                const response = await fetch(`/resources/file/${toggledFile.id}/ajax`, {
+                const response = await fetch(toggledFile.visibilityUrl, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -372,7 +372,7 @@ export default {
                 fileInTableData.hidden = responseData.hidden;
             } catch (error) {
                 console.warn(error);
-            } 
+            }
         },
 
         /**
@@ -481,11 +481,11 @@ export default {
                             @on-filter-change="onFilterChange"
                         />
                     </template>
-                    <template #name="props"> 
+                    <template #name="props">
                         <div>
                             <a data-plugin="preview" :href="props.row.url" rel="external">
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description"> 
+                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
                                     {{ props.row.name }}
                                 </h3>
                             </a>
