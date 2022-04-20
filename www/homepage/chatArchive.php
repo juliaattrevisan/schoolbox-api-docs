@@ -31,7 +31,7 @@ $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 $chatHandler = new Chat();
 
 if (!is_numeric($this->arg[0] ?? null)) {
-    error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+    error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
 }
 
 // setup filters

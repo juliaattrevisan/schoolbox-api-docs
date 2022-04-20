@@ -17,20 +17,27 @@ $groupHandler = new Group();
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
-    $url = new Url($_POST['url']);
+$description = $_POST['description'] ?? null;
+$category    = $_POST['category'] ?? null;
+$linkUrl     = $_POST['url'] ?? null;
+if ($linkUrl && $description && (is_numeric($category) || is_array($category))) {
+    $url = new Url($linkUrl);
     try {
         $url->normalise();
     } catch (InvalidArgumentException $e) {
         error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
     }
 
-    if (is_numeric($_POST['linkID'])) {
+    $linkID = $_POST['linkID'] ?? null;
+    $comment = $_POST['comment'] ?? null;
+    $visible = isset($_POST['visible']) ? 1 : 0;
+    $target = $_POST['target'] ?? '';
+    if (is_numeric($linkID)) {
         /* Modify existing link
          */
         try {
             /** @var Link $link */
-            $link = LinkMapper::getInstance()->findById($_POST['linkID']);
+            $link = LinkMapper::getInstance()->findById($linkID);
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                 error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
@@ -39,33 +46,33 @@ if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['cate
             error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        /** @var Link $link */
         $link->setUrl($url->getUrl());
-        $link->setDescription($_POST['description']);
-        $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? 0 : 1);
-        $link->setTarget($_POST['target']);
+        $link->setDescription($description);
+        $link->setComment($comment);
+        $link->setHidden($visible ? 0 : 1);
+        $link->setTarget($target);
         $link->setModified(Alaress_Date_Format::now());
 
         // If the owner has been deleted - set new owner to the editor
         $owner = $link->getOwner();
         if (!$owner || null === $owner->getId() || $owner->isDeleted()) {
-            $link->setOwner($sessionUser->getId());
+            $link->setOwner($sessionUser);
         }
     } else {
-        /** @var Link $link */
         $link = LinkMapper::getInstance()->createModel();
-        $link->setOwner($sessionUser->getId());
+        $link->setOwner($sessionUser);
 
         $link->setUrl($url->getUrl());
-        $link->setDescription($_POST['description']);
-        $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? 0 : 1);
-        $link->setTarget($_POST['target']);
+        $link->setDescription($description);
+        $link->setComment($comment);
+        $link->setHidden($visible ? 0 : 1);
+        $link->setTarget($target);
 
         // Add to multiple locations
-        if (is_array($_POST['category'])) {
+        if (is_array($category)) {
             $linkCollection = LinkMapper::getInstance()->createCollection();
-            foreach ($_POST['category'] as $cat) {
+            foreach ($category as $cat) {
                 if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE) {
                     error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
                 }
@@ -76,11 +83,11 @@ if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['cate
             }
             $link = $linkCollection;
         } else {
-            if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE) {
+            if ($groupHandler->getPermission($category) < UserAccess::ACCESS_WRITE) {
                 error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
-            $link->setFolder(FolderMapper::getInstance()->createModel($_POST['category']));
+            $link->setFolder(FolderMapper::getInstance()->createModel($category));
         }
     }
 
@@ -89,18 +96,21 @@ if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['cate
 
     $page->backToTheFuture(2);
 } else {
-    if (is_numeric($_POST['move'] ?? null) && is_numeric($_POST['categoryID'])) {
+    $move       = $_POST['move'] ?? null;
+    $categoryID = $_POST['categoryID'] ?? null;
+    $delete     = $_GET['delete'] ?? null;
+    if (is_numeric($move ?? null) && is_numeric($categoryID)) {
         /* Move link from one category to another, after checking permission on both from and to categories
          */
         try {
-            $link = LinkMapper::getInstance()->findById($_POST['move']);
+            $link = LinkMapper::getInstance()->findById($move);
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                $result = "Insufficient permssions";
-            } elseif ($groupHandler->getPermission($_POST['categoryID']) < UserAccess::ACCESS_WRITE) {
-                $result = "Insufficient permssions";
+                $result = "Insufficient permissions";
+            } elseif ($groupHandler->getPermission($categoryID) < UserAccess::ACCESS_WRITE) {
+                $result = "Insufficient permissions";
             } else {
-                $link->setFolder(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($_POST['categoryID']));
+                $link->setFolder(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($categoryID));
                 $link->setModified(Alaress_Date_Format::now());
                 LinkMapper::getInstance()->save($link);
                 $result = "success";
@@ -115,9 +125,9 @@ if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['cate
                 'result' => $result
             )
         );
-    } elseif ($_GET['delete']) {
+    } elseif ($delete) {
         try {
-            $link = LinkMapper::getInstance()->findById($_GET['delete']);
+            $link = LinkMapper::getInstance()->findById($delete);
 
             if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                 error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
@@ -128,12 +138,13 @@ if (($_POST['url'] ?? null) && $_POST['description'] && (is_numeric($_POST['cate
             error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        $redirect = $_GET['redirect'] ?? '';
         if (isset($_REQUEST['ajax'])) {
             die(json_encode(['result' => 'success']));
-        } elseif ($_GET['redirect'] == '') {
+        } elseif ($redirect == '') {
             $page->backToTheFuture(1);
         } else {
-            SitePage::localRedir($_GET['redirect']);
+            SitePage::localRedir($redirect);
         }
     } else {
         error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);

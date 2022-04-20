@@ -250,7 +250,7 @@ class Link implements ISoftDeletable
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {
