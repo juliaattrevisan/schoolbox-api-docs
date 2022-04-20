@@ -126,13 +126,18 @@ header {
         color: var(--navigation-foreground);
         display: block;
         height: 4.5rem;
-        padding: 0.875rem 0;
+        padding: 0.875rem 1rem;
         text-align: center;
     }
+
+        .link span {
+            display: block;
+        }
 
         .link:before {
             font-size: 1.5rem;
             line-height: 1.5rem;
+            padding: 0;
         }
 
     .secondary {
