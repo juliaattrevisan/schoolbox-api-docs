@@ -292,6 +292,7 @@ class Provisioner
             } catch (MapperException $e) {
                 $internalUser = (new User())
                     ->setCampusCollection(new GenericCollection(Campus::class));
+                $internalUser->setAccessList($this->userAccessMapper->createCollection());
                 $internalUser->getRole()->setType($roleType);
                 $this->logger->debug("No existing user to retrieve: new user", $commonContext);
                 $action = 'create';
