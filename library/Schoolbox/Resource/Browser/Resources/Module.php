@@ -9,15 +9,43 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\UserMapper;
 
 class Module extends AbstractModule
 {
     protected $basename = 'resourceBrowser';
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes(): void
+    {
+        $preloadFile = function ($params) {
+            return $this->preloadFile($params);
+        };
+        $getHomepageIdCallback = function ($params) {
+            return $this->preloadFile($params)['file']->getFolder()->getId();
+        };
+
+        $hasEditAccess = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getHomepageIdCallback, Access::getInstance())
+        );
+
+        $this->register('PATCH', '/file/{fileId}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
+    }
 
     /**
      * Add a link route as well
@@ -58,5 +86,27 @@ class Module extends AbstractModule
             ->setNamespace($this->basename)
             ->setNodeType(Resource\Browser\NodeFactory::SBFS)
             ->setTab('resources');
+    }
+
+    /**
+     * Preload a file object
+     *
+     * @param array $params
+     * @return array
+     */
+    private function preloadFile(array $params): array
+    {
+        try {
+            $file = $this->getMapperFactory()->get(FileMapper::class)->findById($params['fileId']);
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+        if (!$file instanceof Resource\File\Model) {
+            throw new Resource\Exception("Requested file is not a file");
+        }
+
+        return [
+            'file' => $file,
+        ];
     }
 }

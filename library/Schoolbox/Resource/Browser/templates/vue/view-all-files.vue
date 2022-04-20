@@ -333,6 +333,49 @@ export default {
         },
 
         /**
+         * Perform on any further user interaction, like updating filters, sorting or searching
+         * Otherwise the animation used to clearly show where new files have been added will be
+         * replayed on any state change
+         *
+         * @param { Object }
+         *
+         * @returns { String }
+         */
+        getVisibilityAction (file) {
+            if (file.hidden) {
+                return 'Show file';
+            } else {
+                return 'Hide file';
+            }
+        },
+
+        /**
+         * Toggle the files visibility to hidden/shown
+         *
+         * @param { Object }
+         */
+        async onToggleVisibilitySelected (toggledFile) {
+            //we need to do this as Vue is watching tableData, not each individual file within
+            const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id);
+            try {
+                const invertedFileHidden = !fileInTableData.hidden; //to pass through to the endpoint
+                const response = await fetch(toggledFile.visibilityUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'hidden': invertedFileHidden,
+                    }),
+                });
+                const responseData = await response.json();
+                fileInTableData.hidden = responseData.hidden;
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+
+        /**
          * Add the file to the table, ensuring it's visible by
          * checking on the relevant filter if not already active
          *
@@ -438,11 +481,11 @@ export default {
                             @on-filter-change="onFilterChange"
                         />
                     </template>
-                    <template #name="props"> 
+                    <template #name="props">
                         <div>
                             <a data-plugin="preview" :href="props.row.url" rel="external">
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description"> 
+                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
                                     {{ props.row.name }}
                                 </h3>
                             </a>
@@ -451,6 +494,7 @@ export default {
                     </template>
                     <template #edit="props">
                         <nav class="edit">
+                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view' : 'icon-view-hollow' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
                             <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                         </nav>
                     </template>
@@ -465,7 +509,7 @@ export default {
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div class="component-action">
                             <section>
-                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`">Select a file</a> or drag and drop multiple onto this component</p>
+                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file">Select a file</a> or drag and drop multiple onto this component</p>
                             </section>
                         </div>
                     </template>
@@ -537,17 +581,24 @@ export default {
 }
 
 .edit {
+    display: flex;
     height: 2.5rem;
-    text-align: center;
-    width: 2.5rem;
+    width: 5rem;
 }
 
 .edit a {
     color: var(--content-ui-foreground);
-    display: block;
     line-height: 2.5;
     opacity: 0.7;
     padding-left: 8px; //move the pencil into the centre
+}
+
+.button-toggle-visibility {
+    background: none;
+    color: var(--content-ui-foreground);
+    font-size: 0rem;
+    line-height: 2.5;
+    padding: 0px 2px 0px 10px;
 }
 
 .date-modified-td {
@@ -562,7 +613,7 @@ export default {
 
 .VueTables__table .edit-td {
     padding-left: 0; //bring it inline with the right side border
-    width: 2.5rem; //keep the edit icon on the right side
+    width: 5rem; //keep the edit icon on the right side
 }
 
 .VueTables__table-footer {

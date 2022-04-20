@@ -86,7 +86,7 @@ export default {
                 const fileDeletions = await Promise.all(this.getFetches());
                 const fileStatuses = fileDeletions.map((file) => file.status); //grab the returned status of each file deletion response
                 const hasDeleteErrors = fileStatuses.some((status) => status !== 200); //check if all files were able to be deleted
-                if (hasDeleteErrors) { //and notify of error if it appears not all deletons were succesfull
+                if (hasDeleteErrors) { //and notify of error if it appears not all deletons were successful
                     this.$refs.toast.timeout('Sorry, there was an error deleting all selected files. Please refresh the page to ensure your file list is up to date.', false, 5000);
                 } else { //otherwise appears everything is aok
                     this.$refs.toast.timeout('Deleted', true, 2000);

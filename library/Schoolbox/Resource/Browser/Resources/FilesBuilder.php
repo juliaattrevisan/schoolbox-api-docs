@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Aura\Router\Router;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -20,6 +21,7 @@ class FilesBuilder
     private int $componentId;
     protected FileMapper $fileMapper;
     protected Component_InstanceMapper $componentInstanceMapper;
+    protected Router $router;
 
     /**
      * FilesBuilder constructor.
@@ -27,10 +29,11 @@ class FilesBuilder
      * @param FileMapper               $fileMapper
      * @param Component_InstanceMapper $componentInstanceMapper
      */
-    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper)
+    public function __construct(FileMapper $fileMapper, Component_InstanceMapper $componentInstanceMapper, Router $router)
     {
         $this->fileMapper               = $fileMapper;
         $this->componentInstanceMapper  = $componentInstanceMapper;
+        $this->router = $router;
     }
 
     /**
@@ -131,6 +134,7 @@ class FilesBuilder
                 'formatted' => $file->getModifiedAt()->getShort(),
             ],
             'editUrl'               => '/cms/file/' . $file->getId() . "?" . Redirect::RETURN_URL . "={$returnURL}",
+            'visibilityUrl'         => $this->router->generate('resourceBrowser.patchFileInfo', ['fileId' => $file->getId()])
         ];
     }
 }

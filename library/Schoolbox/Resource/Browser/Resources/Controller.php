@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -109,7 +110,7 @@ class Controller extends AbstractController
      */
     public function showFiles(int $componentID, int $sourceFolderID)
     {
-        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper);
+        $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper, $this->getRouter());
         $homepage_id = $filesBuilder->getHomepage($componentID);
         $homepage = $this->folderMapper->findById($homepage_id);
 
@@ -234,5 +235,38 @@ class Controller extends AbstractController
     {
         // find out if we have access to the requested folder
         return Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId);
+    }
+
+    /**
+     * @param Resource\File\Model $file
+     * @api   PATCH /resources/file/:fileId/ajax
+     * @since 22.0
+     * @throws Mapper\Exception|Resource\Exception|SchoolboxException
+     */
+    public function patchFileInfo(Resource\File\Model $file)
+    {
+        $data = json_decode(json_encode($this->request->content->get()), true);
+        if (isset($data['hidden'])) {
+            $file->setHidden($data['hidden']);
+        } else {
+            throw new SchoolboxException("Only able to update Hidden option");
+        }
+        /**
+         * save new object
+         */
+        $this->fileMapper->save($file);
+
+        $data = [
+            'title'         => $file->getTitle(),
+            'fileName'      => $file->getFilename(),
+            'description'   => $file->getDescription(),
+            'mimeType'      => $file->getMime(),
+            'filesize'      => $file->getSize(),
+            'hidden'        => $file->isHidden(),
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput($data)
+        );
     }
 }
