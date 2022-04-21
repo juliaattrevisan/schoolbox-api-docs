@@ -491,7 +491,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 T.PERIOD_NUMBER ASC
         ");
 
-        $statement->execute(array( 'room' => $roomCode ));
+        $statement->execute([
+            'room' => $roomCode
+        ]);
 
         foreach ($campuses as $campus) {
             /* Get the timetable definition for $campus to see if $roomCode
