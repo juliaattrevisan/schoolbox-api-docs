@@ -299,6 +299,8 @@ class Controller extends Base
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
                 }
+            } else {
+                $data['schoolHouse'] = null;
             }
         }
         /**
