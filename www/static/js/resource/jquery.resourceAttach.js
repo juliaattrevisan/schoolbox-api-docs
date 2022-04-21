@@ -572,7 +572,7 @@
 
                     //to display an existing file within the drop zone view, as the file has already been loaded
                     //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
-                    this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
+                    this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed, 'Anonymous');
 
                     //as this.on('success') is not called when using the modal window upload,
                     //need to also add the attachment vars in so the files are added on form submit

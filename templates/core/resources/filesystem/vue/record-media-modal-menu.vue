@@ -185,7 +185,7 @@ export default {
 </script>
 
 <template>
-    <div class="pseudo-video" ref="pseudoVideo" v-if="hasChecked">
+    <div v-if="hasChecked" class="pseudo-video" ref="pseudoVideo">
         <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
