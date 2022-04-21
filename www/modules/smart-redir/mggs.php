@@ -133,7 +133,7 @@ if ($_GET) {
             $formArray['pass'] = 'mggs1893';
             break;
 
-        case "librarywebs";
+        case "librarywebs":
             $form      = "Login";
             $action    = "http://online.librarywebs.net/Login.aspx";
             $method    = "post";
@@ -179,9 +179,15 @@ if ($_GET) {
 
         case "infotrac":
             $form            = "form";
-            $action          = "http://infotrac.galegroup.com/itweb/melgg";
-            $method          = "GET";
-            $formArray['id'] = 'literature';
+            $action          = "https://galeapps.gale.com/apps/auth";
+            $method          = "POST";
+            $formArray['password'] = 'literature';
+            $formArray['prodId'] = 'GLS';
+            $formArray['productLongName'] = 'Gale Literature';
+            $formArray['userGroupName'] = 'melgg';
+            $formArray['origURL'] = 'https://go.gale.com/ps/start.do?p=GLS&u=melgg';
+            $formArray['isReattempt'] = 'true';
+
             break;
 
         case "storybox":
@@ -207,6 +213,7 @@ if ($_GET) {
     echo "<body>";
 
     echo "<form method='{$method}' name='{$form}' action='{$action}'>";
+    $nojs = 0;
     if (is_array($formArray)) {
         foreach ($formArray as $key => $value) {
             if ($key == "submit") {
