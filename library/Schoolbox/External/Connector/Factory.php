@@ -44,7 +44,7 @@ class Factory
         }
 
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
-        $schoolCode = ucwords($config->get('site_school_code'));
+        $schoolCode = ucwords(strtolower($config->get('site_school_code')));
 
         $classBase = "{$prefixBase}\\Base\\{$type}";
         if ('tass' === $config->get('external_type') && ExternalConnectorFactory::EXTERNAL_SYNC === $type && $config->get('external_tass_version')) {
