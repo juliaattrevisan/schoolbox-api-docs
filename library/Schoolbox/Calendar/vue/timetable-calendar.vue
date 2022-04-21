@@ -885,7 +885,7 @@ export default {
 /* Make each event div not go all the way to the edge
  */
 .fc-timegrid-event.fc-v-event.fc-event.fc-event-start.fc-event-end {
-    padding: 0.5rem;
+    padding: 0 0.25rem;
 }
 
 /* Remove weird left padding which indents the time, but not any wrapping text
