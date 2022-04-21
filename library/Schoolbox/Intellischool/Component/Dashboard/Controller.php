@@ -30,10 +30,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $deploymentId = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID);
         $learnerUrl = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL);
         $cohortUrl = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL);
-        $taskUrl = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_TASK_DASHBOARD_BASE_URL);
         $jwtIssuer = (new Factory($this->getConfigLoader()))->buildFullyQualified()->toString();
 
-        if ('' === $key || '' === $algo || '' === $deploymentId || '' === $learnerUrl || '' === $cohortUrl || '' === $taskUrl) {
+        if ('' === $key || '' === $algo || '' === $deploymentId || '' === $learnerUrl || '' === $cohortUrl) {
             return false;
         }
 
@@ -43,7 +42,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $deploymentId,
             $learnerUrl,
             $cohortUrl,
-            $taskUrl,
             $jwtIssuer
         );
         return true;
