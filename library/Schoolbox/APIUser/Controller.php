@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -31,6 +32,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Timetable_ColourMapper;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -347,7 +349,7 @@ class Controller extends Base
 
         try {
             $this->userMapper->save($model);
-        } catch (\UnexpectedValueException $e) {
+        } catch (Exception | UnexpectedValueException $e) {
             throw new SchoolboxException($e->getMessage(), 400, $e);
         }
 
