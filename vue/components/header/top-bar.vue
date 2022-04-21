@@ -1,21 +1,19 @@
 <script setup>
 
 /**
- * Heading that contains most primary navigation elements
+ * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-function onMenuIconSelected () {
-    console.warn('eh');
-}
+const emit = defineEmits(['openSideMenu', 'toggleProfileMenu']);
 
 </script>
 
 <template>
     <div class="top-bar">
-       <nav class="primary">
+       <nav class="primary" aria-label="Primary navigation">
             <ul>
                 <li>
-                    <button class="menu-icon" aria-label="Toggle Side Menu" @click="onMenuIconSelected">
+                    <button class="button-side-menu" aria-label="Open Side Menu" @click="$emit('openSideMenu')">
                         <svg width="18" height="14" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><rect width="100" height="10"></rect> <rect width="100" y="25" height="10"></rect> <rect width="100" y="50" height="10"></rect></svg>
                     </button>
                 </li>
@@ -81,13 +79,19 @@ function onMenuIconSelected () {
                 </li>
             </ul>
         </nav>
-        <div class="secondary">
-            
-        </div>
+        <nav class="secondary" aria-label="Secondary navigation">
+            <ul>
+                <li>
+                    <button class="button-profile-menu" aria-label="Toggle Profile Menu" @click="$emit('toggleProfileMenu')">
+                        <img src="admin-logo.jpeg" alt="Profile image" width="72" height="72" />
+                    </button>
+                </li>
+            </ul>
+        </nav>
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 
 .top-bar {
     background-color: var(--navigation-background);
@@ -96,32 +100,35 @@ function onMenuIconSelected () {
 }
 
     .primary {
-        flex-grow: 1;
+        flex-grow: 1; //fill out the entire width excluding the 9rem left for .secondary
+        ul li {
+            margin-right: 10px;
+        }
     }
 
-        .primary ul {
+        ul {
             display: flex;
             margin: 0;
             padding: 0;
+            li {
+                list-style-type: none;
+            }
         }
 
-        .primary ul li {
-            list-style-type: none;
-            margin-right: 10px;
-        }
-
-    .menu-icon {
+    .button-side-menu {
         align-items: center;
         background: none;
         display: flex;
         justify-content: center;
         height: 4.5rem;
         width: 4.5rem;
-    }
-
-        .menu-icon svg {
+        svg {
             fill: var(--navigation-foreground);
         }
+        &:hover {
+            background-color: var(--navigation-hover);
+        }
+    }
 
     .link {
         color: var(--navigation-foreground);
@@ -129,26 +136,25 @@ function onMenuIconSelected () {
         height: 4.5rem;
         padding: 0.875rem 1rem;
         text-align: center;
-    }
-
-        .menu-icon:hover, 
-        .link:hover {
-            background-color: var(--navigation-hover);
-        }
-
-        .link span {
+        span {
             display: block;
         }
-
-        .link:before { /* increase the icon sizes */
+        &:hover {
+            background-color: var(--navigation-hover);
+        }
+        &:before { //increase the icon sizes
             font-size: 1.5rem;
             line-height: 1.5rem;
             padding: 0;
         }
+    }
 
     .secondary {
-        background-color: green;
-        flex: 0 0 9rem;
+        flex: 0 0 9rem; //to side on the right hand side
+    }
+
+    .button-profile-menu {
+        padding: 0;
     }
 
 </style>
