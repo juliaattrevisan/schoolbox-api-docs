@@ -1,16 +1,16 @@
 
-import SbTopBar from '../../vue/components/header/top-bar';
+import SbHeaderTopBar from '../../vue/components/header/header-top-bar';
 
 export default {
-    title: 'IN PROGRESS/UI/TopBar',
-    component: SbTopBar,
+    title: 'IN PROGRESS/Header/Components/TopBar',
+    component: SbHeaderTopBar,
 };
 
 const Template = (args, { argTypes }) => ({
-    components: { SbTopBar },
+    components: { SbHeaderTopBar },
     template:
         `
-        <sb-top-bar/>
+        <sb-header-top-bar/>
         `,
 });
 
