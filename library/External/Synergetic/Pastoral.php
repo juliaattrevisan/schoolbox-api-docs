@@ -396,13 +396,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             $pastoralRecord->setBodyPublic("<p>{$record["Details"]}</p>");
                             $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
                             $this->setPastoralType($pastoralRecord, $record, $owner);
-                            $pastoralRecord->setCreatedAt(new Alaress_Date_Format($record['CreatedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS));
+                            $createdDate = new Alaress_Date_Format($record['CreatedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS);
+                            $pastoralRecord->setCreatedAt($createdDate);
                             if ($record['ModifiedByID']) {
                                 $modifier = $this->getSchoolboxUser($record['ModifiedByID']) ?: $defaultOwner;
                                 $pastoralRecord->setModifiedBy($modifier);
                             }
 
-                            $modifiedDate = null;
+                            $modifiedDate = $createdDate;
                             if ($record['ModifiedDate']) {
                                 $modifiedDate = new Alaress_Date_Format($record['ModifiedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS);
                                 $pastoralRecord->setUpdatedAt($modifiedDate);
