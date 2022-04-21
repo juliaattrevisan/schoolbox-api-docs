@@ -169,6 +169,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateHash']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'undoAlaressUserModification']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidCalendarView']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
@@ -901,7 +902,7 @@ class UserMapper extends Mapper
     public function verifyHasCampus(User $user)
     {
         // if no campus has been selected in the interface
-        if (null === $user->getCampusCollection() ||$user->getCampusCollection()->count() < 1) {
+        if (null === $user->getCampusCollection() || $user->getCampusCollection()->count() < 1) {
             throw new UnexpectedValueException('User must have at least one campus');
         }
 
@@ -1099,6 +1100,22 @@ class UserMapper extends Mapper
         }
         $query = "UPDATE {$this->table} SET calendar_view = :calendarView WHERE id = :userId";
         $this->database->query($query, ['userId' => $userId, 'calendarView' => $calendarView]);
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's calendar View is valid
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws SchoolboxException if calendarView is invalid
+     */
+    public function verifyValidCalendarView(User $user): bool
+    {
+        if (!\in_array($user->getCalendarView(), ViewNameMapping::MAP_FC_TO_STORED)) {
+            throw new SchoolboxException("Calendar View '{$user->getCalendarView()}' is invalid.");
+        }
+
         return true;
     }
 }

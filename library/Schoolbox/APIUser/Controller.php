@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -31,6 +32,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Timetable_ColourMapper;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -137,6 +139,9 @@ class Controller extends Base
     public function apiUserPost()
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
+        if (null === $data) {
+            throw new SchoolboxException("POST Body is empty");
+        }
         /**
          * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
          * that should be done at the PUT/PATCH method
@@ -152,6 +157,16 @@ class Controller extends Base
         }
 
         $newUser = $this->userMapper->createModel($uid);
+
+        /**
+         * set sane defaults
+         */
+        $newUser->setEnabled(true)
+            ->setSuperuser(false)
+            ->setLocalEmail(false)
+            ->setWebmail(false)
+            ->setUseInternalMail(false)
+            ->setEportfolioEnable(false);
 
         /**
          * build the user Model object from the POST data
@@ -235,9 +250,6 @@ class Controller extends Base
             throw new SchoolboxException("Unable to Delete a user from this endpoint, please use the DELETE method");
         }
 
-        $user->setEnabled(true);
-        $user->setSuperuser(false);
-
         /**
          * build the db check data for the new model.
          */
@@ -247,8 +259,10 @@ class Controller extends Base
                 try {
                     $data['yearLevel'] = $this->yearLevelMapper->findById($yearLevel);
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $data['yearLevel'] = null;
+                    throw new SchoolboxException("Year '$yearLevel' Not Found");
                 }
+            } else {
+                $data['yearLevel'] = null;
             }
         }
         /**
@@ -285,6 +299,8 @@ class Controller extends Base
                 } catch (NotFound | Deleted $e) {
                     throw new SchoolboxException("House '$schoolHouse' Not Found or has been Deleted");
                 }
+            } else {
+                $data['schoolHouse'] = null;
             }
         }
         /**
@@ -335,7 +351,7 @@ class Controller extends Base
 
         try {
             $this->userMapper->save($model);
-        } catch (\UnexpectedValueException $e) {
+        } catch (Exception | UnexpectedValueException $e) {
             throw new SchoolboxException($e->getMessage(), 400, $e);
         }
 
