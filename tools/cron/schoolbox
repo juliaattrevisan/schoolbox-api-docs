@@ -49,6 +49,9 @@ MAILTO="support@schoolbox.com.au"
 # Geosnapshot Redactions - daily at 8:08pm I guess
 8 20 * * *	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/geosnapshot/redaction.php --perform >> /var/log/schoolbox/geosnapshot.log 2>&1
 
+# Clipboard Importer - every 4 hours
+22 */4 * * *  www-data   jitter 1800 php /usr/share/schoolbox/tools/clipboard/importer.php --membership --sessions --perform >> /var/log/schoolbox/clipboard-importer.log 2>&1
+
 # Etherpad - sync back to MySQL - every hour
 38 * * * *	www-data	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 
