@@ -133,7 +133,7 @@ if ($_GET) {
             $formArray['pass'] = 'mggs1893';
             break;
 
-        case "librarywebs";
+        case "librarywebs":
             $form      = "Login";
             $action    = "http://online.librarywebs.net/Login.aspx";
             $method    = "post";
