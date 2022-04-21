@@ -442,34 +442,44 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getRoomTimetable(array $roomCodes): array
     {
+        /* Find all the occasions this room gets used, across all campuses everywhere
+         */
+        $campuses = \Schoolbox\CampusMapper::getInstance()->findAll();
+
         $result = [];
+
         foreach ($roomCodes as $roomCode) {
-            $result = array_merge($result, $this->getOneRoomTimetable($roomCode));
+            $result = array_merge($result, $this->getOneRoomTimetable($roomCode, $campuses));
         }
+
         return $result;
     }
 
 
     /**
-     * @param string $roomCode
+     * @param string                $roomCode
+     * @param \Schoolbox\Collection $campuses
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    private function getOneRoomTimetable(string $roomCode): array
+    private function getOneRoomTimetable(string $roomCode, \Schoolbox\Collection $campuses): array
     {
-        $statement = $this->getConnection()->prepareQuery('
+        $result = [];
+        $seen = [];
+
+        $statement = $this->getConnection()->prepareQuery("
             SELECT
-                T.ROOM AS "RoomCode",
-                CL.CLASS AS "Description",
-                T.DAY_NUMBER AS "DayNumber",
-                T.PERIOD_NUMBER AS "PeriodNumber",
-                NULL AS "TimetableGroup",
-                NULL AS "TimetableCampus",
-                T.CLASS_CODE AS "ClassCode",
-                T.STAFF_NUMBER AS "StaffID",
-                ST.SALUTATION AS "StaffTitle",
-                ST.FIRSTNAME AS "StaffPreferredName",
-                ST.SURNAME AS "StaffSurname"
+                T.ROOM AS ROOMCODE,
+                CL.CLASS AS DESCRIPTION,
+                T.DAY_NUMBER AS DAYNUMBER,
+                T.PERIOD_NUMBER AS PERIODNUMBER,
+                NULL AS TIMETABLEGROUP,
+                NULL AS TIMETABLECAMPUS,
+                T.CLASS_CODE AS CLASSCODE,
+                T.STAFF_NUMBER AS STAFFID,
+                ST.SALUTATION AS STAFFTITLE,
+                ST.FIRSTNAME AS STAFFPREFERREDNAME,
+                ST.SURNAME AS STAFFSURNAME
             FROM SCHOOLBOX_TIMETABLE AS T
             INNER JOIN SCHOOLBOX_CLASSES AS CL ON
                 T.CLASS_CODE = CL.CLASS_CODE
@@ -479,29 +489,67 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             ORDER BY
                 T.DAY_NUMBER ASC,
                 T.PERIOD_NUMBER ASC
-        ');
-        $statement->execute(array('room' => $roomCode));
+        ");
 
-        // Join with Edumate's (currently hardcoded and campusless) timetable.
-        $campus = new Campus();
-        $campusTimetable = $this->getTimetableDefinition(null, $campus);
-        $result = array();
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            // Match day and period against a start and end.
-            for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
-                $periodNumber = $campusTimetable['number'][$i];
-                $periodSequence = $campusTimetable['sequence'][$i];
+        $statement->execute(array( 'room' => $roomCode ));
 
-                // (Ignore period sequence 2, everyone else does)
-                if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
-                    $row['PeriodStart'] = $campusTimetable['start'][$i];
-                    $row['PeriodEnd'] = $campusTimetable['end'][$i];
-                    $row['PeriodName'] = $campusTimetable['desc'][$i];
-                    $result[] = $row;
-                    break;
+        foreach ($campuses as $campus) {
+            /* Get the timetable definition for $campus to see if $roomCode
+             * appears in that campus' timetable somewhere
+             */
+            $campusTimetable = $this->getTimetableDefinition(null, $campus);
+
+            foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                /* If we saw this ClassCode before, then don't dupe it up
+                 */
+                $classCode = $row['CLASSCODE'];
+                $day = $row['DAYNUMBER'];
+                $period = $row['PERIODNUMBER'];
+
+                if (isset($seen[$classCode][$day][$period])) {
+                    continue;
+                }
+
+                /* Remember we saw this classCode on the given (day, period)
+                 * We don't need to repeat the event if it spans multiple campuses
+                 */
+                $seen[$classCode][$day][$period] = $classCode;
+
+                // Match day and period against a start and end.
+                for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
+                    $periodNumber   = $campusTimetable['number'][$i];
+                    $periodSequence = $campusTimetable['sequence'][$i];
+
+                    // (Ignore period sequence 2, everyone else does)
+                    if ($periodNumber == $row['PERIODNUMBER'] && $periodSequence != 2) {
+                        /* This is a scuffed db driver
+                         *
+                         * Manually reconstruct the data struct otherwise you get
+                         * stuck in an eternally-processing script somehow
+                         */
+                        $result[] = [
+                            'RoomCode' => $row['ROOMCODE'],
+                            'Description' => $row['DESCRIPTION'],
+                            'DayNumber' => $day,
+                            'PeriodNumber' => $period,
+                            'TimetableGroup' => $campus->getExtTimetableCode(),
+                            'TimetableCampus' => $row['TIMETABLECAMPUS'],
+                            'ClassCode' => $classCode,
+                            'StaffID' => $row['STAFFID'],
+                            'StaffTitle' => $row['STAFFTITLE'],
+                            'StaffPreferredName' => $row['STAFFPREFERREDNAME'],
+                            'StaffSurname' => $row['STAFFSURNAME'],
+                            'PeriodStart' => $campusTimetable['start'][$i],
+                            'PeriodEnd' => $campusTimetable['end'][$i],
+                            'PeriodName' => $campusTimetable['desc'][$i]
+                        ];
+
+                        break;
+                    }
                 }
             }
         }
+
         return $result;
     }
 
