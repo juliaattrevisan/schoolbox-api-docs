@@ -80,7 +80,6 @@ class JwtFactory
         string $deploymentId,
         string $learnerDashboardBaseUrl,
         string $cohortDashboardBaseUrl,
-        string $taskDashboardBaseUrl,
         string $jwtIssuer
     ) {
         $this->privateKey                 = $privateKey;
