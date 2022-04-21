@@ -213,6 +213,7 @@ if ($_GET) {
     echo "<body>";
 
     echo "<form method='{$method}' name='{$form}' action='{$action}'>";
+    $nojs = 0;
     if (is_array($formArray)) {
         foreach ($formArray as $key => $value) {
             if ($key == "submit") {
@@ -220,7 +221,6 @@ if ($_GET) {
                 echo "<input name='$key' type='submit' value='$value'></div>";
                 $nojs = 1;
             } else {
-                $nojs = 0;
                 echo "<input name='$key' type='hidden' value='$value'>";
             }
         }
