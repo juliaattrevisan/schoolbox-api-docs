@@ -1,16 +1,28 @@
-<script>
+<script setup>
 
 /**
  * 
  */
 
+import HeaderTopBar from './header-top-bar';
 
+
+function onOpenSideMenu () {
+    console.warn('onOpenSideMenu');
+}
+
+function onToggleProfileMenu () {
+    console.warn('onToggleProfileMenu');
+}
 
 </script>
 
 <template>
    <header>
-       <h1>Hai</h1>
+       <header-top-bar 
+            @openSideMenu="onOpenSideMenu"
+            @toggleProfileMenu="onToggleProfileMenu"
+       />
    </header>
 </template>
 
