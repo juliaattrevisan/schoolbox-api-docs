@@ -179,9 +179,15 @@ if ($_GET) {
 
         case "infotrac":
             $form            = "form";
-            $action          = "http://infotrac.galegroup.com/itweb/melgg";
-            $method          = "GET";
-            $formArray['id'] = 'literature';
+            $action          = "https://galeapps.gale.com/apps/auth";
+            $method          = "POST";
+            $formArray['password'] = 'literature';
+            $formArray['prodId'] = 'GLS';
+            $formArray['productLongName'] = 'Gale Literature';
+            $formArray['userGroupName'] = 'melgg';
+            $formArray['origURL'] = 'https://go.gale.com/ps/start.do?p=GLS&u=melgg';
+            $formArray['isReattempt'] = 'true';
+
             break;
 
         case "storybox":
@@ -214,6 +220,7 @@ if ($_GET) {
                 echo "<input name='$key' type='submit' value='$value'></div>";
                 $nojs = 1;
             } else {
+                $nojs = 0;
                 echo "<input name='$key' type='hidden' value='$value'>";
             }
         }
