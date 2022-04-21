@@ -92,10 +92,9 @@ class Link implements ISoftDeletable
             return $this->getRelativeUrl();
         } elseif ($this->isFtpUrl()) {
             return $this->getUrl();
-        }
-        /* If this has an id, then log the visit for this instance
-         */
-        else if (is_numeric($this->getId())) {
+        } elseif (is_numeric($this->getId())) {
+            /* If this has an id, then log the visit for this instance
+             */
             return "/redir.php?id={$this->getId()}";
         } else {
             return $this->getBase64EncodedRedirect();
@@ -250,7 +249,7 @@ class Link implements ISoftDeletable
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {
