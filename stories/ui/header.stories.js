@@ -1,5 +1,5 @@
 
-import SbHeader from './header.vue';
+import SbHeader from '../../vue/components/header/header';
 
 export default {
     title: 'IN PROGRESS/UI/Header',
