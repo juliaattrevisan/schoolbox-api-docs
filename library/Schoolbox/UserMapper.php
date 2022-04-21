@@ -902,7 +902,7 @@ class UserMapper extends Mapper
     public function verifyHasCampus(User $user)
     {
         // if no campus has been selected in the interface
-        if (null === $user->getCampusCollection() ||$user->getCampusCollection()->count() < 1) {
+        if (null === $user->getCampusCollection() || $user->getCampusCollection()->count() < 1) {
             throw new UnexpectedValueException('User must have at least one campus');
         }
 
