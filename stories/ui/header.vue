@@ -26,6 +26,11 @@ export default {
                     </a>
                 </li>
                 <li>
+                    <a class="logo" title="Return to the homepage">
+                        <img src="sb-logo.png" alt="Schoolbox Pty Ltd" width="72" height="72" />
+                    </a>
+                </li>
+                <li>
                     <a class="link icon-teacher" title="Navigate to your classes">
                         <span>Classes</span>
                     </a>
@@ -92,7 +97,6 @@ export default {
 
 header {
     background-color: var(--navigation-background);
-    color: white;
     display: flex;
     height: 4.5rem;
 }
@@ -103,11 +107,13 @@ header {
 
         .primary ul {
             display: flex;
+            margin: 0;
             padding: 0;
         }
 
         .primary ul li {
             list-style-type: none;
+            margin-right: 10px;
         }
 
     .menu-icon {
@@ -130,11 +136,15 @@ header {
         text-align: center;
     }
 
+        .link:hover {
+            background-color: var(--navigation-hover);
+        }
+
         .link span {
             display: block;
         }
 
-        .link:before {
+        .link:before { /* increase the icon sizes */
             font-size: 1.5rem;
             line-height: 1.5rem;
             padding: 0;
@@ -142,7 +152,7 @@ header {
 
     .secondary {
         background-color: green;
-        flex: 0 0 144px;
+        flex: 0 0 9rem;
     }
 
 </style>
