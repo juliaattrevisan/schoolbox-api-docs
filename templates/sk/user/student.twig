@@ -12,6 +12,19 @@
 {% block details_hohTeacher %}
 {% endblock details_hohTeacher %}
 
+{% block details_studentType %}
+    {% if boarderType %}
+        <dt class="small-4 medium-3 columns">Student Type:</dt>
+        <dd class="small-8 medium-9 columns">
+            {{ boarderType }}
+
+            {% if externalUser.StudentNonResidentFlag %}
+                <br />International Student
+            {% endif %}
+        </dd>
+    {% endif %}
+{% endblock details_studentType %}
+
 {% block buttons_miscellaneous %}
     <li>
         <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>

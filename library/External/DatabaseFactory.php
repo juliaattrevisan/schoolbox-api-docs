@@ -408,6 +408,8 @@ class External_DatabaseFactory
                         return new External_Synergetic_Srcl_User();
                     case 'THS':
                         return new External_Synergetic_Ths_User();
+                    case 'SK':
+                        return new External_Synergetic_Sk_User();
                 }
                 return new External_Synergetic_User();
             case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
