@@ -161,7 +161,10 @@ class Controller extends Base
          */
         $newUser->setEnabled(true)
             ->setSuperuser(false)
-            ->setLocalEmail(false);
+            ->setLocalEmail(false)
+            ->setWebmail(false)
+            ->setUseInternalMail(false)
+            ->setEportfolioEnable(false);
 
         /**
          * build the user Model object from the POST data
