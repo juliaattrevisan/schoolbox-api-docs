@@ -156,6 +156,13 @@ class Controller extends Base
             return; //exit early the dont try to update a user at the add endpoint, that is for the PUT/PATCH route
         }
 
+        /**
+         * check for the existence the required fields...
+         */
+        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+            throw new SchoolboxException("POST request must include at least the following fields: username, role, campus, firstName");
+        }
+
         $newUser = $this->userMapper->createModel($uid);
 
         /**
@@ -187,6 +194,13 @@ class Controller extends Base
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (null === $data) {
             throw new SchoolboxException("PUT Body is empty");
+        }
+
+        /**
+         * check for the existence the required fields...
+         */
+        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+            throw new SchoolboxException("PUT request must include at least the following fields: username, role, campus, firstName");
         }
 
         $userModal = $this->userMapper->createModel($user->getId());
