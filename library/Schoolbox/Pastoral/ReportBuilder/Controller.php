@@ -647,7 +647,7 @@ class Controller extends Base
         $pastoralReport->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-            if (is_array($post['actions'])) {
+            if (is_array($post['actions'] ?? false)) {
                 $pastoralReport->setActionsCsv(implode(',', $post['actions']));
             } else {
                 $pastoralReport->setActionsCsv('');
