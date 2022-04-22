@@ -159,7 +159,7 @@ class Controller extends Base
         /**
          * check for the existence the required fields...
          */
-        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+        if (!isset($data['username'], $data['role'], $data['campus'], $data['firstName'])) {
             throw new SchoolboxException("POST request must include at least the following fields: username, role, campus, firstName");
         }
 
@@ -199,7 +199,7 @@ class Controller extends Base
         /**
          * check for the existence the required fields...
          */
-        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+        if (!isset($data['username'], $data['role'], $data['campus'], $data['firstName'])) {
             throw new SchoolboxException("PUT request must include at least the following fields: username, role, campus, firstName");
         }
 
