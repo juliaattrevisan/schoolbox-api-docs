@@ -140,7 +140,7 @@ class Controller extends Base
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (null === $data) {
-            throw new SchoolboxException("POST Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
         /**
          * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
@@ -193,7 +193,7 @@ class Controller extends Base
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (null === $data) {
-            throw new SchoolboxException("PUT Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
 
         /**
@@ -223,7 +223,7 @@ class Controller extends Base
         $data = json_decode(json_encode($this->request->content->get()), true);
 
         if (null === $data) {
-            throw new SchoolboxException("PATCH Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
 
         /**
