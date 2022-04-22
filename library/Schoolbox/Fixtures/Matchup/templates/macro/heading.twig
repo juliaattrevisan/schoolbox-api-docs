@@ -75,7 +75,7 @@
 {% macro generate(match) %}
 {% apply spaceless %}
 
-    {% if match.homeTeam.id %}
+    {% if match.homeTeam %}
         {{ match.homeTeam.name ?? '' }}
     {% else %}
         {{ match.homeSchool.name ?? '' }}
