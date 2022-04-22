@@ -296,6 +296,9 @@ class Controller extends Base
          */
         if (array_key_exists('campus', $data)) {
             $campus = $data['campus'];
+            if (!is_array($campus)) {
+                throw new SchoolboxException("Campus must be an array");
+            }
             $campusCollection = (new GenericCollection(Campus::class));
             foreach ($campus as $campusEntry) {
                 $campusId = $campusEntry['id'] ?? null;
@@ -334,6 +337,9 @@ class Controller extends Base
          */
         if (array_key_exists('impersonableUser', $data)) {
             $impersonate = $data['impersonableUser'];
+            if (!is_array($impersonate)) {
+                throw new SchoolboxException("impersonableUser must be an array");
+            }
             $impersonateCollection = new GenericCollection(User::class);
             foreach ($impersonate as $userEntry) {
                 $userId = $userEntry['id'] ?? null;
