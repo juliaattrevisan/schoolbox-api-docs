@@ -167,7 +167,7 @@ abstract class EventBase implements EventInterface
      */
     public function isOwner()
     {
-        if ($this->getAuthorId() == $_SESSION['id']) {
+        if (isset($_SESSION['id']) && ($this->getAuthorId() == $_SESSION['id'])) {
             return true;
         }
 
