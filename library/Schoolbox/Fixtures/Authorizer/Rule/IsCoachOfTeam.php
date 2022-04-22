@@ -40,7 +40,7 @@ class IsCoachOfTeam implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        if (($params['context'] instanceof Matchup) && (is_numeric($params['teamId']))) {
+        if ((($params['context'] ?? null) instanceof Matchup) && (is_numeric($params['teamId']))) {
             /* Viewing the Team Match Page
              * sportsfixturesResult.getResultForTeam
              *
@@ -49,7 +49,7 @@ class IsCoachOfTeam implements IAuthorizationRule
              */
             $matchup = $params['context'];
             $teamId = $params['teamId'];
-        } else if ($params['entity'] instanceof Result) {
+        } elseif (($params['entity'] ?? null) instanceof Result) {
             /* When you're viewing the Modify Form
              * sportsfixturesResult.getModifyForm
              *
