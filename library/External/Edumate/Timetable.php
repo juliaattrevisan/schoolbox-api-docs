@@ -495,14 +495,17 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             'room' => $roomCode
         ]);
 
+        $rows = $statement->fetchAll();
+
         foreach ($campuses as $campus) {
             /* Get the timetable definition for $campus to see if $roomCode
              * appears in that campus' timetable somewhere
              */
             $campusTimetable = $this->getTimetableDefinition(null, $campus);
 
-            foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                /* If we saw this ClassCode before, then don't dupe it up
+            foreach ($rows as $row) {
+                /* If we saw this ClassCode in this (day, period) tuple before,
+                 * then don't dupe it up
                  */
                 $classCode = $row['CLASSCODE'];
                 $day = $row['DAYNUMBER'];
