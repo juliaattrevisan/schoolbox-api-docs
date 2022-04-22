@@ -5,7 +5,7 @@
                 <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="intellischoolIframe">
                     <input type="hidden" name="id_token" value="{{ jwt }}">
                 </form>
-                <iframe style="overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
+                <iframe style="height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
                 </iframe>
                 <script type="text/javascript">
                     window.addEventListener("message", event => {
