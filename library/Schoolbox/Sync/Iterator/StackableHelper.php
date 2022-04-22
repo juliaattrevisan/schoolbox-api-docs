@@ -32,6 +32,9 @@ trait StackableHelper
         $array = [];
 
         foreach ($rows as $row) {
+            if (!isset($row[$columnName])) {
+                continue;
+            }
             $array = array_merge(
                 $array,
                 preg_split('/[,;]/', $row[$columnName])
