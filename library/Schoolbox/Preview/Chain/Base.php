@@ -30,7 +30,7 @@ abstract class Base
     protected function start($responsibilities)
     {
         if (count($responsibilities)) {
-            for ($i = 0; $i < count($responsibilities); $i++) {
+            for ($i = 0; $i < count($responsibilities) - 1; $i++) {
                 $responsibilities[$i]->setNext($responsibilities[$i + 1]);
             }
 
