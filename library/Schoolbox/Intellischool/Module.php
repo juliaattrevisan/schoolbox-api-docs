@@ -112,13 +112,6 @@ class Module extends BaseModule
             'getCohortProfile',
             new Rule\All($basePermission, $staffPermission),
         );
-        //Task Adherence Dashboard
-        $this->register(
-            BaseModule::METHOD_GET,
-            "/task",
-            'getTaskDashboard',
-            new Rule\All($basePermission, $staffPermission),
-        );
     }
 
 

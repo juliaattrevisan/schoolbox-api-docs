@@ -142,23 +142,4 @@ class Controller extends Base
             )
         );
     }
-
-    /**
-     * Intellischool task adherence dashboard
-     *
-     * @api GET /modules/intellischool/task
-     */
-    public function getTaskDashboard(): void
-    {
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@intellischool/task.twig',
-                [
-                    'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
-                    'jwt'         => $this->jwtFactory->generateTaskUrl($this->getUser(), '', ''),
-                ],
-                sprintf('Task Adherence'),
-            )
-        );
-    }
 }
