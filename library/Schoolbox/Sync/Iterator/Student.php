@@ -50,7 +50,7 @@ class Student extends IteratorIterator
             ->setId($currentResult['student_id'])
             ->setTitle($currentResult['student_title'])
             ->setGivenName($currentResult['student_given_name'])
-            ->setPreferredName($currentResult['student_preferred'] ?? $currentResult['student_given_name'])
+            ->setPreferredName($currentResult['student_preferred'] ?? '')
             ->setLastname($currentResult['student_surname'])
             ->setGender($currentResult['student_gender'] ?? null);
 

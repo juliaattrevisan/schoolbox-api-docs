@@ -64,7 +64,7 @@ class Staff extends IteratorIterator
 
         /* Account
          */
-        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag'] ?? 1);
+        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag'] ?? false);
 
         $staff->getHouse()->setCode($currentResult['staff_house']);
 
