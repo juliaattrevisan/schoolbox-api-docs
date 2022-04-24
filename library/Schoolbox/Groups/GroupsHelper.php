@@ -256,6 +256,14 @@ class GroupsHelper
                 continue;
             }
             /**
+             * some groups / folders may have no homepage, and are being used just for data storage
+             * lets make sure they are kept hidden from this page (but you can still go and access them directly
+             * this is to keep functionality that previously existed in < 21.1.12
+             */
+            if (null === $folder->getHomepage()) {
+                continue;
+            }
+            /**
              * default favourite to false, as the use is not a member of the group
              * then confirm with the $userPerms array to see if the user has that group as a favourite
              */
