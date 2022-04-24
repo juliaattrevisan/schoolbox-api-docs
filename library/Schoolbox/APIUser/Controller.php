@@ -140,7 +140,7 @@ class Controller extends Base
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (null === $data) {
-            throw new SchoolboxException("POST Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
         /**
          * check if ID is set in the post request, as the user should not be attempting to update a user at the POST method
@@ -159,7 +159,13 @@ class Controller extends Base
         /**
          * check for the existence the required fields...
          */
-        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+        if (
+            !isset($data['username'], $data['role'], $data['campus'], $data['firstName'])
+            ||
+            !is_array($data['role'])
+            ||
+            !is_array($data['campus'])
+        ) {
             throw new SchoolboxException("POST request must include at least the following fields: username, role, campus, firstName");
         }
 
@@ -193,13 +199,19 @@ class Controller extends Base
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
         if (null === $data) {
-            throw new SchoolboxException("PUT Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
 
         /**
          * check for the existence the required fields...
          */
-        if (!in_array(['username', 'role', 'campus', 'firstName'], $data)) {
+        if (
+            !isset($data['username'], $data['role'], $data['campus'], $data['firstName'])
+            ||
+            !is_array($data['role'])
+            ||
+            !is_array($data['campus'])
+        ) {
             throw new SchoolboxException("PUT request must include at least the following fields: username, role, campus, firstName");
         }
 
@@ -223,7 +235,7 @@ class Controller extends Base
         $data = json_decode(json_encode($this->request->content->get()), true);
 
         if (null === $data) {
-            throw new SchoolboxException("PATCH Body is empty");
+            throw new SchoolboxException("Request BODY has an issue, it may be empty or malformed");
         }
 
         /**
@@ -284,6 +296,9 @@ class Controller extends Base
          */
         if (array_key_exists('campus', $data)) {
             $campus = $data['campus'];
+            if (!is_array($campus)) {
+                throw new SchoolboxException("Campus must be an array");
+            }
             $campusCollection = (new GenericCollection(Campus::class));
             foreach ($campus as $campusEntry) {
                 $campusId = $campusEntry['id'] ?? null;
@@ -322,6 +337,9 @@ class Controller extends Base
          */
         if (array_key_exists('impersonableUser', $data)) {
             $impersonate = $data['impersonableUser'];
+            if (!is_array($impersonate)) {
+                throw new SchoolboxException("impersonableUser must be an array");
+            }
             $impersonateCollection = new GenericCollection(User::class);
             foreach ($impersonate as $userEntry) {
                 $userId = $userEntry['id'] ?? null;
