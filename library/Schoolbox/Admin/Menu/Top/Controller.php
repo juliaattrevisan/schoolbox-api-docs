@@ -224,7 +224,7 @@ class Controller extends Base
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);
         $item->setTarget($post['target']);
-        $item->setWebmail($post['webmail']);
+        $item->setWebmail($post['webmail'] ?? '');
 
         // Populate token
 

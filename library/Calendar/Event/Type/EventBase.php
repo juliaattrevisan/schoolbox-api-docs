@@ -163,11 +163,12 @@ abstract class EventBase implements EventInterface
      * Find out if the currently logged in user is the owner (creator)
      * of this event
      *
+     * @param int $userId
      * @return bool
      */
-    public function isOwner()
+    public function isOwner(int $userId): bool
     {
-        if ($this->getAuthorId() == $_SESSION['id']) {
+        if ($this->getAuthorId() == $userId) {
             return true;
         }
 

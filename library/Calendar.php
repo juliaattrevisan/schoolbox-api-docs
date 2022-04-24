@@ -730,7 +730,7 @@ class Calendar extends DeprecatedModel
 
                 // TODO port this into SQL query so we don't bother building the event just to throw it away
                 $isFutureEvent   = $event->getPublishDate()->getUnixTimeStamp() >= time();
-                $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner() || $event->isEditable();
+                $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner($viewer->getId()) || $event->isEditable();
 
                 if ($isAlwaysVisible || !$isFutureEvent) {
                     $stack->add($event);

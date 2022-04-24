@@ -337,9 +337,9 @@ class Controller extends Base
      */
     private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType, array $post): void
     {
-        $isVisibilityLocked = $post['visibilityLocked'] ? (bool)$post['visibilityLocked'] : false;
+        $isVisibilityLocked = isset($post['visibilityLocked']) ? (bool)$post['visibilityLocked'] : false;
         $actions            =
-            is_array($post['actions'])
+            is_array($post['actions'] ?? null)
                 ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post['actions'])))
                 : $this->pastoralActionMapper->createCollection();
         // Fetch the exiting rules

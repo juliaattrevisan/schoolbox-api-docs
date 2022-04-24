@@ -357,7 +357,7 @@ class Session
         // user exists
         if ($result) {
             $entries = ldap_get_entries($ds, $result);
-            $dn = $entries[0]['dn'];
+            $dn = $entries[0]['dn'] ?? null;
             // if the user exists
             if ($dn) {
                 $bind = @ldap_bind($ds, $dn, utf8_encode($password));

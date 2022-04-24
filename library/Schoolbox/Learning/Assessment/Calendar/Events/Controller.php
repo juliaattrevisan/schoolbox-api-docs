@@ -306,7 +306,7 @@ class Controller extends Base
             // Populate some fields of sub-event
             $carry[$grouping]['data']['subEvents'][] = [
                 'title'  => $event['data']['meta']['title'] ?? $event['title'],
-                'type'   => $event['data']['meta']['workType'],
+                'type'   => $event['data']['meta']['workType'] ?? null,
                 'start'  => $event['start'],
                 'end'    => $event['end'],
                 'allDay' => $event['allDay'],

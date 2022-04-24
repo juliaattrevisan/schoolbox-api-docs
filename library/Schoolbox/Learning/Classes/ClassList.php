@@ -116,6 +116,7 @@ class ClassList
 
         // Only set those homepage URLs that user have access permission
         foreach ($folderList as $folder) {
+            $classTypes[$folder->getId()] ??= '';
             if ($access->getFolderAccess($this->user, $folder->getId()) >= UserAccess::ACCESS_READ) {
                 $homepageUrls[$folder->getId()] = "/homepage/{$folder->getId()}";
             } else {

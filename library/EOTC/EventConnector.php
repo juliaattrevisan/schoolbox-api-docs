@@ -366,8 +366,8 @@ class EventConnector extends EventMapper
             $isSuperuser = $user->isSuperuser();
             $isCreator = $eventItem->getAuthor()->getId() == $user->getId();
             $isTIC = $user->getId() == $eventItem->getTeacherInCharge()->getId();
-            $isStaffAttendee = $row['staffUserId'] == $this->getUser()->getId();
-            $isStudentAttendee = $row['studentUserId'] == $this->getUser()->getId();
+            $isStaffAttendee = ($row['staffUserId'] ?? null) == $this->getUser()->getId();
+            $isStudentAttendee = ($row['studentUserId'] ?? null) == $this->getUser()->getId();
             $isApproved = $eventItem->getMetadata()->getStatus()->isApproved();
             $inCampusAndRole = $inCampus && $inRole;
 
