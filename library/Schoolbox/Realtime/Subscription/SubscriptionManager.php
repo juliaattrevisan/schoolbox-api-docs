@@ -103,9 +103,7 @@ class SubscriptionManager implements ISubscriptionManager
         if (!$this->userHasSubscription($userId)) {
             return false;
         }
-
-        $this->subscriptions[$userId]->unsubscribe();
-
+        // unsetting this will call Subscription::__destruct, which will call unsubscribe()
         unset($this->subscriptions[$userId]);
 
         return true;
