@@ -56,15 +56,15 @@ class Staff extends IteratorIterator
             ->setGivenName($currentResult['staff_given_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
-            ->setDepartment($currentResult['staff_department']);
+            ->setDepartment($currentResult['staff_department'] ?? null);
 
-        $staff->getYear()->setLevel($currentResult['staff_year_level'])->setDescription($currentResult['staff_year_level_description']);
+        $staff->getYear()->setLevel($currentResult['staff_year_level'])->setDescription($currentResult['staff_year_level_description'] ?? '');
 
         $staff->getMeta()->getCategory()->setCode($currentResult['staff_category'])->setType($currentResult['staff_category_type']);
 
         /* Account
          */
-        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag']);
+        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag'] ?? false);
 
         $staff->getHouse()->setCode($currentResult['staff_house']);
 

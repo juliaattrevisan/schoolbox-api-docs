@@ -129,7 +129,7 @@ class StudentIterator extends IteratorIterator
          * is not strictly yes/no; sometimes it contains B, W, D, etc.
          * It's really a Student Boarder Type, more than anything
          */
-        if (strlen($currentResult['student_boarding_house'])) {
+        if (strlen($currentResult['student_boarding_house'] ?? '')) {
             $boardingHouse = new Normalise\User\Common\BoardingHouse();
             $boardingHouse
                 ->setCode($currentResult['student_boarding_house'])

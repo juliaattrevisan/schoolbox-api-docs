@@ -1018,6 +1018,9 @@ abstract class Mapper implements IMapper, Serializable
         $get_method  = $this->getGetMethodName($property);
         $value       = $model->$get_method();
         $map         = $this->map->getOffset($property);
+        if (!$map) {
+            return $value;
+        }
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
         if ($map['hydrator'] instanceof IColumnType) {
             $value = $map['hydrator']->dehydrate($value, $join_mapper);

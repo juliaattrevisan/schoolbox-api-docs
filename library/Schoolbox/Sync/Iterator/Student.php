@@ -50,12 +50,12 @@ class Student extends IteratorIterator
             ->setId($currentResult['student_id'])
             ->setTitle($currentResult['student_title'])
             ->setGivenName($currentResult['student_given_name'])
-            ->setPreferredName($currentResult['student_preferred'])
+            ->setPreferredName($currentResult['student_preferred'] ?? '')
             ->setLastname($currentResult['student_surname'])
-            ->setGender($currentResult['student_gender']);
+            ->setGender($currentResult['student_gender'] ?? null);
 
         $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description'] ?? null);
-        $student->getForm()->setDescription($currentResult['student_form_description']);
+        $student->getForm()->setDescription($currentResult['student_form_description'] ?? '');
 
         $student->getHouse()->setCode($currentResult['student_house']);
 
@@ -69,7 +69,7 @@ class Student extends IteratorIterator
 
         /* Set the student boarding status, effectively it's a bool
          */
-        $student->setBoardingStatus((int)$currentResult['student_boarder']);
+        $student->setBoardingStatus((int)($currentResult['student_boarder'] ?? null));
 
         /* Boarding House should be set if it has a value
          * You can't actually rely on StudentBoarder field, because that
