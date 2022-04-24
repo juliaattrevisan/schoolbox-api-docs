@@ -338,7 +338,7 @@ export default {
 
             return {
                 slotMinTime: slotMinTime ?? '00:00:00',
-                slotMaxTime: slotMaxTime ?? '23:59:59',
+                slotMaxTime: slotMaxTime ?? '00:00:00',
                 allDaySlot: allDaySlot
             }
         },

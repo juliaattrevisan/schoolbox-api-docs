@@ -20,6 +20,7 @@ use External_Timetable;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -32,11 +33,18 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws \InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+        /* Staff can view anyone's timetable calendar
+         * Students can only view their own calendar
+         * Parents can only view their own students' calendar
+         */
+        $getPerms = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
         );
 
         $preloadUser = function ($params) {
