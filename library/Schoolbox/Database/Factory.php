@@ -3,6 +3,7 @@
 namespace Schoolbox\Database;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use InvalidArgumentException;
@@ -137,12 +138,12 @@ class Factory
     public function getExternalDatabase(IConfigLoader $config, bool $ignoreDisabled = false): ?IConnector
     {
         if (!$ignoreDisabled && !$config->get('external_enable')) {
-            return null;
+            return new NullConnector();
         }
 
         switch ($config->get('external_type')) {
             case null:
-                return null;
+                return new NullConnector();
 
             // Schoolbox connector: just return internal DB
             case 'schoolbox':
@@ -168,7 +169,7 @@ class Factory
             // IBM DB2
             case 'edumate':
                 $connectorExternal = $this->factory->createDb2();
-                list($host, $schema) = explode('/', $config->get('external_db_host'), 2);
+                [$host, $schema] = explode('/', $config->get('external_db_host'), 2);
                 $connectorExternal->connect(
                     $host,
                     $config->get('external_db_db'),

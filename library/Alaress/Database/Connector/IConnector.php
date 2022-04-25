@@ -61,6 +61,7 @@ interface IConnector
      * Set the timezone on the connection (Note this is only appplicable on MySQL connections)
      *
      * @param string $timezone A valid timezone
+     * @return $this
      */
     public function setTimezone($timezone);
 
@@ -176,7 +177,7 @@ interface IConnector
      * Return last inserted record ID
      *
      * @param string|null $name
-     * @return string
+     * @return string|false
      */
     public function lastInsertId($name = null);
 
