@@ -4,7 +4,18 @@
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-const emit = defineEmits(['openSideMenu', 'toggleProfileMenu']);
+const emit = defineEmits(['openSideMenu', 'toggleProfileMenu', 'openNotificationsMenu']);
+
+const props = defineProps({
+    unreadNotifications: {
+        type: Number,
+        required: true,
+        default: 0,
+        validator (value) {
+            return typeof value === 'number';
+        }
+    }
+})
 
 </script>
 
@@ -86,6 +97,11 @@ const emit = defineEmits(['openSideMenu', 'toggleProfileMenu']);
                         <img src="admin-logo.jpeg" alt="Profile image" width="72" height="72" />
                     </button>
                 </li>
+                <li>
+                    <button class="button-show-notifications icon-notifications" :data-unread="unreadNotifications" aria-label="Show Notifications" aria-expanded="false" @click="$emit('openNotificationsMenu')">
+                        {{ unreadNotifications }}
+                    </button>
+                </li>
             </ul>
         </nav>
     </div>
@@ -139,13 +155,13 @@ const emit = defineEmits(['openSideMenu', 'toggleProfileMenu']);
         span {
             display: block;
         }
-        &:hover {
-            background-color: var(--navigation-hover);
-        }
         &:before { //increase the icon sizes
             font-size: 1.5rem;
             line-height: 1.5rem;
             padding: 0;
+        }
+        &:hover {
+            background-color: var(--navigation-hover);
         }
     }
 
@@ -155,6 +171,26 @@ const emit = defineEmits(['openSideMenu', 'toggleProfileMenu']);
 
     .button-profile-menu {
         padding: 0;
+    }
+
+    .button-show-notifications {
+        align-items: center;
+        background: none;
+        color: var(--navigation-foreground);
+        display: flex;
+        justify-content: center;
+        height: 4.5rem;
+        width: 4.5rem;
+        &[data-unread]:not([data-unread="0"]) {
+            background-color: #fa4a47;
+            color: #fff;
+        }
+        &:before {
+            padding-right: 5px; //bring the number in closer
+        }
+        &:hover {
+            background-color: var(--navigation-hover);
+        }
     }
 
 </style>
