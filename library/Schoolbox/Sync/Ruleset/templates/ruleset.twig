@@ -63,7 +63,7 @@ set upsConfig = {
             {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
         </div>
 
-        <div class="small-12 island">
+        <div id='ruleset' class="small-12 island">
             {% if hasDryRun ?? false %}
                 <div data-alert class="alert-box">
                     <h2>Processing {{ rulesetId|capitalize }} Dry Run</h2>
@@ -123,7 +123,7 @@ set upsConfig = {
                     <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
                 </ul>
             </div>
-            <div id='ruleset'>
+            <div>
                 <input type="hidden" name="rulesetId" id="rulesetId" value="{{ rulesetId }}" />
 
                 {% if ruleset.getRules() is not empty %}
