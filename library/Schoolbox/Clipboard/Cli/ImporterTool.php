@@ -125,7 +125,7 @@ HELP;
         /* Check that Clipboard Module is enabled
          */
         if (!$this->getConfig()->get('clipboard_enabled')) {
-            $this->getLogger()->info('Clipboard integration is not enabled; existing');
+            $this->getLogger()->info('Clipboard integration is not enabled; exiting');
             exit();
         }
 
