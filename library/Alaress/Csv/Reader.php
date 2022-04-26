@@ -170,7 +170,7 @@ class Reader implements \Iterator
     public function rewind()
     {
         $this->cleanup();
-        if (!is_resource($this->fp)) {
+        if (!isset($this->fp) || !is_resource($this->fp)) {
             $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
         }
 
@@ -184,7 +184,7 @@ class Reader implements \Iterator
 
     protected function cleanup()
     {
-        if (is_resource($this->fp) && $this->filename) {
+        if (is_resource($this->fp ?? null) && $this->filename) {
             fclose($this->fp);
             unset($this->fp);
         }
