@@ -51,10 +51,6 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preloadAssessment             = function ($params) {
-            return $this->preloadAssessment($params);
-        };
-
         $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess);
         $this->register('GET', '', 'apiAssessmentGetAll', $hasApiAccess);
     }
@@ -68,33 +64,5 @@ class Module extends BaseModule
         return new Controller(
 
         );
-    }
-
-    /**
-     * Convert route params into an assessment object
-     *
-     * @param array     $params
-     * @return array$assessable
-     * @throws ApplicationException\Exception If assessment is not found
-     * @throws DomainException If user has interaction but not participant record
-     * @throws InvalidArgumentException If assessment class not registered
-     * @throws LogicException If cyclic graph detected
-     * @throws Mapper\DefinitionException If a specified join mapper is not found
-     * @throws UnexpectedValueException If unable to derive project participant collections
-     */
-    protected function preloadAssessment(array $params): array
-    {
-        try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-        } catch (MapperException\Deleted $e) {
-            $assessment = $e->getDeletedObject();
-        } catch (MapperException $e) {
-            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
-            throw new SchoolboxException("Assessment Not Found", 404, null, 404);
-        }
-
-        return [
-            'assessment' => $assessment
-        ];
     }
 }
