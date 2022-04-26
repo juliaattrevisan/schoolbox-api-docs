@@ -14,19 +14,12 @@ class Reader implements \Iterator
 {
 
     /**
-     * The file name to read from.
-     *
-     * @var null|string
-     */
-    protected ?string $filename = '';
-
-    /**
      * The column list for this reader. Each row returned will be mapped to its
      * corresponding position in this list.
      *
-     * @var array
+     * @var array|bool
      */
-    protected $column_list = array();
+    protected $column_list = [];
 
 
     /**
@@ -35,7 +28,7 @@ class Reader implements \Iterator
      * will be performed against this array.
      * @var array
      */
-    protected $expected_column_list = array();
+    protected $expected_column_list = [];
 
     /**
      * Is the column list loaded from the first row of the CSV file?
@@ -74,30 +67,31 @@ class Reader implements \Iterator
 
     protected $fp           = null;
     protected $current_key  = 0;
-    protected $current_row  = array();
-    protected $previous_row = array();
+    protected $current_row  = [];
+    protected $previous_row = [];
 
     /**
      * Sets up the reader to read from the current file name.
      *
-     * @param string|resource $filename
+     * @param string|resource $file
      *
-     * @throws \RuntimeException if file isn't found or readable
+     * @throws \RuntimeException|\Schoolbox\Resource\Exception if file isn't found or readable
      */
-    public function __construct($filename)
+    public function __construct($file)
     {
-        if (\is_resource($filename)) {
+        if (\is_resource($file)) {
             /* Check if it's a fopen'd resource
              */
-            $this->filename = null;
-            $this->fp = $filename;
-        } elseif (is_readable($filename)) {
+            $this->fp = $file;
+        } elseif (is_readable($file)) {
             /* Otherwise maybe it's a path to a filename
              */
-            $this->filename = $filename;
-            $this->fp = fopen($this->filename, 'r');
+            $this->fp = fopen($file, 'r');
+        } else {
+            throw new \RuntimeException('File not found, or is not readable');
         }
 
+        // Initialise the pointer position
         $this->fp = (new ValidCSV($this->fp))->skipBom();
     }
 
@@ -114,7 +108,7 @@ class Reader implements \Iterator
      */
     public function current()
     {
-        $parsed_row  = array();
+        $parsed_row  = [];
         $column_list = $this->getColumnList();
         if (empty($column_list)) {
             $parsed_row = $this->current_row;
@@ -169,10 +163,10 @@ class Reader implements \Iterator
      */
     public function rewind()
     {
-        $this->cleanup();
-        if (!isset($this->fp) || !is_resource($this->fp)) {
-            $this->fp = (new ValidCSV(fopen($this->filename, 'r')))->skipBom();
-        }
+        $this->current_key = 0;
+        $this->current_row = [];
+        // skipBom rewinds to a proper position
+        $this->fp = (new ValidCSV($this->fp))->skipBom();
 
         // Am I loading the column list from the first column?
         // If so, load that and set it as the column list.
@@ -182,20 +176,24 @@ class Reader implements \Iterator
         $this->next();
     }
 
+    /**
+     * Clean up
+     * @return void
+     */
     protected function cleanup()
     {
-        if (is_resource($this->fp ?? null) && $this->filename) {
+        if (is_resource($this->fp)) {
             fclose($this->fp);
             unset($this->fp);
         }
         $this->current_key = 0;
-        $this->current_row = array();
+        $this->current_row = [];
     }
 
     /**
      * Loads the next row from the CSV file.
      *
-     * @return array
+     * @return array|false
      */
     protected function loadRow()
     {
@@ -204,7 +202,7 @@ class Reader implements \Iterator
 
 
     /**
-     * @param  array $column_list
+     * @param array $column_list
      * @return $this
      */
     public function setColumnList($column_list)
@@ -241,7 +239,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  array $expected_column_list
+     * @param array $expected_column_list
      * @return $this
      */
     public function setExpectedColumnList($expected_column_list)
@@ -259,7 +257,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  bool  $load_from_first
+     * @param bool $load_from_first
      * @return $this
      */
     public function setLoadFromFirst($load_from_first)
@@ -277,7 +275,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  string $delimiter
+     * @param string $delimiter
      * @return $this
      */
     public function setDelimiter($delimiter)
@@ -295,7 +293,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  string $enclosure
+     * @param string $enclosure
      * @return $this
      */
     public function setEnclosure($enclosure)
@@ -313,7 +311,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  string $escape
+     * @param string $escape
      * @return $this
      */
     public function setEscape($escape)
@@ -339,7 +337,7 @@ class Reader implements \Iterator
     }
 
     /**
-     * @param  bool  $fill_down
+     * @param bool $fill_down
      * @return $this
      */
     public function setFillDown($fill_down)
