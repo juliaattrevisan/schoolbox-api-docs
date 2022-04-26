@@ -53,6 +53,7 @@ SELECT
     assessment.course_managed as `commonAssessment`,
     lu_work_type.name AS `workType`,
     v_assessment_relation.folder_id as `folderId`,
+    markTypeTable.hr_name AS markType,
 
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
@@ -76,6 +77,9 @@ FROM v_most_recent_feedback
 
 JOIN assessment on v_most_recent_feedback.assessment_id = assessment.id
 JOIN v_assessment_relation on assessment.id = v_assessment_relation.assessment_id
+LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+
 
 LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
 
@@ -110,6 +114,7 @@ WHERE
             $output['weight'] = $row['weight'];
             $output['commonAssessment'] = (bool)$row['commonAssessment'];
             $output['workType'] = $row['workType'];
+            $output['markType'] = $row['markType'];
             $output['folderId'] = $row['folderId'];
             $output['participants'][] = [
                 'learner' => [
