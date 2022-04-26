@@ -5,3 +5,10 @@
         word-break: break-all
     }
 }
+
+/* so people can see the difference in the characters LlIi1|
+ * because arial is really really really bad at that
+ */
+input[type=text].suds-crypto {
+    font-family: Monospace, Courier, "Courier New", sans-serif;
+}

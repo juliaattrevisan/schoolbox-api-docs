@@ -28,7 +28,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required' name="dsn[tassapi][studentdetails][token]" value="{{ studentdetails.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][studentdetails][token]" value="{{ studentdetails.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required' name="dsn[tassapi][identitymanagement][token]" value="{{ identitymanagement.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][identitymanagement][token]" value="{{ identitymanagement.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -66,7 +66,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required' name="dsn[tassapi][lmsintegration][token]" value="{{ lmsintegration.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][lmsintegration][token]" value="{{ lmsintegration.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -86,7 +86,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>Token</label>
-                        <input type="text" name="dsn[tassapi][schoolcalendarandnotices][token]" value="{{ schoolcalendarandnotices.token ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[tassapi][schoolcalendarandnotices][token]" value="{{ schoolcalendarandnotices.token ?? ''}}" />
                     </div>
                 </div>
             </div>
