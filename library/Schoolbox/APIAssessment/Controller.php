@@ -50,6 +50,10 @@ class Controller extends Base
         $query  = "
 SELECT
     assessment.id, assessment.title, assessment.weight,
+    assessment.course_managed as `commonAssessment`,
+    lu_work_type.name AS `workType`,
+    v_assessment_relation.folder_id as `folderId`,
+
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
     student.title as `studentTitle`,
@@ -71,6 +75,9 @@ SELECT
 FROM v_most_recent_feedback
 
 JOIN assessment on v_most_recent_feedback.assessment_id = assessment.id
+JOIN v_assessment_relation on assessment.id = v_assessment_relation.assessment_id
+
+LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
 
 LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
 
@@ -101,6 +108,9 @@ WHERE
             $output['id'] = $row['id'];
             $output['title'] = $row['title'];
             $output['weight'] = $row['weight'];
+            $output['commonAssessment'] = (bool)$row['commonAssessment'];
+            $output['workType'] = $row['workType'];
+            $output['folderId'] = $row['folderId'];
             $output['participants'][] = [
                 'learner' => [
                     'id' => $row['student_id'],
