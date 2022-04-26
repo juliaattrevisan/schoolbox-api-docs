@@ -58,7 +58,8 @@ SELECT
         if(task.id, 'Task', null),
         if(assess.assessment_id, 'Quiz', null),
         if(lti_assessment.assessment_id, 'LTI', null),
-        if(submission_box.id, 'DueWork', null)
+        if(submission_box.id, 'DueWork', null),
+        if(project.id, 'Project', null)
     ) as `assessmentType`,
 
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
@@ -102,6 +103,7 @@ LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_ret
 LEFT JOIN task on assessment.id = task.assessment_id
 LEFT JOIN assess on assessment.id = assess.assessment_id
 LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
+LEFT JOIN project on assessment.id = project.assessment_id
 WHERE
     v_most_recent_feedback.review_route = 'instructor' AND
     v_most_recent_feedback.assessment_id = :id";
