@@ -283,7 +283,7 @@ class NullConnector implements IConnector
      */
     public function getCollector()
     {
-        return null;
+        throw new Exception();
     }
 
 

@@ -79,7 +79,7 @@ class Controller extends Base
         ImportLogMapper $importLogMapper
     ) {
         $this->databaseFactory  = $databaseFactory;
-        $this->databaseExternal = ($databaseExternal instanceof NullConnector) ? null: $databaseExternal;
+        $this->databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
         $this->configMapper     = $configMapper;
         $this->importLogMapper  = $importLogMapper;
     }
