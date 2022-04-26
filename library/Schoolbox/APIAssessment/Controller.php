@@ -83,7 +83,9 @@ LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
 
 LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
 
-WHERE v_most_recent_feedback.assessment_id = :id";
+WHERE
+    v_most_recent_feedback.review_route = 'instructor' AND
+    v_most_recent_feedback.assessment_id = :id";
 
         $mapper = UserMapper::getInstance()->getDatabase();
         $statement = $mapper->prepare($query);
