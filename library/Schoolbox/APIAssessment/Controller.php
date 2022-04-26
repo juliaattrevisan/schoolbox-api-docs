@@ -96,7 +96,7 @@ class Controller extends Base
 
         $output = [];
         $params = [];
-
+        $mapper = UserMapper::getInstance()->getDatabase();
 
         $select  = "
 SELECT
@@ -198,6 +198,10 @@ WHERE
                 JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id";
             }
         }
+        if ('' !== $search) {
+            $where .= " AND assessment.title like :searchParam ";
+            $params['searchParam'] = '%' . $mapper->getQuoter()->escapeForLike($search) . '%';
+        }
 
         if (0 !== $cursor) {
             $where .= " AND assessment.id > :cursor ";
@@ -206,7 +210,6 @@ WHERE
         if (0 !== $limit) {
             $where .= " LIMIT :limit";
         }
-        $mapper = UserMapper::getInstance()->getDatabase();
         $statement = $mapper->prepare($select . $from . $where);
         if (0 !== $limit) {
             $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
