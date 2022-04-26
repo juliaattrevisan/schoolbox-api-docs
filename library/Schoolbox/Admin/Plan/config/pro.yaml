@@ -10,6 +10,7 @@ config:
   learning_moments_enabled : {edit: true}
   badges_enabled : {edit: true}
   fixtures_enabled: {value: false, edit: false}
+  clipboard_enabled: {value: false, edit: false}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {value: false, edit: false}
   external_document_report_enabled : { edit : true }
