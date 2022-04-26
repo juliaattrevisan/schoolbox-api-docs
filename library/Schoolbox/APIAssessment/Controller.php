@@ -60,7 +60,6 @@ SELECT
     COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
     COALESCE(submission_return.mark, lti_assessment_score.score_given) as `mark`,
     submission_return.norm_mark,
-    submission_return.resubmission_required as `resubmission_required`,
 
     staff.id as `staffId`,
     staff.title as `staffTitle`,
@@ -113,7 +112,6 @@ WHERE
                 'normalisedMark' => $row['norm_mark'],
                 'comment' => $row['comment'],
                 'date'  => $row['completionDate'],
-                'resubmissionRequired'  => (bool)$row['resubmission_required'],
                 'instructor'            => [
                     'id' => $row['staffId'],
                     'title' => $row['staffTitle'],
