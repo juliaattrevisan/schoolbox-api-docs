@@ -2,11 +2,12 @@ const path = require('path');
 
 module.exports = {
     addons: [
-        '@storybook/addon-links',
-        '@storybook/addon-essentials',
         '@storybook/addon-a11y',
-        '@storybook/addon-storysource',
+        '@storybook/addon-actions',
+        '@storybook/addon-essentials',
         '@storybook/addon-interactions',
+        '@storybook/addon-links',
+        '@storybook/addon-storysource',
     ],
     core: {
         builder: 'webpack5',

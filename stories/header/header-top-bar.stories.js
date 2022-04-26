@@ -8,13 +8,16 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { SbHeaderTopBar },
+    setup () {
+        return { args }; //the args will now be passed down to the template
+    },
     template:
-        `
-        <sb-header-top-bar/>
-        `,
+        `<sb-header-top-bar v-bind="args" />`,
 });
 
 export const Default = Template.bind({});
-Default.parameters = {
-    controls: { hideNoControlsWarning: true },
+
+export const Notifications = Template.bind({});
+Notifications.args = {
+    unreadNotifications: 32,
 };
