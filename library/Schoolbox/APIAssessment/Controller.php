@@ -54,6 +54,12 @@ SELECT
     lu_work_type.name AS `workType`,
     v_assessment_relation.folder_id as `folderId`,
     markTypeTable.hr_name AS markType,
+    COALESCE(
+        if(task.id, 'Task', null),
+        if(assess.assessment_id, 'Quiz', null),
+        if(lti_assessment.assessment_id, 'LTI', null),
+        if(submission_box.id, 'DueWork', null)
+    ) as `assessmentType`,
 
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
@@ -93,6 +99,9 @@ LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
 
 LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
 
+LEFT JOIN task on assessment.id = task.assessment_id
+LEFT JOIN assess on assessment.id = assess.assessment_id
+LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
 WHERE
     v_most_recent_feedback.review_route = 'instructor' AND
     v_most_recent_feedback.assessment_id = :id";
@@ -110,6 +119,7 @@ WHERE
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $completionDate = new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT);
             $output['id'] = $row['id'];
+            $output['assessmentType'] = $row['assessmentType'];
             $output['title'] = $row['title'];
             $output['weight'] = $row['weight'];
             $output['commonAssessment'] = (bool)$row['commonAssessment'];
