@@ -106,15 +106,31 @@ SELECT
     lu_work_type.id as `workTypeId`,
     v_assessment_relation.folder_id as `folderId`,
     assessment.weight as `weighted`,
+     COALESCE(
+            if(task.id, 'Task', null),
+            if(assess.assessment_id, 'Quiz', null),
+            if(lti_assessment.assessment_id, 'LTI', null),
+            if(submission_box.id, 'DueWork', null),
+            if(project.id, 'Project', null)
+        ) as `assessmentType`,
     assessment.due_date,
-    GROUP_CONCAT( lu_year_level.id ORDER BY lu_year_level.id) as `yearLevelId`,
-    GROUP_CONCAT( lu_year_level.name ORDER BY lu_year_level.id) as `yearLevelName`
+    (SELECT group_concat(name) from lu_year_level
+        LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+                where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelName`,
+    (SELECT group_concat(id) from lu_year_level
+            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
 ";
         $from = "FROM v_assessment_relation
 JOIN assessment on v_assessment_relation.assessment_id = assessment.id
 LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
-LEFT JOIN folder_year_level on v_assessment_relation.folder_id = folder_year_level.folder_id
-LEFT JOIN lu_year_level on folder_year_level.year_level_id = lu_year_level.id
+LEFT JOIN task on assessment.id = task.assessment_id
+LEFT JOIN assess on assessment.id = assess.assessment_id
+LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
+LEFT JOIN project on assessment.id = project.assessment_id
+LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+
+
 
 ";
         $where = "
@@ -128,6 +144,16 @@ WHERE
         if (array_key_exists('title', $filter)) {
             $where .= " AND assessment.title = :title ";
             $params['title'] = $filter['title'];
+        }
+        if (array_key_exists('assessmentType', $filter)) {
+            $where .= " AND COALESCE(
+            if(task.id, 'Task', null),
+            if(assess.assessment_id, 'Quiz', null),
+            if(lti_assessment.assessment_id, 'LTI', null),
+            if(submission_box.id, 'DueWork', null),
+            if(project.id, 'Project', null)
+        ) = :assessmentType ";
+            $params['assessmentType'] = $filter['assessmentType'];
         }
         if (array_key_exists('contextId', $filter)) {
             $where .= " AND v_assessment_relation.folder_id = :contextId ";
@@ -212,6 +238,7 @@ WHERE
             $output[] = [
                 'assessmentId'  => $row['id'],
                 'title'         => $row['title'],
+                'assessmentType' => $row['assessmentType'],
                 'workType'      => [
                                     'name'  => $row['workTypeName'],
                                     'id'    => $row['workTypeId']
