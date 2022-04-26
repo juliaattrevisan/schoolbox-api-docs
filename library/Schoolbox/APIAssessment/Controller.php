@@ -97,9 +97,11 @@ FROM v_assessment_relation
 
          LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
 
+         LEFT JOIN assess_attempt on (v_most_recent_feedback.feedback_id = assess_attempt.attempt_id AND v_most_recent_feedback.feedback_table = 'assess_attempt')
+
          LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
 
-         LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
+         LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id, assess_attempt.reviewer_id) = staff.id
 
          LEFT JOIN task on assessment.id = task.assessment_id
          LEFT JOIN assess on assessment.id = assess.assessment_id
