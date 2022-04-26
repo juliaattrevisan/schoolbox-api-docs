@@ -128,7 +128,6 @@ class CachingConnectorAbstract
             if (PHP_SAPI === 'cli') {
                 throw new \Schoolbox\External\Exception('SIS connector failed to execute function: ' . $e->getMessage());
             } else {
-                trigger_error($e->getMessage(), E_USER_WARNING);
                 $this->database = $this->offlineConnector;
             }
             return $this->bypassCache($method, $params);

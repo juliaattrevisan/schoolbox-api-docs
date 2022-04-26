@@ -57,7 +57,7 @@ class Healthcheck
         $databaseExternal = $databaseExternal ?? $databaseFactory->getExternalDatabase($configMapper, true);
 
         // Ensure we can connect to external database
-        if (!$databaseExternal) {
+        if (!$databaseExternal || ($databaseExternal instanceof \Alaress\Database\Connector\NullConnector)) {
             throw new InvalidArgumentException('Unable to connect to external database');
         }
 

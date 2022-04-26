@@ -4,6 +4,7 @@ namespace Schoolbox\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use InvalidArgumentException;
@@ -73,7 +74,7 @@ class Factory
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
         }
 
-        return self::$connectorExternal;
+        return (self::$connectorExternal instanceof NullConnector ? null : self::$connectorExternal);
     }
 
 
@@ -185,16 +186,21 @@ class Factory
             throw new DatabaseException("Unknown external database type.");
         }
 
-        $connectorExternal->connect(
-            $config->get('external_db_host'),
-            $config->get('external_db_db'),
-            $config->get('external_db_user'),
-            $config->get('external_db_passwd')
-        );
+        try {
+            $connectorExternal->connect(
+                $config->get('external_db_host'),
+                $config->get('external_db_db'),
+                $config->get('external_db_user'),
+                $config->get('external_db_passwd')
+            );
 
-        $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
+            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
 
-        return $connectorExternal;
+            return $connectorExternal;
+        } catch (Exception $e) {
+            // noop
+        }
+        return new NullConnector();
     }
 
 
