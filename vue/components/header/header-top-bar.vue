@@ -4,10 +4,11 @@
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-import { ref } from 'vue'
+import { ref, computed, onMounted  } from 'vue'
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
-import { menuData } from './headerData';
+import debounce from 'lodash/debounce';
+import { topMenuData } from './headerData';
 
 const emit = defineEmits(['openSideMenu', 'toggleProfileMenu', 'openNotificationsMenu']);
 
@@ -22,6 +23,16 @@ const props = defineProps({
     }
 });
 
+onMounted(() => {
+
+    primaryMenuItems = Array.from(primary.value.querySelectorAll('li')); //get all the list menu list items
+    primaryMenuItems.splice(0, 2); //remove the side menu button and the logo
+    primaryMenuItemsMaxXPos = primaryMenuItems.map((menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width);
+
+    updateTopNavItems();
+
+});
+
 /**
  * Any changes to the element size are tracked by ResizeObserver so can update dimensions
  */
@@ -29,21 +40,21 @@ function onContainerResize () {
     updateTopNavItems();
 }
 
+const menuData = ref(topMenuData);
 const topBar = ref(null);
 const primary = ref(null);
+let primaryMenuItems;
+let primaryMenuItemsMaxXPos;
 const secondary = ref(null);
 
 /**
  * Show/hide top nav items based on space available
  */
 function updateTopNavItems () {
-    const topBarWidth = topBar.value.getBoundingClientRect().width;
-    const primaryWidth = primary.value.getBoundingClientRect().width;
-    const secondaryWidth = secondary.value.getBoundingClientRect().width;
-    const combinedWidth = primaryWidth + secondaryWidth;
-    if (combinedWidth > topBarWidth) {
-        console.warn('hide items');
-    }
+    const secondaryXPos = secondary.value.getBoundingClientRect().x;
+    primaryMenuItems.forEach((menuItem, index) => {
+        menuData.value[index].isShown = secondaryXPos > primaryMenuItemsMaxXPos[index] ? true : false;
+    });
 }
 
 </script>
@@ -63,7 +74,7 @@ function updateTopNavItems () {
                         <img src="sb-logo.png" alt="Schoolbox Pty Ltd" width="72" height="72" />
                     </a>
                 </li>
-                <li v-for="data in menuData">
+                <li v-for="data in menuData" v-show="data.isShown">
                     <a :class="`link icon-${data.icon}`" :href="data.href" :title="data.hover">
                         <span>{{ data.title }}</span>
                     </a>
@@ -91,15 +102,7 @@ function updateTopNavItems () {
 
 .top-bar {
     background-color: var(--navigation-background);
-    display: flex;
     height: 4.5rem;
-}
-
-.primary {
-    flex-grow: 1; //fill out the entire width excluding the 9rem left for .secondary
-    ul li {
-        margin-right: 10px;
-    }
 }
 
     ul {
@@ -127,6 +130,7 @@ function updateTopNavItems () {
 }
 
 .logo {
+    padding: 0 5px;
     img {
         max-width: none; //don't scale the logo on browser resize
     }
@@ -152,7 +156,9 @@ function updateTopNavItems () {
 }
 
 .secondary {
-    flex: 0 0 9rem; //to side on the right hand side
+    right: 0;
+    position: absolute;
+    top: 0;
 }
 
 .button-profile-menu {

@@ -1,70 +1,81 @@
 
 
-export const menuData = [
+export const topMenuData = [
     {
         title: 'Classes', 
         icon: 'teacher',
         href: '',
         hover: 'Navigate to your classes',
+        isShown: true,
     },
     {
         title: 'Timetable', 
         icon: 'timetable',
         href: '',
         hover: 'View your timetable',
+        isShown: true,
     },
     {
         title: 'Assessments', 
         icon: 'due-work',
         href: '',
         hover: 'View assessments requiring action',
+        isShown: true,
     },
     {
         title: 'News', 
         icon: 'news',
         href: '',
         hover: 'View your News Dashboard',
+        isShown: true,
     },
     {
         title: 'Calendar', 
         icon: 'calendar',
         href: '',
         hover: 'View your calendar',
+        isShown: true,
     },
     {
         title: 'Courses', 
         icon: 'course',
         href: '',
         hover: 'Create, modify and view courses',
+        isShown: true,
     },
     {
         title: 'Badges', 
         icon: 'favourite',
         href: '',
         hover: 'Goals & Achievements',
+        isShown: true,
     },
     {
         title: 'Pastoral', 
         icon: 'user',
         href: '',
         hover: 'Access your pastoral care dashboard',
+        isShown: true,
     },
     {
         title: 'Groups', 
         icon: 'group',
         href: '',
         hover: 'Navigate to available groups',
+        isShown: true,
     },
     {
         title: 'Fixtures', 
         icon: 'sport',
         href: '',
         hover: 'Access fixtures administration',
+        isShown: true,
     },
     {
         title: 'Resources', 
         icon: 'folder',
         href: '',
         hover: 'Browse resources and homepages',
+        isShown: true,
     },
 ];
