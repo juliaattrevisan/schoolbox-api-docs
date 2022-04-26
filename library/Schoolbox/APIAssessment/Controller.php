@@ -19,8 +19,6 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
 
-    protected Helper $helper;
-
     protected IConnector $dbMapper;
     /**
      * Controller constructor.
@@ -28,7 +26,6 @@ class Controller extends Base
      */
     public function __construct()
     {
-        $this->helper = new Helper();
     }
 
     /**
@@ -114,7 +111,7 @@ WHERE v_most_recent_feedback.assessment_id = :id";
                 'normalisedMark' => $row['norm_mark'],
                 'comment' => $row['comment'],
                 'date'  => $row['completionDate'],
-                'resubmissionRequired'  => $this->helper->castToBool($row['resubmission_required']),
+                'resubmissionRequired'  => (bool)$row['resubmission_required'],
                 'assessor'            => [
                     'id' => $row['staffId'],
                     'title' => $row['staffTitle'],
