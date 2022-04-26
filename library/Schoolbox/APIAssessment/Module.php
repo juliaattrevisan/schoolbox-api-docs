@@ -14,19 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\GroupMapper;
-use Schoolbox\UserMapper;
-use DomainException;
-use LogicException;
-use Schoolbox\Application\Exception as ApplicationException;
-use UnexpectedValueException;
 
 class Module extends BaseModule
 {
