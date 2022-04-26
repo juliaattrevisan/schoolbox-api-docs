@@ -55,15 +55,16 @@ SELECT
     v_assessment_relation.folder_id as `folderId`,
     markTypeTable.hr_name AS markType,
     COALESCE(
-        if(task.id, 'Task', null),
-        if(assess.assessment_id, 'Quiz', null),
-        if(lti_assessment.assessment_id, 'LTI', null),
-        if(submission_box.id, 'DueWork', null),
-        if(project.id, 'Project', null)
-    ) as `assessmentType`,
+            if(task.id, 'Task', null),
+            if(assess.assessment_id, 'Quiz', null),
+            if(lti_assessment.assessment_id, 'LTI', null),
+            if(submission_box.id, 'DueWork', null),
+            if(project.id, 'Project', null)
+        ) as `assessmentType`,
 
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
+    v_most_recent_feedback.review_route as `reviewRoute`,
     student.title as `studentTitle`,
     student.firstname as `studentFirstname`,
     student.lastname as `studentLastname`,
@@ -80,33 +81,32 @@ SELECT
     staff.synergy_id as `staffExternalId`
 
 
-FROM v_most_recent_feedback
+FROM v_assessment_relation
 
-JOIN assessment on v_most_recent_feedback.assessment_id = assessment.id
-JOIN v_assessment_relation on assessment.id = v_assessment_relation.assessment_id
-LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
-LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+         JOIN assessment on v_assessment_relation.assessment_id = assessment.id
+         LEFT JOIN v_most_recent_feedback on assessment.id = v_most_recent_feedback.assessment_id
+         LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+         LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
 
 
-LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+         LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
 
-LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
+         LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
 
-LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
+         LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
 
-LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
+         LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
 
-LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
+         LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
 
-LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
+         LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id) = staff.id
 
-LEFT JOIN task on assessment.id = task.assessment_id
-LEFT JOIN assess on assessment.id = assess.assessment_id
-LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
-LEFT JOIN project on assessment.id = project.assessment_id
+         LEFT JOIN task on assessment.id = task.assessment_id
+         LEFT JOIN assess on assessment.id = assess.assessment_id
+         LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
+         LEFT JOIN project on assessment.id = project.assessment_id
 WHERE
-    v_most_recent_feedback.review_route = 'instructor' AND
-    v_most_recent_feedback.assessment_id = :id";
+        v_assessment_relation.assessment_id = :id";
 
         $mapper = UserMapper::getInstance()->getDatabase();
         $statement = $mapper->prepare($query);
@@ -128,27 +128,29 @@ WHERE
             $output['workType'] = $row['workType'];
             $output['markType'] = $row['markType'];
             $output['folderId'] = $row['folderId'];
-            $output['participants'][] = [
-                'learner' => [
-                    'id' => $row['student_id'],
-                    'title' => $row['studentTitle'],
-                    'firstName' => $row['studentFirstname'],
-                    'lastName' => $row['studentLastname'],
-                    'externalId' => $row['studentExternalId'],
-                ],
-                'mark'  => $row['mark'],
-                'normalisedMark' => $row['norm_mark'],
-                'comment' => $row['comment'],
-                'date'  => $completionDate->toIso8601String(),
-                'instructor'            => [
-                    'id' => $row['staffId'],
-                    'title' => $row['staffTitle'],
-                    'firstName' => $row['staffFirstname'],
-                    'lastName' => $row['staffLastname'],
-                    'externalId' => $row['staffExternalId'],
-                ]
+            if (null !== $row['student_id'] && 'instructor' ===  $row['reviewRoute']) {
+                $output['participants'][] = [
+                    'learner'        => [
+                        'id'         => $row['student_id'],
+                        'title'      => $row['studentTitle'],
+                        'firstName'  => $row['studentFirstname'],
+                        'lastName'   => $row['studentLastname'],
+                        'externalId' => $row['studentExternalId'],
+                    ],
+                    'mark'           => $row['mark'],
+                    'normalisedMark' => $row['norm_mark'],
+                    'comment'        => $row['comment'],
+                    'date'           => $completionDate->toIso8601String(),
+                    'instructor'     => [
+                        'id'         => $row['staffId'],
+                        'title'      => $row['staffTitle'],
+                        'firstName'  => $row['staffFirstname'],
+                        'lastName'   => $row['staffLastname'],
+                        'externalId' => $row['staffExternalId'],
+                    ]
 
-            ];
+                ];
+            }
         }
         /**
          * build the whole thing
