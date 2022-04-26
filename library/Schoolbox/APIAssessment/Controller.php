@@ -97,6 +97,7 @@ WHERE
          * build the whole thing
          */
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $completionDate = date_create($row['completionDate']);
             $output['id'] = $row['id'];
             $output['title'] = $row['title'];
             $output['weight'] = $row['weight'];
@@ -111,7 +112,7 @@ WHERE
                 'mark'  => $row['mark'],
                 'normalisedMark' => $row['norm_mark'],
                 'comment' => $row['comment'],
-                'date'  => $row['completionDate'],
+                'date'  => date_format($completionDate, 'Y-m-d\TH:i:sP'),
                 'instructor'            => [
                     'id' => $row['staffId'],
                     'title' => $row['staffTitle'],
