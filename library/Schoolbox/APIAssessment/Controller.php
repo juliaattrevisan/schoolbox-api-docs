@@ -188,11 +188,14 @@ WHERE
         }
         if (array_key_exists('yearLevel', $filter)) {
             if (array_key_exists('id', $filter['yearLevel'])) {
-                $where .= " AND lu_year_level.id = :yearLevelId ";
+                $where .= " AND folder_year_level.year_level_id = :yearLevelId ";
                 $params['yearLevelId'] = $filter['yearLevel']['id'];
+                $from .= "JOIN folder_year_level on folder_year_level.folder_id = v_assessment_relation.folder_id";
             } elseif (array_key_exists('name', $filter['yearLevel'])) {
                 $where .= " AND lu_year_level.name = :yearLevelName ";
                 $params['yearLevelName'] = $filter['yearLevel']['name'];
+                $from .= "JOIN folder_year_level on folder_year_level.folder_id = v_assessment_relation.folder_id
+                JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id";
             }
         }
 
