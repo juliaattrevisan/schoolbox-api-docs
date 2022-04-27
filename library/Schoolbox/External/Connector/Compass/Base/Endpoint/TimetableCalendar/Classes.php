@@ -489,9 +489,13 @@ class Classes implements IStrategy
         array $activityInstance
     ): \Schoolbox\External\Event\Model {
 
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
+
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$activity['name']);
+        $classCode = $activityName;
         $day = null;
         $detail = null;
 
@@ -501,7 +505,7 @@ class Classes implements IStrategy
 
         $period = null;
         $room = trim((string)$activityInstance['location']);
-        $title = trim((string)$activity['name']);
+        $title = $activityName;
 
         /* Datetimes for when this class occurs
          */
