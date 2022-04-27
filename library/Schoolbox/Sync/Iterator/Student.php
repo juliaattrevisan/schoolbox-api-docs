@@ -48,7 +48,7 @@ class Student extends IteratorIterator
         $student       = new User\Student();
         $student
             ->setId($currentResult['student_id'])
-            ->setTitle($currentResult['student_title'])
+            ->setTitle($currentResult['student_title'] ?? '')
             ->setGivenName($currentResult['student_given_name'])
             ->setPreferredName($currentResult['student_preferred'] ?? '')
             ->setLastname($currentResult['student_surname'])

@@ -58,7 +58,7 @@ class Guardian extends IteratorIterator
         $guardian      = new User\Guardian();
         $guardian
             ->setId($currentResult['student_contact_id'])
-            ->setTitle($currentResult['student_contact_title'])
+            ->setTitle($currentResult['student_contact_title'] ?? '')
             ->setGivenName($currentResult['student_contact_given_name'])
             ->setPreferredName($currentResult['student_contact_preferred'])
             ->setLastname($currentResult['student_contact_surname'])
@@ -87,14 +87,14 @@ class Guardian extends IteratorIterator
             // Students
             $student = new User\Student();
             $student
-                ->setId($row['student_id'])
-                ->setPreferredName($row['student_preferred'])
+                ->setId($row['student_id'] ?? '')
+                ->setPreferredName($row['student_preferred'] ?? '')
                 ->setLastname($row['student_surname'])
                 ->setGender($row['student_gender'])
             ;
 
             $student->getYear()->setLevel($row['student_year_level']);
-            $student->getForm()->setDescription($row['student_form_description']);
+            $student->getForm()->setDescription($row['student_form_description'] ?? '');
 
             /* Campus
              */
