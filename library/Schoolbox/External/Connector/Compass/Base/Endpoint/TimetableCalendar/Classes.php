@@ -25,7 +25,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Classes implements IStrategy
 {
 
-
     /**
      * RunningStatus determines whether an activity and/or its instance is actually running
      * 0 is cancelled; 1 is running; 2 is draft.
@@ -220,7 +219,6 @@ class Classes implements IStrategy
 
     /**
      * @return void
-     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -253,7 +251,6 @@ class Classes implements IStrategy
         $academicGroupSchedules = (new Lookup\Schedules($this->log, $this->api))->generate();
 
         $this->log->info('Mining all the Schedules for their Activity Instances...');
-
 
         /* Quartic n^4 complexity, but I can't think of a convenient way to improve this
          */

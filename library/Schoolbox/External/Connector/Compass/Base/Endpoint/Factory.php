@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -189,16 +189,10 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function produce(): GenericCollection
     {
         $api = new Api($this->host, $this->key);
-
-        /* Default event owner
-         */
-        $credentials = (new Codec\DSN())->decode($this->key);
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
@@ -210,34 +204,34 @@ class Factory
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
-//            ->add(new Profile\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
+            ->add(new Profile\Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
