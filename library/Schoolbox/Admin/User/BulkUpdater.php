@@ -187,6 +187,13 @@ class BulkUpdater
          */
         if (!in_array(self::UNCHANGED, $campusIds, false)) {
             $this->campusIds = array_map('intval', $campusIds);
+            //check if campus still exists... yay multiplayer schoolbox
+            $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT count(*) as campusCount FROM luCampus WHERE id in (:id) AND deleted_at is NULL", ['id' => implode(',', $this->campusIds)]);
+            $validCampusId->execute();
+            $campusCount = (int)$validCampusId->fetch()['campusCount'];
+            if (count($this->campusIds) !== $campusCount) {
+                throw new SchoolboxException("Campus has been deleted or does not exist.");
+            }
         }
 
         /* Remember these scalars as they are
@@ -406,12 +413,6 @@ class BulkUpdater
          *   One big updater
          */
         if (\count($this->campusIds)) {
-            //check if campus still exists... yay multiplayer schoolbox
-            $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT id FROM luCampus WHERE id in (:id) AND deleted_at is NULL", ['id' => implode(',', $this->campusIds)]);
-            $validCampusId->execute();
-            if (0 === count($validCampusId->fetchAll())) {
-                throw new SchoolboxException("Campus has been deleted or does not exist.");
-            }
             $statements['campus']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
                 "DELETE FROM userCampus WHERE uid IN ({$bindings->getPlaceholder()})"
             );
