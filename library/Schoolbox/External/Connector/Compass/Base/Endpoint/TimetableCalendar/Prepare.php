@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,14 +9,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
 
-use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventMapper;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\External\TimetablePeriodMapper;
 
 /**
- * Purge events that used a specified event_source identifier
- * This ensures we only delete stuff imported via SUDS Compass
+ * Class Prepare
+ *
+ * Clears data from a db in preparation for an import
+ *
+ * @package Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar
  */
 class Prepare implements IStrategy
 {
@@ -40,196 +46,101 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var EventMapper
-     */
-    private EventMapper $eventMapper;
-
-
-    /**
      * @var Mapper
      */
-    private Mapper $eventSourceMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
-     * Constructor.
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
+     * @var ClassPeriodMapper
+     */
+    private ClassPeriodMapper $classPeriodMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
+     * Prepare constructor.
      *
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param EventMapper     $eventMapper
-     * @param Mapper          $eventSourceMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param Mapper                                     $eventMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        EventMapper $eventMapper,
-        Mapper $eventSourceMapper
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
     /**
-     * Delete all the events that used a particular source identifier
-     *
-     * @throws \PDOException
+     * Purge classes that were previously imported
      */
     public function import(): void
     {
         if ($this->perform) {
-            $queries = [];
-
-            /* Mark events for deletion to avoid a mega where-in clause
+            /* Delete any overrides that existed
              */
-            $queries['Event Primer'] = [
-                'query' => "
-                    UPDATE `event` e
-                    INNER JOIN event_source s on e.id = s.event_id
-                    SET e.updated_at = '0000-00-00 00:00:00'
-                    WHERE s.source_name = :sourceName
-                ",
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
+            $this->overridesMapper->truncate();
+            $this->log->debug('Purged timetable event overrides');
 
-            /* Avoid using the eventSourceMapper to delete things via objects etc.
-             * It is super super slow for heaps of events, such as a huge compass import
-             *
-             * Just assassinate them directly
+            /* Delete existing timetable events
              */
-            $queries['Event Attendance Relations'] = [
-                'query' => '
-                    DELETE a
-                    FROM `event` e
-                    INNER JOIN event_attendance a ON a.event_id = e.id
-                    INNER JOIN event_source s ON e.id = s.event_id
-                    WHERE s.source_name = :sourceName                 
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event Campus Relations'] = [
-                'query' => '
-                    DELETE c
-                    FROM `event` e
-                    INNER JOIN event_campus c ON c.event_id = e.id
-                    INNER JOIN event_source s ON e.id = s.event_id
-                    WHERE s.source_name = :sourceName                 
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event Folder Relations'] = [
-                'query' => '
-                    DELETE f
-                    FROM `event` e
-                    INNER JOIN event_folder f ON f.event_id = e.id
-                    INNER JOIN event_source s ON e.id = s.event_id
-                    WHERE s.source_name = :sourceName                 
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event Role Relations'] = [
-                'query' => '
-                    DELETE r
-                    FROM `event` e
-                    INNER JOIN event_role r ON r.event_id = e.id
-                    INNER JOIN event_source s ON e.id = s.event_id
-                    WHERE s.source_name = :sourceName                 
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event User Relations'] = [
-                'query' => '
-                    DELETE u
-                    FROM `event` e
-                    INNER JOIN event_user u ON u.event_id = e.id
-                    INNER JOIN event_source s ON e.id = s.event_id
-                    WHERE s.source_name = :sourceName                 
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event Source'] = [
-                'query' => '
-                    DELETE FROM event_source
-                    WHERE source_name = :sourceName
-                ',
-                'params' => [
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]
-            ];
-
-            $queries['Event Detonator'] = [
-                'query' => "
-                    DELETE FROM event
-                    WHERE updated_at = '0000-00-00 00:00:00'
-                ",
-                'params' => null
-            ];
-
-            $queries['SIS Classes'] = [
-                'query' => '
-                    DELETE FROM sis_class
-                ',
-                'params' => null
-            ];
-
-            $queries['SIS Class Involvements'] = [
-                'query' => '
-                    DELETE FROM sis_class_user
-                ',
-                'params' => null
-            ];
-
+            $this->eventMapper->deleteByColumn('classification', \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE);
             $this->log->debug(sprintf(
-                'Beginning the great purge of existing events/relations that used event_source: %s',
-                self::EVENT_IMPORT_IDENTIFIER
+                'Purged timetable events classified as %s',
+                \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
             ));
 
-            $this->log->debug('This might take a while.');
-            $this->log->debug('');
-
-            /* Delete relations
+            /* Truncate other data entirely
              */
-            foreach ($queries as $name => $setup) {
-                $this->log->debug(sprintf(
-                    'Executing %s purge...',
-                    $name
-                ));
+            $this->classEntryMapper->truncate();
+            $this->classInvolvementMapper->truncate();
+            $this->classPeriodMapper->truncate();
+            $this->periodMapper->truncate();
 
-                $statement = $this->eventSourceMapper->getDatabase()->prepare($setup['query']);
-
-                if (null !== $setup['params']) {
-                    $statement->execute($setup['params']);
-                } else {
-                    $statement->execute();
-                }
-
-                $this->log->debug('Done.');
-            }
-
-            $this->log->info(sprintf(
-                'Purged existing events/relations that used event_source: %s',
-                self::EVENT_IMPORT_IDENTIFIER
-            ));
+            $this->log->info('Purged existing timetable events, classEntry, classInvolvement, classPeriod, period and overrides data');
         }
     }
 }

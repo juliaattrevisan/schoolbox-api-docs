@@ -3636,11 +3636,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/TimetableCalendar/Lookup/Enrolments.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Compass\\\\Base\\\\Endpoint\\\\TimetableCalendar\\\\Prepare\\:\\:\\$eventMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/TimetableCalendar/Prepare.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\CustomSync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/CustomSync.php

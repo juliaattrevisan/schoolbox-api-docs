@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,19 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
-use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\EventType;
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -34,13 +29,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
-    /**
-     * luEventType setup
-     */
-    private const TIMETABLE_EVENT_TYPE = 'Timetable';
-    private const TIMETABLE_COLOR = '#dedede';
-
 
     /**
      * @var LoggerInterface
@@ -99,45 +87,9 @@ class Factory
 
 
     /**
-     * @var UserMapper
+     * @var \Schoolbox\External\Event\Mapper
      */
-    private UserMapper $userMapper;
-
-
-    /**
-     * @var EventMapper
-     */
-    private EventMapper $eventMapper;
-
-
-    /**
-     * @var Mapper
-     */
-    private \Event\Source\Mapper $eventSourceMapper;
-
-
-    /**
-     * @var EventTypeMapper
-     */
-    private EventTypeMapper $eventTypeMapper;
-
-
-    /**
-     * @var PersonalMapper
-     */
-    private PersonalMapper $relationPersonalMapper;
-
-
-    /**
-     * @var CategoryMapper
-     */
-    private CategoryMapper $relationFolderMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
@@ -153,26 +105,41 @@ class Factory
 
 
     /**
+     * @var ClassPeriodMapper
+     */
+    private ClassPeriodMapper $classPeriodMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * Factory constructor.
      *
-     * @param LoggerInterface                   $log
-     * @param bool                              $perform
-     * @param string                            $host
-     * @param string                            $key
-     * @param UserProfile\Mapper                $baseProfileMapper
-     * @param UserProfile\Student\Mapper        $studentProfileMapper
-     * @param UserProfile\Parent\Mapper         $parentProfileMapper
-     * @param UserProfile\Staff\Mapper          $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper   $relationshipMapper
-     * @param UserMapper                        $userMapper
-     * @param EventMapper                       $eventMapper
-     * @param Mapper                            $eventSourceMapper
-     * @param EventTypeMapper                   $eventTypeMapper
-     * @param PersonalMapper                    $relationalPersonalMapper
-     * @param CategoryMapper                    $relationFolderMapper
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param ClassEntryMapper                  $classEntryMapper
-     * @param ClassInvolvementMapper            $classInvolvementMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param string                                     $host
+     * @param string                                     $key
+     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param UserProfile\Student\Mapper                 $studentProfileMapper
+     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
+     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper            $relationshipMapper
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -186,15 +153,12 @@ class Factory
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
-        UserMapper $userMapper,
-        EventMapper $eventMapper,
-        \Event\Source\Mapper $eventSourceMapper,
-        EventTypeMapper $eventTypeMapper,
-        PersonalMapper $relationalPersonalMapper,
-        CategoryMapper $relationFolderMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -211,15 +175,12 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->userMapper = $userMapper;
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->relationPersonalMapper = $relationalPersonalMapper;
-        $this->relationFolderMapper = $relationFolderMapper;
-        $this->folderMapper = $folderMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -228,29 +189,17 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function produce(): GenericCollection
     {
         $api = new Api($this->host, $this->key);
 
-        /* Default event owner
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
          */
-        $credentials = (new Codec\DSN())->decode($this->key);
-
-        try {
-            $defaultOwner = $this->userMapper->findById($credentials['timetableowner']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new \DomainException(sprintf(
-                'Timetable owner user account %s not found, but we needed that. Exiting.',
-                $credentials['timetableowner']
-            ));
-        }
-
-        /* Default event type, I guess
-         */
-        $defaultEventType = $this->findDefaultEventType($defaultOwner);
+        $from = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $to = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
 
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
@@ -287,59 +236,25 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->eventMapper,
-                \Event\Source\Mapper::getInstance(),
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper,
             ))
-            ->add(new TimetableCalendar\Events(
+            ->add(new TimetableCalendar\Classes(
                 $this->log,
                 $this->perform,
                 $api,
-                $defaultOwner,
-                $defaultEventType,
-                $this->userMapper,
                 $this->eventMapper,
-                $this->eventSourceMapper,
-                $this->relationPersonalMapper,
-                $this->relationFolderMapper,
-                $this->folderMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
+                $from,
+                $to
             ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
             ));
-    }
-
-
-    /**
-     * Forcibly create a new luEventType for Compass Timetable events
-     * if one doesn't already exist for us to reuse
-     *
-     * @param \Schoolbox\User $defaultOwner
-     * @return EventType
-     * @throws UnexpectedValueException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function findDefaultEventType(\Schoolbox\User $defaultOwner): EventType
-    {
-        /* Arbitrarily put this event into sequence 999
-         * The next time someone saves this list, they can put it wherever they want
-         */
-        $sequence = 999;
-
-        try {
-            $defaultEventType = $this->eventTypeMapper->findOneByColumn('eventType', self::TIMETABLE_EVENT_TYPE);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $defaultEventType = $this->eventTypeMapper->createModel()
-                ->setType(self::TIMETABLE_EVENT_TYPE)
-                ->setColor(self::TIMETABLE_COLOR)
-                ->setUpdatedBy($defaultOwner->getId())
-                ->setSequence($sequence);
-
-            $this->eventTypeMapper->save($defaultEventType);
-        }
-
-        return $defaultEventType;
     }
 }

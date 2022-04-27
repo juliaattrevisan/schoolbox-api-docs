@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,29 +9,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
 
-use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\EventType;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
+use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\Role;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
- * Set up calendar events to represent these class (Activity) instances
- * with all their student relationships and teacher assignations
- *
- * Each Activity instance occurs on a specific datetime
+ * Import all the classes for a student, saving them as sis_event records
+ * with the 'timetable' classification
  */
-class Events implements IStrategy
+class Classes implements IStrategy
 {
 
     /**
@@ -129,6 +120,8 @@ class Events implements IStrategy
 
 
     /**
+     * The "perform" flag from the cli tool
+     *
      * @var bool
      */
     private bool $perform;
@@ -141,51 +134,9 @@ class Events implements IStrategy
 
 
     /**
-     * @var User
+     * @var \Schoolbox\External\Event\Mapper
      */
-    private User $defaultOwner;
-
-
-    /**
-     * @var EventType
-     */
-    private EventType $defaultEventType;
-
-
-    /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-
-    /**
-     * @var EventMapper
-     */
-    private EventMapper $eventMapper;
-
-
-    /**
-     * @var Mapper
-     */
-    private \Event\Source\Mapper $eventSourceMapper;
-
-
-    /**
-     * @var PersonalMapper
-     */
-    private PersonalMapper $relationPersonalMapper;
-
-
-    /**
-     * @var CategoryMapper
-     */
-    private CategoryMapper $relationFolderMapper;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
@@ -201,80 +152,59 @@ class Events implements IStrategy
 
 
     /**
-     * Used for api calls
-     *
      * @var string
      */
     private string $lBound;
 
 
     /**
-     * Used for api calls
-     *
      * @var string
      */
     private string $uBound;
 
 
     /**
-     * A list of people involved in a folder code
-     *
-     * [
-     *     activity name => [
-     *        instance => an instance of sis_class (ClassEntry)
-     *        manifest => a list of people added to sis_class_user (ClassInvolvement)
-     *     ]
-     * ]
+     * A list of classEntries that we saw previously
      *
      * @var array
      */
-    private array $enrolmentManifest = [];
+    private array $classEntries = [];
+
+
+    /**
+     * A list of classInvolvements that we saw previously
+     *
+     * @var array
+     */
+    private array $classInvolvements = [];
 
 
     /**
      * Constructor.
      *
-     * @param LoggerInterface                   $log
-     * @param bool                              $perform
-     * @param IApi                              $api
-     * @param User                              $defaultOwner
-     * @param EventType                         $defaultEventType
-     * @param UserMapper                        $userMapper
-     * @param EventMapper                       $eventMapper
-     * @param Mapper                            $eventSourceMapper
-     * @param PersonalMapper                    $relationPersonalMapper
-     * @param CategoryMapper                    $relationFolderMapper
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param ClassEntryMapper                  $classEntryMapper
-     * @param ClassInvolvementMapper            $classInvolvementMapper
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param IApi                   $api
+     * @param Mapper                 $eventMapper
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param string                 $fromDate
+     * @param string                 $toDate
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
-        User $defaultOwner,
-        EventType $defaultEventType,
-        UserMapper $userMapper,
-        EventMapper $eventMapper,
-        \Event\Source\Mapper $eventSourceMapper,
-        PersonalMapper $relationPersonalMapper,
-        CategoryMapper $relationFolderMapper,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        ClassInvolvementMapper $classInvolvementMapper,
+        string $fromDate,
+        string $toDate
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-
-        $this->defaultOwner = $defaultOwner;
-        $this->defaultEventType = $defaultEventType;
-        $this->userMapper = $userMapper;
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
-        $this->relationPersonalMapper = $relationPersonalMapper;
-        $this->relationFolderMapper = $relationFolderMapper;
-        $this->folderMapper = $folderMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
 
@@ -282,21 +212,19 @@ class Events implements IStrategy
          * for api calls. It needs to be in a specific format so might
          * as well remember that
          */
-        $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
-        $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+        $this->lBound = $fromDate;
+        $this->uBound = $toDate;
     }
 
 
     /**
-     * Import as calendar events
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-        /* Some extra details about how many things were made
-         */
-        $numEvents = 0;
-        $numRelationships = 0;
-
         $this->log->info('Fetching Staff Lookup, Academic Groups, Enrolments, Schedules and their Activity Instances...');
 
         /* Announce window
@@ -494,304 +422,275 @@ class Events implements IStrategy
                             $activity['name']
                         ));
 
-                        /* The relationships here are based on actual schoolbox.user accounts existing
-                         * since we have foreigner keys for user.id in the schema. This means UPS must
-                         * have run prior to timetable imports...we'll just fumble through it
-                         */
-                        $numRelationships += $this->createClassEvents($activity, $activityInstance, $enrolments);
-                        $numEvents++;
+                        $this->processClass($activity, $activityInstance, $enrolments);
                     }
                 }
             }
         }
-
-        /* Make a quick count of the things we made
-         */
-        $this->log->info(sprintf(
-            'Manufactured %s events in total, with %s relationships in total',
-            $numEvents,
-            $numRelationships
-        ));
     }
 
 
     /**
-     * Create an event that represents an occurrence of this Activity
+     * For each class, process the lessons and apply student/staff involvements
+     * Ignore lessons that occur outside the [$from, $to] window
      *
      * @param array $activity
      * @param array $activityInstance
      * @param array $enrolments
-     * @return int
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
+     * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createClassEvents(array $activity, array $activityInstance, array $enrolments): int
+    private function processClass(array $activity, array $activityInstance, array $enrolments): void
     {
+
+        /* Save sis_event record
+         */
+        $event = $this->createEvent($activity, $activityInstance);
+
+        /* Save sis_class record
+         */
+        $classEntry = $this->createClassEntry($activity, $event);
+
+        /* Save the involvements
+         */
+        $this->createInvolvements($activity, $activityInstance, $enrolments, $event, $classEntry);
+    }
+
+
+    /**
+     * Create a new SUDS Timetable Event with all the class and lesson pieces
+     *
+     * @param array $activity
+     * @param array $activityInstance
+     * @return \Schoolbox\External\Event\Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createEvent(
+        array $activity,
+        array $activityInstance
+    ): \Schoolbox\External\Event\Model {
+
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
+
+        /* Fill in these vars as usual
+         */
+        $classCode = $activityName;
+        $day = null;
+        $detail = null;
+
         /* Arbitrarily concoct a superkey to represent this activity instance
-         * Unlocking shared personal events basically makes this useless imho
          */
         $guid = "{$activity['activityId']}.{$activity['importIdentifier']}.{$activityInstance['start']}";
 
-        /* Arbitrarily concoct a random array of event information that we can pass around
+        $period = null;
+        $room = trim((string)$activityInstance['location']);
+        $title = $activityName;
+
+        /* Datetimes for when this class occurs
          */
-        $meta = [
-            'location' => trim((string)$activityInstance['location']),
-            'title' => trim((string)$activity['name']),
-            'startDatetime' => \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start'])),
-            'endDatetime' => \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['finish'])),
-            'guid' => $guid
-        ];
+        $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start']));
+        $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['finish']));
 
-        /* Recycle this event for all the people related to it
-         *
-         * This would have otherwise created N events, one for each student and another for
-         * the teacher, which is excessive dupe data
-         *
-         * For a given class:
-         *
-         * 25 students in a class = 25 individual personal event records.
-         * 100 occurrences of that class in a year = 2500 records spawning per ups run
-         * 300 UPS runs in a year (assuming once daily) = 750,000 rows spawning throughout the year via ups
-         *
-         * Let's say there's 10 individual classes in a school;
-         * That's 7,500,000 rows spawning throughout the year for the whole school
-         * That's a lot of dupe data
+        /* This is pretty optional - this is the sis' equivalent of our luEventType
+         * Sometimes it's provided, sometimes it's not - we can record it here if
+         * possible. If you can't get it, dw about it
          */
-        $event = $this->eventMapper->createModel()->setCampusCollection(new \Schoolbox\Collection());
-        $eventSource = $this->eventSourceMapper->createModel();
+        $type = '';
 
-        /* Start hydrating $event with info from $activity and $activityInstance
+        /* Cram in everything else
          */
-        $event
-            ->setTitle($meta['title'])
-            ->setLocation($meta['location'])
-            ->setAuthor($this->defaultOwner)
-            ->setOwner($this->defaultOwner)
-            ->setStartDateTime($meta['startDatetime'])
-            ->setEndDateTime($meta['endDatetime'])
-            ->setType($this->defaultEventType)
-            ->setAccess(Event::ACCESS_PERSONAL);
+        $event = $this->eventMapper->createModel()
+            ->setTitle($title)
+            ->setDetail($detail)
+            ->setLocation($room)
+            ->setCode($classCode)
+            ->setDay($day)
+            ->setPeriod($period)
+            ->setStartAt($startAt)
+            ->setFinishAt($finishAt)
+            ->setType($type)
+            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setGuid($guid)
+            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
 
-        /* Assign event source identifier, assign compass guid (whatever that might be)
+        /* Save it and remember what we saw in case we need to reuse this later
          */
-        $eventSource
-            ->setEvent($event)
-            ->setSourceName(Prepare::EVENT_IMPORT_IDENTIFIER)
-            ->setGuid($meta['guid']);
-
-        /* Assign Group (homepage/category/folder) relations using $activity['name']
-         * as the folder code, assigning to individuals if folder code not found
-         */
-        try {
-            /* TODO Improve this with a hashtable lookup, maybe
-             */
-            $folder = $this->folderMapper->findByCode($activity['name']);
-
-            /* Update the Access Level to GROUP before saving it
-             */
-            if ($this->perform) {
-                $event->setAccess(Event::ACCESS_GROUP);
-
-                $this->eventMapper->save($event);
-                $this->eventSourceMapper->save($eventSource);
-            }
-
-            return $this->createGroupEvents($activity, $activityInstance, $enrolments, $event, $folder);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->log->warning(sprintf(
-                'Activity %s Instance on %s: cannot find corresponding folder for %s. Creating personal events instead',
-                $activity['name'],
-                $activityInstance['start'],
-                $activity['name']
-            ));
-
-            if ($this->perform) {
-                $this->eventMapper->save($event);
-                $this->eventSourceMapper->save($eventSource);
-            }
-
-            /* Folder wasn't found; install this event for each guy individually
-             */
-            return $this->createPersonalEvents($activity, $activityInstance, $enrolments, $event);
-        }
-    }
-
-
-    /**
-     * Create a calendar event with Folder relations
-     *
-     * @param array                            $activity
-     * @param array                            $activityInstance
-     * @param array                            $enrolments
-     * @param Event                            $event
-     * @param \Schoolbox\Resource\Folder\Model $folder
-     * @return int
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function createGroupEvents(
-        array $activity,
-        array $activityInstance,
-        array $enrolments,
-        Event $event,
-        \Schoolbox\Resource\Folder\Model $folder
-    ): int {
         $this->log->debug(sprintf(
-            'Activity %s Instance on %s: saving folder relationship with %s',
-            $activity['name'],
-            $activityInstance['start'],
-            $folder->getNameWithCodes()
+            'Creating new timetable event %s - %s, %s, %s-%s',
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
         ));
 
-        /* Assign people relations from $enrolments - try to find the users if they exist
-         * via the usual User lookup technique, skipping if they don't exist
-         */
         if ($this->perform) {
-            $this->relationFolderMapper->save($this->relationFolderMapper->createModel()
-                ->setEventId($event->getId())
-                ->setCategoryId($folder->getId()));
-
-            /* Check if the class record exists;
-             * if it doesn't already exist, spawn it and remember it
-             * then reuse it
-             */
-            if (!isset($this->enrolmentManifest[$activity['name']]['instance'])) {
-                $this->log->debug(sprintf(
-                    'Creating new ClassEntry record for Activity %s Instance on %s',
-                    $activity['name'],
-                    $activityInstance['start'],
-                ));
-
-                $classInstance = $this->classEntryMapper->createModel()
-                    ->setName($activity['name'])
-                    ->setCode($activity['name']);
-
-                $this->classEntryMapper->save($classInstance);
-
-                $this->enrolmentManifest[$activity['name']]['instance'] = $classInstance;
-            }
-
-            $classInstance = $this->enrolmentManifest[$activity['name']]['instance'];
-
-            /* Install everyone into sis_class* tables so they appear
-             * in the Class List and Class Teachers components in a
-             * homepage; only applies to Group Events
-             *
-             * Make a giant assumption that $activity['name'] contains the
-             * same guys all the time; we don't have a unique identifier for
-             * each activity instance and homepages are aggregated by the
-             * $activity['name'] anyway
-             */
-            foreach (array_merge($enrolments['students'], $enrolments['teachers']) as $externalId) {
-                /* Find out if we already added each person to the sis_class_user schema
-                 * If we already did, skip it
-                 */
-                if (!isset($this->enrolmentManifest[$activity['name']]['manifest'][$externalId])) {
-                    $this->log->debug(sprintf(
-                        'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
-                        $activity['name'],
-                        $activityInstance['start'],
-                        $externalId
-                    ));
-
-                    $classInvolvement = $this->classInvolvementMapper->createModel()
-                        ->setClass($classInstance)
-                        ->setExternalId($externalId);
-
-                    $this->classInvolvementMapper->save($classInvolvement);
-
-                    $this->enrolmentManifest[$activity['name']]['manifest'][$externalId] = $classInvolvement;
-                }
-            }
+            $this->eventMapper->save($event);
         }
 
-        /* Created one relationship with $folder
-         */
-        return 1;
+        return $event;
     }
 
 
     /**
-     * Create a calendar event with Personal relations
+     * Create (or reuse) a ClassEntry corresponding to $event
      *
-     * @param array                     $activity
-     * @param array                     $activityInstance
-     * @param array                     $enrolments
-     * @param Event $event
-     * @return int
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @param array                           $activity
+     * @param \Schoolbox\External\Event\Model $event
+     * @return ClassEntry
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createPersonalEvents(
+    private function createClassEntry(array $activity, \Schoolbox\External\Event\Model $event): ClassEntry
+    {
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
+
+        if (isset($this->classEntries[$event->getCode()])) {
+            $classEntry = $this->classEntries[$event->getCode()];
+        } else {
+            $classEntry = $this->classEntryMapper->createModel()
+                ->setName($activityName)
+                ->setCode($activityName);
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($classEntry);
+            }
+
+            $this->classEntries[$event->getCode()] = $classEntry;
+        }
+
+        return $classEntry;
+    }
+
+
+    /**
+     * Save all the involvements for a given $class
+     *
+     * @param array                           $activity
+     * @param array                           $activityInstance
+     * @param array                           $enrolments
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createInvolvements(
         array $activity,
         array $activityInstance,
         array $enrolments,
-        Event $event
-    ): int {
-        $n = 0;
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry
+    ): void {
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
 
-        foreach ($enrolments['students'] as $externalId) {
-            try {
-                $owner = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->log->warning(sprintf(
-                    'Activity %s Instance on %s: cannot find student %s, skipping',
-                    $activity['name'],
+        /* Save sis_class_user involvements
+         * This is the teacher(s)
+         */
+        if (!\count($enrolments['teachers'])) {
+            $this->log->debug(sprintf(
+                '%s: no staff involved',
+                $activityName
+            ));
+        } else {
+            foreach ($enrolments['teachers'] as $externalId) {
+                $name = sprintf(
+                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                    $activityName,
                     $activityInstance['start'],
                     $externalId
-                ));
+                );
 
-                continue;
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
-
-            /* Assign people relations from $enrolments - try to find the users if they exist
-             * via the usual User lookup technique, skipping if they don't exist
-             */
-            if ($this->perform) {
-                $this->relationPersonalMapper->save($this->relationPersonalMapper->createModel()
-                    ->setEventId($event->getId())
-                    ->setUserId($owner->getId()));
-            }
-
-            $n++;
         }
 
-        /* Do this for the Lead Teacher as well
+        /* Save sis_class_user involvements
+         * This is the student(s)
          */
-        foreach ($enrolments['teachers'] as $externalId) {
-            try {
-                $owner = $this->userMapper->findByExternalId($externalId, Role::STAFF);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $this->log->warning(sprintf(
-                    'Activity %s Instance on %s: cannot find teacher %s, skipping',
-                    $activity['name'],
+        if (!\count($enrolments['students'])) {
+            $this->log->debug(sprintf(
+                '%s: no students involved',
+                $activityName
+            ));
+        } else {
+            foreach ($enrolments['students'] as $externalId) {
+                $name = sprintf(
+                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                    $activityName,
                     $activityInstance['start'],
                     $externalId
-                ));
+                );
 
-                continue;
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
-
-            /* Assign people relations from $enrolments - try to find the users if they exist
-             * via the usual User lookup technique, skipping if they don't exist
-             */
-            if ($this->perform) {
-                $this->relationPersonalMapper->save($this->relationPersonalMapper->createModel()
-                    ->setEventId($event->getId())
-                    ->setUserId($owner->getId()));
-            }
-
-            $n++;
         }
+    }
 
-        /* Created $n personal relationships
-         */
-        return $n;
+
+    /**
+     * Save an involvement for user $externalId, whose name is $name,
+     * for the sis_event $event
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @param string                          $name
+     * @param string                          $externalId
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            $this->log->debug(sprintf(
+                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                $name,
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        } else {
+            $classInvolvement = $this->classInvolvementMapper->createModel()
+                ->setClass($classEntry)
+                ->setExternalId($externalId);
+
+            if ($this->perform) {
+                $this->classInvolvementMapper->save($classInvolvement);
+            }
+
+            $this->classInvolvements[$classEntry->getId()][$externalId] = true;
+
+            $this->log->debug(sprintf(
+                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                $name,
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        }
     }
 }

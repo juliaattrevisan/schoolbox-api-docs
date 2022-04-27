@@ -71,6 +71,7 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
+     * @throws DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function __construct(string $host, string $apiKey)
@@ -93,6 +94,7 @@ class Api implements IApi
      * @param string $dsn
      * @param int    $timeout
      * @return Client
+     * @throws DomainException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     private function initClient(string $host, string $dsn, int $timeout): Client

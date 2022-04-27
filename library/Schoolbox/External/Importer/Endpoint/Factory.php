@@ -247,15 +247,12 @@ class Factory implements IFactory
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\UserMapper::getInstance(),
-                    EventMapper::getInstance(),
-                    \Event\Source\Mapper::getInstance(),
-                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    PersonalMapper::getInstance(),
-                    CategoryMapper::getInstance(),
-                    \Schoolbox\Resource\Folder\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance()
+                    ClassInvolvementMapper::getInstance(),
+                    ClassPeriodMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             case self::WONDE:

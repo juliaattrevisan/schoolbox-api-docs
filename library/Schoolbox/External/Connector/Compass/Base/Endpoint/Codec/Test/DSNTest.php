@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\Test;
 
-use DomainException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\DSN;
 
@@ -29,14 +28,13 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecode(): array
+    public function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1' => [
-                'key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;timetableowner=12345',
+                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
                 [
                     'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                    'timetableowner' => '12345'
                 ]
             ],
         ];
@@ -46,10 +44,11 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecode
+     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
-     * @throws DomainException
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function testValidDSNDecode(string $dsn, $expected): void
     {
@@ -64,12 +63,12 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecodeEncode(): array
+    public function providerValidDSNDecodeEncode(): array
     {
         return [
             'Valid DSN Re-encode 1' => [
-                'key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;timetableowner=12345',
-                'key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h;timetableowner=12345'
+                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h'
             ],
         ];
     }
@@ -78,10 +77,9 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecodeEncode
+     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param string $expected
-     * @throws DomainException
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
@@ -106,7 +104,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_invalidDSNDecode(): array
+    public function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1 (empty dsn)' => [
@@ -116,43 +114,6 @@ class DSNTest extends TestCase
             'Invalid DSN 2 (whitespace dsn)' => [
                 '     ', []
             ],
-
-            'Invalid DSN 3 (bad dsn)' => [
-                'cat', []
-            ],
-
-            'Invalid DSN 4 (malformed tuples)' => [
-                'key=', []
-            ],
-
-            'Invalid DSN 5 (malformed tuples)' => [
-                'key=;timetableowner=', []
-            ],
-
-            'Invalid DSN 6 (malformed tuples)' => [
-                'key=;', []
-            ],
-
-            'Invalid DSN 7 (no tuples)' => [
-                ';', []
-            ],
         ];
-    }
-
-
-    /**
-     * Test invalid DSN strings
-     *
-     * @dataProvider provider_invalidDSNDecode
-     * @param string $dsn
-     * @param array  $expected
-     * @throws DomainException
-     */
-    public function testInvalidDSNDecode(string $dsn, $expected): void
-    {
-        $this->expectException(DomainException::class);
-
-        $codec = new DSN();
-        $codec->decode($dsn);
     }
 }
