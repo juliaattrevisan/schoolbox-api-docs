@@ -260,11 +260,19 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return [];
         }
 
+        $params = [
+            'sn' => $externalUserId,
+            'd'  => $dayNumber,
+        ];
+
         $campusCode = explode(',', $campus->getExtTimetableCode());
         if (count($campusCode) > 1) {
             $campus = '( CAMPUS = :campus OR CAMPUS = :campus2 )';
+            $params['campus'] = $campusCode[0];
+            $params['campus2'] = $campusCode[1];
         } else {
             $campus = 'CAMPUS = :campus';
+            $params['campus'] = $campusCode[0];
         }
 
         $stmt = $this->getConnection()->prepareQuery(
@@ -277,14 +285,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         "
         );
 
-        $stmt->execute(
-            array(
-                'sn' => $externalUserId,
-                'd' => $dayNumber,
-                'campus' => $campusCode[0],
-                'campus2' => $campusCode[1],
-            )
-        );
+        $stmt->execute($params);
 
         // Build the timetable
         $timetable = array();
@@ -364,12 +365,20 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return [];
         }
 
+        $params = [
+            'sn' => $externalUserId,
+            'd'  => $this->getCycleLength($campus),
+        ];
+
         $campusCode = explode(',', $campus->getExtTimetableCode());
 
         if (count($campusCode) > 1) {
             $campusSql = "( CAMPUS = :campus OR CAMPUS = :campus2 )";
+            $params['campus'] = $campusCode[0];
+            $params['campus2'] = $campusCode[1];
         } else {
             $campusSql = "CAMPUS = :campus";
+            $params['campus'] = $campusCode[0];
         }
 
         $stmt = $this->getConnection()->prepareQuery(
@@ -383,14 +392,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         "
         );
 
-        $stmt->execute(
-            array(
-                'sn' => $externalUserId,
-                'campus' => $campusCode[0],
-                'campus2' => $campusCode[1],
-                'd' => $this->getCycleLength($campus),
-            )
-        );
+        $stmt->execute($params);
 
         // Build the timetable
         $timetable = array();
