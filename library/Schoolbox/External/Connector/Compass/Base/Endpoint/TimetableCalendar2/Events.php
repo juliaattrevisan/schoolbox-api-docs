@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar2;
 
 use Event\Source\Mapper;
 use Psr\Log\LoggerInterface;
