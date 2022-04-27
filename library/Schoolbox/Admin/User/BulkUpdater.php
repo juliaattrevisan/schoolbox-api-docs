@@ -406,6 +406,12 @@ class BulkUpdater
          *   One big updater
          */
         if (\count($this->campusIds)) {
+            //check if campus still exists... yay multiplayer schoolbox
+            $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT id FROM luCampus WHERE id in (:id) AND deleted_at is NULL", ['id' => implode(',', $this->campusIds)]);
+            $validCampusId->execute();
+            if (0 === count($validCampusId->fetchAll())) {
+                throw new SchoolboxException("Campus has been deleted or does not exist.");
+            }
             $statements['campus']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
                 "DELETE FROM userCampus WHERE uid IN ({$bindings->getPlaceholder()})"
             );
@@ -417,12 +423,6 @@ class BulkUpdater
             $campusInsertPlaceholders = [];
 
             foreach ($this->campusIds as $campusId) {
-                //check if campus still exists... yay multiplayer schoolbox
-                $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT id FROM luCampus WHERE id = :id AND deleted_at is NULL", ['id' => $campusId]);
-                $validCampusId->execute();
-                if (0 === count($validCampusId->fetchAll())) {
-                    throw new SchoolboxException("Campus has been deleted or does not exist.");
-                }
                 foreach ($this->userIds as $userId) {
                     $statements['campus']['insert']['params'][] = [
                         'userId'   => $userId,
