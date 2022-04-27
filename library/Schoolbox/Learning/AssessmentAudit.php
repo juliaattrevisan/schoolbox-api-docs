@@ -49,14 +49,17 @@ class AssessmentAudit
      */
     private IConnector $database;
 
+    private string $schoolCode;
+
     /**
      * @param FolderMapper$folderMapper
      * @param IConnector $database
      */
-    public function __construct(FolderMapper $folderMapper, IConnector $database)
+    public function __construct(FolderMapper $folderMapper, IConnector $database, string $schoolCode)
     {
         $this->folderMapper = $folderMapper;
         $this->database     = $database;
+        $this->schoolCode   = $schoolCode;
     }
 
     /**
@@ -147,8 +150,9 @@ class AssessmentAudit
         //run the sql, if it fails, let it error without breaking the csv file
         $statement->execute();
         //this should have succeeded, so open / build the csv file
+        $filename = sprintf("assessment-audit-%s-%s.csv", $this->schoolCode, \Alaress_Date_Format::now()->toIso8601String());
         header('Content-type: text/csv; charset=utf-8');
-        header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
+        header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
         fputcsv($fp, $rowHeadings);
