@@ -44,6 +44,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
         $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
         $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
+        $this->addPostRoute($router, 'requestReports', $basePath, 'requestReports');
         $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
         $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
     }
@@ -77,6 +78,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(YearLevelMapper::class),
             $this->getMapperFactory()->get(CampusMapper::class),
