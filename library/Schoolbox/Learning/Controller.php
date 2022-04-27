@@ -509,7 +509,7 @@ class Controller extends Base
      */
     public function getAssessmentAudit(Folder\Model $folder)
     {
-        $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database);
+        $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database, $this->getConfigLoader()->get('site_school_code'));
         $assessmentAudit->getAssessmentAudit($folder);
         exit(1);
     }
