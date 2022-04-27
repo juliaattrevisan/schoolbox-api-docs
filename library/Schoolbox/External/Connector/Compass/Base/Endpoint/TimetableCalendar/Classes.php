@@ -449,70 +449,70 @@ class Classes implements IStrategy
      * For each class, process the lessons and apply student/staff involvements
      * Ignore lessons that occur outside the [$from, $to] window
      *
-     * @param array $class
+     * @param array $activity
+     * @param array $activityInstance
+     * @param array $enrolments
      * @return void
-     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $activity, array $activityInstance, array $enrolments)
+    private function processClass(array $activity, array $activityInstance, array $enrolments): void
     {
-        foreach ($class['lessons']['data'] as $lesson) {
-            /* Save sis_event record
-             */
-            $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
 
-            /* Save sis_class record
-             */
-            $classEntry = $this->createClassEntry($class, $event);
+        /* Save sis_event record
+         */
+        $event = $this->createEvent($activity, $activityInstance);
 
-            /* Save the involvements
-             */
-            $this->createInvolvements($class, $lesson, $event, $classEntry);
-        }
+        /* Save sis_class record
+         */
+        $classEntry = $this->createClassEntry($activity, $event);
+
+        /* Save the involvements
+         */
+        $this->createInvolvements($activity, $activityInstance, $enrolments, $event, $classEntry);
     }
 
 
     /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
-     * @param array                $class
-     * @param array                $lesson
-     * @param \Alaress_Date_Format $startAt
-     * @param \Alaress_Date_Format $finishAt
+     * @param array $activity
+     * @param array $activityInstance
      * @return \Schoolbox\External\Event\Model
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function createEvent(
-        array $class,
-        array $lesson,
-        \Alaress_Date_Format $startAt,
-        \Alaress_Date_Format $finishAt
+        array $activity,
+        array $activityInstance
     ): \Schoolbox\External\Event\Model {
+
         /* Fill in these vars as usual
          */
-        $classCode = null;
+        $classCode = trim((string)$activity['name']);
         $day = null;
         $detail = null;
-        $guid = null;
+
+        /* Arbitrarily concoct a superkey to represent this activity instance
+         */
+        $guid = "{$activity['activityId']}.{$activity['importIdentifier']}.{$activityInstance['start']}";
+
         $period = null;
-        $room = null;
-        $title = null;
+        $room = trim((string)$activityInstance['location']);
+        $title = trim((string)$activity['name']);
+
+        /* Datetimes for when this class occurs
+         */
+        $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start']));
+        $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['finish']));
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
          * possible. If you can't get it, dw about it
          */
         $type = '';
-
-        /* Decide where this class happens
-         */
-        if (is_array($lesson['room'])) {
-            $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
-        }
 
         /* Cram in everything else
          */
@@ -552,21 +552,25 @@ class Classes implements IStrategy
     /**
      * Create (or reuse) a ClassEntry corresponding to $event
      *
-     * @param array                           $class
+     * @param array                           $activity
      * @param \Schoolbox\External\Event\Model $event
      * @return ClassEntry
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
+    private function createClassEntry(array $activity, \Schoolbox\External\Event\Model $event): ClassEntry
     {
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
+
         if (isset($this->classEntries[$event->getCode()])) {
             $classEntry = $this->classEntries[$event->getCode()];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
-                ->setName($class['name'])
-                ->setCode($class['code']);
+                ->setName($activityName)
+                ->setCode($activityName);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -582,8 +586,9 @@ class Classes implements IStrategy
     /**
      * Save all the involvements for a given $class
      *
-     * @param array                           $class
-     * @param array                           $lesson
+     * @param array                           $activity
+     * @param array                           $activityInstance
+     * @param array                           $enrolments
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
      * @return void
@@ -592,28 +597,31 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
-        array $class,
-        array $lesson,
+        array $activity,
+        array $activityInstance,
+        array $enrolments,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
+        /* Name is the same as the Code, in compass
+         */
+        $activityName = trim((string)$activity['name']);
+
         /* Save sis_class_user involvements
          * This is the teacher(s)
          */
-        if (!\count($class['employees']['data'])) {
+        if (!\count($enrolments['teachers'])) {
             $this->log->debug(sprintf(
                 '%s: no staff involved',
-                $class['code']
+                $activityName
             ));
         } else {
-            foreach ($class['employees']['data'] as $employee) {
-                $externalId = $employee['mis_id'];
-
+            foreach ($enrolments['teachers'] as $externalId) {
                 $name = sprintf(
-                    '%s %s %s',
-                    $employee['title'],
-                    $employee['forename'],
-                    $employee['surname']
+                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                    $activityName,
+                    $activityInstance['start'],
+                    $externalId
                 );
 
                 $this->saveInvolvement($event, $classEntry, $name, $externalId);
@@ -623,19 +631,18 @@ class Classes implements IStrategy
         /* Save sis_class_user involvements
          * This is the student(s)
          */
-        if (!\count($class['students']['data'])) {
+        if (!\count($enrolments['students'])) {
             $this->log->debug(sprintf(
                 '%s: no students involved',
-                $class['code']
+                $activityName
             ));
         } else {
-            foreach ($class['students']['data'] as $student) {
-                $externalId = $student['mis_id'];
-
+            foreach ($enrolments['students'] as $externalId) {
                 $name = sprintf(
-                    '%s %s',
-                    $student['forename'],
-                    $student['surname']
+                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                    $activityName,
+                    $activityInstance['start'],
+                    $externalId
                 );
 
                 $this->saveInvolvement($event, $classEntry, $name, $externalId);
