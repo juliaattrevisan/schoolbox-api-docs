@@ -13,31 +13,21 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder;
 
 class AssessmentAudit
 {
-    //Mark Visibility strings
-    const MARK0 = 'Staff Only';
-    const MARK1 = 'Staff & Student';
-    const MARK2 = 'Staff, Student & Parent';
-    const MARKVISIBILITY = [
-        0 => self::MARK0,
-        1 => self::MARK1,
-        2 => self::MARK2,
-    ];
-
     //work out number of online submissions
     const NONE          = 'None';
-    const MULTIPLE      =  'Multiple';
+    const MULTIPLE      = 'Multiple';
     const SINGLE        = 'Single';
 
-    const CLASSCREATE   =  'Class Created';
+    const CLASSCREATE   = 'Class Created';
     const CLASSIMPORT   = 'Class Imported';
     const COURSE        = 'Course';
-
 
     /**
      * @var FolderMapper
@@ -230,7 +220,7 @@ class AssessmentAudit
                 $row['publishDate'],
                 $row['dueDate'],
                 $row['selfReviewability'],
-                self::MARKVISIBILITY[$row['markVisibility']],
+                SubmissionBox::MARK_VISIBILITY_STRINGS[$row['markVisibility']],
             ]);
         }
 
