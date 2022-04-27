@@ -19,6 +19,26 @@ use Schoolbox\Resource\Folder;
 
 class AssessmentAudit
 {
+    //Mark Visibility strings
+    const MARK0 = 'Staff Only';
+    const MARK1 = 'Staff & Student';
+    const MARK2 = 'Staff, Student & Parent';
+    const MARKVISIBILITY = [
+        0 => self::MARK0,
+        1 => self::MARK1,
+        2 => self::MARK2,
+    ];
+
+    //work out number of online submissions
+    const NONE          = 'None';
+    const MULTIPLE      =  'Multiple';
+    const SINGLE        = 'Single';
+
+    const CLASSCREATE   =  'Class Created';
+    const CLASSIMPORT   = 'Class Imported';
+    const COURSE        = 'Course';
+
+
     /**
      * @var FolderMapper
      */
@@ -68,7 +88,7 @@ class AssessmentAudit
         $statement = $this->database->prepareQuery("SELECT
         v_assessment_relation.assessment_id AS assessmentId,
         assessment.title AS assessmentTitle,
-        v_assessment_relation.folder_id AS folderID,
+        v_assessment_relation.folder_id AS folderId,
         lu_work_type.name AS assessmentWorkType,
 
         course_implementation.folder_id as course_implementation_folder_id,
@@ -123,26 +143,29 @@ class AssessmentAudit
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
                         'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility'];
+
+        //run the sql, if it fails, let it error without breaking the csv file
+        $statement->execute();
+        //this should have succeeded, so open / build the csv file
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"assessment-audit.csv\"");
 
         $fp = fopen("php://output", 'w');
         fputcsv($fp, $rowHeadings);
 
-        $statement->execute();
         /**
          * send csv data to the client
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             //set if the assignment is a Specification or Implementation or not
-            $specImplem = 'Class Created';
+            $specImplem = self::CLASSCREATE;
             //grab COURSE specificationId or implementationId
             $courseFolderId = null;
             if (null !== $row['course_specification_folder_id']) {
-                $specImplem = 'Course';
+                $specImplem = self::COURSE;
                 $courseFolderId = $row['course_specification_folder_id'];
             } elseif (null !== $row['course_implementation_folder_id']) {
-                $specImplem = 'Class Imported';
+                $specImplem = self::CLASSIMPORT;
                 $courseFolderId = $row['course_implementation_folder_id'];
             }
 
@@ -150,21 +173,21 @@ class AssessmentAudit
             $unitCourseFolderId = null;
             $unitFolderName = null;
             if (null !== $row['course_unit_specification_folder_id']) {
-                $specImplem = 'Course';
+                $specImplem = self::COURSE;
                 $unitCourseFolderId = $row['course_unit_specification_folder_id'];
                 $unitFolderName = $row['unitSpecName'];
             } elseif (null !== $row['course_unit_implementation_folder_id']) {
-                $specImplem = 'Class Imported';
+                $specImplem = self::CLASSIMPORT;
                 $unitCourseFolderId = $row['course_unit_implementation_folder_id'];
                 $unitFolderName = $row['unitImpName'];
             }
 
             //work out number of online submissions
-            $onlineSubs = 'None';
+            $onlineSubs = self::NONE;
             if ($row['multiSubmission']) {
-                $onlineSubs = 'Multiple';
+                $onlineSubs = self::MULTIPLE;
             } elseif ($row['acceptSubmission']) {
-                $onlineSubs = 'Single';
+                $onlineSubs = self::SINGLE;
             }
 
             //Grading and Capability Grading Scheme Scale, only show if using letter grade
@@ -177,21 +200,14 @@ class AssessmentAudit
                 $capabilityGradeSchemeScale = $row['capabilityGradeGroup'];
             }
 
-            //Mark Visibility strings
-            $markVisibility = [
-                0 => 'Staff Only',
-                1 => 'Staff & Student',
-                2 => 'Staff, Student & Parent',
-            ];
-
             //build the row and send
             fputcsv($fp, [
                 $row['assessmentId'],
                 $row['assessmentTitle'],
-                $row['folderID'],
-                $allFolders[$row['folderID']]->getName(),
-                implode(',', $allFolders[$row['folderID']]->getYearLevels()->getPropertyValues('name')),
-                $allFolders[$row['folderID']]->getCodeString(),
+                $row['folderId'],
+                $allFolders[$row['folderId']]->getName(),
+                implode(',', $allFolders[$row['folderId']]->getYearLevels()->getPropertyValues('name')),
+                $allFolders[$row['folderId']]->getCodeString(),
                 $courseFolderId,
                 $row['courseName'],
                 $unitCourseFolderId,
@@ -210,7 +226,7 @@ class AssessmentAudit
                 $row['publishDate'],
                 $row['dueDate'],
                 $row['selfReviewability'],
-                $markVisibility[$row['markVisibility']],
+                self::MARKVISIBILITY[$row['markVisibility']],
             ]);
         }
 
