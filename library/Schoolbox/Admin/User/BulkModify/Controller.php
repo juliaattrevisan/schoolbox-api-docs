@@ -9,6 +9,8 @@ namespace Schoolbox\Admin\User\BulkModify;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use HouseMapper;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\User\BulkUpdater;
@@ -160,25 +162,34 @@ class Controller extends Base
         $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk modify";
         $this->userBulkMapper->log($message);
 
-        $modified = (new BulkUpdater(
-            $this->getUser(),
-            $this->userBulkMapper,
-            $userIds,
-            array_filter(explode(',', $params->get('campusIds'))),
-            (int)$params->get('roleId'),
-            (int)$params->get('yearLevelId'),
-            (int)$params->get('houseId'),
-            (int)$params->get('ePortfolio'),
-            (int)$params->get('emailFromUserName'),
-            (int)$params->get('externalMailClient'),
-            (int)$params->get('webmail'),
-            (int)$params->get('accountEnabled'),
-            (int)$params->get('hideContacts'),
-            (int)$params->get('hideTimetable'),
-            $params->get('positionTitle'),
-            (int)$params->get('displayGradeGraph'),
-            (int)$params->get('revokeToken')
-        ))->update();
+        try {
+            $modified = (new BulkUpdater(
+                $this->getUser(),
+                $this->userBulkMapper,
+                $userIds,
+                array_filter(explode(',', $params->get('campusIds'))),
+                (int)$params->get('roleId'),
+                (int)$params->get('yearLevelId'),
+                (int)$params->get('houseId'),
+                (int)$params->get('ePortfolio'),
+                (int)$params->get('emailFromUserName'),
+                (int)$params->get('externalMailClient'),
+                (int)$params->get('webmail'),
+                (int)$params->get('accountEnabled'),
+                (int)$params->get('hideContacts'),
+                (int)$params->get('hideTimetable'),
+                $params->get('positionTitle'),
+                (int)$params->get('displayGradeGraph'),
+                (int)$params->get('revokeToken')
+            ))->update();
+        } catch (SchoolboxException $e) {
+            $problem = (new ApiProblem('Campus has been deleted or does not exist'))
+                ->setStatus(501)
+                ->asArray();
+            $this->getResponse()->status->setCode(501);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return;
+        }
 
         // refresh subscription cache
         $this->cache->cacheUsers(INSTANCE_ID, $userIds);

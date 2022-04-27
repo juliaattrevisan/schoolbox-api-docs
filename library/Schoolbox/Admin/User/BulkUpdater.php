@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\User;
 
 use Alaress\Database\Predicate\Bindings;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -416,6 +417,12 @@ class BulkUpdater
             $campusInsertPlaceholders = [];
 
             foreach ($this->campusIds as $campusId) {
+                //check if campus still exists... yay multiplayer schoolbox
+                $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT id FROM luCampus WHERE id = :id AND deleted_at is NULL", ['id' => $campusId]);
+                $validCampusId->execute();
+                if (0 === count($validCampusId->fetchAll())) {
+                    throw new SchoolboxException("Campus has been deleted or does not exist.");
+                }
                 foreach ($this->userIds as $userId) {
                     $statements['campus']['insert']['params'][] = [
                         'userId'   => $userId,
