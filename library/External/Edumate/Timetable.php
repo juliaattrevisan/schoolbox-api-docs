@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Campus;
 
 /**
@@ -265,15 +266,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             'd'  => $dayNumber,
         ];
 
-        $campusCode = explode(',', $campus->getExtTimetableCode());
-        if (count($campusCode) > 1) {
-            $campus = '( CAMPUS = :campus OR CAMPUS = :campus2 )';
-            $params['campus'] = $campusCode[0];
-            $params['campus2'] = $campusCode[1];
-        } else {
-            $campus = 'CAMPUS = :campus';
-            $params['campus'] = $campusCode[0];
-        }
+        $campusCodes    = explode(',', $campus->getExtTimetableCode());
+        $campusBindings = Builder::getBindings($campusCodes, 'c');
 
         $stmt = $this->getConnection()->prepareQuery(
             "
@@ -281,11 +275,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM SCHOOLBOX_TIMETABLE T
             LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
-            AND DAY_NUMBER = :d AND $campus
+            AND DAY_NUMBER = :d
+            AND CAMPUS IN ({$campusBindings->getPlaceholder()})
         "
         );
 
-        $stmt->execute($params);
+        $stmt->execute(array_merge($params, $campusBindings->getParams()));
 
         // Build the timetable
         $timetable = array();
@@ -370,16 +365,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             'd'  => $this->getCycleLength($campus),
         ];
 
-        $campusCode = explode(',', $campus->getExtTimetableCode());
-
-        if (count($campusCode) > 1) {
-            $campusSql = "( CAMPUS = :campus OR CAMPUS = :campus2 )";
-            $params['campus'] = $campusCode[0];
-            $params['campus2'] = $campusCode[1];
-        } else {
-            $campusSql = "CAMPUS = :campus";
-            $params['campus'] = $campusCode[0];
-        }
+        $campusCodes    = explode(',', $campus->getExtTimetableCode());
+        $campusBindings = Builder::getBindings($campusCodes, 'c');
 
         $stmt = $this->getConnection()->prepareQuery(
             "
@@ -387,12 +374,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FROM SCHOOLBOX_TIMETABLE T
             LEFT JOIN SCHOOLBOX_CLASSES CL ON T.CLASS_CODE = CL.CLASS_CODE
             $join
-            AND $campusSql
+            AND CAMPUS IN ({$campusBindings->getPlaceholder()})
             AND DAY_NUMBER <= :d
         "
         );
 
-        $stmt->execute($params);
+        $stmt->execute(array_merge($params, $campusBindings->getParams()));
 
         // Build the timetable
         $timetable = array();
