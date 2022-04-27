@@ -6,15 +6,6 @@ export default {
     component: BottomDrawer,
     // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
     argTypes: {
-        showDrawer: { 
-            type: { required: true },
-        },
-        isAlwaysAnchored: { 
-            type: { required: false },
-        },
-        unanchorWidth: { 
-            type: { required: false },
-        },
         default: {
             control: { type: 'text' },
             defaultValue: '<strong>Bottom drawer content goes here</strong>',
