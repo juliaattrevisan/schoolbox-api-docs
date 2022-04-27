@@ -141,12 +141,6 @@ class SitePage extends Page
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
                 include(WEB_root . '/' . $filename . '/index.php');
                 return true;
-            } elseif (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
-                $this->setFile(TEMPLATE_content, $filename . '.html');
-                return true;
-            } elseif (is_file($this->templateRoot . '/' . $filename . '/index.html')) {
-                $this->setFile(TEMPLATE_content, $filename . '/index.html');
-                return true;
             }
 
             /* move last element to arguments */
