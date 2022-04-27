@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\Test;
 
-use DomainException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Codec\DSN;
 
@@ -29,7 +28,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecode(): array
+    public function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1' => [
@@ -45,7 +44,7 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecode
+     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
@@ -64,7 +63,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecodeEncode(): array
+    public function providerValidDSNDecodeEncode(): array
     {
         return [
             'Valid DSN Re-encode 1' => [
@@ -78,7 +77,7 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecodeEncode
+     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
@@ -105,7 +104,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_invalidDSNDecode(): array
+    public function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1 (empty dsn)' => [
