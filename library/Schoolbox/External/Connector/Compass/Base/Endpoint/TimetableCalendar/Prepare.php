@@ -77,7 +77,6 @@ class Prepare implements IStrategy
      * Delete all the events that used a particular source identifier
      *
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function import(): void
     {
@@ -86,75 +85,119 @@ class Prepare implements IStrategy
 
             /* Mark events for deletion to avoid a mega where-in clause
              */
-            $queries['Event Primer'] = "
-                UPDATE `event` e
-                INNER JOIN event_source s on e.id = s.event_id
-                SET e.updated_at = '0000-00-00 00:00:00'
-                WHERE s.source_name = :sourceName
-            ";
+            $queries['Event Primer'] = [
+                'query' => "
+                    UPDATE `event` e
+                    INNER JOIN event_source s on e.id = s.event_id
+                    SET e.updated_at = '0000-00-00 00:00:00'
+                    WHERE s.source_name = :sourceName
+                ",
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
             /* Avoid using the eventSourceMapper to delete things via objects etc.
              * It is super super slow for heaps of events, such as a huge compass import
              *
              * Just assassinate them directly
              */
-            $queries['Event Attendance Relations'] = '
-                DELETE a
-                FROM `event` e
-                INNER JOIN event_attendance a ON a.event_id = e.id
-                INNER JOIN event_source s ON e.id = s.event_id
-                WHERE s.source_name = :sourceName                 
-            ';
+            $queries['Event Attendance Relations'] = [
+                'query' => '
+                    DELETE a
+                    FROM `event` e
+                    INNER JOIN event_attendance a ON a.event_id = e.id
+                    INNER JOIN event_source s ON e.id = s.event_id
+                    WHERE s.source_name = :sourceName                 
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event Campus Relations'] = '
-                DELETE c
-                FROM `event` e
-                INNER JOIN event_campus c ON c.event_id = e.id
-                INNER JOIN event_source s ON e.id = s.event_id
-                WHERE s.source_name = :sourceName                 
-            ';
+            $queries['Event Campus Relations'] = [
+                'query' => '
+                    DELETE c
+                    FROM `event` e
+                    INNER JOIN event_campus c ON c.event_id = e.id
+                    INNER JOIN event_source s ON e.id = s.event_id
+                    WHERE s.source_name = :sourceName                 
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event Folder Relations'] = '
-                DELETE f
-                FROM `event` e
-                INNER JOIN event_folder f ON f.event_id = e.id
-                INNER JOIN event_source s ON e.id = s.event_id
-                WHERE s.source_name = :sourceName                 
-            ';
+            $queries['Event Folder Relations'] = [
+                'query' => '
+                    DELETE f
+                    FROM `event` e
+                    INNER JOIN event_folder f ON f.event_id = e.id
+                    INNER JOIN event_source s ON e.id = s.event_id
+                    WHERE s.source_name = :sourceName                 
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event Role Relations'] = '
-                DELETE r
-                FROM `event` e
-                INNER JOIN event_role r ON r.event_id = e.id
-                INNER JOIN event_source s ON e.id = s.event_id
-                WHERE s.source_name = :sourceName                 
-            ';
+            $queries['Event Role Relations'] = [
+                'query' => '
+                    DELETE r
+                    FROM `event` e
+                    INNER JOIN event_role r ON r.event_id = e.id
+                    INNER JOIN event_source s ON e.id = s.event_id
+                    WHERE s.source_name = :sourceName                 
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event User Relations'] = '
-                DELETE u
-                FROM `event` e
-                INNER JOIN event_user u ON u.event_id = e.id
-                INNER JOIN event_source s ON e.id = s.event_id
-                WHERE s.source_name = :sourceName                 
-            ';
+            $queries['Event User Relations'] = [
+                'query' => '
+                    DELETE u
+                    FROM `event` e
+                    INNER JOIN event_user u ON u.event_id = e.id
+                    INNER JOIN event_source s ON e.id = s.event_id
+                    WHERE s.source_name = :sourceName                 
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event Source'] = '
-                DELETE FROM event_source
-                WHERE source_name = :sourceName
-            ';
+            $queries['Event Source'] = [
+                'query' => '
+                    DELETE FROM event_source
+                    WHERE source_name = :sourceName
+                ',
+                'params' => [
+                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
+                ]
+            ];
 
-            $queries['Event Detonator'] = "
-                DELETE FROM event
-                WHERE updated_at = '0000-00-00 00:00:00'
-            ";
+            $queries['Event Detonator'] = [
+                'query' => "
+                    DELETE FROM event
+                    WHERE updated_at = '0000-00-00 00:00:00'
+                ",
+                'params' => null
+            ];
 
-            $queries['SIS Classes'] = "
-                DELETE FROM sis_class
-            ";
+            $queries['SIS Classes'] = [
+                'query' => '
+                    DELETE FROM sis_class
+                ',
+                'params' => null
+            ];
 
-            $queries['SIS Class Involvements'] = "
-                DELETE FROM sis_class_user
-            ";
+            $queries['SIS Class Involvements'] = [
+                'query' => '
+                    DELETE FROM sis_class_user
+                ',
+                'params' => null
+            ];
 
             $this->log->debug(sprintf(
                 'Beginning the great purge of existing events/relations that used event_source: %s',
@@ -166,17 +209,19 @@ class Prepare implements IStrategy
 
             /* Delete relations
              */
-            foreach ($queries as $name => $query) {
+            foreach ($queries as $name => $setup) {
                 $this->log->debug(sprintf(
                     'Executing %s purge...',
                     $name
                 ));
 
-                $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
+                $statement = $this->eventSourceMapper->getDatabase()->prepare($setup['query']);
 
-                $statement->execute([
-                    'sourceName' => self::EVENT_IMPORT_IDENTIFIER
-                ]);
+                if (null !== $setup['params']) {
+                    $statement->execute($setup['params']);
+                } else {
+                    $statement->execute();
+                }
 
                 $this->log->debug('Done.');
             }
