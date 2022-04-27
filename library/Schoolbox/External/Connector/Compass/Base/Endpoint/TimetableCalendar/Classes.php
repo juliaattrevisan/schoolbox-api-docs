@@ -76,21 +76,15 @@ class Classes implements IStrategy
 
 
     /**
-     * @var \DateTimeZone
+     * @var string
      */
-    private \DateTimeZone $timezone;
+    private string $fromDate;
 
 
     /**
-     * @var \Alaress_Date_Format
+     * @var string
      */
-    private \Alaress_Date_Format $fromDate;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $toDate;
+    private string $toDate;
 
 
     /**
@@ -112,15 +106,14 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param Mapper                                     $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \DateTimeZone                              $timezone
-     * @param \Alaress_Date_Format                       $fromDate
-     * @param \Alaress_Date_Format                       $toDate
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param IApi                   $api
+     * @param Mapper                 $eventMapper
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param string                 $fromDate
+     * @param string                 $toDate
      */
     public function __construct(
         LoggerInterface $log,
@@ -129,9 +122,8 @@ class Classes implements IStrategy
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        \DateTimeZone $timezone,
-        \Alaress_Date_Format $fromDate,
-        \Alaress_Date_Format $toDate
+        string $fromDate,
+        string $toDate
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -139,7 +131,11 @@ class Classes implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->timezone = $timezone;
+
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
+         */
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
     }

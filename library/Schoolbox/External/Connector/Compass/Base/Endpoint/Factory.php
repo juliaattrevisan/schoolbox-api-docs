@@ -200,6 +200,13 @@ class Factory
          */
         $credentials = (new Codec\DSN())->decode($this->key);
 
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
+         */
+        $from = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $to = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
@@ -241,21 +248,16 @@ class Factory
                 $this->periodMapper,
                 $this->overridesMapper,
             ))
-//            ->add(new TimetableCalendar\Events(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $defaultOwner,
-//                $defaultEventType,
-//                $this->userMapper,
-//                $this->eventMapper,
-//                $this->eventSourceMapper,
-//                $this->relationPersonalMapper,
-//                $this->relationFolderMapper,
-//                $this->folderMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//            ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $from,
+                $to
+            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
