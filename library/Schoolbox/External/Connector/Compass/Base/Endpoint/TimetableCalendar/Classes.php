@@ -25,18 +25,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Classes implements IStrategy
 {
 
-    /**
-     * Prevent infinite loop of api calls
-     */
-    private const MAX_CALLS = 100;
-
-
-    /**
-     * Number of records per page
-     * The maximum is an unwritten 200 or so, apparently
-     */
-    private const NUM_PER_PAGE = 200;
-
 
     /**
      * RunningStatus determines whether an activity and/or its instance is actually running
