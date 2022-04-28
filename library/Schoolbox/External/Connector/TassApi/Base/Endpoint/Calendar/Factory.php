@@ -223,8 +223,7 @@ class Factory
             ->add(new Prepare(
                 $this->log,
                 $this->perform,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
                 self::SOURCE_NAME
             ))
             ->add(new ParentCalendar(
@@ -326,7 +325,7 @@ class Factory
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
-                $this->eventMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
                 self::SOURCE_NAME
             ))
             ->add(new Summary(

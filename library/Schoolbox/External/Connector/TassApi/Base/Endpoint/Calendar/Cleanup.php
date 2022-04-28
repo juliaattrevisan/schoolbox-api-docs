@@ -33,9 +33,9 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @var EventMapper
+     * @var \Schoolbox\External\Event\Mapper
      */
-    private EventMapper $eventMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
@@ -50,15 +50,15 @@ class Cleanup implements IStrategy
     /**
      * Base constructor.
      *
-     * @param LoggerInterface   $log
-     * @param bool              $perform
-     * @param EventMapper       $eventMapper
-     * @param string            $source
+     * @param LoggerInterface                  $log
+     * @param bool                             $perform
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param string                           $source
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        EventMapper $eventMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         string $source
     ) {
         $this->log = $log;
@@ -77,21 +77,49 @@ class Cleanup implements IStrategy
      * relationships and stuff. It's going to be wrapped in a transaction
      * anyway, so if anything dies we roll back.
      *
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \PDOException
      */
     public function import(): void
     {
         if ($this->perform) {
-            $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
+            $queries = [
+                [
+                    'query' => '
+                        DELETE sis_event_campus
+                        FROM sis_event_campus
+                        INNER JOIN sis_event ON sis_event.id = sis_event_campus.event_id
+                        WHERE sis_event.source = :source            
+                    ',
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => '
+                        DELETE sis_event_roletype
+                        FROM sis_event_roletype
+                        INNER JOIN sis_event ON sis_event.id = sis_event_roletype.event_id
+                        WHERE sis_event.source = :source       
+                    ',
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => "
+                        DELETE FROM sis_event
+                        WHERE updated_at = '0000-00-00 00:00:00'
+                        AND sis_event.source = :source 
+                    ",
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+            ];
 
-            foreach ($deadEvents as $deadEvent) {
-                $this->log->debug(sprintf(
-                    'Deleting %s event "%s"; it was never updated during import',
-                    $this->source,
-                    $deadEvent->getTitle()
-                ));
-
-                $this->eventMapper->delete($deadEvent);
+            foreach ($queries as $setup) {
+                $statement = $this->eventMapper->getDatabase()->prepare($setup['query']);
+                $statement->execute($setup['params']);
             }
         }
     }

@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
-use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
@@ -36,15 +34,9 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var EventMapper
+     * @var \Schoolbox\External\Event\Mapper
      */
-    private EventMapper $eventMapper;
-
-
-    /**
-     * @var EventSourceMapper
-     */
-    private EventSourceMapper $eventSourceMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
@@ -59,23 +51,20 @@ class Prepare implements IStrategy
     /**
      * Base constructor.
      *
-     * @param LoggerInterface   $log
-     * @param bool              $perform
-     * @param EventMapper       $eventMapper
-     * @param EventSourceMapper $eventSourceMapper
-     * @param string            $source
+     * @param LoggerInterface                  $log
+     * @param bool                             $perform
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param string                           $source
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        EventMapper $eventMapper,
-        EventSourceMapper $eventSourceMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         string $source
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
 
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
@@ -90,27 +79,23 @@ class Prepare implements IStrategy
      * anyway, so if anything dies we roll back.
      *
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function import(): void
     {
-        /* Set Events and Event Sources updated_at to something obvious
+        /* Set SUDS Events updated_at to something obvious
          * Anything that updates them will be safe from cleanup later
          */
         if ($this->perform) {
             $query = "
                 UPDATE
-                {$this->eventSourceMapper->getTable()}
-                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')}
-                AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
-                {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
+                {$this->eventMapper->getTable()}
+                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+                WHERE {$this->eventMapper->getTable()}.`source` = :source
             ";
 
-            $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
-                'sourceName' => $this->source
+                'source' => $this->source
             ]);
 
             $this->log->debug(sprintf(
