@@ -16,10 +16,11 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
-class ThreadMapper extends Mapper implements FeedableMapperInterface
+class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageCleanable
 {
     const FORUM_THREADS_PER_PAGE = 30;
     protected function mapping()
