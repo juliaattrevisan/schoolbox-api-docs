@@ -40,7 +40,7 @@ class Factory
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed
      */
-    private const SOURCE_NAME = 'suds_tass';
+    public const SOURCE_NAME = 'suds_tass';
 
 
     /**
