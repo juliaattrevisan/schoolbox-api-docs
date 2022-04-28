@@ -78,7 +78,15 @@ SELECT
     staff.title as `staffTitle`,
     staff.firstname as `staffFirstname`,
     staff.lastname as `staffLastname`,
-    staff.synergy_id as `staffExternalId`
+    staff.synergy_id as `staffExternalId`,
+    folder_code.code as `folderCode`,
+    folder.name as `folderName`,
+    (SELECT group_concat(name) from lu_year_level
+        LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+                where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelName`,
+    (SELECT group_concat(id) from lu_year_level
+            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
 
 
 FROM v_assessment_relation
@@ -107,6 +115,8 @@ FROM v_assessment_relation
          LEFT JOIN assess on assessment.id = assess.assessment_id
          LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
          LEFT JOIN project on assessment.id = project.assessment_id
+         LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
+         LEFT JOIN folder_code on v_assessment_relation.folder_id = folder_code.folder_id
 WHERE
         v_assessment_relation.assessment_id = :id";
 
@@ -129,7 +139,21 @@ WHERE
             $output['commonAssessment'] = (bool)$row['commonAssessment'];
             $output['workType'] = $row['workType'];
             $output['markType'] = $row['markType'];
-            $output['folderId'] = $row['folderId'];
+            $names = explode(',', $row['yearLevelName']);
+            $ids = explode(',', $row['yearLevelId']);
+            $yearLevel = [];
+            foreach ($names as $id => $name) {
+                $yearLevel[] = [
+                    'id'    => $ids[$id],
+                    'name'    => $name,
+                ];
+            }
+            $output['folder'] = [
+                'id' => $row['folderId'],
+                'name' => $row['folderName'],
+                'code' => $row['folderCode'],
+                'yearLevel' => $yearLevel,
+            ];
             if (null !== $row['student_id'] && 'instructor' ===  $row['reviewRoute']) {
                 $output['participants'][] = [
                     'learner'        => [
