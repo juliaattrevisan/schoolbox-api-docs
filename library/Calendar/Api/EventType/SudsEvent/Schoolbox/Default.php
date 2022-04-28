@@ -1,14 +1,14 @@
 <?php
 
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\GenericCollection;
-use Schoolbox\User;
-
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
