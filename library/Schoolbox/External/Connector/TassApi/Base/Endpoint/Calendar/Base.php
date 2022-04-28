@@ -353,7 +353,9 @@ class Base
                 ->setFinishAt($endDatetime)
                 ->setAllday($allDay)
                 ->setType($eventType)
-                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT);
+                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
+                ->setGuid($guid)
+                ->setSource($this->source);
 
             /* Assigned Event Type via the payload's Category field "cat_desc"
              */
