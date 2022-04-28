@@ -110,8 +110,29 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $this->folderCodes ?? null
         );
 
+        /* A list of all the event types from which we can choose
+         */
+        $eventTypes = $this->eventTypeMapper->findAll()->indexBy('type');
+
         /** @var \Schoolbox\External\Event\Model $event */
         foreach ($events as $event) {
+            /* Default colour scheme specified by the calendar subscription
+             * admin > calendar > subscribe
+             */
+            $eventTypeId = $eventTypeSettings['type'];
+            $eventTypeColor = $eventTypeSettings['color'];
+
+            /* Find out if this tass event has a corresponding luEventType instance
+             * If so, use its colours; otherwise, use the default one specified in
+             * the subscription settings: admin > calendar > subscribe
+             */
+            $eventType = $eventTypes->getOffset($event->getType());
+
+            if ($eventType) {
+                $eventTypeId = $eventType->getId();
+                $eventTypeColor = $eventType->getColor();
+            }
+
             $instance = new \Calendar\Event\Type\SudsEvent\Event();
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($event->getTitle());
@@ -121,8 +142,8 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $instance->setStartTime($event->getStartAt());
             $instance->setEndTime($event->getFinishAt());
             $instance->setAllDay($event->getAllday());
-            $instance->setColour($eventTypeSettings['color']);
-            $instance->setType($eventTypeSettings['type']);
+            $instance->setColour($eventTypeColor);
+            $instance->setType($eventTypeId);
             $instance->setFolder($event->getFolder());
 
             $stack->add($instance);
