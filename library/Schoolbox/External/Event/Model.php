@@ -75,6 +75,12 @@ class Model
 
 
     /**
+     * @var int
+     */
+    private int $allday;
+
+
+    /**
      * @var string|null
      */
     private ?string $type;
@@ -276,6 +282,26 @@ class Model
 
 
     /**
+     * @return int
+     */
+    public function getAllday(): int
+    {
+        return $this->allday;
+    }
+
+
+    /**
+     * @param int $allday
+     * @return Model
+     */
+    public function setAllday(int $allday): self
+    {
+        $this->allday = $allday;
+        return $this;
+    }
+
+
+    /**
      * @param \Alaress_Date_Format|null $finishAt
      * @return Model
      */
@@ -284,6 +310,7 @@ class Model
         $this->finishAt = $finishAt;
         return $this;
     }
+
 
 
     /**

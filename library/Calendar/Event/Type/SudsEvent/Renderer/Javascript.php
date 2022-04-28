@@ -54,7 +54,7 @@ class Javascript extends Base
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
              */
-            'allDay'    => false,
+            'allDay'    => $this->event->getAllDay(),
 
             /* Colour of the event
              */

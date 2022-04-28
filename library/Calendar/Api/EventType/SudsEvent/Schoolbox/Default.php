@@ -112,17 +112,15 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
         /** @var \Schoolbox\External\Event\Model $event */
         foreach ($events as $event) {
-            $instance = new \Calendar\Event\Type\SudsTimetable\Event();
+            $instance = new \Calendar\Event\Type\SudsEvent\Event();
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($event->getTitle());
             $instance->setDetail($event->getDetail());
             $instance->setLocation($event->getLocation());
             $instance->setCode($event->getCode());
-            $instance->setDay($event->getDay());
-            $instance->setPeriod($event->getPeriod());
             $instance->setStartTime($event->getStartAt());
             $instance->setEndTime($event->getFinishAt());
-            $instance->setAllDay(false);
+            $instance->setAllDay($event->getAllday());
             $instance->setColour($eventTypeSettings['color']);
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($event->getFolder());

@@ -33,7 +33,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
  */
-class BaseOld
+class Base
 {
 
 
@@ -301,22 +301,26 @@ class BaseOld
         $n = 0;
 
         foreach ($tassEvents['events'] as $tassEvent) {
-//            /* Spawn a new Event instance and ensure that we tell it where it came from
-//             * Set the normal Event data fields from the $tassEvent structure
-//             */
-//            $title = (string)$tassEvent['title'];
-//            $location = (string)$tassEvent['location'];
-//
-//            /* TODO There's another field, $tassEvent['summary'], but I can't see how it is different to
-//             *  $tassEvent['description'] from the api docs, I'd need real data to know which to use
-//             *  I suspect it's a shorter version of $tassEvent['description']
-//             */
-//            $detail = (string)$tassEvent['description'];
-//
-//            /* Datetimes for the event and whether it's an all-day event
-//             */
-//            $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
-//            $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
+            /* Spawn a new Event instance and ensure that we tell it where it came from
+             * Set the normal Event data fields from the $tassEvent structure
+             */
+            $title = (string)$tassEvent['title'];
+            $location = (string)$tassEvent['location'];
+
+            /* TODO There's another field, $tassEvent['summary'], but I can't see how it is different to
+             *  $tassEvent['description'] from the api docs, I'd need real data to know which to use
+             *  I suspect it's a shorter version of $tassEvent['description']
+             */
+            $detail = (string)$tassEvent['description'];
+
+            /* Datetimes for the event and whether it's an all-day event
+             */
+            $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
+            $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
+
+            if ($tassEvent['all_day']) {
+                print_r($tassEvent);
+            }
 //            $allDay = (int)$tassEvent['all_day'];
 //
 //            /* Third-party source identifier for our import
