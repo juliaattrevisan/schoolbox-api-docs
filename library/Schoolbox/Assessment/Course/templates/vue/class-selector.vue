@@ -9,6 +9,7 @@
 
 import { ref, computed, watch, onMounted  } from 'vue'
 import ClassSelectorSearchResult from './class-selector-search-result';
+import ClassSelectorSelectedClass from './class-selector-selected-class';
 import { gsap } from 'gsap/all';
 
 
@@ -19,22 +20,16 @@ const props = defineProps({
     }
 });
 
-const classes = ref([]); //all the classes
 
-const selectedClasses = ref([]); //the classes currently selected
-const selectedClassIds = computed(() => {
-    return selectedClasses.value.map((classItem) => classItem.id);
-});
+/*****************************************************************
+ * 
+ * Load all the classes
+ * 
+ ****************************************************************/
 
 const isLoading = ref(true);
 const hasLoadError = ref(false);
-const query = ref('');
-const minQueryLength = 1;
-const activeIndex = ref(0); //to track which index is selected
-const queryInputEl = ref(null);
-const classSelectorEl = ref(null);
-const searchResultsEl = ref([]);
-
+const classes = ref([]); //all the classes
 
 /**
  * to notify whether still loading the results or not
@@ -49,108 +44,9 @@ const inputPlaceholder = computed(() => {
     }
 });
 
-/**
- * the search string broken into words, to search for each word
- *
- * @returns { Array } the search string broken into single words
- */
-const queryWordList = computed(() => {
-    const allWords = query.value.match(/\b(\w+)\b/g);
-    const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
-    return onlyWordsAboveTwoLetters;
-});
-
-/**
- * the settings relevant to the search input
- * 
- * @returns { Array } all relevant search results, once we've reached the minQueryLength
- */
-const resultsList = computed(() => {
-    return query.value.length < minQueryLength ? [] : classes.value.filter(searchForTitle);
-});
-
-/**
- * find all those results that match EACH search word
- * within the the title field
- *
- * @params { Object }
- *
- * @return { Boolean } true if found
- */
-function searchForTitle (classItem) {
-    let wordMatchCount = 0;
-    queryWordList.value.forEach(wordInSearch => {
-        if (classItem.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-            wordMatchCount++;
-        }
-    });
-    return wordMatchCount > 0 ? true : false; //if a word matches
-}
-
-/**
- * reset the active index when the list changes as the index may become out of range
- */
-watch (resultsList, async (newValue, oldValue) => {
-    if ((newValue.length !== oldValue.length) && (activeIndex.value > 0)) {
-        activeIndex.value = 0;
-    }
-});
-
-
 onMounted(() => {
-    initKeyboardEvents();
-    initMouseEvents();
     loadClassList();
 });
-
-/**
- * to be able to select by enter and navigate by up/down arrows
- */
-function initKeyboardEvents () {
-    document.addEventListener('keyup', (event) => {
-        const keyName = event.key;
-        const keyOptions = {
-            'Enter': () => selectResult(resultsList.value[activeIndex.value].name),
-            'ArrowUp': () => decrementActiveIndex(),
-            'ArrowDown': () => incrementActiveIndex(),
-        }
-        if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
-            keyOptions[keyName]();
-        }
-    });
-}
-
-/**
- * to be able to move up and down through the selections
- * with the arrow keys
- */
-function decrementActiveIndex () {
-    if (activeIndex.value > 0) {
-        activeIndex.value--;
-    }
-}
-
-/**
- * to be able to move up and down through the selections
- * with the arrow keys
- */
-function incrementActiveIndex () {
-    if (activeIndex.value < (resultsList.value.length-1)) {
-        activeIndex.value++;
-    }
-}
-
-/**
- * to be able to close the menu when something else
- * is selected outside the menu
- */
-function initMouseEvents () {
-    document.addEventListener('click', (event) => {
-        if (!classSelectorEl.value.contains(event.target)) {
-            clearInput();
-        }
-    });
-}
 
 /**
  * check if already loaded and saved, or load up
@@ -169,6 +65,129 @@ async function loadClassList () {
     }
 }
 
+
+/*****************************************************************
+ * 
+ * Search for classes
+ * 
+ ****************************************************************/
+
+const query = ref(''); //the search string to match against
+const queryInputEl = ref(null); 
+const minQueryLength = 1;
+
+/**
+ * the search string broken into words, to search for each word
+ *
+ * @returns { Array } the search string broken into single words
+ */
+const queryWordList = computed(() => {
+    const allWords = query.value.match(/\b(\w+)\b/g);
+    const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
+    return onlyWordsAboveTwoLetters;
+});
+
+/**
+ * the classes relevant to the search input
+ * 
+ * @returns { Array } all relevant search results, once we've reached the minQueryLength
+ */
+const resultsList = computed(() => {
+    return query.value.length < minQueryLength ? [] : classes.value.filter(searchForName);
+});
+
+/**
+ * find all those results that match EACH search word
+ * within the the title field
+ *
+ * @params { Object }
+ *
+ * @return { Boolean } true if found
+ */
+function searchForName (classItem) {
+    let wordMatchCount = 0;
+    queryWordList.value.forEach(wordInSearch => {
+        if (classItem.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+    });
+    return wordMatchCount > 0 ? true : false; //if a word matches
+}
+
+
+/*****************************************************************
+ * 
+ * Keyboard / Mouse events
+ * 
+ ****************************************************************/
+
+const activeIndex = ref(0); //to track which index is selected
+
+/**
+ * reset the active index when the search result list changes as the index may become out of range
+ */
+watch (resultsList, async (newValue, oldValue) => {
+    if ((newValue.length !== oldValue.length) && (activeIndex.value > 0)) {
+        activeIndex.value = 0;
+    }
+});
+
+onMounted(() => {
+    // initKeyboardEvents();
+    initMouseEvents();
+});
+
+/**
+ * to be able to select by enter and navigate by up/down arrows
+ */
+// function initKeyboardEvents () {
+//     document.addEventListener('keyup', (event) => {
+//         const keyName = event.key;
+//         const keyOptions = {
+//             'Enter': () => selectResult(resultsList.value[activeIndex.value].name),
+//             'ArrowUp': () => decrementActiveIndex(),
+//             'ArrowDown': () => incrementActiveIndex(),
+//         }
+//         if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+//             keyOptions[keyName]();
+//         }
+//     });
+// }
+
+/**
+ * to be able to move up and down through the selections
+ * with the arrow keys
+ */
+// function decrementActiveIndex () {
+//     if (activeIndex.value > 0) {
+//         activeIndex.value--;
+//     }
+// }
+
+/**
+ * to be able to move up and down through the selections
+ * with the arrow keys
+ */
+// function incrementActiveIndex () {
+//     if (activeIndex.value < (resultsList.value.length-1)) {
+//         activeIndex.value++;
+//     }
+// }
+
+const classSelectorEl = ref(null); 
+
+/**
+ * to be able to close the search results
+ * when selection outside is made
+ */
+function initMouseEvents () {
+    document.addEventListener('click', (event) => {
+        if (!classSelectorEl.value.contains(event.target)) {
+            clearInput();
+        }
+    });
+}
+
 /**
  * clear the search
  */
@@ -176,6 +195,15 @@ function clearInput () {
     query.value = '';
     activeIndex.value = -1;
 }
+
+
+/*****************************************************************
+ * 
+ * Animating the search results
+ * 
+ ****************************************************************/
+
+const searchResultsEl = ref([]);
 
 /**
  * how the element animates off
@@ -208,7 +236,7 @@ function onBeforeOnEnter (element) {
  * @param { Function } done - to be called once animation is complete
  */
 function onEnter (element, done) {
-    let delay = element.dataset.index * 0.025;
+    const delay = element.dataset.index * 0.025;
     gsap.to(element, 0.3, { opacity: 1, y: 0, height: 'auto', delay: delay, onComplete: done } );
 }
 
@@ -229,10 +257,22 @@ function onMouseOverResult () {
     activeIndex.value = -1; //disable the keyboard selection, mouse takes precedence until search is updated
 }
 
+
+/*****************************************************************
+ * 
+ * Adding / Removing classes 
+ * 
+ ****************************************************************/
+
+const selectedClasses = ref([]); //the classes currently selected
+const selectedClassIds = computed(() => { //so can easily filter by id
+    return selectedClasses.value.map((classItem) => classItem.id);
+});
+
 /**
  * a result has been selected via #class-selector-search-result
  * 
- * @param { String }
+ * @param { Object }
  * @param { Boolean }
  */
 function onSelectedResult (toggledClassItem, isSelected) {
@@ -243,7 +283,7 @@ function onSelectedResult (toggledClassItem, isSelected) {
  * to move to the page the selected search result is on
  * which will have the result highlighted
  * 
- * @param { String }
+ * @param { Object }
  * @param { Boolean }
  */
 function selectResult (toggledClassItem, isSelected) {
@@ -252,6 +292,15 @@ function selectResult (toggledClassItem, isSelected) {
     } else {
         selectedClasses.value = [...selectedClasses.value, toggledClassItem];
     }
+}
+
+/**
+ * to remove a class from selection
+ * 
+ * @param { Object }
+ */
+function onRemoveClassSelected (classItem) {
+    selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== classItem.id);
 }
 
 </script>
@@ -294,11 +343,13 @@ function selectResult (toggledClassItem, isSelected) {
             </transition-group>
         </div><!-- .search-results -->
         <div class="selected-classes-container">
-            <div v-for="selectedClass in selectedClasses" :key="selectedClass.id" class="selected-class">
-                <span>{{ selectedClass.name }}</span>
-                <button class="remove-selected-class-button icon-close" :aria-label="`Remove ${selectedClass.name}`" @click.prevent="onRemoveSelected"></button>
-            </div>
-        </div>
+            <class-selector-selected-class 
+                v-for="selectedClass in selectedClasses" 
+                :key="selectedClass.id"  
+                :class-item="selectedClass"  
+                @remove="onRemoveClassSelected"  
+            />
+        </div><!-- .selected-classes-container -->
     </div>
 </template>
 
@@ -334,6 +385,16 @@ function selectResult (toggledClassItem, isSelected) {
             }
         }
     }
+}
+
+.selected-classes-container {
+    border: 1px solid var(--form-border-color);
+    border-top: none;
+    display: flex;
+    gap: 2px;
+    margin-bottom: 1rem;
+    min-height: 2.25rem;
+    padding: 2px;
 }
 
 </style>

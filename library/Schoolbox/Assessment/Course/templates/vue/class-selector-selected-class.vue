@@ -6,7 +6,7 @@
  *
  */
 
-const emit = defineEmits(['on-remove-selected']);
+const emit = defineEmits(['remove']);
 
 const props = defineProps({
     classItem: {
@@ -14,32 +14,18 @@ const props = defineProps({
         required: true,
         default: () => {
             return {
+                id: 0,
                 name: 'name',
             }
         }
     },
-    selectedClassIds: { //to determine the status of the checkbox
-        type: Array,
-        required: true,
-        default: []
-    },
-    queryWordList: { //current word list in the query
-        type: Array,
-        required: true,
-        default: []
-    },
-    activeIndex: { //to know whether this result is currently active
-        type: Number,
-        required: true,
-        default: 0
-    }
 });
 
 /**
  * To remove from the selected list
  */
 function onRemoveSelected () {
-    this.$emit('on-remove-selected', props.classItem);
+    emit('remove', props.classItem);
 }
 
 
@@ -47,7 +33,7 @@ function onRemoveSelected () {
 
 <template>
     <div class="selected-class">
-        <span>{{ selectedClass.name }}</span>
+        <span>{{ classItem.name }}</span>
         <button class="remove-button icon-close" :aria-label="`Remove ${classItem.name}`" @click.prevent="onRemoveSelected"></button>
     </div>
 </template>
