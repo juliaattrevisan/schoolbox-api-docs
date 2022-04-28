@@ -121,6 +121,11 @@ class Cleanup implements IStrategy
                 $statement = $this->eventMapper->getDatabase()->prepare($setup['query']);
                 $statement->execute($setup['params']);
             }
+
+            $this->log->debug(sprintf(
+                'Deleting all %s events that never updated during import',
+                $this->source,
+            ));
         }
     }
 }
