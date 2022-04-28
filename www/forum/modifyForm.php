@@ -13,7 +13,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$forumHandler = new Forum();
 $groupHandler = new Group();
 $access = Access::getInstance();
 $threadMapper = ThreadMapper::getInstance();
