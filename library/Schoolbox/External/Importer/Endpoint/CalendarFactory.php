@@ -105,9 +105,7 @@ class CalendarFactory implements IFactory
                     $this->key,
                     EventMapper::getInstance(),
                     EventSourceMapper::getInstance(),
-                    RoleMapper::getInstance(),
-                    PersonalMapper::getInstance(),
-                    CategoryMapper::getInstance()
+                    RoleMapper::getInstance()
                 ))->produce();
 
             default:

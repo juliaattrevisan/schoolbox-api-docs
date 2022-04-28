@@ -29,37 +29,37 @@ class Model
     /**
      * @var string|null
      */
-    private ?string $title;
+    private ?string $title = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $detail;
+    private ?string $detail = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $location;
+    private ?string $location = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $code;
+    private ?string $code = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $day;
+    private ?string $day = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $period;
+    private ?string $period = null;
 
 
     /**
@@ -83,25 +83,25 @@ class Model
     /**
      * @var string|null
      */
-    private ?string $type;
+    private ?string $type = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $classification;
+    private ?string $classification = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $guid;
+    private ?string $guid = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $source;
+    private ?string $source = null;
 
 
     /**

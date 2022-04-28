@@ -100,18 +100,6 @@ class Factory
 
 
     /**
-     * @var PersonalMapper
-     */
-    protected PersonalMapper $personalRelationshipMapper;
-
-
-    /**
-     * @var CategoryMapper
-     */
-    protected CategoryMapper $folderRelationshipMapper;
-
-
-    /**
      * Factory constructor.
      *
      * @param LoggerInterface   $log
@@ -121,8 +109,6 @@ class Factory
      * @param EventMapper       $eventMapper
      * @param EventSourceMapper $eventSourceMapper
      * @param RoleMapper        $roleMapper
-     * @param PersonalMapper    $personalRelationshipMapper
-     * @param CategoryMapper    $folderRelationshipMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -131,9 +117,7 @@ class Factory
         string $key,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
-        RoleMapper $roleMapper,
-        PersonalMapper $personalRelationshipMapper,
-        CategoryMapper $folderRelationshipMapper
+        RoleMapper $roleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -142,11 +126,6 @@ class Factory
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
-
-        /* These are relationships to events via event_user and event_folder tables
-         */
-        $this->personalRelationshipMapper = $personalRelationshipMapper;
-        $this->folderRelationshipMapper = $folderRelationshipMapper;
     }
 
 
@@ -257,11 +236,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -274,11 +252,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -291,11 +268,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -308,11 +284,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -325,11 +300,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
@@ -342,11 +316,10 @@ class Factory
                 $campuses,
                 $eventTypes,
                 $owner,
-                $this->eventMapper,
-                $this->eventSourceMapper,
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 $this->roleMapper,
-                $this->personalRelationshipMapper,
-                $this->folderRelationshipMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,
