@@ -13,8 +13,6 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\ApiCertification;
