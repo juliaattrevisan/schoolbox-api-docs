@@ -6,7 +6,7 @@ import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/drawer/bottom-drawer';
 
 
 /**
