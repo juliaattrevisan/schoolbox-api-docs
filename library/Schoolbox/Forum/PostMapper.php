@@ -280,4 +280,22 @@ class PostMapper extends Mapper implements FeedableMapperInterface
 
         return $collection;
     }
+
+    /**
+     * @param Post $post
+     * @return false|float
+     */
+    public function getPageNumber(Post $post)
+    {
+        $stmt = $this->database->prepare("SELECT count(*) as postCount FROM forumPost
+        WHERE deleted = 'false'
+            AND threadID = :threadId
+            AND postID <= :postId");
+        $stmt->execute([
+                'threadId' => $post->getThread()->getId(),
+                'postId' => $post->getId(),
+                ]);
+
+        return ceil($stmt->fetch()['postCount'] / self::FORUM_POSTS_PER_PAGE);
+    }
 }

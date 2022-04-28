@@ -29,8 +29,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     }
 
     // forum exists
-    /** @var \Schoolbox\Resource\Folder\Model $folder */
-    if (!$forumHandler->hasForum($folder->getId())) {
+    if (!$threadMapper->isComponent($folder->getId())) {
         SitePage::localRedir('/homepage/' . $folder->getId());
     }
 
@@ -166,8 +165,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
         }
     }
-
-    SitePage::localRedir('/forum/thread/' . $thread->getId() . '/' . $forumHandler->getPageNumber($post->getId()) . '/#' . $post->getId());
+    SitePage::localRedir('/forum/thread/' . $thread->getId() . '/' . $postMapper->getPageNumber($post) . '/#' . $post->getId());
 } elseif (is_numeric($_GET['toggleLock'] ?? false)) {
     /* thread exists
      */
@@ -180,7 +178,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     /* forum exists
      */
     /** @var \Schoolbox\Forum\Thread $thread */
-    if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
+    if (!$threadMapper->isComponent($thread->getCategory()->getId())) {
         SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
     }
 
@@ -194,7 +192,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    $thread->setLocked($thread->isLocked() ? false : true);
+    $thread->setLocked(!$thread->isLocked());
 
     $threadMapper->save($thread);
 
@@ -211,7 +209,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     /* forum exists
      */
     /** @var \Schoolbox\Forum\Thread $thread */
-    if (!$forumHandler->hasForum($thread->getCategory()->getId())) {
+    if (!$threadMapper->isComponent($thread->getCategory()->getId())) {
         SitePage::localRedir('/homepage/' . $thread->getCategory()->getId());
     }
 
@@ -286,7 +284,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    $pageNumber = $forumHandler->getPageNumber($post->getId());
+    $pageNumber = $postMapper->getPageNumber($post);
 
     /** @var \Schoolbox\Forum\Thread $earliestPost */
     if ($earliestPost->getId() !== $post->getId()) {
