@@ -33,7 +33,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
  */
-class Base
+class BaseOld
 {
 
 
