@@ -380,23 +380,37 @@ class Base
                     ->setEventId($event->getId())
                     ->setRoleType($this->roleType));
 
+                $this->log->info(sprintf(
+                    'Saved %s event "%s" with roletype relationship %s',
+                    $this->source,
+                    $event->getTitle(),
+                    $this->roleType
+                ));
+
                 /* Slam in all the relevant campuses
                  */
                 foreach ($campuses as $campus) {
                     $this->campusRelationMapper->save($this->campusRelationMapper->createModel()
                         ->setEventId($event->getId())
                         ->setCampusName($campus->getName()));
+
+                    $this->log->info(sprintf(
+                        'Saved %s event "%s" with campus relationship %s',
+                        $this->source,
+                        $event->getTitle(),
+                        $campus->getName()
+                    ));
                 }
 
                 $this->log->info(sprintf(
-                    'Saved %s event "%s" with event_source.guid %s',
+                    'Saved %s event "%s" with guid %s',
                     $this->source,
                     $event->getTitle(),
                     $event->getGuid()
                 ));
             } else {
                 $this->log->info(sprintf(
-                    'Planning %s event "%s" with event_source.guid %s',
+                    'Planning %s event "%s" with guid %s',
                     $this->source,
                     $event->getTitle(),
                     $event->getGuid()
