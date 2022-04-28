@@ -333,7 +333,9 @@ export default {
         <section>
             <div class="v-card small-12">
                 <div class="group-image-container">
-                    <div class="card-class-image" :style="getImageStyles()"></div>
+                    <a :href="`/homepage/${group.id}`" :title="`Visit ${group.name}`">
+                        <div class="card-class-image" :style="getImageStyles()"></div>
+                    </a>
                     <transition name="slide">
                         <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
                             <button :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']" title="Toggle Favourites" @click="toggleFavourites">Toggle Favourites</button>
