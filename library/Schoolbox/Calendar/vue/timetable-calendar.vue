@@ -876,6 +876,12 @@ export default {
 <style lang="scss">
 @import "@schoolboxVue/components/fullcalendar/styles/calendar";
 
+/* Move times right up to the top
+ */
+.fc-timegrid-slot.fc-timegrid-slot-label.fc-scrollgrid-shrink {
+    vertical-align: top;
+}
+
 /* Make each event dig go to the edges of their container columns
  */
 .fc-direction-ltr .fc-timegrid-col-events {
