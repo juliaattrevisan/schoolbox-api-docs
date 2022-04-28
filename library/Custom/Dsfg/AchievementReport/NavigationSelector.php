@@ -123,10 +123,8 @@ class NavigationSelector
          */
         if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        } elseif ($this->user->getYear()->getName() == 7) {
+        } elseif (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::MYP_KEY;
-        } elseif (($this->user->getYear()->getName() >= 8) && ($this->user->getYear()->getName() <= 10)) {
-            $this->defaultReport = self::SCHOOLGRADES_KEY;
         } elseif ($this->user->getYear()->getName() == 11) {
             /* NCEA for year 11 specifically
              */

@@ -9,71 +9,7 @@
     elements: navigation
 } %}
 <div class="row achievement-report myp">
-    {% for classCode, subjectData in subjects %}
-        <div class="row">
-            <div class="small-12 island">
-                <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 island">
-                <section class="content">
-                    <p>{{ subjectData.overview }}</p>
-                </section>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 island">
-                <section>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th class="fixed"></th>
-                            {% for shortHeading in headings[classCode].shortHeadings %}
-                                <th class="centered fixed">{{ shortHeading }}</th>
-                            {% endfor %}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for topicHeading in headings[classCode].topicHeadings %}
-                            <tr>
-                                <th>{{ topicHeading }}</th>
-                                {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                                    <td class="centered">{{ subjectData.topics[topicHeading][shortCode] ?? '' }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}" class="spacer"></td>
-                        </tr>
-                        <tr>
-                            <th>Interim Achievement Level</th>
-                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                                <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}" class="spacer"></td>
-                        </tr>
-                        <tr>
-                            <th>Final Achievement Level</th>
-                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                                <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
-                            {% endfor %}
-                        </tr>
-                        </tbody>
-                    </table>
-                </section>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 island">
-                <section class="content">
-                    <p>{{ subjectData.comment }}</p>
-                </section>
-            </div>
-        </div>
-    {% endfor %}
+    {% include '@myp/result.twig' with {subjects: subjects, grades: grades, headings: headings} %}
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Further Information</h2>
@@ -82,4 +18,31 @@
             </section>
         </div>
     </div>
+    {% if (historical | length) > 0 %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">MYP Results By Year</h2>
+            <ul id="historical" class="sub-nav">
+                {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
+                    <li data-year id="data-{{ year }}"><a>{{ year }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
+        <div data-result id="data-{{ year }}-result" class="hide">
+            {% include '@myp/result.twig' with {subjects: data.subjects.data, grades: data.grades, headings: data.subjects.headings} %}
+        </div>
+    {% endfor %}
+    {% endif %}
 </div>
+<script>
+    $('#historical').on('click', '[data-year]', function () {
+        $('[data-year]').removeClass('active');
+        $('[data-result]').addClass('hide');
+        $(this).addClass('active');
+        let name = $(this).attr('id');
+        $('#' + name + '-result').removeClass('hide');
+    })
+</script>
