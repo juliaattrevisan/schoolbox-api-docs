@@ -19,13 +19,16 @@ const props = defineProps({
     }
 });
 
-const settingsList =  ref([]);
-const isLoaded = ref(false);
+const dataList = ref([]); //all the classes
+const selectedList =  ref([]); //the classes currently selected
+const isLoading = ref(true);
 const hasLoadError = ref(false);
 const query = ref('');
 const minQueryLength = 3;
-const resultsShownLimit = 6;
 const activeIndex = ref(0); //to track which index is selected
+const queryInputEl = ref(null);
+const classSelectorEl = ref(null);
+const searchResultsEl = ref([]);
 
 
 /**
@@ -34,23 +37,10 @@ const activeIndex = ref(0); //to track which index is selected
  * @returns { String } loading status
  */
 const inputPlaceholder = computed(() => {
-    if (isLoaded.value) {
-        return 'Search administration settings...';
+    if (isLoading.value) {
+        return 'Loading classes, please wait...'
     } else {
-        return 'Loading settings, please wait...'
-    }
-});
-
-/**
- * only when started typing beyond minQueryLength count and there's actual results
- * 
- * @returns { Boolean } start displaying results or not
- */
-const isActive = computed(() => {
-    if ((query.value.length >= minQueryLength) && (resultsList.value.length > 0)) {
-        return true
-    } else {
-        return false;
+        return 'Search for classes...';
     }
 });
 
@@ -68,51 +58,29 @@ const queryWordList = computed(() => {
 /**
  * the settings relevant to the search input
  * 
- * @returns { Array } all relevant search results, with title matches first over those just with description matches
+ * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const resultsList = computed(() => {
-    if (query.value.length < minQueryLength) {
-        return [];
-    }
-    return settingsList.value.filter(searchForTitle);
+    return query.value.length < minQueryLength ? [] : dataList.value.filter(searchForTitle);
 });
 
 /**
- * the settings relevant to the search input and capped to resultsShownLimit
- * 
- * @returns { Array } 
+ * find all those results that match EACH search word
+ * within the the title field
+ *
+ * @params { Object }
+ *
+ * @return { Boolean } true if found
  */
-const resultsListLimited = computed(() => {
-    if (resultsList.value.length > resultsShownLimit) { //return the capped results
-        return resultsList.value.filter((setting, index) => index < resultsShownLimit);
-    } else { //otherwise just return the whole list
-        return resultsList.value;
-    }
-});
-
-/**
- * to show the search refine note
- * 
- * @returns { Boolean }
- */
-const hasResultsBeydondLimit = computed(() => {
-    if (resultsList.value.length > resultsShownLimit) {
-        return true
-    } else {
-        return false;
-    }
-});
-
-/**
- * to show the count of how many aren't appearing in the search
- * 
- * @returns { Number }
- */
-const resultsBeyondLimitCount = computed(() => {
-    return resultsList.value.length - resultsShownLimit;
-});
-
-
+function searchForTitle (classItem) {
+    let wordMatchCount = 0;
+    queryWordList.value.forEach(wordInSearch => {
+        if (classItem.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+    });
+    return wordMatchCount > 0 ? true : false; //if a word matches
+}
 
 /**
  * reset the active index when the list changes as the index may become out of range
@@ -127,35 +95,12 @@ watch (resultsList, async (newValue, oldValue) => {
 onMounted(() => {
     initKeyboardEvents();
     initMouseEvents();
-    loadSettings();
+    loadClassList();
 });
-
-/**
- * find all those results that match EACH search word
- * within the the title field
- *
- * @params { Object }
- *
- * @return { Boolean } true if found
- */
-function searchForTitle (setting) {
-    let wordMatchCount = 0;
-    queryWordList.value.forEach(wordInSearch => {
-        if (setting.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-            wordMatchCount++;
-        }
-    });
-    if (wordMatchCount > 0) { //all words have to match
-        return true;
-    } else {
-        return false;
-    }
-}
 
 /**
  * to be able to select by enter and navigate by up/down arrows
  */
-const queryInput = ref(null);
 function initKeyboardEvents () {
     document.addEventListener('keyup', (event) => {
         const keyName = event.key;
@@ -164,7 +109,7 @@ function initKeyboardEvents () {
             'ArrowUp': () => decrementActiveIndex(),
             'ArrowDown': () => incrementActiveIndex(),
         }
-        if (keyOptions[keyName] && document.activeElement === queryInput.value) { //ensure search input has focus
+        if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
             keyOptions[keyName]();
         }
     });
@@ -185,7 +130,7 @@ function decrementActiveIndex () {
  * with the arrow keys
  */
 function incrementActiveIndex () {
-    if (activeIndex.value < (resultsListLimited.value.length-1)) {
+    if (activeIndex.value < (resultsList.value.length-1)) {
         activeIndex.value++;
     }
 }
@@ -194,10 +139,9 @@ function incrementActiveIndex () {
  * to be able to close the menu when something else
  * is selected outside the menu
  */
-const adminSearchContainer = ref(null);
 function initMouseEvents () {
     document.addEventListener('click', (event) => {
-        if (!adminSearchContainer.value.contains(event.target)) {
+        if (!classSelectorEl.value.contains(event.target)) {
             clearInput();
         }
     });
@@ -206,23 +150,18 @@ function initMouseEvents () {
 /**
  * check if already loaded and saved, or load up
  */
-async function loadSettings () {
+async function loadClassList () {
     try {
         const response = await fetch(props.endpoint);
         const responseJson = await response.json();
-        settingsList.value = responseJson;
+        dataList.value = responseJson;
     } catch (error) {
+        console.warn(error);
+        isLoading.value = false;
         hasLoadError.value = true; //hide search bar in the dom
     } finally {
-        isLoaded.value = true;
+        isLoading.value = false;
     }
-}
-
-/**
- * clear the search button selected
- */
-function onClearInputSelected () {
-    clearInput();
 }
 
 /**
@@ -240,9 +179,8 @@ function clearInput () {
  * @param { Function } done - to be called once animation is complete
  *
  */
-const searchResults = ref([]);
 function checkEachResultIndex () {
-    searchResults.value.forEach(searchResult => {
+    searchResultsEl.value.forEach(searchResult => {
         searchResult.checkIndex();
     });
 }
@@ -253,7 +191,6 @@ function checkEachResultIndex () {
  * what happens before shown
  *
  * @param { DOMElement } element - the element that's animating
- *
  */
 function onBeforeOnEnter (element) {
     gsap.set(element, { opacity: 0, y: 10, height: 0 } );
@@ -264,7 +201,6 @@ function onBeforeOnEnter (element) {
  *
  * @param { DOMElement } element - the element that's animating
  * @param { Function } done - to be called once animation is complete
- *
  */
 function onEnter (element, done) {
     let delay = element.dataset.index * 0.025;
@@ -276,23 +212,9 @@ function onEnter (element, done) {
  *
  * @param { DOMElement } element - the element that's animating
  * @param { Function } done - to be called once animation is complete
- *
  */
 function onLeave (element, done) {
     gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
-}
-
-/**
- * how the element animates off
- *
- * @param { DOMElement } element - the element that's animating
- * @param { Function } done - to be called once animation is complete
- *
- */
-function onAfterLeave (element) {
-    searchResults.value.forEach(searchResult => {
-        searchResult.test();
-    });
 }
 
 /**
@@ -307,8 +229,8 @@ function onMouseOverResult () {
  * 
  * @param { String }
  */
-function onSelectedResult (name) {
-    selectResult(name);
+function onSelectedResult (classItem) {
+    selectResult(classItem);
 }
 
 /**
@@ -317,25 +239,29 @@ function onSelectedResult (name) {
  * 
  * @param { String }
  */
-function selectResult (name) {
-    clearInput();
+function selectResult (classItem) {
+    selectedList.value.push(classItem);
 }
 
 </script>
 
 <template>
-    <div class="admin-search-container" ref="adminSearchContainer">
+    <div class="class-selector" ref="classSelectorEl">
+        <div class="selected-results">
+            <div v-for="selectedItem in selectedList" :key="selectedItem.id">
+                {{ selectedItem.name }}
+            </div>
+        </div><!-- .selected-results -->
         <input
             v-if="!hasLoadError"
             v-model="query"
             @input="$event.target.composing = false"
-            :readonly="!isLoaded"
+            :readonly="isLoading"
             :placeholder="inputPlaceholder"
-            ref="queryInput"
+            ref="queryInputEl"
             type="text"
-            class=""
         />
-        <div>
+        <div class="search-results">
             <transition-group
                 name="staggered-fade"
                 tag="ul"
@@ -347,9 +273,9 @@ function selectResult (name) {
                 @after-leave="checkEachResultIndex"
                 @leave-cancelled="checkEachResultIndex"
             >
-                <li v-for="(result, index) in resultsListLimited" :key="result.name" :data-index="index">
+                <li v-for="(result, index) in resultsList" :key="result.id" :data-index="index">
                     <class-selector-search-result
-                        ref="searchResults"
+                        ref="searchResultsEl"
                         :result="result"
                         :query-word-list="queryWordList"
                         :active-index="activeIndex"
@@ -358,53 +284,42 @@ function selectResult (name) {
                     />
                 </li>
             </transition-group>
-            <aside v-if="isActive && hasResultsBeydondLimit" class="search-refine-note">{{ resultsBeyondLimitCount }} search results not shown, try refining your search further.</aside>
-        </div>
+        </div><!-- .search-results -->
     </div>
 </template>
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/foundation/utils/_variables.scss';
-
-.admin-search-container {
+.selected-results {
     position: relative;
-    > div {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        position: absolute;
-        top: 40px;
-        z-index: 10;
-    }
 }
 
-ul {
-    margin: 0;
-    list-style: none;
-    width: 500px;
-    @media only screen and (max-width: 640px) {
-        width: 100%;
-    }
-    li {
-        border-bottom: 1px solid $body-bg;
-        border-left: 1px solid $navigation-hover;
-        border-right: 1px solid $navigation-hover;
-        transform: none !important;
-        &:first-child {
-            border-top: 1px solid $navigation-hover;
-        }
-        &:last-child {
-            border-bottom: 1px solid $navigation-hover;
-        }
-    }
+.class-selector {
+    position: relative;
 }
 
-.search-refine-note {
-    background-color: #FAFAFA;
-    border: 1px solid #EDEDED;
+.search-results {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 40px;
     width: 100%;
-    padding: .75rem;
-    font-size: 13px;
-    font-style: italic;
+    z-index: 10;
+    ul {
+        list-style: none;
+        margin: 0;
+        li {
+            border-bottom: 1px solid var(--body-background);
+            border-left: 1px solid var(--navigation-hover);
+            border-right: 1px solid var(--navigation-hover);
+            transform: none !important;
+            &:first-child {
+                border-top: 1px solid var(--navigation-hover);
+            }
+            &:last-child {
+                border-bottom: 1px solid var(--navigation-hover);
+            }
+        }
+    }
 }
 
 </style>

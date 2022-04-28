@@ -37,6 +37,7 @@ const props = defineProps({
 
 const itemIndex = ref(-1);
 const isActive = ref(false);
+const resultEl = ref(null);
 
 const highlightTitleSearch = computed(() => {
     return highlightSearchInElement(props.result.name);
@@ -63,10 +64,9 @@ onBeforeUnmount(() => {
  * to highlight the current selection relative to key events
  * needs to be updated once the animations have completed
  */
-const resultEl = ref(null);
 function checkIndex() {
     itemIndex.value = getIndex(resultEl.value.parentElement);
-    if (itemIndex.value === props.activeIndex.value) {
+    if (itemIndex.value === props.activeIndex) {
         isActive.value = true;
     } else {
         isActive.value = false;
@@ -102,7 +102,7 @@ function mouseOverResult() {
  * dispatch to parent so can move to relevant settings page
  */
 function selectResult() {
-    // this.$emit('on-selected-result', this.result.url);
+    emit('on-selected-result', props.result);
 }
 
 
@@ -110,7 +110,7 @@ function selectResult() {
 </script>
 
 <template>
-    <a class="search-result"
+    <button class="search-result"
         ref="resultEl"
         :class="{ searchResultActive: isActive }"
         @mouseover="mouseOverResult"
@@ -118,35 +118,28 @@ function selectResult() {
         @click.prevent="selectResult"
         @keyup.enter="selectResult"
     >
-        <h4 class="result-title" v-html="highlightTitleSearch"></h4>
-    </a>
+        <span class="result-title" v-html="highlightTitleSearch"></span>
+    </button>
 </template>
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/foundation/utils/_variables.scss';
-
 .search-result {
-    display: block;
-    padding: .75rem;
     background: white;
-    transition: back ground 0.2s;
+    display: block;
+    font-size: 0.825rem;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    transition: background 0.2s;
+    width: 100%;
     &:hover {
-        background: $content-ui-hover;
-    }
-    h4 {
-        margin-bottom: .5rem;
-    }
-    p {
-        color: #9A9A9A;
-        font-size: 13px;
-        font-style: italic;
-        margin-bottom: 0;
+        background: var(--content-ui-hover);
     }
 }
 
 .searchResultActive {
-    background: $content-ui-hover;
+    background: var(--content-ui-hover);
 }
 
 </style>
