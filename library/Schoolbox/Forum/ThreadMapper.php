@@ -312,4 +312,15 @@ WHERE
          */
         return false;
     }
+
+    /**
+     * Soft-deletes Forum for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('categoryID', $cid);
+    }
 }
