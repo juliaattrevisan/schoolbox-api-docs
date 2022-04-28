@@ -323,4 +323,44 @@ WHERE
     {
         $this->deleteByColumn('categoryID', $cid);
     }
+
+    /**
+     * @param int $categoryID
+     * @param array $config
+     * @return array|bool
+     */
+    public function getRecentThreadList(int $categoryID, array $config)
+    {
+        /* Set default sorting to threads, but leave options for other sort fields
+         */
+        $params = [
+            'categoryID'    => $categoryID,
+        ];
+
+        $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id
+                  FROM forumThread t
+                  LEFT JOIN user u ON u.id = t.userID
+                  WHERE t.categoryID = :categoryID
+                  AND t.deleted = 'false'
+                  ORDER BY ";
+
+        if ($config['sort'] == 'Posts') {
+            $query .= ' t.last_post_date DESC ';
+        } elseif ($config['sort'] == 'Threads') {
+            $query .= 't.date DESC ';
+        } else {
+            $query .= 't.date DESC ';
+        }
+
+        if ($config['size'] != 0 && $config['size'] != '') {
+            $query .= " LIMIT 0, :size";
+            $params['size'] = (int)$config['size'];
+        }
+        $statement = $this->database->prepare($query);
+        foreach ($params as $param => $value) {
+            $statement->bindValue($param, $value, PDO::PARAM_INT);
+        }
+        $statement->execute();
+        return $statement->fetchAll();
+    }
 }

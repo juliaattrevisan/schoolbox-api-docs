@@ -16,6 +16,8 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
      */
     private $groupHandler;
 
+    private \Schoolbox\Forum\ThreadMapper $threadMapper;
+
     /**
      * Available sort fields for this component.
      *
@@ -37,6 +39,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         }
 
         $this->groupHandler = new Group();
+        $this->threadMapper = \Schoolbox\Forum\ThreadMapper::getInstance();
         return true;
     }
 
@@ -59,8 +62,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'has_posts', 'has_posts_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        $forumHandler = new Forum();
-        $threadList   = $forumHandler->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
+        $threadList   = $this->threadMapper->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
 
         // don't show forums to parents if they not a direct member of group
         // (Allow parents to read, but not post, if a child is in group)
