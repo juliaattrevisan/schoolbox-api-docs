@@ -46,10 +46,10 @@ class Renderer extends Handler
      * to prepend "Year " in front of it, because this is how it will
      * manifest in a UI somewhere.
      *
-     * @param $yearName
+     * @param string $yearName
      * @return string
      */
-    private function getLongName($yearName): string
+    private function getLongName(string $yearName): string
     {
         if (preg_match('/^[0-9]+$/', $yearName)) {
             return "Year {$yearName}";
