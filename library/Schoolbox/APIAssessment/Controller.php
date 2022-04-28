@@ -117,6 +117,8 @@ SELECT
             if(project.id, 'Project', null)
         ) as `assessmentType`,
     assessment.due_date,
+    folder_code.code as `folderCode`,
+    folder.name as `folderName`,
     (SELECT group_concat(name) from lu_year_level
         LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
                 where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelName`,
@@ -132,6 +134,8 @@ LEFT JOIN assess on assessment.id = assess.assessment_id
 LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
 LEFT JOIN project on assessment.id = project.assessment_id
 LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
+LEFT JOIN folder_code on v_assessment_relation.folder_id = folder_code.folder_id
 
 
 
@@ -244,6 +248,12 @@ WHERE
                     ];
                 }
             }
+            $folder = [
+                'id' => $row['folderId'],
+                'name' => $row['folderName'],
+                'code' => $row['folderCode'],
+                'yearLevel' => $yearLevel,
+            ];
             $output[] = [
                 'assessmentId'  => $row['id'],
                 'title'         => $row['title'],
@@ -252,8 +262,7 @@ WHERE
                                     'name'  => $row['workTypeName'],
                                     'id'    => $row['workTypeId']
                                 ],
-                'yearLevel'     => $yearLevel,
-                'folderId'      => $row['folderId'],
+                'folder'        => $folder,
                 'weighted'      => $weighted,
                 'due_date'      => $row['due_date'],
 
