@@ -34,6 +34,31 @@ class Renderer extends Handler
      */
     protected $tabName = 'People';
 
+
+    /**
+     * TODO: Remove UserHandler usage in favour of UserMapper
+     *
+     * This is cloned from library/Schoolbox/User.php
+     * This entire search processor is using User Handler, returning array data
+     * which precludes usage of the model's getLongName() implementation
+     *
+     * If the year's name contains only an integer, presume the user wanted
+     * to prepend "Year " in front of it, because this is how it will
+     * manifest in a UI somewhere.
+     *
+     * @param $yearName
+     * @return string
+     */
+    private function getLongName($yearName): string
+    {
+        if (preg_match('/^[0-9]+$/', $yearName)) {
+            return "Year {$yearName}";
+        }
+
+        return $yearName;
+    }
+
+
     /**
      * Render
      */
@@ -90,7 +115,7 @@ class Renderer extends Handler
                     'USER_SEARCH_NAME'       => Scrub::text($userHandler->formatName($user)),
                     'USER_SEARCH_USERNAME'   => Scrub::text($user['username']),
                     'USER_SEARCH_COUNT'      => $this->getCount($this->getType()),
-                    'USER_SEARCH_YEAR'       => empty($user['year_name']) ? '' : "Year {$user['year_name']}",
+                    'USER_SEARCH_YEAR'       => $this->getLongName((string)$user['year_name']),
                     'USER_POSITION_TITLE'    => $user['position_title'],
                     // For now, do not output a user's campus
                     'USER_SEARCH_CAMPUS'     => '',
