@@ -25,7 +25,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     try {
         $folder = FolderMapper::getInstance()->findById($_POST['categoryID']);
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     // forum exists
@@ -38,10 +38,10 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
      */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($_POST['categoryID'], $_SESSION['user']->getId())) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     /* modify post
@@ -52,7 +52,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_POST_NOT_FOUND);
         } catch (Exception $e) {
-            error(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
 
@@ -60,20 +60,20 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
          */
         /** @var \Schoolbox\Forum\Post $post */
         if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         try {
             $thread = $threadMapper->findById($post->getThread()->getId());
         } catch (Exception $e) {
-            error(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* check locked
          */
         /** @var \Schoolbox\Forum\Thread $thread */
         if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         $threadMapper->getDatabase()->beginTransaction();
@@ -86,7 +86,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
                 $threadMapper->save($thread);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $threadMapper->getDatabase()->rollback();
-                error($e->getCode(), $e->getMessage());
+                throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
             }
         }
 
@@ -100,7 +100,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             $threadMapper->getDatabase()->commit();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $threadMapper->getDatabase()->rollback();
-            error($e->getCode(), $e->getMessage());
+            throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
         }
     } else {
         /* create thread
@@ -117,20 +117,20 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
                 $threadMapper->save($thread);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $threadMapper->getDatabase()->rollback();
-                error($e->getCode(), $e->getMessage());
+                throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
             }
         } else {
             try {
                 $thread = $threadMapper->findById($_POST['threadID']);
             } catch (Exception $e) {
-                error(ErrorMapper::ERROR_INFORMATION_MISSING);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
 
             /* check locked
              */
             /** @var \Schoolbox\Forum\Thread $thread */
             if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
-                error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
         }
 
@@ -151,7 +151,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             $postMapper->save($post);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $threadMapper->getDatabase()->rollback();
-            error($e->getCode(), $e->getMessage());
+            throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
         }
 
         /* update thread */
@@ -163,7 +163,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
             $threadMapper->getDatabase()->commit();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $threadMapper->getDatabase()->rollback();
-            error($e->getCode(), $e->getMessage());
+            throw ErrorMapper::getInstance()->generateException($e->getCode(), $e->getMessage());
         }
     }
 
@@ -174,7 +174,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     try {
         $thread = $threadMapper->findById($_GET['toggleLock']);
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     /* forum exists
@@ -188,10 +188,10 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
      */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
     if ($accessLevel < UserAccess::ACCESS_WRITE) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $thread->setLocked($thread->isLocked() ? false : true);
@@ -205,7 +205,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     try {
         $thread = $threadMapper->findById($_GET['deleteThread']);
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     /* forum exists
@@ -219,10 +219,10 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
      */
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
     if ($accessLevel < UserAccess::ACCESS_WRITE) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $threadMapper->delete($thread);
@@ -240,10 +240,10 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
              */
             $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
             if ($accessLevel < UserAccess::ACCESS_WRITE) {
-                error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
             if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-                error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
 
             $categoryID = $thread->getCategory()->getId();
@@ -264,7 +264,7 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
 
         $earliestPost  = $postMapper->findFirstPost($post->getThread()->getId());
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
 
@@ -274,16 +274,16 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $thread->getCategory()->getId());
     /** @var \Schoolbox\Forum\Post $post */
     if ($accessLevel < UserAccess::ACCESS_WRITE && $post->getOwner()->getId() !== $_SESSION['user']->getId()) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     /* check locked
     */
     if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($thread->getCategory()->getId(), $_SESSION['user']->getId())) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $pageNumber = $forumHandler->getPageNumber($post->getId());
@@ -292,10 +292,10 @@ if (is_numeric($_POST['categoryID'] ?? false)) {
     if ($earliestPost->getId() !== $post->getId()) {
         $postMapper->delete($post);
     } else {
-        error(ErrorMapper::ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED);
     }
 
     SitePage::localRedir('/forum/thread/' . $post->getThread()->getId() . '/' . $pageNumber);
 } else {
-    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
