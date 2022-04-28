@@ -84,23 +84,23 @@ class Cleanup implements IStrategy
         if ($this->perform) {
             $queries = [
                 [
-                    'query' => '
+                    'query' => "
                         DELETE sis_event_campus
                         FROM sis_event_campus
-                        INNER JOIN sis_event ON sis_event.id = sis_event_campus.event_id
-                        WHERE sis_event.source = :source            
-                    ',
+                        INNER JOIN sis_event ON sis_event.id = sis_event_campus.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
+                        WHERE sis_event.source = :source
+                    ",
                     'params' => [
                         'source' => $this->source
                     ]
                 ],
                 [
-                    'query' => '
+                    'query' => "
                         DELETE sis_event_roletype
                         FROM sis_event_roletype
-                        INNER JOIN sis_event ON sis_event.id = sis_event_roletype.event_id
+                        INNER JOIN sis_event ON sis_event.id = sis_event_roletype.event_id AND sis_event.updated_at = '0000-00-00 00:00:00'
                         WHERE sis_event.source = :source       
-                    ',
+                    ",
                     'params' => [
                         'source' => $this->source
                     ]
