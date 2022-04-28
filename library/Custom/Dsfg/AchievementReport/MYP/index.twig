@@ -24,14 +24,14 @@
             <h2 class="subheader">MYP Results By Year</h2>
             <ul id="historical" class="sub-nav">
                 {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
-                    <li data-year id="data-{{ year }}" {% if loop.first %}class="active"{% endif %}><a>{{ year }}</a>
+                    <li data-year id="data-{{ year }}"><a>{{ year }}</a>
                     </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
     {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
-        <div data-result id="data-{{ year }}-result" {% if not loop.first %}class="hide"{% endif %}>
+        <div data-result id="data-{{ year }}-result" class="hide">
             {% include '@myp/result.twig' with {subjects: data.subjects.data, grades: data.grades, headings: data.subjects.headings} %}
         </div>
     {% endfor %}
