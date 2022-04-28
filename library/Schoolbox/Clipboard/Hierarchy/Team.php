@@ -370,14 +370,22 @@ class Team implements IStrategy
             ));
 
             /* Put them in the Division pool too
+             * Check if they're already in there - just reuse it if it exists
              */
-            $divisionUser = $this->divisionUserMapper->createModel()
-                ->setUser($user)
-                ->setDivision($division)
-                ->setSequence($sequence);
+            try {
+                $divisionUser = $this->divisionUserMapper->findByColumnList([
+                    'user_id' => $user->getId(),
+                    'division_id' => $division->getId()
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $divisionUser = $this->divisionUserMapper->createModel()
+                    ->setUser($user)
+                    ->setDivision($division)
+                    ->setSequence($sequence);
 
-            if ($this->perform) {
-                $this->divisionUserMapper->save($divisionUser);
+                if ($this->perform) {
+                    $this->divisionUserMapper->save($divisionUser);
+                }
             }
 
             $this->log->debug(sprintf(
