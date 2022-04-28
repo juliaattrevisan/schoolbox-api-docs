@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
