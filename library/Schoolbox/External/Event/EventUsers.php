@@ -117,7 +117,7 @@ class EventUsers
          * both the campus and the roletype
          */
         $query = "
-            SELECT 
+            SELECT DISTINCT
                 {$this->eventMapper->getColumnString('se')},
                 {$folderColumnString}, 
                 {$folderCodeColumnString}
