@@ -18,8 +18,10 @@
             </section>
         </div>
     </div>
+    {% if (historical | length) > 0 %}
     <div class="row">
         <div class="small-12 columns">
+            <h2 class="subheader">MYP Results By Year</h2>
             <ul id="historical" class="sub-nav">
                 {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
                     <li data-year id="data-{{ year }}" {% if loop.first %}class="active"{% endif %}><a>{{ year }}</a>
@@ -33,6 +35,7 @@
             {% include '@myp/result.twig' with {subjects: data.subjects.data, grades: data.grades, headings: data.subjects.headings} %}
         </div>
     {% endfor %}
+    {% endif %}
 </div>
 <script>
     $('#historical').on('click', '[data-year]', function () {
