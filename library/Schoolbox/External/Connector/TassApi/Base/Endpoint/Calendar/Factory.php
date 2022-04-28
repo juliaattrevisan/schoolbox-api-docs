@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
-use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
@@ -80,15 +78,33 @@ class Factory
 
 
     /**
-     * @var EventMapper
+     * @var CampusMapper
      */
-    private EventMapper $eventMapper;
+    private \Schoolbox\CampusMapper $campusMapper;
 
 
     /**
-     * @var EventSourceMapper
+     * @var EventTypeMapper
      */
-    private EventSourceMapper $eventSourceMapper;
+    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Roletype\Mapper
+     */
+    private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Campus\Mapper
+     */
+    private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
 
 
     /**
@@ -100,29 +116,38 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface   $log
-     * @param bool              $perform
-     * @param string            $host
-     * @param string            $key
-     * @param EventMapper       $eventMapper
-     * @param EventSourceMapper $eventSourceMapper
-     * @param RoleMapper        $roleMapper
+     * @param LoggerInterface                           $log
+     * @param bool                                      $perform
+     * @param string                                    $host
+     * @param string                                    $key
+     * @param CampusMapper                              $campusMapper
+     * @param EventTypeMapper                           $eventTypeMapper
+     * @param \Schoolbox\External\Event\Mapper          $eventMapper
+     * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
+     * @param RoleMapper                                $roleMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         string $host,
         string $key,
-        EventMapper $eventMapper,
-        EventSourceMapper $eventSourceMapper,
+        \Schoolbox\CampusMapper $campusMapper,
+        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
+        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
         RoleMapper $roleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->campusMapper = $campusMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
+        $this->roletypeRelationMapper = $roletypeRelationMapper;
+        $this->campusRelationMapper = $campusRelationMapper;
         $this->roleMapper = $roleMapper;
     }
 
@@ -179,23 +204,10 @@ class Factory
             ));
         }
 
-        /* A list of all the campuses from which we can chooze
-         *
-         * Get all the campuses but we can't index them for quick lookup
-         * since they are allowed to have the same name and ext_timetable_code
-         * via our ui...
-         */
-        $campuses = CampusMapper::getInstance()->findAll();
-
-        /* Obtain events between these two datetimes
-         */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
-        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
-
         /* A list of the event types that can be associated with an event that is
          * indexed by the eventType column which I have presumed to be unique
          */
-        $eventTypes = EventTypeMapper::getInstance()->findAll()->indexBy('type');
+        $eventTypes = $this->eventTypeMapper->findAll()->indexBy('type');
 
         /* Without event types we can't import anything - they're mandatory
          */
@@ -203,9 +215,18 @@ class Factory
             throw new \DomainException('There needs to be at least one Event Type to import events.');
         }
 
-        /* TODO Elected event Owner and Author is arbitrarily this person for now...
+        /* A list of all the campuses from which we can chooze
+         *
+         * Get all the campuses but we can't index them for quick lookup
+         * since they are allowed to have the same name and ext_timetable_code
+         * via our ui...
          */
-        $owner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+        $campuses = $this->campusMapper->findAll();
+
+        /* Obtain events between these two datetimes
+         */
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* Remember statistics generated procedurally from all the tass products
          * and dump them all at the very end, together - people weren't reading
@@ -223,7 +244,7 @@ class Factory
             ->add(new Prepare(
                 $this->log,
                 $this->perform,
-                \Schoolbox\External\Event\Mapper::getInstance(),
+                $this->eventMapper,
                 self::SOURCE_NAME
             ))
             ->add(new ParentCalendar(
@@ -232,10 +253,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -248,10 +268,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -264,10 +283,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -280,10 +298,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -296,10 +313,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -312,10 +328,9 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
-                $owner,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
                 $this->roleMapper,
                 self::SOURCE_NAME,
                 $registry,
@@ -325,7 +340,7 @@ class Factory
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
-                \Schoolbox\External\Event\Mapper::getInstance(),
+                $this->eventMapper,
                 self::SOURCE_NAME
             ))
             ->add(new Summary(

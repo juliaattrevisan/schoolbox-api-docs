@@ -9,12 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
-use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
@@ -66,21 +61,6 @@ class Base
      * @var GenericCollection
      */
     protected GenericCollection $eventTypes;
-
-
-    /**
-     * This person arbitrarily authored and owns the events
-     * (because we need that)
-     *
-     * But, because events are determined by Role and Campus,
-     * the fact that it is "owned" by a particular guy and
-     * would appear on that guy's calendar had the events been
-     * "Personal" ...doesn't really matter. The events will be
-     * visible to anyone in the assigned Role(s) and Campus(es)
-     *
-     * @var User
-     */
-    protected User $owner;
 
 
     /**
@@ -162,7 +142,6 @@ class Base
      * @param array                                     $api
      * @param GenericCollection                         $campuses
      * @param GenericCollection                         $eventTypes
-     * @param User                                      $owner
      * @param \Schoolbox\External\Event\Mapper          $eventMapper
      * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
      * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
@@ -178,7 +157,6 @@ class Base
         array $api,
         GenericCollection $campuses,
         GenericCollection $eventTypes,
-        User $owner,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
@@ -193,7 +171,6 @@ class Base
         $this->api = $api;
         $this->campuses = $campuses;
         $this->eventTypes = $eventTypes;
-        $this->owner = $owner;
         $this->eventMapper = $eventMapper;
         $this->roletypeRelationMapper = $roletypeRelationMapper;
         $this->campusRelationMapper = $campusRelationMapper;
