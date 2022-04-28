@@ -11,16 +11,17 @@
 
 namespace Schoolbox\Forum;
 
-use Alaress\Async\Notification\Instance\Instance;
 use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
 class ThreadMapper extends Mapper implements FeedableMapperInterface
 {
-
+    const FORUM_THREADS_PER_PAGE = 30;
     protected function mapping()
     {
         $this->hasTable('forumThread');
@@ -122,6 +123,15 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
             'this_key'  => 'last_post_id',
             'other_key' => 'postID'
         ));
+        $this->hasJoin(
+            'posts',
+            array(
+                'multiple'  => true,
+                'mapper'    => PostMapper::class,
+                'this_key'  => 'threadID',
+                'other_key' => 'threadID',
+            )
+        );
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
     }
@@ -362,5 +372,59 @@ WHERE
         }
         $statement->execute();
         return $statement->fetchAll();
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('lastPoster', 'lastPoster')},
+                   {$this->getJoinColumnString('post', 'post')},
+                   {$this->getJoinColumnString('posts', 'posts')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
+            INNER JOIN {$this->getJoinSql('lastPoster', '', 'lastPoster', true)}
+            LEFT JOIN {$this->getJoinSql('post', '', 'post', false)}
+            LEFT JOIN {$this->getJoinSql('posts', '', 'posts', false)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+        $post_mapper = $this->getJoinMapper('post');
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $thread = $this->hydrate($row)
+                         ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
+                         ->setUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'))
+                         ->setLastPost($this->hydrateJoin($row, 'post', 'post'));
+            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
+            $collection[$thread->getId()] = $thread;
+        }
+
+        return $collection;
     }
 }

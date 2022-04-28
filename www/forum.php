@@ -4,7 +4,6 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-$forumHandler = new Forum();
 $threadMapper = \Schoolbox\Forum\ThreadMapper::getInstance();
 $groupHandler = new Group();
 
@@ -41,7 +40,7 @@ if (is_numeric($this->arg[0] ?? null)) {
 }
 
 // forum exists
-if (!$threadMapper->hasForum($category->getId())) {
+if (!$threadMapper->isComponent($category->getId())) {
     SitePage::localRedir('/homepage/' . $category->getId());
 }
 
@@ -88,15 +87,15 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* output pagination */
 
-$threadList = $forumHandler->getThreadList($category->getId());
+$threadList = $threadMapper->findByColumn('categoryID', $category->getId())->getAll();
 $pageNum = $this->arg[1] ?? 1;
 
 if (!$pageNum) {
     $pageNum = 1;
 }
 
-$threadPerPage = FORUM_THREADS_PER_PAGE;
-$totalPages = is_array($threadList) ? ceil(count($threadList) / $threadPerPage) : 0;
+$threadPerPage = \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE;
+$totalPages = count($threadList) ? ceil(count($threadList) / $threadPerPage) : 0;
 $threadIndex = $threadPerPage * ($pageNum - 1);
 
 $this->setVar(array(
@@ -135,44 +134,29 @@ $outputPagination = array(
 $this->setVar($outputPagination);
 
 /* output threads */
-$threadList = $forumHandler->getThreadList($category->getId(), $threadIndex, $threadPerPage);
+$threadList = $threadMapper->findByColumn('categoryID', $category->getId(), ['limit' => $threadPerPage, 'offset' => $threadIndex])->getAll();
 
-if (is_array($threadList)) {
+if (0 !== count($threadList)) {
     $userHandler = new User();
     $j = 0;
 
     foreach ($threadList as $thread) {
-        $user   = [
-            'title'     => $thread['userTitle'],
-            'firstname' => $thread['userFirstname'],
-            'lastname'  => $thread['userLastname'],
-        ];
-
-        $last_post_user = array(
-            'title' => $thread['last_post_title'],
-            'firstname' => $thread['last_post_firstname'],
-            'lastname' => $thread['last_post_surname'],
-        );
-
-        $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
-        $threadLastPostTime = new Alaress_Date_Format($thread['last_post_date'], 'Y-m-d H:i:s');
-
         $this->setVar(array(
-            'THREAD_ID' => $thread['threadID'],
-            'THREAD_TITLE' => Scrub::text($thread['title']),
-            'THREAD_AUTHOR' => Scrub::text($userHandler->formatName($user)),
-            'THREAD_AUTHOR_ID' => $thread['userID'],
-            'THREAD_AUTHOR_EXTERNAL_ID' => $thread['userSynID'],
-            'THREAD_TIME' => $threadTime->getRelativeTime(),
-            'THREAD_LAST_POST_TIME' => $threadLastPostTime->getRelativeTime(),
-            'THREAD_LAST_POST_ID' => $thread['last_post_id'],
-            'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread['last_post_external_id'],
-            'THREAD_LAST_POST_USER_ID' => $thread['last_post_user_id'],
-            'THREAD_LAST_POST_USER' => Scrub::text($userHandler->formatName($last_post_user)),
-            'THREAD_REPLIES' => $thread['replies'],
-            'THREAD_VIEWS' => $thread['views'],
-            'THREAD_LAST_PAGE' => ceil((($thread['replies'] + 1) / FORUM_POSTS_PER_PAGE)),
-            'THREAD_LOCKED' => $thread['locked'] == 'true' ? '(Locked)' : '',
+            'THREAD_ID' => $thread->getId(),
+            'THREAD_TITLE' => Scrub::text($thread->getTitle()),
+            'THREAD_AUTHOR' => Scrub::text($thread->getUser()->getFullname()),
+            'THREAD_AUTHOR_ID' => $thread->getUser()->getId(),
+            'THREAD_AUTHOR_EXTERNAL_ID' => $thread->getUser()->getExternalId(),
+            'THREAD_TIME' => $thread->getDate()->getRelativeTime(),
+            'THREAD_LAST_POST_TIME' => $thread->getLastPostDate()->getRelativeTime(),
+            'THREAD_LAST_POST_ID' => $thread->getLastPost()->getId(),
+            'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread->getLastPostUser()->getExternalId(),
+            'THREAD_LAST_POST_USER_ID' => $thread->getLastPostUser()->getId(),
+            'THREAD_LAST_POST_USER' => $thread->getLastPostUser()->getFullname(),
+            'THREAD_REPLIES' => $thread->getPosts()->count(),
+            'THREAD_VIEWS' => $thread->getViews(),
+            'THREAD_LAST_PAGE' => ceil((($thread->getPosts()->count() + 1) / \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE)),
+            'THREAD_LOCKED' => $thread->isLocked() == 'true' ? '(Locked)' : '',
             'ON_OFF'          => ++$j % 2 ? 'dark' : ''
         ));
 
@@ -188,14 +172,14 @@ if (is_array($threadList)) {
             $this->parse('modify_thread_block', 'modify_thread', true);
         }
 
-        if ($thread['replies'] > 0) {
+        if ($thread->getPosts()->count() > 0) {
             $this->parse('last_post_block', 'last_post', true);
         }
 
         $this->setVar('deleted_thread_author_block', '');
         $this->parse('thread_author_block', 'thread_author');
 
-        if ($thread['authorDeletedAt']) {
+        if ($thread->getUser()->isDeleted()) {
             $this->setVar('thread_author_block', '');
             $this->parse('deleted_thread_author_block', 'deleted_thread_author');
         }
