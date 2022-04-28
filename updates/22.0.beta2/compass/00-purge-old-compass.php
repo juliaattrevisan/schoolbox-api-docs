@@ -186,20 +186,6 @@ HELP;
             'params' => null
         ];
 
-        $queries['SIS Classes'] = [
-            'query' => '
-                    DELETE FROM sis_class
-                ',
-            'params' => null
-        ];
-
-        $queries['SIS Class Involvements'] = [
-            'query' => '
-                    DELETE FROM sis_class_user
-                ',
-            'params' => null
-        ];
-
         $this->getLogger()->debug(sprintf(
             'Beginning the great purge of existing events/relations that used event_source: %s',
             self::EVENT_IMPORT_IDENTIFIER
