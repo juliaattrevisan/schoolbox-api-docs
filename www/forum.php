@@ -2,8 +2,10 @@
 
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $forumHandler = new Forum();
+$threadMapper = \Schoolbox\Forum\ThreadMapper::getInstance();
 $groupHandler = new Group();
 
 /** @var SitePage $this */
@@ -32,20 +34,20 @@ if (is_numeric($this->arg[0] ?? null)) {
     try {
         $category = $categoryMapper->findById($this->arg[0]);
     } catch (\Exception $e) {
-        error(2);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 } else {
-    error(2);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 // forum exists
-if (!$forumHandler->hasForum($category->getId())) {
+if (!$threadMapper->hasForum($category->getId())) {
     SitePage::localRedir('/homepage/' . $category->getId());
 }
 
 // check permissions
 if (($perm = $groupHandler->getPermission($category->getId())) < UserAccess::ACCESS_READ) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 //
 // Parent's permissions:
@@ -54,7 +56,7 @@ if (($perm = $groupHandler->getPermission($category->getId())) < UserAccess::ACC
 $is_post_allowed = !$groupHandler->hasChildAccessOnly($category->getId());
 
 if (!$is_post_allowed && Config::get('restrict_parent_forum_access')) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setVar(array(
