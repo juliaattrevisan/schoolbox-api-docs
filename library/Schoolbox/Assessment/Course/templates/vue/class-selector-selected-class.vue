@@ -1,0 +1,77 @@
+<script setup>
+
+/**
+ * An individual search result that matches the search query with search result
+ * highlighted within. Selecting will take the user to relevant page/setting
+ *
+ */
+
+const emit = defineEmits(['on-remove-selected']);
+
+const props = defineProps({
+    classItem: {
+        type: Object,
+        required: true,
+        default: () => {
+            return {
+                name: 'name',
+            }
+        }
+    },
+    selectedClassIds: { //to determine the status of the checkbox
+        type: Array,
+        required: true,
+        default: []
+    },
+    queryWordList: { //current word list in the query
+        type: Array,
+        required: true,
+        default: []
+    },
+    activeIndex: { //to know whether this result is currently active
+        type: Number,
+        required: true,
+        default: 0
+    }
+});
+
+/**
+ * To remove from the selected list
+ */
+function onRemoveSelected () {
+    this.$emit('on-remove-selected', props.classItem);
+}
+
+
+</script>
+
+<template>
+    <div class="selected-class">
+        <span>{{ selectedClass.name }}</span>
+        <button class="remove-button icon-close" :aria-label="`Remove ${classItem.name}`" @click.prevent="onRemoveSelected"></button>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+
+.selected-class {
+    background: var(--body-background);
+    color: #000;
+    display: flex;
+    font-size: 0.7rem;
+    gap: 0.5rem;
+    min-height: auto;
+    padding: 5px 10px;
+    text-align: left;
+    transition: all 0.3s;
+}
+
+.remove-button {
+    background: var(--body-background);
+    border-radius: 1rem;
+    height: 1rem;
+    min-height: 0;
+    padding: 0;
+}
+
+</style>

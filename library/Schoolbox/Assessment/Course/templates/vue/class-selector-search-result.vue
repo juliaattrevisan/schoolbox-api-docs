@@ -23,6 +23,11 @@ const props = defineProps({
             }
         }
     },
+    selectedClassIds: { //to determine the status of the checkbox
+        type: Array,
+        required: true,
+        default: []
+    },
     queryWordList: { //current word list in the query
         type: Array,
         required: true,
@@ -94,17 +99,34 @@ function highlightSearchInElement(toHighlight) {
 /**
  * so mouse selection takes precendence over the arrow/enter selection
  */
-function mouseOverResult() {
+function mouseOverResult () {
     emit('on-mouse-over-result');
 }
 
 /**
  * dispatch to parent so can move to relevant settings page
  */
-function selectResult() {
-    emit('on-selected-result', props.result);
+function selectResult () {
+    emit('on-selected-result', props.result, isResultSelected.value);
 }
 
+/**
+ * To determine the status of the checkbox
+ * 
+ * @returns { Boolean }
+ */
+const isResultSelected = computed(() => {
+    return props.selectedClassIds.includes(props.result.id);
+});
+
+/**
+ * To be able to award badges to multiple students
+ * 
+ * @params { Boolean } 
+ */
+function onResultSelected (isChecked) {
+    this.$emit('on-result-selected', props.result.id, isChecked);
+}
 
 
 </script>
@@ -118,6 +140,16 @@ function selectResult() {
         @click.prevent="selectResult"
         @keyup.enter="selectResult"
     >
+        <div class="checklist">
+            <input 
+                :id="`checkbox-${result.id}`"
+                type="checkbox"
+                :value="result.id"
+                :checked="isResultSelected"
+                @change="onResultSelected($event.target.checked)"
+            />
+            <label :for="`checkbox-${result.id}`"></label>
+        </div>
         <span class="result-title" v-html="highlightTitleSearch"></span>
     </button>
 </template>
@@ -126,7 +158,7 @@ function selectResult() {
 
 .search-result {
     background: white;
-    display: block;
+    display: flex;
     font-size: 0.825rem;
     margin: 0;
     padding: 0.5rem 0.75rem;
@@ -140,6 +172,10 @@ function selectResult() {
 
 .searchResultActive {
     background: var(--content-ui-hover);
+}
+
+input[type=checkbox]:not(.plain) + label {
+    margin: 0;
 }
 
 </style>

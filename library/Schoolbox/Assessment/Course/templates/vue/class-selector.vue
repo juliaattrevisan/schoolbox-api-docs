@@ -19,12 +19,17 @@ const props = defineProps({
     }
 });
 
-const dataList = ref([]); //all the classes
-const selectedList =  ref([]); //the classes currently selected
+const classes = ref([]); //all the classes
+
+const selectedClasses = ref([]); //the classes currently selected
+const selectedClassIds = computed(() => {
+    return selectedClasses.value.map((classItem) => classItem.id);
+});
+
 const isLoading = ref(true);
 const hasLoadError = ref(false);
 const query = ref('');
-const minQueryLength = 3;
+const minQueryLength = 1;
 const activeIndex = ref(0); //to track which index is selected
 const queryInputEl = ref(null);
 const classSelectorEl = ref(null);
@@ -61,7 +66,7 @@ const queryWordList = computed(() => {
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const resultsList = computed(() => {
-    return query.value.length < minQueryLength ? [] : dataList.value.filter(searchForTitle);
+    return query.value.length < minQueryLength ? [] : classes.value.filter(searchForTitle);
 });
 
 /**
@@ -154,7 +159,7 @@ async function loadClassList () {
     try {
         const response = await fetch(props.endpoint);
         const responseJson = await response.json();
-        dataList.value = responseJson;
+        classes.value = responseJson;
     } catch (error) {
         console.warn(error);
         isLoading.value = false;
@@ -228,9 +233,10 @@ function onMouseOverResult () {
  * a result has been selected via #class-selector-search-result
  * 
  * @param { String }
+ * @param { Boolean }
  */
-function onSelectedResult (classItem) {
-    selectResult(classItem);
+function onSelectedResult (toggledClassItem, isSelected) {
+    selectResult(toggledClassItem, isSelected);
 }
 
 /**
@@ -238,20 +244,20 @@ function onSelectedResult (classItem) {
  * which will have the result highlighted
  * 
  * @param { String }
+ * @param { Boolean }
  */
-function selectResult (classItem) {
-    selectedList.value.push(classItem);
+function selectResult (toggledClassItem, isSelected) {
+    if (isSelected) {
+        selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
+    } else {
+        selectedClasses.value = [...selectedClasses.value, toggledClassItem];
+    }
 }
 
 </script>
 
 <template>
     <div class="class-selector" ref="classSelectorEl">
-        <div class="selected-results">
-            <div v-for="selectedItem in selectedList" :key="selectedItem.id">
-                {{ selectedItem.name }}
-            </div>
-        </div><!-- .selected-results -->
         <input
             v-if="!hasLoadError"
             v-model="query"
@@ -260,6 +266,7 @@ function selectResult (classItem) {
             :placeholder="inputPlaceholder"
             ref="queryInputEl"
             type="text"
+            class="search-input"
         />
         <div class="search-results">
             <transition-group
@@ -277,6 +284,7 @@ function selectResult (classItem) {
                     <class-selector-search-result
                         ref="searchResultsEl"
                         :result="result"
+                        :selected-class-ids="selectedClassIds"
                         :query-word-list="queryWordList"
                         :active-index="activeIndex"
                         @on-mouse-over-result="onMouseOverResult"
@@ -285,17 +293,23 @@ function selectResult (classItem) {
                 </li>
             </transition-group>
         </div><!-- .search-results -->
+        <div class="selected-classes-container">
+            <div v-for="selectedClass in selectedClasses" :key="selectedClass.id" class="selected-class">
+                <span>{{ selectedClass.name }}</span>
+                <button class="remove-selected-class-button icon-close" :aria-label="`Remove ${selectedClass.name}`" @click.prevent="onRemoveSelected"></button>
+            </div>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 
-.selected-results {
+.class-selector {
     position: relative;
 }
 
-.class-selector {
-    position: relative;
+.search-input {
+    margin: 0;
 }
 
 .search-results {
