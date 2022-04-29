@@ -136,7 +136,7 @@ class Creational extends AbstractFactory
             $fileArray = $_FILES['file'];
 
             try {
-                $resource = Mapper::getInstance()->accept($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
+                $resource = Mapper::getInstance()->accept($fileArray['name'], $fileArray['tmp_name']);
                 $this->parseStorageMetadata($resource, $data);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // noop - don't do anything else if you can attach the file for some reason?
