@@ -4,7 +4,6 @@
  * To help users find admin settings faster (hopefully!)
  * Search field is used to filter the results, then the relevant
  * search result can be selected to move to the relevant page/setting
- *
  */
 
 import { ref, computed, watch, onMounted  } from 'vue'
@@ -85,7 +84,8 @@ const minQueryLength = 0; //should be able to search for just '3', if we want al
  * @returns { Array } the search string broken into single words
  */
 const queryWordList = computed(() => {
-    const allWords = query.value.match(/\b(\w+)\b/g);
+    const queryTrimmed = query.value.trim();
+    const allWords = queryTrimmed.match(/\b(\w+)\b/g) ?? [];
     return allWords.filter(word => word.length > 0);
 });
 
@@ -264,6 +264,16 @@ function onLeave (element, done) {
 const selectedClasses = ref([]); //the classes currently selected
 
 /**
+ * To determine the behaviour of the 'Select all classes' button
+ * 
+ * @returns { String } 
+ */
+const selectedClassIds = computed(() => {
+    const selectedClassIdList = selectedClasses.value.map((selectedClasss) => selectedClasss.id);
+    return selectedClassIdList.join(',');
+});
+
+/**
  * a result has been selected via #class-selector-search-result
  * 
  * @param { Object }
@@ -365,6 +375,7 @@ function onRemoveClassSelected (classItem) {
 <template>
     <div class="class-selector" ref="classSelectorEl">
         <label class="required">Class(es)</label>
+        <input id="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
             v-if="!hasLoadError"
             v-model="query"
@@ -378,9 +389,8 @@ function onRemoveClassSelected (classItem) {
         <div class="search-results-container">
             <div class="search-results">
                 <transition-group
-                    name="staggered-fade"
                     tag="ul"
-                    v-bind:css="false"
+                    :css="false"
                     @before-enter="onBeforeOnEnter"
                     @enter="onEnter"
                     @enter-cancelled="checkEachResultIndex"
@@ -429,6 +439,9 @@ function onRemoveClassSelected (classItem) {
 
 .search-input {
     margin: 0; //so the .search-results-container is jammed up on the input
+    &::placeholder {
+        font-style: italic;
+    }
 }
 
 .search-results-container {
@@ -437,6 +450,8 @@ function onRemoveClassSelected (classItem) {
 
 .search-results {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    max-height: 500px;
+    overflow: auto;
     position: absolute;
     top: 0;
     width: 100%;
