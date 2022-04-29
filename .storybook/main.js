@@ -16,7 +16,7 @@ module.exports = {
         postcss: false,
     },
     framework: '@storybook/vue3',
-    staticDirs: ['../stories/assets'],
+    staticDirs: ['../stories/assets', '../www'],
     stories: [
         '../stories/**/*.stories.mdx',
         '../stories/**/*.stories.@(js|jsx|ts|tsx)',
@@ -33,6 +33,8 @@ module.exports = {
           use: ['style-loader', 'css-loader', 'sass-loader'],
           include: path.resolve(__dirname, '../'),
         });
+
+        config.resolve.alias['@js'] = path.resolve(__dirname, '../www/static/js');
     
         // Return the altered config
         return config;
