@@ -36,7 +36,7 @@ class Controller extends Base
             ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
-            ->setHref('#')
+            ->setHref($data['href'] ?? '#')
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
