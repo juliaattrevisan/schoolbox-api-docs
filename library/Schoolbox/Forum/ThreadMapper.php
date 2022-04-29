@@ -16,6 +16,7 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Forum\Search\Result;
 use Schoolbox\GenericCollection;
 use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper;
@@ -444,7 +445,7 @@ WHERE
      * @param int             $limit
      * @param string          $sortProperty
      * @param string          $sortDirection
-     * @return Result
+     * @return Result | Collection
      */
     public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
