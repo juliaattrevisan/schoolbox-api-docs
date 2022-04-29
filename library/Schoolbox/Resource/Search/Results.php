@@ -20,6 +20,7 @@ use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Resource\Textbox\Search\Renderer as TextboxRenderer;
+use Schoolbox\Forum;
 use SitePage;
 
 /**
@@ -96,6 +97,7 @@ class Results implements Searchable
         $this->registry->add(new Definition('link', LinkMapper::getInstance(), new LinkRenderer($page)));
         $this->registry->add(new Definition('textbox', TextboxMapper::getInstance(), new TextboxRenderer($page)));
         $this->registry->add(new Definition('news', News\Mapper::getInstance(), new News\Search\Renderer($page)));
+        $this->registry->add(new Definition('forum', Forum\ThreadMapper::getInstance(), new Forum\Search\Renderer($page)));
     }
 
 

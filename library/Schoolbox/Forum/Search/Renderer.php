@@ -10,14 +10,15 @@
 
 namespace Schoolbox\Forum\Search;
 
-use Schoolbox\Resource\Search\Renderer\Handler;
+use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
+use Schoolbox\Resource\Search\Renderer\Base;
 use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class Renderer extends Handler
+class Renderer extends Base
 {
 
     /**
@@ -35,9 +36,12 @@ class Renderer extends Handler
     protected $tabName = 'Forums';
 
     /**
-     * Render
+     * Render html fragment
+     *
+     * @param MapperResult $mapperResult
+     * @param string|null $type
      */
-    public function render()
+    public function render(MapperResult $mapperResult, $type)
     {
         $folderMapper = FolderMapper::getInstance();
         $userHandler = new \User();
