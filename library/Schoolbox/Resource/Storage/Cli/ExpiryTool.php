@@ -107,13 +107,41 @@ HELP;
         if ($acquired) {
             /* Generate a list of expired storage objects
              */
+            $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
 
+            $pb = $storageMapper->getPredicateBuilder()
+                ->notNull('expired_at')
+                ->lessThan('expired_at', \Alaress_Date_Format::newFromTimestamp($_SERVER['REQUEST_TIME'])->getDatabase());
+
+            $items = $storageMapper->findByPredicates($pb);
+
+            /* No items? No trabajo
+             */
+            if (!$items->count()) {
+                $this->getLogger()->debug('No expired items found; exiting.');
+                exit;
+            }
+
+            /* Otherwise, start doing the stuff
+             */
             if ($this->perform()) {
                 /* In Perform mode, blow them away
                  */
+                foreach ($items as $item) {
+
+                }
             } else {
                 /* In Planning mode, show them in the cli
                  */
+                foreach ($items as $item) {
+                    $this->getLogger()->debug(sprintf(
+                        '%s: %s expired on %s',
+                        $item->getHash(),
+                        $item->getBasename(),
+                        $item->getExpiryAt()->getDatabase()
+                    ));
+                }
+
                 $this->getLogger()->debug('Planning finished.');
             }
         }
