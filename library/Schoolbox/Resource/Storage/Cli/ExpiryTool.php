@@ -113,7 +113,11 @@ HELP;
                 ->notNull('expired_at')
                 ->lessThan('expired_at', \Alaress_Date_Format::newFromTimestamp($_SERVER['REQUEST_TIME'])->getDatabase());
 
-            $items = $storageMapper->findByPredicates($pb);
+            $items = $storageMapper->findByPredicates($pb, [
+                'order' => [
+                    'expired_at' => 'desc'
+                ]
+            ]);
 
             /* No items? No trabajo
              */
@@ -127,15 +131,17 @@ HELP;
             if ($this->perform()) {
                 /* In Perform mode, blow them away
                  */
-                foreach ($items as $item) {
+                $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
 
+                foreach ($items as $item) {
+                    $relationalDelete->remove($item->getHash(), false);
                 }
             } else {
                 /* In Planning mode, show them in the cli
                  */
                 foreach ($items as $item) {
                     $this->getLogger()->debug(sprintf(
-                        '%s: %s expired on %s',
+                        '%s: %s -  expired on %s',
                         $item->getHash(),
                         $item->getBasename(),
                         $item->getExpiryAt()->getDatabase()
