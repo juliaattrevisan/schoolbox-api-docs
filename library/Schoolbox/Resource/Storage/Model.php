@@ -58,7 +58,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     /**
      * @var Alaress_Date_Format|null
      */
-    protected ?\Alaress_Date_Format $expiryAt;
+    protected ?\Alaress_Date_Format $expiryAt = null;
 
 
     /**
