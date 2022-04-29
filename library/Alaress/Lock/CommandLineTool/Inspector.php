@@ -27,6 +27,7 @@ use Schoolbox\Learning\Turnitin\Cli\GroupTool;
 use Schoolbox\Learning\Turnitin\Cli\RetrofitTool;
 use Schoolbox\Learning\Turnitin\Cli\HistoricalTool;
 use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
+use Schoolbox\Resource\Storage\Cli\ExpiryTool;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Schoolbox\Intellischool\CommandLineTool\DataSync;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
@@ -88,6 +89,10 @@ class Inspector extends CliTool\App
         /* Clipboard CLI Tools
          */
         ImporterTool::CLIPBOARD_IMPORTER_LOCK_NAME => 'Clipboard Sport/Division/Team/Players/Sessions (./tools/clipboard/importer.php)',
+
+        /* Expired Storage Removal Tool
+         */
+        ExpiryTool::EXPIRED_STORAGE_REMOVAL_LOCK_NAME => 'Expired Storage Removal Tool (./tools/storage/expired-storage-removal.php)',
     ];
 
 
