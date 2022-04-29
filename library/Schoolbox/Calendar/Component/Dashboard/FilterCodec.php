@@ -60,8 +60,8 @@ class FilterCodec
     {
         return sprintf(
             'eventType:%s;source:%s',
-            implode(',', $parts['eventType'] ?? []),
-            implode(',', $parts['source'] ?? [])
+            implode(',', array_filter($parts['eventType'] ?? [])),
+            implode(',', array_filter($parts['source'] ?? []))
         );
     }
 
