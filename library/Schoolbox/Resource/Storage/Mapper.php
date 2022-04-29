@@ -299,18 +299,23 @@ class Mapper extends BaseMapper implements Receiver
         }
     }
 
+
     /**
      * Accept a resource stream (or string file contents) upload
      *
-     * @param string          $filename
-     * @param resource|string $fp
-     * @param bool            $public
-     *
+     * @param string                    $filename
+     * @param resource|string           $fp
+     * @param bool                      $public
+     * @param \Alaress_Date_Format|null $expiryAt
      * @return Model
-     * @throws MapperException
+     * @throws BaseMapper\DefinitionException
      * @throws FileException
+     * @throws FileNotFoundException
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function acceptStream($filename, $fp, $public = false)
+    public function acceptStream($filename, $fp, $public = false, ?\Alaress_Date_Format $expiryAt = null): Model
     {
         // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
         // (just like an upload)
@@ -332,7 +337,7 @@ class Mapper extends BaseMapper implements Receiver
 
         file_put_contents($tempLocation, $fp);
 
-        return $this->accept($filename, $tempLocation, $public);
+        return $this->accept($filename, $tempLocation, $public, $expiryAt);
     }
 
 
@@ -342,7 +347,7 @@ class Mapper extends BaseMapper implements Receiver
      * @param string                    $basename
      * @param string                    $tempLocation
      * @param bool                      $public
-     * @param \Alaress_Date_Format|null $expiry
+     * @param \Alaress_Date_Format|null $expiryAt
      * @return Model
      * @throws BaseMapper\DefinitionException
      * @throws FileNotFoundException
@@ -350,7 +355,7 @@ class Mapper extends BaseMapper implements Receiver
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiry = null)
+    public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiryAt = null): Model
     {
         /** @var MimetypeMapper $mtm */
         $mtm = $this->getJoinMapper('allowedFileExtension');
@@ -383,8 +388,8 @@ class Mapper extends BaseMapper implements Receiver
         $storage->setPublic($public);
         $this->getManager()->sanitize($storage);
 
-        if (null !== $expiry) {
-            $storage->setExpiryAt($expiry);
+        if (null !== $expiryAt) {
+            $storage->setExpiryAt($expiryAt);
         }
 
         $this->save($storage);

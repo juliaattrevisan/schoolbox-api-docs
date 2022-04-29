@@ -37,12 +37,21 @@ if (!$_SESSION['id']) {
 } elseif (isset($_FILES['upload'])) {
     $meta = $_FILES['upload'];
 
+    /* Optional expiry timestamp
+     */
+    $expiryUnixTimestamp = $_GET['expiry'] ?? null;
+    $expiryAt = null;
+
+    if (null !== $expiryUnixTimestamp) {
+        $expiryAt = \Alaress_Date_Format::newFromTimestamp($expiryUnixTimestamp);
+    }
+
     if (is_array($meta['name'])) {
         $hashes = array();
         $metas = array();
         for ($i = 0; $i < count($meta['name']); ++$i) {
             try {
-                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator);
+                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator, $expiryAt);
                 $hashes[] = $result['hash'];
                 $metas[]  = $result['meta'];
             } catch (Exception $e) {
@@ -54,7 +63,7 @@ if (!$_SESSION['id']) {
         $result['meta'] = $metas;
     } else {
         try {
-            $result = attemptStorage($meta, $prefixGenerator);
+            $result = attemptStorage($meta, $prefixGenerator, $expiryAt);
         } catch (Exception $e) {
             $result['hash'] = 'exception:' . $e->getMessage();
             $result['meta'] = array();
@@ -82,16 +91,19 @@ function getFileAtIndex($meta, $i)
     return $rtn;
 }
 
-
 /**
- * @param array           $fileData
- * @param PrefixGenerator $prefixGenerator
+ * @param array                    $fileData
+ * @param PrefixGenerator          $prefixGenerator
+ * @param Alaress_Date_Format|null $expiryAt
  * @return array
+ * @throws PDOException
+ * @throws UnexpectedValueException
  * @throws \League\Flysystem\FileNotFoundException
  * @throws \Schoolbox\File\Exception
+ * @throws \Schoolbox\Mapper\DefinitionException
  * @throws \Schoolbox\Mapper\Exception
  */
-function attemptStorage($fileData, PrefixGenerator $prefixGenerator)
+function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, ?\Alaress_Date_Format $expiryAt = null): array
 {
     if ($fileData['size'] == 0) {
         throw new Schoolbox\File\Exception("File has no content");
@@ -100,7 +112,7 @@ function attemptStorage($fileData, PrefixGenerator $prefixGenerator)
         throw new Schoolbox\File\Exception("Filedata not readable");
     }
 
-    $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name']);
+    $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name'], $expiryAt);
 
     // to also return the stored file location for possible reference / display
     $modelToArray = new ModelToArray($prefixGenerator);
