@@ -27,7 +27,7 @@
                         <a href="/search/user/{{ student.id }}" title="View Profile">
                             {% include 'include/portrait.twig' with {user: student, description: student.fullName} only %}
                             <p>{{ student.fullName }}</p>
-                            <p class="meta">Year {{ student.year ? student.year.name : '' }} Student</p>
+                            <p class="meta">{{ student.year.longName }} Student</p>
                         </a>
                     </div>
                 </li>
