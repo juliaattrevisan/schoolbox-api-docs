@@ -84,8 +84,14 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $stack = new \Calendar\Event\Collection();
 
         try {
+            /* $eventTypeSettings is now the default event type that we ascribe
+             * to events coming out of this subscription when sis_event.type
+             * does not match anything in luEventType; we can do that by passing
+             * empty array into the generator and doing the $allowedEventTypes
+             * check in the iteration below
+             */
             $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
-                ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+                ->findEventType($this->loadConnectorConfiguration(), []);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventTypeSettings = null;
         }
@@ -131,6 +137,13 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             if ($eventType) {
                 $eventTypeId = $eventType->getId();
                 $eventTypeColor = $eventType->getColor();
+            }
+
+            /* If this derived $eventTypeId was one of the $allowedEventTypes,
+             * Let it through; otherwise disregard it
+             */
+            if (\count($allowedEventTypes) && !\in_array($eventTypeId, $allowedEventTypes, true)) {
+                continue;
             }
 
             $instance = new \Calendar\Event\Type\SudsEvent\Event();
