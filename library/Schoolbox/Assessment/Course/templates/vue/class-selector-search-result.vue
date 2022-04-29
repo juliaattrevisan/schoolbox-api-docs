@@ -1,9 +1,10 @@
 <script setup>
 
 /**
- * An individual search result that matches the search query with search result
- * highlighted within. Selecting will take the user to relevant page/setting
- *
+ * An individual class search result that matches the search query with search result
+ * highlighted within. Selecting will add the class to the list
+ * Also included is a 'Select All' feature which toggles the selection of all
+ * results currently shown
  */
 
 import { ref, computed, watch, onMounted, onUpdated, onBeforeUnmount } from 'vue';
@@ -11,7 +12,7 @@ import { getIndex } from '@js/util/domUtils';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
-const emit = defineEmits(['mouse-over-result', 'select-result', 'toggle-all']);
+const emit = defineEmits(['mouse-over-result', 'toggle', 'toggle-all']);
 
 const props = defineProps({
     result: {
@@ -26,20 +27,25 @@ const props = defineProps({
             }
         }
     },
-    selectedClassIds: { //to determine the status of the checkbox
-        type: Array,
+    isAllResultsSelected: { //to determine the behaviour of the 'Select all classes' button
+        type: Boolean,
         required: true,
-        default: []
+        default: false,
+    },
+    isSomeResultsSelected: { //to add the 'indeterminate' class to the select all checkbox
+        type: Boolean,
+        required: true,
+        default: false,
     },
     queryWordList: { //current word list in the query
         type: Array,
         required: true,
-        default: []
+        default: [],
     },
     activeIndex: { //to know whether this result is currently active
         type: Number,
         required: true,
-        default: 0
+        default: 0,
     }
 });
 
@@ -72,7 +78,7 @@ onBeforeUnmount(() => {
  * to highlight the current selection relative to key events
  * needs to be updated once the animations have completed
  */
-function checkIndex() {
+function checkIndex () {
     itemIndex.value = getIndex(resultEl.value.parentElement);
     if (itemIndex.value === props.activeIndex) {
         isActive.value = true;
@@ -89,7 +95,7 @@ function checkIndex() {
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement(toHighlight) {
+function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
     props.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
@@ -98,6 +104,34 @@ function highlightSearchInElement(toHighlight) {
     });
     return highlighted;
 }
+
+/**
+ * To determine the check dispaly of the checkbox
+ *
+ * @returns { Boolean } 
+ */
+const isChecked = computed(() => {
+    if (!props.result.isSelectAll) {
+        return props.result.isSelected;
+    } else if (props.isAllResultsSelected) {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+/**
+ *  To describe the current select all action
+ *
+ * @returns { String } 
+ */
+const selectAllAction = computed(() => {
+    if (props.isAllResultsSelected) {
+        return 'Remove all classes';
+    } else {
+        return 'Add all classes';
+    }
+});
 
 /**
  * so mouse selection takes precendence over the arrow/enter selection
@@ -113,25 +147,16 @@ function selectResult () {
     if (props.result.isSelectAll) {
         emit('toggle-all');
     } else {
-        emit('select-result', props.result);
+        emit('toggle', props.result);
     }
 }
-
-/**
- * To determine the status of the checkbox
- * 
- * @returns { Boolean }
- */
-// const isResultSelected = computed(() => {
-//     return props.selectedClassIds.includes(props.result.id);
-// });
 
 </script>
 
 <template>
     <button class="search-result"
         ref="resultEl"
-        :class="{ searchResultActive: isActive }"
+        :class="{ 'search-result-active': isActive }"
         @mouseover="mouseOverResult"
         @focus="mouseOverResult"
         @click.prevent="selectResult"
@@ -141,12 +166,12 @@ function selectResult () {
             <input 
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
-                :value="result.id"
-                :checked="result.isSelected"
+                :checked="isChecked"
+                :class="{ 'indeterminate': result.isSelectAll && isSomeResultsSelected }"
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
-        <strong v-if="result.isSelectAll">{{ result.name }}</strong>
+        <strong v-if="result.isSelectAll">Select All</strong>
         <span v-else v-html="highlightTitleSearch"></span>
     </button>
 </template>
@@ -167,7 +192,7 @@ function selectResult () {
     }
 }
 
-.searchResultActive {
+.search-result-active {
     background: var(--content-ui-hover);
 }
 

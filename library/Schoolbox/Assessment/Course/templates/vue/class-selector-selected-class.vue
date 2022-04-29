@@ -16,6 +16,8 @@ const props = defineProps({
             return {
                 id: 0,
                 name: 'name',
+                isSelectAll: false,
+                isSelected: false,
             }
         }
     },

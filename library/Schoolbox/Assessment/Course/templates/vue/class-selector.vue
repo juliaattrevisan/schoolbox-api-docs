@@ -96,7 +96,7 @@ const queryWordList = computed(() => {
  * 
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
-const resultsList = computed(() => {
+const results = computed(() => {
     if (query.value.length === minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) {
@@ -104,6 +104,15 @@ const resultsList = computed(() => {
     } else {
         return [];
     }
+});
+
+/**
+ * pull out select all option for adding / removing classes 
+ * 
+ * @returns { Array } all relevant search results, once we've reached the minQueryLength
+ */
+const resultsNoSelectAll = computed(() => {
+    return results.value.filter((result) => !result.isSelectAll);
 });
 
 /**
@@ -136,7 +145,7 @@ const activeIndex = ref(0); //to track which index is selected
 /**
  * reset the active index when the search result list changes as the index may become out of range
  */
-watch (resultsList, async (newValue, oldValue) => {
+watch (results, async (newValue, oldValue) => {
     if ((newValue.length !== oldValue.length) && (activeIndex.value > 0)) {
         activeIndex.value = 0;
     }
@@ -154,7 +163,7 @@ onMounted(() => {
 //     document.addEventListener('keyup', (event) => {
 //         const keyName = event.key;
 //         const keyOptions = {
-//             'Enter': () => selectResult(resultsList.value[activeIndex.value].name),
+//             'Enter': () => toggleResult(results.value[activeIndex.value].name),
 //             'ArrowUp': () => decrementActiveIndex(),
 //             'ArrowDown': () => incrementActiveIndex(),
 //         }
@@ -179,7 +188,7 @@ onMounted(() => {
  * with the arrow keys
  */
 // function incrementActiveIndex () {
-//     if (activeIndex.value < (resultsList.value.length-1)) {
+//     if (activeIndex.value < (results.value.length-1)) {
 //         activeIndex.value++;
 //     }
 // }
@@ -275,9 +284,6 @@ function onMouseOverResult () {
  ****************************************************************/
 
 const selectedClasses = ref([]); //the classes currently selected
-const selectedClassIds = computed(() => { //so can easily filter by id
-    return selectedClasses.value.map((classItem) => classItem.id);
-});
 
 /**
  * a result has been selected via #class-selector-search-result
@@ -285,8 +291,8 @@ const selectedClassIds = computed(() => { //so can easily filter by id
  * @param { Object }
  * @param { Boolean }
  */
-function onSelectResult (toggledClassItem) {
-    selectResult(toggledClassItem);
+function onToggleResult (toggledClassItem) {
+    toggleResult(toggledClassItem);
 }
 
 /**
@@ -295,7 +301,7 @@ function onSelectResult (toggledClassItem) {
  * @param { Object }
  * @param { Boolean }
  */
-function selectResult (toggledClassItem) {
+function toggleResult (toggledClassItem) {
     if (toggledClassItem.isSelected) { //pull out
         toggledClassItem.isSelected = false;
         selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
@@ -306,23 +312,64 @@ function selectResult (toggledClassItem) {
 }
 
 /**
- * to move to the page the selected search result is on
- * which will have the result highlighted
+ * To determine the behaviour of the 'Select all classes' button
  * 
- * @param { Object }
- * @param { Boolean }
+ * @returns { Boolean } 
  */
-function onToggleAllResults (toggledClassItem) {
-    // if (isSelected) {
-    //     selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
-    // } else {
-    //     selectedClasses.value = [...selectedClasses.value, toggledClassItem];
-    // }
-    const withoutSelectAll = resultsList.value.filter((selectedClassItem) => !selectedClassItem.isSelectAll);
-    const noAlreadySelectedClasses = withoutSelectAll.filter((resultItem) => { //check if the class isn't in the list already
+const isAllResultsSelected = computed(() => {
+    if (selectedClasses.value.length > 0) {
+        const alreadySelectedClasses = resultsNoSelectAll.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
+        return alreadySelectedClasses.length === resultsNoSelectAll.value.length ? true : false;
+    } else {
+        return false;
+    }
+});
+
+/**
+ * To add the 'indeterminate' class to the select all checkbox
+ * 
+ * @returns { Boolean } 
+ */
+const isSomeResultsSelected = computed(() => {
+    if (selectedClasses.value.length > 0) {
+        const alreadySelectedClasses = resultsNoSelectAll.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
+        return alreadySelectedClasses.length >= 1 && alreadySelectedClasses.length !== resultsNoSelectAll.value.length ? true : false;
+    } else {
+        return false;
+    }
+});
+
+/**
+ * to add / remove all the currently matched search classes
+ */
+function onToggleAllResults () {
+    if (isAllResultsSelected.value) {
+        removeAllResults();
+    } else {
+        addAllResults();
+    }
+}
+
+/**
+ * pull all results out 
+ */
+function removeAllResults () {
+    const matchedSelectedClasses = resultsNoSelectAll.value.filter((resultItem) => { //check if the class is in the list already
+        return selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //add in those that match
+    });
+    matchedSelectedClasses.forEach((classItem) => classItem.isSelected = false); //set false on all
+    selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.isSelected); //and then remove those there were just unset  
+}
+
+/**
+ * add all results in 
+ */
+function addAllResults () {
+    const newSelectedClasses = resultsNoSelectAll.value.filter((resultItem) => { //check if the class isn't in the list already
         return !selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //don't add in those that match
     });
-    selectedClasses.value = [...selectedClasses.value, ...noAlreadySelectedClasses];
+    newSelectedClasses.forEach((classItem) => classItem.isSelected = true);
+    selectedClasses.value = [...selectedClasses.value, ...newSelectedClasses];
 }
 
 /**
@@ -331,46 +378,9 @@ function onToggleAllResults (toggledClassItem) {
  * @param { Object }
  */
 function onRemoveClassSelected (classItem) {
+    classItem.isSelected = false;
     selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== classItem.id);
 }
-
-/**
- * 
- * 
- * @returns { Boolean } 
- */
-const hasMostResultsSelected = computed(() => {
-    
-    if (selectedClasses.value.length > 1) {
-
-        const withoutSelectAll = resultsList.value.filter((selectedClassItem) => !selectedClassItem.isSelectAll);
-
-        const alreadySelectedClasses = withoutSelectAll.filter((resultItem) => { //check if the class is in the list already
-            return selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //add those in that match
-        });
-
-        const alreadySelectedCount = alreadySelectedClasses.length;
-
-        const allResultCount = withoutSelectAll.length;
-
-        if (allResultCount > alreadySelectedCount) {
-
-
-
-        }
-
-        // if (alreadySelectedCount / allResultCount)
-
-        //search has most selected
-        //compare selectedClasses and resultsList to find how many of the current search result are selected
-
-    } else {
-
-        return false;
-
-    }
-
-});
 
 </script>
 
@@ -400,15 +410,16 @@ const hasMostResultsSelected = computed(() => {
                     @after-leave="checkEachResultIndex"
                     @leave-cancelled="checkEachResultIndex"
                 >
-                    <li v-for="(result, index) in resultsList" :key="result.id" :data-index="index">
+                    <li v-for="(result, index) in results" :key="result.id" :data-index="index">
                         <class-selector-search-result
                             ref="searchResultsEl"
                             :result="result"
-                            :selected-class-ids="selectedClassIds"
+                            :is-all-results-selected="isAllResultsSelected"
+                            :is-some-results-selected="isSomeResultsSelected"
                             :query-word-list="queryWordList"
                             :active-index="activeIndex"
                             @mouse-over-result="onMouseOverResult"
-                            @select-result="onSelectResult"
+                            @toggle="onToggleResult"
                             @toggle-all="onToggleAllResults"
                         />
                     </li>
