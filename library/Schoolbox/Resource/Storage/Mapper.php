@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\User;
 use Schoolbox\Video\QueueMapper;
 
 /**
@@ -77,6 +76,7 @@ class Mapper extends BaseMapper implements Receiver
         $this->uses('last_accessed', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('public', self::TYPE_BOOLEAN);
         $this->uses('ext', self::TYPE_STRING, null, 'extension');
+        $this->uses('expired_at', self::TYPE_DATETIME, null, 'expiryAt');
 
         // Derived field: Mime type automatically joined via the extension
 
@@ -335,17 +335,22 @@ class Mapper extends BaseMapper implements Receiver
         return $this->accept($filename, $tempLocation, $public);
     }
 
+
     /**
      * Accept a new file upload
      *
-     * @param string $basename
-     * @param string $tempLocation
-     * @param bool   $public
-     *
+     * @param string                    $basename
+     * @param string                    $tempLocation
+     * @param bool                      $public
+     * @param \Alaress_Date_Format|null $expiry
      * @return Model
+     * @throws BaseMapper\DefinitionException
+     * @throws FileNotFoundException
      * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function accept($basename, $tempLocation, $public = true)
+    public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiry = null)
     {
         /** @var MimetypeMapper $mtm */
         $mtm = $this->getJoinMapper('allowedFileExtension');
@@ -377,6 +382,10 @@ class Mapper extends BaseMapper implements Receiver
 
         $storage->setPublic($public);
         $this->getManager()->sanitize($storage);
+
+        if (null !== $expiry) {
+            $storage->setExpiryAt($expiry);
+        }
 
         $this->save($storage);
 

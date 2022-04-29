@@ -56,6 +56,12 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
 
 
     /**
+     * @var Alaress_Date_Format|null
+     */
+    protected ?\Alaress_Date_Format $expiryAt;
+
+
+    /**
      * @return string
      */
     public function getFilename()
@@ -267,6 +273,27 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
 
         return $this;
     }
+
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getExpiryAt(): ?Alaress_Date_Format
+    {
+        return $this->expiryAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $expiryAt
+     * @return $this
+     */
+    public function setExpiryAt(?Alaress_Date_Format $expiryAt): self
+    {
+        $this->expiryAt = $expiryAt;
+        return $this;
+    }
+
 
     /**
      * Pipe the readstream of this file to some other stream resource
