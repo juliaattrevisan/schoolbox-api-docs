@@ -19,7 +19,10 @@ const props = defineProps({
         required: true,
         default: () => {
             return {
+                id: 0,
                 name: 'name',
+                isSelectAll: false,
+                isSelected: false,
             }
         }
     },
@@ -110,7 +113,7 @@ function selectResult () {
     if (props.result.isSelectAll) {
         emit('toggle-all');
     } else {
-        emit('select-result', props.result, isResultSelected.value);
+        emit('select-result', props.result);
     }
 }
 
@@ -119,9 +122,9 @@ function selectResult () {
  * 
  * @returns { Boolean }
  */
-const isResultSelected = computed(() => {
-    return props.selectedClassIds.includes(props.result.id);
-});
+// const isResultSelected = computed(() => {
+//     return props.selectedClassIds.includes(props.result.id);
+// });
 
 </script>
 
@@ -139,7 +142,7 @@ const isResultSelected = computed(() => {
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
                 :value="result.id"
-                :checked="isResultSelected"
+                :checked="result.isSelected"
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>

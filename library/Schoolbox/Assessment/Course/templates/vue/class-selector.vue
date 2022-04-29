@@ -100,7 +100,7 @@ const resultsList = computed(() => {
     if (query.value.length === minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) {
-        return [{ id: -1, isSelectAll: true, isSelected: false, name: 'Add all classes' }, ...classes.value.filter(searchForName)]; 
+        return [{ id: -1, name: 'Add all classes', isSelectAll: true, isSelected: false }, ...classes.value.filter(searchForName)]; 
     } else {
         return [];
     }
@@ -285,8 +285,8 @@ const selectedClassIds = computed(() => { //so can easily filter by id
  * @param { Object }
  * @param { Boolean }
  */
-function onSelectResult (toggledClassItem, isSelected) {
-    selectResult(toggledClassItem, isSelected);
+function onSelectResult (toggledClassItem) {
+    selectResult(toggledClassItem);
 }
 
 /**
@@ -295,10 +295,12 @@ function onSelectResult (toggledClassItem, isSelected) {
  * @param { Object }
  * @param { Boolean }
  */
-function selectResult (toggledClassItem, isSelected) {
-    if (isSelected) { //pull out
+function selectResult (toggledClassItem) {
+    if (toggledClassItem.isSelected) { //pull out
+        toggledClassItem.isSelected = false;
         selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
     } else { //otherwise put in
+        toggledClassItem.isSelected = true;
         selectedClasses.value = [...selectedClasses.value, toggledClassItem];
     }
 }
