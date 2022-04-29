@@ -98,7 +98,9 @@ const queryWordList = computed(() => {
 const results = computed(() => {
     if (query.value.length === minQueryLength) {
         return [];
-    } else if (classes.value.filter(searchForName).length > 0) {
+    } else if (classes.value.filter(searchForName).length === 1) { //don't add in the Select All for just one result
+        return classes.value.filter(searchForName)
+    } else if (classes.value.filter(searchForName).length > 1) { 
         return [{ id: -1, name: 'Add all classes', isSelectAll: true, isSelected: false }, ...classes.value.filter(searchForName)]; 
     } else {
         return [];
@@ -139,17 +141,6 @@ function searchForName (classItem) {
  * 
  ****************************************************************/
 
-const activeIndex = ref(0); //to track which index is selected
-
-/**
- * reset the active index when the search result list changes as the index may become out of range
- */
-watch (results, async (newValue, oldValue) => {
-    if ((newValue.length !== oldValue.length) && (activeIndex.value > 0)) {
-        activeIndex.value = 0;
-    }
-});
-
 onMounted(() => {
     initKeyboardEvents();
     initMouseEvents();
@@ -170,8 +161,6 @@ function initKeyboardEvents () {
         const keyName = event.key;
         const keyOptions = {
             'Enter': () => onEnterKeySelected(),
-            'ArrowUp': () => decrementActiveIndex(),
-            'ArrowDown': () => incrementActiveIndex(),
         }
         if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
             event.preventDefault();
@@ -189,26 +178,6 @@ function onEnterKeySelected () {
     addAllResults();
     clearInput();
 }
-
-/**
- * to be able to move up and down through the selections
- * with the arrow keys
- */
-// function decrementActiveIndex () {
-//     if (activeIndex.value > 0) {
-//         activeIndex.value--;
-//     }
-// }
-
-/**
- * to be able to move up and down through the selections
- * with the arrow keys
- */
-// function incrementActiveIndex () {
-//     if (activeIndex.value < (results.value.length-1)) {
-//         activeIndex.value++;
-//     }
-// }
 
 const classSelectorEl = ref(null); 
 
@@ -229,7 +198,6 @@ function initMouseEvents () {
  */
 function clearInput () {
     query.value = '';
-    activeIndex.value = -1;
 }
 
 
@@ -284,13 +252,6 @@ function onEnter (element, done) {
  */
 function onLeave (element, done) {
     gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
-}
-
-/**
- * a result has been moused over via #class-selector-search-result
- */
-function onMouseOverResult () {
-    activeIndex.value = -1; //disable the keyboard selection, mouse takes precedence until search is updated
 }
 
 
@@ -434,8 +395,6 @@ function onRemoveClassSelected (classItem) {
                             :is-all-results-selected="isAllResultsSelected"
                             :is-some-results-selected="isSomeResultsSelected"
                             :query-word-list="queryWordList"
-                            :active-index="activeIndex"
-                            @mouse-over-result="onMouseOverResult"
                             @toggle="onToggleResult"
                             @toggle-all="onToggleAllResults"
                         />

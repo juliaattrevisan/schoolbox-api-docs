@@ -42,11 +42,6 @@ const props = defineProps({
         required: true,
         default: [],
     },
-    activeIndex: { //to know whether this result is currently active
-        type: Number,
-        required: true,
-        default: 0,
-    }
 });
 
 const itemIndex = ref(-1);
@@ -56,23 +51,6 @@ const resultEl = ref(null);
 const highlightTitleSearch = computed(() => {
     return highlightSearchInElement(props.result.name);
 });
-    
-watch(() => props.activeIndex, (newValue, oldValue) => {
-    checkIndex();
-});
-    
-onMounted(() => {
-    checkIndex();
-});
-
-onUpdated(() => {
-    checkIndex();
-});
-
-onBeforeUnmount(() => {
-    checkIndex();
-});
-
 
 /**
  * to highlight the current selection relative to key events
