@@ -33,6 +33,7 @@ use Schoolbox\Role;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
+use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Alaress\Database\Predicate;
@@ -66,6 +67,8 @@ class Controller extends ConfigController
 
     private Access $access;
 
+    private UserBulkMapper $userBulkMapper;
+
     /**
      * @param UserMapper            $userMapper
      * @param TermMapper            $termMapper
@@ -76,6 +79,7 @@ class Controller extends ConfigController
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param RubricDataSource      $rubricDataSource
      * @param Access                $access
+     * @param UserBulkMapper        $userBulkMapper
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      */
@@ -89,6 +93,7 @@ class Controller extends ConfigController
         AssessmentMapperProxy $assessmentMapperProxy,
         RubricDataSource $rubricDataSource,
         Access $access,
+        UserBulkMapper $userBulkMapper,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory
     ) {
@@ -102,6 +107,7 @@ class Controller extends ConfigController
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
         $this->access                = $access;
+        $this->userBulkMapper        = $userBulkMapper;
     }
 
     /**
@@ -146,20 +152,56 @@ class Controller extends ConfigController
     }
 
     /**
+     * Request report generation to taskd
      * @return void
+     * @throws RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function requestReports()
+    public function requestReports(): void
     {
-        $reportParams = new ReportParams($this->request->post->getArrayCopy());
+        $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
 
         // find students
-        if (count($reportParams->getYearLevels()) > 0) {
+        $students   = $this->userBulkMapper->bulkModifySearch(
+            empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
+            [UserBulkMapper::ANY], // TODO: limit to students?
+            UserBulkMapper::ANY,
+            empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
+            UserBulkMapper::ANY
+        );
+        $studentIds = array_column($students, 'id');
+
+        if ($reportParams->getStudentIds()) {
+            $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
+            $studentIds = array_unique($studentIds);
+        }
+        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
+
+        $reportUrls = [];
+        $params     = $reportParams->getParams();
+        $urlBase    = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        foreach ($reportStudents as $student) {
+            try {
+                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
+                    'studentId' => $student->getId(),
+                    'student'   => $student,
+                ]);
+                if ($reportPath) {
+                    $reportUrls[] = $urlBase->setPath($reportPath)->setQuery($params)->toString();
+                }
+            } catch (RouteNotFound $e) {
+                // noop
+            }
         }
 
-        // TODO: filter students
-
-        // TODO: callback
-
+        if (empty($reportUrls)) {
+            // TODO: Where should we show error
+            $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
+        }
 
         // Get the taskd context, and send
         /** @var Producer $producer */
@@ -168,10 +210,20 @@ class Controller extends ConfigController
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
         $message        = $messageFactory->build(
-            'test',
-            [],
-            null,
-            null,
+            'download-pages',
+            [
+                'token'     => $this->getUser(),
+                'content'   => [
+                    'filename' => null,
+                    'urls'     => $reportUrls,
+                ],
+                'gotenberg' => [
+                    'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                    'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                ],
+            ],
+            '', // TODO: $callBackUrl,
+            $this->getUser(),
         );
 
         $producer->send($message);
@@ -260,7 +312,7 @@ class Controller extends ConfigController
      */
     public function getStudentReport(User $student)
     {
-        $params = new ReportParams($this->request->query->getArrayCopy());
+        $params = new ReportParams($this->request->query->getArrayCopy(), $this->termMapper);
 
         // Dates
         try {
@@ -289,8 +341,8 @@ class Controller extends ConfigController
                 $viewer = $this->getUser();
         }
 
-        $summaryWorkTypes = !$params->getSummaryWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $params->getSummaryWorkTypeIds())));
-        $classWorkTypes   = !$params->getClassWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $params->getClassWorkTypeIds())));
+        $summaryWorkTypes = !$params->getSummaryWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getSummaryWorkTypeIds());
+        $classWorkTypes   = !$params->getClassWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getClassWorkTypeIds());
 
         $markSchemeFactory = new Factory($this->getConfigLoader());
 

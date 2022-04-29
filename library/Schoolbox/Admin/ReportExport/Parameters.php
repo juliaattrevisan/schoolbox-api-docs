@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\ReportExport;
 
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Role;
 
 class Parameters
@@ -20,6 +22,7 @@ class Parameters
     public const YEAR_LEVELS = 'yearLevels';
     public const CAMPUSES    = 'campuses';
     public const STUDENT_IDS = 'studentIds';
+    public const TERMS       = 'terms';
 
     public const START_DATE               = 'startDate';
     public const END_DATE                 = 'endDate';
@@ -67,6 +70,10 @@ class Parameters
     private ?string $startDate;
     private ?string $endDate;
 
+    private TermMapper $termMapper;
+
+    private array $termIds;
+
     private string $viewAs;
 
     // summary
@@ -74,7 +81,7 @@ class Parameters
 
     private bool $showSummaryOverallGrade;
 
-    private string $summaryWorkTypeIds;
+    private array $summaryWorkTypeIds;
 
     private bool $showSummaryGrades;
 
@@ -87,7 +94,7 @@ class Parameters
 
     private bool $showClassOverallGrade;
 
-    private string $classWorkTypeIds;
+    private array $classWorkTypeIds;
 
     private bool $showClassGrades;
 
@@ -102,29 +109,32 @@ class Parameters
 
     private array $studentIds;
 
-    public function __construct(array $params = [])
+
+    public function __construct(array $params, TermMapper $termMapper)
     {
-        $this->startDate = $params[self::START_DATE] ?? null;
-        $this->endDate   = $params[self::END_DATE] ?? null;
-        $this->viewAs    = $params[self::VIEW_AS] ?? Role::STAFF;
+        $this->startDate  = $params[self::START_DATE] ?? null;
+        $this->endDate    = $params[self::END_DATE] ?? null;
+        $this->viewAs     = $params[self::VIEW_AS] ?? Role::STAFF;
+        $this->termMapper = $termMapper;
+        $this->termIds    = (isset($params[self::TERMS]) && $params[self::TERMS] !== null) ? $this->filter($params[self::TERMS]) : [];
         // summary
         $this->showSummary             = (bool)($params[self::SHOW_SUMMARY] ?? false);
         $this->showSummaryOverallGrade = (bool)($params[self::SHOW_OVERALL_GRADE] ?? false);
-        $this->summaryWorkTypeIds      = $params[self::WORK_TYPES] ?? '';
+        $this->summaryWorkTypeIds      = (isset($params[self::WORK_TYPES]) && $params[self::WORK_TYPES] !== null) ? $this->filter($params[self::WORK_TYPES]) : [];
         $this->showSummaryGrades       = (bool)($params[self::SHOW_GRADES] ?? false);
         $this->showSummaryComments     = (bool)($params[self::SHOW_COMMENTS] ?? false);
         $this->showSummaryRubrics      = (bool)($params[self::SHOW_RUBRICS] ?? false);
         // class
         $this->showClass             = (bool)($params[self::SHOW_CLASS] ?? false);
         $this->showClassOverallGrade = (bool)($params[self::SHOW_CLASS_OVERALL_GRADE] ?? false);
-        $this->classWorkTypeIds      = $params[self::CLASS_WORK_TYPES] ?? '';
+        $this->classWorkTypeIds      = (isset($params[self::CLASS_WORK_TYPES]) && $params[self::CLASS_WORK_TYPES] !== null) ? $this->filter($params[self::CLASS_WORK_TYPES]) : [];
         $this->showClassGrades       = (bool)($params[self::SHOW_CLASS_GRADES] ?? false);
         $this->showClassComments     = (bool)($params[self::SHOW_CLASS_COMMENTS] ?? false);
         $this->showClassRubrics      = (bool)($params[self::SHOW_CLASS_RUBRICS] ?? false);
         // student
-        $this->yearLevels = $params[self::YEAR_LEVELS] ? $this->toArray($params[self::YEAR_LEVELS]) : [];
-        $this->campuses   = $params[self::CAMPUSES] ? $this->toArray($params[self::CAMPUSES]) : [];
-        $this->studentIds = $params[self::STUDENT_IDS] ? $this->toArray($params[self::STUDENT_IDS]) : [];
+        $this->yearLevels = (isset($params[self::YEAR_LEVELS]) && $params[self::YEAR_LEVELS] !== null) ? $this->filter($params[self::YEAR_LEVELS]) : [];
+        $this->campuses   = (isset($params[self::CAMPUSES]) && $params[self::CAMPUSES] !== null) ? $this->filter($params[self::CAMPUSES]) : [];
+        $this->studentIds = (isset($params[self::STUDENT_IDS]) && $params[self::STUDENT_IDS] !== null) ? $this->filter($params[self::STUDENT_IDS]) : [];
     }
 
     /**
@@ -141,6 +151,14 @@ class Parameters
     public function getEndDate()
     {
         return $this->endDate;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTermIds(): array
+    {
+        return $this->termIds;
     }
 
     /**
@@ -168,9 +186,9 @@ class Parameters
     }
 
     /**
-     * @return mixed|string
+     * @return array
      */
-    public function getSummaryWorkTypeIds()
+    public function getSummaryWorkTypeIds(): array
     {
         return $this->summaryWorkTypeIds;
     }
@@ -216,9 +234,9 @@ class Parameters
     }
 
     /**
-     * @return mixed|string
+     * @return array
      */
-    public function getClassWorkTypeIds()
+    public function getClassWorkTypeIds(): array
     {
         return $this->classWorkTypeIds;
     }
@@ -272,11 +290,44 @@ class Parameters
     }
 
     /**
-     * Build query from current parameters
-     * @return string
+     * @return void
      */
-    public function getQuery(): string
+    private function setDates(): void
     {
+        if ($this->startDate !== null && $this->endDate !== null) {
+            // let's just use them
+            return;
+        }
+
+        if (!empty($this->termIds)) {
+            $terms = $this->termMapper->findByColumn('id', $this->termIds);
+            /** @var Model $term */
+            foreach ($terms as $term) {
+                if (!isset($startDate) || $term->getStart()->lt($startDate)) {
+                    $startDate = $term->getStart();
+                }
+                if (!isset($endDate) || $term->getDisplayFinish()->gt($endDate)) {
+                    $endDate = $term->getDisplayFinish();
+                }
+            }
+            if (isset($startDate) && isset($endDate)) {
+                $this->startDate = $startDate->getDatabaseDate();
+                $this->endDate   = $endDate->getDatabaseDate();
+                return;
+            }
+        }
+        $currentTerm     = $this->termMapper->findForToday();
+        $this->startDate = $currentTerm->getStart()->getDatabaseDate();
+        $this->endDate   = $currentTerm->getDisplayFinish()->getDatabaseDate();
+    }
+
+    /**
+     * Return all parameters
+     * @return array
+     */
+    public function getParams(): array
+    {
+        $this->setDates();
         $params = [];
 
         if ($this->startDate) {
@@ -291,7 +342,7 @@ class Parameters
         $params[self::SHOW_SUMMARY] = $this->showSummary;
         if ($this->showSummary) {
             $params[self::SHOW_OVERALL_GRADE] = $this->showSummaryOverallGrade;
-            $params[self::WORK_TYPES]         = $this->summaryWorkTypeIds;
+            $params[self::WORK_TYPES]         = implode(',', $this->summaryWorkTypeIds);
             $params[self::SHOW_GRADES]        = $this->showSummaryGrades;
             $params[self::SHOW_COMMENTS]      = $this->showSummaryComments;
             $params[self::SHOW_RUBRICS]       = $this->showSummaryRubrics;
@@ -300,21 +351,24 @@ class Parameters
         $params[self::SHOW_CLASS] = $this->showClass;
         if ($this->showClass) {
             $params[self::SHOW_CLASS_OVERALL_GRADE] = $this->showClassOverallGrade;
-            $params[self::CLASS_WORK_TYPES]         = $this->classWorkTypeIds;
+            $params[self::CLASS_WORK_TYPES]         = implode(',', $this->classWorkTypeIds);
             $params[self::SHOW_CLASS_GRADES]        = $this->showClassGrades;
             $params[self::SHOW_CLASS_COMMENTS]      = $this->showClassComments;
             $params[self::SHOW_CLASS_RUBRICS]       = $this->showClassRubrics;
         }
-        return http_build_query($params);
+        return $params;
     }
 
     /**
-     * @param string $idList
+     * @param array|string $idList
      * @return array
      */
-    private function toArray(string $idList): array
+    private function filter($idList): array
     {
-        $filteredList = array_filter(explode(',', $idList), 'is_numeric');
+        if (is_string($idList)) {
+            $idList = explode(',', $idList);
+        }
+        $filteredList = array_map('intval', array_filter($idList, 'is_numeric'));
         return $filteredList ?: [];
     }
 }

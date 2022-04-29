@@ -115,7 +115,7 @@
                         </script>
                         <div class="small-12 columns">
                             <label for="report-students">Students</label>
-                            <select data-actions name="students[]" id="report-students" multiple></select>
+                            <select data-actions name="studentIds[]" id="report-students" multiple></select>
                         </div>
                         <script type="text/javascript">
                             {% autoescape 'js' %}
@@ -164,7 +164,7 @@
                     </fieldset>
                     <fieldset id="summaryPageAssessmentOptions" class="hide">
                         {% include '@adminReportExport/assessmentOptions.twig' with
-                            {assessmentOptions: summaryAssessmentOptions, page: 'summary'} only %}
+                            {assessmentOptions: summaryAssessmentOptions, page: 'summary', workTypeOption: 'workTypes'} only %}
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -196,7 +196,7 @@
                     </fieldset>
                     <fieldset id="classPageAssessmentOptions" class="hide">
                         {% include '@adminReportExport/assessmentOptions.twig' with
-                            {assessmentOptions: classAssessmentOptions, page: 'class'} only %}
+                            {assessmentOptions: classAssessmentOptions, page: 'class', workTypeOption: 'classWorkTypes'} only %}
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">

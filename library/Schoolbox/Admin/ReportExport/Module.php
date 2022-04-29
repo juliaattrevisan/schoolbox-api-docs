@@ -27,6 +27,8 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
@@ -65,6 +67,9 @@ class Module extends BaseModule
     {
         $this->addRoutePreload($matcher, '.*', function ($params) {
             $preloads = [];
+            if (isset($params['student']) && $params['student'] instanceof User) {
+                $preloads['student'] = $params['student'];
+            }
             if (isset($params['studentId'])) {
                 $preloads['student'] = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
             }
@@ -87,6 +92,7 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(UserBulkMapper::class),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
         );
