@@ -34,14 +34,14 @@ const classes = ref([]); //all the classes
 /**
  * to notify whether still loading the results or not
  * 
- * @returns { String } loading status
+ * @returns { String } 
  */
 const inputPlaceholder = computed(() => {
     if (isLoading.value) {
         return 'Loading classes, please wait...'
     } else {
-        return 'Search for classes...';
-    }
+        return 'Search for classes or manually enter comma-separated classes...';
+    } 
 });
 
 onMounted(() => {
@@ -86,8 +86,7 @@ const minQueryLength = 0; //should be able to search for just '3', if we want al
  */
 const queryWordList = computed(() => {
     const allWords = query.value.match(/\b(\w+)\b/g);
-    const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
-    return onlyWordsAboveTwoLetters;
+    return allWords.filter(word => word.length > 0);
 });
 
 /**
@@ -152,26 +151,44 @@ watch (results, async (newValue, oldValue) => {
 });
 
 onMounted(() => {
-    // initKeyboardEvents();
+    initKeyboardEvents();
     initMouseEvents();
 });
 
 /**
  * to be able to select by enter and navigate by up/down arrows
  */
-// function initKeyboardEvents () {
-//     document.addEventListener('keyup', (event) => {
-//         const keyName = event.key;
-//         const keyOptions = {
-//             'Enter': () => toggleResult(results.value[activeIndex.value].name),
-//             'ArrowUp': () => decrementActiveIndex(),
-//             'ArrowDown': () => incrementActiveIndex(),
-//         }
-//         if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
-//             keyOptions[keyName]();
-//         }
-//     });
-// }
+function initKeyboardEvents () {
+    
+    document.addEventListener('keydown', (event) => { //prevent the <form> from being submitted on enter
+        if (event.key === 'Enter' && document.activeElement === queryInputEl.value) {
+            event.preventDefault();
+        }
+    });
+
+    document.addEventListener('keyup', (event) => {
+        const keyName = event.key;
+        const keyOptions = {
+            'Enter': () => onEnterKeySelected(),
+            'ArrowUp': () => decrementActiveIndex(),
+            'ArrowDown': () => incrementActiveIndex(),
+        }
+        if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+            event.preventDefault();
+            keyOptions[keyName]();
+        }
+    });
+
+}
+
+/**
+ * enter the manual entry or select the currently 
+ * highlighted search result
+ */
+function onEnterKeySelected () {
+    addAllResults();
+    clearInput();
+}
 
 /**
  * to be able to move up and down through the selections
@@ -386,7 +403,7 @@ function onRemoveClassSelected (classItem) {
 
 <template>
     <div class="class-selector" ref="classSelectorEl">
-        <label for="import_folders" class="required">Class(es)</label>
+        <label class="required">Class(es)</label>
         <input
             v-if="!hasLoadError"
             v-model="query"
@@ -438,6 +455,18 @@ function onRemoveClassSelected (classItem) {
 </template>
 
 <style lang="scss" scoped>
+.radiolist {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    .option-list {
+        display: flex;
+        gap: 1rem;
+        margin: 0;
+    }
+}
+
 
 .search-input {
     margin: 0; //so the .search-results-container is jammed up on the input
@@ -478,7 +507,7 @@ function onRemoveClassSelected (classItem) {
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    min-height: 2.25rem;
+    min-height: 50px;
     padding: 0.5rem;
 }
 
