@@ -10,12 +10,11 @@
 
 namespace Schoolbox\Forum\Search;
 
-use Schoolbox\Forum\Thread;
+use Schoolbox\Forum\Post;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -55,10 +54,10 @@ class Renderer extends Base
                                          'FORUM_COUNT' => $mapperResult->getCount(),
                                      ));
 
-            foreach ($mapperResult->getResult() as $forum) {
-                /** @var Thread $forum */
+            foreach ($mapperResult->getResult() as $post) {
+                /** @var Post $post */
                 try {
-                    $folder = $folderMapper->findCheaplyById($forum->getCategory()->getId());
+                    $folder = $folderMapper->findCheaplyById($post->getThread()->getCategory()->getId());
                     $forumBreadcrumb = '';
 
                     foreach ($folderMapper->breadcrumb($folder, true) as $i => $breadcrumb) {
@@ -67,13 +66,13 @@ class Renderer extends Base
 
                     $this->getPage()->setVar(
                         array(
-                            'FORUM_CID'        => $forum->getCategory()->getId(),
-                            'FORUM_THREADID'   => $forum->getId(),
-                            'FORUM_TITLE'      => $forum->getTitle(),
-                            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($forum->getPosts()->first()->getBody()), 150),
-                            'FORUM_OWNER'      => $forum->getUser()->getId(),
-                            'FORUM_OWNER_NAME' => $forum->getUser()->getFullName(),
-                            'FORUM_CREATED'    => $forum->getDate()->getRelativeTime(),
+                            'FORUM_CID'        => $post->getThread()->getCategory()->getId(),
+                            'FORUM_THREADID'   => $post->getId(),
+                            'FORUM_TITLE'      => $post->getThread()->getTitle(),
+                            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 150),
+                            'FORUM_OWNER'      => $post->getOwner()->getId(),
+                            'FORUM_OWNER_NAME' => $post->getOwner()->getFullName(),
+                            'FORUM_CREATED'    => $post->getDate()->getRelativeTime(),
                             'FORUM_BREADCRUMB' => $forumBreadcrumb,
                         )
                     );

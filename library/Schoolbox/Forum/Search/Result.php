@@ -12,8 +12,7 @@ namespace Schoolbox\Forum\Search;
 
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Forum\Thread;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Forum\Post;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
@@ -33,50 +32,59 @@ class Result extends Base
      */
     protected function executeSearch(ArticleResolver $articleResolver, User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
-        $query = "
-            SELECT
-                {$mapper->getColumnString()},
-                {$mapper->getJoinMapper('post')->getColumnString()},
-                {$mapper->getJoinMapper('category')->getColumnString()},
-                {$mapper->getJoinMapper('owner')->getColumnString()},
-                MATCH(forumPost.body) AGAINST ({$sanitiser->getKeyword()}) AS `score`,
-                MATCH(forumThread.title) AGAINST ({$sanitiser->getKeyword()}) AS `score_title`
-            FROM
-                `{$mapper->getTable()}`
-                LEFT JOIN {$mapper->getJoinSql('owner', '', '', true)}
-                INNER JOIN {$mapper->getJoinSql('category', '', '')}
-                INNER JOIN {$mapper->getJoinSql('post', '', '')}
-            WHERE
-                forumPost.deleted = 'false'
-            AND
-                forumThread.deleted = 'false'
-                AND (
-                     MATCH(forumPost.body) AGAINST ({$sanitiser->getKeyword()}) OR
-                     MATCH(forumThread.title) AGAINST ({$sanitiser->getKeyword()})
-                    )
-            ORDER BY {$sanitiser->getSortBy()} {$sanitiser->getSortDir()}
-            LIMIT 0,{$sanitiser->getResultLimit()}
-        ";
+        $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
+                            `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+                            MATCH(`body`) AGAINST (:keywordBodySelect) AS score,
+                            MATCH(`forumThread`.`title`) AGAINST (:keywordTitleSelect) AS `score_title`
+                        FROM `forumPost`
+                        JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
+                        JOIN `folder` ON `folder`.id = `forumThread`.categoryID AND `folder`.deleted_At IS NULL
+                        LEFT JOIN `user` ON `forumPost`.userID = `user`.id
+                        LEFT JOIN `perms` ON `forumThread`.categoryID = `perms`.cid
+                            AND `perms`.gid = :roleId
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `forumThread`.categoryID = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = :userId
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND (
+                                MATCH(`body`) AGAINST (:keywordBodyWhere) OR
+                                MATCH(`forumThread`.`title`) AGAINST (:keywordTitleWhere)
+                            )
+                            AND `forumThread`.`deleted` = 'false'
+                            AND `forumPost`.`deleted` = 'false'
+                        ORDER BY :sortQuote DESC
+                        LIMIT :offset, :limit;
+            ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
+        $params = [
+            'keywordBodySelect' => $sanitiser->getKeyword(),
+            'keywordTitleSelect' => $sanitiser->getKeyword(),
+            'keywordBodyWhere' => $sanitiser->getKeyword(),
+            'keywordTitleWhere' => $sanitiser->getKeyword(),
+            'roleId'            => $user->getRole()->getId(),
+            'userId'            => $user->getId(),
+            'sortQuote'         => $sanitiser->getSortBy(),
+            'offset'                => $sanitiser->getOffset(),
+            'limit'                => $sanitiser->getResultLimit()
+        ];
+        foreach ($params as $label => $value) {
+            if ('offset' === $label || 'limit' === $label) {
+                $stmt->bindValue($label, $value, \PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue($label, $value);
+            }
+        }
         $stmt->execute();
-        $post_mapper = $mapper->getJoinMapper('post');
         $collection = $mapper->createCollection();
 
         foreach ($this->buildSearchResult($stmt, $user, 'categoryID', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
-            /** @var Thread $thread */
-            $thread = $mapper->hydrate($row);
-            /** @var User $owner */
-            $owner = $mapper->hydrateJoin($row, 'owner');
-            /** @var FolderModel $folder */
-            $folder = $mapper->hydrateJoin($row, 'category');
-            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
-            $thread->setUser($owner)->setCategory($folder);
-
-            $collection->add($thread);
+            /** @var Post $post */
+            $post = $mapper->findById($row['postID']);
+            $collection->add($post);
         }
-
-        return $collection;
+        return $mapper->hydrateCollection($collection);
     }
 
     /**
