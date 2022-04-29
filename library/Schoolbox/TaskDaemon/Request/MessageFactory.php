@@ -51,11 +51,17 @@ class MessageFactory
      * @param string      $task
      * @param array       $params
      * @param string|null $callbackUrl
+     * @param array|null  $callbackParams
      * @param User|null   $effector
      * @return Message
      */
-    public function build(string $task, array $params, ?string $callbackUrl, ?User $effector): Message
-    {
+    public function build(
+        string $task,
+        array $params,
+        ?string $callbackUrl,
+        ?array $callbackParams,
+        ?User $effector
+    ): Message {
         // Convert the instance to an intermediary format
         return new Message(
             $task,
@@ -68,6 +74,7 @@ class MessageFactory
             $this->instance->getType(),
             $this->instance->getSchoolCode(),
             $callbackUrl,
+            $callbackParams,
             $effector ? $this->tokenBuilder->generate($effector) : null,
         );
     }
