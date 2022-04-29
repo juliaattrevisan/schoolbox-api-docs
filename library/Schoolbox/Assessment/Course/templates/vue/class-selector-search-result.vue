@@ -11,7 +11,7 @@ import { getIndex } from '@js/util/domUtils';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
-const emit = defineEmits(['on-mouse-over-result', 'on-selected-result']);
+const emit = defineEmits(['mouse-over-result', 'select-result', 'toggle-all']);
 
 const props = defineProps({
     result: {
@@ -100,14 +100,18 @@ function highlightSearchInElement(toHighlight) {
  * so mouse selection takes precendence over the arrow/enter selection
  */
 function mouseOverResult () {
-    emit('on-mouse-over-result');
+    emit('mouse-over-result');
 }
 
 /**
  * dispatch to parent so can move to relevant settings page
  */
 function selectResult () {
-    emit('on-selected-result', props.result, isResultSelected.value);
+    if (props.result.isSelectAll) {
+        emit('toggle-all');
+    } else {
+        emit('select-result', props.result, isResultSelected.value);
+    }
 }
 
 /**
@@ -118,16 +122,6 @@ function selectResult () {
 const isResultSelected = computed(() => {
     return props.selectedClassIds.includes(props.result.id);
 });
-
-/**
- * To be able to award badges to multiple students
- * 
- * @params { Boolean } 
- */
-function onResultSelected (isChecked) {
-    this.$emit('on-result-selected', props.result.id, isChecked);
-}
-
 
 </script>
 
@@ -146,11 +140,11 @@ function onResultSelected (isChecked) {
                 type="checkbox"
                 :value="result.id"
                 :checked="isResultSelected"
-                @change="onResultSelected($event.target.checked)"
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
-        <span class="result-title" v-html="highlightTitleSearch"></span>
+        <strong v-if="result.isSelectAll">{{ result.name }}</strong>
+        <span v-else v-html="highlightTitleSearch"></span>
     </button>
 </template>
 

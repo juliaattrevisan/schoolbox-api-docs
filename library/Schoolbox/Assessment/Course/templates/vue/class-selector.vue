@@ -74,7 +74,7 @@ async function loadClassList () {
 
 const query = ref(''); //the search string to match against
 const queryInputEl = ref(null); 
-const minQueryLength = 1;
+const minQueryLength = 0; //should be able to search for just '3', if we want all of Grade 3  
 
 /**
  * the search string broken into words, to search for each word
@@ -89,11 +89,18 @@ const queryWordList = computed(() => {
 
 /**
  * the classes relevant to the search input
+ * and also the Select All toggle to be able to add / remove ALL search results
  * 
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const resultsList = computed(() => {
-    return query.value.length < minQueryLength ? [] : classes.value.filter(searchForName);
+    if (query.value.length === minQueryLength) {
+        return [];
+    } else if (classes.value.filter(searchForName).length > 0) {
+        return [{ id: -1, isSelectAll: true, name: 'Add all classes' }, ...classes.value.filter(searchForName)]; 
+    } else {
+        return [];
+    }
 });
 
 /**
@@ -275,8 +282,22 @@ const selectedClassIds = computed(() => { //so can easily filter by id
  * @param { Object }
  * @param { Boolean }
  */
-function onSelectedResult (toggledClassItem, isSelected) {
+function onSelectResult (toggledClassItem, isSelected) {
     selectResult(toggledClassItem, isSelected);
+}
+
+/**
+ * add the class to the selected list
+ * 
+ * @param { Object }
+ * @param { Boolean }
+ */
+function selectResult (toggledClassItem, isSelected) {
+    if (isSelected) { //pull out
+        selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
+    } else { //otherwise put in
+        selectedClasses.value = [...selectedClasses.value, toggledClassItem];
+    }
 }
 
 /**
@@ -286,12 +307,17 @@ function onSelectedResult (toggledClassItem, isSelected) {
  * @param { Object }
  * @param { Boolean }
  */
-function selectResult (toggledClassItem, isSelected) {
-    if (isSelected) {
-        selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
-    } else {
-        selectedClasses.value = [...selectedClasses.value, toggledClassItem];
-    }
+function onToggleAllResults (toggledClassItem) {
+    // if (isSelected) {
+    //     selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
+    // } else {
+    //     selectedClasses.value = [...selectedClasses.value, toggledClassItem];
+    // }
+    const withoutSelectAll = resultsList.value.filter((selectedClassItem) => !selectedClassItem.isSelectAll);
+    const noAlreadySelectedClasses = withoutSelectAll.filter((resultItem) => { //check if the class isn't in the list already
+        return !selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //don't add in those that match
+    });
+    selectedClasses.value = [...selectedClasses.value, ...noAlreadySelectedClasses];
 }
 
 /**
@@ -307,6 +333,7 @@ function onRemoveClassSelected (classItem) {
 
 <template>
     <div class="class-selector" ref="classSelectorEl">
+        <label for="import_folders" class="required">Class(es)</label>
         <input
             v-if="!hasLoadError"
             v-model="query"
@@ -317,31 +344,34 @@ function onRemoveClassSelected (classItem) {
             type="text"
             class="search-input"
         />
-        <div class="search-results">
-            <transition-group
-                name="staggered-fade"
-                tag="ul"
-                v-bind:css="false"
-                @before-enter="onBeforeOnEnter"
-                @enter="onEnter"
-                @enter-cancelled="checkEachResultIndex"
-                @leave="onLeave"
-                @after-leave="checkEachResultIndex"
-                @leave-cancelled="checkEachResultIndex"
-            >
-                <li v-for="(result, index) in resultsList" :key="result.id" :data-index="index">
-                    <class-selector-search-result
-                        ref="searchResultsEl"
-                        :result="result"
-                        :selected-class-ids="selectedClassIds"
-                        :query-word-list="queryWordList"
-                        :active-index="activeIndex"
-                        @on-mouse-over-result="onMouseOverResult"
-                        @on-selected-result="onSelectedResult"
-                    />
-                </li>
-            </transition-group>
-        </div><!-- .search-results -->
+        <div class="search-results-container">
+            <div class="search-results">
+                <transition-group
+                    name="staggered-fade"
+                    tag="ul"
+                    v-bind:css="false"
+                    @before-enter="onBeforeOnEnter"
+                    @enter="onEnter"
+                    @enter-cancelled="checkEachResultIndex"
+                    @leave="onLeave"
+                    @after-leave="checkEachResultIndex"
+                    @leave-cancelled="checkEachResultIndex"
+                >
+                    <li v-for="(result, index) in resultsList" :key="result.id" :data-index="index">
+                        <class-selector-search-result
+                            ref="searchResultsEl"
+                            :result="result"
+                            :selected-class-ids="selectedClassIds"
+                            :query-word-list="queryWordList"
+                            :active-index="activeIndex"
+                            @mouse-over-result="onMouseOverResult"
+                            @select-result="onSelectResult"
+                            @toggle-all="onToggleAllResults"
+                        />
+                    </li>
+                </transition-group>
+            </div><!-- .search-results -->
+        </div><!-- .search-results-container -->
         <div class="selected-classes-container">
             <class-selector-selected-class 
                 v-for="selectedClass in selectedClasses" 
@@ -355,18 +385,18 @@ function onRemoveClassSelected (classItem) {
 
 <style lang="scss" scoped>
 
-.class-selector {
-    position: relative;
+.search-input {
+    margin: 0; //so the .search-results-container is jammed up on the input
 }
 
-.search-input {
-    margin: 0;
+.search-results-container {
+    position: relative; //to give the .search-result position: absolute context
 }
 
 .search-results {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
-    top: 40px;
+    top: 0;
     width: 100%;
     z-index: 10;
     ul {
@@ -391,10 +421,11 @@ function onRemoveClassSelected (classItem) {
     border: 1px solid var(--form-border-color);
     border-top: none;
     display: flex;
-    gap: 2px;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     margin-bottom: 1rem;
     min-height: 2.25rem;
-    padding: 2px;
+    padding: 0.5rem;
 }
 
 </style>
