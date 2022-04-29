@@ -51,7 +51,7 @@ if (!$_SESSION['id']) {
         $metas = array();
         for ($i = 0; $i < count($meta['name']); ++$i) {
             try {
-                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator, $expiryAt);
+                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator, true, $expiryAt);
                 $hashes[] = $result['hash'];
                 $metas[]  = $result['meta'];
             } catch (Exception $e) {
@@ -63,7 +63,7 @@ if (!$_SESSION['id']) {
         $result['meta'] = $metas;
     } else {
         try {
-            $result = attemptStorage($meta, $prefixGenerator, $expiryAt);
+            $result = attemptStorage($meta, $prefixGenerator, true, $expiryAt);
         } catch (Exception $e) {
             $result['hash'] = 'exception:' . $e->getMessage();
             $result['meta'] = array();
@@ -94,6 +94,7 @@ function getFileAtIndex($meta, $i)
 /**
  * @param array                    $fileData
  * @param PrefixGenerator          $prefixGenerator
+ * @param bool                     $public
  * @param Alaress_Date_Format|null $expiryAt
  * @return array
  * @throws PDOException
@@ -103,7 +104,7 @@ function getFileAtIndex($meta, $i)
  * @throws \Schoolbox\Mapper\DefinitionException
  * @throws \Schoolbox\Mapper\Exception
  */
-function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, ?\Alaress_Date_Format $expiryAt = null): array
+function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, bool $public = true, ?\Alaress_Date_Format $expiryAt = null): array
 {
     if ($fileData['size'] == 0) {
         throw new Schoolbox\File\Exception("File has no content");
@@ -112,7 +113,7 @@ function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, ?\Ala
         throw new Schoolbox\File\Exception("Filedata not readable");
     }
 
-    $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name'], $expiryAt);
+    $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name'], $public, $expiryAt);
 
     // to also return the stored file location for possible reference / display
     $modelToArray = new ModelToArray($prefixGenerator);
