@@ -52,6 +52,9 @@ MAILTO="support@schoolbox.com.au"
 # Clipboard Importer - every 4 hours
 22 */4 * * *  www-data   /usr/local/bin/jitter 1800 php /usr/share/schoolbox/tools/clipboard/importer.php --membership --sessions --perform >> /var/log/schoolbox/clipboard-importer.log 2>&1
 
+# Expired Storage Removal Tool - every Sunday at 5am
+15 5 * * 0	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/storage/expired-storage-removal.php --perform >> /var/log/schoolbox/expired-storage-removal.log 2>&1
+
 # Etherpad - sync back to MySQL - every hour
 38 * * * *	www-data	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 
