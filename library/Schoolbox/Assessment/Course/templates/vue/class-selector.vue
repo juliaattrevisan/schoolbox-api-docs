@@ -56,6 +56,9 @@ async function loadClassList () {
         const response = await fetch(props.endpoint);
         const responseJson = await response.json();
         classes.value = responseJson;
+        classes.value.forEach((classItem) => { //add in additional data to help track selection status
+            classItem = { ...classItem, isSelectAll: false, isSelected: false };
+        });
     } catch (error) {
         console.warn(error);
         isLoading.value = false;
@@ -97,7 +100,7 @@ const resultsList = computed(() => {
     if (query.value.length === minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) {
-        return [{ id: -1, isSelectAll: true, name: 'Add all classes' }, ...classes.value.filter(searchForName)]; 
+        return [{ id: -1, isSelectAll: true, isSelected: false, name: 'Add all classes' }, ...classes.value.filter(searchForName)]; 
     } else {
         return [];
     }
@@ -328,6 +331,44 @@ function onToggleAllResults (toggledClassItem) {
 function onRemoveClassSelected (classItem) {
     selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== classItem.id);
 }
+
+/**
+ * 
+ * 
+ * @returns { Boolean } 
+ */
+const hasMostResultsSelected = computed(() => {
+    
+    if (selectedClasses.value.length > 1) {
+
+        const withoutSelectAll = resultsList.value.filter((selectedClassItem) => !selectedClassItem.isSelectAll);
+
+        const alreadySelectedClasses = withoutSelectAll.filter((resultItem) => { //check if the class is in the list already
+            return selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //add those in that match
+        });
+
+        const alreadySelectedCount = alreadySelectedClasses.length;
+
+        const allResultCount = withoutSelectAll.length;
+
+        if (allResultCount > alreadySelectedCount) {
+
+
+
+        }
+
+        // if (alreadySelectedCount / allResultCount)
+
+        //search has most selected
+        //compare selectedClasses and resultsList to find how many of the current search result are selected
+
+    } else {
+
+        return false;
+
+    }
+
+});
 
 </script>
 
