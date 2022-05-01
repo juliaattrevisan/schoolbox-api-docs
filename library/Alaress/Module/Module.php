@@ -187,37 +187,13 @@ class Module
     /**
      * Installs module with its most basic configuration.
      *
-     * This will not override a previous install of a module with the same basename.
-     *
-     * @param string $basePath The base URL for this module, used by initRoutes
-     */
-    public function init($basePath)
-    {
-        $this->internalInit($basePath, false);
-    }
-
-    /**
-     * Installs module with its most basic configuration, overriding a previous
-     * install of a module with the same basename.
-     *
-     * @param string $basePath The base URL for this module, used by initRoutes
-     */
-    public function initOverride($basePath)
-    {
-        $this->internalInit($basePath, true);
-    }
-
-    /**
-     * Installs module with its most basic configuration.
-     *
      * Only the module's submodules and routes should be initialised here -
      * these are the bare minimum the kernel requires to bind a module to a
      * route, and then execute it.
      *
      * @param string $basePath The base URL for this module, used by initRoutes
-     * @param bool   $override If true, override a previous definition with this basename
      */
-    protected function internalInit($basePath, $override)
+    public function init(string $basePath)
     {
         if ($this->installModule()) {
             $this->initSubmodules($this->injector, $basePath);
