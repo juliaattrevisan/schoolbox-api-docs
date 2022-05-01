@@ -8,7 +8,7 @@
  */
 
 import ManageQrCodesStudent from './manage-qr-codes-student';
-import BottomDrawer from '@schoolboxVue/components/drawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 
 export default {
 

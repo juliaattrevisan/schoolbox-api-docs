@@ -7,7 +7,7 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
-import BottomDrawer from '@schoolboxVue/components/drawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {

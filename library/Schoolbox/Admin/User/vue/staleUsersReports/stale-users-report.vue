@@ -8,7 +8,7 @@
 
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
-import BottomDrawer from '@schoolboxVue/components/drawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 
 export default {

@@ -6,7 +6,7 @@
  */
 
 import SimilarityReportFilters from './similarity-report-filters';
-import BottomDrawer from '@schoolboxVue/components/drawer/bottom-drawer';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import Toast from '@schoolboxVue/components/toast';
 import FilterEvents from './similarityReportFilterEvents';
 
