@@ -191,22 +191,27 @@ class Module
      * these are the bare minimum the kernel requires to bind a module to a
      * route, and then execute it.
      *
-     * @param string $basePath The base URL for this module, used by initRoutes
+     * @param string|null $basePath The base URL for this module, used by
+     *                              `initRoutes`.
+     *                              If this is null, this can't have any routes.
      */
-    public function init(string $basePath)
+    public function init(?string $basePath)
     {
         if ($this->installModule()) {
             $this->initSubmodules($this->injector, $basePath);
 
-            // perform any route registration available
-            $this->registerRoutes();
+            if (isset($basePath)) {
+                // perform any route registration available
+                $this->registerRoutes();
 
-            // preload registered routes
-            foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
-                     ->setMethod($method)
-                     ->setTokens($tokens);
+                // preload registered routes
+                foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
+                    $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
+                         ->setMethod($method)
+                         ->setTokens($tokens);
+                }
             }
+
             // no need that no more
             unset($this->routeIndex);
 
@@ -312,9 +317,9 @@ class Module
      * Initializes any submodules of this module.
      *
      * @param ContainerInterface $injector
-     * @param string             $basePath The base route for this module
+     * @param string|null        $basePath The base route for this module
      */
-    public function initSubmodules(ContainerInterface $injector, $basePath)
+    public function initSubmodules(ContainerInterface $injector, ?string $basePath)
     {
     }
 

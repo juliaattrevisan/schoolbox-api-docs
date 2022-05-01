@@ -28,10 +28,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initSubmodules(ContainerInterface $injector, $basePath)
+    public function initSubmodules(ContainerInterface $injector, ?string $basePath)
     {
         $importModule = new Import\Module($injector);
-        $importModule->init($basePath . '/import');
+        $importModule->init(isset($basePath) ? ($basePath . '/import') : null);
     }
 
     /**
