@@ -266,6 +266,27 @@ class Module
         if (!$this->basename) {
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
+
+        // Don't allow this module to be redefined
+        if (isset(self::$installedModules[$this->basename])) {
+            $other = self::$installedModules[$this->basename];
+            if (get_class($other) !== get_class($this)) {
+                throw new LogicException(
+                    sprintf(
+                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
+                        $this->basename,
+                        get_class($other),
+                        get_class($this)
+                    )
+                );
+            } else {
+                user_error(
+                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
+                    E_USER_WARNING
+                );
+                return false;
+            }
+        }
         self::$installedModules[$this->basename] = $this;
         return true;
     }
