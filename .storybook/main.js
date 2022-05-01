@@ -16,7 +16,7 @@ module.exports = {
         postcss: false,
     },
     framework: '@storybook/vue3',
-    staticDirs: ['../stories/assets', '../www'],
+    staticDirs: ['../stories/assets'],
     stories: [
         '../stories/**/*.stories.mdx',
         '../stories/**/*.stories.@(js|jsx|ts|tsx)',

@@ -1,22 +1,13 @@
 
 import ClassSelector from '../library/Schoolbox/Assessment/Course/templates/vue/class-selector';
 import { rest } from 'msw';
+import { data } from './dataClassSelector';
 
 export default {
     title: 'IN PROGRESS/ClassSelector',
     component: ClassSelector,
 };
 
-const films = [
-    {
-        id: 1,
-        name: 'Name 1',
-    },
-    {
-        id: 2,
-        name: 'Name 2',
-    },
-];
 
 const Template = (args, { argTypes }) => ({
     components: { ClassSelector },
@@ -38,7 +29,7 @@ Default.parameters = {
             rest.get('https://swapi.dev/api/films/', (req, res, ctx) => {
             return res(
                 ctx.json([
-                        ...films,
+                        ...data,
                     ]),
                 );
             }),
