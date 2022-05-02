@@ -306,8 +306,8 @@ class Mapper extends BaseMapper
                 aa.user_id,
                 aa.attempt_id,
                 aq.section_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark
             FROM assess_attempt aa
                 LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
                 LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
