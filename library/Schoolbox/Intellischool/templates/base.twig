@@ -15,7 +15,8 @@
                     // Check that the event is from a trusted source
                     if (![
                         "https://analytics.intellischool.cloud",
-                        "https://analytics.intellischool.xyz"
+                        "https://analytics.intellischool.xyz",
+                        "https://analytics.intellischool.dev"
                     ].includes(event.origin)
                     )
                         return;
@@ -25,7 +26,7 @@
                         {
                             case "resize":
                                 if (event.data.intellischool.height) {
-                                    document.getElementById('iframe').style.height = event.data.intellischool.height;
+                                    document.getElementById('iframe').height = Math.ceil(event.data.intellischool.height);
                                 }
                                 return;
                             default:
@@ -38,7 +39,7 @@
                     document.getElementById('iframeForm').submit();
                 });
             </script>
-            <iframe style="height:500px;overflow: hidden" name="iframe" id="iframe">
+            <iframe style="min-height:500px;overflow: hidden" name="iframe" id="iframe">
             </iframe>
         </div>
     </div>
