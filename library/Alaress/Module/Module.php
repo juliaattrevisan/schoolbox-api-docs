@@ -386,6 +386,9 @@ class Module
     /**
      * Initializes any submodules of this module.
      *
+     * @deprecated Submodules aren't used anymore:
+     *             instead, define modules directly in the module config
+     *
      * @param ContainerInterface $injector
      * @param string|null        $basePath The base route for this module
      */
