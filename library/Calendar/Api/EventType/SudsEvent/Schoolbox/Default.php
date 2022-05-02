@@ -142,7 +142,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             /* If this derived $eventTypeId was one of the $allowedEventTypes,
              * Let it through; otherwise disregard it
              */
-            if (\count($allowedEventTypes) && !\in_array($eventTypeId, $allowedEventTypes, true)) {
+            if (null !== $allowedEventTypes && \count($allowedEventTypes) && !\in_array($eventTypeId, $allowedEventTypes, true)) {
                 continue;
             }
 
