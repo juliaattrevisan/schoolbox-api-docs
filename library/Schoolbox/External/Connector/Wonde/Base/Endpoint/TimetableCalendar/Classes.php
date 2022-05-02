@@ -282,6 +282,18 @@ class Classes implements IStrategy
                 continue;
             }
 
+            /* Class has no code. ignore this class
+            Schoolbox has no way of working with an external class that has no code.
+            */
+            if (null === $class['code']) {
+                $this->log->debug(sprintf(
+                    "Class Name:'%s' Code:'%s', has no class code. ignoring",
+                    $class['name'],
+                    $class['code'],
+                ));
+                continue;
+            }
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
