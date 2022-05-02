@@ -112,6 +112,12 @@ class Module
      */
     private static array $installedModules = [];
 
+    /**
+     * A list of module registrations.
+     *
+     * @var array<string, array{class: class-string, basePath: string, params: array}>
+     */
+    protected static array $registeredModules = [];
 
     /**
      * Constructor
@@ -208,13 +214,30 @@ class Module
                 }
             }
 
-            // no need that no more
-            unset($this->routeIndex);
+//            // no need that no more
+//            unset($this->routeIndex);
 
             // manual route init
             $this->initRoutes($this->getRouter(), $basePath);
         }
     }
+
+
+    /**
+     * Register this module.
+     *
+     * @param string|null $basePath
+     * @return void
+     */
+    public function registerModule(?string $basePath): void
+    {
+        self::$registeredModules[$this->basename] = [
+            'class'    => get_class($this),
+            'basePath' => $basePath,
+            'params'   => [],
+        ];
+    }
+
 
     /**
      * Performs setup steps required to use this module's controller.

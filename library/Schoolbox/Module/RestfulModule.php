@@ -213,4 +213,21 @@ abstract class RestfulModule extends AlaressModule
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
+
+    /**
+     * Registers this restful module, with an additional context constructor
+     * parameter.
+     *
+     * @param string|null   $basePath
+     * @param RestfulModule $context
+     * @return void
+     */
+    public function registerModuleWithContext(?string $basePath, RestfulModule $context): void
+    {
+        self::$registeredModules[$this->basename] = [
+            'class'    => get_class($this),
+            'basePath' => $basePath,
+            'params'   => ['context' => $context],
+        ];
+    }
 }
