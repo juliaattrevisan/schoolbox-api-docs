@@ -435,8 +435,8 @@ class MapperProxy
                 a.weight AS weight,
                 null AS mark_type,
                 aa.user_id AS user_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark,
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark,
                 aa.reviewed_at AS published_at
            FROM assess a
                 JOIN participant_plan pp ON pp.assessment_id = a.assessment_id AND pp.deleted_at IS NULL
