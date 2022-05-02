@@ -69,11 +69,21 @@ class Model implements ISoftDeletable
     private $answers;
 
     /**
+     * @var null|float
+     */
+    private ?float $mark;
+
+    /**
+     * @var null|float
+     */
+    private ?float $max_mark;
+
+    /**
      * The mark that the user has received for this attempt.
      *
      * @return float
      */
-    public function getMark(): float
+    public function getMarkOLD(): float
     {
         $mark = 0;
         foreach ($this->answers as $answer) {
@@ -300,5 +310,41 @@ class Model implements ISoftDeletable
     {
         $this->reviewer = $reviewer;
         return $this;
+    }
+
+    /**
+     * @param null|float $mark
+     * @return static
+     */
+    public function setMark(?float $mark): self
+    {
+        $this->mark = $mark;
+        return $this;
+    }
+
+    /**
+     * @return null|float
+     */
+    public function getMark(): ?float
+    {
+        return $this->mark;
+    }
+
+    /**
+     * @param null|float $max_mark
+     * @return static
+     */
+    public function setMaxMark(?float $max_mark): self
+    {
+        $this->max_mark = $max_mark;
+        return $this;
+    }
+
+    /**
+     * @return null|float
+     */
+    public function getMaxMark(): ?float
+    {
+        return $this->max_mark;
     }
 }

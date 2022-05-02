@@ -63,6 +63,8 @@ class Mapper extends BaseMapper
         $this->joins('reviewer_id', UserMapper::class, 'id', null, null, 'reviewer', 'reviewer');
         $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
+        $this->uses('mark', self::TYPE_DECIMAL);
+        $this->uses('max_mark', self::TYPE_DECIMAL);
 
         $this->hasJoin('answers', array(
             'mapper'    => QuizAnswerMapper::class,
