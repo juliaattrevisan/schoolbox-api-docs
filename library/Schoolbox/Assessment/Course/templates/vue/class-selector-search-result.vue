@@ -7,11 +7,11 @@
  * results currently shown
  */
 
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
-const emit = defineEmits(['mouse-over-result', 'toggle', 'toggle-all']);
+const emit = defineEmits(['select']);
 
 const props = defineProps({
     result: {
@@ -21,7 +21,6 @@ const props = defineProps({
             return {
                 id: 0,
                 name: 'name',
-                isSelectAll: false,
                 isSelected: false,
             }
         }
@@ -42,9 +41,6 @@ const props = defineProps({
         default: [],
     },
 });
-
-const isActive = ref(false);
-const resultEl = ref(null);
 
 const highlightTitleSearch = computed(() => {
     return highlightSearchInElement(props.result.name);
@@ -69,60 +65,37 @@ function highlightSearchInElement (toHighlight) {
 }
 
 /**
- * To determine the check dispaly of the checkbox
+ * To determine the check display of the checkbox
  *
  * @returns { Boolean } 
  */
 const isChecked = computed(() => {
-    if (!props.result.isSelectAll) {
-        return props.result.isSelected;
-    } else if (props.isAllResultsSelected) {
-        return true;
-    } else {
-        return false;
-    }
+    return props.result.isSelected;
 });
-
-/**
- * so mouse selection takes precendence over the arrow/enter selection
- */
-function mouseOverResult () {
-    emit('mouse-over-result');
-}
 
 /**
  * dispatch to parent so can move to relevant settings page
  */
-function selectResult () {
-    if (props.result.isSelectAll) {
-        emit('toggle-all');
-    } else {
-        emit('toggle', props.result);
-    }
+function onSelect () {
+    emit('select', props.result);
 }
 
 </script>
 
 <template>
     <button class="search-result"
-        ref="resultEl"
-        :class="{ 'search-result-active': isActive }"
-        @mouseover="mouseOverResult"
-        @focus="mouseOverResult"
-        @click.prevent="selectResult"
-        @keyup.enter="selectResult"
+        @click.prevent="onSelect"
+        @keyup.enter="onSelect"
     >
         <div class="checklist">
             <input 
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
                 :checked="isChecked"
-                :class="{ 'indeterminate': result.isSelectAll && isSomeResultsSelected }"
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
-        <strong v-if="result.isSelectAll">Select All</strong>
-        <span v-else v-html="highlightTitleSearch"></span>
+        <span v-html="highlightTitleSearch"></span>
     </button>
 </template>
 
@@ -140,9 +113,7 @@ function selectResult () {
         background: var(--content-ui-hover);
     }
 }
-.search-result-active {
-    background: var(--content-ui-hover);
-}
+
 input[type=checkbox]:not(.plain) + label {
     margin: 0;
 }

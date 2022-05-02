@@ -6,17 +6,15 @@
  * Classes can also be manually entered, with pressing enter adding matched results
  */
 
-import { ref, computed, watch, onMounted  } from 'vue'
+import { ref, computed, onMounted  } from 'vue'
+import ClassSelectorSelectAll from './class-selector-select-all';
 import ClassSelectorSearchResult from './class-selector-search-result';
 import ClassSelectorSelectedClass from './class-selector-selected-class';
 import { gsap } from 'gsap/all';
 
 
 const props = defineProps({
-    /**
-     * the endpoint to retrieve all the classes from
-     */
-    endpoint: {
+    endpoint: { //the endpoint to retrieve all the classes from
         type: String,
         required: true,
     }
@@ -61,7 +59,7 @@ async function loadClassList () {
         const responseJson = await response.json();
         classes.value = responseJson;
         classes.value.forEach((classItem) => { //add in additional data to help track selection status
-            classItem = { ...classItem, isSelectAll: false, isSelected: false };
+            classItem = { ...classItem, isSelected: false };
         });
     } catch (error) {
         console.warn(error);
@@ -95,30 +93,28 @@ const queryWordList = computed(() => {
 });
 
 /**
- * the classes relevant to the search input
- * and also the Select All toggle to be able to add / remove ALL search results
+ * the classes found relevant to the search input
  * 
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const results = computed(() => {
     if (query.value.length < minQueryLength) {
         return [];
-    } else if (classes.value.filter(searchForName).length === 1) { //don't add in the Select All for just one result
-        return classes.value.filter(searchForName)
     } else if (classes.value.filter(searchForName).length > 1) { 
-        return [{ id: -1, name: 'Add all classes', isSelectAll: true, isSelected: false }, ...classes.value.filter(searchForName)]; 
+        return classes.value.filter(searchForName); 
     } else {
         return [];
     }
 });
 
 /**
- * pull out select all option for adding / removing classes 
+ * show select all option for adding / removing classes only if there's 
+ * more than one search result
  * 
- * @returns { Array } all relevant search results, once we've reached the minQueryLength
+ * @returns { Boolean } 
  */
-const resultsNoSelectAll = computed(() => {
-    return results.value.filter((result) => !result.isSelectAll);
+const showSelectAll = computed(() => {
+    return results.value.length > 1;
 });
 
 /**
@@ -275,7 +271,7 @@ const selectedClassIds = computed(() => {
  * @param { Object }
  * @param { Boolean }
  */
-function onToggleResult (toggledClass) {
+function onSelectResult (toggledClass) {
     toggleResult(toggledClass);
 }
 
@@ -302,8 +298,8 @@ function toggleResult (toggledClass) {
  */
 const isAllResultsSelected = computed(() => {
     if (selectedClasses.value.length > 0) {
-        const alreadySelectedClasses = resultsNoSelectAll.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
-        return alreadySelectedClasses.length === resultsNoSelectAll.value.length ? true : false;
+        const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
+        return alreadySelectedClasses.length === results.value.length ? true : false;
     } else {
         return false;
     }
@@ -316,8 +312,8 @@ const isAllResultsSelected = computed(() => {
  */
 const isSomeResultsSelected = computed(() => {
     if (selectedClasses.value.length > 0) {
-        const alreadySelectedClasses = resultsNoSelectAll.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
-        return alreadySelectedClasses.length >= 1 && alreadySelectedClasses.length !== resultsNoSelectAll.value.length ? true : false;
+        const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
+        return alreadySelectedClasses.length >= 1 && alreadySelectedClasses.length !== results.value.length ? true : false;
     } else {
         return false;
     }
@@ -326,7 +322,7 @@ const isSomeResultsSelected = computed(() => {
 /**
  * to add / remove all the currently matched search classes
  */
-function onToggleAllResults () {
+function onSelectAllResults () {
     if (isAllResultsSelected.value) {
         removeAllResults();
     } else {
@@ -338,7 +334,7 @@ function onToggleAllResults () {
  * pull all results out 
  */
 function removeAllResults () {
-    const matchedSelectedClasses = resultsNoSelectAll.value.filter((matchedSelectedClass) => { //check if the class is in the list already
+    const matchedSelectedClasses = results.value.filter((matchedSelectedClass) => { //check if the class is in the list already
         return selectedClasses.value.some((selectedClass) => selectedClass.id === matchedSelectedClass.id); //add in those that match
     });
     matchedSelectedClasses.forEach((matchedSelectedClass) => matchedSelectedClass.isSelected = false); //set false on all
@@ -349,7 +345,7 @@ function removeAllResults () {
  * add all results in 
  */
 function addAllResults () {
-    const newSelectedClasses = resultsNoSelectAll.value.filter((newSelectedClass) => { //check if the class isn't in the list already
+    const newSelectedClasses = results.value.filter((newSelectedClass) => { //check if the class isn't in the list already
         return !selectedClasses.value.some((selectedClass) => selectedClass.id === newSelectedClass.id); //don't add in those that match
     });
     newSelectedClasses.forEach((newSelectedClass) => newSelectedClass.isSelected = true);
@@ -398,14 +394,20 @@ function onClearAllSelected () {
                     @enter="onEnter"
                     @leave="onLeave"
                 >
-                    <li v-for="(result, index) in results" :key="result.id" :data-index="index">
+                    <li v-if="showSelectAll">
+                        <class-selector-select-all
+                            :is-all-results-selected="isAllResultsSelected"
+                            :is-some-results-selected="isSomeResultsSelected"
+                            @select-all="onSelectAllResults"
+                        />
+                    </li>
+                    <li v-for="result in results" :key="result.id">
                         <class-selector-search-result
                             :result="result"
                             :is-all-results-selected="isAllResultsSelected"
                             :is-some-results-selected="isSomeResultsSelected"
                             :query-word-list="queryWordList"
-                            @toggle="onToggleResult"
-                            @toggle-all="onToggleAllResults"
+                            @select="onSelectResult"
                         />
                     </li>
                 </transition-group>
