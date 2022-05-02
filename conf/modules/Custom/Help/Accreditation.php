@@ -10,21 +10,17 @@
 
 namespace Config\Modules\Custom\Help;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Custom\Help\Nesa\Module as NesaModule;
+use Psr\Container\ContainerInterface;
 
 class Accreditation extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, NesaModule::class, '/accreditation');
+        $this->loadModule($di, NesaModule::class, '/accreditation');
     }
 }

@@ -11,19 +11,15 @@ namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
 use Custom\Help\CourseParticipation;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 
 class API extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, CourseParticipation\Module::class, '/api/course-participation');
+        $this->loadModule($di, CourseParticipation\Module::class, '/api/course-participation');
     }
 }

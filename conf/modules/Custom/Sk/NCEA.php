@@ -8,22 +8,17 @@
 
 namespace Config\Modules\Custom\Sk;
 
-use Alaress\Application\Kernel;
 use Custom\Sk\NCEA\Module as NCEAModule;
 use Config\Modules\ModuleConfigInterface;
+use Psr\Container\ContainerInterface;
 
 class NCEA implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $module = new NCEAModule($di);
         $module->init('/modules/custom/stk/ncea');
     }

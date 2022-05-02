@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Intellischool\Module;
 use Schoolbox\Intellischool\Component\Dashboard\Module as DashboardModule;
 
@@ -20,14 +20,11 @@ use Schoolbox\Intellischool\Component\Dashboard\Module as DashboardModule;
 class IntellischoolAnalytics extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, Module::class, "/modules/analytics");
-        $this->loadModule($kernel, DashboardModule::class, 'intellischoolDashboard');
+        $this->loadModule($di, Module::class, "/modules/analytics");
+        $this->loadModule($di, DashboardModule::class, 'intellischoolDashboard');
     }
 }

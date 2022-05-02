@@ -8,24 +8,17 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Module as FilterModule;
 
 class Admin implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         if ($di->get('config')->get(ConfigMapper::NAME_LMS_ENABLED)) {
             // Admin course builder page
             (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');

@@ -9,21 +9,17 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Realtime;
 
 class Settings implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $messagesModule = new Realtime\Module($kernel->getDependencyInjector());
+        $messagesModule = new Realtime\Module($di);
         $messagesModule->init('/settings/messages');
     }
 }

@@ -8,7 +8,7 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Fixtures\Landing\Module as LandingModule;
 use Schoolbox\Fixtures\Import\Module as ImportModule;
 use Schoolbox\Fixtures\Sport\Module as SportModule;
@@ -27,17 +27,11 @@ use Schoolbox\Fixtures\Status\Module as StatusModule;
 
 class SportsFixtures implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $namespace = 'fixtures';
 
         $homepageModule = new HomepageModule($di);

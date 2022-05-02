@@ -9,21 +9,18 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Survey\Module as SurveyModule;
 
 class Survey extends ModuleLoader implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'survey';
 
-        $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
+        $this->loadModule($di, SurveyModule::class, "/{$namespace}");
     }
 }

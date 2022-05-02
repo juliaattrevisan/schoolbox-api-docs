@@ -10,22 +10,19 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Canvas\Module;
 
 class Canvas implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'canvas';
 
-        $module = new Module($kernel->getDependencyInjector());
+        $module = new Module($di);
         $module->init("/{$namespace}");
     }
 }

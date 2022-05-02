@@ -8,22 +8,23 @@
 
 namespace Config;
 
-use Alaress\Application\Kernel;
-use Alaress\Module\Module;
 use Config\Modules\ModuleConfigInterface;
+use Psr\Container\ContainerInterface;
 
 abstract class ModuleLoader implements ModuleConfigInterface
 {
     /**
-     * @param string $className Name of module class to load
-     * @param string $path
-     * @param Kernel $kernel
-     * @return Module
+     * Loads this module.
+     *
+     * @template T of \Alaress\Module\Module
+     * @param ContainerInterface $di
+     * @param class-string<T>    $className
+     * @param string|null        $path
+     * @return T
      */
-    protected function loadModule($kernel, $className, $path)
+    protected function loadModule(ContainerInterface $di, string $className, ?string $path)
     {
-        /** @var Module $module */
-        $module = new $className($kernel->getDependencyInjector());
+        $module = new $className($di);
         $module->init($path);
         return $module;
     }

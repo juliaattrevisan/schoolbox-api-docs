@@ -9,23 +9,17 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox;
 
 // TODO - this class name is illegal in PHP7. Needs to be changed to other than 'Resource'
 class Resource implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
         $browserModule->init('/resources');
 

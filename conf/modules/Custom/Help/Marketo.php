@@ -9,21 +9,18 @@
 namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
 use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
+use Psr\Container\ContainerInterface;
 
 class Marketo extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'marketo';
 
-        $this->loadModule($kernel, MarketoModule::class, "/modules/custom/help/{$namespace}");
+        $this->loadModule($di, MarketoModule::class, "/modules/custom/help/{$namespace}");
     }
 }

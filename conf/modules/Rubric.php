@@ -9,7 +9,7 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\Manager\Module as ManagerModule;
 use Schoolbox\Assessment\Rubric\Markbook\Module as RubricMarkbookModule;
 use Schoolbox\Assessment\Rubric\Module;
@@ -17,15 +17,10 @@ use Schoolbox\Assessment\Rubric\Module;
 class Rubric implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $module = new Module($di);
         $module->init('/rubric');
 

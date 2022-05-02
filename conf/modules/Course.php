@@ -9,33 +9,29 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 
 class Course implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         /** @var IConfigLoader $config */
-        $config = $kernel->getDependencyInjector()->get('config');
+        $config = $di->get('config');
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $courseModule = new Assessment\Course\Module($kernel->getDependencyInjector());
+            $courseModule = new Assessment\Course\Module($di);
             $courseModule->init('/course');
 
-            $importModule = new Assessment\Course\Import\Module($kernel->getDependencyInjector());
+            $importModule = new Assessment\Course\Import\Module($di);
             $importModule->init('/course/import');
 
-            $atlasModule = new Assessment\Course\Import\Atlas\Module($kernel->getDependencyInjector());
+            $atlasModule = new Assessment\Course\Import\Atlas\Module($di);
             $atlasModule->init('/course/import/atlas');
         }
     }

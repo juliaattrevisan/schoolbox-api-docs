@@ -9,20 +9,17 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 
 class Weather extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, \Schoolbox\Weather\Component\Dashboard\Module::class, "/weather/component/dashboard");
-        $this->loadModule($kernel, \Schoolbox\Weather\Module::class, "/weather");
+        $this->loadModule($di, \Schoolbox\Weather\Component\Dashboard\Module::class, "/weather/component/dashboard");
+        $this->loadModule($di, \Schoolbox\Weather\Module::class, "/weather");
     }
 }

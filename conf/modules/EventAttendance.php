@@ -10,22 +10,19 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Event\Attendance\Module;
 
 class EventAttendance implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'calendarEventAttendance';
 
-        $module = new Module($kernel->getDependencyInjector());
+        $module = new Module($di);
         $module->init('/calendar/event/attendance');
     }
 }

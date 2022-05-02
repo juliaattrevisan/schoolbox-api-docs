@@ -7,9 +7,9 @@
 
 namespace Config\Modules\Custom\Sk;
 
-use Alaress\Application\Kernel;
 use Custom\Sk\OleReport\Module as OleReportModule;
 use Config\Modules\ModuleConfigInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Configuration for the SaintKentigern-specific OLE report.
@@ -19,16 +19,10 @@ use Config\Modules\ModuleConfigInterface;
 class OleReport implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $module = new OleReportModule($di);
         $module->init('/modules/custom/stk/oleReport');
     }

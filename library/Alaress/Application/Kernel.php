@@ -1863,7 +1863,7 @@ abstract class Kernel
                 /** @var ModuleConfigInterface $obj */
                 try {
                     $obj = new $class();
-                    $obj->configure($this);
+                    $obj->configure($this->getDependencyInjector());
                 } catch (\Throwable $e) {
                     $firstError = $firstError ?? $e;
                 }

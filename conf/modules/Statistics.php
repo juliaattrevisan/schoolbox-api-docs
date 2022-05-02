@@ -10,21 +10,15 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
-use Schoolbox\Statistics\Module;
+use Psr\Container\ContainerInterface;
 
 class Statistics implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
         $statisticsModule = new \Schoolbox\Statistics\Module($di);
         $statisticsModule->init('/statistics');
     }

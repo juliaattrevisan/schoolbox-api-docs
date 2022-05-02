@@ -7,6 +7,7 @@
 
 namespace Config\Modules;
 
+use Psr\Container\ContainerInterface;
 use Schoolbox\Twitter\Module;
 
 /**
@@ -15,11 +16,11 @@ use Schoolbox\Twitter\Module;
 class Twitter implements ModuleConfigInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $module = new Module($kernel->getDependencyInjector());
+        $module = new Module($di);
         $module->init('/twitter');
     }
 }

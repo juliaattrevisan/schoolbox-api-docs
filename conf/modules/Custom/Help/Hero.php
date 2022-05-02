@@ -10,21 +10,17 @@
 
 namespace Config\Modules\Custom\Help;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Custom\Help\Hero\Module as HeroModule;
+use Psr\Container\ContainerInterface;
 
 class Hero extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, HeroModule::class, '/hero');
+        $this->loadModule($di, HeroModule::class, '/hero');
     }
 }
