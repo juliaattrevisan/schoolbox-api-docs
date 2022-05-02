@@ -1,14 +1,14 @@
 <?php
 
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\GenericCollection;
-use Schoolbox\User;
-
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
 
 class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
@@ -84,8 +84,14 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $stack = new \Calendar\Event\Collection();
 
         try {
+            /* $eventTypeSettings is now the default event type that we ascribe
+             * to events coming out of this subscription when sis_event.type
+             * does not match anything in luEventType; we can do that by passing
+             * empty array into the generator and doing the $allowedEventTypes
+             * check in the iteration below
+             */
             $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
-                ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+                ->findEventType($this->loadConnectorConfiguration(), []);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventTypeSettings = null;
         }
@@ -110,21 +116,47 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $this->folderCodes ?? null
         );
 
+        /* A list of all the event types from which we can choose
+         */
+        $eventTypes = $this->eventTypeMapper->findAll()->indexBy('type');
+
         /** @var \Schoolbox\External\Event\Model $event */
         foreach ($events as $event) {
-            $instance = new \Calendar\Event\Type\SudsTimetable\Event();
+            /* Default colour scheme specified by the calendar subscription
+             * admin > calendar > subscribe
+             */
+            $eventTypeId = $eventTypeSettings['type'];
+            $eventTypeColor = $eventTypeSettings['color'];
+
+            /* Find out if this tass event has a corresponding luEventType instance
+             * If so, use its colours; otherwise, use the default one specified in
+             * the subscription settings: admin > calendar > subscribe
+             */
+            $eventType = $eventTypes->getOffset($event->getType());
+
+            if ($eventType) {
+                $eventTypeId = $eventType->getId();
+                $eventTypeColor = $eventType->getColor();
+            }
+
+            /* If this derived $eventTypeId was one of the $allowedEventTypes,
+             * Let it through; otherwise disregard it
+             */
+            if (null !== $allowedEventTypes && \count($allowedEventTypes) && !\in_array($eventTypeId, $allowedEventTypes, true)) {
+                continue;
+            }
+
+            $instance = new \Calendar\Event\Type\SudsEvent\Event();
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($event->getTitle());
             $instance->setDetail($event->getDetail());
             $instance->setLocation($event->getLocation());
             $instance->setCode($event->getCode());
-            $instance->setDay($event->getDay());
-            $instance->setPeriod($event->getPeriod());
             $instance->setStartTime($event->getStartAt());
             $instance->setEndTime($event->getFinishAt());
-            $instance->setAllDay(false);
-            $instance->setColour($eventTypeSettings['color']);
-            $instance->setType($eventTypeSettings['type']);
+            $instance->setAllDay($event->getAllday());
+            $instance->setColour($eventTypeColor);
+            $instance->setType($eventTypeId);
             $instance->setFolder($event->getFolder());
 
             $stack->add($instance);

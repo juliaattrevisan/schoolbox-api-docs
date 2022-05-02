@@ -38,7 +38,7 @@ class Event extends Day\Event
     /**
      * @var array
      */
-    private array $staff;
+    private array $staff = [];
 
 
     /**

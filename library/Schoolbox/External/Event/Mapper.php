@@ -64,6 +64,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('period', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->uses('finish_at', self::TYPE_DATETIME);
+        $this->uses('allday', self::TYPE_INTEGER);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('classification', self::TYPE_STRING);
         $this->uses('guid', self::TYPE_STRING);

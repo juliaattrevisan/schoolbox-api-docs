@@ -29,37 +29,37 @@ class Model
     /**
      * @var string|null
      */
-    private ?string $title;
+    private ?string $title = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $detail;
+    private ?string $detail = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $location;
+    private ?string $location = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $code;
+    private ?string $code = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $day;
+    private ?string $day = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $period;
+    private ?string $period = null;
 
 
     /**
@@ -75,27 +75,33 @@ class Model
 
 
     /**
-     * @var string|null
+     * @var int
      */
-    private ?string $type;
+    private int $allday;
 
 
     /**
      * @var string|null
      */
-    private ?string $classification;
+    private ?string $type = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $guid;
+    private ?string $classification = null;
 
 
     /**
      * @var string|null
      */
-    private ?string $source;
+    private ?string $guid = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $source = null;
 
 
     /**
@@ -276,6 +282,26 @@ class Model
 
 
     /**
+     * @return int
+     */
+    public function getAllday(): int
+    {
+        return $this->allday;
+    }
+
+
+    /**
+     * @param int $allday
+     * @return Model
+     */
+    public function setAllday(int $allday): self
+    {
+        $this->allday = $allday;
+        return $this;
+    }
+
+
+    /**
      * @param \Alaress_Date_Format|null $finishAt
      * @return Model
      */
@@ -284,6 +310,7 @@ class Model
         $this->finishAt = $finishAt;
         return $this;
     }
+
 
 
     /**

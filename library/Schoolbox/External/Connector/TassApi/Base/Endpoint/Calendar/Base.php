@@ -9,12 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
-use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\Event;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
@@ -35,7 +30,6 @@ use Schoolbox\User;
  */
 class Base
 {
-
 
     /**
      * @var LoggerInterface
@@ -70,48 +64,27 @@ class Base
 
 
     /**
-     * This person arbitrarily authored and owns the events
-     * (because we need that)
-     *
-     * But, because events are determined by Role and Campus,
-     * the fact that it is "owned" by a particular guy and
-     * would appear on that guy's calendar had the events been
-     * "Personal" ...doesn't really matter. The events will be
-     * visible to anyone in the assigned Role(s) and Campus(es)
-     *
-     * @var User
+     * @var \Schoolbox\External\Event\Mapper
      */
-    protected User $owner;
+    protected \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
-     * @var EventMapper
+     * @var \Schoolbox\External\Event\Roletype\Mapper
      */
-    protected EventMapper $eventMapper;
+    protected \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
 
 
     /**
-     * @var EventSourceMapper
+     * @var \Schoolbox\External\Event\Campus\Mapper
      */
-    protected EventSourceMapper $eventSourceMapper;
+    protected \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
 
 
     /**
      * @var RoleMapper
      */
     protected RoleMapper $roleMapper;
-
-
-    /**
-     * @var PersonalMapper
-     */
-    protected PersonalMapper $personalRelationshipMapper;
-
-
-    /**
-     * @var CategoryMapper
-     */
-    protected CategoryMapper $folderRelationshipMapper;
 
 
     /**
@@ -164,21 +137,19 @@ class Base
     /**
      * Base constructor.
      *
-     * @param LoggerInterface      $log
-     * @param bool                 $perform
-     * @param array                $api
-     * @param GenericCollection    $campuses
-     * @param GenericCollection    $eventTypes
-     * @param User                 $owner
-     * @param EventMapper          $eventMapper
-     * @param EventSourceMapper    $eventSourceMapper
-     * @param RoleMapper           $roleMapper
-     * @param PersonalMapper       $personalRelationshipMapper
-     * @param CategoryMapper       $folderRelationshipMapper
-     * @param string               $source
-     * @param Registry             $registry
-     * @param \Alaress_Date_Format $from
-     * @param \Alaress_Date_Format $to
+     * @param LoggerInterface                           $log
+     * @param bool                                      $perform
+     * @param array                                     $api
+     * @param GenericCollection                         $campuses
+     * @param GenericCollection                         $eventTypes
+     * @param \Schoolbox\External\Event\Mapper          $eventMapper
+     * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
+     * @param RoleMapper                                $roleMapper
+     * @param string                                    $source
+     * @param Registry                                  $registry
+     * @param \Alaress_Date_Format                      $from
+     * @param \Alaress_Date_Format                      $to
      */
     public function __construct(
         LoggerInterface $log,
@@ -186,12 +157,10 @@ class Base
         array $api,
         GenericCollection $campuses,
         GenericCollection $eventTypes,
-        User $owner,
-        EventMapper $eventMapper,
-        EventSourceMapper $eventSourceMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
+        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
         RoleMapper $roleMapper,
-        PersonalMapper $personalRelationshipMapper,
-        CategoryMapper $folderRelationshipMapper,
         string $source,
         Registry $registry,
         \Alaress_Date_Format $from,
@@ -202,15 +171,10 @@ class Base
         $this->api = $api;
         $this->campuses = $campuses;
         $this->eventTypes = $eventTypes;
-        $this->owner = $owner;
         $this->eventMapper = $eventMapper;
-        $this->eventSourceMapper = $eventSourceMapper;
+        $this->roletypeRelationMapper = $roletypeRelationMapper;
+        $this->campusRelationMapper = $campusRelationMapper;
         $this->roleMapper = $roleMapper;
-
-        /* These are relationships to events via event_user and event_folder tables
-         */
-        $this->personalRelationshipMapper = $personalRelationshipMapper;
-        $this->folderRelationshipMapper = $folderRelationshipMapper;
 
         /* Obtain events between these two datetimes
          */
@@ -249,11 +213,6 @@ class Base
         /* A list of missing event types which the admin needs to configure in schoolbox
          */
         $missingEventTypes = [];
-
-        /* Role id collection, in case there are multiple records of the same type
-         * e.g. a Student event should be associated with all the Student RoleType roles
-         */
-        $roleIds = $this->findRoles($this->roleType);
 
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
@@ -317,6 +276,7 @@ class Base
              */
             $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
             $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
+
             $allDay = (int)$tassEvent['all_day'];
 
             /* Third-party source identifier for our import
@@ -332,17 +292,12 @@ class Base
              * Link it to all the campuses in schoolbox unless you can specifically determine
              * a particular campus relation via "campus_code"
              */
-            $campusIds = $this->findCampuses((string)$tassEvent['campus_code']);
+            $campuses = $this->findCampuses((string)$tassEvent['campus_code']);
 
             /* Find an event instance that used guid
              */
             try {
-                $eventSource = $this->eventSourceMapper->findOneByColumnList([
-                    'source_name' => $this->source,
-                    'guid' => $guid
-                ]);
-
-                $event = $this->eventMapper->findById($eventSource->getEvent()->getId());
+                $event = $this->eventMapper->findOneByColumn('guid', $guid);
 
                 $this->log->debug(sprintf(
                     'Found an existing %s event "%s" (schoolbox eventId %s) using guid %s',
@@ -355,8 +310,6 @@ class Base
                 /* Couldn't find any event matching $guid so it's a new event
                  * Make a new source and make a new event instance
                  */
-                $eventSource = $this->eventSourceMapper->createModel();
-
                 $event = $this->eventMapper->createModel();
 
                 $this->log->debug(sprintf(
@@ -371,28 +324,19 @@ class Base
              */
             $event
                 ->setTitle($title)
-                ->setLocation($location)
                 ->setDetail($detail)
-                ->setAuthor($this->owner)
-                ->setOwner($this->owner)
-                ->setAccess(Event::ACCESS_CAMPUS)
-                ->setStartDateTime($startDatetime)
-                ->setEndDateTime($endDatetime)
-                ->setAllDay($allDay)
-                ->setCampusCollection($campusIds);
+                ->setLocation($location)
+                ->setStartAt($startDatetime)
+                ->setFinishAt($endDatetime)
+                ->setAllday($allDay)
+                ->setType($eventType)
+                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
+                ->setGuid($guid)
+                ->setSource($this->source);
 
-            /* Assign role relations
-             *
-             * These are role-specific and hardcoded per strat, but there might be multiple
-             * instances of the same role type
+            /* Assigned Event Type via the payload's Category field "cat_desc"
              */
-            $event->setRoleCollection($roleIds);
-
-            /* Assign Event Type via the payload's Category field "cat_desc"
-             */
-            if (isset($this->eventTypes[$eventType])) {
-                $event->setType($this->eventTypes[$eventType]);
-            } else {
+            if (!isset($this->eventTypes[$eventType])) {
                 $this->log->warning(sprintf(
                     '%s event "%s" has an event type "%s" which is not in admin Event Type list; giving it "%s" anyway',
                     $this->source,
@@ -401,19 +345,10 @@ class Base
                     $this->eventTypes->first()->getType()
                 ));
 
-                $event->setType($this->eventTypes->first());
-
                 /* Remember it so we can tell the user which event types were missing
                  */
                 $missingEventTypes[$eventType] = $eventType;
             }
-
-            /* Set up the Event Source so we know where this came from
-             */
-            $eventSource
-                ->setEvent($event)
-                ->setSourceName($this->source)
-                ->setGuid($guid);
 
             /* Some diagnostic loggings
              */
@@ -421,47 +356,64 @@ class Base
                 '%s event "%s" is in campuses: %s',
                 $this->source,
                 $event->getTitle(),
-                implode(', ', $campusIds)
+                implode(', ', $campuses->getPropertyValues('name'))
             ));
 
             $this->log->debug(sprintf(
-                '%s event "%s" is in roles: %s',
+                '%s event "%s" is in role type: %s',
                 $this->source,
                 $event->getTitle(),
-                implode(', ', $roleIds)
+                $this->roleType
             ));
 
             /* Save it
              */
             if ($this->perform) {
                 $this->eventMapper->save($event);
-                $this->eventSourceMapper->save($eventSource);
 
-                /* Clear event_user and event_folder relationships,
-                 * if any existed previously somehow (tass events
-                 * are associated with roles and campuses only)
+                /* Assign role relations
                  *
-                 * I know it's a db-in-a-loop, but need to be surgical
-                 * cos there's some busted data out in the wild
-                 *
-                 * SA-13403 explains why, but this deletion may be too heavy-handed.
-                 * Nobody is meant to edit the events to change their settings, but they could.
+                 * These are role-specific and hardcoded per strat, but there might be multiple
+                 * instances of the same role type
                  */
-//                $this->personalRelationshipMapper->deleteByColumn('event_id', $event->getId());
-//                $this->folderRelationshipMapper->deleteByColumn('event_id', $event->getId());
+                $this->roletypeRelationMapper->save($this->roletypeRelationMapper->createModel()
+                    ->setEventId($event->getId())
+                    ->setRoleType($this->roleType));
 
                 $this->log->info(sprintf(
-                    'Saved %s event "%s" with event_source.guid %s',
+                    'Saved %s event "%s" with roletype relationship %s',
                     $this->source,
                     $event->getTitle(),
-                    $eventSource->getGuid()
+                    $this->roleType
+                ));
+
+                /* Slam in all the relevant campuses
+                 */
+                foreach ($campuses as $campus) {
+                    $this->campusRelationMapper->save($this->campusRelationMapper->createModel()
+                        ->setEventId($event->getId())
+                        ->setCampusName($campus->getName()));
+
+                    $this->log->info(sprintf(
+                        'Saved %s event "%s" with campus relationship %s',
+                        $this->source,
+                        $event->getTitle(),
+                        $campus->getName()
+                    ));
+                }
+
+                $this->log->info(sprintf(
+                    'Saved %s event "%s" with guid %s',
+                    $this->source,
+                    $event->getTitle(),
+                    $event->getGuid()
                 ));
             } else {
                 $this->log->info(sprintf(
-                    'Planning %s event "%s" with event_source.guid %s',
+                    'Planning %s event "%s" with guid %s',
                     $this->source,
                     $event->getTitle(),
-                    $eventSource->getGuid()
+                    $event->getGuid()
                 ));
             }
 
@@ -507,39 +459,25 @@ class Base
      * Generate a list of campus ids which might be associated with $campusCode
      *
      * @param string $campusCode
-     * @return array
+     * @return GenericCollection
+     * @throws \UnexpectedValueException
      */
-    protected function findCampuses(string $campusCode): array
+    protected function findCampuses(string $campusCode): GenericCollection
     {
-        $campusIds = [];
+        $campuses = new \Schoolbox\GenericCollection(\Schoolbox\Campus::class);
 
         foreach ($this->campuses as $campus) {
             if ($campus->getName() === $campusCode || $campus->getExtTimetableCode() === $campusCode) {
-                $campusIds[] = $campus->getId();
+                $campuses->add($campus);
             }
         }
 
         /* If you didn't match any campuses, add them all
          */
-        if (!\count($campusIds)) {
-            $campusIds = $this->campuses->getPropertyValues('id');
+        if (!\count($campuses)) {
+            return $this->campuses;
         }
 
-        return $campusIds;
-    }
-
-
-    /**
-     * Find a set of roleIds that are relevant to this import
-     *
-     * @param string $roleType
-     * @return array
-     */
-    protected function findRoles(string $roleType): array
-    {
-        return $this->roleMapper
-            ->findByColumn('group_type', $roleType)
-            ->indexBy('id')
-            ->keys();
+        return $campuses;
     }
 }
