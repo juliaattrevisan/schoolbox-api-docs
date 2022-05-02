@@ -41,6 +41,7 @@ class Module extends BaseModule
 
         // Various permissions
         $basePermission = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_JWT_PRIVATE_KEY_SIGNING_ALGORITHM, $this->getConfig()),
             new Rule\IsConfigOn(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID, $this->getConfig()),
