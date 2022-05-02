@@ -710,7 +710,7 @@ class Module
     /**
      * @return string
      */
-    protected function getBasename()
+    public function getBasename()
     {
         return $this->basename;
     }
