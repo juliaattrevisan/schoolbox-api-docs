@@ -33,7 +33,16 @@
         {% if unitAction == 'modify' %}
         <h3>
             <span class="icon-unit"></span>{{ unitSpec.folder.name ?? '<span class="meta">Deleted unit<span>' }}
-            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            <span class="pipe meta">
+                {% if not unitAssessmentCount %}
+                    No {{ locale.assessment.plural }}
+                {% elseif unitAssessmentCount == 1 %}
+                    1 {{ locale.assessment }}
+                {% else %}
+                    {{ unitAssessmentCount ~ ' ' ~ locale.assessment.plural }}
+                {% endif %}
+                {% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
+            </span>
         </h3>
         {% else %}
         <input id="select-all-unit-assessments-{{ unitSpec.id }}"
@@ -43,16 +52,16 @@
         >
         <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
             <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
-            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} {{ locale.assessment.plural }}{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
         </label>
         {% endif %}
     </div>
     {% if not canReadUnitSpec %}
             <p class="alert-box">
-                This unit is no longer accessible.
+                This {{ locale.unit }} is no longer accessible.
                 {% if unitAssessmentCount %}
-                You can modify the dates of assessments,
-                and remove them from your class, but you can no longer import new assessments.
+                You can modify the dates of {{ locale.assessment.plural }},
+                and remove them from your class, but you can no longer import new {{ locale.assessment.plural }}.
                 {% endif %}
             </p>
     {% endif %}
