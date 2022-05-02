@@ -15,6 +15,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Loader as ModuleLoader;
+use Alaress\Module\Module;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
@@ -1839,7 +1840,8 @@ abstract class Kernel
     {
         // Load the list of routes from somewhere.
         // Custom routes: only allow if the site school code matches
-        $routeCache = SITE_root . '/conf/routes';
+        // TODO should this be in Redis?
+        $routeCache = SITE_root . '/conf/routeCache';
         if (!file_exists($routeCache)) {
             return;
         }
@@ -1860,53 +1862,19 @@ abstract class Kernel
     }
 
     /**
-     * Globs over the Modules directory and initialises them so their routes can be used
-     *
-     * @throws \Throwable Module initialization may raise any error: the first
-     *                    one raised will be rethrown, but all modules will
-     *                    attempt to initialize.
+     * Registers modules based on the pre-generated module cache.
      */
     protected function initModules(): void
     {
-        // TODO no longer used: this should only load routes
-
-//        // Initialise module configuration
-//        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
-//        require_once SITE_root . '/conf/ModuleLoader.php';
-//
-//        $customModuleLocation = sprintf(
-//            '/conf/modules/Custom/%s/',
-//            ucfirst(strtolower((new ConfigLoader())->get('site_school_code')))
-//        );
-//        $modulePaths = array_merge(
-//            glob(SITE_root . '/conf/modules/*.php'),
-//            glob(SITE_root . $customModuleLocation . '*.php')
-//        );
-//
-//        $firstError = null;
-//        foreach ($modulePaths as $routePath) {
-//            require_once $routePath;
-//
-//            // Get a route name out of this path
-//            $path = preg_replace('/^' . preg_quote(SITE_root . '/conf/modules/', '/') . '/', '', $routePath);
-//            $path = preg_replace('/\\.php$/', '', $path);
-//            $path = preg_replace('/\\//', '\\', $path);
-//
-//            $class = 'Config\\Modules\\' . $path;
-//
-//            if (class_exists($class, false)) {
-//                /** @var ModuleConfigInterface $obj */
-//                try {
-//                    $obj = new $class();
-//                    $obj->configure($this->getDependencyInjector());
-//                } catch (\Throwable $e) {
-//                    $firstError = $firstError ?? $e;
-//                }
-//            }
-//        }
-//
-//        if ($firstError) {
-//            throw $firstError;
-//        }
+        // Put list of modules in somewhere
+        $moduleCache = SITE_root . '/conf/moduleCache';
+        if (!file_exists($moduleCache)) {
+            return;
+        }
+        $modulesEncoded = file_get_contents($moduleCache);
+        if (empty($modulesEncoded)) {
+            return;
+        }
+        Module::installModuleRegistrations(json_decode($modulesEncoded, true));
     }
 }

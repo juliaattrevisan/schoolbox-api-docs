@@ -37,5 +37,5 @@ v8-compile-cache-0/
 www/css/core/*.css
 www/javascript
 # this is auto-generated
-conf/routes
-conf/routes.php
+conf/moduleCache
+conf/routeCache

@@ -27,6 +27,11 @@ require_once SITE_root . '/conf/ModuleLoader.php';
 
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App {
+
+        private const ROUTE_CACHE_FILE = SITE_root . '/conf/routeCache';
+
+        private const MODULE_CACHE_FILE = SITE_root . '/conf/moduleCache';
+
         public function run(): void
         {
             // Load all modules here.
@@ -35,6 +40,8 @@ $kernel = new CliTool\Kernel(
                 glob(SITE_root . '/conf/modules/Custom/*/*.php')
             );
 
+            // TODO restore custom module filtering
+            // This means the route cache is rebuilt on upgrade for each school
             $customModuleLocation = sprintf(
                 '/conf/modules/Custom/%s/',
                 ucfirst(strtolower((new ConfigLoader())->get('site_school_code')))
@@ -64,16 +71,13 @@ $kernel = new CliTool\Kernel(
                 BaseModule::buildModuleFromRegistration($this->getDi(), $basename)->init($registration['basePath']);
             }
 
-
-            $routeCatalog = [];
-
-            // All routes are now loaded: interrogate them
-            // (How do I figure if a route is custom?)
+            // All routes are now loaded: dump the route table to a file
             /** @var Router $router */
             $router = $this->getDi()->get('router');
-            $routes = serialize($router->getRoutes());
-            echo $routes;
+            file_put_contents(self::ROUTE_CACHE_FILE, serialize($router->getRoutes()));
 
+            // Dump the module table to a file as well
+            file_put_contents(self::MODULE_CACHE_FILE, json_encode(BaseModule::retrieveAllModuleRegistrations()));
 
 //            foreach ($router->getRoutes() as $route) {
 //                /** @var Route $route */

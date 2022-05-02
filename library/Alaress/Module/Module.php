@@ -286,6 +286,17 @@ class Module
         return $module;
     }
 
+    /**
+     * Install cached module registrations.
+     *
+     * @param array $registrations
+     * @return void
+     */
+    public static function installModuleRegistrations(array $registrations): void
+    {
+        self::$registeredModules = $registrations;
+    }
+
 
 
 
