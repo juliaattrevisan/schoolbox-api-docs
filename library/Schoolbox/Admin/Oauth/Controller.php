@@ -15,7 +15,6 @@ use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends ConfigController
 {
@@ -50,7 +49,7 @@ class Controller extends ConfigController
     {
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate(),
-            $this->getRouter()->generate(Module::BASE_NAME . '.postAdmin'),
+            $this->getRouter()->generate('adminOauth.postAdmin'),
         );
 
         $data = [
@@ -61,7 +60,7 @@ class Controller extends ConfigController
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@' . Module::BASE_NAME . '/admin.twig',
+                '@adminOauth/admin.twig',
                 $data,
                 "oAuth Provider Configuration"
             )
@@ -83,7 +82,7 @@ class Controller extends ConfigController
     public function postAdmin(): void
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate(Module::BASE_NAME . '.getAdmin'));
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminOauth.getAdmin'));
     }
 
 

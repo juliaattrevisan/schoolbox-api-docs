@@ -13,7 +13,6 @@ use Alaress;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -21,18 +20,10 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 
 class Module extends Alaress\Module\Module
 {
-
-    public const BASE_NAME = 'tigsSummativeAdmin';
-
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename ?: self::BASE_NAME);
-    }
-
+    protected $basename = 'tigsSummativeAdmin';
 
     /**
      * @inheritdoc

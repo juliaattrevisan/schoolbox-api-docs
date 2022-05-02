@@ -14,25 +14,16 @@ use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
 {
-
-    public const BASE_NAME = 'adminOauth';
-
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename ?: self::BASE_NAME);
-    }
-
+    protected $basename = 'adminOauth';
 
     /**
      * @inheritdoc

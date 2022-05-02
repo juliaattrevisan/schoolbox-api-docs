@@ -12,23 +12,14 @@ namespace Custom\Tigs\Summative\Comment;
 use Alaress;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Role;
 
 class Module extends Alaress\Module\Module
 {
-
-    public const BASE_NAME = 'tigsSummativeComment';
-
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename ?: self::BASE_NAME);
-    }
-
+    protected $basename = 'tigsSummativeComment';
 
     /**
      * @inheritdoc

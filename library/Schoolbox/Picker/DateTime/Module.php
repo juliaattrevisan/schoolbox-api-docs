@@ -32,16 +32,6 @@ class Module extends BaseModule
     protected $basename = 'pickerDatetime';
 
     /**
-     * Module constructor.
-     * @param ContainerInterface $injector
-     * @param string $basename
-     */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function initRoutes(Router $router, $basePath)

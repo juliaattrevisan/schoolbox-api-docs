@@ -19,6 +19,10 @@ class Module extends RestfulModule
 {
     use StandardModuleTrait;
 
+    /**
+     * @var string
+     */
+    protected $basename = 'sportsfixturesSport';
 
     /**
      * @param ContainerInterface $injector
@@ -26,7 +30,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector, ?RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::class, 'sports', $context, 'sportsfixturesSport');
+        parent::__construct($injector, Mapper::class, 'sports', $context);
     }
 
     /**
