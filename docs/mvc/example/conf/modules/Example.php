@@ -23,6 +23,7 @@ class Example implements ModuleConfigInterface
         $namespace = 'example';
 
         $module = new Module($di);
-        $module->init("/{$namespace}");
+        $module->registerModule("/$namespace");
+//        $module->init("/{$namespace}");
     }
 }
