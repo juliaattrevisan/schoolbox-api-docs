@@ -254,6 +254,15 @@ function onLeave (element, done) {
 const selectedClasses = ref([]); //the classes currently selected
 
 /**
+ * determine display of elements based on whether any classes are selected
+ * 
+ * @returns { Boolean } all relevant search results, once we've reached the minQueryLength
+ */
+const hasSelectedClasses = computed(() => {
+    return selectedClasses.value.length > 0;
+});
+
+/**
  * To determine the behaviour of the 'Select all classes' button
  * 
  * @returns { String } 
@@ -360,6 +369,14 @@ function onRemoveClassSelected (classItem) {
     selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== classItem.id);
 }
 
+/**
+ * clear all classes
+ */
+function onClearAllSelected () {
+    selectedClasses.value.forEach((selectedClass) => selectedClass.isSelected = false);
+    selectedClasses.value = [];
+}
+
 </script>
 
 <template>
@@ -405,22 +422,17 @@ function onRemoveClassSelected (classItem) {
                 @remove="onRemoveClassSelected"  
             />
         </div><!-- .selected-classes-container -->
+        <div class="extra-actions-container">
+            <button v-if="hasSelectedClasses" class="button icon-delete clear-all-button" aria-label="Clear all Classes" @click.prevent="onClearAllSelected">Clear all Classes</button>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.radiolist {
-    display: flex;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-    .option-list {
-        display: flex;
-        gap: 1rem;
-        margin: 0;
-    }
-}
 
+.class-selector {
+    margin-bottom: 1rem;
+}
 
 .search-input {
     margin: 0; //so the .search-results-container is jammed up on the input
@@ -465,9 +477,20 @@ function onRemoveClassSelected (classItem) {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 1rem;
     min-height: 50px;
     padding: 0.5rem;
+}
+
+.extra-actions-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.clear-all-button {
+    font-size: 0.825rem;
+    &:before {
+        font-size: 0.825rem;
+    }
 }
 
 </style>
