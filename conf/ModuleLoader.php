@@ -11,6 +11,7 @@ namespace Config;
 use Alaress\Module\Module;
 use Config\Modules\ModuleConfigInterface;
 use Psr\Container\ContainerInterface;
+use Schoolbox\Module\RestfulModule;
 
 abstract class ModuleLoader implements ModuleConfigInterface
 {
@@ -25,7 +26,33 @@ abstract class ModuleLoader implements ModuleConfigInterface
      */
     protected function loadModule(ContainerInterface $di, string $className, ?string $path): Module
     {
+        /** @var Module $module */
         $module = new $className($di);
+        $module->registerModule($path);
+        $module->init($path);
+        // @phpstan-ignore-next-line: this should be recognized
+        return $module;
+    }
+
+    /**
+     * Loads this RESTful module, with additional context.
+     *
+     * @template T of RestfulModule
+     * @param ContainerInterface $di
+     * @param class-string<T>    $className
+     * @param string|null        $path
+     * @param RestfulModule      $context
+     * @return RestfulModule
+     */
+    protected function loadModuleWithContext(
+        ContainerInterface $di,
+        string $className,
+        ?string $path,
+        RestfulModule $context
+    ): RestfulModule {
+        /** @var RestfulModule $module */
+        $module = new $className($di, $context);
+        $module->registerModuleWithContext($path, $context);
         $module->init($path);
         return $module;
     }
