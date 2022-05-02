@@ -169,8 +169,9 @@ class External_Schoolpro_User implements External_UserInterface
                 }
             }
 
-            $student = array(
+            return [
                 'StudentID'               => $currentStudent['ID'],
+                'StudentTitle'            => '',
                 'StudentGiven1'           => $currentStudent['Firstname'],
                 'StudentSurname'          => $currentStudent['Surname'],
                 'StudentGender'           => '',
@@ -197,9 +198,7 @@ class External_Schoolpro_User implements External_UserInterface
                 'IndigenousFlag'          => '',
                 'StudentTSIFlag'          => '',
                 'ParentsSeparatedFlag'    => '',
-            );
-
-            return $student;
+            ];
         }
 
         return [];

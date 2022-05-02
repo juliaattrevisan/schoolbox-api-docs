@@ -67,8 +67,6 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['countIndividualEducationPlans']
      *
      * @importance high - used on student profile page
-     *
-
      */
     public function getStudent(string $externalUserId): array;
 
