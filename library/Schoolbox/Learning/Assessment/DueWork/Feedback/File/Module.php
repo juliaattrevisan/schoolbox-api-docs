@@ -21,7 +21,7 @@ class Module extends BaseModule\Module
     /**
      * @inheritdoc
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    public function __construct(ContainerInterface $injector, string $basename = '')
     {
         parent::__construct($injector, $basename ?: 'learningDueWorkFeedbackFile');
     }

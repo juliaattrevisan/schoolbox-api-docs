@@ -39,16 +39,21 @@ abstract class RestfulModule extends AlaressModule
 
     /**
      * @param ContainerInterface $injector
-     * @param string             $mapper
+     * @param class-string       $mapper
      * @param string             $collectionName
      * @param RestfulModule|null $context
      * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector, $mapper, $collectionName, RestfulModule $context = null, $basename = '')
-    {
+    public function __construct(
+        ContainerInterface $injector,
+        string $mapper,
+        string $collectionName,
+        RestfulModule $context = null,
+        string $basename = ''
+    ) {
         parent::__construct($injector, $basename);
-        $this->context    = $context;
-        $this->collection = $collectionName;
+        $this->context     = $context;
+        $this->collection  = $collectionName;
         $this->mapperClass = $mapper;
     }
 

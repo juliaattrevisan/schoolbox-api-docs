@@ -24,8 +24,6 @@ require __DIR__ . '/../../conf/core/require.php';
 require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
 require_once SITE_root . '/conf/ModuleLoader.php';
 
-// Intentionally does not run within the kernel?
-
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App {
         public function run(): void
@@ -67,6 +65,8 @@ $kernel = new CliTool\Kernel(
             foreach ($router->getRoutes() as $route) {
                 /** @var Route $route */
                 preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
+
+                // TODO figure out how to actually build a module, not just retrieve a manually built one
                 $module = Module::retrieveInstalledModule($parsedName['controller']);
                 $routeCatalog[$route->name] = [
                     'module'     => get_class($module),

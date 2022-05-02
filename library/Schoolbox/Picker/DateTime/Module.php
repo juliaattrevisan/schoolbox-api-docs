@@ -36,7 +36,7 @@ class Module extends BaseModule
      * @param ContainerInterface $injector
      * @param string $basename
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    public function __construct(ContainerInterface $injector, string $basename = '')
     {
         parent::__construct($injector, $basename);
     }

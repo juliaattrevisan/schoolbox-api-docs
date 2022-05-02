@@ -77,7 +77,7 @@ class SportsFixtures implements ModuleConfigInterface
             $resultModule = new ResultModule($di, $matchupModule);
             $resultModule->init("/$namespace");
 
-            $statusModule = new StatusModule($di, $resultModule);
+            $statusModule = new StatusModule($di);
             $statusModule->init("/$namespace");
         }
     }

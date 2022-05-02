@@ -31,7 +31,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    public function __construct(ContainerInterface $injector, string $basename = '')
     {
         if ('' === $basename) {
             $basename = 'learningGrades';
