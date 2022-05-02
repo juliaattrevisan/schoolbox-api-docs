@@ -163,7 +163,7 @@ export default {
          * @param { Object }
          */
         checkUpdateResponse (responseData) {
-            if (responseData.status === 501) { //the update was not unable to take place
+            if (responseData.status && responseData.status === 501) { //the update was not unable to take place
                 this.hasDataError = true; //so notify of the error
                 this.logData = [responseData.title]; //and retrieve the returned error response
             } else { //otherwise a successful update is assumed
