@@ -285,7 +285,7 @@ class Classes implements IStrategy
             /* Class has no code. ignore this class
             Schoolbox has no way of working with an external class that has no code.
             */
-            if (null === $class['code']) {
+            if ('' === trim($class['code'])) {
                 $this->log->debug(sprintf(
                     "Class Name:'%s' Code:'%s', has no class code. ignoring",
                     $class['name'],
