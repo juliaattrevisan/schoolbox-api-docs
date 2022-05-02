@@ -60,11 +60,11 @@ class SportsFixtures implements ModuleConfigInterface
             $seasonModule->init("/$namespace");
 
             $divisionModule = new DivisionModule($di, $sportModule);
-            $divisionModule->registerModule("/$namespace");
+            $divisionModule->registerModuleWithContext("/$namespace", $sportModule);
             $divisionModule->init("/$namespace");
 
             $teamModule = new TeamModule($di, $divisionModule);
-            $teamModule->registerModule("/$namespace");
+            $teamModule->registerModuleWithContext("/$namespace", $divisionModule);
             $teamModule->init("/$namespace");
 
             $importModule = new ImportModule($di);
@@ -72,11 +72,11 @@ class SportsFixtures implements ModuleConfigInterface
             $importModule->init("/$namespace");
 
             $positionModule = new PositionModule($di, $sportModule);
-            $positionModule->registerModule("/$namespace");
+            $positionModule->registerModuleWithContext("/$namespace", $sportModule);
             $positionModule->init("/$namespace");
 
             $matchupModule = new MatchupModule($di, $divisionModule);
-            $matchupModule->registerModule("/$namespace");
+            $matchupModule->registerModuleWithContext("/$namespace", $divisionModule);
             $matchupModule->init("/$namespace");
 
             $venueModule = new VenueModule($di, null);
@@ -84,11 +84,11 @@ class SportsFixtures implements ModuleConfigInterface
             $venueModule->init("/$namespace");
 
             $itineraryItemModule = new ItineraryItemModule($di, $matchupModule);
-            $itineraryItemModule->registerModule("/$namespace");
+            $itineraryItemModule->registerModuleWithContext("/$namespace", $divisionModule);
             $itineraryItemModule->init("/$namespace");
 
             $resultModule = new ResultModule($di, $matchupModule);
-            $resultModule->registerModule("/$namespace");
+            $resultModule->registerModuleWithContext("/$namespace", $matchupModule);
             $resultModule->init("/$namespace");
 
             $statusModule = new StatusModule($di, null);
