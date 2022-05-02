@@ -25,6 +25,6 @@ class OleReport implements ModuleConfigInterface
     {
         $module = new OleReportModule($di);
         $module->registerModule('/modules/custom/stk/oleReport');
-        $module->init('/modules/custom/stk/oleReport');
+//        $module->init('/modules/custom/stk/oleReport');
     }
 }

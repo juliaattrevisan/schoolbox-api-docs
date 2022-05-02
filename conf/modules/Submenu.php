@@ -24,6 +24,6 @@ class Submenu implements ModuleConfigInterface
 
         $module = new Module($di);
         $module->registerModule("/{$namespace}");
-        $module->init("/{$namespace}");
+//        $module->init("/{$namespace}");
     }
 }

@@ -21,6 +21,6 @@ class Statistics implements ModuleConfigInterface
     {
         $statisticsModule = new \Schoolbox\Statistics\Module($di);
         $statisticsModule->registerModule('/statistics');
-        $statisticsModule->init('/statistics');
+//        $statisticsModule->init('/statistics');
     }
 }

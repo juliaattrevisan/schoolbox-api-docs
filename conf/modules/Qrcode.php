@@ -22,6 +22,6 @@ class Qrcode implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/qrcode');
-        $module->init('/qrcode');
+//        $module->init('/qrcode');
     }
 }

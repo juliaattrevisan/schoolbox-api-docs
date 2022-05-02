@@ -22,6 +22,6 @@ class Preview implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/preview');
-        $module->init('/preview');
+//        $module->init('/preview');
     }
 }

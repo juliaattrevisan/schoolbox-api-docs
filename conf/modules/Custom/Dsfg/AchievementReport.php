@@ -23,6 +23,6 @@ class AchievementReport implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/modules/custom/diocesan/achievementreport');
-        $module->init('/modules/custom/diocesan/achievementreport');
+//        $module->init('/modules/custom/diocesan/achievementreport');
     }
 }

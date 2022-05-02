@@ -23,6 +23,6 @@ class Pastoral implements ModuleConfigInterface
     {
         $pastoralModule = new Module($di);
         $pastoralModule->registerModule('/modules/custom/meriden/pastoral');
-        $pastoralModule->init('/modules/custom/meriden/pastoral');
+//        $pastoralModule->init('/modules/custom/meriden/pastoral');
     }
 }

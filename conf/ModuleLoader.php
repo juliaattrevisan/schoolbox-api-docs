@@ -29,7 +29,7 @@ abstract class ModuleLoader implements ModuleConfigInterface
         /** @var Module $module */
         $module = new $className($di, null);
         $module->registerModule($path);
-        $module->init($path);
+//        $module->init($path);
         // @phpstan-ignore-next-line: this should be recognized
         return $module;
     }
@@ -53,7 +53,7 @@ abstract class ModuleLoader implements ModuleConfigInterface
         /** @var RestfulModule $module */
         $module = new $className($di, $context);
         $module->registerModuleWithContext($path, $context);
-        $module->init($path);
+//        $module->init($path);
         return $module;
     }
 }

@@ -36,64 +36,64 @@ class SportsFixtures implements ModuleConfigInterface
 
         $homepageModule = new HomepageModule($di);
         $homepageModule->registerModule("/$namespace");
-        $homepageModule->init("/$namespace");
+//        $homepageModule->init("/$namespace");
 
         if ($di->get('config')->get('fixtures_enabled')) {
             $dashboardModule = new DashboardModule($di);
             $dashboardModule->registerModule("/$namespace");
-            $dashboardModule->init("/$namespace");
+//            $dashboardModule->init("/$namespace");
 
             $landingModule = new LandingModule($di);
             $landingModule->registerModule("/$namespace");
-            $landingModule->init("/$namespace");
+//            $landingModule->init("/$namespace");
 
             $sportModule = new SportModule($di, null);
             $sportModule->registerModule("/$namespace");
-            $sportModule->init("/$namespace");
+//            $sportModule->init("/$namespace");
 
             $schoolModule = new SchoolModule($di);
             $schoolModule->registerModule("/$namespace/school");
-            $schoolModule->init("/$namespace/school");
+//            $schoolModule->init("/$namespace/school");
 
             $seasonModule = new SeasonModule($di, null);
             $seasonModule->registerModule("/$namespace");
-            $seasonModule->init("/$namespace");
+//            $seasonModule->init("/$namespace");
 
             $divisionModule = new DivisionModule($di, $sportModule);
             $divisionModule->registerModuleWithContext("/$namespace", $sportModule);
-            $divisionModule->init("/$namespace");
+//            $divisionModule->init("/$namespace");
 
             $teamModule = new TeamModule($di, $divisionModule);
             $teamModule->registerModuleWithContext("/$namespace", $divisionModule);
-            $teamModule->init("/$namespace");
+//            $teamModule->init("/$namespace");
 
             $importModule = new ImportModule($di);
             $importModule->registerModule("/$namespace");
-            $importModule->init("/$namespace");
+//            $importModule->init("/$namespace");
 
             $positionModule = new PositionModule($di, $sportModule);
             $positionModule->registerModuleWithContext("/$namespace", $sportModule);
-            $positionModule->init("/$namespace");
+//            $positionModule->init("/$namespace");
 
             $matchupModule = new MatchupModule($di, $divisionModule);
             $matchupModule->registerModuleWithContext("/$namespace", $divisionModule);
-            $matchupModule->init("/$namespace");
+//            $matchupModule->init("/$namespace");
 
             $venueModule = new VenueModule($di, null);
             $venueModule->registerModule("/$namespace");
-            $venueModule->init("/$namespace");
+//            $venueModule->init("/$namespace");
 
             $itineraryItemModule = new ItineraryItemModule($di, $matchupModule);
             $itineraryItemModule->registerModuleWithContext("/$namespace", $divisionModule);
-            $itineraryItemModule->init("/$namespace");
+//            $itineraryItemModule->init("/$namespace");
 
             $resultModule = new ResultModule($di, $matchupModule);
             $resultModule->registerModuleWithContext("/$namespace", $matchupModule);
-            $resultModule->init("/$namespace");
+//            $resultModule->init("/$namespace");
 
             $statusModule = new StatusModule($di, null);
             $statusModule->registerModule("/$namespace");
-            $statusModule->init("/$namespace");
+//            $statusModule->init("/$namespace");
         }
     }
 }

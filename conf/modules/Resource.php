@@ -22,27 +22,27 @@ class Resource implements ModuleConfigInterface
     {
         $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
         $browserModule->registerModule('/resources');
-        $browserModule->init('/resources');
+//        $browserModule->init('/resources');
 
         $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
         $myBrowserModule->registerModule('/my-files');
-        $myBrowserModule->init('/my-files');
+//        $myBrowserModule->init('/my-files');
 
         $webDavBrowserModule = new Schoolbox\Resource\Browser\WebDav\Module($di);
         $webDavBrowserModule->registerModule('/drives');
-        $webDavBrowserModule->init('/drives');
+//        $webDavBrowserModule->init('/drives');
 
         $folderModule = new Schoolbox\Resource\Folder\Module($di);
         $folderModule->registerModule('/resource');
-        $folderModule->init('/resource');
+//        $folderModule->init('/resource');
 
         $textboxModule = new Schoolbox\Resource\Textbox\Module($di);
         $textboxModule->registerModule('/textbox');
-        $textboxModule->init('/textbox');
+//        $textboxModule->init('/textbox');
 
         $googleFileModule = new Schoolbox\Resource\GoogleFile\Module($di);
         $googleFileModule->registerModule('/googleFile');
-        $googleFileModule->init('/googleFile');
+//        $googleFileModule->init('/googleFile');
         // Commented out as:
         // * it's unused
         // * it collides with folder search page www/resource/folder/search.php

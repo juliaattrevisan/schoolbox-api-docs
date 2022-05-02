@@ -21,6 +21,6 @@ class Picker implements ModuleConfigInterface
     {
         $datetime = new \Schoolbox\Picker\DateTime\Module($di);
         $datetime->registerModule('/picker/datetime');
-        $datetime->init('/picker/datetime');
+//        $datetime->init('/picker/datetime');
     }
 }

@@ -21,6 +21,6 @@ class NCEA implements ModuleConfigInterface
     {
         $module = new NCEAModule($di);
         $module->registerModule('/modules/custom/stk/ncea');
-        $module->init('/modules/custom/stk/ncea');
+//        $module->init('/modules/custom/stk/ncea');
     }
 }
