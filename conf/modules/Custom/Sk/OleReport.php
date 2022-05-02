@@ -24,6 +24,7 @@ class OleReport implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new OleReportModule($di);
+        $module->registerModule('/modules/custom/stk/oleReport');
         $module->init('/modules/custom/stk/oleReport');
     }
 }

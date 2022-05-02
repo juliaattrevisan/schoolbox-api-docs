@@ -21,6 +21,7 @@ class Curriculum implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/curriculum');
         $module->init('/curriculum');
 
         // Submodules:

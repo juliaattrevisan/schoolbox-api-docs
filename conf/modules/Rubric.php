@@ -22,12 +22,15 @@ class Rubric implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/rubric');
         $module->init('/rubric');
 
         $module = new ManagerModule($di);
+        $module->registerModule('/rubric/manager');
         $module->init('/rubric/manager');
 
         $module = new RubricMarkbookModule($di);
+        $module->registerModule('/rubricMarkbook');
         $module->init('/rubricMarkbook');
     }
 }

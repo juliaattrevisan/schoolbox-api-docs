@@ -21,6 +21,7 @@ class Timetable implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/timetable');
         $module->init('/timetable');
     }
 }

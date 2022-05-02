@@ -25,6 +25,7 @@ class TassPortal implements ModuleConfigInterface
 
         if ($config->get('external_type') == 'tass' || $config->get('schooldata_import_data_source') == Factory::TASS_API) {
             $module = new Portal\Module($di);
+            $module->registerModule('/modules/tassportal');
             $module->init('/modules/tassportal');
         }
     }

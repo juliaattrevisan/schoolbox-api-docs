@@ -20,6 +20,7 @@ class Groups implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/groups');
         $module->init('/groups');
     }
 }

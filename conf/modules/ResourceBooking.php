@@ -25,15 +25,19 @@ class ResourceBooking implements ModuleConfigInterface
     {
         if ($di->get('config')->get('resource_booking_enabled')) {
             $categoryModule = new Category\Module($di);
+            $categoryModule->registerModule('/resource-booking/category');
             $categoryModule->init('/resource-booking/category');
 
             $itemModule = new Item\Module($di);
+            $itemModule->registerModule('/resource-booking/item');
             $itemModule->init('/resource-booking/item');
 
             $bookingModule = new Booking\Module($di);
+            $bookingModule->registerModule('/resource-booking/booking');
             $bookingModule->init('/resource-booking/booking');
 
             $reportModule = new Report\Module($di);
+            $reportModule->registerModule('/resource-booking/report');
             $reportModule->init('/resource-booking/report');
         }
     }

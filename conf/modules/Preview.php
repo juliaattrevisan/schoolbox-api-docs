@@ -21,6 +21,7 @@ class Preview implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/preview');
         $module->init('/preview');
     }
 }

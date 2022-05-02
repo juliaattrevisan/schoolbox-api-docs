@@ -26,12 +26,15 @@ class Course implements ModuleConfigInterface
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $courseModule = new Assessment\Course\Module($di);
+            $courseModule->registerModule('/course');
             $courseModule->init('/course');
 
             $importModule = new Assessment\Course\Import\Module($di);
+            $importModule->registerModule('/course/import');
             $importModule->init('/course/import');
 
             $atlasModule = new Assessment\Course\Import\Atlas\Module($di);
+            $atlasModule->registerModule('/course/import/atlas');
             $atlasModule->init('/course/import/atlas');
         }
     }

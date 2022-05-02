@@ -20,6 +20,7 @@ class NCEA implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new NCEAModule($di);
+        $module->registerModule('/modules/custom/stk/ncea');
         $module->init('/modules/custom/stk/ncea');
     }
 }

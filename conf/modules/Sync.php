@@ -20,15 +20,19 @@ class Sync implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $ruleset = new \Schoolbox\Sync\Ruleset\Module($di);
+        $ruleset->registerModule('/adminv2/ups');
         $ruleset->init('/adminv2/ups');
 
         $rule = new \Schoolbox\Sync\Rule\Module($di);
+        $rule->registerModule('/adminv2/ups/rule');
         $rule->init('/adminv2/ups/rule');
 
         $condition = new \Schoolbox\Sync\Condition\Module($di);
+        $condition->registerModule('/adminv2/ups/condition');
         $condition->init('/adminv2/ups/condition');
 
         $effect = new \Schoolbox\Sync\Effect\Module($di);
+        $effect->registerModule('/adminv2/ups/effect');
         $effect->init('/adminv2/ups/effect');
     }
 }

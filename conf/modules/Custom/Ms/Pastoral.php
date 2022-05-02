@@ -22,6 +22,7 @@ class Pastoral implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $pastoralModule = new Module($di);
+        $pastoralModule->registerModule('/modules/custom/meriden/pastoral');
         $pastoralModule->init('/modules/custom/meriden/pastoral');
     }
 }

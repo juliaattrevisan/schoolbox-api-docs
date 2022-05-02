@@ -8,6 +8,7 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Import;
 
@@ -16,7 +17,7 @@ use Schoolbox\Admin\Import;
  *
  * @package Config\Modules
  */
-class AdminImport implements ModuleConfigInterface
+class AdminImport extends ModuleLoader
 {
     /**
      * @inheritdoc
@@ -25,7 +26,7 @@ class AdminImport implements ModuleConfigInterface
     {
         /* Introduction to Admin Importers
          */
-        (new Import\Module($di))->init('/adminv2/import');
+        $this->loadModule($di, Import\Module::class, '/adminv2/import');
 
         /**
          * Direct Import
@@ -33,22 +34,22 @@ class AdminImport implements ModuleConfigInterface
 
         /* User Accounts
          */
-        (new Import\UserAccount\Module($di))->init('/adminv2/import/userAccount');
+        $this->loadModule($di, Import\UserAccount\Module::class, '/adminv2/import/userAccount');
 
         /* User Photos
          */
-        (new Import\Photos\Module($di))->init('/adminv2/import/photos');
+        $this->loadModule($di, Import\Photos\Module::class, '/adminv2/import/photos');
 
         /* Pastoral Care
          */
         if ($di->get('config')->get('pastoral_enabled')) {
-            (new Import\Pastoral\Module($di))->init('/adminv2/import/pastoral');
+            $this->loadModule($di, Import\Pastoral\Module::class, '/adminv2/import/pastoral');
         }
 
         /* Import folders
          * (bulk add folders)
          */
-        (new Import\Folder\Module($di))->init('/adminv2/import/folder');
+        $this->loadModule($di, Import\Folder\Module::class, '/adminv2/import/folder');
 
         /**
          * School Data
@@ -56,18 +57,18 @@ class AdminImport implements ModuleConfigInterface
 
         /* User Profile
          */
-        (new Import\Profile\Module($di))->init('/adminv2/import/profile');
+        $this->loadModule($di, Import\Profile\Module::class, '/adminv2/import/profile');
 
         /* Timetable Structure
          */
-        (new Import\TimetableStructure\Module($di))->init('/adminv2/import/timetableStructure');
+        $this->loadModule($di, Import\TimetableStructure\Module::class, '/adminv2/import/timetableStructure');
 
         /* Timetable
          */
-        (new Import\Timetable\Module($di))->init('/adminv2/import/timetable');
+        $this->loadModule($di, Import\Timetable\Module::class, '/adminv2/import/timetable');
 
         /* Timetable Enrolment
          */
-        (new Import\TimetableEnrolment\Module($di))->init('/adminv2/import/timetableEnrolment');
+        $this->loadModule($di, Import\TimetableEnrolment\Module::class, '/adminv2/import/timetableEnrolment');
     }
 }

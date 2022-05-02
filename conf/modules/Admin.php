@@ -8,11 +8,12 @@
 
 namespace Config\Modules;
 
+use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Module as FilterModule;
 
-class Admin implements ModuleConfigInterface
+class Admin extends ModuleLoader
 {
     /**
      * @inheritdoc
@@ -21,94 +22,94 @@ class Admin implements ModuleConfigInterface
     {
         if ($di->get('config')->get(ConfigMapper::NAME_LMS_ENABLED)) {
             // Admin course builder page
-            (new \Schoolbox\Admin\CourseBuilder\Module($di))->init('/adminv2/course-builder');
+            $this->loadModule($di, \Schoolbox\Admin\CourseBuilder\Module::class, '/adminv2/course-builder');
 
             // Bulk course import
-            (new \Schoolbox\Admin\BulkCourseImport\Module($di))->init('/adminv2/bulkCourseImport');
+            $this->loadModule($di, \Schoolbox\Admin\BulkCourseImport\Module::class, '/adminv2/bulkCourseImport');
 
             // Report export
-            (new \Schoolbox\Admin\ReportExport\Module($di))->init('/adminv2/report-export');
+            $this->loadModule($di, \Schoolbox\Admin\ReportExport\Module::class, '/adminv2/report-export');
         }
 
         // Eportfolio
-        (new \Schoolbox\Admin\Eportfolio\Module($di))->init('/adminv2/eportfolio');
+        $this->loadModule($di, \Schoolbox\Admin\Eportfolio\Module::class, '/adminv2/eportfolio');
 
         // Feature Tours
-        (new \Schoolbox\Admin\FeatureTours\Module($di))->init('/adminv2/feature-tours');
+        $this->loadModule($di, \Schoolbox\Admin\FeatureTours\Module::class, '/adminv2/feature-tours');
 
         // Admin Home
-        (new \Schoolbox\Admin\Home\Module($di))->init('/adminv2/home');
+        $this->loadModule($di, \Schoolbox\Admin\Home\Module::class, '/adminv2/home');
 
         // Admin Lists
-        (new \Schoolbox\Admin\Lists\Module($di))->init('/adminv2/lists');
+        $this->loadModule($di, \Schoolbox\Admin\Lists\Module::class, '/adminv2/lists');
 
         // LTI
-        (new \Schoolbox\Admin\LTI\Module($di))->init('/adminv2/lti');
+        $this->loadModule($di, \Schoolbox\Admin\LTI\Module::class, '/adminv2/lti');
 
         // Side menu manager
-        (new \Schoolbox\Admin\Menu\Side\Module($di))->init('/adminv2/menu-side');
+        $this->loadModule($di, \Schoolbox\Admin\Menu\Side\Module::class, '/adminv2/menu-side');
 
         // Top menu manager
-        (new \Schoolbox\Admin\Menu\Top\Module($di))->init('/adminv2/menu-top');
+        $this->loadModule($di, \Schoolbox\Admin\Menu\Top\Module::class, '/adminv2/menu-top');
 
         // Profile button manager
-        (new \Schoolbox\Admin\Profile\Button\Module($di))->init('/adminv2/profile-button');
+        $this->loadModule($di, \Schoolbox\Admin\Profile\Button\Module::class, '/adminv2/profile-button');
 
         // Admin navigation
-        (new \Schoolbox\Admin\Navigation\Module($di))->init('/adminv2/navigation');
+        $this->loadModule($di, \Schoolbox\Admin\Navigation\Module::class, '/adminv2/navigation');
 
         // oAuth-specific settings
-        (new \Schoolbox\Admin\Oauth\Module($di))->init('/adminv2/oauth');
+        $this->loadModule($di, \Schoolbox\Admin\Oauth\Module::class, '/adminv2/oauth');
 
         // Route list
-        (new \Schoolbox\Admin\RouteSummary\Module($di))->init('/adminv2/routes');
+        $this->loadModule($di, \Schoolbox\Admin\RouteSummary\Module::class, '/adminv2/routes');
 
         // Service Roster
-        (new \Schoolbox\Admin\Service\Module($di))->init('/adminv2/service');
+        $this->loadModule($di, \Schoolbox\Admin\Service\Module::class, '/adminv2/service');
 
         // Settings
-        (new \Schoolbox\Admin\Settings\Module($di))->init('/adminv2/setting');
+        $this->loadModule($di, \Schoolbox\Admin\Settings\Module::class, '/adminv2/setting');
 
         // SHAPS
-        (new \Schoolbox\Admin\SHAPS\Module($di))->init('/adminv2/shaps');
+        $this->loadModule($di, \Schoolbox\Admin\SHAPS\Module::class, '/adminv2/shaps');
 
         // Package Installer
-        (new \Schoolbox\Admin\Package\Module($di))->init('/adminv2/package');
+        $this->loadModule($di, \Schoolbox\Admin\Package\Module::class, '/adminv2/package');
 
         // Custom Terminology
-        (new \Schoolbox\Admin\Terminology\Module($di))->init('/adminv2/terminology');
+        $this->loadModule($di, \Schoolbox\Admin\Terminology\Module::class, '/adminv2/terminology');
 
         // Admin terms manager page
-        (new \Schoolbox\Admin\Terms\Module($di))->init('/adminv2/terms');
+        $this->loadModule($di, \Schoolbox\Admin\Terms\Module::class, '/adminv2/terms');
 
         // Admin Modify User
-        (new \Schoolbox\Admin\User\Module($di))->init('/adminv2/user');
+        $this->loadModule($di, \Schoolbox\Admin\User\Module::class, '/adminv2/user');
 
         // Admin Bulk Modify User
-        (new \Schoolbox\Admin\User\BulkModify\Module($di))->init('/adminv2/user/bulk');
+        $this->loadModule($di, \Schoolbox\Admin\User\BulkModify\Module::class, '/adminv2/user/bulk');
 
         // Video Queue
-        (new \Schoolbox\Admin\Video\Module($di))->init('/adminv2/video');
+        $this->loadModule($di, \Schoolbox\Admin\Video\Module::class, '/adminv2/video');
 
         // News
-        (new \Schoolbox\Admin\News\Policy\Module($di))->init('/adminv2/news');
+        $this->loadModule($di, \Schoolbox\Admin\News\Policy\Module::class, '/adminv2/news');
 
         // Messages
-        (new \Schoolbox\Realtime\Admin\Module($di))->init('/adminv2/messages');
+        $this->loadModule($di, \Schoolbox\Realtime\Admin\Module::class, '/adminv2/messages');
 
         // Filters
-        (new FilterModule($di))->init('/adminv2/filters');
+        $this->loadModule($di, FilterModule::class, '/adminv2/filters');
 
         // Restore (undelete) entities that have been recenetly deleted
-        (new \Schoolbox\Admin\Restore\Module($di))->init('/adminv2/restore');
+        $this->loadModule($di, \Schoolbox\Admin\Restore\Module::class, '/adminv2/restore');
 
         // Grades page
-        (new \Schoolbox\Admin\Grades\Module($di))->init('/adminv2/grades');
+        $this->loadModule($di, \Schoolbox\Admin\Grades\Module::class, '/adminv2/grades');
 
         // Usage Graphs
-        (new \Schoolbox\Admin\Usage\Module($di))->init('/adminv2/usage');
+        $this->loadModule($di, \Schoolbox\Admin\Usage\Module::class, '/adminv2/usage');
 
         // Usage Graphs
-        (new \Schoolbox\Admin\Intellischool\Module($di))->init('/adminv2/intellischool');
+        $this->loadModule($di, \Schoolbox\Admin\Intellischool\Module::class, '/adminv2/intellischool');
     }
 }

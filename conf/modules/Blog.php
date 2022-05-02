@@ -21,9 +21,13 @@ class Blog implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $blogModule = new BlogModule($di);
+        $blogModule->registerModule('/blog');
+        $blogModule->registerModule('/blog');
         $blogModule->init('/blog');
 
         $eportfolioBlogModule = new EportfolioBlogModule($di);
+        $eportfolioBlogModule->registerModule('/eportfolio/blog');
+        $eportfolioBlogModule->registerModule('/eportfolio/blog');
         $eportfolioBlogModule->init('/eportfolio/blog');
     }
 }

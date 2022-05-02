@@ -21,6 +21,7 @@ class Greenhouse implements ModuleConfigInterface
         $namespace = 'greenhouse';
 
         $greenhouseModule = new GreenhouseModule($di);
+        $greenhouseModule->registerModule("/$namespace");
         $greenhouseModule->init("/$namespace");
     }
 }

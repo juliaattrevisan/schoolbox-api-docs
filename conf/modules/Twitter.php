@@ -21,6 +21,7 @@ class Twitter implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
+        $module->registerModule('/twitter');
         $module->init('/twitter');
     }
 }

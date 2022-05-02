@@ -23,6 +23,7 @@ class ProfessionalDevelopment implements ModuleConfigInterface
         $namespace = 'professionaldevelopment';
 
         $module = new Module($di);
+        $module->registerModule("/$namespace");
         $module->init("/$namespace");
     }
 }

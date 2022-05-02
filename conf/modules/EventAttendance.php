@@ -23,6 +23,7 @@ class EventAttendance implements ModuleConfigInterface
         $namespace = 'calendarEventAttendance';
 
         $module = new Module($di);
+        $module->registerModule('/calendar/event/attendance');
         $module->init('/calendar/event/attendance');
     }
 }
