@@ -53,7 +53,7 @@ onMounted(() => {
 });
 
 /**
- * check if already loaded and saved, or load up
+ * load all the classes for searching
  */
 async function loadClassList () {
     try {
@@ -81,7 +81,7 @@ async function loadClassList () {
 
 const query = ref(''); //the search string to match against
 const queryInputEl = ref(null); 
-const minQueryLength = 0; //should be able to search for just '3', if we want all of Grade 3  
+const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3  
 
 /**
  * the search string broken into words, to search for each word
@@ -101,7 +101,7 @@ const queryWordList = computed(() => {
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const results = computed(() => {
-    if (query.value.length === minQueryLength) {
+    if (query.value.length < minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length === 1) { //don't add in the Select All for just one result
         return classes.value.filter(searchForName)
@@ -129,10 +129,10 @@ const resultsNoSelectAll = computed(() => {
  *
  * @return { Boolean } true if found
  */
-function searchForName (classItem) {
+function searchForName (removedClass) {
     let wordMatchCount = 0;
     queryWordList.value.forEach(wordInSearch => {
-        if (classItem.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+        if (removedClass.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
             wordMatchCount++;
         }
     });
@@ -155,13 +155,11 @@ onMounted(() => {
  * to be able to select by enter and navigate by up/down arrows
  */
 function initKeyboardEvents () {
-    
     document.addEventListener('keydown', (event) => { //prevent the <form> from being submitted on enter
         if (event.key === 'Enter' && document.activeElement === queryInputEl.value) {
             event.preventDefault();
         }
     });
-
     document.addEventListener('keyup', (event) => {
         const keyName = event.key;
         const keyOptions = {
@@ -172,7 +170,6 @@ function initKeyboardEvents () {
             keyOptions[keyName]();
         }
     });
-
 }
 
 /**
@@ -278,8 +275,8 @@ const selectedClassIds = computed(() => {
  * @param { Object }
  * @param { Boolean }
  */
-function onToggleResult (toggledClassItem) {
-    toggleResult(toggledClassItem);
+function onToggleResult (toggledClass) {
+    toggleResult(toggledClass);
 }
 
 /**
@@ -288,13 +285,13 @@ function onToggleResult (toggledClassItem) {
  * @param { Object }
  * @param { Boolean }
  */
-function toggleResult (toggledClassItem) {
-    if (toggledClassItem.isSelected) { //pull out
-        toggledClassItem.isSelected = false;
-        selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== toggledClassItem.id);
+function toggleResult (toggledClass) {
+    if (toggledClass.isSelected) { //pull out
+        toggledClass.isSelected = false;
+        selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.id !== toggledClass.id);
     } else { //otherwise put in
-        toggledClassItem.isSelected = true;
-        selectedClasses.value = [...selectedClasses.value, toggledClassItem];
+        toggledClass.isSelected = true;
+        selectedClasses.value = [...selectedClasses.value, toggledClass];
     }
 }
 
@@ -341,21 +338,21 @@ function onToggleAllResults () {
  * pull all results out 
  */
 function removeAllResults () {
-    const matchedSelectedClasses = resultsNoSelectAll.value.filter((resultItem) => { //check if the class is in the list already
-        return selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //add in those that match
+    const matchedSelectedClasses = resultsNoSelectAll.value.filter((matchedSelectedClass) => { //check if the class is in the list already
+        return selectedClasses.value.some((selectedClass) => selectedClass.id === matchedSelectedClass.id); //add in those that match
     });
-    matchedSelectedClasses.forEach((classItem) => classItem.isSelected = false); //set false on all
-    selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.isSelected); //and then remove those there were just unset  
+    matchedSelectedClasses.forEach((matchedSelectedClass) => matchedSelectedClass.isSelected = false); //set false on all
+    selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.isSelected); //and then remove those there were just unset  
 }
 
 /**
  * add all results in 
  */
 function addAllResults () {
-    const newSelectedClasses = resultsNoSelectAll.value.filter((resultItem) => { //check if the class isn't in the list already
-        return !selectedClasses.value.some((selectedClassItem) => selectedClassItem.id === resultItem.id); //don't add in those that match
+    const newSelectedClasses = resultsNoSelectAll.value.filter((newSelectedClass) => { //check if the class isn't in the list already
+        return !selectedClasses.value.some((selectedClass) => selectedClass.id === newSelectedClass.id); //don't add in those that match
     });
-    newSelectedClasses.forEach((classItem) => classItem.isSelected = true);
+    newSelectedClasses.forEach((newSelectedClass) => newSelectedClass.isSelected = true);
     selectedClasses.value = [...selectedClasses.value, ...newSelectedClasses];
 }
 
@@ -364,9 +361,9 @@ function addAllResults () {
  * 
  * @param { Object }
  */
-function onRemoveClassSelected (classItem) {
-    classItem.isSelected = false;
-    selectedClasses.value = selectedClasses.value.filter((selectedClassItem) => selectedClassItem.id !== classItem.id);
+function onRemoveClassSelected (removedClass) {
+    removedClass.isSelected = false;
+    selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.id !== removedClass.id);
 }
 
 /**
