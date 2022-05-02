@@ -7,8 +7,7 @@
  * results currently shown
  */
 
-import { ref, computed, watch, onMounted, onUpdated, onBeforeUnmount } from 'vue';
-import { getIndex } from '@js/util/domUtils';
+import { ref, computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
@@ -85,19 +84,6 @@ const isChecked = computed(() => {
 });
 
 /**
- *  To describe the current select all action
- *
- * @returns { String } 
- */
-const selectAllAction = computed(() => {
-    if (props.isAllResultsSelected) {
-        return 'Remove all classes';
-    } else {
-        return 'Add all classes';
-    }
-});
-
-/**
  * so mouse selection takes precendence over the arrow/enter selection
  */
 function mouseOverResult () {
@@ -141,7 +127,6 @@ function selectResult () {
 </template>
 
 <style lang="scss" scoped>
-
 .search-result {
     background: white;
     display: flex;
@@ -155,11 +140,9 @@ function selectResult () {
         background: var(--content-ui-hover);
     }
 }
-
 .search-result-active {
     background: var(--content-ui-hover);
 }
-
 input[type=checkbox]:not(.plain) + label {
     margin: 0;
 }
