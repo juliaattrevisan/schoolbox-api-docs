@@ -268,8 +268,8 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 aa.attempt_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark,
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark,
                 (
                     SELECT `as`.section_id
                     FROM assess_section `as`
