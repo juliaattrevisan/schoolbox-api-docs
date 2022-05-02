@@ -18,7 +18,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    public function __construct(ContainerInterface $injector, string $basename = '')
     {
         parent::__construct($injector, $basename ?: 'learningMarkScheme');
     }

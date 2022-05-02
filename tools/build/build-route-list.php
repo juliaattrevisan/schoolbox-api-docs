@@ -17,6 +17,7 @@ use Aura\Router\Router;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Admin\RouteSummary\Module;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Module\RestfulModule;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -68,6 +69,16 @@ $kernel = new CliTool\Kernel(
 
                 // TODO figure out how to actually build a module, not just retrieve a manually built one
                 $module = Module::retrieveInstalledModule($parsedName['controller']);
+
+                // Allow only two types of constructor signature:
+                //
+                // Figure out what that context might be, and then construct it
+                if ($module instanceof RestfulModule) {
+                    $module->getContext();
+                } else {
+                    // Just build it?
+                }
+
                 $routeCatalog[$route->name] = [
                     'module'     => get_class($module),
                     'controller' => $parsedName['controller'],

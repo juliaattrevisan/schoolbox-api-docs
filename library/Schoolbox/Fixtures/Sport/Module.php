@@ -22,10 +22,11 @@ class Module extends RestfulModule
 
     /**
      * @param ContainerInterface $injector
+     * @param RestfulModule|null $context
      */
-    public function __construct(ContainerInterface $injector)
+    public function __construct(ContainerInterface $injector, ?RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::class, 'sports', null, 'sportsfixturesSport');
+        parent::__construct($injector, Mapper::class, 'sports', $context, 'sportsfixturesSport');
     }
 
     /**

@@ -31,7 +31,7 @@ abstract class RestfulModule extends AlaressModule
     /** @var string */
     protected $collection;
 
-    /** @var RestfulModule */
+    /** @var RestfulModule|null */
     protected $context = null;
 
     /** @var string */
@@ -57,6 +57,13 @@ abstract class RestfulModule extends AlaressModule
         $this->mapperClass = $mapper;
     }
 
+    /**
+     * @return RestfulModule|null
+     */
+    public function getContext(): ?RestfulModule
+    {
+        return $this->context;
+    }
 
     /**
      * @return string

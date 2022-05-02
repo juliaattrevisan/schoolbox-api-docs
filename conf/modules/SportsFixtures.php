@@ -44,13 +44,13 @@ class SportsFixtures implements ModuleConfigInterface
             $landingModule = new LandingModule($di);
             $landingModule->init("/$namespace");
 
-            $sportModule = new SportModule($di);
+            $sportModule = new SportModule($di, null);
             $sportModule->init("/$namespace");
 
             $schoolModule = new SchoolModule($di);
             $schoolModule->init("/$namespace/school");
 
-            $seasonModule = new SeasonModule($di);
+            $seasonModule = new SeasonModule($di, null);
             $seasonModule->init("/$namespace");
 
             $divisionModule = new DivisionModule($di, $sportModule);
@@ -68,7 +68,7 @@ class SportsFixtures implements ModuleConfigInterface
             $matchupModule = new MatchupModule($di, $divisionModule);
             $matchupModule->init("/$namespace");
 
-            $venueModule = new VenueModule($di);
+            $venueModule = new VenueModule($di, null);
             $venueModule->init("/$namespace");
 
             $itineraryItemModule = new ItineraryItemModule($di, $matchupModule);
@@ -77,7 +77,7 @@ class SportsFixtures implements ModuleConfigInterface
             $resultModule = new ResultModule($di, $matchupModule);
             $resultModule->init("/$namespace");
 
-            $statusModule = new StatusModule($di);
+            $statusModule = new StatusModule($di, null);
             $statusModule->init("/$namespace");
         }
     }

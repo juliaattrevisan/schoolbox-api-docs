@@ -44,10 +44,11 @@ class Module extends RestfulModule
 
     /**
      * @param ContainerInterface $injector
+     * @param RestfulModule|null $context
      */
-    public function __construct(ContainerInterface $injector)
+    public function __construct(ContainerInterface $injector, ?RestfulModule $context)
     {
-        parent::__construct($injector, QuizMapper::class, 'quiz', null, 'learningQuiz');
+        parent::__construct($injector, QuizMapper::class, 'quiz', $context, 'learningQuiz');
     }
 
     /**
