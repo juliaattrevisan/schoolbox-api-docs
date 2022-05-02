@@ -12,12 +12,12 @@ declare(strict_types=1);
  * Build a list of all routes, and their corresponding module/path/etc.
  */
 
+use Alaress\Module\Module as BaseModule;
 use Aura\Router\Route;
 use Aura\Router\Router;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Admin\RouteSummary\Module;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Module\RestfulModule;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -29,6 +29,7 @@ $kernel = new CliTool\Kernel(
     new class extends CliTool\App {
         public function run(): void
         {
+            // Load all modules here.
             $modulePaths = array_merge(
                 glob(SITE_root . '/conf/modules/*.php'),
                 glob(SITE_root . '/conf/modules/Custom/*/*.php')
@@ -57,6 +58,13 @@ $kernel = new CliTool\Kernel(
                 }
             }
 
+
+            // Use the list of routes to do stuff
+            foreach (BaseModule::retrieveAllModuleRegistrations() as $basename => $registration) {
+                BaseModule::buildModuleFromRegistration($this->getDi(), $basename)->init($registration['basePath']);
+            }
+
+
             $routeCatalog = [];
 
             // All routes are now loaded: interrogate them
@@ -67,17 +75,10 @@ $kernel = new CliTool\Kernel(
                 /** @var Route $route */
                 preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
 
-                // TODO figure out how to actually build a module, not just retrieve a manually built one
-                $module = Module::retrieveInstalledModule($parsedName['controller']);
+                $module = BaseModule::buildModuleFromRegistration($this->getDi(), $parsedName['controller']);
 
                 // Allow only two types of constructor signature:
-                //
                 // Figure out what that context might be, and then construct it
-                if ($module instanceof RestfulModule) {
-                    $module->getContext();
-                } else {
-                    // Just build it?
-                }
 
                 $routeCatalog[$route->name] = [
                     'module'     => get_class($module),
