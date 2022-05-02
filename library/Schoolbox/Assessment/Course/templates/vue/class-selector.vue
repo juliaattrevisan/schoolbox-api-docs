@@ -382,7 +382,7 @@ function onClearAllSelected () {
 <template>
     <div class="class-selector" ref="classSelectorEl">
         <label class="required">Class(es)</label>
-        <input id="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
+        <input id="import_folders" name="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
             v-model="query"
             ref="queryInputEl"
