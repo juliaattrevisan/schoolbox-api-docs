@@ -19,7 +19,13 @@
 <input type="hidden" name="unit[{{ unitSpec.id }}][close_date]"   value="{{ unitImpl.dueDate.localShort }}" />
 <div class="row" data-unit="{{ unitSpec.id }}">
     {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
-
+    {% if not unitAssessmentCount %}
+        {% set assessmentCountMessage  = 'No ' ~ locale.assessment.plural %}
+    {% elseif unitAssessmentCount == 1 %}
+        {% set assessmentCountMessage  = '1 ' ~ locale.assessment ~ ',' %}
+    {% else %}
+        {% set assessmentCountMessage  = unitAssessmentCount ~ ' ' ~ locale.assessment.plural ~ ',' %}
+    {% endif %}
     {#
      # No read perm on unit spec? don't show the full assessment count, just what was selected.
      # This is so that users don't see a count that's greater than what they can actually affect.
@@ -39,14 +45,8 @@
                 <span class="meta">Deleted {{ locale.unit }}</span>
             {% endif %}
             <span class="pipe meta">
-                {% if not unitAssessmentCount %}
-                    No {{ locale.assessment.plural }}
-                {% elseif unitAssessmentCount == 1 %}
-                    1 {{ locale.assessment }}
-                {% else %}
-                    {{ unitAssessmentCount ~ ' ' ~ locale.assessment.plural }}
-                {% endif %}
-                {% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
+                {{ assessmentCountMessage }}
+                {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
             </span>
         </h3>
         {% else %}
@@ -57,7 +57,10 @@
         >
         <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
             <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
-            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} {{ locale.assessment.plural }}{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            <span class="pipe meta">
+                {{ assessmentCountMessage }}
+                {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
+            </span>
         </label>
         {% endif %}
     </div>
