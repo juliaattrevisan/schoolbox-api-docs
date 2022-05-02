@@ -25,14 +25,14 @@ class Module extends BaseModule
 {
     protected $basename = 'curriculum';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initSubmodules(ContainerInterface $injector, ?string $basePath)
-    {
-        $importModule = new Import\Module($injector);
-        $importModule->init(isset($basePath) ? ($basePath . '/import') : null);
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initSubmodules(ContainerInterface $injector, ?string $basePath)
+//    {
+//        $importModule = new Import\Module($injector);
+//        $importModule->init(isset($basePath) ? ($basePath . '/import') : null);
+//    }
 
     /**
      * {@inheritdoc}

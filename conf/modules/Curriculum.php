@@ -11,6 +11,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Curriculum\Import\Module as ImportModule;
 use Schoolbox\Curriculum\Module;
 
 class Curriculum implements ModuleConfigInterface
@@ -23,6 +24,10 @@ class Curriculum implements ModuleConfigInterface
         $module = new Module($di);
         $module->registerModule('/curriculum');
         $module->init('/curriculum');
+
+        $importModule = new ImportModule($di);
+        $importModule->registerModule('/curriculum/import');
+        $importModule->init('/curriculum/import');
 
         // Submodules:
         // * learning areas
