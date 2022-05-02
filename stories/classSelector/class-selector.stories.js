@@ -6,10 +6,17 @@ import { data } from './dataClassSelector';
 export default {
     title: 'IN PROGRESS/ClassSelector',
     component: ClassSelector,
+    parameters: {
+        docs: {
+            description: {
+                component: 'To choose the classes a course will be imported to',
+            },
+        },
+    },
     decorators: [() => ({ 
     template: `
-    <div class="row">
-        <div class="small-12 island" style="margin-top: 1rem">
+    <div class="row" style="padding: 0 1rem">
+        <div class="small-12 island" style="margin-top: 2rem">
             <section>
                 <fieldset class="content">
                     <legend>1. Course</legend>
@@ -37,7 +44,6 @@ export default {
 const Template = (args, { argTypes }) => ({
     components: { ClassSelector },
     setup() {
-        //👇 The args will now be passed down to the template
         return { args };
     },
     template:
@@ -46,18 +52,32 @@ const Template = (args, { argTypes }) => ({
         `,
 });
 
+const endpoint = 'https://swapi.dev/api/films/';
+
 export const Default = Template.bind({});
 Default.parameters = {
-    controls: { hideNoControlsWarning: true },
     msw: {
         handlers: [
-            rest.get('https://swapi.dev/api/films/', (req, res, ctx) => {
+            rest.get(endpoint, (req, res, ctx) => {
                 return res(ctx.json(data)) //we grab an endpoint and then modify the data before it's returned
             }), 
         ]
     },
 }
-
 Default.args = {
-    endpoint: 'https://swapi.dev/api/films/',
+    endpoint: endpoint,
+}
+
+export const LoadError = Template.bind({});
+LoadError.parameters = {
+    msw: {
+        handlers: {
+            auth: rest.get(endpoint, (req, res, ctx) => {
+                return res(ctx.status(403))
+            }),
+        }
+    }
+}
+LoadError.args = {
+    endpoint: endpoint,
 }

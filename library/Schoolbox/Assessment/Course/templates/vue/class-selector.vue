@@ -1,9 +1,9 @@
 <script setup>
 
 /**
- * To help users find admin settings faster (hopefully!)
- * Search field is used to filter the results, then the relevant
- * search result can be selected to move to the relevant page/setting
+ * To help users add classes to a course faster
+ * The search field is used to find classes, then they can be selected to add in
+ * Classes can also be manually entered, with pressing enter adding matched results
  */
 
 import { ref, computed, watch, onMounted  } from 'vue'
@@ -13,6 +13,9 @@ import { gsap } from 'gsap/all';
 
 
 const props = defineProps({
+    /**
+     * the endpoint to retrieve all the classes from
+     */
     endpoint: {
         type: String,
         required: true,
@@ -38,6 +41,8 @@ const classes = ref([]); //all the classes
 const inputPlaceholder = computed(() => {
     if (isLoading.value) {
         return 'Loading classes, please wait...'
+    } else if (hasLoadError.value) {
+        return 'Unable to load classes. Please contact your IT support.';
     } else {
         return 'Search for classes or manually enter comma-separated classes...';
     } 
@@ -187,7 +192,7 @@ const classSelectorEl = ref(null);
  */
 function initMouseEvents () {
     document.addEventListener('click', (event) => {
-        if (!classSelectorEl.value.contains(event.target)) {
+        if (classSelectorEl.value && !classSelectorEl.value.contains(event.target)) {
             clearInput();
         }
     });
@@ -377,14 +382,13 @@ function onRemoveClassSelected (classItem) {
         <label class="required">Class(es)</label>
         <input id="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
-            v-if="!hasLoadError"
             v-model="query"
-            @input="$event.target.composing = false"
-            :readonly="isLoading"
-            :placeholder="inputPlaceholder"
             ref="queryInputEl"
             type="text"
             class="search-input"
+            :readonly="isLoading || hasLoadError"
+            :placeholder="inputPlaceholder"
+            @input="$event.target.composing = false"
         />
         <div class="search-results-container">
             <div class="search-results">
