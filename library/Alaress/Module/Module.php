@@ -115,7 +115,7 @@ class Module
     /**
      * A list of module registrations.
      *
-     * @var array<string, array{class: class-string, basePath: string, params: array}>
+     * @var array<string, array{class: class-string, basePath: string, contextBasename: ?string}>
      */
     protected static array $registeredModules = [];
 
@@ -232,9 +232,9 @@ class Module
     public function registerModule(?string $basePath): void
     {
         self::$registeredModules[$this->basename] = [
-            'class'    => get_class($this),
-            'basePath' => $basePath,
-            'params'   => [],
+            'class'           => get_class($this),
+            'basePath'        => $basePath,
+            'contextBasename' => null,
         ];
     }
 

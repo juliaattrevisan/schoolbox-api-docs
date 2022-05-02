@@ -27,7 +27,7 @@ abstract class ModuleLoader implements ModuleConfigInterface
     protected function loadModule(ContainerInterface $di, string $className, ?string $path): Module
     {
         /** @var Module $module */
-        $module = new $className($di);
+        $module = new $className($di, null);
         $module->registerModule($path);
         $module->init($path);
         // @phpstan-ignore-next-line: this should be recognized

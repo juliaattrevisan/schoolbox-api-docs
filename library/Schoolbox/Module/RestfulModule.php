@@ -225,9 +225,9 @@ abstract class RestfulModule extends AlaressModule
     public function registerModuleWithContext(?string $basePath, RestfulModule $context): void
     {
         self::$registeredModules[$this->basename] = [
-            'class'    => get_class($this),
-            'basePath' => $basePath,
-            'params'   => ['context' => get_class($context)],
+            'class'           => get_class($this),
+            'basePath'        => $basePath,
+            'contextBasename' => $context->getBasename(),
         ];
     }
 }
