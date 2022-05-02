@@ -93,6 +93,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(UserBulkMapper::class),
+            $this->injector->get('user.tokenBuilder'),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
         );

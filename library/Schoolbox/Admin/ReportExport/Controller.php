@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\ReportExport;
 
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
@@ -69,6 +70,8 @@ class Controller extends ConfigController
 
     private UserBulkMapper $userBulkMapper;
 
+    private Jwt $tokenBuilder;
+
     /**
      * @param UserMapper            $userMapper
      * @param TermMapper            $termMapper
@@ -80,6 +83,7 @@ class Controller extends ConfigController
      * @param RubricDataSource      $rubricDataSource
      * @param Access                $access
      * @param UserBulkMapper        $userBulkMapper
+     * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      */
@@ -94,6 +98,7 @@ class Controller extends ConfigController
         RubricDataSource $rubricDataSource,
         Access $access,
         UserBulkMapper $userBulkMapper,
+        Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory
     ) {
@@ -106,6 +111,7 @@ class Controller extends ConfigController
         $this->folderMapper          = $folderMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
+        $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
     }
@@ -181,9 +187,9 @@ class Controller extends ConfigController
         }
         $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
 
-        $reportUrls = [];
-        $params     = $reportParams->getParams();
-        $urlBase    = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $reports = [];
+        $params  = $reportParams->getParams();
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
         foreach ($reportStudents as $student) {
             try {
                 $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
@@ -191,14 +197,17 @@ class Controller extends ConfigController
                     'student'   => $student,
                 ]);
                 if ($reportPath) {
-                    $reportUrls[] = $urlBase->setPath($reportPath)->setQuery($params)->toString();
+                    $reports[] = [
+                        'filename' => sprintf("%d_report.pdf", $student->getId()), // TODO better filename?
+                        'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
+                    ];
                 }
             } catch (RouteNotFound $e) {
                 // noop
             }
         }
 
-        if (empty($reportUrls)) {
+        if (empty($reports)) {
             // TODO: Where should we show error
             $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
         }
@@ -212,17 +221,20 @@ class Controller extends ConfigController
         $message        = $messageFactory->build(
             'download-pages',
             [
-                'token'     => $this->getUser(),
-                'content'   => [
-                    'filename' => null,
-                    'urls'     => $reportUrls,
-                ],
+                'token'     => $this->tokenBuilder->generate($this->getUser()),
+                'content'   => $reports,
                 'gotenberg' => [
                     'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                     'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
                 ],
             ],
-            '', // TODO: $callBackUrl,
+            $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
+                    ->setQuery(null)
+                    ->toString(),
+            //            [
+            //                'message' => 'Your report has been generated',
+            //                'href'    => '', TODO: what this href would be
+            //            ],
             $this->getUser(),
         );
 
