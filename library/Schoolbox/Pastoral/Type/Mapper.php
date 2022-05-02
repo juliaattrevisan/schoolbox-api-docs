@@ -34,12 +34,10 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
-        $this->uses('template_private', self::TYPE_STRING);
         $this->uses('color', self::TYPE_COLOR);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('visibility_locked', self::TYPE_BOOLEAN);
-        $this->uses('sentiment', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::SENTIMENT_VALUES);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -62,7 +60,8 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('subTypes', 'st')}
+                   {$this->getJoinColumnString('subTypes', 'st')},
+                   {$this->getJoinColumnString('pastoral_type_action', 'actions')}
         ";
     }
 
@@ -75,6 +74,7 @@ class Mapper extends BaseMapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('subTypes', '', 'st')}
+            LEFT JOIN {$this->getJoinSql('pastoral_type_action', '', 'actions')}
         ";
     }
 
@@ -92,6 +92,12 @@ class Mapper extends BaseMapper
         /** @var Pastoral\SubType\Mapper $subTypeMapper */
         $subTypeMapper = $this->getJoinMapper('subTypes');
 
+
+        /* Pastoral Actions need to be part of findById() in Admin Lists controller
+         * otherwise you lose their relationships when you change a Type's details
+         */
+        $actionsMapper = $this->getJoinMapper('pastoral_type_action');
+
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $modelId = $row[$this->getIdentifierColumn()];
@@ -106,6 +112,14 @@ class Mapper extends BaseMapper
             $subType = $subTypeMapper->hydrate($row, 'st');
             if ($subType) {
                 $model->getSubTypes()[$subType->getId()] = $subType;
+            }
+
+            /* Hydrate pastoral actions, if there are any associated
+             */
+            $action = $actionsMapper->hydrate($row, 'actions');
+
+            if (null !== $action) {
+                $model->getActions()->add($action);
             }
         }
         return $collection;
