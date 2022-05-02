@@ -71,12 +71,12 @@ class Model implements ISoftDeletable
     /**
      * @var null|float
      */
-    private ?float $mark;
+    private ?float $mark = null;
 
     /**
      * @var null|float
      */
-    private ?float $max_mark;
+    private ?float $max_mark = null;
 
     /**
      * The mark that the user has received for this attempt.
