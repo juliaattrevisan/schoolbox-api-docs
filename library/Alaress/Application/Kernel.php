@@ -1825,6 +1825,14 @@ abstract class Kernel
         return $di;
     }
 
+    /**
+     * Inits all routes based on the pre-generated routes file.
+     */
+    protected function initRoutes(): void
+    {
+        // Load the list of routes from somewhere.
+        // Custom routes: only allow if the site school code matches
+    }
 
     /**
      * Globs over the Modules directory and initialises them so their routes can be used
@@ -1835,7 +1843,7 @@ abstract class Kernel
      */
     protected function initModules(): void
     {
-        // TODO no longer used
+        // TODO no longer used: this should only load routes
 
         // Initialise module configuration
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';

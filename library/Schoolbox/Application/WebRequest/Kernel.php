@@ -534,6 +534,7 @@ class Kernel extends WebKernelAbstract
     {
         parent::postInstallDependencies();
 
+        $this->initRoutes();
         $this->initModules();
     }
 

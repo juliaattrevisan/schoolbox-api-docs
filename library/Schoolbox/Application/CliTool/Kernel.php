@@ -265,6 +265,7 @@ class Kernel extends CliKernelAbstract
      */
     protected function postInstallDependencies(): void
     {
+        $this->initRoutes();
         $this->initModules();
     }
 

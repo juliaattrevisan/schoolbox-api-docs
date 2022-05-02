@@ -36,3 +36,5 @@ v8-compile-cache-0/
 # < 21.0 static assets: exclude from <= 21.0 so it's not committed by accident
 www/css/core/*.css
 www/javascript
+# this is auto-generated
+conf/routes.php
