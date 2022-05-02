@@ -117,14 +117,10 @@ class Module
      * Constructor
      *
      * @param ContainerInterface $injector
-     * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
+    public function __construct(ContainerInterface $injector)
     {
         $this->injector = $injector;
-        if ($basename) {
-            $this->basename = $basename;
-        }
     }
 
 
