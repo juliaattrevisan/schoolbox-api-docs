@@ -32,7 +32,12 @@
         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
         {% if unitAction == 'modify' %}
         <h3>
-            <span class="icon-unit"></span>{{ unitSpec.folder.name ?? '<span class="meta">Deleted unit<span>' }}
+            <span class="icon-unit"></span>
+            {% if unitSpec.folder.name ?? false %}
+                {{ unitSpec.folder.name }}
+            {% else %}
+                <span class="meta">Deleted {{ locale.unit }}</span>
+            {% endif %}
             <span class="pipe meta">
                 {% if not unitAssessmentCount %}
                     No {{ locale.assessment.plural }}
