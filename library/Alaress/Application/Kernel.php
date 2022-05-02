@@ -1835,6 +1835,8 @@ abstract class Kernel
      */
     protected function initModules(): void
     {
+        // TODO no longer used
+
         // Initialise module configuration
         require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
         require_once SITE_root . '/conf/ModuleLoader.php';
