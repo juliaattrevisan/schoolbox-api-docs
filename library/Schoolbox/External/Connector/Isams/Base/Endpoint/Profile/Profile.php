@@ -759,7 +759,10 @@ class Profile implements IStrategy
 
             /* Accumulate messages
              */
-            $messages[] = trim((string)$parent->SOS);
+            $sos = trim((string)$parent->SOS);
+            if ('' !== $sos) {
+                $messages[] = $sos;
+            }
         }
 
         return implode("\n", $messages);
