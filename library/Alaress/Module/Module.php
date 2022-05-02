@@ -36,10 +36,10 @@ use function strtolower;
 class Module
 {
     // HTTP methods
-    public const METHOD_GET = 'GET';
-    public const METHOD_POST = 'POST';
-    public const METHOD_PUT = 'PUT';
-    public const METHOD_PATCH = 'PATCH';
+    public const METHOD_GET    = 'GET';
+    public const METHOD_POST   = 'POST';
+    public const METHOD_PUT    = 'PUT';
+    public const METHOD_PATCH  = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
 
 
@@ -88,7 +88,7 @@ class Module
      * @internal string   $routeIndex[1] eg '/{studentId}/{classId}/update'
      * @internal string[] $routeIndex[2] eg ['studentId' => '\d+']   (note that classId does not have a regex constraint)
      */
-    protected $routeIndex   = [];
+    protected $routeIndex = [];
 
     /**
      * List of preloads indexed by callable, for pre-registered routes
@@ -102,7 +102,7 @@ class Module
      *
      * @var array
      */
-    protected $permissionIndex  = [];
+    protected $permissionIndex = [];
 
 
     /**
@@ -123,7 +123,7 @@ class Module
     {
         $this->injector = $injector;
         if ($basename) {
-            $this->setBasename($basename);
+            $this->basename = $basename;
         }
     }
 
@@ -179,7 +179,7 @@ class Module
         if (isset($index)) {
             $storage[$index][1][] = $string;
         } else {
-            $storage[] = [ $object, [ $string ] ];
+            $storage[] = [$object, [$string]];
         }
     }
 
@@ -713,17 +713,6 @@ class Module
     public function getBasename()
     {
         return $this->basename;
-    }
-
-
-    /**
-     * @param string $basename
-     * @return $this
-     */
-    protected function setBasename($basename)
-    {
-        $this->basename = $basename;
-        return $this;
     }
 
 
