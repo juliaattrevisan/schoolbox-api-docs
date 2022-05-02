@@ -32,7 +32,7 @@
         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
         {% if unitAction == 'modify' %}
         <h3>
-            <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+            <span class="icon-unit"></span>{{ unitSpec.folder.name ?? '<span class="meta">Deleted unit<span>' }}
             <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
         </h3>
         {% else %}
@@ -49,8 +49,11 @@
     </div>
     {% if not canReadUnitSpec %}
             <p class="alert-box">
-                This unit is no longer accessible. You can modify the dates of assessments,
+                This unit is no longer accessible.
+                {% if unitAssessmentCount %}
+                You can modify the dates of assessments,
                 and remove them from your class, but you can no longer import new assessments.
+                {% endif %}
             </p>
     {% endif %}
     <div class="small-12 columns">
@@ -73,7 +76,7 @@
                                     defaultDueDate:  unitDefaultDueDates[unitSpec.id],
                                     canReadUnitSpec: canReadUnitSpec,
                                 } only %}
-                            {% else %}
+                            {% elseif canReadUnitSpec %}
                                 <p class="content">This {{ locale.unit }} contains no coursework.</p>
                             {% endif %}
                         </section>
