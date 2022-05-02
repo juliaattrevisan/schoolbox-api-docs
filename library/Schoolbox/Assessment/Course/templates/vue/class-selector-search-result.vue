@@ -44,26 +44,12 @@ const props = defineProps({
     },
 });
 
-const itemIndex = ref(-1);
 const isActive = ref(false);
 const resultEl = ref(null);
 
 const highlightTitleSearch = computed(() => {
     return highlightSearchInElement(props.result.name);
 });
-
-/**
- * to highlight the current selection relative to key events
- * needs to be updated once the animations have completed
- */
-function checkIndex () {
-    itemIndex.value = getIndex(resultEl.value.parentElement);
-    if (itemIndex.value === props.activeIndex) {
-        isActive.value = true;
-    } else {
-        isActive.value = false;
-    }
-}
 
 /**
  * To highlight where the search string matches within the settings result

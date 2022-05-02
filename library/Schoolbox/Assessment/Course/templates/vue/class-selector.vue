@@ -212,21 +212,6 @@ function clearInput () {
  * 
  ****************************************************************/
 
-const searchResultsEl = ref([]);
-
-/**
- * how the element animates off
- *
- * @param { DOMElement } element - the element that's animating
- * @param { Function } done - to be called once animation is complete
- *
- */
-function checkEachResultIndex () {
-    searchResultsEl.value.forEach(searchResult => {
-        searchResult.checkIndex();
-    });
-}
-
 /**
  * animate settings to help context when filtering
  * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
@@ -397,14 +382,10 @@ function onRemoveClassSelected (classItem) {
                     :css="false"
                     @before-enter="onBeforeOnEnter"
                     @enter="onEnter"
-                    @enter-cancelled="checkEachResultIndex"
                     @leave="onLeave"
-                    @after-leave="checkEachResultIndex"
-                    @leave-cancelled="checkEachResultIndex"
                 >
                     <li v-for="(result, index) in results" :key="result.id" :data-index="index">
                         <class-selector-search-result
-                            ref="searchResultsEl"
                             :result="result"
                             :is-all-results-selected="isAllResultsSelected"
                             :is-some-results-selected="isSomeResultsSelected"
