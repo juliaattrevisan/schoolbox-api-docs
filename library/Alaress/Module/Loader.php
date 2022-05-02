@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Module;
 
 use LogicException;
+use Psr\Container\ContainerInterface;
 
 /**
  * A loader class for loading module's controller dependencies dynamically.
@@ -17,11 +18,9 @@ use LogicException;
 class Loader implements LoaderInterface
 {
     /**
-     * Modules that have already been loaded. Don't try to load them again.
-     *
-     * @var array
+     * DI container
      */
-    protected $loadedModules = [];
+    private ContainerInterface $di;
 
     /**
      * Regular expression which extracts a module name out of $moduleString
@@ -31,15 +30,17 @@ class Loader implements LoaderInterface
      *
      * @var string
      */
-    protected $moduleRegex;
+    private string $moduleRegex;
 
     /**
      * Constructor
      *
-     * @param string $moduleRegex
+     * @param ContainerInterface $di
+     * @param string             $moduleRegex
      */
-    public function __construct($moduleRegex)
+    public function __construct(ContainerInterface $di, string $moduleRegex)
     {
+        $this->di          = $di;
         $this->moduleRegex = $moduleRegex;
     }
 
@@ -51,7 +52,8 @@ class Loader implements LoaderInterface
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
             try {
-                $module = Module::retrieveInstalledModule($moduleName);
+//                $module = Module::retrieveInstalledModule($moduleName);
+                $module = Module::buildModuleFromRegistration($this->di, $moduleName);
             } catch (LogicException $e) {
                 // There was no module to load.
                 // That's fine, as `addTemplatePath` can set a different

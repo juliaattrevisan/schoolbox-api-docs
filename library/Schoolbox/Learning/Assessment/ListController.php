@@ -406,7 +406,8 @@ class ListController extends Web\Controller\Base
      */
     private function getDelegateController($type): Controller
     {
-        $module = Module::retrieveInstalledModule('learningAssessment');
+//        $module = Module::retrieveInstalledModule('learningAssessment');
+        $module = Module::buildModuleFromRegistration($this->di, 'learningAssessment');
         if ($module instanceof Module) {
             // Dependencies need to be set up too
             $module->initControllerDependencies();

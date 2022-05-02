@@ -46,7 +46,8 @@ class RequireModule
     public function __invoke($moduleName)
     {
         try {
-            $module = Module::retrieveInstalledModule($moduleName);
+//            $module = Module::retrieveInstalledModule($moduleName);
+            $module = Module::buildModuleFromRegistration($this->di, $moduleName);
         } catch (LogicException $e) {
             throw new RuntimeError(sprintf('Module "%s" does not exist', $moduleName));
         }

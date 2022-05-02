@@ -256,7 +256,8 @@ class Kernel extends WebKernelAbstract
         $action         = $parsedName['action'];
 
         // Get module out of its own cache, instead of from DI
-        $module = Module::retrieveInstalledModule($controllerName);
+//        $module = Module::retrieveInstalledModule($controllerName);
+        $module = Module::buildModuleFromRegistration($this->di, $controllerName);
         $module->initControllerDependencies();
 
         // User is from:

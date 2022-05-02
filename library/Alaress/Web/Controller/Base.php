@@ -365,7 +365,8 @@ abstract class Base
      */
     protected function getController($name)
     {
-        $module = Module::retrieveInstalledModule($name);
+//        $module = Module::retrieveInstalledModule($name);
+        $module = Module::buildModuleFromRegistration($this->di, $name);
 
         // initialise controller's routes and dependencies, and then build it
         $module->initControllerDependencies();

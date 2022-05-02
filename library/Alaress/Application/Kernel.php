@@ -29,11 +29,12 @@ use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
+use Aura\Router\RouteCollection;
 use Aura\Router\Router;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
-use Config\Modules\ModuleConfigInterface;
+//use Config\Modules\ModuleConfigInterface;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
@@ -542,7 +543,10 @@ abstract class Kernel
             'moduleLoader',
             $di->lazyNew(
                 ModuleLoader::class,
-                ['moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
+                [
+                    'di'          => $di,
+                    'moduleRegex' => '/^(?P<module>[^\\.]+)\\./',
+                ]
             ),
         );
         $di->set(
@@ -815,7 +819,10 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di) {
                     $config      = $di->get('config');
-                    $chainLoader = new ChainLoader(new ModuleLoader('[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
+                    $chainLoader = new ChainLoader(
+                        new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'),
+                        new \Twig\Loader\ChainLoader()
+                    );
                     $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_school_code} over templates/core
                     $basePath     = SITE_root . '/templates/';
@@ -1832,6 +1839,24 @@ abstract class Kernel
     {
         // Load the list of routes from somewhere.
         // Custom routes: only allow if the site school code matches
+        $routeCache = SITE_root . '/conf/routes';
+        if (!file_exists($routeCache)) {
+            return;
+        }
+        $routesSerialized = file_get_contents($routeCache);
+        if (empty($routesSerialized)) {
+            return;
+        }
+
+        // Is unserializing this massive lump any better than loading all modules?
+        // Other approaches:
+        // * on route not found, figure out the module and attempt to match again
+        /** @var RouteCollection $routes */
+        $routes = unserialize($routesSerialized);
+
+        /** @var Router $router */
+        $router = $this->get('router');
+        $router->setRoutes($routes);
     }
 
     /**
@@ -1845,43 +1870,43 @@ abstract class Kernel
     {
         // TODO no longer used: this should only load routes
 
-        // Initialise module configuration
-        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
-        require_once SITE_root . '/conf/ModuleLoader.php';
-
-        $customModuleLocation = sprintf(
-            '/conf/modules/Custom/%s/',
-            ucfirst(strtolower((new ConfigLoader())->get('site_school_code')))
-        );
-        $modulePaths = array_merge(
-            glob(SITE_root . '/conf/modules/*.php'),
-            glob(SITE_root . $customModuleLocation . '*.php')
-        );
-
-        $firstError = null;
-        foreach ($modulePaths as $routePath) {
-            require_once $routePath;
-
-            // Get a route name out of this path
-            $path = preg_replace('/^' . preg_quote(SITE_root . '/conf/modules/', '/') . '/', '', $routePath);
-            $path = preg_replace('/\\.php$/', '', $path);
-            $path = preg_replace('/\\//', '\\', $path);
-
-            $class = 'Config\\Modules\\' . $path;
-
-            if (class_exists($class, false)) {
-                /** @var ModuleConfigInterface $obj */
-                try {
-                    $obj = new $class();
-                    $obj->configure($this->getDependencyInjector());
-                } catch (\Throwable $e) {
-                    $firstError = $firstError ?? $e;
-                }
-            }
-        }
-
-        if ($firstError) {
-            throw $firstError;
-        }
+//        // Initialise module configuration
+//        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+//        require_once SITE_root . '/conf/ModuleLoader.php';
+//
+//        $customModuleLocation = sprintf(
+//            '/conf/modules/Custom/%s/',
+//            ucfirst(strtolower((new ConfigLoader())->get('site_school_code')))
+//        );
+//        $modulePaths = array_merge(
+//            glob(SITE_root . '/conf/modules/*.php'),
+//            glob(SITE_root . $customModuleLocation . '*.php')
+//        );
+//
+//        $firstError = null;
+//        foreach ($modulePaths as $routePath) {
+//            require_once $routePath;
+//
+//            // Get a route name out of this path
+//            $path = preg_replace('/^' . preg_quote(SITE_root . '/conf/modules/', '/') . '/', '', $routePath);
+//            $path = preg_replace('/\\.php$/', '', $path);
+//            $path = preg_replace('/\\//', '\\', $path);
+//
+//            $class = 'Config\\Modules\\' . $path;
+//
+//            if (class_exists($class, false)) {
+//                /** @var ModuleConfigInterface $obj */
+//                try {
+//                    $obj = new $class();
+//                    $obj->configure($this->getDependencyInjector());
+//                } catch (\Throwable $e) {
+//                    $firstError = $firstError ?? $e;
+//                }
+//            }
+//        }
+//
+//        if ($firstError) {
+//            throw $firstError;
+//        }
     }
 }
