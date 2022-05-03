@@ -90,73 +90,60 @@ HELP;
 
         /* Check that this isn't currently running
          */
+        $lock = $this->acquireLock(self::EXPIRED_STORAGE_REMOVAL_LOCK_NAME, self::LOCK_TTL);
 
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::EXPIRED_STORAGE_REMOVAL_LOCK_NAME, self::LOCK_TTL);
-
-        try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
 
-        if ($acquired) {
-            /* Generate a list of expired storage objects
+        /* Generate a list of expired storage objects
+         */
+        $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
+
+        $pb = $storageMapper->getPredicateBuilder()
+            ->notNull('expired_at')
+            ->lessThan('expired_at', \Alaress_Date_Format::newFromTimestamp($_SERVER['REQUEST_TIME'])->getDatabase());
+
+        $items = $storageMapper->findByPredicates($pb, [
+            'order' => [
+                'expired_at' => 'desc'
+            ]
+        ]);
+
+        /* No items? No trabajo
+         */
+        if (!$items->count()) {
+            $this->getLogger()->debug('No expired items found; exiting.');
+            exit;
+        }
+
+        /* Otherwise, start doing the stuff
+         */
+        if ($this->perform()) {
+            /* In Perform mode, blow them away
              */
-            $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
+            $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
 
-            $pb = $storageMapper->getPredicateBuilder()
-                ->notNull('expired_at')
-                ->lessThan('expired_at', \Alaress_Date_Format::newFromTimestamp($_SERVER['REQUEST_TIME'])->getDatabase());
+            foreach ($items as $item) {
+                $relationalDelete->remove($item->getHash(), false);
 
-            $items = $storageMapper->findByPredicates($pb, [
-                'order' => [
-                    'expired_at' => 'desc'
-                ]
-            ]);
-
-            /* No items? No trabajo
-             */
-            if (!$items->count()) {
-                $this->getLogger()->debug('No expired items found; exiting.');
-                exit;
-            }
-
-            /* Otherwise, start doing the stuff
-             */
-            if ($this->perform()) {
-                /* In Perform mode, blow them away
-                 */
-                $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
-
-                foreach ($items as $item) {
-                    $relationalDelete->remove($item->getHash(), false);
-
-                    $lock->refresh();
-                }
-            } else {
-                /* In Planning mode, show them in the cli
-                 */
-                foreach ($items as $item) {
-                    $this->getLogger()->debug(sprintf(
-                        '%s: %s -  expired on %s',
-                        $item->getHash(),
-                        $item->getBasename(),
-                        $item->getExpiryAt()->getDatabase()
-                    ));
-
-                    $lock->refresh();
-                }
-
-                $this->getLogger()->debug('Planning finished.');
+                $lock->refresh();
             }
         } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+            /* In Planning mode, show them in the cli
+             */
+            foreach ($items as $item) {
+                $this->getLogger()->debug(sprintf(
+                    '%s: %s -  expired on %s',
+                    $item->getHash(),
+                    $item->getBasename(),
+                    $item->getExpiryAt()->getDatabase()
+                ));
+
+                $lock->refresh();
+            }
+
+            $this->getLogger()->debug('Planning finished.');
         }
     }
 }
