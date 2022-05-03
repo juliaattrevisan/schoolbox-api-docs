@@ -12,7 +12,6 @@ use Alaress\Module\Registry;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
 
-
 /**
  * A controller for viewing a list of routes defined within Schoolbox.
  */
