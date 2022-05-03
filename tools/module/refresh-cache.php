@@ -34,6 +34,8 @@ $kernel = new CliTool\Kernel(
          */
         public function run(): void
         {
+            $this->getLogger()->info(sprintf('Refreshing route and module cache for instance "%s"', INSTANCE_ID));
+
             /** @var Router $router */
             $router = $this->getDi()->get('router');
 
