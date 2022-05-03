@@ -260,9 +260,11 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     public function getMarksForAttempt($attempt_id)
     {
         $query = "SELECT
-                      COALESCE(assess_attempt.mark,0) AS totalMarks
+                      COALESCE(SUM(assess_response.mark),0) AS totalMarks
                   FROM assess_attempt
+                  LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
         $result = $this->db->getOne($query);
