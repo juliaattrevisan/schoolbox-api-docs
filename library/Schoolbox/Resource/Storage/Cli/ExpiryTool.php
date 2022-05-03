@@ -135,6 +135,8 @@ HELP;
 
                 foreach ($items as $item) {
                     $relationalDelete->remove($item->getHash(), false);
+
+                    $lock->refresh();
                 }
             } else {
                 /* In Planning mode, show them in the cli
@@ -146,6 +148,8 @@ HELP;
                         $item->getBasename(),
                         $item->getExpiryAt()->getDatabase()
                     ));
+
+                    $lock->refresh();
                 }
 
                 $this->getLogger()->debug('Planning finished.');
