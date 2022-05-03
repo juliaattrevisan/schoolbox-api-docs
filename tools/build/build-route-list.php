@@ -13,17 +13,18 @@ declare(strict_types=1);
  */
 
 use Alaress\Module\Module as BaseModule;
-use Aura\Router\Route;
+use Alaress\Web\Router\RouteCollection;
+use Aura\Router\RouteFactory;
 use Aura\Router\Router;
 use Config\Modules\ModuleConfigInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 require __DIR__ . '/../../conf/core/require.php';
 
 // Initialise module configuration
 require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
 require_once SITE_root . '/conf/ModuleLoader.php';
+
 
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App {
@@ -34,14 +35,19 @@ $kernel = new CliTool\Kernel(
 
         public function run(): void
         {
-            $this->loadAllModules();
-
-            // All routes are now loaded: dump the route table to a file
             /** @var Router $router */
             $router = $this->getDi()->get('router');
-            file_put_contents(self::ROUTE_CACHE_FILE, serialize($router->getRoutes()));
 
-            // Dump the module table to a file as well
+            // Before this runs: clear the route and module registrations,
+            // so that new registration tables may be built
+            $router->setRoutes(new RouteCollection(new RouteFactory()));
+            BaseModule::installModuleRegistrations([]);
+
+            $this->loadAllModules();
+
+            // The new route and module registrations have been loaded:
+            // dump their registration tables
+            file_put_contents(self::ROUTE_CACHE_FILE, serialize($router->getRoutes()));
             file_put_contents(self::MODULE_CACHE_FILE, json_encode(BaseModule::retrieveAllModuleRegistrations()));
         }
 
