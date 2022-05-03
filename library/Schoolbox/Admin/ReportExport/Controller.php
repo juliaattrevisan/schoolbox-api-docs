@@ -34,6 +34,7 @@ use Schoolbox\Role;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -218,6 +219,8 @@ class Controller extends ConfigController
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
+        $userSerializer = new ModelToArray();
+
         $message        = $messageFactory->build(
             'download-pages',
             [
@@ -231,10 +234,11 @@ class Controller extends ConfigController
             $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
                     ->setQuery(null)
                     ->toString(),
-            //            [
-            //                'message' => 'Your report has been generated',
-            //                'href'    => '', TODO: what this href would be
-            //            ],
+            [
+                'message' => 'Your summative report export is ready to download',
+                'from'      => call_user_func($userSerializer, $this->getUser()),
+                'to'        => call_user_func($userSerializer, $this->getUser()),
+            ],
             $this->getUser(),
         );
 
