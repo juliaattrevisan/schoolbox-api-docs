@@ -554,12 +554,14 @@ class Mapper extends BaseMapper
     /**
      * update the quiz response score
      */
-    public function updateMarks(Model $attempt)
+    public function updateMarks(int|Model $attempt)
     {
         /**
          * collate all marks and total possible marks, and update this field.
          */
         $query =  $this->getDatabase()->prepare("
+UPDATE assess_attempt
+SET 
 SELECT
     SUM(ar.mark)  AS mark,
     SUM(aq.marks) AS max_mark
@@ -568,8 +570,14 @@ FROM assess_attempt aa
          LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
          LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
 WHERE aa.attempt_id = :attemptId
+AND ar.deleted_at IS NULL
+AND aq.deleted_at IS NULL
 GROUP BY aa.assess_id, aa.attempt_id");
-        $query->execute(['attemptId' => $attempt->getId()]);
+        if (is_int($attempt)) {
+            $query->execute(['attemptId' => $attempt]);
+        } else {
+            $query->execute(['attemptId' => $attempt->getId()]);
+        }
         $marks = $query->fetch();
         $attempt->setMark($marks['mark']);
         $attempt->setMaxMark($marks['max_mark']);
