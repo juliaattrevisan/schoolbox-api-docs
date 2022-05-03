@@ -18,6 +18,7 @@ use Alaress\Web\Router\RouteCollection;
 use Aura\Router\RouteFactory;
 use Aura\Router\Router;
 use Config\Modules\ModuleConfigInterface;
+use Predis\Client;
 use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
@@ -28,12 +29,11 @@ require_once SITE_root . '/conf/ModuleLoader.php';
 
 
 $kernel = new CliTool\Kernel(
-    new class extends CliTool\App {
-
-        private const ROUTE_CACHE_FILE = SITE_root . '/conf/routeCache';
-
-        private const MODULE_CACHE_FILE = SITE_root . '/conf/moduleCache';
-
+    new class extends CliTool\App
+    {
+        /**
+         * @inheritdoc
+         */
         public function run(): void
         {
             /** @var Router $router */
@@ -47,9 +47,11 @@ $kernel = new CliTool\Kernel(
             $this->loadAllModules();
 
             // The new route and module registrations have been loaded:
-            // dump their registration tables
-            file_put_contents(self::ROUTE_CACHE_FILE, serialize($router->getRoutes()));
-            file_put_contents(self::MODULE_CACHE_FILE, json_encode(Registry::getRegistrations()));
+            // dump their registration tables into Redis
+            /** @var Client $redis */
+            $redis = $this->getDi()->get('redis.storage');
+            $redis->set('routeCache:' . INSTANCE_ID, serialize($router->getRoutes()));
+            $redis->set('moduleCache:' . INSTANCE_ID, json_encode(Registry::getRegistrations()));
         }
 
         /**

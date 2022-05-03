@@ -1837,14 +1837,10 @@ abstract class Kernel
      */
     protected function initRoutes(): void
     {
-        // Load the list of routes from somewhere.
-        // Custom routes: only allow if the site school code matches
-        // TODO should this be in Redis?
-        $routeCache = SITE_root . '/conf/routeCache';
-        if (!file_exists($routeCache)) {
-            return;
-        }
-        $routesSerialized = file_get_contents($routeCache);
+        // Load the list of routes from Redis.
+        /** @var Predis\ClientInterface $redis */
+        $redis            = $this->getDependencyInjector()->get('redis.storage');
+        $routesSerialized = $redis->get('routeCache:' . INSTANCE_ID);
         if (empty($routesSerialized)) {
             return;
         }
@@ -1865,12 +1861,10 @@ abstract class Kernel
      */
     protected function initModules(): void
     {
-        // Put list of modules in somewhere
-        $moduleCache = SITE_root . '/conf/moduleCache';
-        if (!file_exists($moduleCache)) {
-            return;
-        }
-        $modulesEncoded = file_get_contents($moduleCache);
+        // Load the list of modules from Redis.
+        /** @var Predis\ClientInterface $redis */
+        $redis          = $this->getDependencyInjector()->get('redis.storage');
+        $modulesEncoded = $redis->get('moduleCache:' . INSTANCE_ID);
         if (empty($modulesEncoded)) {
             return;
         }
