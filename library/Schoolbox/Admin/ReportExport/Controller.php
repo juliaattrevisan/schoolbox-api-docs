@@ -199,7 +199,7 @@ class Controller extends ConfigController
                 ]);
                 if ($reportPath) {
                     $reports[] = [
-                        'filename' => sprintf("%d_report.pdf", $student->getId()), // TODO better filename?
+                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId() ), // TODO better filename?
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -226,6 +226,7 @@ class Controller extends ConfigController
             [
                 'token'     => $this->tokenBuilder->generate($this->getUser()),
                 'content'   => $reports,
+                'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-report-export.zip',
                 'gotenberg' => [
                     'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                     'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
