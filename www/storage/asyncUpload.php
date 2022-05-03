@@ -37,13 +37,14 @@ if (!$_SESSION['id']) {
 } elseif (isset($_FILES['upload'])) {
     $meta = $_FILES['upload'];
 
-    /* Optional expiry timestamp
+    /* Optional expiry date, e.g. 2022-03-04
+     * (Storage items always expire at the start of that date)
      */
-    $expiryUnixTimestamp = $_GET['expiry'] ?? null;
+    $expiryDate = $_GET['expiryDate'] ?? null;
     $expiryAt = null;
 
-    if (null !== $expiryUnixTimestamp) {
-        $expiryAt = \Alaress_Date_Format::newFromTimestamp($expiryUnixTimestamp);
+    if (null !== $expiryDate) {
+        $expiryAt = \Alaress_Date_Format::newDatabaseDate("{$expiryDate} 00:00:00");
     }
 
     if (is_array($meta['name'])) {
