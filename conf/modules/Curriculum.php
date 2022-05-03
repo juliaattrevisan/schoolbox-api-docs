@@ -23,11 +23,9 @@ class Curriculum implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/curriculum');
-//        $module->init('/curriculum');
 
         $importModule = new ImportModule($di);
         $importModule->registerModule('/curriculum/import');
-//        $importModule->init('/curriculum/import');
 
         // Submodules:
         // * learning areas

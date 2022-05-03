@@ -22,6 +22,5 @@ class Timetable implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/timetable');
-//        $module->init('/timetable');
     }
 }

@@ -21,6 +21,5 @@ class Settings implements ModuleConfigInterface
     {
         $messagesModule = new Realtime\Module($di);
         $messagesModule->registerModule('/settings/messages');
-//        $messagesModule->init('/settings/messages');
     }
 }

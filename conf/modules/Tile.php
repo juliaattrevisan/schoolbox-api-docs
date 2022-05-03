@@ -22,6 +22,5 @@ class Tile implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/tile');
-//        $module->init('/tile');
     }
 }

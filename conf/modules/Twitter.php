@@ -22,6 +22,5 @@ class Twitter implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/twitter');
-//        $module->init('/twitter');
     }
 }

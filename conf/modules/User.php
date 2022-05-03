@@ -26,31 +26,26 @@ class User implements ModuleConfigInterface
     {
         $userModule = new UserModule($di);
         $userModule->registerModule('/user');
-//        $userModule->init('/user');
 
         // Only load the external SIS academic report module if it is enabled in config
 
         if ($di->get('config')->get('external_document_report_enabled')) {
             $documentReportModule = new UserProfileDocumentManagementModule($di);
             $documentReportModule->registerModule('/user/profile/documents/reports');
-//            $documentReportModule->init('/user/profile/documents/reports');
         }
 
         /* Change Password
          */
         $module = new ChangePasswordModule($di);
         $module->registerModule('/passwordChange');
-//        $module->init('/passwordChange');
 
         /* Reset Password
          */
         $module = new ResetPasswordModule($di);
         $module->registerModule('/passwordReset');
-//        $module->init('/passwordReset');
 
         // Token
         $module = new UserTokenModule($di);
         $module->registerModule('/user/token');
-//        $module->init('/user/token');
     }
 }

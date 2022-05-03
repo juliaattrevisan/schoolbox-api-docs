@@ -24,6 +24,5 @@ class EventAttendance implements ModuleConfigInterface
 
         $module = new Module($di);
         $module->registerModule('/calendar/event/attendance');
-//        $module->init('/calendar/event/attendance');
     }
 }

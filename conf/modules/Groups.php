@@ -21,6 +21,5 @@ class Groups implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/groups');
-//        $module->init('/groups');
     }
 }

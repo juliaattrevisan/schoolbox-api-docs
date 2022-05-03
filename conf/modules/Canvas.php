@@ -24,6 +24,5 @@ class Canvas implements ModuleConfigInterface
 
         $module = new Module($di);
         $module->registerModule("/{$namespace}");
-//        $module->init("/{$namespace}");
     }
 }
