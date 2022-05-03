@@ -69,28 +69,21 @@ class Controller extends Base
      */
     public function apiAssessmentSearch()
     {
-        $search = $this->request->query->get('search', '');
-        $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        /**
+         * check if filter is an array or string and use it like that
+         */
+        $filter = null;
+        $getFilter = $this->request->query->get('filter', '');
+        if (is_string($getFilter)) {
+            $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        } elseif (is_array($getFilter)) {
+            $filter = $getFilter;
+        }
         $cursor = (int)$this->request->query->get('cursor', null);
         $limit = (int)$this->request->query->get('limit', 5);
-        if ('' === $search) {
-            $problem = (new ApiProblem('Search must not be blank'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early there is a malformed keyword for search
-        }
+
         if (null === $filter) {
             $problem = (new ApiProblem('Filter must not be blank'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early there is a malformed keyword for search
-        }
-        if (strlen($search) <= 2) {
-            $problem = (new ApiProblem('Search term must be longer than 2 characters'))
                 ->setStatus(401)
                 ->asArray();
             $this->getResponse()->status->setCode(401);
@@ -148,10 +141,6 @@ WHERE
             $where .= " AND v_assessment_relation.assessment_id = :assessmentId ";
             $params['assessmentId'] = $filter['assessmentId'];
         }
-        if (array_key_exists('title', $filter)) {
-            $where .= " AND assessment.title = :title ";
-            $params['title'] = $filter['title'];
-        }
         if (array_key_exists('assessmentType', $filter)) {
             $where .= " AND COALESCE(
             if(task.id, 'Task', null),
@@ -205,9 +194,9 @@ WHERE
                 JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id";
             }
         }
-        if ('' !== $search) {
+        if (array_key_exists('title', $filter)) {
             $where .= " AND assessment.title like :searchParam ";
-            $params['searchParam'] = '%' . $this->dbMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
+            $params['searchParam'] = '%' . $this->dbMapper->getDatabase()->getQuoter()->escapeForLike($filter['title']) . '%';
         }
 
         if (0 !== $cursor) {
