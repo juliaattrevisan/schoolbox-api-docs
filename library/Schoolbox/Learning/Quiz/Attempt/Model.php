@@ -79,54 +79,6 @@ class Model implements ISoftDeletable
     private ?float $max_mark = null;
 
     /**
-     * The mark that the user has received for this attempt.
-     *
-     * @return float
-     */
-    public function getMarkOLD(): float
-    {
-        $mark = 0;
-        foreach ($this->answers as $answer) {
-            $mark += $answer->getMark();
-        }
-        return $mark;
-    }
-
-    /**
-     * The total number of marks available for this attempt.
-     *
-     * @return float
-     */
-    public function getTotalMark(): float
-    {
-        $totalMark = 0;
-        foreach ($this->answers as $answer) {
-            $totalMark += $answer->getQuestion()->getMarks();
-        }
-        return $totalMark;
-    }
-
-    /**
-     * The total mark value of this attempt which has been graded.
-     *
-     * @return float
-     */
-    public function getTotalMarkGraded(): float
-    {
-        // Is this reviewed? If so then 100% of marks are graded.
-        if ($this->isReviewed()) {
-            return $this->getTotalMark();
-        }
-        $totalMark = 0;
-        foreach ($this->answers as $answer) {
-            if ($answer->getAutoMarked()) {
-                $totalMark += $answer->getQuestion()->getMarks();
-            }
-        }
-        return $totalMark;
-    }
-
-    /**
      * Is this deleted?
      *
      * @return bool
