@@ -282,15 +282,22 @@ class Classes implements IStrategy
                 continue;
             }
 
-            /* Class has no code. ignore this class
-            Schoolbox has no way of working with an external class that has no code.
+            /* Class has no code; ignore this class
+             * Schoolbox has no way of working with an external class that has no code.
+             *
+             * I'm not entirely sure how prevalent this setup might be. I haven't encountered
+             * a school which had classes sans code; those would be considered regular events
+             * to me. I haven't seen inside wonde to decide if that's even technically possible
+             * in their software, so this could be a result of bad data or other weird stuff.
+             *
+             * Re-address upon first encounter of a legitimate class that has no code.
             */
             if ('' === trim((string)$class['code'])) {
-                $this->log->debug(sprintf(
-                    "Class Name:'%s' Code:'%s', has no class code. ignoring",
+                $this->log->warning(sprintf(
+                    'Class %s has empty class code - skipping',
                     $class['name'],
-                    $class['code'],
                 ));
+
                 continue;
             }
 
