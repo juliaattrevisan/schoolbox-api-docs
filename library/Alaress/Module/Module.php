@@ -113,13 +113,6 @@ class Module
     private static array $installedModules = [];
 
     /**
-     * A list of module registrations.
-     *
-     * @var array<string, array{class: class-string, basePath: string, contextBasename: ?string}>
-     */
-    protected static array $registeredModules = [];
-
-    /**
      * Constructor
      *
      * @param ContainerInterface $injector
@@ -222,84 +215,16 @@ class Module
         }
     }
 
-
     /**
      * Register this module.
-     *
-     * TODO move all of this to a Registry class or something
      *
      * @param string|null $basePath
      * @return void
      */
     public function registerModule(?string $basePath): void
     {
-        self::$registeredModules[$this->basename] = [
-            'class'           => get_class($this),
-            'basePath'        => $basePath,
-            'contextBasename' => null,
-        ];
+        Registry::register($this, $basePath);
     }
-
-    /**
-     * Retrieve all module registrations.
-     *
-     * @return array<string, array{class: class-string, basePath: string, contextBasename: ?string}>
-     */
-    public static function retrieveAllModuleRegistrations(): array
-    {
-        return self::$registeredModules;
-    }
-
-    /**
-     * Retrieve a single module registration.
-     *
-     * @param string $basename The name of the registered module.
-     * @return array{class: class-string, basePath: string, contextBasename: ?string}
-     */
-    public static function retrieveRegistration(string $basename): array
-    {
-        if (!isset(self::$registeredModules[$basename])) {
-            throw new LogicException(sprintf('Module "%s" does not exist', $basename));
-        }
-        return self::$registeredModules[$basename];
-    }
-
-    /**
-     * Build a module out of a registration.
-     *
-     * @param ContainerInterface $di       The DI container all modules require.
-     * @param string             $basename The name of the registered module.
-     * @return Module
-     */
-    public static function buildModuleFromRegistration(ContainerInterface $di, string $basename): Module
-    {
-        $registration = self::retrieveRegistration($basename);
-        $class        = $registration['class'];
-
-        // Modules may have a context module:
-        // if so, build its context recursively.
-        if (isset($registration['contextBasename'])) {
-            $module = new $class($di, self::buildModuleFromRegistration($di, $registration['contextBasename']));
-        } else {
-            $module = new $class($di, null);
-        }
-        return $module;
-    }
-
-    /**
-     * Install cached module registrations.
-     *
-     * @param array $registrations
-     * @return void
-     */
-    public static function installModuleRegistrations(array $registrations): void
-    {
-        self::$registeredModules = $registrations;
-    }
-
-
-
-
 
     /**
      * Performs setup steps required to use this module's controller.

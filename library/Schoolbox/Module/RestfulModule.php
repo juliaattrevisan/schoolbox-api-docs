@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Module;
 
+use Alaress\Module\Registry;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
@@ -224,10 +225,6 @@ abstract class RestfulModule extends AlaressModule
      */
     public function registerModuleWithContext(?string $basePath, RestfulModule $context): void
     {
-        self::$registeredModules[$this->basename] = [
-            'class'           => get_class($this),
-            'basePath'        => $basePath,
-            'contextBasename' => $context->getBasename(),
-        ];
+        Registry::register($this, $basePath, $context);
     }
 }

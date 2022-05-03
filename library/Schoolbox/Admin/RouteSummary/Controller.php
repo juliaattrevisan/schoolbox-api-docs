@@ -8,9 +8,9 @@
 
 namespace Schoolbox\Admin\RouteSummary;
 
+use Alaress\Module\Registry;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
-use Schoolbox\Admin\Navigation\Subnav;
 
 
 /**
@@ -28,8 +28,7 @@ class Controller extends Base
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
-//                $module = Module::retrieveInstalledModule($parsedName['controller']);
-                $module = Module::buildModuleFromRegistration($this->di, $parsedName['controller']);
+                $module = Registry::buildModuleFromRegistration($this->di, $parsedName['controller']);
                 $module->initControllerDependencies();
                 $controller = $module->buildController();
             } catch (\Throwable $e) {

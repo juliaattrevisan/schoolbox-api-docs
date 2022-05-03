@@ -52,8 +52,7 @@ class Loader implements LoaderInterface
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
             try {
-//                $module = Module::retrieveInstalledModule($moduleName);
-                $module = Module::buildModuleFromRegistration($this->di, $moduleName);
+                $module = Registry::buildModuleFromRegistration($this->di, $moduleName);
             } catch (LogicException $e) {
                 // There was no module to load.
                 // That's fine, as `addTemplatePath` can set a different

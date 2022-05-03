@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 use Alaress\Module\Module as BaseModule;
+use Alaress\Module\Registry;
 use Alaress\Web\Router\RouteCollection;
 use Aura\Router\RouteFactory;
 use Aura\Router\Router;
@@ -41,14 +42,14 @@ $kernel = new CliTool\Kernel(
             // Before this runs: clear the route and module registrations,
             // so that new registration tables may be built
             $router->setRoutes(new RouteCollection(new RouteFactory()));
-            BaseModule::installModuleRegistrations([]);
+            Registry::setRegistrations([]);
 
             $this->loadAllModules();
 
             // The new route and module registrations have been loaded:
             // dump their registration tables
             file_put_contents(self::ROUTE_CACHE_FILE, serialize($router->getRoutes()));
-            file_put_contents(self::MODULE_CACHE_FILE, json_encode(BaseModule::retrieveAllModuleRegistrations()));
+            file_put_contents(self::MODULE_CACHE_FILE, json_encode(Registry::getRegistrations()));
         }
 
         /**
@@ -85,8 +86,8 @@ $kernel = new CliTool\Kernel(
             }
 
             // All modules have been registered: now init them
-            foreach (BaseModule::retrieveAllModuleRegistrations() as $basename => $registration) {
-                BaseModule::buildModuleFromRegistration($this->getDi(), $basename)->init($registration['basePath']);
+            foreach (Registry::getRegistrations() as $basename => $registration) {
+                Registry::buildModuleFromRegistration($this->getDi(), $basename)->init($registration['basePath']);
             }
         }
     }

@@ -15,7 +15,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Loader as ModuleLoader;
-use Alaress\Module\Module;
+use Alaress\Module\Registry;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
@@ -1874,6 +1874,6 @@ abstract class Kernel
         if (empty($modulesEncoded)) {
             return;
         }
-        Module::installModuleRegistrations(json_decode($modulesEncoded, true));
+        Registry::setRegistrations(json_decode($modulesEncoded, true));
     }
 }

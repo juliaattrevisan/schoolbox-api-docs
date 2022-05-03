@@ -11,6 +11,7 @@
 namespace Alaress\Web\Controller;
 
 use Alaress\Module\Module;
+use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Aura\Session\SegmentInterface;
@@ -365,8 +366,7 @@ abstract class Base
      */
     protected function getController($name)
     {
-//        $module = Module::retrieveInstalledModule($name);
-        $module = Module::buildModuleFromRegistration($this->di, $name);
+        $module = Registry::buildModuleFromRegistration($this->di, $name);
 
         // initialise controller's routes and dependencies, and then build it
         $module->initControllerDependencies();
