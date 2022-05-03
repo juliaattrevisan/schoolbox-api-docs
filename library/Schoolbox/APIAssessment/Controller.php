@@ -102,6 +102,7 @@ SELECT
     lu_work_type.id as `workTypeId`,
     v_assessment_relation.folder_id as `folderId`,
     assessment.weight as `weighted`,
+    assessment.course_managed AS commonAssessment,
      COALESCE(
             if(task.id, 'Task', null),
             if(assess.assessment_id, 'Quiz', null),
@@ -247,7 +248,7 @@ WHERE
                 'id'  => $row['id'],
                 'title'         => $row['title'],
                 'assessmentType' => $row['assessmentType'],
-                'commonAssessment' => '',
+                'commonAssessment' => (bool)$row['commonAssessment'],
                 'workType'      => [
                                     'name'  => $row['workTypeName'],
                                     'id'    => $row['workTypeId']
