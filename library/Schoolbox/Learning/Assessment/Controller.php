@@ -458,7 +458,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         $folder = $assessment->getContext()->getFolder();
-        $postReturnUrl = $this->getRequest()->query[Redirect::RETURN_URL];
+        $postReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, "/homepage/{$folder->getId()}");
 
