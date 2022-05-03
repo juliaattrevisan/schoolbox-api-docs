@@ -537,9 +537,9 @@ class Mapper extends BaseMapper
     {
         $attempt->setReviewed(Alaress_Date_Format::now());
         $attempt->setReviewer($reviewer);
+        $saved = $this->save($attempt);
         $this->updateMarks($attempt);
-
-        return $this->save($attempt);
+        return $saved;
     }
 
     /**

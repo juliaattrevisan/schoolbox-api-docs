@@ -79,20 +79,19 @@ HELP;
         /**
          * get list of quiz responses to update
          */
-        /** @var Schoolbox\Learning\Quiz\Attempt\Model[] $attempts */
-        $attempts = $this->attemptMapper->findAll();
+        $attemptIds = $this->attemptMapper->findAllIds();
 
         /**
          * do the update
          */
-        foreach ($attempts as $attempt) {
+        foreach ($attemptIds as $attempt) {
             $this->getLogger()->debug(sprintf(
                 'Updating marks for attempt: %d',
-                $attempt->getId()
+                $attempt
             ));
+            //this also accepts int, not just the model
             $this->attemptMapper->updateMarks($attempt);
         }
-
 
         $this->getLogger()->debug('Done.');
     }
