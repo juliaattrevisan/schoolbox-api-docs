@@ -14,6 +14,13 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 
+/**
+ * Implementation of *Alaress\Database\Connector\IConnector* for when
+ * external_enable is off or connection to the external DB used by SIS cannot be established
+ *
+ * This is introduced to prevent $di->get('databaseExternal') returning null, which is no longer allowed.
+ * This is different from the External_Offline series which are implementations of *External\IConnector*.
+ */
 class NullConnector implements IConnector
 {
 
@@ -85,7 +92,7 @@ class NullConnector implements IConnector
      */
     public function prepareQuery($query, $parameters = [])
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -94,7 +101,7 @@ class NullConnector implements IConnector
      */
     public function executeQuery($sql, $parameters = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -103,7 +110,7 @@ class NullConnector implements IConnector
      */
     public function getQueryIterator($sql, $parameters = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -112,7 +119,7 @@ class NullConnector implements IConnector
      */
     public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -121,7 +128,7 @@ class NullConnector implements IConnector
      */
     public function executeFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -130,7 +137,7 @@ class NullConnector implements IConnector
      */
     public function prepareStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -139,7 +146,7 @@ class NullConnector implements IConnector
      */
     public function executeStoredProcedure($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -148,7 +155,7 @@ class NullConnector implements IConnector
      */
     public function getStoredProcedureIterator($procedure, $inputs = null, &$outputs = null, &$return = null)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -283,7 +290,7 @@ class NullConnector implements IConnector
      */
     public function getCollector()
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -309,7 +316,7 @@ class NullConnector implements IConnector
      */
     public function buildPredicateBuilder($table)
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -318,7 +325,7 @@ class NullConnector implements IConnector
      */
     public function getQuoter(): IQuoter
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -354,7 +361,7 @@ class NullConnector implements IConnector
      */
     public function getIterator(string $sql, array $parameters = null): IIterator
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -363,7 +370,7 @@ class NullConnector implements IConnector
      */
     public function query(string $sql, array $parameters = null): IStatement
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
@@ -372,7 +379,7 @@ class NullConnector implements IConnector
      */
     public function prepareProcedure(string $name): IStoredProcedure
     {
-        throw new Exception();
+        throw new Exception('Not supported.');
     }
 
 
