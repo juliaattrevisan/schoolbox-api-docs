@@ -28,9 +28,16 @@ class Registry
     /**
      * A list of module registrations.
      *
-     * @var array<string, array{class: class-string, basePath: string, contextBasename: ?string}>
+     * @var array<string, array{class: class-string, basePath: ?string, contextBasename: ?string}>
      */
-    protected static array $registrations = [];
+    private static array $registrations = [];
+
+    /**
+     * A list of modules previously crated by `buildModuleFromRegistration`.
+     *
+     * @var array<string, Module>
+     */
+    private static array $moduleCache = [];
 
     /**
      * Register a single module.
@@ -76,7 +83,7 @@ class Registry
      * Retrieve a single module registration.
      *
      * @param string $basename The name of the registered module.
-     * @return array{class: class-string, basePath: string, contextBasename: ?string}
+     * @return array{class: class-string, basePath: ?string, contextBasename: ?string}
      * @throws LogicException if no module with basename `$basename` has been
      *                        registered using `register()`
      */
@@ -103,6 +110,10 @@ class Registry
      */
     public static function buildModuleFromRegistration(ContainerInterface $di, string $basename): Module
     {
+        $builtModule = self::$moduleCache[$basename] ?? null;
+        if (isset($builtModule)) {
+            return $builtModule;
+        }
         $registration = self::retrieveRegistration($basename);
         $class        = $registration['class'];
 
@@ -118,11 +129,12 @@ class Registry
         // permissions as set up in `registerRoutes`.
         /** @var Module $module */
         $module->installRoutes($registration['basePath']);
+        self::$moduleCache[$basename] = $module;
         return $module;
     }
 
     /**
-     * @return array<string, array{class: class-string, basePath: string, contextBasename: ?string}>
+     * @return array<string, array{class: class-string, basePath: ?string, contextBasename: ?string}>
      */
     public static function getRegistrations(): array
     {
@@ -132,7 +144,7 @@ class Registry
     /**
      * Install cached module registrations.
      *
-     * @param array<string, array{class: class-string, basePath: string, contextBasename: ?string}> $registrations
+     * @param array<string, array{class: class-string, basePath: ?string, contextBasename: ?string}> $registrations
      * @return void
      */
     public static function setRegistrations(array $registrations): void
