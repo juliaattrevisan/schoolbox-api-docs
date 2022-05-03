@@ -180,39 +180,34 @@ class Module
 
 
     /**
-     * Installs module with its most basic configuration.
+     * Installs a module's routes.
      *
-     * Only the module's submodules and routes should be initialised here -
-     * these are the bare minimum the kernel requires to bind a module to a
-     * route, and then execute it.
+     * A module's routes are the bare minimum the kernel requires to bind a
+     * module to a route, and then execute it.
      *
      * @param string|null $basePath The base URL for this module, used by
      *                              `initRoutes`.
      *                              If this is null, this can't have any routes.
      */
-    public function init(?string $basePath)
+    public function installRoutes(?string $basePath)
     {
-        if ($this->installModule()) {
-            $this->initSubmodules($this->injector, $basePath);
+        if (isset($basePath)) {
+            // perform any route registration available
+            $this->registerRoutes();
 
-            if (isset($basePath)) {
-                // perform any route registration available
-                $this->registerRoutes();
-
-                // preload registered routes
-                foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
-                    $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
-                         ->setMethod($method)
-                         ->setTokens($tokens);
-                }
+            // preload registered routes
+            foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
+                $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
+                     ->setMethod($method)
+                     ->setTokens($tokens);
             }
-
-//            // no need that no more
-//            unset($this->routeIndex);
-
-            // manual route init
-            $this->initRoutes($this->getRouter(), $basePath);
         }
+
+//        // no need that no more
+//        unset($this->routeIndex);
+
+        // manual route init
+        $this->initRoutes($this->getRouter(), $basePath);
     }
 
     /**
@@ -302,35 +297,6 @@ class Module
         return true;
     }
 
-
-    /**
-     * Retrieves a module previously installed via `$this->init`.
-     *
-     * @param string $baseName
-     * @return self
-     * @throws LogicException if module isn't installed
-     */
-    public static function retrieveInstalledModule(string $baseName): self
-    {
-        if (!(self::$installedModules[$baseName] ?? null) instanceof Module) {
-            throw new LogicException(sprintf('Module "%s" does not exist', $baseName));
-        }
-        return self::$installedModules[$baseName];
-    }
-
-
-    /**
-     * Initializes any submodules of this module.
-     *
-     * @deprecated Submodules aren't used anymore:
-     *             instead, define modules directly in the module config
-     *
-     * @param ContainerInterface $injector
-     * @param string|null        $basePath The base route for this module
-     */
-    public function initSubmodules(ContainerInterface $injector, ?string $basePath)
-    {
-    }
 
     /**
      * Hook method for setting up routes via self::register()
