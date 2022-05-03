@@ -431,7 +431,17 @@ class Controller extends Base
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early there is a malformed keyword for search
         }
-        $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        /**
+         * check if filter is an array or string and use it like that
+         */
+        $filter = null;
+        $getFilter = $this->request->query->get('filter', '');
+        if (is_string($getFilter)) {
+            $filter = json_decode($this->request->query->get('filter', ''), true) ?? null;
+        } elseif (is_array($getFilter)) {
+            $filter = $getFilter;
+        }
+
         $userHelper = new Helper($this->userMapper);
         $output = [];
         $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
