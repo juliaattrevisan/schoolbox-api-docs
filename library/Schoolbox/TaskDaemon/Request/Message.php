@@ -81,6 +81,14 @@ class Message
     private ?string $callbackUrl;
 
     /**
+     * If provided: the task daemon will use these params as the body of the
+     * request to `$callbackUrl`.
+     *
+     * Currently, these params are always passed as JSON.
+     */
+    private ?array $callbackParams;
+
+    /**
      * If provided: the task daemon will use this as an authorization token
      * when calling `$callbackUrl`.
      */
@@ -104,6 +112,7 @@ class Message
      * @param string            $type
      * @param string            $schoolCode
      * @param string|null       $callbackUrl
+     * @param array|null        $callbackParams
      * @param string|null       $callbackToken
      */
     public function __construct(
@@ -117,19 +126,21 @@ class Message
         string $type,
         string $schoolCode,
         ?string $callbackUrl,
+        ?array $callbackParams,
         ?string $callbackToken
     ) {
-        $this->task          = $task;
-        $this->params        = $params;
-        $this->timestamp     = $timestamp;
-        $this->instanceId    = $instanceId;
-        $this->hostName      = $hostName;
-        $this->domain        = $domain;
-        $this->version       = $version;
-        $this->type          = $type;
-        $this->schoolCode    = $schoolCode;
-        $this->callbackUrl   = $callbackUrl;
-        $this->callbackToken = $callbackToken;
+        $this->task           = $task;
+        $this->params         = $params;
+        $this->timestamp      = $timestamp;
+        $this->instanceId     = $instanceId;
+        $this->hostName       = $hostName;
+        $this->domain         = $domain;
+        $this->version        = $version;
+        $this->type           = $type;
+        $this->schoolCode     = $schoolCode;
+        $this->callbackUrl    = $callbackUrl;
+        $this->callbackParams = $callbackParams;
+        $this->callbackToken  = $callbackToken;
     }
 
     /**
@@ -202,6 +213,14 @@ class Message
     public function getCallbackUrl(): ?string
     {
         return $this->callbackUrl;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getCallbackParams(): ?array
+    {
+        return $this->callbackParams;
     }
 
     /**

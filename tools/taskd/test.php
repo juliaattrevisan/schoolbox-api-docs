@@ -59,6 +59,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             'test',
             [],
             null,
+            [],
             null,
         );
 

@@ -89,15 +89,16 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $userSerializer = new ModelToArray();
         $message        = $messageFactory->build(
             'notify',
+            [],
+            (new Factory($this->getConfig()))
+                ->buildFullyQualified()
+                ->setPath(sprintf('/api/user/%d/notify', $toUserId))
+                ->toString(),
             [
                 'message'   => $messageBody,
                 'from'      => call_user_func($userSerializer, $fromUser),
                 'to'        => call_user_func($userSerializer, $toUser),
             ],
-            (new Factory($this->getConfig()))
-                ->buildFullyQualified()
-                ->setPath(sprintf('/api/user/%d/notify', $toUserId))
-                ->toString(),
             $adminUser,
         );
 
