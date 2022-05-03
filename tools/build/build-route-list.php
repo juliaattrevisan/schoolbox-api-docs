@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 /**
- * Build a list of all routes, and their corresponding module/path/etc.
+ * Loads or refreshes the route and module cache for this instance.
  */
 
 use Alaress\Module\Registry;
@@ -37,15 +37,15 @@ $kernel = new CliTool\Kernel(
             /** @var Router $router */
             $router = $this->getDi()->get('router');
 
-            // Before this runs: clear the route and module registrations,
-            // so that new registration tables may be built
+            // Before this runs: clear the route table and module registrations,
+            // so that they may be built afresh.
             $router->setRoutes(new RouteCollection(new RouteFactory()));
             Registry::setRegistrations([]);
 
             $this->loadAllModules();
 
-            // The new route and module registrations have been loaded:
-            // dump their registration tables into Redis
+            // The new route table and module registrations have been loaded:
+            // dump them into Redis.
             /** @var Client $redis */
             $redis = $this->getDi()->get('redis.storage');
             $this->getLogger()->info('Writing route and module configs to Redis cache');
@@ -57,7 +57,8 @@ $kernel = new CliTool\Kernel(
          * Load all module configs which are relevant for this instance, then
          * loads each of its modules and performs its init steps.
          *
-         * This builds the route and module tables, ready to be cached.
+         * This builds the route table and module registrations, ready to be
+         * cached.
          *
          * @return void
          */
@@ -73,6 +74,7 @@ $kernel = new CliTool\Kernel(
                 glob($customModulePath),
             );
 
+            // Load the module config for each module path
             foreach ($modulePaths as $routePath) {
                 require_once $routePath;
                 $this->getLogger()->debug(sprintf('Loading module config: %s', $routePath));
