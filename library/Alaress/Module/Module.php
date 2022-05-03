@@ -181,10 +181,13 @@ class Module
                      ->setMethod($method)
                      ->setTokens($tokens);
             }
-        }
 
-        // manual route init
-        $this->initRoutes($this->getRouter(), $basePath);
+            // no need that no more
+            unset($this->routeIndex);
+
+            // manual route init
+            $this->initRoutes($this->getRouter(), $basePath);
+        }
     }
 
     /**

@@ -96,8 +96,7 @@ $kernel = new CliTool\Kernel(
             // All modules have been registered: now build their routes
             foreach (Registry::getRegistrations() as $basename => $registration) {
                 $this->getLogger()->debug(sprintf('Loading routes from module: %s (%s)', $basename, $registration['class']));
-                Registry::buildModuleFromRegistration($this->getDi(), $basename)
-                        ->installRoutes($registration['basePath']);
+                Registry::buildModuleFromRegistration($this->getDi(), $basename);
             }
         }
     },

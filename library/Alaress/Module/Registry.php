@@ -91,6 +91,10 @@ class Registry
     /**
      * Build a module out of a registration.
      *
+     * Also re-installs all the module's routes, preloads and permissions: these
+     * need to be reloaded as the preloads+permissions are set up in the same
+     * process as setting up the module's routes.
+     *
      * @param ContainerInterface $di       The DI container all modules require.
      * @param string             $basename The name of the registered module.
      * @return Module
@@ -109,6 +113,11 @@ class Registry
         } else {
             $module = new $class($di, null);
         }
+
+        // Re-install the module's routes, as well as its preloads and
+        // permissions as set up in `registerRoutes`.
+        /** @var Module $module */
+        $module->installRoutes($registration['basePath']);
         return $module;
     }
 
