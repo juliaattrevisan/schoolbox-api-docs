@@ -26,7 +26,6 @@ require __DIR__ . '/../../conf/core/require.php';
 require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
 require_once SITE_root . '/conf/ModuleLoader.php';
 
-
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App
     {
@@ -49,6 +48,7 @@ $kernel = new CliTool\Kernel(
             // dump their registration tables into Redis
             /** @var Client $redis */
             $redis = $this->getDi()->get('redis.storage');
+            $this->getLogger()->info('Writing route and module configs to Redis cache');
             $redis->set(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, serialize($router->getRoutes()));
             $redis->set(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, json_encode(Registry::getRegistrations()));
         }
@@ -63,14 +63,19 @@ $kernel = new CliTool\Kernel(
          */
         private function loadAllModules(): void
         {
-            $siteSchoolCode = $this->getConfig()->get('site_school_code');
+            $siteSchoolCode   = ucfirst(strtolower($this->getConfig()->get('site_school_code')));
+            $coreModulePath   = SITE_root . '/conf/modules/*.php';
+            $customModulePath = SITE_root . sprintf('/conf/modules/Custom/%s/*.php', $siteSchoolCode);
+            $this->getLogger()->info(sprintf('Loading core module config from path: %s', $coreModulePath));
+            $this->getLogger()->info(sprintf('Loading custom module config from path: %s', $customModulePath));
             $modulePaths    = array_merge(
-                glob(SITE_root . '/conf/modules/*.php'),
-                glob(SITE_root . sprintf('/conf/modules/Custom/%s/*.php', $siteSchoolCode)),
+                glob($coreModulePath),
+                glob($customModulePath),
             );
 
             foreach ($modulePaths as $routePath) {
                 require_once $routePath;
+                $this->getLogger()->debug(sprintf('Loading module config: %s', $routePath));
 
                 // Get a route name out of this path
                 $path = preg_replace('/^' . preg_quote(SITE_root . '/conf/modules/', '/') . '/', '', $routePath);
@@ -79,19 +84,23 @@ $kernel = new CliTool\Kernel(
 
                 $class = 'Config\\Modules\\' . $path;
 
+                $this->getLogger()->debug(sprintf('Loading module config:  modules from config: %s', $class));
                 if (class_exists($class, false)) {
                     /** @var ModuleConfigInterface $obj */
                     $obj = new $class();
                     $obj->configure($this->getDi());
                 }
             }
+            $this->getLogger()->info('Module configs loaded; loading routes from modules');
 
             // All modules have been registered: now build their routes
             foreach (Registry::getRegistrations() as $basename => $registration) {
+                $this->getLogger()->debug(sprintf('Loading routes from module: %s (%s)', $basename, $registration['class']));
                 Registry::buildModuleFromRegistration($this->getDi(), $basename)
                         ->installRoutes($registration['basePath']);
             }
         }
-    }
+    },
+    [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO],
 );
 $kernel->runApp();
