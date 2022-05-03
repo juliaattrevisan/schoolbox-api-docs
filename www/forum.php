@@ -134,7 +134,20 @@ $outputPagination = array(
 $this->setVar($outputPagination);
 
 /* output threads */
-$threadList = $threadMapper->findByColumn('categoryID', $category->getId(), ['limit' => $threadPerPage, 'offset' => $threadIndex])->getAll();
+/**
+ * limited, offset, and ordered correctly... (by the most recent thread that was updated)
+ */
+$threadList = $threadMapper->findByColumn(
+    'categoryID',
+    $category->getId(),
+    [
+        'limit' => $threadPerPage,
+        'offset' => $threadIndex,
+        'order' => [
+            'last_post_date' => 'DESC'
+        ]
+    ]
+)->getAll();
 
 if (0 !== count($threadList)) {
     $userHandler = new User();
