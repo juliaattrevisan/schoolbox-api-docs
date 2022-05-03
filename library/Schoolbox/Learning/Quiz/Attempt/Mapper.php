@@ -553,6 +553,7 @@ class Mapper extends BaseMapper
 
     /**
      * update the quiz response score
+     * no save call, or return, just DB direct query
      */
     public function updateMarks(int|Model $attempt)
     {
@@ -560,28 +561,28 @@ class Mapper extends BaseMapper
          * collate all marks and total possible marks, and update this field.
          */
         $query =  $this->getDatabase()->prepare("
-UPDATE assess_attempt
-SET 
-SELECT
-    SUM(ar.mark)  AS mark,
-    SUM(aq.marks) AS max_mark
-FROM assess_attempt aa
-         JOIN assess q ON q.assess_id = aa.assess_id
-         LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-         LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-WHERE aa.attempt_id = :attemptId
-AND ar.deleted_at IS NULL
-AND aq.deleted_at IS NULL
-GROUP BY aa.assess_id, aa.attempt_id");
+        UPDATE assess_attempt,
+            (SELECT
+                 SUM(ar.mark)  AS mark,
+                 SUM(aq.marks) AS max_mark,
+                 aa.attempt_id
+             FROM assess_attempt aa
+                      JOIN assess q ON q.assess_id = aa.assess_id
+                      LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                      LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+             WHERE aa.attempt_id = :attemptId
+               AND ar.deleted_at IS NULL
+               AND aq.deleted_at IS NULL
+             GROUP BY aa.assess_id, aa.attempt_id) as newVal
+        SET
+            assess_attempt.max_mark = newVal.max_mark,
+            assess_attempt.mark  = newVal.mark
+        WHERE assess_attempt.attempt_id = newVal.attempt_id;
+        ");
         if (is_int($attempt)) {
             $query->execute(['attemptId' => $attempt]);
         } else {
             $query->execute(['attemptId' => $attempt->getId()]);
         }
-        $marks = $query->fetch();
-        $attempt->setMark($marks['mark']);
-        $attempt->setMaxMark($marks['max_mark']);
-
-        return $this->save($attempt);
     }
 }
