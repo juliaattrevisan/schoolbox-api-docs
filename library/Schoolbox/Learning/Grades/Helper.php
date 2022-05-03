@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
@@ -136,7 +137,7 @@ class Helper
             $workTypeAssessments = new Collection();
             foreach ($folderAssessments as $folderAssessment) {
                 if (
-                    ($folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
+                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
                     $visibility->isVisibleToUser($folderAssessment, $viewee, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
