@@ -133,11 +133,11 @@ class Controller extends Base
         /* If there were any search results, display control options
          */
         $userList = $this->userBulkMapper->bulkModifySearch(
-            $selected['campusId'],
-            $selected['roleId'],
-            $selected['ePortfolio'],
-            $selected['yearLevelId'],
-            $selected['token']
+            $selected['campusId'] ? [(int)$selected['campusId']] : [UserBulkMapper::ANY],
+            $selected['roleId'] ? [(int)$selected['roleId']] : [UserBulkMapper::ANY],
+            (int)$selected['ePortfolio'],
+            $selected['yearLevelId'] ? [(int)$selected['yearLevelId']] : [UserBulkMapper::ANY],
+            (int)$selected['token']
         );
         $this->getResponse()->content->set($this->buildJsonOutput($userList));
     }

@@ -4,11 +4,12 @@
  # Parameters:
  # * assessmentOptions: available options for assessments
  # * page:              name of the page to display the options for
+ # * workTypeOption:    name of work type option
 #}
 <legend>{{ locale.assessment.plural | capitalize }}</legend>
 <div class="small-12 columns">
-    <label for="report-work-types-{{ page }}">Work Types</label>
-    <select data-actions name="workTypes-{{ page }}[]" id="report-work-types-{{ page }}" multiple></select>
+    <label for="report-work-types-{{ page }}">Work types</label>
+    <select data-actions name="{{ workTypeOption }}[]" id="report-work-types-{{ page }}" multiple></select>
 </div>
 <script type="text/javascript">
     {% autoescape 'js' %}
@@ -37,13 +38,13 @@
     });
     {% endautoescape %}
 </script>
-{% for assessmentOption in assessmentOptions %}
+{% for optionId, assessmentOption in assessmentOptions %}
     <div class="small-12 medium-6 large-6 columns">
-        <label for="{{ assessmentOption.id }}-{{ page }}">{{ assessmentOption.name }}</label>
+        <label for="{{ optionId }}">{{ assessmentOption }}</label>
         <div class="switch">
-            <input name="{{ assessmentOption.id }}-{{ page }}" id="{{ assessmentOption.id }}-{{ page }}" type="checkbox"
+            <input name="{{ optionId }}" id="{{ optionId }}" type="checkbox"
                    value="1"/>
-            <label for="{{ assessmentOption.id }}-{{ page }}">
+            <label for="{{ optionId }}">
                 <span>ON</span>
                 <span>OFF</span>
             </label>

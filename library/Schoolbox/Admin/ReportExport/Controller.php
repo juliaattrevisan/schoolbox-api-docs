@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\ReportExport;
 
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
@@ -30,9 +31,14 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
+use Schoolbox\UserBulkMapper;
+use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Alaress\Database\Predicate;
+use Schoolbox\Admin\ReportExport\Parameters as ReportParams;
 
 /**
  * Class Controller
@@ -43,6 +49,8 @@ use Alaress\Database\Predicate;
  */
 class Controller extends ConfigController
 {
+
+    private UserMapper $userMapper;
 
     private TermMapper $termMapper;
 
@@ -60,7 +68,12 @@ class Controller extends ConfigController
 
     private Access $access;
 
+    private UserBulkMapper $userBulkMapper;
+
+    private Jwt $tokenBuilder;
+
     /**
+     * @param UserMapper            $userMapper
      * @param TermMapper            $termMapper
      * @param YearLevelMapper       $yearLevelMapper
      * @param CampusMapper          $campusMapper
@@ -69,10 +82,13 @@ class Controller extends ConfigController
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param RubricDataSource      $rubricDataSource
      * @param Access                $access
+     * @param UserBulkMapper        $userBulkMapper
+     * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      */
     public function __construct(
+        UserMapper $userMapper,
         TermMapper $termMapper,
         YearLevelMapper $yearLevelMapper,
         CampusMapper $campusMapper,
@@ -81,10 +97,13 @@ class Controller extends ConfigController
         AssessmentMapperProxy $assessmentMapperProxy,
         RubricDataSource $rubricDataSource,
         Access $access,
+        UserBulkMapper $userBulkMapper,
+        Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory);
+        $this->userMapper            = $userMapper;
         $this->termMapper            = $termMapper;
         $this->yearLevelMapper       = $yearLevelMapper;
         $this->campusMapper          = $campusMapper;
@@ -92,7 +111,9 @@ class Controller extends ConfigController
         $this->folderMapper          = $folderMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
+        $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
+        $this->userBulkMapper        = $userBulkMapper;
     }
 
     /**
@@ -108,61 +129,17 @@ class Controller extends ConfigController
             $this->router->generate('adminReportExport.postConfig'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
-
-
-        $summaryPageOptions = [
-            [
-                'id'   => 'showOverallGrades',
-                'name' => 'Show overall grades',
-            ],
-        ];
-        $classPageOptions   = [
-            [
-                'id'   => 'showLearningLevels',
-                'name' => 'Show learning levels',
-            ],
-            [
-                'id'   => 'showCohortResults',
-                'name' => 'Show cohort / class results',
-            ],
-            [
-                'id'   => 'showCapabilityGrades',
-                'name' => 'Show capability grades',
-            ],
-            [
-                'id'   => 'showProgression',
-                'name' => 'Show progression',
-            ],
-            [
-                'id'   => 'showOverallGrades',
-                'name' => 'Show overall grades',
-            ],
-        ];
-        $assessmentOptions  = [
-            [
-                'id'   => 'showGrades',
-                'name' => 'Show grades',
-            ],
-            [
-                'id'   => 'showComments',
-                'name' => 'Show comments',
-            ],
-            [
-                'id'   => 'showRubrics',
-                'name' => 'Show rubrics',
-            ],
-        ];
-
         $this->getResponse()->content->set(
             [
                 'template' => '@adminReportExport/index.twig',
                 'data'     => [
-                    'pageCurrent'        => $this->router->generate('adminReportExport.getIndex'),
-                    'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getIndex')),
-                    'summaryPageOptions' => $summaryPageOptions,
-                    'classPageOptions'   => $classPageOptions,
-                    'assessmentOptions'  => $assessmentOptions,
-                    'configContext'      => $configContext,
+                    'pageCurrent'              => $this->router->generate('adminReportExport.getIndex'),
+                    'allBreadcrumbs'           => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getIndex')),
+                    'summaryPageOptions'       => ReportParams::SUMMARY_PAGE_OPTIONS,
+                    'classPageOptions'         => ReportParams::CLASS_PAGE_OPTIONS,
+                    'summaryAssessmentOptions' => ReportParams::SUMMARY_ASSESSMENT_OPTIONS,
+                    'classAssessmentOptions'   => ReportParams::CLASS_ASSESSMENT_OPTIONS,
+                    'configContext'            => $configContext,
                 ],
             ]
         );
@@ -178,6 +155,91 @@ class Controller extends ConfigController
     {
         $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
         $this->response->redirect->afterPost($this->router->generate('adminReportExport.getIndex'));
+    }
+
+    /**
+     * Request report generation to taskd
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function requestReports(): void
+    {
+        $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
+
+        // find students
+        $students   = $this->userBulkMapper->bulkModifySearch(
+            empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
+            [UserBulkMapper::ANY], // TODO: limit to students?
+            UserBulkMapper::ANY,
+            empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
+            UserBulkMapper::ANY
+        );
+        $studentIds = array_column($students, 'id');
+
+        if ($reportParams->getStudentIds()) {
+            $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
+            $studentIds = array_unique($studentIds);
+        }
+        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
+
+        $reports = [];
+        $params  = $reportParams->getParams();
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        foreach ($reportStudents as $student) {
+            try {
+                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
+                    'studentId' => $student->getId(),
+                    'student'   => $student,
+                ]);
+                if ($reportPath) {
+                    $reports[] = [
+                        'filename' => sprintf("%d_report.pdf", $student->getId()), // TODO better filename?
+                        'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
+                    ];
+                }
+            } catch (RouteNotFound $e) {
+                // noop
+            }
+        }
+
+        if (empty($reports)) {
+            // TODO: Where should we show error
+            $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
+        }
+
+        // Get the taskd context, and send
+        /** @var Producer $producer */
+        $producer = $this->getDi()->get('taskd.messageProducer');
+
+        /** @var MessageFactory $messageFactory */
+        $messageFactory = $this->getDi()->get('taskd.messageFactory');
+        $message        = $messageFactory->build(
+            'download-pages',
+            [
+                'token'     => $this->tokenBuilder->generate($this->getUser()),
+                'content'   => $reports,
+                'gotenberg' => [
+                    'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                    'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                ],
+            ],
+            $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
+                    ->setQuery(null)
+                    ->toString(),
+            //            [
+            //                'message' => 'Your report has been generated',
+            //                'href'    => '', TODO: what this href would be
+            //            ],
+            $this->getUser(),
+        );
+
+        $producer->send($message);
+        $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
     }
 
     /**
@@ -257,34 +319,17 @@ class Controller extends ConfigController
      * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/student/25?startDate=2021-01-01&endDate=2022-12-31&showOverallGrade=1&showSummary=1
      * @param User $student
      * @return void
-     * @api GET /adminv2/report-export/student/:studentId
      * @throws MapperException
+     * @api GET /adminv2/report-export/student/:studentId
      */
     public function getStudentReport(User $student)
     {
-        $startDate = $this->request->query->get('startDate');
-        $endDate   = $this->request->query->get('endDate');
-        $viewAs    = $this->request->query->get('viewAs');
-        // summary
-        $showSummary             = (bool)$this->request->query->get('showSummary');
-        $showSummaryOverallGrade = (bool)$this->request->query->get('showOverallGrade');
-        $summaryWorkTypeIds      = $this->request->query->get('workTypes');
-        $showSummaryGrades       = (bool)$this->request->query->get('showGrades');
-        $showSummaryComments     = (bool)$this->request->query->get('showComments');
-        $showSummaryRubrics      = (bool)$this->request->query->get('showRubrics');
-        // class
-        $showClass             = (bool)$this->request->query->get('showClass');
-        $showClassOverallGrade = (bool)$this->request->query->get('showClassOverallGrade');
-        $classWorkTypeIds      = $this->request->query->get('classWorkTypes');
-        $showClassGrades       = (bool)$this->request->query->get('showClassGrades');
-        $showClassComments     = (bool)$this->request->query->get('showClassComments');
-        $showClassRubrics      = (bool)$this->request->query->get('showClassRubrics');
-
+        $params = new ReportParams($this->request->query->getArrayCopy(), $this->termMapper);
 
         // Dates
         try {
-            $from = new \Alaress_Date_Format($startDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $to   = new \Alaress_Date_Format($endDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $from = new \Alaress_Date_Format($params->getStartDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $to   = new \Alaress_Date_Format($params->getEndDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
             // fake term
             $term = $this->termMapper->createModel()->setStart($from)->setActualFinish($to);
         } catch (\Exception $e) {
@@ -294,7 +339,7 @@ class Controller extends ConfigController
         }
 
         // View As
-        switch ($viewAs) {
+        switch ($params->getViewAs()) {
             case Role::STUDENT:
                 $viewer = $student;
                 break;
@@ -308,8 +353,8 @@ class Controller extends ConfigController
                 $viewer = $this->getUser();
         }
 
-        $summaryWorkTypes = !$summaryWorkTypeIds ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $summaryWorkTypeIds)));
-        $classWorkTypes   = !$classWorkTypeIds ? null : $this->workTypeMapper->findByColumn('id', array_map('intval', explode(',', $classWorkTypeIds)));
+        $summaryWorkTypes = !$params->getSummaryWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getSummaryWorkTypeIds());
+        $classWorkTypes   = !$params->getClassWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getClassWorkTypeIds());
 
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
@@ -335,9 +380,9 @@ class Controller extends ConfigController
             $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
         }
 
-        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $showSummaryRubrics);
+        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $params->getShowSummaryRubrics());
 
-        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $showClassRubrics);
+        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $params->getShowClassRubrics());
 
         $data = [
             'student'                    => $student,
@@ -348,16 +393,16 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'reportTitle'                => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
-            'showSummary'                => $showSummary,
-            'showSummaryOverallGrade'    => $showSummaryOverallGrade,
-            'showSummaryGrades'          => $showSummaryGrades,
-            'showSummaryComments'        => $showSummaryComments,
-            'showSummaryRubrics'         => $showSummaryRubrics,
-            'showClass'                  => $showClass,
-            'showClassOverallGrade'      => $showClassOverallGrade,
-            'showClassGrades'            => $showClassGrades,
-            'showClassComments'          => $showClassComments,
-            'showClassRubrics'           => $showClassRubrics,
+            'showSummary'                => $params->getShowSummary(),
+            'showSummaryOverallGrade'    => $params->getShowSummaryOverallGrade(),
+            'showSummaryGrades'          => $params->getShowSummaryGrades(),
+            'showSummaryComments'        => $params->getShowSummaryComments(),
+            'showSummaryRubrics'         => $params->getShowSummaryRubrics(),
+            'showClass'                  => $params->getShowClass(),
+            'showClassOverallGrade'      => $params->getShowClassOverallGrade(),
+            'showClassGrades'            => $params->getShowClassGrades(),
+            'showClassComments'          => $params->getShowClassComments(),
+            'showClassRubrics'           => $params->getShowClassRubrics(),
         ];
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
@@ -386,7 +431,7 @@ class Controller extends ConfigController
                 if (!$participant) {
                     continue;
                 }
-                $feedback    = $participant->findMostRecentInstructorGivenPublishedFeedback();
+                $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                 if (
                     $includeRubric
                     && $assessment instanceof DueWork

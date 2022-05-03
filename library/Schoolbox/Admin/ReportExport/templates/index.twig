@@ -13,7 +13,7 @@
     <div class="admin-content">
         {% include '@settings/moduleConfig.twig' with configContext only %}
         <div class="small-12 island" id="formReportExport">
-            <form class="top" id="reportExportForm" method="post" enctype="multipart/form-data" action="">
+            <form class="top" id="reportExportForm" method="post" enctype="multipart/form-data" action="{{ routeLookupIfAuthorized('adminReportExport.requestReports') }}">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -52,7 +52,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <p class="meta">Select the students to be included in the report generation, all students in each group will be included in the final export.</p>
-                            <label for="report-year-levels">Year Level</label>
+                            <label for="report-year-levels">Year levels</label>
                             <select data-actions name="yearLevels[]" id="report-year-levels" multiple></select>
                         </div>
                         <script type="text/javascript">
@@ -115,7 +115,7 @@
                         </script>
                         <div class="small-12 columns">
                             <label for="report-students">Students</label>
-                            <select data-actions name="students[]" id="report-students" multiple></select>
+                            <select data-actions name="studentIds[]" id="report-students" multiple></select>
                         </div>
                         <script type="text/javascript">
                             {% autoescape 'js' %}
@@ -136,11 +136,11 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="includeSummaryPage">Include Summary Page</label>
+                            <label for="showSummary">Include summary page</label>
                             <p class="meta">The summary page will display a list of subjects. You may choose to display just overall grades or the grades from specific assessments in each subject.</p>
                             <div class="switch">
-                                <input name="includeSummaryPage" id="includeSummaryPage" type="checkbox" value="1"/>
-                                <label for="includeSummaryPage">
+                                <input name="showSummary" id="showSummary" type="checkbox" value="1"/>
+                                <label for="showSummary">
                                     <span>ON</span>
                                     <span>OFF</span>
                                 </label>
@@ -148,13 +148,13 @@
                         </div>
                     </fieldset>
                     <fieldset id="summaryPageOptions" class="hide">
-                        {% for summaryPageOption in summaryPageOptions %}
+                        {% for optionId, summaryPageOption in summaryPageOptions %}
                             <div class="small-12 medium-6 large-6 columns">
-                                <label for="{{ summaryPageOption.id }}">{{ summaryPageOption.name }}</label>
+                                <label for="{{ optionId }}">{{ summaryPageOption }}</label>
                                 <div class="switch">
-                                    <input name="{{ summaryPageOption.id }}" id="{{ summaryPageOption.id }}"
+                                    <input name="{{ optionId }}" id="{{ optionId }}"
                                            type="checkbox" value="1"/>
-                                    <label for="{{ summaryPageOption.id }}">
+                                    <label for="{{ optionId }}">
                                         <span>ON</span>
                                         <span>OFF</span>
                                     </label>
@@ -164,15 +164,15 @@
                     </fieldset>
                     <fieldset id="summaryPageAssessmentOptions" class="hide">
                         {% include '@adminReportExport/assessmentOptions.twig' with
-                            {assessmentOptions: assessmentOptions, page: 'summary'} only %}
+                            {assessmentOptions: summaryAssessmentOptions, page: 'summary', workTypeOption: 'workTypes'} only %}
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="includeClassPage">Include Class Page</label>
+                            <label for="showClass">Include class page</label>
                             <p class="meta">This will include a new page in the report for each class.  This may include summary graphs and assessments for more detailed information about the class</p>
                             <div class="switch">
-                                <input name="includeClassPage" id="includeClassPage" type="checkbox" value="1"/>
-                                <label for="includeClassPage">
+                                <input name="showClass" id="showClass" type="checkbox" value="1"/>
+                                <label for="showClass">
                                     <span>ON</span>
                                     <span>OFF</span>
                                 </label>
@@ -180,13 +180,13 @@
                         </div>
                     </fieldset>
                     <fieldset id="classPageOptions" class="hide">
-                        {% for classPageOption in classPageOptions %}
+                        {% for optionId, classPageOption in classPageOptions %}
                             <div class="small-12 medium-6 large-6 columns">
-                                <label for="{{ classPageOption.id }}">{{ classPageOption.name }}</label>
+                                <label for="{{ optionId }}">{{ classPageOption }}</label>
                                 <div class="switch">
-                                    <input name="{{ classPageOption.id }}" id="{{ classPageOption.id }}" type="checkbox"
+                                    <input name="{{ optionId }}" id="{{ optionId }}" type="checkbox"
                                            value="1"/>
-                                    <label for="{{ classPageOption.id }}">
+                                    <label for="{{ optionId }}">
                                         <span>ON</span>
                                         <span>OFF</span>
                                     </label>
@@ -196,13 +196,13 @@
                     </fieldset>
                     <fieldset id="classPageAssessmentOptions" class="hide">
                         {% include '@adminReportExport/assessmentOptions.twig' with
-                            {assessmentOptions: assessmentOptions, page: 'class'} only %}
+                            {assessmentOptions: classAssessmentOptions, page: 'class', workTypeOption: 'classWorkTypes'} only %}
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="view-as">View As</label>
+                            <label for="viewAs">View as</label>
                             <p class="meta">Only show assessment results that are visible as this type of user</p>
-                            <select id="view-as" name="view-as">
+                            <select id="viewAs" name="viewAs">
                                 <option value="staff">Staff</option>
                                 <option value="student">Student</option>
                                 <option value="parent">Parent</option>
@@ -216,7 +216,7 @@
     </div>
 </div>
 <script>
-    $('#includeSummaryPage').on('change', function () {
+    $('#showSummary').on('change', function () {
                 if ($(this).is(":checked")) {
                     $('#summaryPageOptions').removeClass('hide');
                     $('#summaryPageAssessmentOptions').removeClass('hide');
@@ -226,7 +226,7 @@
                 }
             }
     );
-    $('#includeClassPage').on('change', function () {
+    $('#showClass').on('change', function () {
                 if ($(this).is(":checked")) {
                     $('#classPageOptions').removeClass('hide');
                     $('#classPageAssessmentOptions').removeClass('hide');
