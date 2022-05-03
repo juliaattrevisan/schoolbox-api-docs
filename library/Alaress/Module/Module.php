@@ -183,9 +183,6 @@ class Module
             }
         }
 
-//        // no need that no more
-//        unset($this->routeIndex);
-
         // manual route init
         $this->initRoutes($this->getRouter(), $basePath);
     }
