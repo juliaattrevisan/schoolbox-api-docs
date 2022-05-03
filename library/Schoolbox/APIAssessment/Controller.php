@@ -151,7 +151,7 @@ WHERE
         ) = :assessmentType ";
             $params['assessmentType'] = $filter['assessmentType'];
         }
-        if (array_key_exists('contextId', $filter)) {
+        if (array_key_exists('folderId', $filter)) {
             $where .= " AND v_assessment_relation.folder_id = :contextId ";
             $params['contextId'] = $filter['contextId'];
         }
@@ -244,16 +244,17 @@ WHERE
                 'yearLevel' => $yearLevel,
             ];
             $output[] = [
-                'assessmentId'  => $row['id'],
+                'id'  => $row['id'],
                 'title'         => $row['title'],
                 'assessmentType' => $row['assessmentType'],
+                'commonAssessment' => '',
                 'workType'      => [
                                     'name'  => $row['workTypeName'],
                                     'id'    => $row['workTypeId']
                                 ],
                 'folder'        => $folder,
                 'weighted'      => $weighted,
-                'due_date'      => $row['due_date'],
+                'dueDate'      => $row['due_date'],
 
             ];
         }
