@@ -35,7 +35,6 @@ use Aura\Router\Router;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
-//use Config\Modules\ModuleConfigInterface;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
