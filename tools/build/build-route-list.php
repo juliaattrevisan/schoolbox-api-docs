@@ -12,7 +12,6 @@ declare(strict_types=1);
  * Build a list of all routes, and their corresponding module/path/etc.
  */
 
-use Alaress\Module\Module as BaseModule;
 use Alaress\Module\Registry;
 use Alaress\Web\Router\RouteCollection;
 use Aura\Router\RouteFactory;
@@ -50,8 +49,8 @@ $kernel = new CliTool\Kernel(
             // dump their registration tables into Redis
             /** @var Client $redis */
             $redis = $this->getDi()->get('redis.storage');
-            $redis->set('routeCache:' . INSTANCE_ID, serialize($router->getRoutes()));
-            $redis->set('moduleCache:' . INSTANCE_ID, json_encode(Registry::getRegistrations()));
+            $redis->set(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, serialize($router->getRoutes()));
+            $redis->set(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, json_encode(Registry::getRegistrations()));
         }
 
         /**

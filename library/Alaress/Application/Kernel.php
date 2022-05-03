@@ -26,11 +26,11 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
 use Alaress\Web\Router\PathMatcher;
+use Alaress\Web\Router\RouteCollection;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
-use Aura\Router\RouteCollection;
 use Aura\Router\Router;
 use Aura\Web\WebFactory;
 use Calendar\Api\ModuleChecker;
@@ -1840,7 +1840,7 @@ abstract class Kernel
         // Load the list of routes from Redis.
         /** @var Predis\ClientInterface $redis */
         $redis            = $this->getDependencyInjector()->get('redis.storage');
-        $routesSerialized = $redis->get('routeCache:' . INSTANCE_ID);
+        $routesSerialized = $redis->get(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
         if (empty($routesSerialized)) {
             return;
         }
@@ -1864,7 +1864,7 @@ abstract class Kernel
         // Load the list of modules from Redis.
         /** @var Predis\ClientInterface $redis */
         $redis          = $this->getDependencyInjector()->get('redis.storage');
-        $modulesEncoded = $redis->get('moduleCache:' . INSTANCE_ID);
+        $modulesEncoded = $redis->get(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
         if (empty($modulesEncoded)) {
             return;
         }
