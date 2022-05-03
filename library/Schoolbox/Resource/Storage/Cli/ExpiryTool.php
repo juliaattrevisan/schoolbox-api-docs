@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\RedisStore;
 /**
  * Removes storage files that fulfil all these conditions:
  *     - expired_at is not null
- *     - expirted_at is in the past
+ *     - expired_at is in the past
  */
 class ExpiryTool extends CliTool\App
 {
@@ -79,7 +79,7 @@ This tool removes storage objects that have expired. An expired object
 has a non-null storage.expired_at value that's in the past.
 
 Planning mode gives you a list of expired files.
-Perform mode blows them away.
+Perform mode blows them away, hard deleting their records from the db and file system.
 
 Usage: expired-storage-removal.php [--perform]
 
