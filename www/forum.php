@@ -152,7 +152,7 @@ $threadList = $threadMapper->findByColumn(
 if (0 !== count($threadList)) {
     $userHandler = new User();
     $j = 0;
-
+    $threadPostCounts = $threadMapper->findPostCount(new \Schoolbox\Collection($threadList));
     foreach ($threadList as $thread) {
         $this->setVar(array(
             'THREAD_ID' => $thread->getId(),
@@ -166,9 +166,9 @@ if (0 !== count($threadList)) {
             'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread->getLastPostUser()->getExternalId(),
             'THREAD_LAST_POST_USER_ID' => $thread->getLastPostUser()->getId(),
             'THREAD_LAST_POST_USER' => $thread->getLastPostUser()->getFullname(),
-            'THREAD_REPLIES' => $thread->getPosts()->count(),
+            'THREAD_REPLIES' => $threadPostCounts[$thread->getID()],
             'THREAD_VIEWS' => $thread->getViews(),
-            'THREAD_LAST_PAGE' => ceil((($thread->getPosts()->count() + 1) / \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE)),
+            'THREAD_LAST_PAGE' => ceil((($threadPostCounts[$thread->getID()] + 1) / \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE)),
             'THREAD_LOCKED' => $thread->isLocked() == 'true' ? '(Locked)' : '',
             'ON_OFF'          => ++$j % 2 ? 'dark' : ''
         ));

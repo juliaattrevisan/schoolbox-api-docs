@@ -428,4 +428,32 @@ WHERE
 
         return $collection;
     }
+
+    /**
+     * finds last posts for a list of forum threads
+     */
+    public function findLastPosts(Collection $threads): Collection
+    {
+    }
+
+    /**
+     * find post count for a list of forum threads
+     */
+    public function findPostCount(Collection $threads): array
+    {
+        $statement = $this->database->prepare("
+            SELECT threadID, count(*) -1 as count
+            FROM forumPost
+            WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")
+                AND
+                deleted = 'false'
+            GROUP BY threadID
+        ");
+        $statement->execute();
+        $postCounts = [];
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $postCounts[$row['threadID']] = $row['count'];
+        }
+        return $postCounts;
+    }
 }
