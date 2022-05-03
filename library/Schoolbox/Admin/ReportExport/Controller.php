@@ -199,7 +199,7 @@ class Controller extends ConfigController
                 ]);
                 if ($reportPath) {
                     $reports[] = [
-                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId() ), // TODO better filename?
+                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId() ),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
