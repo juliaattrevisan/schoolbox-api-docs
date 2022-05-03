@@ -34,6 +34,7 @@ use Schoolbox\Role;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -198,7 +199,7 @@ class Controller extends ConfigController
                 ]);
                 if ($reportPath) {
                     $reports[] = [
-                        'filename' => sprintf("%d_report.pdf", $student->getId()), // TODO better filename?
+                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId() ),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -218,11 +219,14 @@ class Controller extends ConfigController
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.messageFactory');
+        $userSerializer = new ModelToArray();
+
         $message        = $messageFactory->build(
             'download-pages',
             [
                 'token'     => $this->tokenBuilder->generate($this->getUser()),
                 'content'   => $reports,
+                'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-report-export.zip',
                 'gotenberg' => [
                     'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                     'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
@@ -231,10 +235,11 @@ class Controller extends ConfigController
             $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
                     ->setQuery(null)
                     ->toString(),
-            //            [
-            //                'message' => 'Your report has been generated',
-            //                'href'    => '', TODO: what this href would be
-            //            ],
+            [
+                'message' => 'Your summative report export is ready to download',
+                'from'      => call_user_func($userSerializer, $this->getUser()),
+                'to'        => call_user_func($userSerializer, $this->getUser()),
+            ],
             $this->getUser(),
         );
 
