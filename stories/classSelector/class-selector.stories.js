@@ -56,6 +56,7 @@ const endpoint = 'https://swapi.dev/api/films/';
 
 export const Default = Template.bind({});
 Default.parameters = {
+    controls: { hideNoControlsWarning: true },
     msw: {
         handlers: [
             rest.get(endpoint, (req, res, ctx) => {
@@ -70,6 +71,7 @@ Default.args = {
 
 export const LoadError = Template.bind({});
 LoadError.parameters = {
+    controls: { hideNoControlsWarning: true },
     msw: {
         handlers: {
             auth: rest.get(endpoint, (req, res, ctx) => {

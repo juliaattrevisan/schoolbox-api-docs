@@ -100,7 +100,7 @@ const queryWordList = computed(() => {
 const results = computed(() => {
     if (query.value.length < minQueryLength) {
         return [];
-    } else if (classes.value.filter(searchForName).length > 1) { 
+    } else if (classes.value.filter(searchForName).length > 0) { 
         return classes.value.filter(searchForName); 
     } else {
         return [];
@@ -125,10 +125,10 @@ const showSelectAll = computed(() => {
  *
  * @return { Boolean } true if found
  */
-function searchForName (removedClass) {
+function searchForName (classItem) {
     let wordMatchCount = 0;
     queryWordList.value.forEach(wordInSearch => {
-        if (removedClass.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+        if (classItem.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
             wordMatchCount++;
         }
     });
