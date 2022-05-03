@@ -32,12 +32,34 @@ class Registry
      * @param string|null        $basePath The base path for the module's routes
      * @param RestfulModule|null $context  If set: `$module`'s routes will be
      *                                     installed as sub-routes of `$context`
+     * @throws LogicException if a module with basename `$basename` has already
+     *                        been registered
      * @return void
      */
     public static function register(Module $module, ?string $basePath, ?RestfulModule $context = null)
     {
-        self::$registrations[$module->getBasename()] = [
-            'class'           => get_class($module),
+        $moduleClass = get_class($module);
+        $basename    = $module->getBasename();
+        if (isset(self::$registrations[$basename])) {
+            $otherModuleClass = self::$registrations[$basename]['class'] ?? null;
+            if ($moduleClass !== ($otherModuleClass)) {
+                throw new LogicException(
+                    sprintf(
+                        'Module "%s" is already registered as instanceof "%s" - won\'t redefine as instanceof "%s"',
+                        $basename,
+                        $otherModuleClass,
+                        $moduleClass,
+                    )
+                );
+            } else {
+                user_error(
+                    sprintf('Module "%s" is already registered - not redefining', $basename),
+                    E_USER_WARNING
+                );
+            }
+        }
+        self::$registrations[$basename] = [
+            'class'           => $moduleClass,
             'basePath'        => $basePath,
             'contextBasename' => $context ? $context->getBasename() : null,
         ];

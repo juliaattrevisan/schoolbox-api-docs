@@ -22,12 +22,8 @@ class Blog implements ModuleConfigInterface
     {
         $blogModule = new BlogModule($di);
         $blogModule->registerModule('/blog');
-        $blogModule->registerModule('/blog');
-//        $blogModule->init('/blog');
 
         $eportfolioBlogModule = new EportfolioBlogModule($di);
         $eportfolioBlogModule->registerModule('/eportfolio/blog');
-        $eportfolioBlogModule->registerModule('/eportfolio/blog');
-//        $eportfolioBlogModule->init('/eportfolio/blog');
     }
 }

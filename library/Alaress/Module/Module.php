@@ -61,18 +61,6 @@ class Module
     protected $basename;
 
     /**
-     * Modules that this module depends on.
-     *
-     * Each entry must be a module in $this->injector.
-     *
-     * @deprecated Module dependencies should now be automatically installed when required
-     *             (@see `Alaress\Module\Loader` and classes which use it)
-     *
-     * @var array
-     */
-    protected $moduleDependencies = [];
-
-    /**
      * Has this module had its controller's dependencies installed yet?
      * They should only be installed once.
      *
@@ -103,14 +91,6 @@ class Module
      * @var array
      */
     protected $permissionIndex = [];
-
-
-    /**
-     * A list of initialised modules.
-     *
-     * @var array<string, self>
-     */
-    private static array $installedModules = [];
 
     /**
      * Constructor
@@ -260,43 +240,6 @@ class Module
         // initialise templates
         $this->initTemplatePaths($this->getTemplateLoader());
     }
-
-    /**
-     * Installs this module into the dependency injection system.
-     *
-     * @return bool Was the module installed?
-     * @throws LogicException if this module has no basename, or it is already defined as a different class
-     */
-    protected function installModule(): bool
-    {
-        if (!$this->basename) {
-            throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
-        }
-
-        // Don't allow this module to be redefined
-        if (isset(self::$installedModules[$this->basename])) {
-            $other = self::$installedModules[$this->basename];
-            if (get_class($other) !== get_class($this)) {
-                throw new LogicException(
-                    sprintf(
-                        'Module "%s" is already defined as instanceof "%s" - won\'t redefine as instanceof "%s"',
-                        $this->basename,
-                        get_class($other),
-                        get_class($this)
-                    )
-                );
-            } else {
-                user_error(
-                    sprintf('Module "%s" is already defined - not redefining', $this->basename),
-                    E_USER_WARNING
-                );
-                return false;
-            }
-        }
-        self::$installedModules[$this->basename] = $this;
-        return true;
-    }
-
 
     /**
      * Hook method for setting up routes via self::register()
