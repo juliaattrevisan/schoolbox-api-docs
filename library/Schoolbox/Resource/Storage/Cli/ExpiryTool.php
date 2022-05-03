@@ -154,6 +154,9 @@ HELP;
 
                 $this->getLogger()->debug('Planning finished.');
             }
+        } else {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
+            exit;
         }
     }
 }
