@@ -537,6 +537,25 @@ class Mapper extends BaseMapper
     {
         $attempt->setReviewed(Alaress_Date_Format::now());
         $attempt->setReviewer($reviewer);
+        $this->updateMarks($attempt);
+
+        return $this->save($attempt);
+    }
+
+    /**
+     * @return BaseMapper|QuizMapper
+     * @throws BaseMapper\DefinitionException
+     */
+    private function getQuizMapper(): QuizMapper
+    {
+        return $this->getJoinMapper('quiz');
+    }
+
+    /**
+     * update the quiz response score
+     */
+    public function updateMarks(Model $attempt)
+    {
         /**
          * collate all marks and total possible marks, and update this field.
          */
@@ -549,7 +568,6 @@ FROM assess_attempt aa
          LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
          LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
 WHERE aa.attempt_id = :attemptId
-            AND ar.deleted_at IS NULL
 GROUP BY aa.assess_id, aa.attempt_id");
         $query->execute(['attemptId' => $attempt->getId()]);
         $marks = $query->fetch();
@@ -557,14 +575,5 @@ GROUP BY aa.assess_id, aa.attempt_id");
         $attempt->setMaxMark($marks['max_mark']);
 
         return $this->save($attempt);
-    }
-
-    /**
-     * @return BaseMapper|QuizMapper
-     * @throws BaseMapper\DefinitionException
-     */
-    private function getQuizMapper(): QuizMapper
-    {
-        return $this->getJoinMapper('quiz');
     }
 }
