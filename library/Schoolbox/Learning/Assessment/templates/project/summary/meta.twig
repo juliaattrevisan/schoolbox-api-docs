@@ -9,6 +9,7 @@
 #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 <ul class="meta">
+    {% include '@learning/fragments/meta/workType.twig' %}
     {% if assessment.baseContext is not unitSpecification %}
         <li class="icon-calendar">{{ dueDate.dueDate(assessment, student ?? USER) }}</li>
     {% endif %}
