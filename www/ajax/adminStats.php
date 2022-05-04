@@ -27,11 +27,12 @@ if (!isset($_POST['module'])) {
     die();
 }
 
+/** @var IConnector $config */
+$config = $kernel->get('config');
+
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        /** @var IConfigLoader $config */
-        $config        = $kernel->get('config');
         $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
         $summary       = $login->userSummary(null);
         $totalUser     = 0;
@@ -331,6 +332,41 @@ switch ($_POST['module']) {
             'kami_status' => $status,
             'kami_light' => $light,
         ];
+        break;
+    case 'service_saml_cert':
+        $samlCert = $config->get('saml_public_cert');
+        $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
+
+        $daysBeforeExpiry = ($validTo - time()) / 60 / 60 / 24;
+
+        //get plural/singular form of 'day'
+        if(abs($daysBeforeExpiry) === 1) {
+            $dayOrDays = "day";
+        }
+        else {
+            $dayOrDays = "days";
+        }
+
+        if ($daysBeforeExpiry < 0) {
+            $output[] = array('SAML_LIGHT'  => 'alert',
+                              'SAML_MESSAGE' => 'Expired ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays . ' ago'
+            );
+        }
+        elseif ($daysBeforeExpiry < 7) {
+            $output[] = array('SAML_LIGHT'  => 'alert',
+                              'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+            );
+        }
+        elseif ($daysBeforeExpiry < 30) {
+            $output[] = array('SAML_LIGHT'  => 'warning',
+                              'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+            );
+        }
+        else {
+            $output[] = array('SAML_LIGHT'  => 'success',
+                              'SAML_MESSAGE' => 'Valid'
+            );
+        }
         break;
     default:
         break;

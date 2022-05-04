@@ -90,6 +90,16 @@
             {
                 $('[data-light="www"]').html(data[0].WWW_STATUS).removeClass('neutral').addClass(data[0].WWW_LIGHT);
             });
+
+            {% if saml_enabled %}
+            // Replace the default saml status with 'loading...'
+            $('[data-light="saml_cert"]').html('Loading...');
+            // Load service statuses via ajax
+            $.post('/ajax/adminStats.php', { module : 'service_saml_cert' }, function(data)
+            {
+                $('[data-light="saml_cert"]').html(data[0].SAML_MESSAGE).removeClass('neutral').addClass(data[0].SAML_LIGHT);
+            });
+            {% endif %}
         }
         {% if collabDocsEnabled %}
         // check if /pad is accessible
@@ -483,6 +493,16 @@
                                     <span class="full-width neutral label" data-light="ntp">Testing...</span>
                                 </div>
                             </li>
+                            {% if saml_enabled %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    SAML Public Cert Expiry
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="saml_cert">loading...</span>
+                                </div>
+                            </li>
+                            {% endif %}
                         {% endif %}
                     </ul>
                 </section>
