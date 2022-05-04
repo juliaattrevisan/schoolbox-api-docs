@@ -416,17 +416,6 @@ WHERE
     }
 
     /**
-     * finds last posts for a list of forum threads
-     */
-    public function findLastPosts(Collection $threads): Collection
-    {
-        /** @var PostMapper $post_mapper */
-        $post_mapper = $this->getJoinMapper('post');
-        $posts = $post_mapper->findByColumnList(['postID' => $threads->getPropertyValues('id')]);
-        return $posts;
-    }
-
-    /**
      * find post count for a list of forum threads
      */
     public function findPostCount(Collection $threads): array

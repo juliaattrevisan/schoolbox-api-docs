@@ -153,7 +153,6 @@ if (0 !== count($threadList)) {
     $userHandler = new User();
     $j = 0;
     $threadPostCounts = $threadMapper->findPostCount($threadList);
-    $lastPosts = $threadMapper->findLastPosts($threadList);
     foreach ($threadList as $thread) {
         $this->setVar(array(
             'THREAD_ID' => $thread->getId(),
