@@ -44,7 +44,8 @@ if (!$_SESSION['id']) {
     $expiryAt = null;
 
     if (null !== $expiryDate) {
-        $expiryAt = \Alaress_Date_Format::newDatabaseDate("{$expiryDate} 00:00:00");
+        $expiryAt = new Alaress_Date_Format($_GET['expiryDate'], \DateTime::RFC3339);
+        $expiryAt->setTimezone($kernel->get('config')->get('date_timezone'));
     }
 
     if (is_array($meta['name'])) {
