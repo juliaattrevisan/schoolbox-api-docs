@@ -271,7 +271,7 @@ class Controller extends Base
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.read', ['id' => $model->getId()])
+            $this->getRouter()->generate('resourceItem.read', ['id' => $model->getId(), 'format' => ''])
         );
     }
 
@@ -293,7 +293,7 @@ class Controller extends Base
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.read', ['id' => $item->getId()])
+            $this->getRouter()->generate('resourceItem.read', ['id' => $item->getId(), 'format' => ''])
         );
     }
 
