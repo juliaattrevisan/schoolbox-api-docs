@@ -417,6 +417,15 @@ class Controller extends Base\Base
                 $dto = $this->importFactory->buildForNewImport($unitImpls, $defaultDueTime);
             } elseif ('modify' === $action) {
                 $dto = $this->importFactory->buildForImportModify($unitImpls, $defaultDueTime);
+                /** @var UnitImplementation\Model $unitImpl */
+                foreach ($dto->getUnitImplementations() as $unitImpl) {
+                    // get name from impl title, if spec folder is null
+                    // this happens when unit spec is deleted and there's no assessments
+                    if (!$unitImpl->getSpecification()->getFolder() instanceof Folder\Model) {
+                        $fetchedUnitImpl = $this->unitImplementationMapper->findById($unitImpl->getId());
+                        $unitImpl->setTitle($fetchedUnitImpl->getTitle());
+                    }
+                }
             } else {
                 throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
             }

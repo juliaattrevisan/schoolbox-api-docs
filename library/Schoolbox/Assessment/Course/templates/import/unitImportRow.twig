@@ -39,11 +39,7 @@
         {% if unitAction == 'modify' %}
         <h3>
             <span class="icon-unit"></span>
-            {% if unitSpec.folder.name ?? false %}
-                {{ unitSpec.folder.name }}
-            {% else %}
-                <span class="meta">Deleted {{ locale.unit }}</span>
-            {% endif %}
+               {{ unitSpec.folder.name ?? unitImpl.title }}
             <span class="pipe meta">
                 {{ assessmentCountMessage }}
                 {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
@@ -66,10 +62,12 @@
     </div>
     {% if not canReadUnitSpec %}
             <p class="alert-box">
-                This {{ locale.unit }} is no longer accessible.
                 {% if unitAssessmentCount %}
+                This {{ locale.unit }} is no longer accessible.
                 You can modify the dates of {{ locale.assessment.plural }},
                 and remove them from your class, but you can no longer import new {{ locale.assessment.plural }}.
+                {% else %}
+                This {{ locale.unit }} is no longer accessible and had no {{ locale.assessment.plural }} to manage.
                 {% endif %}
             </p>
     {% endif %}
