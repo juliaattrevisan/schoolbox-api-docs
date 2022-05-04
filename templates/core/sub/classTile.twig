@@ -60,6 +60,11 @@
                         <li><a href="{{ route.url }}" class="icon-poll">{{ route.title }}</a></li>
                     {% endfor %}
                 {% endif %}
+                {% set intellischoolRoute = routeLookupIfAuthorized('intellischool.getClassAnalytics', {folderId: class.id}) %}
+                {% if intellischoolRoute %}
+                <li class="separator">Albitros Analytics</li>
+                <li><a href="{{ intellischoolRoute }}" class="icon-intellischool">Class Analytics</a></li>
+                {% endif %}
 
             </ul>
         {% endif %}
