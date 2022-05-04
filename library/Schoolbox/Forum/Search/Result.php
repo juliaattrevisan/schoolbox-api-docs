@@ -53,7 +53,7 @@ class Result extends Base
                             )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
-                        ORDER BY :sortQuote :sortDir, 'score' :sortScoreDir
+                        ORDER BY score_title DESC, score DESC
                         LIMIT :offset, :limit;
             ";
 
@@ -65,9 +65,6 @@ class Result extends Base
             'keywordTitleWhere' => $sanitiser->getKeyword(),
             'roleId'            => $user->getRole()->getId(),
             'userId'            => $user->getId(),
-            'sortQuote'         => $sanitiser->getSortBy(),
-            'sortScoreDir'      => $sanitiser->getSortDir(),
-            'sortDir'      => $sanitiser->getSortDir(),
             'offset'                => $sanitiser->getOffset(),
             'limit'                => $sanitiser->getResultLimit()
         ];
