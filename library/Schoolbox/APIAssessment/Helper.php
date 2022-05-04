@@ -100,7 +100,7 @@ FROM v_assessment_relation
          LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
          LEFT JOIN project on assessment.id = project.assessment_id
          LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
-         LEFT JOIN folder_code on v_assessment_relation.folder_id = folder_code.folder_id
+         LEFT JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is null)
 WHERE
         v_assessment_relation.assessment_id = :id";
 
