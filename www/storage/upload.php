@@ -18,8 +18,7 @@ if (is_readable($_FILES['file']['tmp_name'])) {
     try {
         $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept(
             $_FILES['file']['name'],
-            $_FILES['file']['tmp_name'],
-            $_SESSION['id']
+            $_FILES['file']['tmp_name']
         );
         $hash = $imageResource->getHash();
         if (isset($_POST['return'])) {
