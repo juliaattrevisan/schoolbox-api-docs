@@ -19,7 +19,13 @@
 <input type="hidden" name="unit[{{ unitSpec.id }}][close_date]"   value="{{ unitImpl.dueDate.localShort }}" />
 <div class="row" data-unit="{{ unitSpec.id }}">
     {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
-
+    {% if not unitAssessmentCount %}
+        {% set assessmentCountMessage  = 'No ' ~ locale.assessment.plural %}
+    {% elseif unitAssessmentCount == 1 %}
+        {% set assessmentCountMessage  = '1 ' ~ locale.assessment ~ ',' %}
+    {% else %}
+        {% set assessmentCountMessage  = unitAssessmentCount ~ ' ' ~ locale.assessment.plural ~ ',' %}
+    {% endif %}
     {#
      # No read perm on unit spec? don't show the full assessment count, just what was selected.
      # This is so that users don't see a count that's greater than what they can actually affect.
@@ -32,8 +38,12 @@
         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
         {% if unitAction == 'modify' %}
         <h3>
-            <span class="icon-unit"></span>{{ unitSpec.folder.name }}
-            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            <span class="icon-unit"></span>
+               {{ unitSpec.folder.name ?? unitImpl.title }}
+            <span class="pipe meta">
+                {{ assessmentCountMessage }}
+                {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
+            </span>
         </h3>
         {% else %}
         <input id="select-all-unit-assessments-{{ unitSpec.id }}"
@@ -43,14 +53,22 @@
         >
         <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
             <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
-            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            <span class="pipe meta">
+                {{ assessmentCountMessage }}
+                {% if unitAssessmentCount %}<span data-show-count="{{ countSelected }}"> selected</span>{% endif %}
+            </span>
         </label>
         {% endif %}
     </div>
     {% if not canReadUnitSpec %}
             <p class="alert-box">
-                This unit is no longer accessible. You can modify the dates of assessments,
-                and remove them from your class, but you can no longer import new assessments.
+                {% if unitAssessmentCount %}
+                This {{ locale.unit }} is no longer accessible.
+                You can modify the dates of {{ locale.assessment.plural }},
+                and remove them from your class, but you can no longer import new {{ locale.assessment.plural }}.
+                {% else %}
+                This {{ locale.unit }} is no longer accessible and had no {{ locale.assessment.plural }} to manage.
+                {% endif %}
             </p>
     {% endif %}
     <div class="small-12 columns">
@@ -73,7 +91,7 @@
                                     defaultDueDate:  unitDefaultDueDates[unitSpec.id],
                                     canReadUnitSpec: canReadUnitSpec,
                                 } only %}
-                            {% else %}
+                            {% elseif canReadUnitSpec %}
                                 <p class="content">This {{ locale.unit }} contains no coursework.</p>
                             {% endif %}
                         </section>
