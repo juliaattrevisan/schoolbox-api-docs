@@ -118,7 +118,7 @@ class CachingConnectorAbstract
 
         try {
             return $this->cache->cacheFunctionCall($key, $callback, $params, $timeoutOverride ?? $this->timeout);
-	} catch (\Alaress\Database\Exception $e) {
+        } catch (\Alaress\Database\Exception $e) {
             $this->isOffline = true;
             // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
             if (PHP_SAPI === 'cli') {
