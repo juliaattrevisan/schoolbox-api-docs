@@ -70,7 +70,12 @@ class Module extends AbstractModule
             $this->injector->get('user'),
             $this->injector->get('l10n')->translate('resource', true, true),
         );
-        $treeBuilder->setFileLocator($this->getMapperFactory()->get(Resource\File\Mapper::class));
+        $treeBuilder->setFileLocator(
+            new Resource\File\CompositeLocator(
+                $this->getMapperFactory()->get(Resource\File\Mapper::class),
+                $this->getMapperFactory()->get(Resource\LinkMapper::class)
+            )
+        );
         return (
             new Controller(
                 $this->getMapperFactory()->get(Resource\File\Mapper::class),
