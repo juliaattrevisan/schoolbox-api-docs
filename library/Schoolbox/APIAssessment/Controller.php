@@ -14,19 +14,23 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\YearLevel\Mapper;
+use PDO;
 
 class Controller extends Base
 {
 
-    protected IConnector $dbMapper;
     protected Helper $assessmentHelper;
+    protected Mapper $dbMapper;
+
     /**
      * Controller constructor.
      *
      */
+
     public function __construct(Mapper $mapper)
     {
         $this->assessmentHelper = new Helper($mapper);
+        $this->dbMapper = $mapper;
     }
 
     /**
@@ -96,7 +100,6 @@ class Controller extends Base
 
         $output = [];
         $params = [];
-        $mapper = UserMapper::getInstance()->getDatabase();
 
         $select  = "
 SELECT
@@ -200,7 +203,7 @@ WHERE
         }
         if ('' !== $search) {
             $where .= " AND assessment.title like :searchParam ";
-            $params['searchParam'] = '%' . $mapper->getQuoter()->escapeForLike($search) . '%';
+            $params['searchParam'] = '%' . $this->dbMapper->getDatabase()->getQuoter()->escapeForLike($search) . '%';
         }
 
         if (0 !== $cursor) {
@@ -210,7 +213,7 @@ WHERE
         if (0 !== $limit) {
             $where .= " LIMIT :limit";
         }
-        $statement = $mapper->prepare($select . $from . $where);
+        $statement = $this->dbMapper->getDatabase()->prepare($select . $from . $where);
         if (0 !== $limit) {
             $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
