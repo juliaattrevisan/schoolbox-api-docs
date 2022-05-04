@@ -292,7 +292,7 @@ FROM        `component_instance`
     JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
     JOIN   `component_config_instance` `cci` ON
             `ccd`.`id` = `cci`.`component_config_definition_id` AND
-            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = ':id1'
+            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = :id1
 
 WHERE
   `component_instance`.module = 'homepage'
