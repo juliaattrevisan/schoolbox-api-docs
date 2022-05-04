@@ -13,6 +13,8 @@ namespace Schoolbox\Forum\Search;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Forum\Post;
+use Schoolbox\Forum\PostMapper;
+use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
@@ -57,6 +59,9 @@ class Result extends Base
                         LIMIT :offset, :limit;
             ";
 
+        /** @var PostMapper $mapper */
+        /** @var ThreadMapper $threadMapper */
+        $threadMapper = $mapper->getJoinMapper('thread');
         $stmt = $mapper->getDatabase()->prepare($query);
         $params = [
             'keywordBodySelect' => $sanitiser->getKeyword(),
@@ -79,6 +84,12 @@ class Result extends Base
         $collection = $mapper->createCollection();
 
         foreach ($this->buildSearchResult($stmt, $user, 'categoryID', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
+            /**
+             * remove any forums that do not exist on homepages
+             */
+            if (!$threadMapper->isComponent($row['categoryID'])) {
+                continue;
+            }
             /** @var Post $post */
             $post = $mapper->findById($row['postID']);
             $collection->add($post);
@@ -119,10 +130,11 @@ class Result extends Base
                             )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
-                        ORDER BY :sortQuote DESC
-                        LIMIT :offset, :limit;
             ";
 
+        /** @var PostMapper $mapper */
+        /** @var ThreadMapper $threadMapper */
+        $threadMapper = $mapper->getJoinMapper('thread');
         $stmt = $mapper->getDatabase()->prepare($query);
         $params = [
             'keywordBodySelect' => $sanitiser->getKeyword(),
@@ -130,20 +142,22 @@ class Result extends Base
             'keywordBodyWhere' => $sanitiser->getKeyword(),
             'keywordTitleWhere' => $sanitiser->getKeyword(),
             'roleId'            => $user->getRole()->getId(),
-            'userId'            => $user->getId(),
-            'sortQuote'         => $sanitiser->getSortBy(),
-            'offset'                => $sanitiser->getOffset(),
-            'limit'                => $sanitiser->getResultLimit()
+            'userId'            => $user->getId()
         ];
         foreach ($params as $label => $value) {
-            if ('offset' === $label || 'limit' === $label) {
-                $stmt->bindValue($label, $value, \PDO::PARAM_INT);
-            } else {
-                $stmt->bindValue($label, $value);
-            }
+            $stmt->bindValue($label, $value);
         }
         $stmt->execute();
-
-        return $this->buildSearchCount($stmt, $user, 'folderId');
+        $count = 0;
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            /**
+             * remove any forums that do not exist on homepages
+             */
+            if (!$threadMapper->isComponent($row['categoryID'])) {
+                continue;
+            }
+            $count++;
+        }
+        return $count;
     }
 }
