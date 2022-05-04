@@ -100,6 +100,7 @@ echo 'started mariadb'
 # Set data dirs in config table + run upgrade scripts
 cd tools || exit 1
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
+./module/refresh-cache.php
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
 
