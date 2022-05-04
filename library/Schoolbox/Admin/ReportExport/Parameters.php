@@ -162,9 +162,9 @@ class Parameters
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
-    public function getViewAs()
+    public function getViewAs(): string
     {
         return $this->viewAs;
     }

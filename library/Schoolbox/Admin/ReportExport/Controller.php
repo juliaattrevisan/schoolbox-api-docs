@@ -168,19 +168,24 @@ class Controller extends ConfigController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function requestReports(): void
+    public function postReport(): void
     {
         $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
 
         // find students
-        $students   = $this->userBulkMapper->bulkModifySearch(
-            empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
-            [UserBulkMapper::ANY], // TODO: limit to students?
-            UserBulkMapper::ANY,
-            empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
-            UserBulkMapper::ANY
-        );
-        $studentIds = array_column($students, 'id');
+        if (empty($reportParams->getCampuses()) && empty($reportParams->getYearLevels())) {
+            // if both campuses and year levels are not provided, generate only for specific students
+            $studentIds = [];
+        } else {
+            $students   = $this->userBulkMapper->bulkModifySearch(
+                empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
+                [UserBulkMapper::ANY], // TODO: limit to students?
+                UserBulkMapper::ANY,
+                empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
+                UserBulkMapper::ANY
+            );
+            $studentIds = array_column($students, 'id');
+        }
 
         if ($reportParams->getStudentIds()) {
             $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
@@ -188,10 +193,19 @@ class Controller extends ConfigController
         }
         $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
 
+        $warnings = [];
+
         $reports = [];
         $params  = $reportParams->getParams();
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
         foreach ($reportStudents as $student) {
+            if ($reportParams->getViewAs() === Role::PARENT) {
+                $student->loadParents();
+                if ($student->getParents()->count() === 0) {
+                    $warnings[] = sprintf('Unable to generate report for student id %d. No parents.', $student->getId());
+                    continue;
+                }
+            }
             try {
                 $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
                     'studentId' => $student->getId(),
@@ -199,7 +213,7 @@ class Controller extends ConfigController
                 ]);
                 if ($reportPath) {
                     $reports[] = [
-                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId() ),
+                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId()),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -208,43 +222,52 @@ class Controller extends ConfigController
             }
         }
 
-        if (empty($reports)) {
-            // TODO: Where should we show error
-            $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
-        }
+        if (!empty($reports)) {
+            // Get the taskd context, and send
+            /** @var Producer $producer */
+            $producer = $this->getDi()->get('taskd.messageProducer');
 
-        // Get the taskd context, and send
-        /** @var Producer $producer */
-        $producer = $this->getDi()->get('taskd.messageProducer');
+            /** @var MessageFactory $messageFactory */
+            $messageFactory = $this->getDi()->get('taskd.messageFactory');
+            $userSerializer = new ModelToArray();
 
-        /** @var MessageFactory $messageFactory */
-        $messageFactory = $this->getDi()->get('taskd.messageFactory');
-        $userSerializer = new ModelToArray();
-
-        $message        = $messageFactory->build(
-            'download-pages',
-            [
-                'token'     => $this->tokenBuilder->generate($this->getUser()),
-                'content'   => $reports,
-                'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-report-export.zip',
-                'gotenberg' => [
-                    'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                    'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+            $message = $messageFactory->build(
+                'download-pages',
+                [
+                    'token'     => $this->tokenBuilder->generate($this->getUser()),
+                    'content'   => $reports,
+                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-report-export.zip',
+                    'gotenberg' => [
+                        'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                    ],
                 ],
-            ],
-            $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
-                    ->setQuery(null)
-                    ->toString(),
-            [
-                'message' => 'Your summative report export is ready to download',
-                'from'      => call_user_func($userSerializer, $this->getUser()),
-                'to'        => call_user_func($userSerializer, $this->getUser()),
-            ],
-            $this->getUser(),
-        );
+                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
+                        ->setQuery(null)
+                        ->toString(),
+                [
+                    'message' => 'Your summative report export is ready to download',
+                    'from'    => call_user_func($userSerializer, $this->getUser()),
+                    'to'      => call_user_func($userSerializer, $this->getUser()),
+                ],
+                $this->getUser(),
+            );
 
-        $producer->send($message);
-        $this->response->redirect->to($this->getRouter()->generate('adminReportExport.getIndex'));
+            $producer->send($message);
+        }
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminReportExport/result.twig',
+                'data'     => [
+                    'pageCurrent'    => $this->router->generate('adminReportExport.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                        $this->router->generate('adminReportExport.getIndex')
+                    ),
+                    'reportCount'    => count($reports),
+                    'warnings'       => $warnings,
+                ],
+            ]
+        );
     }
 
     /**
@@ -351,6 +374,9 @@ class Controller extends ConfigController
             case Role::PARENT:
                 $student->loadParents();
                 $viewer = $student->getParents()->first();
+                if (!$viewer) {
+                    $this->sendError(sprintf('Unable to generate report for student id %d. No parents.', $student->getId()));
+                }
                 break;
             case Role::STAFF:
             default:

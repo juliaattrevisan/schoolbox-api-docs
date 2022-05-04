@@ -46,7 +46,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
         $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
         $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
-        $this->addPostRoute($router, 'requestReports', $basePath, 'requestReports');
+        $this->addPostRoute($router, 'postReport', $basePath, '/postReport');
         $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
         $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
     }
