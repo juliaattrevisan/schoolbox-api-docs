@@ -100,6 +100,10 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             return;
         }
 
+        if (!\count($diff)) {
+            return;
+        }
+
         $instance = $this->getInstanceFromConfig($model);
 
         // update is a delete-and-replace action
