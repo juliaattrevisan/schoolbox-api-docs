@@ -308,13 +308,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // Class analytics link
         $this->setVar('class_analytics_link_block', '');
         if ($isClassPage) {
-            $hasAnalytics = true;
             $cohortProfileRoute = 'intellischool.getClassAnalytics';
             $params             = [
                 'folder'   => $this->getContext(),
                 'folderId' => $this->getContext()->getId(),
             ];
             if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
+                $hasAnalytics = true;
                 $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
                 $this->parse('class_analytics_link_block', 'class_analytics_link');
             }
