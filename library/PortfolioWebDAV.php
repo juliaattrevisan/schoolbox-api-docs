@@ -279,9 +279,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 'name' => rawurldecode($filename),
                 'description' => rawurldecode($filename),
                 'type' => $type,
-                'file_size' => $info['{DAV:}getcontentlength'],
-                'submitted' => $info['{DAV:}getlastmodified'],
-                'ctime' => $info['{DAV:}creationdate'],
+                'file_size' => $info['{DAV:}getcontentlength'] ?? '',
+                'submitted' => $info['{DAV:}getlastmodified'] ?? '',
+                'ctime' => $info['{DAV:}creationdate'] ?? '',
             ];
 
             $this->cache[$md5Path][$type][] = $temp;
