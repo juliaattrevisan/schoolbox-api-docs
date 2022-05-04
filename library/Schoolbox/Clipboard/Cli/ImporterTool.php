@@ -71,6 +71,7 @@ class ImporterTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_INSTANCE,
             self::OPT_LONG_MEMBERSHIP,
             self::OPT_LONG_SESSIONS,
         ];
