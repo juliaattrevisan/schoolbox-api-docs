@@ -137,7 +137,7 @@ $this->setVar($outputPagination);
 /**
  * limited, offset, and ordered correctly... (by the most recent thread that was updated)
  */
-$threadList = $threadMapper->findByColumn(
+$threadList = new \Schoolbox\Collection($threadMapper->findByColumn(
     'categoryID',
     $category->getId(),
     [
@@ -147,12 +147,13 @@ $threadList = $threadMapper->findByColumn(
             'last_post_date' => 'DESC'
         ]
     ]
-)->getAll();
+)->getAll());
 
 if (0 !== count($threadList)) {
     $userHandler = new User();
     $j = 0;
-    $threadPostCounts = $threadMapper->findPostCount(new \Schoolbox\Collection($threadList));
+    $threadPostCounts = $threadMapper->findPostCount($threadList);
+    $lastPosts = $threadMapper->findLastPosts($threadList);
     foreach ($threadList as $thread) {
         $this->setVar(array(
             'THREAD_ID' => $thread->getId(),

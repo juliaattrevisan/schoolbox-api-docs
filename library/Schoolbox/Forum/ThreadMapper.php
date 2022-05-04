@@ -420,7 +420,6 @@ WHERE
         while ($row = $statement->fetch()) {
             $thread = $this->hydrate($row)
                          ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
-                         ->setUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'))
                          ->setLastPost($this->hydrateJoin($row, 'post', 'post'));
             $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
             $collection[$thread->getId()] = $thread;
@@ -434,6 +433,10 @@ WHERE
      */
     public function findLastPosts(Collection $threads): Collection
     {
+        /** @var PostMapper $post_mapper */
+        $post_mapper = $this->getJoinMapper('post');
+        $posts = $post_mapper->findByColumnList(['postID' => $threads->getPropertyValues('id')]);
+        return $posts;
     }
 
     /**
