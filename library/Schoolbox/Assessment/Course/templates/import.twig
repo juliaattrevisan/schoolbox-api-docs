@@ -60,17 +60,6 @@ Usages:
             }
         });
 
-        {# Setup class selectize #}
-        $('#import_folders').selectizeSelector({
-            ajax: {
-                url:      '{{ routeLookup('courseImport.searchClasses') }}',
-                type:     'GET',
-                dataType: 'json'
-            },
-            multiple: true,
-            value: {{ destinations|json_encode|raw }}
-        });
-
         var initStage1 = function() {
             {# Init stage 1 mage #}
             $('input[data-mage-next="part-2"]').mage({
@@ -273,8 +262,12 @@ Usages:
                         <p class="course-import icon-next"></p>
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
-                        <label for="import_folders" class="required">Class(es)</label>
-                        <input id="import_folders" type="text" name="import_folders" required />
+                        <div id="class-selector-container">
+                            <class-selector 
+                                endpoint="{{ routeLookup('courseImport.searchClasses') }}"
+                            />
+                        </div>
+                        <script src="{{CDN_PREFIX}}/js/bundle/classSelector.js?v={{ config.site_version }}"></script>
                     </div>
                     {% if 1 == initialStage %}
                         <div class="small-12 column">

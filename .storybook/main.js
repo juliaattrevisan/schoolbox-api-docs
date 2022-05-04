@@ -33,6 +33,8 @@ module.exports = {
           use: ['style-loader', 'css-loader', 'sass-loader'],
           include: path.resolve(__dirname, '../'),
         });
+
+        config.resolve.alias['@js'] = path.resolve(__dirname, '../www/static/js');
     
         // Return the altered config
         return config;
