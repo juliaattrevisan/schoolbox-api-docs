@@ -67,7 +67,7 @@ class Renderer extends Base
                     $this->getPage()->setVar(
                         array(
                             'FORUM_CID'        => $post->getThread()->getCategory()->getId(),
-                            'FORUM_THREADID'   => $post->getId(),
+                            'FORUM_THREADID'   => $post->getThread()->getId(),
                             'FORUM_TITLE'      => $post->getThread()->getTitle(),
                             'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 150),
                             'FORUM_OWNER'      => $post->getOwner()->getId(),
