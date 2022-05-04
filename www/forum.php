@@ -186,7 +186,7 @@ if (0 !== count($threadList)) {
             $this->parse('modify_thread_block', 'modify_thread', true);
         }
 
-        if ($thread->getPosts()->count() > 0) {
+        if ($threadPostCounts[$thread->getID()] > 0) {
             $this->parse('last_post_block', 'last_post', true);
         }
 

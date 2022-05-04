@@ -124,15 +124,6 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             'this_key'  => 'last_post_id',
             'other_key' => 'postID'
         ));
-        $this->hasJoin(
-            'posts',
-            array(
-                'multiple'  => true,
-                'mapper'    => PostMapper::class,
-                'this_key'  => 'threadID',
-                'other_key' => 'threadID',
-            )
-        );
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
     }
@@ -175,7 +166,6 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             $this->throwIfDeleted($thread);
 
             $thread->setFirstPost($post_mapper->hydrate($row, 'firstPost'));
-            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
 
             return $thread;
         } else {
@@ -385,8 +375,7 @@ WHERE
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('owner', 'owner')},
                    {$this->getJoinColumnString('lastPoster', 'lastPoster')},
-                   {$this->getJoinColumnString('post', 'post')},
-                   {$this->getJoinColumnString('posts', 'posts')}
+                   {$this->getJoinColumnString('post', 'post')}
         ";
     }
 
@@ -401,7 +390,6 @@ WHERE
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
             INNER JOIN {$this->getJoinSql('lastPoster', '', 'lastPoster', true)}
             LEFT JOIN {$this->getJoinSql('post', '', 'post', false)}
-            LEFT JOIN {$this->getJoinSql('posts', '', 'posts', false)}
         ";
     }
 
@@ -421,7 +409,6 @@ WHERE
             $thread = $this->hydrate($row)
                          ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
                          ->setLastPost($this->hydrateJoin($row, 'post', 'post'));
-            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
             $collection[$thread->getId()] = $thread;
         }
 
