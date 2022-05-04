@@ -84,9 +84,6 @@ chmod 777 -R $instance_data_dir
 ## Push out a dns record to the hosts file to ensure all the linkage works properly
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
 
-## Set the plan to the highest level
-tools/set-plan.php --plan=elite
-
 ## Start the services!
 service $PHP_SERVICE start
 echo 'started php'
@@ -97,10 +94,13 @@ echo 'started redis-server'
 service mariadb start
 echo 'started mariadb'
 
+
+
 # Set data dirs in config table + run upgrade scripts
 cd tools || exit 1
-./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
 ./module/refresh-cache.php
+./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
+./set-plan.php --plan=elite
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
 
