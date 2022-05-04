@@ -7,11 +7,21 @@ assessment
     </div>
     <div class="small-2 columns">
         {% if feedback %}
+
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
                 <h3 class="heading__tertiary text-right">{{ grade }}</h3>
             {% endif %}
         {% endif %}
+
+        {# Was this really how we did it?
+         # I could have sworn there was a real way to determine an assessment's class
+         # rather than this random loose comparison
+         #}
+        {% if assessment.familyName == 'project' %}
+            {% set participant = assessment.allParticipants[student.id] %}
+            <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
+        {%endif%}
     </div>
     <div class="small-12 columns">
         {% if showRubrics and feedback and feedback.rubricMarkedGrid %}
