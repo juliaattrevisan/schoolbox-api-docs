@@ -1,0 +1,17 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+        {% if reportCount == 0 %}
+            No report will be generated.
+        {% else %}
+            {{ reportCount }} reports will be generated.
+        {% endif %}
+        {% for warning in warnings %}
+            {{ warning }}<br>
+        {% endfor %}
+    </div>
+</div>
