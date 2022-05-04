@@ -9,13 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * Encapsulated cli tool
@@ -77,6 +71,7 @@ class ImporterTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_INSTANCE,
             self::OPT_LONG_MEMBERSHIP,
             self::OPT_LONG_SESSIONS,
         ];
@@ -129,63 +124,52 @@ HELP;
 
         /* Check that this isn't currently running
          */
+        $lock = $this->acquireLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
 
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
-
-        try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
-        }
-
-        if ($acquired) {
-            $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
-
-            try {
-                $composites = (new \Schoolbox\Clipboard\Factory(
-                    $this->getLogger(),
-                    $this->perform(),
-                    (string)$this->getConfig()->get('clipboard_endpoint_host'),
-                    (string)$this->getConfig()->get('clipboard_endpoint_token'),
-                ))->produce(
-                    $this->getOpt(self::OPT_LONG_MEMBERSHIP),
-                    $this->getOpt(self::OPT_LONG_SESSIONS),
-                );
-            } catch (\DomainException $e) {
-                $this->getLogger()->warning($e->getMessage());
-
-                return;
-            }
-
-            foreach ($composites as $composite) {
-                $composite->import();
-
-                $this->getLogger()->debug(sprintf(
-                    'Refreshing lock for another %s seconds',
-                    self::LOCK_TTL
-                ));
-
-                $lock->refresh();
-            }
-
-            /* Only commit changes in Perform mode
-             */
-            if (!$this->perform()) {
-                $this->getLogger()->info('Planning finished.');
-            }
-
-            /* Releasing control
-             */
-            $lock->release();
-        } else {
+        if (!$lock->isAcquired()) {
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
         }
+
+        $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
+
+        try {
+            $composites = (new \Schoolbox\Clipboard\Factory(
+                $this->getLogger(),
+                $this->perform(),
+                $lock,
+                (string)$this->getConfig()->get('clipboard_endpoint_host'),
+                (string)$this->getConfig()->get('clipboard_endpoint_token')
+            ))->produce(
+                $this->getOpt(self::OPT_LONG_MEMBERSHIP),
+                $this->getOpt(self::OPT_LONG_SESSIONS),
+            );
+        } catch (\DomainException $e) {
+            $this->getLogger()->warning($e->getMessage());
+
+            return;
+        }
+
+        foreach ($composites as $composite) {
+            $composite->import();
+
+            $this->getLogger()->debug(sprintf(
+                'Refreshing lock for another %s seconds',
+                self::LOCK_TTL
+            ));
+
+            $lock->refresh();
+        }
+
+        /* Only commit changes in Perform mode
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

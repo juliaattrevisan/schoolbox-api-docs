@@ -27,6 +27,20 @@ $app = new class extends CliTool\App
 {
 
     /**
+     * Make sure to add your locking script to the Lock Inspector tool
+     * const LOCK_NAMES in Inspector.php
+     */
+    public const MY_TOOL_LOCK_NAME = 'example';
+
+
+    /**
+     * Decide how long this should be based on your usage
+     * You might have to adjust it, but it should cover the cost of an iteration
+     */
+    private const LOCK_TTL = 60;
+
+
+    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -79,6 +93,15 @@ Usage: example.php [--flag] [--input mytest.txt]
 
 
 HELP;
+            exit;
+        }
+
+        /* Check that this isn't currently running
+         */
+        $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+
+        if (!$lock->isAcquired()) {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
         }
 

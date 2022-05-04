@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Import the Hierarchy of data from clipboard into schoolbox
@@ -32,6 +33,12 @@ class Factory
 
 
     /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
+
+
+    /**
      * Clipboard host url, from the config var
      *
      * @var string
@@ -50,17 +57,20 @@ class Factory
     /**
      * @param LoggerInterface $log
      * @param bool            $perform
+     * @param LockInterface   $lock
      * @param string          $host
      * @param string          $token
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        LockInterface $lock,
         string $host,
         string $token
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->lock = $lock;
         $this->host = $host;
         $this->token = $token;
     }
@@ -133,6 +143,7 @@ class Factory
         $bus->add(new Hierarchy\Prepare(
             $this->log,
             $this->perform,
+            $this->lock,
             $seasonMapper,
             $sportMapper,
             $positionMapper,
@@ -145,6 +156,7 @@ class Factory
         ->add(new Hierarchy\Team(
             $this->log,
             $this->perform,
+            $this->lock,
             $api,
             $membership,
             $registry,
@@ -157,6 +169,7 @@ class Factory
         ->add(new Hierarchy\Cleanup(
             $this->log,
             $this->perform,
+            $this->lock,
             $seasonMapper,
             $sportMapper,
             $positionMapper,
@@ -181,12 +194,14 @@ class Factory
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
+                $this->lock,
                 $matchupMapper,
                 $coachMapper
             ))
             ->add(new Sessions\Sessions(
                 $this->log,
                 $this->perform,
+                $this->lock,
                 $api,
                 $registry,
                 $userLookup,
@@ -198,6 +213,7 @@ class Factory
             ->add(new Sessions\Cleanup(
                 $this->log,
                 $this->perform,
+                $this->lock,
                 $matchupMapper,
                 $coachMapper
             ));

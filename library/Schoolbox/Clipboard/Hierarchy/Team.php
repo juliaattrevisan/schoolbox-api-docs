@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Import Clipboard teams into schoolbox
@@ -45,6 +46,12 @@ class Team implements IStrategy
      * @var bool
      */
     private bool $perform;
+
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
 
 
     /**
@@ -104,6 +111,7 @@ class Team implements IStrategy
     /**
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
+     * @param LockInterface                            $lock
      * @param IApi                                     $api
      * @param bool                                     $membership
      * @param Registry                                 $registry
@@ -116,6 +124,7 @@ class Team implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        LockInterface $lock,
         IApi $api,
         bool $membership,
         Registry $registry,
@@ -127,6 +136,7 @@ class Team implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->lock = $lock;
         $this->api = $api;
         $this->membership = $membership;
         $this->registry = $registry;
@@ -191,6 +201,8 @@ class Team implements IStrategy
         $nextUrl = $endpoint;
 
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
+            $this->lock->refresh();
+
             $teams = $this->api->retrieve('GET', $endpoint, [
                 'includePositions' => 'true',
                 'includeStudents' => $includeStudents,
@@ -201,6 +213,8 @@ class Team implements IStrategy
             ]);
 
             foreach ($teams['data'] as $teamData) {
+                $this->lock->refresh();
+
                 /* Build a lookup here, because we're about to take advantage of it
                  */
                 $positionLookup = [];
@@ -324,6 +338,8 @@ class Team implements IStrategy
         $sequence = 0;
 
         foreach ($teamData['students'] as $student) {
+            $this->lock->refresh();
+
             $externalId = $student['smsId'];
             $userId = $userLookup[$externalId] ?? null;
             $sequence++;
@@ -351,13 +367,20 @@ class Team implements IStrategy
 
             /* Put them in a team
              */
-            $teamPlayer = $this->teamPlayerMapper->createModel()
-                ->setUser($user)
-                ->setTeam($team)
-                ->setSequence($sequence);
+            try {
+                $teamPlayer = $this->teamPlayerMapper->findOneByColumnList([
+                    'user_id' => $user->getId(),
+                    'team_id' => $team->getId()
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $teamPlayer = $this->teamPlayerMapper->createModel()
+                    ->setUser($user)
+                    ->setTeam($team)
+                    ->setSequence($sequence);
 
-            if ($this->perform) {
-                $this->teamPlayerMapper->save($teamPlayer);
+                if ($this->perform) {
+                    $this->teamPlayerMapper->save($teamPlayer);
+                }
             }
 
             $this->log->info(sprintf(
@@ -373,7 +396,7 @@ class Team implements IStrategy
              * Check if they're already in there - just reuse it if it exists
              */
             try {
-                $divisionUser = $this->divisionUserMapper->findByColumnList([
+                $divisionUser = $this->divisionUserMapper->findOneByColumnList([
                     'user_id' => $user->getId(),
                     'division_id' => $division->getId()
                 ]);
