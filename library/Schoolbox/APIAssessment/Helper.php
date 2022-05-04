@@ -65,9 +65,6 @@ SELECT
     staff.synergy_id as `staffExternalId`,
     folder_code.code as `folderCode`,
     folder.name as `folderName`,
-    (SELECT group_concat(name) from lu_year_level
-        LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-                where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelName`,
     (SELECT group_concat(id) from lu_year_level
             LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
                     where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
@@ -176,7 +173,7 @@ WHERE
     public function getYearlevel(int $yearLevelId)
     {
         if (null === $this->yearLevels) {
-            $this->yearLevels = $this->mapper->findAll();
+            $this->yearLevels = $this->mapper->findAll()->indexBy('id');
         }
         return $this->yearLevels[$yearLevelId];
     }
