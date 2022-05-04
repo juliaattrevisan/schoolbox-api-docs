@@ -3,6 +3,8 @@
 namespace Schoolbox\Database;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
+use Alaress\Database\Exception;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use InvalidArgumentException;
@@ -72,7 +74,7 @@ class Factory
             self::$connectorExternal = self::getInstance()->getExternalDatabase(new Loader());
         }
 
-        return self::$connectorExternal;
+        return (self::$connectorExternal instanceof NullConnector ? null : self::$connectorExternal);
     }
 
 
@@ -137,12 +139,12 @@ class Factory
     public function getExternalDatabase(IConfigLoader $config, bool $ignoreDisabled = false): ?IConnector
     {
         if (!$ignoreDisabled && !$config->get('external_enable')) {
-            return null;
+            return new NullConnector();
         }
 
         switch ($config->get('external_type')) {
             case null:
-                return null;
+                return new NullConnector();
 
             // Schoolbox connector: just return internal DB
             case 'schoolbox':
@@ -168,7 +170,7 @@ class Factory
             // IBM DB2
             case 'edumate':
                 $connectorExternal = $this->factory->createDb2();
-                list($host, $schema) = explode('/', $config->get('external_db_host'), 2);
+                [$host, $schema] = explode('/', $config->get('external_db_host'), 2);
                 $connectorExternal->connect(
                     $host,
                     $config->get('external_db_db'),
@@ -184,16 +186,21 @@ class Factory
             throw new DatabaseException("Unknown external database type.");
         }
 
-        $connectorExternal->connect(
-            $config->get('external_db_host'),
-            $config->get('external_db_db'),
-            $config->get('external_db_user'),
-            $config->get('external_db_passwd')
-        );
+        try {
+            $connectorExternal->connect(
+                $config->get('external_db_host'),
+                $config->get('external_db_db'),
+                $config->get('external_db_user'),
+                $config->get('external_db_passwd')
+            );
 
-        $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
+            $connectorExternal->setTimezone($this->fetchTimezone($this->getInternalDatabase()));
 
-        return $connectorExternal;
+            return $connectorExternal;
+        } catch (Exception $e) {
+            // noop
+        }
+        return new NullConnector();
     }
 
 

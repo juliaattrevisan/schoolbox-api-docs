@@ -9,6 +9,7 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Byte_Format;
@@ -78,7 +79,7 @@ class Controller extends Base
         ImportLogMapper $importLogMapper
     ) {
         $this->databaseFactory  = $databaseFactory;
-        $this->databaseExternal = $databaseExternal;
+        $this->databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
         $this->configMapper     = $configMapper;
         $this->importLogMapper  = $importLogMapper;
     }

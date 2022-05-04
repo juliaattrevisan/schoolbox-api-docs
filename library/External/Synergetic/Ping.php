@@ -14,7 +14,7 @@ class External_Synergetic_Ping implements External_PingInterface
     use External_MssqlPingTrait;
 
     /**
-     * @var IConnector
+     * @var IConnector|null
      */
     private $database;
 
@@ -29,8 +29,19 @@ class External_Synergetic_Ping implements External_PingInterface
     /**
      * @inheritdoc
      */
+    public function isResponsive(): bool
+    {
+        return $this->database !== null;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getVersion(): string
     {
+        if (!$this->database) {
+            return '';
+        }
         try {
             return $this->database->getOne("SELECT TOP 1 [VALUE] FROM Config WHERE Key1 = 'System' AND Key2 = 'Network' AND Key3 = 'Version' AND Key4 = 'DataStructure'");
         } catch (\Exception $e) {

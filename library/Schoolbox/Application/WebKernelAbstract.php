@@ -404,6 +404,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}") . "</li>";
             if ($args['stackTrace'] instanceof \Throwable) {
                 foreach ($args['stackTrace']->getTrace() as $i => $frame) {
+                    foreach (['class', 'type', 'function', 'file', 'line'] as $prop) {
+                        $frame[$prop] ??= '';
+                    }
                     $output .= <<<LINE
                     <li>
                         <pre>#$i:{$frame['class']}{$frame['type']}{$frame['function']}, called from {$frame['file']}:{$frame['line']}</pre>

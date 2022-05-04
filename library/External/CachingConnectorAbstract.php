@@ -10,14 +10,11 @@ declare(strict_types=1);
 namespace External;
 
 use Alaress\Redis;
-
-use function call_user_func_array;
-use function get_class;
-
 use InvalidArgumentException;
 use Schoolbox\External;
 
-use function trigger_error;
+use function call_user_func_array;
+use function get_class;
 
 /**
  * Common implementation for classes that:
@@ -121,14 +118,12 @@ class CachingConnectorAbstract
 
         try {
             return $this->cache->cacheFunctionCall($key, $callback, $params, $timeoutOverride ?? $this->timeout);
-        } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (\Alaress\Database\Exception $e) {
+        } catch (\Alaress\Database\Exception $e) {
             $this->isOffline = true;
             // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
             if (PHP_SAPI === 'cli') {
                 throw new \Schoolbox\External\Exception('SIS connector failed to execute function: ' . $e->getMessage());
             } else {
-                trigger_error($e->getMessage(), E_USER_WARNING);
                 $this->database = $this->offlineConnector;
             }
             return $this->bypassCache($method, $params);
