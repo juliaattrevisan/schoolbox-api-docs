@@ -69,7 +69,8 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('pastoralType', 't')}
+                   {$this->getJoinColumnString('pastoralType', 't')},
+                   {$this->getJoinColumnString('pastoral_type_action', 'actions')}
         ";
     }
 
@@ -82,6 +83,7 @@ class Mapper extends BaseMapper
         return "
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('pastoralType', '', 't', true)}
+            LEFT JOIN {$this->getJoinSql('pastoral_type_action', '', 'actions')}
         ";
     }
 
@@ -98,6 +100,11 @@ class Mapper extends BaseMapper
         /** @var Pastoral\Type\Mapper $typeMapper */
         $typeMapper = $this->getJoinMapper('pastoralType');
 
+        /* Pastoral Actions need to be part of findById() in Admin Lists controller
+         * otherwise you lose their relationships when you change a Subtype's details
+         */
+        $actionsMapper = $this->getJoinMapper('pastoral_type_action');
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $modelId = $row[$this->getIdentifierColumn()];
 
@@ -109,6 +116,15 @@ class Mapper extends BaseMapper
             }
 
             $type = $typeMapper->hydrate($row, 't');
+
+            /* Hydrate pastoral actions, if there are any associated
+             */
+            $action = $actionsMapper->hydrate($row, 'actions');
+
+            if (null !== $action) {
+                $model->getActions()->add($action);
+            }
+
             $model->setPastoralType($type);
         }
         return $collection;
