@@ -351,13 +351,20 @@ class Team implements IStrategy
 
             /* Put them in a team
              */
-            $teamPlayer = $this->teamPlayerMapper->createModel()
-                ->setUser($user)
-                ->setTeam($team)
-                ->setSequence($sequence);
+            try {
+                $teamPlayer = $this->teamPlayerMapper->findOneByColumnList([
+                    'user_id' => $user->getId(),
+                    'team_id' => $team->getId()
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $teamPlayer = $this->teamPlayerMapper->createModel()
+                    ->setUser($user)
+                    ->setTeam($team)
+                    ->setSequence($sequence);
 
-            if ($this->perform) {
-                $this->teamPlayerMapper->save($teamPlayer);
+                if ($this->perform) {
+                    $this->teamPlayerMapper->save($teamPlayer);
+                }
             }
 
             $this->log->info(sprintf(
@@ -373,7 +380,7 @@ class Team implements IStrategy
              * Check if they're already in there - just reuse it if it exists
              */
             try {
-                $divisionUser = $this->divisionUserMapper->findByColumnList([
+                $divisionUser = $this->divisionUserMapper->findOneByColumnList([
                     'user_id' => $user->getId(),
                     'division_id' => $division->getId()
                 ]);
