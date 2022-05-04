@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 class Module extends BaseModule
 {
@@ -49,7 +50,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-
+            $this->getMapperFactory()->get(YearLevelMapper::class)
         );
     }
 }
