@@ -50,7 +50,7 @@ class Renderer extends Base
             $this->getPage()->setFile('forum_t', 'resource/forum/search/results.html');
             $this->getPage()->setBlock('forum_t', 'forum', 'forum_block');
             $this->getPage()->setVar(array(
-                                         'FORUM_DISP_COUNT' => $mapperResult->getCount(),
+                                         'FORUM_DISP_COUNT' => $mapperResult->getResult()->count(),
                                          'FORUM_COUNT' => $mapperResult->getCount(),
                                      ));
 

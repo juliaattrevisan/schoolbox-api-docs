@@ -35,7 +35,7 @@ class Result extends Base
         $query = "SELECT `forumThread`.*, `forumPost`.*, `forumThread`.title AS `threadTitle`,
                             `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
                             MATCH(`body`) AGAINST (:keywordBodySelect) AS score,
-                            MATCH(`forumThread`.`title`) AGAINST (:keywordTitleSelect) AS `score_title`
+                            MATCH(`forumThread`.`title`) AGAINST (:keywordTitleSelect) AS score_title
                         FROM `forumPost`
                         JOIN `forumThread` ON `forumPost`.threadID = `forumThread`.threadID
                         JOIN `folder` ON `folder`.id = `forumThread`.categoryID AND `folder`.deleted_At IS NULL
@@ -53,7 +53,7 @@ class Result extends Base
                             )
                             AND `forumThread`.`deleted` = 'false'
                             AND `forumPost`.`deleted` = 'false'
-                        ORDER BY :sortQuote DESC
+                        ORDER BY :sortQuote :sortDir, 'score' :sortScoreDir
                         LIMIT :offset, :limit;
             ";
 
@@ -66,6 +66,8 @@ class Result extends Base
             'roleId'            => $user->getRole()->getId(),
             'userId'            => $user->getId(),
             'sortQuote'         => $sanitiser->getSortBy(),
+            'sortScoreDir'      => $sanitiser->getSortDir(),
+            'sortDir'      => $sanitiser->getSortDir(),
             'offset'                => $sanitiser->getOffset(),
             'limit'                => $sanitiser->getResultLimit()
         ];
