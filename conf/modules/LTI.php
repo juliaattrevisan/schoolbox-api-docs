@@ -10,7 +10,7 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\LTI\Component\Homepage\Module as LtiComponent;
 use Schoolbox\LTI\Consumer\Module as LtiConsumer;
 use Schoolbox\LTI\Platform\Module as LtiPlatform;
@@ -22,23 +22,20 @@ use Schoolbox\LTI\Prototype\Tool\Module as LtiPrototypeTool;
 class LTI extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, LtiComponent::class, "/lti");
-        $this->loadModule($kernel, LtiConsumer::class, "/lti-consumer");
+        $this->loadModule($di, LtiComponent::class, "/lti");
+        $this->loadModule($di, LtiConsumer::class, "/lti-consumer");
 
         // LTI 1.3 platform
-        $this->loadModule($kernel, LtiPlatform::class, "/lti-platform");
-        $this->loadModule($kernel, LtiPlatformContext::class, "/lti-platform/context");
-        $this->loadModule($kernel, LtiPlatformLineItem::class, "/lti-platform/line-item");
+        $this->loadModule($di, LtiPlatform::class, "/lti-platform");
+        $this->loadModule($di, LtiPlatformContext::class, "/lti-platform/context");
+        $this->loadModule($di, LtiPlatformLineItem::class, "/lti-platform/line-item");
 
         // Prototype platform and tool
-        $this->loadModule($kernel, LtiPrototypePlatform::class, "/lti-prototype/platform");
-        $this->loadModule($kernel, LtiPrototypeTool::class, "/lti-prototype/tool");
+        $this->loadModule($di, LtiPrototypePlatform::class, "/lti-prototype/platform");
+        $this->loadModule($di, LtiPrototypeTool::class, "/lti-prototype/tool");
     }
 }

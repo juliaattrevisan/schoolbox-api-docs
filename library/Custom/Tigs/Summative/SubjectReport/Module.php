@@ -18,7 +18,6 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -34,18 +33,10 @@ use UnexpectedValueException;
 
 class Module extends Alaress\Module\Module
 {
-
-    public const BASE_NAME = 'tigsSubjectReport';
-
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename ?: self::BASE_NAME);
-    }
-
+    protected $basename = 'tigsSubjectReport';
 
     /**
      * @inheritdoc

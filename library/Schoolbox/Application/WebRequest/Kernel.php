@@ -16,7 +16,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\Module\Module;
+use Alaress\Module\Registry;
 use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
@@ -256,7 +256,7 @@ class Kernel extends WebKernelAbstract
         $action         = $parsedName['action'];
 
         // Get module out of its own cache, instead of from DI
-        $module = Module::retrieveInstalledModule($controllerName);
+        $module = Registry::buildModuleFromRegistration($this->di, $controllerName);
         $module->initControllerDependencies();
 
         // User is from:
@@ -534,6 +534,7 @@ class Kernel extends WebKernelAbstract
     {
         parent::postInstallDependencies();
 
+        $this->initRoutes();
         $this->initModules();
     }
 

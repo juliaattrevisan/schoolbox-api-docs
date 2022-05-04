@@ -11,7 +11,7 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Pastoral\Module as PastoralModule;
 use Schoolbox\Pastoral\ReportBuilder\Module as PastoralReportBuilderModule;
 use Schoolbox\Pastoral\Management\Module as PastoralManagementModule;
@@ -19,22 +19,16 @@ use Schoolbox\Pastoral\Audience;
 
 class Pastoral extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         if ($di->get('config')->get('pastoral_enabled')) {
-            $this->loadModule($kernel, PastoralModule::class, "/pastoral");
-            $this->loadModule($kernel, PastoralReportBuilderModule::class, "/pastoral/report");
-            $this->loadModule($kernel, PastoralManagementModule::class, "/pastoral/management/groups");
-            $this->loadModule($kernel, Audience\Module::class, "/pastoral/management/audience");
+            $this->loadModule($di, PastoralModule::class, "/pastoral");
+            $this->loadModule($di, PastoralReportBuilderModule::class, "/pastoral/report");
+            $this->loadModule($di, PastoralManagementModule::class, "/pastoral/management/groups");
+            $this->loadModule($di, Audience\Module::class, "/pastoral/management/audience");
         }
     }
 }

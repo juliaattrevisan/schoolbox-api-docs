@@ -9,21 +9,18 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Module;
 
 class Calendar extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, Module::class, "/calendar");
-        $this->loadModule($kernel, \Schoolbox\Calendar\Event\Module::class, "/calendar/event");
+        $this->loadModule($di, Module::class, "/calendar");
+        $this->loadModule($di, \Schoolbox\Calendar\Event\Module::class, "/calendar/event");
     }
 }

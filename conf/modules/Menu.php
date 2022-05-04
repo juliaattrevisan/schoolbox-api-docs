@@ -9,21 +9,18 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Menu\Side\Module as MenuSideModule;
 use Schoolbox\Menu\Top\Module as MenuTopModule;
 
 class Menu extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, MenuTopModule::class, null);
-        $this->loadModule($kernel, MenuSideModule::class, null);
+        $this->loadModule($di, MenuTopModule::class, null);
+        $this->loadModule($di, MenuSideModule::class, null);
     }
 }

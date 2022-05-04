@@ -10,22 +10,19 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Submenu\Module;
 
 class Submenu implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'submenu';
 
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init("/{$namespace}");
+        $module = new Module($di);
+        $module->registerModule("/{$namespace}");
     }
 }

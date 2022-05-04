@@ -9,44 +9,37 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox;
 
 // TODO - this class name is illegal in PHP7. Needs to be changed to other than 'Resource'
 class Resource implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $browserModule = new Schoolbox\Resource\Browser\Resources\Module($di);
-        $browserModule->init('/resources');
+        $browserModule->registerModule('/resources');
 
         $myBrowserModule = new Schoolbox\Resource\Browser\MyFiles\Module($di);
-        $myBrowserModule->init('/my-files');
+        $myBrowserModule->registerModule('/my-files');
 
         $webDavBrowserModule = new Schoolbox\Resource\Browser\WebDav\Module($di);
-        $webDavBrowserModule->init('/drives');
+        $webDavBrowserModule->registerModule('/drives');
 
         $folderModule = new Schoolbox\Resource\Folder\Module($di);
-        $folderModule->init('/resource');
+        $folderModule->registerModule('/resource');
 
         $textboxModule = new Schoolbox\Resource\Textbox\Module($di);
-        $textboxModule->init('/textbox');
+        $textboxModule->registerModule('/textbox');
 
         $googleFileModule = new Schoolbox\Resource\GoogleFile\Module($di);
-        $googleFileModule->init('/googleFile');
+        $googleFileModule->registerModule('/googleFile');
         // Commented out as:
         // * it's unused
         // * it collides with folder search page www/resource/folder/search.php
 //        $folderSearchModule = new \Schoolbox\Resource\Folder\Search\Module($di);
-//        $folderSearchModule->init('/resource/folder/search');
     }
 }

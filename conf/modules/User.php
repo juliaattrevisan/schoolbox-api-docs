@@ -10,7 +10,7 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
@@ -20,39 +20,32 @@ use Schoolbox\User\Token\Module as UserTokenModule;
 class User implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $userModule = new UserModule($di);
-        $userModule->init('/user');
+        $userModule->registerModule('/user');
 
         // Only load the external SIS academic report module if it is enabled in config
 
         if ($di->get('config')->get('external_document_report_enabled')) {
             $documentReportModule = new UserProfileDocumentManagementModule($di);
-            $documentReportModule->init('/user/profile/documents/reports');
+            $documentReportModule->registerModule('/user/profile/documents/reports');
         }
 
         /* Change Password
          */
         $module = new ChangePasswordModule($di);
-        $module->init('/passwordChange');
+        $module->registerModule('/passwordChange');
 
         /* Reset Password
          */
         $module = new ResetPasswordModule($di);
-        $module->init('/passwordReset');
+        $module->registerModule('/passwordReset');
 
         // Token
         $module = new UserTokenModule($di);
-        $module->init('/user/token');
+        $module->registerModule('/user/token');
     }
 }

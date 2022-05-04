@@ -23,16 +23,10 @@ use Schoolbox\RoleMapper;
  */
 class Module extends AlaressModule
 {
-
     /**
-     * @param ContainerInterface $injector
-     * @param string             $basename
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        parent::__construct($injector, '' === $basename ? 'filters' : $basename);
-    }
-
+    protected $basename = 'filters';
 
     /**
      * @inheritdoc

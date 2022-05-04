@@ -8,22 +8,18 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\ImmersiveReader\Module as ImmersiveReaderModule;
 
 class ImmersiveReader extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'immersive-reader';
-        $this->loadModule($kernel, ImmersiveReaderModule::class, "/{$namespace}");
+        $this->loadModule($di, ImmersiveReaderModule::class, "/{$namespace}");
     }
 }

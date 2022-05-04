@@ -10,22 +10,18 @@
 
 namespace Config\Modules\Custom\Dsfg;
 
-use Alaress\Application\Kernel;
 use Custom\Dsfg\AchievementReport\Module;
 use Config\Modules\ModuleConfigInterface;
+use Psr\Container\ContainerInterface;
 
 class AchievementReport implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
         $module = new Module($di);
-        $module->init('/modules/custom/diocesan/achievementreport');
+        $module->registerModule('/modules/custom/diocesan/achievementreport');
     }
 }

@@ -11,7 +11,7 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\LearningAnalytics\Module as LearningAnalyticsModule;
@@ -19,18 +19,15 @@ use Schoolbox\LearningAnalytics\Module as LearningAnalyticsModule;
 class LearningAnalytics extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         /** @var IConfigLoader $config */
-        $config = $kernel->getDependencyInjector()->get('config');
+        $config = $di->get('config');
 
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $this->loadModule($kernel, LearningAnalyticsModule::class, "/learning/analytics");
+            $this->loadModule($di, LearningAnalyticsModule::class, "/learning/analytics");
         }
     }
 }

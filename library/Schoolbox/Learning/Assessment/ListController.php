@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Module\Registry;
 use Alaress\Web;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
@@ -406,7 +407,7 @@ class ListController extends Web\Controller\Base
      */
     private function getDelegateController($type): Controller
     {
-        $module = Module::retrieveInstalledModule('learningAssessment');
+        $module = Registry::buildModuleFromRegistration($this->di, 'learningAssessment');
         if ($module instanceof Module) {
             // Dependencies need to be set up too
             $module->initControllerDependencies();

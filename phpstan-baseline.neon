@@ -6,11 +6,6 @@ parameters:
 			path: conf/core/require.php
 
 		-
-			message: "#^Class Schoolbox\\\\Fixtures\\\\Status\\\\Module constructor invoked with 2 parameters, 1 required\\.$#"
-			count: 1
-			path: conf/modules/SportsFixtures.php
-
-		-
 			message: "#^Result of && is always false\\.$#"
 			count: 1
 			path: library/AjaxChat.php
@@ -4766,11 +4761,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Matchup/Notifier/Helper.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Module.php
-
-		-
 			message: "#^Parameter \\#1 \\$context \\(null\\) of method Schoolbox\\\\Fixtures\\\\Sport\\\\Controller\\:\\:getList\\(\\) should be compatible with parameter \\$context \\(object\\) of method Alaress\\\\Web\\\\Controller\\\\Restful\\\\IController\\:\\:getList\\(\\)$#"
 			count: 2
 			path: library/Schoolbox/Fixtures/Sport/Controller.php
@@ -6366,17 +6356,7 @@ parameters:
 			path: library/Schoolbox/Menu/Top/Model.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Module/RestfulModule.php
-
-		-
 			message: "#^Method Schoolbox\\\\Module\\\\RestfulModule\\:\\:findById\\(\\) should return object but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Module/RestfulModule.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php
 

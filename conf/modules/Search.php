@@ -7,6 +7,7 @@
 
 namespace Config\Modules;
 
+use Psr\Container\ContainerInterface;
 use Schoolbox\Search\Mock;
 use Schoolbox\Search\User;
 
@@ -16,14 +17,14 @@ use Schoolbox\Search\User;
 class Search implements ModuleConfigInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $module = new Mock\Module($kernel->getDependencyInjector());
-        $module->init('/searchv2');
+        $module = new Mock\Module($di);
+        $module->registerModule('/searchv2');
 
-        $module = new User\Module($kernel->getDependencyInjector());
-        $module->init('/search/user');
+        $module = new User\Module($di);
+        $module->registerModule('/search/user');
     }
 }

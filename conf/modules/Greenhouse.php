@@ -8,23 +8,19 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Greenhouse\Module as GreenhouseModule;
 
 class Greenhouse implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'greenhouse';
 
-        $greenhouseModule = new GreenhouseModule($kernel->getDependencyInjector());
-        $greenhouseModule->init("/$namespace");
+        $greenhouseModule = new GreenhouseModule($di);
+        $greenhouseModule->registerModule("/$namespace");
     }
 }

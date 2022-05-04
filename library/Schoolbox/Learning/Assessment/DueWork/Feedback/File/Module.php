@@ -11,21 +11,15 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback\File;
 use Alaress\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile;
 use Schoolbox\Mapper;
 
 class Module extends BaseModule\Module
 {
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        parent::__construct($injector, $basename ?: 'learningDueWorkFeedbackFile');
-    }
-
+    protected $basename = 'learningDueWorkFeedbackFile';
 
     /**
      * Hook method for setting up routes via self::register()

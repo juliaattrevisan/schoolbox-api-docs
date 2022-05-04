@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Module;
 
+use Alaress\Module\Registry;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
 use Psr\Container\ContainerInterface;
@@ -31,7 +32,7 @@ abstract class RestfulModule extends AlaressModule
     /** @var string */
     protected $collection;
 
-    /** @var RestfulModule */
+    /** @var RestfulModule|null */
     protected $context = null;
 
     /** @var string */
@@ -39,19 +40,29 @@ abstract class RestfulModule extends AlaressModule
 
     /**
      * @param ContainerInterface $injector
-     * @param string             $mapper
+     * @param class-string       $mapper
      * @param string             $collectionName
      * @param RestfulModule|null $context
-     * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector, $mapper, $collectionName, RestfulModule $context = null, $basename = '')
-    {
-        parent::__construct($injector, $basename);
-        $this->context    = $context;
-        $this->collection = $collectionName;
+    public function __construct(
+        ContainerInterface $injector,
+        string $mapper,
+        string $collectionName,
+        RestfulModule $context = null
+    ) {
+        parent::__construct($injector);
+        $this->context     = $context;
+        $this->collection  = $collectionName;
         $this->mapperClass = $mapper;
     }
 
+    /**
+     * @return RestfulModule|null
+     */
+    public function getContext(): ?RestfulModule
+    {
+        return $this->context;
+    }
 
     /**
      * @return string
@@ -202,5 +213,18 @@ abstract class RestfulModule extends AlaressModule
         } catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
+    }
+
+    /**
+     * Registers this restful module, with an additional context constructor
+     * parameter.
+     *
+     * @param string|null   $basePath
+     * @param RestfulModule $context
+     * @return void
+     */
+    public function registerModuleWithContext(?string $basePath, RestfulModule $context): void
+    {
+        Registry::register($this, $basePath, $context);
     }
 }

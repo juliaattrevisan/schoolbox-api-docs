@@ -5,6 +5,7 @@
 # - Restarts daemons (primary host only)
 # - Rebuilds cron jobs (primary host only)
 # - Rebuilds binding cache (primary host only)
+# - Rebuilds module and route cache (primary host only)
 #
 # @copyright   Copyright 2021, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
@@ -203,6 +204,7 @@ function upgrade_instances(){
 }
 
 function restart_php_fpm(){
+  # TODO shouldn't this reload php8-fpm?
   log "Reloading php7.4-fpm ..."
   service php7.4-fpm reload         # Ensure web requests use upgraded code
 }
@@ -264,12 +266,33 @@ function reload_binding_cache(){
   fi
 }
 
+function reload_route_and_module_cache(){
+  if [[ $is_primary_host == '1' ]]; then
+    log "---reloading route+module cache (in parallel)---";
+    for i in $instance_list; do
+    {
+      instance_log_file_2=/var/log/schoolbox/"$i"/upgrade.log;
+      log "route+module cache refresh starting for instance $i - logging to $instance_log_file_2";
+      INSTANCE_ID="$i" /usr/share/schoolbox/tools/module/refresh-cache.php >> "$instance_log_file_2" 2>&1;
+      log "route+module cache refresh finished for instance $i";
+    } &
+    done;
+    # Wait for all child processes to finish
+    sleep 1 && log "Parent script waiting for all child processes to complete...";
+    wait;
+    log "All child processes have completed";
+  else
+    log "---skipping route+module cache reload on secondary host---";
+  fi
+}
+
 # Main script logic
 function main() {
   export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
   check_run_as_root
   parse_args "$@"
   parse_global_vars "$@"
+  reload_route_and_module_cache
   upgrade_instances
   restart_php_fpm
   remove_maintenance_page

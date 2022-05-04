@@ -9,29 +9,25 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox;
 
 class API extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, Schoolbox\API\Module::class, '/api');
+        $this->loadModule($di, Schoolbox\API\Module::class, '/api');
 
-        $this->loadModule($kernel, Schoolbox\Admin\API\Module::class, '/api/admin');
+        $this->loadModule($di, Schoolbox\Admin\API\Module::class, '/api/admin');
 
-        $this->loadModule($kernel, Schoolbox\APIGroup\Module::class, '/api/user');
+        $this->loadModule($di, Schoolbox\APIGroup\Module::class, '/api/user');
 
-        $this->loadModule($kernel, Schoolbox\APIUser\Module::class, '/api/user');
+        $this->loadModule($di, Schoolbox\APIUser\Module::class, '/api/user');
 
-        $this->loadModule($kernel, Schoolbox\APIUser\Notify\Module::class, '/api/user');
+        $this->loadModule($di, Schoolbox\APIUser\Notify\Module::class, '/api/user');
     }
 }

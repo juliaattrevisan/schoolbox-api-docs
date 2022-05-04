@@ -10,19 +10,16 @@ declare(strict_types=1);
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Help\SingleSignOn\Module;
 
 class Help extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, Module::class, "/help/sso");
+        $this->loadModule($di, Module::class, "/help/sso");
     }
 }

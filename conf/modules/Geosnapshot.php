@@ -9,22 +9,18 @@ declare(strict_types=1);
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 
 class Geosnapshot extends ModuleLoader
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Component\Dashboard\Module::class, "/geosnapshot/component/dashboard");
-        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Component\Homepage\Module::class, "/geosnapshot/component/homepage");
-        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Module::class, "/geosnapshot");
+        $this->loadModule($di, \Schoolbox\Geosnapshot\Component\Dashboard\Module::class, "/geosnapshot/component/dashboard");
+        $this->loadModule($di, \Schoolbox\Geosnapshot\Component\Homepage\Module::class, "/geosnapshot/component/homepage");
+        $this->loadModule($di, \Schoolbox\Geosnapshot\Module::class, "/geosnapshot");
     }
 }

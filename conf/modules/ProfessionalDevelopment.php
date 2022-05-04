@@ -10,23 +10,19 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\ProfessionalDevelopment\Module;
 
 class ProfessionalDevelopment implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
         $namespace = 'professionaldevelopment';
 
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init("/$namespace");
+        $module = new Module($di);
+        $module->registerModule("/$namespace");
     }
 }

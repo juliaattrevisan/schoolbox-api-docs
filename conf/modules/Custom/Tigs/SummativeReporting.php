@@ -9,27 +9,22 @@ declare(strict_types=1);
 
 namespace Config\Modules\Custom\Tigs;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Custom\Tigs\Summative;
+use Psr\Container\ContainerInterface;
 
 class SummativeReporting extends ModuleLoader
 {
-
     /**
      * @inheritdoc
-     * @param Kernel $kernel
-     * @return void
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $basePath = '/modules/custom/tigs/summative';
 
-        $this->loadModule($kernel, Summative\Admin\Module::class, "{$basePath}/admin");
-        $this->loadModule($kernel, Summative\Comment\Module::class, "{$basePath}/comments");
-        $this->loadModule($kernel, Summative\SubjectReport\Module::class, "{$basePath}/subject");
-        $this->loadModule($kernel, Summative\ParticipationReport\Module::class, "{$basePath}/participation");
+        $this->loadModule($di, Summative\Admin\Module::class, "{$basePath}/admin");
+        $this->loadModule($di, Summative\Comment\Module::class, "{$basePath}/comments");
+        $this->loadModule($di, Summative\SubjectReport\Module::class, "{$basePath}/subject");
+        $this->loadModule($di, Summative\ParticipationReport\Module::class, "{$basePath}/participation");
     }
 }

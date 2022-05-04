@@ -7,8 +7,8 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Assessment\Course;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -37,66 +37,62 @@ use Schoolbox\Learning\Upcoming;
 class Learning extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
         /** @var IConfigLoader $config */
-        $config = $kernel->getDependencyInjector()->get('config');
+        $config = $di->get('config');
 
         $namespace = 'learning';
 
         // TODO - split 'LearningModule' into ClassModule + PendingModule
-        $this->loadModule($kernel, LearningModule::class, "/{$namespace}");
+        $this->loadModule($di, LearningModule::class, "/{$namespace}");
 
         // LMS module required plan (Basic,Pro,Elite)
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $this->loadModule($kernel, Grades\Module::class, "/{$namespace}/grades");
-            $this->loadModule($kernel, AssessmentModule::class, "/{$namespace}");
-            $this->loadModule($kernel, DueworkFeedbackModule::class, "/{$namespace}");
-            $this->loadModule($kernel, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
-            $this->loadModule($kernel, DueworkResponseModule::class, "/{$namespace}");
-            $this->loadModule($kernel, QuizModule::class, "/{$namespace}");
-            $this->loadModule($kernel, MarkbookModule::class, "/{$namespace}/markbook");
-            $this->loadModule($kernel, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
-            $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
-            $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
-            $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+            $this->loadModule($di, Grades\Module::class, "/{$namespace}/grades");
+            $this->loadModule($di, AssessmentModule::class, "/{$namespace}");
+            $this->loadModule($di, DueworkFeedbackModule::class, "/{$namespace}");
+            $this->loadModule($di, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
+            $this->loadModule($di, DueworkResponseModule::class, "/{$namespace}");
+            $this->loadModule($di, QuizModule::class, "/{$namespace}");
+            $this->loadModule($di, MarkbookModule::class, "/{$namespace}/markbook");
+            $this->loadModule($di, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
+            $this->loadModule($di, Upcoming\Module::class, "/{$namespace}/due");
+            $this->loadModule($di, AssessmentExporterModule::class, "/{$namespace}/export");
+            $this->loadModule($di, MarkScheme\Module::class, "/{$namespace}/markscheme");
         }
 
         // Student toolkit component: not feature flagged
-        $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
+        $this->loadModule($di, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
 
 
         // Learning moment evidence: behind a feature flag
         if ($config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {
-            $this->loadModule($kernel, EvidenceModule::class, "/{$namespace}/evidence");
+            $this->loadModule($di, EvidenceModule::class, "/{$namespace}/evidence");
 
             // Discussion threads and comments for learning moment evidence:
             // also behind the same feature flag
-            $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
-            $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
+            $this->loadModule($di, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
+            $this->loadModule($di, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
         }
 
         // Badge module: behind a feature flag
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
-            $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
-            $this->loadModule($kernel, BadgeAwardModule::class, "/{$namespace}/badge/award");
+            $this->loadModule($di, BadgeModule::class, "/{$namespace}/badge");
+            $this->loadModule($di, BadgeAwardModule::class, "/{$namespace}/badge/award");
         }
 
         // Feed module: not behind a feature flag
-        $this->loadModule($kernel, FeedModule::class, "/{$namespace}/evidenceFeed");
+        $this->loadModule($di, FeedModule::class, "/{$namespace}/evidenceFeed");
 
         /* Assessment Calendar is behind a feature flag
          */
         if ($config->get('assessment_calendar_enabled')) {
-            $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
+            $this->loadModule($di, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
             $this->loadModule(
-                $kernel,
+                $di,
                 AssessmentCalendarEventsModule::class,
                 "/{$namespace}/assessment/calendar/events"
             );
@@ -108,6 +104,6 @@ class Learning extends ModuleLoader
          *  make webhooks accessible if your turnitin configuration exists
          *  and based on plan availability settings?
          */
-        $this->loadModule($kernel, TurnitinModule::class, "/{$namespace}/turnitin");
+        $this->loadModule($di, TurnitinModule::class, "/{$namespace}/turnitin");
     }
 }

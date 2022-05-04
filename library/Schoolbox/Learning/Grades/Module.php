@@ -13,7 +13,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
@@ -29,16 +28,9 @@ use Schoolbox\UserMapper;
 class Module extends BaseModule
 {
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        if ('' === $basename) {
-            $basename = 'learningGrades';
-        }
-        parent::__construct($injector, $basename);
-    }
-
+    protected $basename = 'learningGrades';
 
     /**
      * @inheritdoc

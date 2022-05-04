@@ -10,21 +10,17 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Tile\Module;
 
 class Tile implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init('/tile');
+        $module = new Module($di);
+        $module->registerModule('/tile');
     }
 }

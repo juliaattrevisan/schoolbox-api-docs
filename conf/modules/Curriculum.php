@@ -10,22 +10,22 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
+use Schoolbox\Curriculum\Import\Module as ImportModule;
 use Schoolbox\Curriculum\Module;
 
 class Curriculum implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $module = new Module($kernel->getDependencyInjector());
-        $module->init('/curriculum');
+        $module = new Module($di);
+        $module->registerModule('/curriculum');
+
+        $importModule = new ImportModule($di);
+        $importModule->registerModule('/curriculum/import');
 
         // Submodules:
         // * learning areas

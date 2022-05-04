@@ -10,24 +10,18 @@
 
 namespace Config\Modules\Custom\Ms;
 
-use Alaress\Application\Kernel;
 use Custom\Ms\Pastoral\Module;
 use Config\Modules\ModuleConfigInterface;
-use External_User;
+use Psr\Container\ContainerInterface;
 
 class Pastoral implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     *
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
         $pastoralModule = new Module($di);
-        $pastoralModule->init('/modules/custom/meriden/pastoral');
+        $pastoralModule->registerModule('/modules/custom/meriden/pastoral');
     }
 }

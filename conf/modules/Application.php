@@ -8,22 +8,19 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox;
 
 class Application extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, Schoolbox\Application\Login\Module::class, '/login');
-        $this->loadModule($kernel, Schoolbox\Application\Feedback\Module::class, '/feedback');
-        $this->loadModule($kernel, Schoolbox\Application\Policy\Module::class, '/policy');
+        $this->loadModule($di, Schoolbox\Application\Login\Module::class, '/login');
+        $this->loadModule($di, Schoolbox\Application\Feedback\Module::class, '/feedback');
+        $this->loadModule($di, Schoolbox\Application\Policy\Module::class, '/policy');
     }
 }

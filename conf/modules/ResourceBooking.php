@@ -10,7 +10,7 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Item;
@@ -18,29 +18,23 @@ use Schoolbox\ResourceBooking\Report;
 
 class ResourceBooking implements ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         if ($di->get('config')->get('resource_booking_enabled')) {
             $categoryModule = new Category\Module($di);
-            $categoryModule->init('/resource-booking/category');
+            $categoryModule->registerModule('/resource-booking/category');
 
             $itemModule = new Item\Module($di);
-            $itemModule->init('/resource-booking/item');
+            $itemModule->registerModule('/resource-booking/item');
 
             $bookingModule = new Booking\Module($di);
-            $bookingModule->init('/resource-booking/booking');
+            $bookingModule->registerModule('/resource-booking/booking');
 
             $reportModule = new Report\Module($di);
-            $reportModule->init('/resource-booking/report');
+            $reportModule->registerModule('/resource-booking/report');
         }
     }
 }

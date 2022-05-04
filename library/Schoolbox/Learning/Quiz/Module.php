@@ -43,11 +43,17 @@ class Module extends RestfulModule
     use StandardModuleTrait;
 
     /**
-     * @param ContainerInterface $injector
+     * @var string
      */
-    public function __construct(ContainerInterface $injector)
+    protected $basename = 'learningQuiz';
+
+    /**
+     * @param ContainerInterface $injector
+     * @param RestfulModule|null $context
+     */
+    public function __construct(ContainerInterface $injector, ?RestfulModule $context)
     {
-        parent::__construct($injector, QuizMapper::class, 'quiz', null, 'learningQuiz');
+        parent::__construct($injector, QuizMapper::class, 'quiz', $context);
     }
 
     /**

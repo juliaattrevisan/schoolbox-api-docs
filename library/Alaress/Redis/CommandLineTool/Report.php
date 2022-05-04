@@ -166,7 +166,7 @@ class Report extends CliTool\App
 //            '^msg:' . INSTANCE_ID . ':q:\d+:push',
 //            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
 
-            // Route cache
+            // Message route cache
             "^m:" . INSTANCE_ID . ":routes",
 
             // Scheduled triggers?
@@ -176,6 +176,10 @@ class Report extends CliTool\App
 
             // Access tokens for LTI assessments
             '^accessToken:' . INSTANCE_ID . ':.+',
+
+            // Aura route and module caches
+            'routeCache:' . INSTANCE_ID,
+            'moduleCache:' . INSTANCE_ID,
 
             // Etherpad patterns
             '^pad:g\.',

@@ -36,12 +36,17 @@ class Module extends RestfulModule
     protected $externalDb;
 
     /**
-     * @param ContainerInterface $injector
-     * @param RestfulModule      $context
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, RestfulModule $context)
+    protected $basename = 'sportsfixturesResult';
+
+    /**
+     * @param ContainerInterface $injector
+     * @param RestfulModule|null $context
+     */
+    public function __construct(ContainerInterface $injector, ?RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::class, 'results', $context, 'sportsfixturesResult');
+        parent::__construct($injector, Mapper::class, 'results', $context);
     }
 
     /**

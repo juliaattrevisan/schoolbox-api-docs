@@ -8,10 +8,9 @@
 
 namespace Schoolbox\Admin\RouteSummary;
 
+use Alaress\Module\Registry;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Route;
-use Schoolbox\Admin\Navigation\Subnav;
-
 
 /**
  * A controller for viewing a list of routes defined within Schoolbox.
@@ -28,7 +27,7 @@ class Controller extends Base
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
             try {
-                $module = Module::retrieveInstalledModule($parsedName['controller']);
+                $module = Registry::buildModuleFromRegistration($this->di, $parsedName['controller']);
                 $module->initControllerDependencies();
                 $controller = $module->buildController();
             } catch (\Throwable $e) {

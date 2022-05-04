@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace Config\Modules;
 
 use Config\ModuleLoader;
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Profile\Button\Module as ProfileButtonModule;
 
 class Profile extends ModuleLoader
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel): void
+    public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($kernel, ProfileButtonModule::class, null);
+        $this->loadModule($di, ProfileButtonModule::class, null);
     }
 }

@@ -247,6 +247,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
+# TODO remove this once route+module cache is built in schoolbox-data-refresh.sh
+echo "[SB][`date +%Y-%m-%d\ %X`] Loading route+module cache (should be in schoolbox-data-refresh.sh)";
+"$SITE_ROOT"/tools/module/refresh-cache.php 2>&1;
 
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(

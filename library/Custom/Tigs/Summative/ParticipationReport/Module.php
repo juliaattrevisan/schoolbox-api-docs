@@ -33,18 +33,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 
 class Module extends Alaress\Module\Module
 {
-
-    public const BASE_NAME = 'tigsParticipationReport';
-
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, string $basename = '')
-    {
-        parent::__construct($injector, $basename ?: self::BASE_NAME);
-    }
-
+    protected $basename = 'tigsParticipationReport';
 
     /**
      * @inheritdoc

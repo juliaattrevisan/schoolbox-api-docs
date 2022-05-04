@@ -10,19 +10,13 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
-use Psr\Container\ContainerInterface;
 
 class Module extends BaseModule
 {
-
     /**
-     * @inheritdoc
+     * @var string
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
-    {
-        parent::__construct($injector, $basename ?: 'learningMarkScheme');
-    }
-
+    protected $basename = 'learningMarkScheme';
 
     /**
      * @inheritdoc

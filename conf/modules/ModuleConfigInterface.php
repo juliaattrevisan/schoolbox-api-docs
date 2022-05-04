@@ -9,16 +9,21 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 interface ModuleConfigInterface
 {
-
     /**
-     * Run configuration for the given module
+     * Run configuration for the given module.
      *
-     * @param Kernel $kernel
+     * @param ContainerInterface $di The dependency injection container which
+     *                               this config will use to construct its
+     *                               modules.
+     * @throws NotFoundExceptionInterface  if a dependency is not in `$di`
+     * @throws ContainerExceptionInterface if there's another issue with `$di`
      * @return void
      */
-    public function configure($kernel);
+    public function configure(ContainerInterface $di): void;
 }

@@ -9,6 +9,7 @@
 namespace Config\Modules;
 
 use Config\ModuleLoader;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Tour\Module as TourModule;
 
 class Tour extends ModuleLoader
@@ -16,12 +17,10 @@ class Tour extends ModuleLoader
     /**
      * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         if ($di->get('config')->get('tours_enabled')) {
-            $this->loadModule($kernel, TourModule::class, "/tour");
+            $this->loadModule($di, TourModule::class, "/tour");
         }
     }
 }

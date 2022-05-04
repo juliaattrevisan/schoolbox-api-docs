@@ -9,26 +9,21 @@
 
 namespace Config\Modules;
 
-use Alaress\Application\Kernel;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Blog\Eportfolio\Module as EportfolioBlogModule;
 use Schoolbox\Blog\Homepage\Module as BlogModule;
 
 class Blog implements ModuleConfigInterface
 {
     /**
-     * Run configuration for the given module
-     *
-     * @param Kernel $kernel
-     * @return void
+     * @inheritdoc
      */
-    public function configure($kernel)
+    public function configure(ContainerInterface $di): void
     {
-        $di = $kernel->getDependencyInjector();
-
         $blogModule = new BlogModule($di);
-        $blogModule->init('/blog');
+        $blogModule->registerModule('/blog');
 
         $eportfolioBlogModule = new EportfolioBlogModule($di);
-        $eportfolioBlogModule->init('/eportfolio/blog');
+        $eportfolioBlogModule->registerModule('/eportfolio/blog');
     }
 }

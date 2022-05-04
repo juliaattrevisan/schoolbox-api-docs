@@ -16,7 +16,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -24,15 +23,6 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 class Module extends BaseModule
 {
     protected $basename = 'curriculum';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initSubmodules(ContainerInterface $injector, $basePath)
-    {
-        $importModule = new Import\Module($injector);
-        $importModule->init($basePath . '/import');
-    }
 
     /**
      * {@inheritdoc}

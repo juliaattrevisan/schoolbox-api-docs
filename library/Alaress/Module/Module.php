@@ -36,10 +36,10 @@ use function strtolower;
 class Module
 {
     // HTTP methods
-    public const METHOD_GET = 'GET';
-    public const METHOD_POST = 'POST';
-    public const METHOD_PUT = 'PUT';
-    public const METHOD_PATCH = 'PATCH';
+    public const METHOD_GET    = 'GET';
+    public const METHOD_POST   = 'POST';
+    public const METHOD_PUT    = 'PUT';
+    public const METHOD_PATCH  = 'PATCH';
     public const METHOD_DELETE = 'DELETE';
 
 
@@ -61,18 +61,6 @@ class Module
     protected $basename;
 
     /**
-     * Modules that this module depends on.
-     *
-     * Each entry must be a module in $this->injector.
-     *
-     * @deprecated Module dependencies should now be automatically installed when required
-     *             (@see `Alaress\Module\Loader` and classes which use it)
-     *
-     * @var array
-     */
-    protected $moduleDependencies = [];
-
-    /**
      * Has this module had its controller's dependencies installed yet?
      * They should only be installed once.
      *
@@ -88,7 +76,7 @@ class Module
      * @internal string   $routeIndex[1] eg '/{studentId}/{classId}/update'
      * @internal string[] $routeIndex[2] eg ['studentId' => '\d+']   (note that classId does not have a regex constraint)
      */
-    protected $routeIndex   = [];
+    protected $routeIndex = [];
 
     /**
      * List of preloads indexed by callable, for pre-registered routes
@@ -102,29 +90,16 @@ class Module
      *
      * @var array
      */
-    protected $permissionIndex  = [];
-
-
-    /**
-     * A list of initialised modules.
-     *
-     * @var array<string, self>
-     */
-    private static array $installedModules = [];
-
+    protected $permissionIndex = [];
 
     /**
      * Constructor
      *
      * @param ContainerInterface $injector
-     * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector, $basename = '')
+    public function __construct(ContainerInterface $injector)
     {
         $this->injector = $injector;
-        if ($basename) {
-            $this->setBasename($basename);
-        }
     }
 
 
@@ -179,49 +154,24 @@ class Module
         if (isset($index)) {
             $storage[$index][1][] = $string;
         } else {
-            $storage[] = [ $object, [ $string ] ];
+            $storage[] = [$object, [$string]];
         }
     }
 
 
     /**
-     * Installs module with its most basic configuration.
+     * Installs a module's routes.
      *
-     * This will not override a previous install of a module with the same basename.
+     * A module's routes are the bare minimum the kernel requires to bind a
+     * module to a route, and then execute it.
      *
-     * @param string $basePath The base URL for this module, used by initRoutes
+     * @param string|null $basePath The base URL for this module, used by
+     *                              `initRoutes`.
+     *                              If this is null, this can't have any routes.
      */
-    public function init($basePath)
+    public function installRoutes(?string $basePath)
     {
-        $this->internalInit($basePath, false);
-    }
-
-    /**
-     * Installs module with its most basic configuration, overriding a previous
-     * install of a module with the same basename.
-     *
-     * @param string $basePath The base URL for this module, used by initRoutes
-     */
-    public function initOverride($basePath)
-    {
-        $this->internalInit($basePath, true);
-    }
-
-    /**
-     * Installs module with its most basic configuration.
-     *
-     * Only the module's submodules and routes should be initialised here -
-     * these are the bare minimum the kernel requires to bind a module to a
-     * route, and then execute it.
-     *
-     * @param string $basePath The base URL for this module, used by initRoutes
-     * @param bool   $override If true, override a previous definition with this basename
-     */
-    protected function internalInit($basePath, $override)
-    {
-        if ($this->installModule()) {
-            $this->initSubmodules($this->injector, $basePath);
-
+        if (isset($basePath)) {
             // perform any route registration available
             $this->registerRoutes();
 
@@ -231,12 +181,24 @@ class Module
                      ->setMethod($method)
                      ->setTokens($tokens);
             }
+
             // no need that no more
             unset($this->routeIndex);
 
             // manual route init
             $this->initRoutes($this->getRouter(), $basePath);
         }
+    }
+
+    /**
+     * Register this module.
+     *
+     * @param string|null $basePath
+     * @return void
+     */
+    public function registerModule(?string $basePath): void
+    {
+        Registry::register($this, $basePath);
     }
 
     /**
@@ -277,48 +239,6 @@ class Module
 
         // initialise templates
         $this->initTemplatePaths($this->getTemplateLoader());
-    }
-
-    /**
-     * Installs this module into the dependency injection system.
-     *
-     * @return bool Was the module installed?
-     * @throws LogicException if this module has no basename, or it is already defined as a different class
-     */
-    protected function installModule(): bool
-    {
-        if (!$this->basename) {
-            throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
-        }
-        self::$installedModules[$this->basename] = $this;
-        return true;
-    }
-
-
-    /**
-     * Retrieves a module previously installed via `$this->init`.
-     *
-     * @param string $baseName
-     * @return self
-     * @throws LogicException if module isn't installed
-     */
-    public static function retrieveInstalledModule(string $baseName): self
-    {
-        if (!(self::$installedModules[$baseName] ?? null) instanceof Module) {
-            throw new LogicException(sprintf('Module "%s" does not exist', $baseName));
-        }
-        return self::$installedModules[$baseName];
-    }
-
-
-    /**
-     * Initializes any submodules of this module.
-     *
-     * @param ContainerInterface $injector
-     * @param string             $basePath The base route for this module
-     */
-    public function initSubmodules(ContainerInterface $injector, $basePath)
-    {
     }
 
     /**
@@ -708,20 +628,9 @@ class Module
     /**
      * @return string
      */
-    protected function getBasename()
+    public function getBasename()
     {
         return $this->basename;
-    }
-
-
-    /**
-     * @param string $basename
-     * @return $this
-     */
-    protected function setBasename($basename)
-    {
-        $this->basename = $basename;
-        return $this;
     }
 
 
