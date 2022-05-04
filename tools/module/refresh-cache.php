@@ -10,6 +10,11 @@ declare(strict_types=1);
 
 /**
  * Loads or refreshes the route and module cache for this instance.
+ *
+ * This script must be run as part of the upgrade process. The ideal time for it
+ * to be run is before an upgrade's SQL updates are run:
+ * update scripts may require that routes and modules be defined, but route and
+ * module definitions should not depend on SQL updates.
  */
 
 use Alaress\Module\Registry;
