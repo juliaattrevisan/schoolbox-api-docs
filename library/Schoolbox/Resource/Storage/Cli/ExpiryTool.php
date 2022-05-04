@@ -9,13 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * Removes storage files that fulfil all these conditions:
@@ -93,6 +87,7 @@ HELP;
         $lock = $this->acquireLock(self::EXPIRED_STORAGE_REMOVAL_LOCK_NAME, self::LOCK_TTL);
 
         if (!$lock->isAcquired()) {
+            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit(1);
         }
 
@@ -125,22 +120,22 @@ HELP;
             $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
 
             foreach ($items as $item) {
-                $relationalDelete->remove($item->getHash(), false);
-
                 $lock->refresh();
+
+                $relationalDelete->remove($item->getHash(), false);
             }
         } else {
             /* In Planning mode, show them in the cli
              */
             foreach ($items as $item) {
+                $lock->refresh();
+
                 $this->getLogger()->debug(sprintf(
                     '%s: %s -  expired on %s',
                     $item->getHash(),
                     $item->getBasename(),
                     $item->getExpiryAt()->getDatabase()
                 ));
-
-                $lock->refresh();
             }
 
             $this->getLogger()->debug('Planning finished.');
