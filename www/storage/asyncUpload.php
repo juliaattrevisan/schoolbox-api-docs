@@ -37,13 +37,12 @@ if (!$_SESSION['id']) {
 } elseif (isset($_FILES['upload'])) {
     $meta = $_FILES['upload'];
 
-    /* Optional expiry date, e.g. 2022-03-04
+    /* Optional expiry date, e.g. 2022-05-04T12:52:46+00:00
      * (Storage items always expire at the start of that date)
      */
-    $expiryDate = $_GET['expiryDate'] ?? null;
     $expiryAt = null;
 
-    if (null !== $expiryDate) {
+    if (isset($_GET['expiryDate'])) {
         $expiryAt = new Alaress_Date_Format($_GET['expiryDate'], \DateTime::RFC3339);
         $expiryAt->setTimezone($kernel->get('config')->get('date_timezone'));
     }
