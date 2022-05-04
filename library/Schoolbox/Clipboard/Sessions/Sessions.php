@@ -14,6 +14,7 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Generate a list of Clipboard Sessions to load as schoolbox Matchups
@@ -49,6 +50,12 @@ class Sessions implements IStrategy
      * @var bool
      */
     private bool $perform;
+
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
 
 
     /**
@@ -104,6 +111,7 @@ class Sessions implements IStrategy
      *
      * @param LoggerInterface                       $log
      * @param bool                                  $perform
+     * @param LockInterface                         $lock
      * @param IApi                                  $api
      * @param Registry                              $registry
      * @param Person                                $userLookup
@@ -115,6 +123,7 @@ class Sessions implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        LockInterface $lock,
         IApi $api,
         Registry $registry,
         Person $userLookup,
@@ -125,6 +134,7 @@ class Sessions implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->lock = $lock;
         $this->api = $api;
         $this->registry = $registry;
         $this->userLookup = $userLookup;
@@ -177,6 +187,8 @@ class Sessions implements IStrategy
         $nextUrl = $endpoint;
 
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
+            $this->lock->refresh();
+
             $sessions = $this->api->retrieve('GET', $endpoint, [
                 'includeTeams' => 'true',
                 'includeStaff' => 'true',
@@ -198,6 +210,8 @@ class Sessions implements IStrategy
                 $teamActivity = $session['activity']['name'] ?? '';
 
                 foreach ($session['teams'] as $teamData) {
+                    $this->lock->refresh();
+
                     /* Division identifiers
                      */
                     $teamCategory = $teamData['category']['name'] ?? '';

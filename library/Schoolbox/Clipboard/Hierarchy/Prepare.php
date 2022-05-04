@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard\Hierarchy;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\IStrategy;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Prepare the db by soft-deleting stuff we're about to reimport
@@ -30,6 +31,12 @@ class Prepare implements IStrategy
      * @var bool
      */
     private bool $perform;
+
+
+    /**
+     * @var LockInterface
+     */
+    private LockInterface $lock;
 
 
     /**
@@ -83,6 +90,7 @@ class Prepare implements IStrategy
     /**
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
+     * @param LockInterface                            $lock
      * @param \Schoolbox\Fixtures\Season\Mapper        $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper         $sportMapper
      * @param \Schoolbox\Fixtures\Position\Mapper      $positionMapper
@@ -95,6 +103,7 @@ class Prepare implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        LockInterface $lock,
         \Schoolbox\Fixtures\Season\Mapper $seasonMapper,
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
@@ -106,6 +115,7 @@ class Prepare implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->lock = $lock;
         $this->seasonMapper = $seasonMapper;
         $this->sportMapper = $sportMapper;
         $this->positionMapper = $positionMapper;
@@ -121,10 +131,14 @@ class Prepare implements IStrategy
      * Soft delete relevant data
      *
      * @return void
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      */
     public function import(): void
     {
         if ($this->perform) {
+            $this->lock->refresh();
+
             $this->seasonMapper->getDatabase()->query("UPDATE {$this->seasonMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->sportMapper->getDatabase()->query("UPDATE {$this->sportMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
