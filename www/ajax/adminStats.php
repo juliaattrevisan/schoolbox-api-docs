@@ -340,10 +340,9 @@ switch ($_POST['module']) {
         $daysBeforeExpiry = ($validTo - time()) / 60 / 60 / 24;
 
         //get plural/singular form of 'day'
-        if(abs($daysBeforeExpiry) === 1) {
+        if (abs($daysBeforeExpiry) === 1) {
             $dayOrDays = "day";
-        }
-        else {
+        } else {
             $dayOrDays = "days";
         }
 
@@ -351,18 +350,15 @@ switch ($_POST['module']) {
             $output[] = array('SAML_LIGHT'  => 'alert',
                               'SAML_MESSAGE' => 'Expired ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays . ' ago'
             );
-        }
-        elseif ($daysBeforeExpiry < 7) {
+        } elseif ($daysBeforeExpiry < 7) {
             $output[] = array('SAML_LIGHT'  => 'alert',
                               'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
             );
-        }
-        elseif ($daysBeforeExpiry < 30) {
+        } elseif ($daysBeforeExpiry < 30) {
             $output[] = array('SAML_LIGHT'  => 'warning',
                               'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
             );
-        }
-        else {
+        } else {
             $output[] = array('SAML_LIGHT'  => 'success',
                               'SAML_MESSAGE' => 'Valid'
             );
