@@ -233,7 +233,7 @@ WHERE
                 ],
                 'folder'        => $folder,
                 'weighted'      => $weighted,
-                'dueDate'      => $row['due_date'],
+                'dueDate'      => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
 
             ];
         }
@@ -347,12 +347,12 @@ WHERE
         }
         if (array_key_exists('dueDate', $filter)) {
             if (array_key_exists('from', $filter['dueDate'])) {
-                $where             .= " AND due_date >= :dueFrom ";
-                $params['dueFrom'] = $filter['dueDate']['from'];
+                $where             .= " AND due_date >= FROM_UNIXTIME(:dueFrom) ";
+                $params['dueFrom'] = \DateTime::createFromFormat(DATE_RFC3339, $filter['dueDate']['from'])->getTimestamp();
             }
             if (array_key_exists('to', $filter['dueDate'])) {
-                $where             .= " AND due_date <= :dueTo ";
-                $params['dueTo'] = $filter['dueDate']['to'];
+                $where             .= " AND due_date <= FROM_UNIXTIME(:dueTo) ";
+                $params['dueTo'] = \DateTime::createFromFormat(DATE_RFC3339, $filter['dueDate']['to'])->getTimestamp();
             }
         }
         if (array_key_exists('yearLevel', $filter)) {
