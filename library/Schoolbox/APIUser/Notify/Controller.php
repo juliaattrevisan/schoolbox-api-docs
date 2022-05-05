@@ -13,7 +13,6 @@ namespace Schoolbox\APIUser\Notify;
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Queue\Composite;
-use Alaress\Redis;
 use Alaress\Web\Controller\Base;
 use Monolog\Logger;
 use Predis\ClientInterface;
@@ -24,19 +23,25 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
+    private ClientInterface $redisStorage;
+
+    public function __construct(
+        ClientInterface $redisStorage
+    ) {
+        $this->redisStorage = $redisStorage;
+    }
+
     /**
      * Send a test notification to a user.
      *
      * @param User $user
      * @return void
      * @api POST /api/user/{userId}/notify
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function apiUserNotify(User $user): void
     {
-        $data   = json_decode(json_encode($this->request->content->get()), true);
-        $bob    = new NotificationInstanceBuilder();
+        $data = json_decode(json_encode($this->request->content->get()), true);
+        $bob  = new NotificationInstanceBuilder();
         $bob->setTitle($data['message'] ?? '')
             ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
@@ -46,12 +51,9 @@ class Controller extends Base
             ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
             ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
-        /** @var Redis|ClientInterface $redis */
-        $redis = $this->getDi()->get('redis.storage');
-
         $composite = new Composite(
-            new Listed($redis, INSTANCE_ID, $user->getId()),
-            new Unread($redis, INSTANCE_ID, $user->getId())
+            new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
+            new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
         );
         $composite->push($bob->build());
     }
