@@ -29,5 +29,7 @@ class API extends ModuleLoader
         $this->loadModule($di, Schoolbox\APIUser\Module::class, '/api/user');
 
         $this->loadModule($di, Schoolbox\APIUser\Notify\Module::class, '/api/user');
+
+        $this->loadModule($di, Schoolbox\APIAssessment\Module::class, '/api/assessment');
     }
 }
