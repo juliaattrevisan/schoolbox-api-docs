@@ -31,21 +31,10 @@ class Helper
      */
     public function getAssessment(string $assessmentId)
     {
-        $query  = "
-SELECT
-    assessment.id, assessment.title, assessment.weight,
-    assessment.course_managed as `commonAssessment`,
-    lu_work_type.name AS `workType`,
-    v_assessment_relation.folder_id as `folderId`,
-    markTypeTable.hr_name AS markType,
-    COALESCE(
-            if(task.id, 'Task', null),
-            if(assess.assessment_id, 'Quiz', null),
-            if(lti_assessment.assessment_id, 'LTI', null),
-            if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null)
-        ) as `assessmentType`,
+        $query  = $this->getBaseSelect();
 
+        $query .= ",
+        markTypeTable.hr_name AS markType,
     COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
     v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
     v_most_recent_feedback.review_route as `reviewRoute`,
@@ -62,13 +51,7 @@ SELECT
     staff.title as `staffTitle`,
     staff.firstname as `staffFirstname`,
     staff.lastname as `staffLastname`,
-    staff.synergy_id as `staffExternalId`,
-    folder_code.code as `folderCode`,
-    folder.name as `folderName`,
-    (SELECT group_concat(id) from lu_year_level
-            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
-
+    staff.synergy_id as `staffExternalId`
 
 FROM v_assessment_relation
 
@@ -118,7 +101,7 @@ WHERE
             $output['title'] = $row['title'];
             $output['weight'] = $row['weight'];
             $output['commonAssessment'] = (bool)$row['commonAssessment'];
-            $output['workType'] = $row['workType'];
+            $output['workTypeName'] = $row['workTypeName'];
             $output['markType'] = $row['markType'];
             $yearLevel = null;
             /**
@@ -199,7 +182,7 @@ WHERE
          */
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $weighted = false;
-            if ('0.00' !== $row['weighted']) {
+            if ('0.00' !== $row['weight']) {
                 $weighted = true;
             }
             $yearLevel = null;
@@ -269,29 +252,8 @@ WHERE
     {
         $params = [];
 
-        $select  = "
-SELECT
-    assessment.id,
-    assessment.title,
-    lu_work_type.name as `workTypeName`,
-    lu_work_type.id as `workTypeId`,
-    v_assessment_relation.folder_id as `folderId`,
-    assessment.weight as `weighted`,
-    assessment.course_managed AS commonAssessment,
-     COALESCE(
-            if(task.id, 'Task', null),
-            if(assess.assessment_id, 'Quiz', null),
-            if(lti_assessment.assessment_id, 'LTI', null),
-            if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null)
-        ) as `assessmentType`,
-    assessment.due_date,
-    folder_code.code as `folderCode`,
-    folder.name as `folderName`,
-    (SELECT group_concat(id) from lu_year_level
-            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
-";
+        $select  = $this->getBaseSelect();
+
         $from = "FROM v_assessment_relation
 JOIN assessment on v_assessment_relation.assessment_id = assessment.id
 LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
@@ -375,6 +337,33 @@ WHERE
             $select . $from . $where,
             $params
         ];
+    }
+
+    private function getBaseSelect()
+    {
+        return "
+        SELECT
+    assessment.id,
+    assessment.title,
+    assessment.weight,
+    assessment.course_managed as commonAssessment,
+    lu_work_type.name as `workTypeName`,
+    lu_work_type.id as `workTypeId`,
+    assessment.due_date,
+    v_assessment_relation.folder_id as `folderId`,
+    COALESCE(
+            if(task.id, 'Task', null),
+            if(assess.assessment_id, 'Quiz', null),
+            if(lti_assessment.assessment_id, 'LTI', null),
+            if(submission_box.id, 'DueWork', null),
+            if(project.id, 'Project', null)
+        ) as `assessmentType`,
+        folder_code.code as `folderCode`,
+    folder.name as `folderName`,
+    (SELECT group_concat(id) from lu_year_level
+            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
+        ";
     }
 
     /**
