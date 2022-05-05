@@ -2476,46 +2476,6 @@ parameters:
 			path: library/Feed.php
 
 		-
-			message: "#^Variable \\$blog might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$blogComments might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$file might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$folder might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$forum might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$link might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$surveys might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
-			message: "#^Variable \\$wiki might not be defined\\.$#"
-			count: 1
-			path: library/Feed.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Group.php
