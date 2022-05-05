@@ -34,7 +34,7 @@ class QueueSorter implements FilterInterface
     /** @var RoutePermissionMapper */
     private $permMapper;
 
-    /** @var MessageList\IListFactory */
+    /** @var MessageList\IPublicationFactory */
     private $listFactory;
 
 
@@ -163,13 +163,14 @@ class QueueSorter implements FilterInterface
      *
      * @param Instance $message
      * @param User     $user
-     * @return void
+     * @return bool
      * @throws FilterException
      */
     public function validate(Instance $message, User $user)
     {
         // exceptions get thrown if it fails a given filter
         $this->filter->validate($message, $user);
+        return true;
     }
 
 
@@ -234,12 +235,16 @@ class QueueSorter implements FilterInterface
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
         $topic  = $instance->getTopics()[0];
-        $intent = $this->permMapper->findRouteLevels(
-            $topic,
-            $user->getRole()->getId(),
-            $user->getId(),
-            $instance->getFolderId()
-        );
+        try {
+            $intent = $this->permMapper->findRouteLevels(
+                $topic,
+                $user->getRole()->getId(),
+                $user->getId(),
+                $instance->getFolderId()
+            );
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $intent = [];
+        }
 
         $delivery = $instance->retrieveDeliveryMethod();
 
