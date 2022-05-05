@@ -173,6 +173,87 @@ WHERE
     public function searchForAssessments(array $filter, int $limit, int $cursor): array
     {
         $output = [];
+
+        [$query, $params] = $this->buildSearch($filter);
+
+        if (0 !== $cursor) {
+            $query .= " AND assessment.id > :cursor ";
+        }
+        $query .= "ORDER BY assessment.id";
+        if (0 !== $limit) {
+            $query .= " LIMIT :limit";
+        }
+        $statement = $this->mapper->getDatabase()->prepare($query);
+        if (0 !== $limit) {
+            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if (0 !== $cursor) {
+            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
+        }
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
+        /**
+         * build the whole thing
+         */
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $weighted = false;
+            if ('0.00' !== $row['weighted']) {
+                $weighted = true;
+            }
+            $yearLevel = null;
+            /**
+             * check if folder has yearlevels?
+             */
+            if (null !== $row['yearLevelId']) {
+                $yearLevel = [];
+                $ids = explode(',', $row['yearLevelId']);
+                foreach ($ids as $id => $name) {
+                    $yearLevel[] = [
+                        'id'    => $this->getYearlevel($name)->getId(),
+                        'name'    => $this->getYearlevel($name)->getName(),
+                    ];
+                }
+            }
+            $folder = [
+                'id' => $row['folderId'],
+                'name' => $row['folderName'],
+                'code' => $row['folderCode'],
+                'yearLevel' => $yearLevel,
+            ];
+            $output[] = [
+                'id'  => $row['id'],
+                'title'         => $row['title'],
+                'assessmentType' => $row['assessmentType'],
+                'commonAssessment' => (bool)$row['commonAssessment'],
+                'workType'      => [
+                    'name'  => $row['workTypeName'],
+                    'id'    => $row['workTypeId']
+                ],
+                'folder'        => $folder,
+                'weighted'      => $weighted,
+                'dueDate'      => $row['due_date'],
+
+            ];
+        }
+        return $output;
+    }
+
+    /**
+     *
+     */
+    public function searchForAssessmentsCount(): int
+    {
+
+    }
+
+    /**
+     * search base
+     * build the search query for both count, and json response
+     */
+    private function buildSearch(array $filter)
+    {
         $params = [];
 
         $select  = "
@@ -277,77 +358,10 @@ WHERE
             $where .= " AND assessment.title like :searchParam ";
             $params['searchParam'] = '%' . $this->mapper->getDatabase()->getQuoter()->escapeForLike($filter['title']) . '%';
         }
-
-        if (0 !== $cursor) {
-            $where .= " AND assessment.id > :cursor ";
-        }
-        $where .= "ORDER BY assessment.id";
-        if (0 !== $limit) {
-            $where .= " LIMIT :limit";
-        }
-        $statement = $this->mapper->getDatabase()->prepare($select . $from . $where);
-        if (0 !== $limit) {
-            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
-        }
-        if (0 !== $cursor) {
-            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
-        }
-        foreach ($params as $label => $value) {
-            $statement->bindValue($label, $value);
-        }
-        $statement->execute();
-        /**
-         * build the whole thing
-         */
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $weighted = false;
-            if ('0.00' !== $row['weighted']) {
-                $weighted = true;
-            }
-            $yearLevel = null;
-            /**
-             * check if folder has yearlevels?
-             */
-            if (null !== $row['yearLevelId']) {
-                $yearLevel = [];
-                $ids = explode(',', $row['yearLevelId']);
-                foreach ($ids as $id => $name) {
-                    $yearLevel[] = [
-                        'id'    => $this->getYearlevel($name)->getId(),
-                        'name'    => $this->getYearlevel($name)->getName(),
-                    ];
-                }
-            }
-            $folder = [
-                'id' => $row['folderId'],
-                'name' => $row['folderName'],
-                'code' => $row['folderCode'],
-                'yearLevel' => $yearLevel,
-            ];
-            $output[] = [
-                'id'  => $row['id'],
-                'title'         => $row['title'],
-                'assessmentType' => $row['assessmentType'],
-                'commonAssessment' => (bool)$row['commonAssessment'],
-                'workType'      => [
-                    'name'  => $row['workTypeName'],
-                    'id'    => $row['workTypeId']
-                ],
-                'folder'        => $folder,
-                'weighted'      => $weighted,
-                'dueDate'      => $row['due_date'],
-
-            ];
-        }
-        return $output;
-    }
-
-    /**
-     *
-     */
-    public function searchForAssessmentsCount(): int
-    {
-
+        return [
+            $select . $from . $where,
+            $params
+        ];
     }
 
     /**
