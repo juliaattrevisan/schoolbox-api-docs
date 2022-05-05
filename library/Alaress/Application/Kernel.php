@@ -11,6 +11,7 @@ namespace Alaress\Application;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
@@ -1102,6 +1103,7 @@ abstract class Kernel
 
                         /** @var array|IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
+                        $databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
 
                         $customSync = new CustomSync($config, $databaseExternal);
 
