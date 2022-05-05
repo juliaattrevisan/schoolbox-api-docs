@@ -267,27 +267,6 @@ class Thread implements ISoftDeletable
         return $this->lastPost;
     }
 
-
-    /**
-     * @param Collection|Post[] $posts
-     * @return self
-     */
-    public function setPosts($posts)
-    {
-        $this->posts = $posts;
-        return $this;
-    }
-
-
-    /**
-     * @return Collection|Post[]
-     */
-    public function getPosts()
-    {
-        return $this->posts;
-    }
-
-
     /**
      * @param Alaress_Date_Format $lastPostDate
      * @return self
