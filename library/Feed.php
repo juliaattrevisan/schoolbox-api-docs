@@ -105,6 +105,7 @@ class Feed
 
     public function getFiles($folderId, $limit)
     {
+        $file = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -154,6 +155,7 @@ class Feed
 
     public function getLinks($folderId, $limit)
     {
+        $link = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -208,6 +210,7 @@ class Feed
      */
     public function getOnlineAssessments($folderIds, $limit): array
     {
+
         $where = $this->getFilterFromCategoryId($folderIds);
 
         // Apply SIVO filter
@@ -281,6 +284,7 @@ class Feed
      */
     public function getSurveys($folderId, $limit)
     {
+        $surveys = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -328,6 +332,7 @@ class Feed
 
     public function getFolders($folderId, $limit)
     {
+        $folder = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -367,6 +372,7 @@ class Feed
 
     public function getForum($folderId, $limit)
     {
+        $forum = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -412,6 +418,7 @@ class Feed
      */
     public function getWiki($folderId, $limit)
     {
+        $wiki = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -459,6 +466,7 @@ class Feed
      */
     public function getBlog($folderId, $limit)
     {
+        $blog = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
@@ -507,6 +515,7 @@ class Feed
      */
     public function getBlogComments($folderId, $limit)
     {
+        $blogComments = [];
 
         $where = $this->getFilterFromCategoryId($folderId);
 
