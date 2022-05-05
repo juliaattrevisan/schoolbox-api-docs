@@ -11,15 +11,26 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser\Notify;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
-use Alaress\Redis;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\Composite;
 use Alaress\Web\Controller\Base;
 use Monolog\Logger;
-use Schoolbox\Realtime\Alert\RedisPublisher;
+use Predis\ClientInterface;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\MessageList\Listed;
+use Schoolbox\Realtime\MessageList\Unread;
 use Schoolbox\User;
 
 class Controller extends Base
 {
+    private ClientInterface $redisStorage;
+
+    public function __construct(
+        ClientInterface $redisStorage
+    ) {
+        $this->redisStorage = $redisStorage;
+    }
+
     /**
      * Send a test notification to a user.
      *
@@ -29,24 +40,21 @@ class Controller extends Base
      */
     public function apiUserNotify(User $user): void
     {
-        $data   = json_decode(json_encode($this->request->content->get()), true);
-        $userId = $user->getId();
-        $bob    = new NotificationInstanceBuilder();
+        $data = json_decode(json_encode($this->request->content->get()), true);
+        $bob  = new NotificationInstanceBuilder();
         $bob->setTitle($data['message'] ?? '')
             ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
             ->setHref($data['href'] ?? '#')
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
-            ->addTopic("notify.user.$userId")
-            ->putMeta('ttl', 30)
+            ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
             ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
-        (new RedisPublisher(
-            Redis::getSignalQueueClientInstance(),
-            INSTANCE_ID,
-        ))->pushUser($userId, $bob->build());
-
-        // Output nothing
+        $composite = new Composite(
+            new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
+            new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
+        );
+        $composite->push($bob->build());
     }
 }

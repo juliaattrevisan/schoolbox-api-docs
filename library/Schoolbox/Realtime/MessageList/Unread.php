@@ -40,6 +40,7 @@ class Unread extends AbstractList
 
         // TODO this should be injected: however I'd have to update everywhere
         //      which uses `ListFactory` to make it so
-        Redis::getStorageClientInstance()->publish($topic, "$instance");
+
+        Redis::getSignalQueueClientInstance()->publish($topic, "$instance");
     }
 }
