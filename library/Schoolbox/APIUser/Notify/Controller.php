@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser\Notify;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Queue\Composite;
 use Alaress\Redis;
 use Alaress\Web\Controller\Base;
@@ -35,15 +36,14 @@ class Controller extends Base
     public function apiUserNotify(User $user): void
     {
         $data   = json_decode(json_encode($this->request->content->get()), true);
-        $userId = $user->getId();
         $bob    = new NotificationInstanceBuilder();
-        $bob->setTitle(($data['message'] ?? ''))
+        $bob->setTitle($data['message'] ?? '')
             ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
             ->setHref($data['href'] ?? '#')
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
-            ->addTopic("instant.user.$userId")
+            ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
             ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
         /** @var Redis|ClientInterface $redis */
