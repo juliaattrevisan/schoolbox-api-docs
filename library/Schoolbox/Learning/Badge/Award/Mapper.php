@@ -332,6 +332,23 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * If the year's name contains only an integer, presume the user wanted
+     * to prepend "Year " in front of it, because this is how it will
+     * manifest in a UI somewhere.
+     *
+     * @return string
+     */
+    private function getLongName(?string $yearName): string
+    {
+        if (preg_match('/^[0-9]+$/', $yearName)) {
+            return "Year {$yearName}";
+        }
+
+        return $yearName;
+    }
+
+
+    /**
      * Find a list of people who have received $badge at least once
      *
      * $roleType is one of the student/staff/parent/guest consts in Role
@@ -372,7 +389,7 @@ class Mapper extends \Schoolbox\Mapper
                 `user`.id,
                 `user`.firstname,
                 `user`.lastname,
-                lyl.name,
+                lyl.name AS year,
                 `groups`.name AS role,
                 `user`.synergy_id
             FROM `user`
@@ -402,8 +419,8 @@ class Mapper extends \Schoolbox\Mapper
              */
             $person = "{$row['firstname']} {$row['lastname']} - ";
 
-            if ($row['year']) {
-                $person .= "Year {$row['year']}, ";
+            if (isset($row['year'])) {
+                $person .= $this->getLongName($row['year']) . ', ';
             }
 
             $person .= $row['role'];
