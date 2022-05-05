@@ -151,7 +151,7 @@ class Registry
             $season = $this->seasonMapper->findOneByColumn('name', $seasonName);
 
             $this->log->debug(sprintf(
-                'Reusing existing season %s %s-%s',
+                'Reusing existing season %s %s to %s',
                 $season->getName(),
                 $season->getStart()->getDatabase(),
                 $season->getEnd()->getDatabase()

@@ -207,6 +207,10 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_GEOSNAPSHOT_UNAVAILABLE = 230;
 
+    /* Clipboard
+     */
+    public const ERROR_CLIPBOARD_UNAVAILABLE = 231;
+
     /**
      * Setup mapping
      */

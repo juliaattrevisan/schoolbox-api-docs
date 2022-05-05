@@ -122,6 +122,13 @@ HELP;
             exit;
         }
 
+        /* Check that Clipboard Module is enabled
+         */
+        if (!$this->getConfig()->get('clipboard_enabled')) {
+            $this->getLogger()->info('Clipboard integration is not enabled; existing');
+            exit();
+        }
+
         /* Check that this isn't currently running
          */
         $lock = $this->acquireLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
