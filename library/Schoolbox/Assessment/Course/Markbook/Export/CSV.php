@@ -59,7 +59,11 @@ class CSV extends AbstractCSV
 
             /** @var GenericCollection $classAssessments */
             $classAssessments    = $courseMarkbook->getCourseImportAssessments()->offsetGet($class->getId());
-            $studentAverageMarks = ($courseMarkbook->getStudentAverageMarks())[$class->getId()];
+            $studentAverageMarksData = $courseMarkbook->getStudentAverageMarks();
+
+            /* Class id not found in the average marks data; default to empty
+             */
+            $studentAverageMarks = $studentAverageMarksData[$class->getId()] ?? [];
 
             // Class Average
             foreach ($assessmentSpecs as $assessmentSpec) {
