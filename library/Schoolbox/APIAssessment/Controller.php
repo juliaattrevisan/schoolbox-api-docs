@@ -102,7 +102,7 @@ class Controller extends Base
                 [
                     'data'  =>  $output,
                     'metadata'  => [
-                        'count' => count($output),
+                        'count' => $this->assessmentHelper->searchForAssessmentsCount($filter),
                         'cursor' => end($output)['id'] ?? null
                     ]
                 ]

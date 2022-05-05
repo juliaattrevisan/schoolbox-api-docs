@@ -243,9 +243,22 @@ WHERE
     /**
      *
      */
-    public function searchForAssessmentsCount(): int
+    public function searchForAssessmentsCount(array $filter): int
     {
-
+        [$query, $params] = $this->buildSearch($filter);
+        $statement = $this->mapper->getDatabase()->prepare($query);
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
+        $count = 0;
+        /**
+         * build the whole thing
+         */
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $count++;
+        }
+        return $count;
     }
 
     /**
@@ -312,8 +325,8 @@ WHERE
             $params['assessmentType'] = $filter['assessmentType'];
         }
         if (array_key_exists('folderId', $filter)) {
-            $where .= " AND v_assessment_relation.folder_id = :contextId ";
-            $params['contextId'] = $filter['contextId'];
+            $where .= " AND v_assessment_relation.folder_id = :folderId ";
+            $params['folderId'] = $filter['folderId'];
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight";
