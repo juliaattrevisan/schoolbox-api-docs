@@ -194,9 +194,6 @@ SELECT
     assessment.due_date,
     folder_code.code as `folderCode`,
     folder.name as `folderName`,
-    (SELECT group_concat(name) from lu_year_level
-        LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-                where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelName`,
     (SELECT group_concat(id) from lu_year_level
             LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
                     where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
@@ -210,7 +207,7 @@ LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
 LEFT JOIN project on assessment.id = project.assessment_id
 LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
 LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
-LEFT JOIN folder_code on v_assessment_relation.folder_id = folder_code.folder_id
+LEFT JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is null)
 
 
 
@@ -308,14 +305,16 @@ WHERE
                 $weighted = true;
             }
             $yearLevel = null;
-            if (null !== $row['yearLevelName']) {
-                $names = explode(',', $row['yearLevelName']);
-                $ids = explode(',', $row['yearLevelId']);
+            /**
+             * check if folder has yearlevels?
+             */
+            if (null !== $row['yearLevelId']) {
                 $yearLevel = [];
-                foreach ($names as $id => $name) {
+                $ids = explode(',', $row['yearLevelId']);
+                foreach ($ids as $id => $name) {
                     $yearLevel[] = [
-                        'id'    => $ids[$id],
-                        'name'    => $name,
+                        'id'    => $this->getYearlevel($name)->getId(),
+                        'name'    => $this->getYearlevel($name)->getName(),
                     ];
                 }
             }
