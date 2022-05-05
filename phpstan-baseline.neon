@@ -6771,21 +6771,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/Filter/FilterFactory.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Realtime\\\\MessageList\\\\IListFactory\\:\\:email\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Routing/QueueSorter.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Realtime\\\\MessageList\\\\IListFactory\\:\\:mobile\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Routing/QueueSorter.php
-
-		-
-			message: "#^Return type \\(void\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\QueueSorter\\:\\:validate\\(\\) should be compatible with return type \\(bool\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Filter\\\\FilterInterface\\:\\:validate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Routing/QueueSorter.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
