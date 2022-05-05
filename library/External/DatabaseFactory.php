@@ -198,7 +198,7 @@ class External_DatabaseFactory
      */
     private function isEnabled(IConfigLoader $config): bool
     {
-        return $config->get('external_enable');
+        return $config->get('external_enable') && Schoolbox\Database\Factory::getInstanceExternal();
     }
 
 
