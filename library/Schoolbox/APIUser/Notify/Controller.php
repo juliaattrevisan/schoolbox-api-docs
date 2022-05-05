@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\APIUser\Notify;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
-use Alaress\Async\Notification\Parameter\Param;
-use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Async\Queue\Composite;
 use Alaress\Redis;
 use Alaress\Web\Controller\Base;
@@ -39,12 +37,11 @@ class Controller extends Base
         $data   = json_decode(json_encode($this->request->content->get()), true);
         $userId = $user->getId();
         $bob    = new NotificationInstanceBuilder();
-        $bob->setTitle(($data['message'] ?? '') . ' :time')
+        $bob->setTitle(($data['message'] ?? ''))
             ->setAllowSelfSend(true)
             ->setSeverity(Logger::INFO)
             ->setNamespace(NSMapper::NS_MESSAGE)
             ->setHref($data['href'] ?? '#')
-            ->setParam('time', new Param((new \Alaress_Date_Format())->getLocal(), ParameterInterface::STACKING_IGNORE))
             ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
             ->addTopic("instant.user.$userId")
             ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
