@@ -2,14 +2,33 @@
 assessment
 #}
 <div class="row row__{{ page }}-details">
-    <div class="small-10 columns">
-        <h3 class="heading__tertiary">{{ assessment.title }}</h3>
+    <div class="small-4 columns">
+        <p class="item-title">Assessment</p>
+        <h3 class="heading__tertiary">
+            {{ assessment.title }}
+        </h3>
     </div>
-    <div class="small-2 columns">
-        {% if feedback %}
 
+    {# Only show comment if it exists
+     # Otherwise, just occupy small-6 space
+     # Foundation-related behaviour requires a character to do that
+     #}
+    {% if showComments and feedback %}
+        <div class="small-6 columns">
+            {% if feedback.comment %}
+                <p class="item-title">Comment</p>
+                <p>{{ feedback.comment | linkify | nl2br }}</p>
+            {% else %}
+                &nbsp;
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="small-1 columns text-right">
+        {% if feedback %}
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
+                <p class="item-title text-right">Result</p>
                 <h3 class="heading__tertiary text-right">{{ grade }}</h3>
             {% endif %}
         {% endif %}
@@ -21,10 +40,12 @@ assessment
         {% if assessment.familyName == 'project' %}
             {% set participant = assessment.allParticipants[student.id] %}
             <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
-        {%endif%}
+        {% endif %}
     </div>
-    <div class="small-12 columns">
-        {% if showRubrics and feedback and feedback.rubricMarkedGrid %}
+
+    {% if feedback %}
+        {% if showRubrics and feedback.rubricMarkedGrid %}
+        <div class="small-12 columns">
             <div class="rubric-wrap">
                 {% include '@rubric/grid.twig' with {
                     rubricGrid:       feedback.rubricMarkedGrid.grid,
@@ -36,11 +57,7 @@ assessment
                     selfAssessmentFeedback: null
                 } only %}
             </div>
+        </div>
         {% endif %}
-        {% if showComments and feedback and feedback.comment %}
-            <div class="small-12 columns">
-                <p>{{ feedback.comment | linkify | nl2br }}</p>
-            </div>
-        {% endif %}
-    </div>
+    {% endif %}
 </div>
