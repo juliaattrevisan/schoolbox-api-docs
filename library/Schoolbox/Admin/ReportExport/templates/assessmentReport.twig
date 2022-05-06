@@ -9,11 +9,14 @@ assessment
         </h3>
     </div>
 
+    {# If there's no feedback, don't render anything else about
+     # rubrics, comments and grades - nothing to show
+     #}
     {% if feedback %}
         {# If this feedback has a rubric grid, show that
          # Then show the comment below it
          #}
-        {% if showRubrics and feedback.rubricMarkedGrid%}
+        {% if showRubrics and feedback.rubricMarkedGrid %}
             <div class="rubric-wrap">
                 {% include '@rubric/grid.twig' with {
                     rubricGrid:       feedback.rubricMarkedGrid.grid,
