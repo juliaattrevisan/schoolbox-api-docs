@@ -24,7 +24,7 @@ assessment
                     learner: student,
                     showDescriptorValue: true,
                     showGroupTotal: true,
-                    showRubricTotal: true,
+                    showRubricTotal: false,
                     selfAssessmentFeedback: null
                 } only %}
             </div>
@@ -49,8 +49,10 @@ assessment
              #}
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
-                <p class="item-title text-right">Result</p>
-                <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                <div class="feedback-grade columns">
+                    <p class="item-title text-right">Result</p>
+                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                </div>
             {% endif %}
         {% else %}
             {# Only show comment if it exists
