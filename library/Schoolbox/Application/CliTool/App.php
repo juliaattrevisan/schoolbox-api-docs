@@ -206,6 +206,7 @@ abstract class App
      * @return LockInterface
      *
      * @noinspection PhpDocMissingThrowsInspection
+     * @throws \RuntimeException
      */
     protected function acquireLock(string $lockName, ?float $timeout): LockInterface
     {
@@ -215,18 +216,30 @@ abstract class App
         $lock        = $lockFactory->createLock($lockName, $timeout);
 
         // Try to acquire this lock
-        $acquired = false;
+        $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
         try {
             $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            // Couldn't acquire the lock: this is okay
-            // The calling code will check if the lock is acquired
+        } catch (\Exception $e) {
+            /* Any weird exception being thrown here - lock-related or otherwise -
+             * is going to preclude a proper lock acquisition and you should be
+             * prevented from doing whatever you're doing
+             */
+            throw new \RuntimeException($message);
         }
+
+        /* You didn't die, but you also couldn't acquire a lock
+         * Drop a nice message because this is an intended behaviour
+         */
         if (!$acquired) {
-            $this->logger->warning(
-                'This process is already running for this instance: trusting it will self-terminate on timeout'
-            );
+            $this->logger->warning($message);
+
+            throw new \RuntimeException(sprintf(
+                'Could not acquire %s lock',
+                $lockName
+            ));
         }
+
         return $lock;
     }
 
