@@ -75,7 +75,7 @@ $app = new class extends CliTool\App
              */
             sleep(3);
 
-            $lock->refresh();
+            $this->refreshLock($lock);
         }
     }
 

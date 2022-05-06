@@ -261,7 +261,11 @@ abstract class App
         try {
             $lock->refresh();
         } catch (LockConflictedException | LockAcquiringException $e) {
-            throw new \RuntimeException('Could not refresh lock');
+            $message = 'Could not refresh lock; perhaps expired';
+
+            $this->logger->warning($message);
+
+            throw new \RuntimeException($message);
         }
     }
 
