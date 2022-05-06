@@ -2,7 +2,7 @@
 assessment
 #}
 <div class="row row__{{ page }}-details">
-    <div class="small-4 columns">
+    <div class="feedback-assessment columns">
         <p class="item-title">Assessment</p>
         <h3 class="heading__tertiary">
             {{ assessment.title }}
@@ -14,7 +14,7 @@ assessment
      # Foundation-related behaviour requires a character to do that
      #}
     {% if showComments and feedback %}
-        <div class="small-6 columns">
+        <div class="feedback-comment columns">
             {% if feedback.comment %}
                 <p class="item-title">Comment</p>
                 <p>{{ feedback.comment | linkify | nl2br }}</p>
@@ -24,7 +24,7 @@ assessment
         </div>
     {% endif %}
 
-    <div class="small-1 columns text-right">
+    <div class="feedback-grade columns">
         {% if feedback %}
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}

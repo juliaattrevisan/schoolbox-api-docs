@@ -308,6 +308,22 @@
         color: grey;
     }
 
+    /* The width of the Assessment, Comment and Grade columns
+     * Using small-* names is going to be misleading - specify them explicitly
+     */
+    .feedback-assessment {
+        width: 30%;
+    }
+
+    .feedback-comment {
+        width: 47%;
+    }
+
+    .feedback-grade {
+        text-align: right;
+        width: 15%;
+    }
+
     /* These are used, but derived programmatically - storm thinks they are unused
      * See the top of assessmentReport.twig which uses the `pag` var as css clasname
      */
