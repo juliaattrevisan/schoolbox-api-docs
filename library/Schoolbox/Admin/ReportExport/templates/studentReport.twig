@@ -295,20 +295,6 @@
         text-align: right;
     }
 
-    /* Push the rubric grid down a little bit, if it exists
-     */
-    .rubric-wrap {
-        margin-top: 0.75rem;
-        margin-bottom: 1rem;
-    }
-
-    /* I think floating elements cause this to need such a large margin
-     * since they are no longer in document flow
-     */
-    .rb.markable {
-        margin-top: 4.5rem;
-    }
-
     /* These appear the name of the assessment and the comment
      * as little subtitle sort of things
      */
@@ -348,11 +334,33 @@
         border-bottom: 1px solid #ccc;
     }
 
+    /* Push the rubric grid down a little bit, if it exists
+     */
+    .rubric-wrap {
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
     /* Rubric heading cells for Capabilities, Indicators, Levels
      * Use a lighter shade of grey than selected Descriptors
      */
     .rb th {
         background-color: #eaeaea;
+    }
+
+    /* I think floating elements cause this to need such a large margin
+     * since they are no longer in document flow
+     */
+    .rb.markable {
+        margin-top: 4.5rem;
+    }
+
+    /* Top-left cell is a meaningless cell
+     */
+    .rb.markable thead tr th:first-child {
+        background-color: transparent;
+        border-left: 0;
+        border-top: 0;
     }
 
     /* End Steve Quarantine Styles
