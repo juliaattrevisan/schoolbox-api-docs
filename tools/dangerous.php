@@ -35,7 +35,7 @@ $app = new class extends CliTool\App
     /**
      * Temporary 10 sec ttl
      */
-    private const LOCK_TTL = 10;
+    private const LOCK_TTL = 2;
 
 
     /**
@@ -73,7 +73,7 @@ $app = new class extends CliTool\App
 
             /* Give you a chance to ctrl-c
              */
-            sleep(1);
+            sleep(3);
 
             $lock->refresh();
         }
