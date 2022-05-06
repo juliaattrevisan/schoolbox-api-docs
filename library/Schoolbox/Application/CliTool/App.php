@@ -245,6 +245,24 @@ abstract class App
 
 
     /**
+     * An alias to refresh a lock but captures the exception thrown
+     * when a lock expires
+     *
+     * @param LockInterface $lock
+     * @return void
+     * @throws \RuntimeException
+     */
+    protected function refreshLock(LockInterface $lock): void
+    {
+        try {
+            $lock->refresh();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            throw new \RuntimeException('Could not refresh lock');
+        }
+    }
+
+
+    /**
      * Helper to fetch a CLI option value.
      *
      * Supports options that are still have colon chars suffixed to indicate required/optional status
