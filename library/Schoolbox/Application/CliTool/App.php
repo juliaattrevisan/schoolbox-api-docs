@@ -216,8 +216,6 @@ abstract class App
         $lock        = $lockFactory->createLock($lockName, $timeout);
 
         // Try to acquire this lock
-        $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
-
         try {
             $acquired = $lock->acquire();
         } catch (\Exception $e) {
@@ -225,6 +223,10 @@ abstract class App
              * is going to preclude a proper lock acquisition and you should be
              * prevented from doing whatever you're doing
              */
+            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
+            $this->logger->warning($message);
+
             throw new \RuntimeException($message);
         }
 
@@ -232,12 +234,14 @@ abstract class App
          * Drop a nice message because this is an intended behaviour
          */
         if (!$acquired) {
-            $this->logger->warning($message);
-
-            throw new \RuntimeException(sprintf(
+            $message = sprintf(
                 'Could not acquire %s lock',
                 $lockName
-            ));
+            );
+
+            $this->logger->warning($message);
+
+            throw new \RuntimeException($message);
         }
 
         return $lock;
