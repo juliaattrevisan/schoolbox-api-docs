@@ -85,14 +85,35 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput(
                 [
-                    'token' => $this->tokenBuilder->generate(
+                    'token'        => $this->tokenBuilder->generate(
                         $user,
                         $userJwtId ? $userJwtId->getExpiry() : null,
                         $userJwtId ? $userJwtId->getJwtId() : null
                     ),
+                    'createdAt'    => $userJwtId ? $userJwtId->getCreatedAt()->getShort() : null,
+                    'expiry'       => $userJwtId ? $userJwtId->getExpiry()->getShort() : null,
+                    'createdBy'    => $userJwtId ? $userJwtId->getCreatedBy()->getFullName() : null,
+                    'jwtId'        => $userJwtId ? $userJwtId->getJwtId() : null,
                     'showExisting' => $showExisting,
                 ]
             )
+        );
+    }
+
+    /**
+     * Deletes token
+     * @return void
+     * @api   /user/token/postDeleteToken
+     * @since 22.0
+     */
+    public function postDeleteToken()
+    {
+        $jwtId = $this->request->post->get('jwtIdToken');
+        if ($jwtId) {
+            $this->tokenMapper->deleteByColumn('jwt_id', $jwtId);
+        }
+        $this->response->content->set(
+            $this->buildJsonOutput([])
         );
     }
 }
