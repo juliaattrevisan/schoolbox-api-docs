@@ -96,18 +96,28 @@ HELP;
             exit;
         }
 
-        /* Check that this isn't currently running
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->>acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
          */
-        $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
-
-        if (!$lock->isAcquired()) {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+        try {
+            $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            exit();
         }
 
         /* FIXME Main algorithm goes here
          */
         $this->getLogger()->info('Script commencing.');
+
+        /* TODO Implement your iterations here, refreshing lock each time
+         *  This will grant you LOCK_TTL more seconds until the script unlocks itself
+         */
+        for ($i = 0; $i < 10; $i++) {
+
+            $this->refreshLock($lock);
+        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
