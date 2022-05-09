@@ -9,6 +9,7 @@
 
 namespace Schoolbox\User\Token;
 
+use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -30,6 +31,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('jwt_id', self::TYPE_STRING, self::COLUMN_IDENTIFIER_UUID);
         $this->uses('expiry', self::TYPE_DATETIME);
+        $this->uses('type', self::TYPE_STRING, self::COLUMN_ENUM, null, [Model::TYPE_API, Model::TYPE_QRCODE, null]);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
@@ -38,26 +40,74 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param User $user
-     * @param User $effector
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('createdBy', 'c')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
+        ";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $model     = $this->hydrate($row);
+            $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
+
+            if ($createdBy instanceof User) {
+                $model->setCreatedBy($createdBy);
+            }
+            $collection->add($model);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * @param User                      $user
+     * @param User                      $effector
+     * @param \Alaress_Date_Format|null $expiry
+     * @param string|null               $type
      * @return Model
      * @throws BaseMapper\Exception
      */
-    public function generateForUser(User $user, User $effector): Model
+    public function generateForUser(User $user, User $effector, ?\Alaress_Date_Format $expiry = null, ?string $type = null): Model
     {
-        // delete existing
-        $existingJwtIds   = $this->findByColumn('user_id', $user->getId());
-        /** @var Model $existing */
-        foreach ($existingJwtIds as $existing) {
-            $existing->setDeletedBy($effector)->setDeletedAt(\Alaress_Date_Format::now());
-            $this->save($existing);
+        // delete existing, if type is provided
+        if ($type) {
+            $existingJwtIds = $this->findByColumnList(['user_id' => $user->getId(), 'type' => $type]);
+            /** @var Model $existing */
+            foreach ($existingJwtIds as $existing) {
+                $existing->setDeletedBy($effector)->setDeletedAt(\Alaress_Date_Format::now());
+                $this->save($existing);
+            }
         }
         // create new
         $userJwtId = $this->createModel()
                           ->setUser($user)
-                          ->setCreatedBy($effector);
+                          ->setCreatedBy($effector)
+                          ->setExpiry($expiry ?? (new \Alaress_Date_Format())->addDays(Model::DEFAULT_EXPIRY))
+                          ->setType($type);
         $this->save($userJwtId);
-        // get the new one
-        return $this->findOneByColumn('user_id', $user->getId());
+        return $userJwtId;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['expiry' => 'ASC'];
     }
 }
