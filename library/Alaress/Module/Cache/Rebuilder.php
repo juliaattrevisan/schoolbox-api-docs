@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Module\Cache;
 
 use Alaress\Module\Registry;
-use Alaress\Web\Router\RouteCollection;
+use Aura\Router\RouteCollection;
 use Aura\Router\RouteFactory;
 use Aura\Router\Router;
 use Config\Modules\ModuleConfigInterface;

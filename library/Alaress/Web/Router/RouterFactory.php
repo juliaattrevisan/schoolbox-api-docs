@@ -14,6 +14,7 @@
 namespace Alaress\Web\Router;
 
 use Aura\Router\Generator;
+use Aura\Router\RouteCollection;
 use Aura\Router\RouteFactory;
 use Aura\Router\Router;
 

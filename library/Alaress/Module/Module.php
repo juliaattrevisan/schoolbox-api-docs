@@ -14,13 +14,13 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Router\RouteCollection;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Aura\Router\Route;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouteCollection;
 use LogicException;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -376,7 +376,6 @@ class Module
      */
     protected function attachResourceRoutes(Router $router, $basePath)
     {
-        /** @var RouteCollection $routes */
         $routes = $router->getRoutes();
         $routes->attachResource($this->basename, $basePath);
 
