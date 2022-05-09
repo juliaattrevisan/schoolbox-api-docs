@@ -18,19 +18,12 @@ declare(strict_types=1);
  */
 
 use Alaress\Module\CacheBuilder;
-use Alaress\Module\Registry;
-use Alaress\Web\Router\RouteCollection;
-use Aura\Router\RouteFactory;
 use Aura\Router\Router;
-use Config\Modules\ModuleConfigInterface;
 use Predis\Client;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
-
-// Initialise module configuration
-require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
-require_once SITE_root . '/conf/ModuleLoader.php';
 
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App
@@ -53,6 +46,6 @@ $kernel = new CliTool\Kernel(
             $cacheBuilder->rebuild($this->getConfig()->get('site_school_code'));
         }
     },
-    [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO],
+    [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
 );
 $kernel->runApp();
