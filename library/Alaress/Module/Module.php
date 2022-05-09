@@ -379,7 +379,25 @@ class Module
         /** @var RouteCollection $routes */
         $routes = $router->getRoutes();
         $routes->attachResource($this->basename, $basePath);
-        $routes->attachResourcePostAlias($this->basename, $basePath);
+
+        // Attach POST aliases for the PUT/PATCH/DELETE routes added by
+        // `attachResource`.
+        $routes->attach(
+            $this->basename,
+            $basePath,
+            function (RouteCollection $subroute) {
+                $subroute->setTokens(['id' => '\d+', 'format' => '(\.[^/]+)?',]);
+                $subroute
+                    ->addPost('update:post', '/{id}/update')
+                    ->addValues(['action' => 'update']);
+                $subroute
+                    ->addPost('replace:post', '/{id}/replace')
+                    ->addValues(['action' => 'replace']);
+                $subroute
+                    ->addPost('delete:post', '/{id}/delete')
+                    ->addValues(['action' => 'delete']);
+            }
+        );
     }
 
     /**
