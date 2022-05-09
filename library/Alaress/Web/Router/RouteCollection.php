@@ -20,13 +20,6 @@ namespace Alaress\Web\Router;
 class RouteCollection extends \Aura\Router\RouteCollection
 {
     /**
-     * The prefix for the key within which the route collection cache is stored.
-     *
-     * Will be suffixed with the current instance ID.
-     */
-    public const MODULE_CACHE_KEY_PREFIX = 'routeCache:';
-
-    /**
      * Adds POST aliases to a route already added with $this->attachResource()
      *
      * The following aliases are added:

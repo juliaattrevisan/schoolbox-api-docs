@@ -15,6 +15,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Module\Cache\Cache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
 use Alaress\Redis;
@@ -1842,7 +1843,7 @@ abstract class Kernel
         // Load the list of routes from Redis.
         /** @var Predis\ClientInterface $redis */
         $redis            = $this->getDependencyInjector()->get('redis.storage');
-        $routesSerialized = $redis->get(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
+        $routesSerialized = $redis->get(Cache::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID);
         if (empty($routesSerialized)) {
             return;
         }
@@ -1866,7 +1867,7 @@ abstract class Kernel
         // Load the list of modules from Redis.
         /** @var Predis\ClientInterface $redis */
         $redis          = $this->getDependencyInjector()->get('redis.storage');
-        $modulesEncoded = $redis->get(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
+        $modulesEncoded = $redis->get(Cache::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID);
         if (empty($modulesEncoded)) {
             return;
         }

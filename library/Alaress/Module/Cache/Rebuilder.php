@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Module\Cache;
 
+use Alaress\Module\Registry;
 use Alaress\Web\Router\RouteCollection;
 use Aura\Router\RouteFactory;
 use Aura\Router\Router;
@@ -90,8 +91,14 @@ class Rebuilder
         // The new route table and module registrations have been loaded:
         // dump them into Redis.
         $this->logger->info('Writing route and module configs to Redis cache');
-        $this->redis->set(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, serialize($this->router->getRoutes()));
-        $this->redis->set(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID, json_encode(Registry::getRegistrations()));
+        $this->redis->set(
+            Cache::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID,
+            serialize($this->router->getRoutes()),
+        );
+        $this->redis->set(
+            Cache::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID,
+            json_encode(Registry::getRegistrations()),
+        );
     }
 
     /**

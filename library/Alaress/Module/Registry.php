@@ -19,13 +19,6 @@ use Schoolbox\Module\RestfulModule;
 class Registry
 {
     /**
-     * The prefix for the key within which the module cache is stored.
-     *
-     * Will be suffixed with the current instance ID.
-     */
-    public const MODULE_CACHE_KEY_PREFIX = 'moduleCache:';
-
-    /**
      * A list of module registrations.
      *
      * @var array<string, array{class: class-string, basePath: ?string, contextBasename: ?string}>
