@@ -112,11 +112,20 @@ HELP;
         $this->getLogger()->info('Script commencing.');
 
         /* TODO Implement your iterations here, refreshing lock each time
-         *  This will grant you LOCK_TTL more seconds until the script unlocks itself
+         *  This will grant you LOCK_TTL more seconds to do another iteration,
+         *  until the script unlocks itself
          */
-        for ($i = 0; $i < 10; $i++) {
+        try {
+            for ($i = 0; $i < 10; $i++) {
+                $this->refreshLock($lock);
 
-            $this->refreshLock($lock);
+                /* Your logic goes here
+                 */
+            }
+        } catch (\Alaress\Lock\LockRefreshException $e) {
+            /* Lock TTL expired; just leave politely
+             */
+            exit();
         }
 
         if (!$this->perform()) {

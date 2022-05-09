@@ -12,6 +12,7 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Exception\UnreachableException;
 use Alaress\Lock\InstanceLockFactory;
+use Alaress\Lock\LockRefreshException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -254,7 +255,7 @@ abstract class App
      *
      * @param LockInterface $lock
      * @return void
-     * @throws \RuntimeException
+     * @throws LockRefreshException
      */
     protected function refreshLock(LockInterface $lock): void
     {
@@ -265,7 +266,7 @@ abstract class App
 
             $this->logger->warning($message);
 
-            throw new \RuntimeException($message);
+            throw new LockRefreshException($message);
         }
     }
 
