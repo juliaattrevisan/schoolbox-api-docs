@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Module\Cache;
 
 use Alaress\Web\Router\RouteCollection;
+use JsonException;
 use Predis\ClientInterface;
 
 class Cache
@@ -47,11 +48,13 @@ class Cache
      * Fetch module registrations from cache.
      *
      * @return array
+     * @throws JsonException if for some reason the module registrations can't
+     *                       be decoded
      */
     public function fetchModuleRegistrations(): array
     {
         $modulesEncoded = $this->redis->get(self::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID);
-        return json_decode($modulesEncoded, true);
+        return json_decode($modulesEncoded, true, 512, JSON_THROW_ON_ERROR);
     }
 
     /**
