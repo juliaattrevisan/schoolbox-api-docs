@@ -18,8 +18,6 @@ declare(strict_types=1);
  */
 
 use Alaress\Module\Cache\Rebuilder;
-use Aura\Router\Router;
-use Predis\Client;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 
@@ -33,17 +31,11 @@ $kernel = new CliTool\Kernel(
          */
         public function run(): void
         {
-            /** @var Router $router */
-            /** @var Client $redis */
-            $router       = $this->getDi()->get('router');
-            $redis        = $this->getDi()->get('redis.storage');
-            $cacheBuilder = new Rebuilder(
-                $this->getDi(),
-                $router,
-                $redis,
-                $this->getLogger(),
-            );
-            $cacheBuilder->rebuild($this->getConfig()->get('site_school_code'));
+            /** @var Rebuilder $cacheBuilder */
+            $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
+            $cacheBuilder
+                ->setLogger($this->getLogger())
+                ->rebuild($this->getConfig()->get('site_school_code'));
         }
     },
     [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
