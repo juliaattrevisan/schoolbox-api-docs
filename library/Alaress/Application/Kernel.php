@@ -1856,26 +1856,16 @@ abstract class Kernel
     }
 
     /**
-     * Inits all routes based on the pre-generated routes file.
+     * Inits all routes based on the pre-generated route table.
      */
     protected function initRoutes(): void
     {
-        // Load the list of routes from Redis.
-        /** @var Predis\ClientInterface $redis */
-        $redis            = $this->getDependencyInjector()->get('redis.storage');
-        $routesSerialized = $redis->get(ModuleCache\Cache::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID);
-        if (empty($routesSerialized)) {
-            return;
-        }
-
-        // Is unserializing this massive lump any better than loading all modules?
-        // Other approaches:
-        // * on route not found, figure out the module and attempt to match again
-        /** @var RouteCollection $routes */
-        $routes = unserialize($routesSerialized);
+        /** @var ModuleCache\Cache $moduleCache */
+        $moduleCache = $this->di->get('moduleCache');
+        $routes      = $moduleCache->fetchRouteTable();
 
         /** @var Router $router */
-        $router = $this->get('router');
+        $router = $this->di->get('router');
         $router->setRoutes($routes);
     }
 
@@ -1884,13 +1874,9 @@ abstract class Kernel
      */
     protected function initModules(): void
     {
-        // Load the list of modules from Redis.
-        /** @var Predis\ClientInterface $redis */
-        $redis          = $this->getDependencyInjector()->get('redis.storage');
-        $modulesEncoded = $redis->get(ModuleCache\Cache::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID);
-        if (empty($modulesEncoded)) {
-            return;
-        }
-        Registry::setRegistrations(json_decode($modulesEncoded, true));
+        /** @var ModuleCache\Cache $moduleCache */
+        $moduleCache = $this->di->get('moduleCache');
+        $modules     = $moduleCache->fetchModuleRegistrations();
+        Registry::setRegistrations($modules);
     }
 }
