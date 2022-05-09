@@ -416,7 +416,7 @@ class Controller extends Base\Base
     {
         $this->courseTpl('course', [
             'courseSpec'        => null,
-            'courseName'        => $name,
+            'courseName'        => urldecode($name),
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
