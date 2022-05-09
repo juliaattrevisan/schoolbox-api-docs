@@ -132,7 +132,7 @@ if ($config->get('mail_enable') == 1) {
                 '[title]'     => $user->getTitle(),
                 '[firstname]' => $user->getFirstname(),
                 '[lastname]'  => $user->getLastname(),
-                '[email]'     => $user->getEmail(),
+                '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $user->getEmail(), $user->getEmail()),
                 '[position]'  => $user->getPositionTitle(),
             ]
         );
