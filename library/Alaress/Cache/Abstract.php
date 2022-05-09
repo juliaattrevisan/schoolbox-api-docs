@@ -257,6 +257,12 @@ abstract class Alaress_Cache_Abstract
             if (count($this->headers)) {
                 $headers = array_merge($this->headers, $headers);
             }
+            /**
+             * check scheme, if webcal, update the scheme to http
+             */
+            if ('webcal' === parse_url($url, PHP_URL_SCHEME)) {
+                $url = str_replace('webcal', 'http', $url);
+            }
             $httpClient->get($url, ['headers' => $headers, 'sink' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;

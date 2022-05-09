@@ -232,6 +232,7 @@ class Scrub
                     'dvcplay' => true,
                     'data'    => true,
                     'tel'     => true,
+                    'webcal'  => true,
                 )
             );
 
