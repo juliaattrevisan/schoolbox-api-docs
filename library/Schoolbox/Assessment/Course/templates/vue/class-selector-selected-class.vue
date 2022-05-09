@@ -9,6 +9,9 @@
 const emit = defineEmits(['remove']);
 
 const props = defineProps({
+    /**
+     * the class item to display
+     */
     classItem: {
         type: Object,
         required: true,
@@ -21,6 +24,13 @@ const props = defineProps({
             }
         }
     },
+    /**
+     * if the class-selector is disabled, we can hide the close button
+     */
+    isClassSelectorActive: {
+        type: Boolean, 
+        required: false,
+    }
 });
 
 /**
@@ -36,7 +46,7 @@ function onRemoveSelected () {
 <template>
     <div class="selected-class">
         <span>{{ classItem.name }}</span>
-        <button class="remove-button icon-close" :aria-label="`Remove ${classItem.name}`" @click.prevent="onRemoveSelected"></button>
+        <button v-if="isClassSelectorActive" class="remove-button icon-close" :aria-label="`Remove ${classItem.name}`" @click.prevent="onRemoveSelected"></button>
     </div>
 </template>
 

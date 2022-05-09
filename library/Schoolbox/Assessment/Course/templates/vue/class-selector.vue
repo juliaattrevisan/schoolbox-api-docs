@@ -455,16 +455,16 @@ function onClearAllSelected () {
                 </transition-group>
             </div><!-- .search-results -->
         </div><!-- .search-results-container -->
-        <div class="selected-classes-container">
+        <div :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
             <class-selector-selected-class 
                 v-for="selectedClass in selectedClasses" 
                 :key="selectedClass.id"  
-                :class-item="selectedClass"  
+                :class-item="selectedClass"
                 @remove="onRemoveClassSelected"  
             />
         </div><!-- .selected-classes-container -->
         <div class="extra-actions-container">
-            <button v-if="hasSelectedClasses && isClassSelectorActive" class="button icon-delete clear-all-button" aria-label="Clear all Classes" @click.prevent="onClearAllSelected">Clear all Classes</button>
+            <button v-if="isClassSelectorActive && hasSelectedClasses" class="button icon-delete clear-all-button" aria-label="Clear all Classes" @click.prevent="onClearAllSelected">Clear all Classes</button>
         </div>
     </div>
 </template>
@@ -521,6 +521,10 @@ function onClearAllSelected () {
     min-height: 50px;
     padding: 0.5rem;
 }
+
+    .selected-classes-container__disabled {
+        opacity: 0.8;
+    }
 
 .extra-actions-container {
     display: flex;
