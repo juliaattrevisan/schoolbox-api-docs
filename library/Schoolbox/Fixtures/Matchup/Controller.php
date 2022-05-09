@@ -333,10 +333,14 @@ class Controller extends AbstractController
         }
 
         // Venue
-        try {
-            $venue = $this->getVenueMapper()->findById($this->request->post->get('venueId'));
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+        $venue = null;
+
+        if ('' !== (string)$this->request->post->get('venueId')) {
+            try {
+                $venue = $this->getVenueMapper()->findById($this->request->post->get('venueId'));
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+            }
         }
 
         // Teams
@@ -423,18 +427,22 @@ class Controller extends AbstractController
     /**
      * Save Match data to db
      *
-     * @param Model $matchup
-     * @param Division $division
-     * @param string $name
-     * @param Season $season ,
+     * @param Model               $matchup
+     * @param Division            $division
+     * @param string              $name
+     * @param Season              $season ,
      * @param Alaress_Date_Format $startAt
-     * @param Team $homeTeam
-     * @param Team $awayTeam
-     * @param School $homeSchool
-     * @param School $awaySchool
-     * @param Venue $venue
-     * @param string $notes
-     * @param Collection|ItineraryItem[] $itinerary
+     * @param Alaress_Date_Format $finishAt
+     * @param Team                $homeTeam
+     * @param Team                $awayTeam
+     * @param School              $homeSchool
+     * @param School              $awaySchool
+     * @param Venue|null          $venue
+     * @param string              $notes
+     * @param Collection          $itinerary
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function saveMatch(
         Matchup $matchup,
@@ -447,7 +455,7 @@ class Controller extends AbstractController
         Team $awayTeam,
         School $homeSchool,
         School $awaySchool,
-        Venue $venue,
+        ?Venue $venue,
         string $notes,
         Collection $itinerary
     ) {
