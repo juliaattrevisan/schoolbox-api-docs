@@ -14,10 +14,21 @@ import { gsap } from 'gsap/all';
 
 
 const props = defineProps({
-    endpoint: { //the endpoint to retrieve all the classes from
+    /**
+     * the endpoint to retrieve all the classes from
+     */
+    endpoint: {
         type: String,
         required: true,
-    }
+    },
+    /**
+     * for the Modify Course page, the class-selector will be disabled but it should contain the 
+     * Class we are currently viewing the Modify Course page from
+     */
+    initialValue: { //
+        type: Object,
+        required: false,
+    },
 });
 
 
