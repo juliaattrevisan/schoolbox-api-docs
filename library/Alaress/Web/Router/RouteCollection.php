@@ -1,19 +1,22 @@
 <?php
 
 /**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+namespace Alaress\Web\Router;
+
+/**
  * Extends \Aura\Router\RouteCollection with a method for adding POST aliases
  * for REST HTTP methods that aren't supported by most browsers.
  *
  * The REST routes should have already been added with the attachResource()
  * method.
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @deprecated attachResourcePostAlias is used only in one place, extract it to
+ *             that one place and remove this class
  */
-
-namespace Alaress\Web\Router;
-
 class RouteCollection extends \Aura\Router\RouteCollection
 {
     /**
