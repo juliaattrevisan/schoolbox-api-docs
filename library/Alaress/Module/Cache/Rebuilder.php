@@ -70,6 +70,16 @@ class Rebuilder
     }
 
     /**
+     * @param LoggerInterface $logger
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
      * Reloads the cache.
      *
      * @param string $siteSchoolCode The school code to rebuild the cache for.
