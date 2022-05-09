@@ -49,7 +49,7 @@ const classes = ref([]); //all the classes
  * @returns { Boolean } 
  */
 const hasPreviouslySelectedClass = computed(() => {
-    return props.previouslySelectedClass !== null;
+    return props.previouslySelectedClass.id !== undefined;
 });
 
 /**
@@ -58,7 +58,7 @@ const hasPreviouslySelectedClass = computed(() => {
  * @returns { Boolean } 
  */
 const isClassSelectorActive = computed(() => {
-    return props.previouslySelectedClass === null;
+    return props.previouslySelectedClass.id === undefined;
 });
 
 /**
@@ -460,6 +460,7 @@ function onClearAllSelected () {
                 v-for="selectedClass in selectedClasses" 
                 :key="selectedClass.id"  
                 :class-item="selectedClass"
+                :is-class-selector-active="isClassSelectorActive"
                 @remove="onRemoveClassSelected"  
             />
         </div><!-- .selected-classes-container -->
