@@ -67,6 +67,8 @@ $app = new class extends CliTool\App
 
         try {
             for ($i = 0; $i < 10; $i++) {
+                $this->refreshLock($lock);
+
                 $this->getLogger()->warning(sprintf(
                     'Do something dangerous %s - hit ctrl-c to simulate an early exit',
                     $i
@@ -75,8 +77,6 @@ $app = new class extends CliTool\App
                 /* Give you a chance to ctrl-c
                  */
                 sleep(3);
-
-                $this->refreshLock($lock);
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
