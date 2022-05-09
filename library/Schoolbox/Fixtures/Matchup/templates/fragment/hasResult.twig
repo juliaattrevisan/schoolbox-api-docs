@@ -30,15 +30,20 @@
                         {{ teamResult.description|purify }}
                     </div>
                 </div>
+                {% set deleteResult = routeLookupIfAuthorized('sportsfixturesResult.deleteEntity', {entityId: teamResult.id}) %}
+                {% if deleteResult or (hasMatchModify and not match.season.isArchived) %}
                 <nav>
                     {% if hasMatchModify and not match.season.isArchived %}
                     <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: teamResult.id}) }}" class="icon-modify" title="Modify"></a>
                     {% endif %}
                     <a href="#" class="icon-more" data-dropdown="sportsfixtures-position-{{ currentPosition.getId() ?? '' }}-actions"></a>
                 </nav>
+                {% if deleteResult %}
                 <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-position-{{ currentPosition.getId() ?? '' }}-actions">
-                    <li><a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: teamResult.id}) }}" class="icon-delete" title="Delete" data-delete="{{ teamResult.id }}">Delete</a></li>
+                    <li><a href="{{ deleteResult }}" class="icon-delete" title="Delete" data-delete="{{ teamResult.id }}">Delete</a></li>
                 </ul>
+                {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
