@@ -1,21 +1,42 @@
+{% set reportCount = 25 %}
+{% set warnings = ["X warning","Y warning"] %}
 <style>
+    .island {
+        margin-top: 4em;
+        width: 80%;
+    }
 
-
-    div {
-        border: 1px solid green;
+    .wait-content {
+        border: 1px solid blueviolet;
+        height: 15rem;
     }
 
 
-
 </style>
-
+<div class="admin-container row">
+    <div class="admin-content">
 <div class="row">
     <div class="small-12 island">
-        <h1>Greenhouse</h1>
         <section class="content">
-            <div>
+            <div class="wait-content">
 
             </div>
+            <div>
+                <p>We are currently working on collating your student reports for {{reportCount}} students into a zip file…..
+                    We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minutes
+                    Feel free to continue working, we will send you a notification when the file is ready to download
+                </p>
+            </div>
+            <div class="alert-box alert">
+                {% if warnings %}
+                    <p>Please note that we encountered the following issues while processing your request:</p>
+                    {% for warning in warnings %}
+                        {{ warning }} <br>
+                    {% endfor %}
+                {% endif %}
+            </div>
+    </div>
         </section>
     </div>
+</div>
 </div>
