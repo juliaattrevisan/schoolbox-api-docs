@@ -293,7 +293,6 @@ class Classes implements IStrategy
                     ->setPeriod($class['attributes']['periodName'])
                     ->setStartAt($start)
                     ->setFinishAt($finish)
-                    ->setAllday(\Schoolbox\External\Event\Model::NOT_ALL_DAY)
                     ->setType($class['attributes']['classType'])
                     ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                     ->setGuid($class['id'])
