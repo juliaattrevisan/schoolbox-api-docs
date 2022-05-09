@@ -75,9 +75,9 @@ class Model
 
 
     /**
-     * @var int
+     * @var int|null
      */
-    private int $allday;
+    private ?int $allday = null;
 
 
     /**
@@ -282,19 +282,19 @@ class Model
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getAllday(): int
+    public function getAllday(): ?int
     {
         return $this->allday;
     }
 
 
     /**
-     * @param int $allday
+     * @param int|null $allday
      * @return Model
      */
-    public function setAllday(int $allday): self
+    public function setAllday(?int $allday): self
     {
         $this->allday = $allday;
         return $this;
@@ -310,7 +310,6 @@ class Model
         $this->finishAt = $finishAt;
         return $this;
     }
-
 
 
     /**
