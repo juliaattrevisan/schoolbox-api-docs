@@ -181,10 +181,9 @@ HELP
      */
     private function rebuildModuleCache(): void
     {
+        $this->getLogger()->info("Rebuilding route and module cache");
         /** @var Rebuilder $cacheBuilder */
         $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
-        $cacheBuilder
-            ->setLogger($this->getLogger())
-            ->rebuild($this->getConfig()->get('site_school_code'));
+        $cacheBuilder->rebuild($this->getConfig()->get('site_school_code'));
     }
 }
