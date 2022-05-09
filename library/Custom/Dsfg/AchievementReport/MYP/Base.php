@@ -129,7 +129,8 @@ class Base extends AchievementReportBase
                 AssessAreaHdgAbbrev1,
                 AssessAreaHdgAbbrev2,
                 ID,
-                AssessResultsResult
+                AssessResultsResult,
+                StaffMailName
             FROM uvSchoolBoxMYPGRADEResults
             WHERE StudentID = :externalId
             AND FileSemester IN (2, 4)
@@ -139,7 +140,7 @@ class Base extends AchievementReportBase
 
         $gradeData = [];
         foreach ($rows as $row) {
-            $gradeData[$row['ClassCode']][$row['FileSemester']][$row['AssessAreaHdgAbbrev2']] = $row['AssessResultsResult'];
+            $gradeData[$row['ClassCode']][$row['FileSemester']][$row['AssessAreaHdgAbbrev2']] = $row;
         }
         return $gradeData;
     }

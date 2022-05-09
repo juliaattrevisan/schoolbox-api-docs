@@ -43,9 +43,7 @@ class YearlyBreakdown extends Base
         foreach ($preprocessed as $year => $allCourses) {
             /* Initialise totals for letters
              */
-            if (!is_array($totals[$year]['letters'])) {
-                $totals[$year]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-            }
+            $totals[$year]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
             $totals[$year]['achievedGrades'] = 0;
 
@@ -57,9 +55,7 @@ class YearlyBreakdown extends Base
             foreach ($allCourses as $courseName => $allAreas) {
                 /* Initialise totals for letters
                  */
-                if (!is_array($yearStack[$year][$courseName]['letters'])) {
-                    $yearStack[$year][$courseName]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-                }
+                $yearStack[$year][$courseName]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
                 $yearStack[$year][$courseName]['achievedGrades'] = 0;
 
@@ -102,6 +98,7 @@ class YearlyBreakdown extends Base
         /* Available Grades
          */
         foreach ($yearStack as $currentYear => $allCourses) {
+            $totals[$currentYear]['availableGrades'] = 0;
             foreach ($allCourses as $courseName => $data) {
                 $yearStack[$currentYear][$courseName]['availableGrades'] = $yearStack[$currentYear][$courseName]['enteredGrades'] - array_sum($yearStack[$currentYear][$courseName]['letters']);
                 $totals[$currentYear]['availableGrades'] ??= 0;

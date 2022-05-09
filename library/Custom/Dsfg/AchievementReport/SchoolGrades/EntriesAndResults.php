@@ -47,7 +47,7 @@ class EntriesAndResults extends Base
 
             /* List of teachers - uniquify and exclude empties
              */
-            if (!is_array($finalStack[$year][$courseName][$assessArea]['teachers'])) {
+            if (!isset($finalStack[$year][$courseName][$assessArea]['teachers'])) {
                 $finalStack[$year][$courseName]['allTeachers'] = [];
             }
 
@@ -65,14 +65,12 @@ class EntriesAndResults extends Base
 
             /* Initialise marks for All Terms
              */
-            if (!is_array($finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'])) {
-                $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] = [
-                    'term1' => '',
-                    'term2' => '',
-                    'term3' => '',
-                    'term4' => ''
-                ];
-            }
+            $finalStack[$year][$courseName]['allAreas'][$assessArea]['letters'] ??= [
+                'term1' => '',
+                'term2' => '',
+                'term3' => '',
+                'term4' => '',
+            ];
 
             /* Marks
              */
@@ -97,12 +95,12 @@ class EntriesAndResults extends Base
                     preg_match('/^\d+\.(\d+)/', $a, $matchesA);
                     preg_match('/^\d+\.(\d+)/', $b, $matchesB);
 
-                    return $matchesA[1] > $matchesB[1];
+                    return ($matchesA[1] ?? '') <=> ($matchesB[1] ?? '');
                 });
 
                 $processed[$year][$name] = $data;
                 $processed[$year][$name]['allAreas'] = $subjects;
-                $processed[$year][$name]['comments'] = $comments[$year]['courses'][$name]['terms'];
+                $processed[$year][$name]['comments'] = $comments[$year]['courses'][$name]['terms'] ?? '';
             }
         }
 

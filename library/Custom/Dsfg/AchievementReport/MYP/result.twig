@@ -1,7 +1,14 @@
 {% for classCode, subjectData in subjects %}
     <div class="row">
         <div class="small-12 island">
-            <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
+            <section class="type-blue content">
+                <strong>{{ headings[classCode].subjectName }}</strong>
+                {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                    {% if loop.first %}
+                        <span class="right">{{ grades[classCode][2][shortCode]['StaffMailName'] ?? '' }}</span>
+                    {% endif %}
+                {% endfor %}
+            </section>
         </div>
     </div>
     <div class="row">
@@ -38,7 +45,7 @@
                     <tr>
                         <th>Interim Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
+                            <td class="centered">{{ grades[classCode][2][shortCode]['AssessResultsResult'] ?? '' }}</td>
                         {% endfor %}
                     </tr>
                     <tr>
@@ -47,7 +54,7 @@
                     <tr>
                         <th>Final Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
+                            <td class="centered">{{ grades[classCode][4][shortCode]['AssessResultsResult'] ?? '' }}</td>
                         {% endfor %}
                     </tr>
                     </tbody>
@@ -58,6 +65,7 @@
     <div class="row">
         <div class="small-12 island">
             <section class="content">
+                Comment
                 <p>{{ subjectData.comment }}</p>
             </section>
         </div>

@@ -123,7 +123,7 @@ class NavigationSelector
          */
         if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        } elseif (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 8)) {
+        } elseif ($this->hasMYP()) {
             $this->defaultReport = self::MYP_KEY;
         } elseif (($this->user->getYear()->getName() >= 9) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
@@ -164,7 +164,7 @@ class NavigationSelector
     {
         $availableNavigation = [];
 
-        if (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
+        if ($this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->router->generate('achievementreport.getMyp', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -376,5 +376,18 @@ class NavigationSelector
     public function getAvailableNavigation(): array
     {
         return $this->availableNavigation;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasMYP(): bool
+    {
+        $currentYear = (int)date('Y');
+        return
+            $this->user->getYear()->getName() == 7
+            || $this->user->getYear()->getName() == 8
+            || ($this->user->getYear()->getName() == 9 && $currentYear >= 2023)
+            || ($this->user->getYear()->getName() == 10 && $currentYear >= 2024);
     }
 }

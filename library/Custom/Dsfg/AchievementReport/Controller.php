@@ -884,7 +884,7 @@ class Controller extends Base
                 ],
                 'externalUser' => $externalUser,
                 'user'         => $user,
-                'year'         => $year,
+                'year'         => $currentYear,
                 'headings'     => $mypData['headings'],
                 'subjects'     => $mypData['data'],
                 'grades'       => $mypBase->getMYPGrade(),
