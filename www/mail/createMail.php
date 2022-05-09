@@ -10,6 +10,7 @@
 use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
 use Schoolbox\UserMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -17,12 +18,13 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
+$config = ConfigLoader::getInstance();
 
 $groupHandler = new Group();
 $externalHandler = new External_User();
 $userMapper = UserMapper::getInstance();
 
-if (Config::get('mail_enable') == 1) {
+if ($config->get('mail_enable') == 1) {
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $invalidEmails = [];
@@ -156,7 +158,7 @@ if (Config::get('mail_enable') == 1) {
 
     $page->setVar($output);
 
-    $uri = (new \Schoolbox\Url\Factory($page->getDi()->get('config')->getInstance()))->buildFullyQualified()->setScheme("https");
+    $uri = (new \Schoolbox\Url\Factory($config))->buildFullyQualified()->setScheme("https");
     $urlOrigin = array( 'BASE_HREF' => $uri );
     $page->setVar($urlOrigin);
 
