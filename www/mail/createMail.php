@@ -19,6 +19,8 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 $config = ConfigLoader::getInstance();
+/** @var \Schoolbox\User $currentUser */
+$user = $_SESSION['user'];
 
 $groupHandler = new Group();
 $externalHandler = new External_User();
@@ -113,6 +115,28 @@ if ($config->get('mail_enable') == 1) {
         }
     }
 
+    /**
+     * build the email signature if it is defined, and the user has a schoolbox email
+     * matching on user's email domain matches the smtp from address
+     */
+    $emailBody = '';
+    $signature = $config->get('email_signature');
+    $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
+    if (
+        $config->get('mail_address') === explode('@', $user->getEmail())[1] &&
+        null !== $signature
+    ) {
+        $emailBody = "<br><br>---<br>" . $tokenReplacer->replace(
+            $signature,
+            [
+                '[title]'     => $user->getTitle(),
+                '[firstname]' => $user->getFirstname(),
+                '[lastname]'  => $user->getLastname(),
+                '[email]'     => $user->getEmail(),
+                '[position]'  => $user->getPositionTitle(),
+            ]
+        );
+    }
     $page->setFile(TEMPLATE_content, 'mail/send.html');
     $page->setTitle('Webmail');
     $page->setTab('webmail');
@@ -141,7 +165,7 @@ if ($config->get('mail_enable') == 1) {
 
     $output = array(
         'SUBJECT' => ($_REQUEST['subject'] ?? false) ? Scrub::text($_REQUEST['subject']) : '',
-        'BODY'    => '',
+        'BODY'    => $emailBody,
         'REPLYTO' => json_encode($addressLists['replyto']),
         'CC'      => json_encode($addressLists['cc']),
         'BCC'     => json_encode($addressLists['bcc']),
