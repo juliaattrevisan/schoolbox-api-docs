@@ -35,7 +35,7 @@ $app = new class extends CliTool\App
     /**
      * Temporary 10 sec ttl
      */
-    private const LOCK_TTL = 2;
+    private const LOCK_TTL = 3;
 
 
     /**
@@ -65,7 +65,7 @@ $app = new class extends CliTool\App
             exit();
         }
 
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $this->getLogger()->warning(sprintf(
                 'Do something dangerous %s - hit ctrl-c to simulate an early exit',
                 $i
