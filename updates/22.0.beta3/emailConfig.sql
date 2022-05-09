@@ -1,4 +1,4 @@
-INSERT INTO schoolbox.config (name, value, title, description, field_id, options, type_id, editable, hidden, required,
+INSERT INTO config (name, value, title, description, field_id, options, type_id, editable, hidden, required,
                               module, sequence)
 VALUES ('email_signature', null, 'Email Signature',
         'Inserts this signature into emails created inside schoolbox. available tokens are [title] [firstname] [lastname] [email] [position] ',
