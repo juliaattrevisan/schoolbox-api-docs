@@ -17,7 +17,7 @@ declare(strict_types=1);
  * module definitions should not depend on SQL updates.
  */
 
-use Alaress\Module\CacheBuilder;
+use Alaress\Module\Cache\Rebuilder;
 use Aura\Router\Router;
 use Predis\Client;
 use Schoolbox\Application\CliKernelAbstract;
@@ -37,7 +37,7 @@ $kernel = new CliTool\Kernel(
             /** @var Client $redis */
             $router       = $this->getDi()->get('router');
             $redis        = $this->getDi()->get('redis.storage');
-            $cacheBuilder = new CacheBuilder(
+            $cacheBuilder = new Rebuilder(
                 $this->getDi(),
                 $router,
                 $redis,

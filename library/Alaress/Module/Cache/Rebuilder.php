@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Module;
+namespace Alaress\Module\Cache;
 
 use Alaress\Web\Router\RouteCollection;
 use Aura\Router\RouteFactory;
@@ -21,9 +21,9 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Method for rebuilding the cache for the route and module tables.
+ * Method for rebuilding the cache for the route table and module registrations.
  */
-class CacheBuilder
+class Rebuilder
 {
     /**
      * DI container: `\Config\Modules\ModuleConfigInterface::configure`
@@ -32,12 +32,12 @@ class CacheBuilder
     private ContainerInterface $di;
 
     /**
-     * Route table: once built, modules add their routes into this table.
+     * Route table: once built, modules add their routes here.
      */
     private Router $router;
 
     /**
-     * Redis client: the route and module tables are stored here.
+     * Redis client: the route table and module registrations are stored here.
      */
     private ClientInterface $redis;
 
