@@ -514,6 +514,7 @@ class Classes implements IStrategy
             ->setPeriod($period)
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
+            ->setAllday(0)
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
