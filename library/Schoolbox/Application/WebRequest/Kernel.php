@@ -124,7 +124,20 @@ class Kernel extends WebKernelAbstract
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);
         }
 
-
+        if ('OPTIONS' === $server['REQUEST_METHOD']) {
+            /**
+             * if system is requesting OPTIONS lets give them what the endpoint actually accepts, not just all.
+             */
+            $methods = [];
+            foreach (["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"] as $testMethod) {
+                if (false !== $this->di->get('router')->match($path, ['REQUEST_METHOD' => $testMethod])) {
+                    $methods[] = $testMethod;
+                }
+            }
+            http_response_code(204);
+            header(sprintf('Allow: OPTIONS, %s', implode(', ', $methods)));
+            exit;
+        }
         $route = $this->di->get('router')->match($path, $server);
 
         try {
