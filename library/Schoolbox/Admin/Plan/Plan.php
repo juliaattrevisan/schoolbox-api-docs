@@ -2,6 +2,9 @@
 
 namespace Schoolbox\Admin\Plan;
 
+use Alaress\Module\Cache\Rebuilder;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mapper\Exception\NotFound;
 use Symfony\Component\Yaml\Yaml;
@@ -47,6 +50,7 @@ class Plan extends CliTool\App
             $this->setConfig($planConfig['config']);
             $this->setTopMenu($planConfig['topMenu']);
             $this->setComponents($planConfig['components']);
+            $this->rebuildModuleCache();
         } else {
             echo
             <<<HELP
@@ -163,5 +167,24 @@ HELP
         } catch (\PDOException $e) {
             $this->getDatabaseInternal()->rollBack();
         }
+    }
+
+    /**
+     * After all is done: rebuild the module and route caches.
+     *
+     * Rebuilding the module and route caches is necessary because changing the
+     * plan may change the routes which are available to an instance.
+     *
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function rebuildModuleCache(): void
+    {
+        /** @var Rebuilder $cacheBuilder */
+        $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
+        $cacheBuilder
+            ->setLogger($this->getLogger())
+            ->rebuild($this->getConfig()->get('site_school_code'));
     }
 }
