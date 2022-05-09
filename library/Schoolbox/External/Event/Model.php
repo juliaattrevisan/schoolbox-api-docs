@@ -30,8 +30,8 @@ class Model
      * Initial condition for all-day flag
      * All events are timed unless specified otherwise
      */
-    public const NOT_ALL_DAY = 0;
-    public const ALL_DAY = 1;
+    public const NOT_ALL_DAY = false;
+    public const ALL_DAY = true;
 
 
     /**
@@ -83,9 +83,9 @@ class Model
 
 
     /**
-     * @var int|null
+     * @var bool|null
      */
-    private ?int $allday = null;
+    private ?bool $allday = null;
 
 
     /**
@@ -290,19 +290,19 @@ class Model
 
 
     /**
-     * @return int|null
+     * @return bool|null
      */
-    public function getAllday(): ?int
+    public function getAllday(): ?bool
     {
         return $this->allday;
     }
 
 
     /**
-     * @param int|null $allday
+     * @param bool|null $allday
      * @return Model
      */
-    public function setAllday(?int $allday): self
+    public function setAllday(?bool $allday): self
     {
         $this->allday = $allday;
         return $this;
