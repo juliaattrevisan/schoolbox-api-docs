@@ -43,14 +43,12 @@ abstract class Base extends AchievementReportBase
 
             /* Initialise
              */
-            if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = [
-                    'term1' => '',
-                    'term2' => '',
-                    'term3' => '',
-                    'term4' => '',
-                ];
-            }
+            $yearStack[$studentYear][$courseName][$assessArea] ??= [
+                'term1' => '',
+                'term2' => '',
+                'term3' => '',
+                'term4' => '',
+            ];
 
             /* Assign values
              */
