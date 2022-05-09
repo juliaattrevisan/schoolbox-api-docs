@@ -27,6 +27,14 @@ class Model
 
 
     /**
+     * Initial condition for all-day flag
+     * All events are timed unless specified otherwise
+     */
+    public const NOT_ALL_DAY = 0;
+    public const ALL_DAY = 1;
+
+
+    /**
      * @var string|null
      */
     private ?string $title = null;
