@@ -62,20 +62,18 @@ class Status implements IStatus
     {
         /* Try accessing an intentionally broken place
          */
-        $endpoint = 'getStudents';
+        $flag = 'Invalid request';
 
         try {
-            (new Api($this->host, $this->key, Codec\DSN::MODULE_LMS_INTEGRATION))->retrieveDocument($endpoint, [
+            (new Api($this->host, $this->key, Codec\DSN::MODULE_LMS_INTEGRATION))->retrieveDocument('getStudents', [
                 'test' => true
             ]);
         } catch (RuntimeException $e) {
             /* We only need to know that the server is alive; even if we
              * get an error message in response, it tells us the server is here
              * and waiting to accept actual calls with valid data
-             *
-             * Endpoint name appears in the error message.
              */
-            if (strpos($e->getMessage(), $endpoint) !== false) {
+            if (strpos($e->getMessage(), $flag) !== false) {
                 return true;
             }
         }
