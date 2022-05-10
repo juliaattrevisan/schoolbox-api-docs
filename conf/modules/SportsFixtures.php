@@ -9,6 +9,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Fixtures\Landing\Module as LandingModule;
 use Schoolbox\Fixtures\Import\Module as ImportModule;
 use Schoolbox\Fixtures\Sport\Module as SportModule;
@@ -37,7 +38,7 @@ class SportsFixtures implements ModuleConfigInterface
         $homepageModule = new HomepageModule($di);
         $homepageModule->registerModule("/$namespace");
 
-        if ($di->get('config')->get('fixtures_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_FIXTURES_ENABLED)) {
             $dashboardModule = new DashboardModule($di);
             $dashboardModule->registerModule("/$namespace");
 

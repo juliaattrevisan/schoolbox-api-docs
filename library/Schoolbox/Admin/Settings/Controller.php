@@ -20,6 +20,50 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
+    /**
+     * Config settings which may affect the behaviour of the router daemon.
+     *
+     * If any of these settings change: send a reload message to the router
+     * daemon.
+     */
+    private const SETTINGS_AFFECTING_ROUTED = [
+        'messaging_enabled',
+        'mail_replyto_enabled',
+        'feedback_url',
+        'feedback_text',
+    ];
+
+    /**
+     * Config settings which may affect the behaviour of the schedule daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the schedule daemon.
+     */
+    private const SETTINGS_AFFECTING_SCHEDULED = [
+        'restrict_parent_duework_access',
+        'restrict_student_submissions',
+        'restrict_parent_grades',
+    ];
+
+    /**
+     * Config settings which affect the modules and routes available to this
+     * instance.
+     *
+     * If any of these settings change: reload the route and module tables.
+     */
+    private const SETTINGS_AFFECTING_MODULES = [
+        ConfigMapper::NAME_LMS_ENABLED,
+        ConfigMapper::NAME_PASTORAL_ENABLED,
+        ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+        ConfigMapper::NAME_BADGES_ENABLED,
+        ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED,
+        ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED,
+        ConfigMapper::NAME_FIXTURES_ENABLED,
+        ConfigMapper::NAME_TOURS_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_TYPE,
+        ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+    ];
 
     /**
      * Renders an admin settings page for settings with the specified type
@@ -168,17 +212,9 @@ class Controller extends ConfigController
         /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate($typeLabel))->indexBy(ConfigMapper::COL_NAME);
 
-        // Messaging behavior may be affected by changing configuration.
-        $reRouterSettings = ['messaging_enabled', 'mail_replyto_enabled', 'feedback_url', 'feedback_text'];
-        $reloadReRouter   = false;
-
-        $notifierSettings = [
-            'restrict_parent_duework_access',
-            'restrict_student_submissions',
-            'restrict_parent_grades',
-        ];
-        $dropNotifierConfigCache = false;
-
+        // Do any changed settings necessitate a reload of any processes?
+        $reloadRouteDaemon    = false;
+        $reloadScheduleDaemon = false;
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
             if (!$existingConfig->getEditable()) {
@@ -188,24 +224,23 @@ class Controller extends ConfigController
             $newValue        = $valueSerializer->serializeValue($value);
 
             if ($newValue !== $existingConfig->getValue()) {
-                if (\in_array($name, $reRouterSettings, true)) {
-                    $reloadReRouter = true;
+                if (\in_array($name, self::SETTINGS_AFFECTING_ROUTED, true)) {
+                    $reloadRouteDaemon = true;
                 }
-                if (\in_array($name, $notifierSettings, true)) {
-                    $dropNotifierConfigCache = true;
+                if (\in_array($name, self::SETTINGS_AFFECTING_SCHEDULED, true)) {
+                    $reloadScheduleDaemon = true;
                 }
                 $existingConfig->setValue(trim($newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
-        if ($reloadReRouter || $dropNotifierConfigCache) {
+        if ($reloadRouteDaemon || $reloadScheduleDaemon) {
             $redisClient = Redis::getSignalQueueClientInstance();
-            if ($redisClient && $reloadReRouter) {
-                // Reload message router
+            if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
             }
-            if ($redisClient && $dropNotifierConfigCache) {
+            if ($redisClient && $reloadScheduleDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
         }

@@ -12,6 +12,7 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral\Module as PastoralModule;
 use Schoolbox\Pastoral\ReportBuilder\Module as PastoralReportBuilderModule;
 use Schoolbox\Pastoral\Management\Module as PastoralManagementModule;
@@ -24,7 +25,7 @@ class Pastoral extends ModuleLoader
      */
     public function configure(ContainerInterface $di): void
     {
-        if ($di->get('config')->get('pastoral_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
             $this->loadModule($di, PastoralModule::class, "/pastoral");
             $this->loadModule($di, PastoralReportBuilderModule::class, "/pastoral/report");
             $this->loadModule($di, PastoralManagementModule::class, "/pastoral/management/groups");

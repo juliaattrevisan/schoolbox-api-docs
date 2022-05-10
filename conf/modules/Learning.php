@@ -89,7 +89,7 @@ class Learning extends ModuleLoader
 
         /* Assessment Calendar is behind a feature flag
          */
-        if ($config->get('assessment_calendar_enabled')) {
+        if ($config->get(ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED)) {
             $this->loadModule($di, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
             $this->loadModule(
                 $di,

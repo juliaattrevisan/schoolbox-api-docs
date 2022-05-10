@@ -159,6 +159,11 @@ class ConfigMapper extends Mapper
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
     public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
+    public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
+    public const NAME_RESOURCE_BOOKING_ENABLED = 'resource_booking_enabled';
+    public const NAME_FIXTURES_ENABLED = 'fixtures_enabled';
+    public const NAME_TOURS_ENABLED = 'tours_enabled';
+    public const NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED = 'external_document_report_enabled';
 
     public const NAME_WEBDAV_ENABLED         = 'webdav_enable';
     public const NAME_GOOGLEDRIVE_ENABLED    = 'googledrive_enabled';
@@ -186,6 +191,8 @@ class ConfigMapper extends Mapper
 
     public const NAME_TASKD_REDIS_URL = 'taskd_redis_url';
     public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
+
+    public const NAME_SCHOOLDATA_IMPORT_DATA_SOURCE = 'schooldata_import_data_source';
 
     /**
      * @throws \InvalidArgumentException
