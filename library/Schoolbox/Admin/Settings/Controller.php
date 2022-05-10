@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Redis;
 use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -20,6 +21,28 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
+    /**
+     * Module/route cache rebuilder: required as changing config settings may
+     * change the modules and routes available.
+     */
+    private Rebuilder $rebuilder;
+
+    /**
+     * Constructor
+     *
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     */
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory);
+        $this->rebuilder = $rebuilder;
+    }
+
     /**
      * Renders an admin settings page for settings with the specified type
      *
@@ -205,6 +228,7 @@ class Controller extends ConfigController
         }
         if ($rebuildModules) {
             // After everything else: reload the route table
+            $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
         }
 
         $route = urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));

@@ -141,6 +141,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
+    public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
 
@@ -369,6 +370,11 @@ class ConfigMapper extends Mapper
 
     /**
      * Override notifications to silence them
+     *
+     * TODO: consider using system-level notifications to reload
+     *       routed/scheduled/modules
+     * (Currently, reloading of daemons and modules is handled in
+     *  `\Schoolbox\Admin\Settings\Controller::postSettings`)
      *
      * @param object $object
      * @param string $verb
