@@ -55,9 +55,9 @@ class Phone
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $communicationTypes;
+    private string $communicationTypes;
 
 
     /**
@@ -68,9 +68,9 @@ class Phone
      * @param IApi   $api
      * @param string $fatherAddressDescription
      * @param string $motherAddressDescription
-     * @param string|null $communicationTypes
+     * @param string $communicationTypes
      */
-    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, ?string $communicationTypes)
+    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, string $communicationTypes)
     {
         $this->api = $api;
         $this->fatherAddressDescription = $fatherAddressDescription;

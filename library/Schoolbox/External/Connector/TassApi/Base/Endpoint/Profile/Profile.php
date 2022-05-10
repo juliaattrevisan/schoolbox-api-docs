@@ -71,6 +71,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Default TASS Communication Rule
+     */
+    private const DEFAULT_COMMUNICATION_RULE = 'tkco';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -247,7 +253,14 @@ class Profile implements IStrategy
         $this->addnumMother = $addnumMother;
         $this->fatherAddressDescription = $fatherAddressDescription;
         $this->motherAddressDescription = $motherAddressDescription;
-        $this->communicationTypes = $communicationTypes;
+
+        /* If $communicationTypes is an empty string, default it to "tkco"
+         * which is the default communication rule specified by TASS The Organisation
+         */
+        $this->communicationTypes = '' === $communicationTypes ? self::DEFAULT_COMMUNICATION_RULE : $communicationTypes;
+
+        /* Various mappers
+         */
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
