@@ -300,6 +300,11 @@ class Profile implements IStrategy
     {
         /* Build some lookups to save on traversal and api banging
          */
+        $this->log->debug(sprintf(
+            'Fetching data using TASS Communication Rules: %s',
+            $this->communicationTypes
+        ));
+
         $families = (new Lookup\Family(
             $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
             $this->spousePrefix,
