@@ -153,7 +153,16 @@ abstract class AbstractMailer implements IMailer
      */
     public function setReplyTo($email, string $name = '')
     {
-        $this->email->replyTo(new Address($email, $name));
+        /**
+         * if $email is an array... do magic combining, else just do what it was doing...
+         */
+        if (is_array($email)) {
+            foreach ($email as $address => $name) {
+                $this->email->addReplyTo(new Address($address, $name));
+            }
+        } else {
+            $this->email->replyTo(new Address($email, $name));
+        }
     }
 
 
