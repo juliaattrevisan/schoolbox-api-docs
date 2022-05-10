@@ -278,6 +278,10 @@ class Family
 
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
+                /* Everyone coming out of getParents() is a physical parent, known to tass.
+                 * The communication rules decide whether this physical parent should be
+                 * associated with the student in suds; use validCommRule boolean to decide
+                 */
                 if (isset($family['students'])) {
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
@@ -398,6 +402,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'validCommRule' => false
         ];
 
         /* Find the first non-empty email address from the two possibilities
@@ -449,7 +454,7 @@ class Family
             $family[$node]['first_name']
         ]);
 
-        $person = $this->phones[$family['user_code']][$node] ?? [
+        $defaultPerson = [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
@@ -457,7 +462,14 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'validCommRule' => false
         ];
+
+        /* If the phones lookup contains data for this user code,
+         * then they have one of the commsrules that determines suds parentage
+         * and should be associated with the student
+         */
+        $person = $this->phones[$family['user_code']][$node] ?? $defaultPerson;
 
         /* Assign an externalId to this person
          */

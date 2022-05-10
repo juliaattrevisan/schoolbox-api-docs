@@ -199,6 +199,7 @@ class Phone
                         'work' => '',
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipM,
+                        'validCommRule' => true
                     ];
                 } elseif ($address['address_description'] === $this->fatherAddressDescription) {
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
@@ -212,6 +213,7 @@ class Phone
                         'work' => '',
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipF,
+                        'validCommRule' => true
                     ];
                 } else {
                     /* Nukular family: fields are distributed among the guys in the fam
@@ -227,6 +229,7 @@ class Phone
                         'work' => '',
                         'email' => $email1,
                         'relationship' => $relationshipM,
+                        'validCommRule' => true
                     ];
 
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
@@ -240,6 +243,7 @@ class Phone
                         'work' => '',
                         'email' => $email2,
                         'relationship' => $relationshipF,
+                        'validCommRule' => true
                     ];
                 }
             }
