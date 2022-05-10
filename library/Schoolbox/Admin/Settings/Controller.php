@@ -205,7 +205,14 @@ class Controller extends ConfigController
         }
         if ($rebuildModules) {
             // After everything else: reload the route table
-            $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
+            $this->getResponse()->content->set([
+                'format'     => 'noContent',
+                'postOutput' => [
+                    function () {
+                        $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
+                    }
+                ],
+            ]);
         }
 
         $route = urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
