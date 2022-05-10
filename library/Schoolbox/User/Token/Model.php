@@ -22,6 +22,12 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
     use CreatedAtDate;
 
+    // default expiry days
+    public const DEFAULT_EXPIRY = 60;
+
+    public const TYPE_API = 'api';
+    public const TYPE_QRCODE = 'qrcode';
+
     /**
      * @var string|null
      */
@@ -31,6 +37,12 @@ class Model implements ISoftDeletable
      * @var User|null
      */
     protected ?User $user = null;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $type = null;
+
     /**
      * @var User|null
      */
@@ -80,6 +92,24 @@ class Model implements ISoftDeletable
     public function setJwtId(string $jwtId): self
     {
         $this->jwtId = $jwtId;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string|null $type
+     * @return self
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
         return $this;
     }
 

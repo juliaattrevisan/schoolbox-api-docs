@@ -45,7 +45,8 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getTokenForSelf', $isLoggedIn);
-        $this->register('POST', '/{userId}', 'getTokenForUser', $isUserOrSuperUser, $preloadUser);
+        $this->register('POST', '/postDeleteToken', 'postDeleteToken', $isUserOrSuperUser);
+        $this->register('POST', '/{userId:\d+}', 'getTokenForUser', $isUserOrSuperUser, $preloadUser);
     }
 
 

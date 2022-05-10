@@ -52,69 +52,69 @@ class Controller extends Base
     /**
      * @var FolderMapper
      */
-    protected $folderMapper;
+    protected FolderMapper $folderMapper;
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * @var UserAccessMapper
      */
-    protected $userAccessMapper;
+    protected UserAccessMapper $userAccessMapper;
 
     /**
      * @var UserTitleMapper
      */
-    protected $userTitleMapper;
+    protected UserTitleMapper $userTitleMapper;
 
     /**
      * @var CampusMapper
      */
-    protected $campusMapper;
+    protected CampusMapper $campusMapper;
 
     /**
      * @var RoleMapper
      */
-    protected $roleMapper;
+    protected RoleMapper $roleMapper;
 
     /**
      * @var ErrorMapper
      */
-    protected $errorMapper;
+    protected ErrorMapper $errorMapper;
 
     /**
      * @var HouseResidentialMapper
      */
-    protected $houseResidentialMapper;
+    protected HouseResidentialMapper $houseResidentialMapper;
 
     /**
      * @var HouseMapper
      */
-    protected $houseMapper;
+    protected HouseMapper $houseMapper;
 
     /**
      * @var UserLogMapper;
      */
-    protected $userLogMapper;
+    protected UserLogMapper $userLogMapper;
 
     /**
      * @var CMSLogMapper;
      */
-    protected $cmsLogMapper;
+    protected CMSLogMapper $cmsLogMapper;
 
 
     /**
      * @var YearLevel\Mapper
      */
-    protected $yearLevelMapper;
+    protected YearLevel\Mapper $yearLevelMapper;
 
 
     /**
      * @var User\Token\Mapper
      */
-    private $tokenMapper;
+    private User\Token\Mapper $tokenMapper;
 
     /**
      * These identifier consts determine which dropdown to use when choosing the Service Identifier
@@ -364,6 +364,7 @@ class Controller extends Base
                     'order' => ['date' => 'desc'],
                     'limit' => 10
                 ]),
+                'tokens' => $this->tokenMapper->findByColumn('user_id', $user->getId()),
                 'cmsLog' => $this->cmsLogMapper->findByColumn('user', $user->getId(), [
                     'order' => ['time' => 'desc'],
                     'limit' => 10

@@ -82,6 +82,7 @@ class Controller extends Base
      *
      * @param Folder $folder
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws MapperException
      * @since 22.0
      * @api   POST /qrcode/:folderId/generate
      */
@@ -114,7 +115,7 @@ class Controller extends Base
             $selectedStudents = $this->userMapper->findByColumn('id', array_map('intval', $studentIds))->indexBy('id');
 
             // Ignoring expiry on the db for now, as we're using what is provided in the request for now
-            $tokens = $this->tokenMapper->findByColumn('user_id', $users->getPropertyValues('id'))
+            $tokens = $this->tokenMapper->findByColumnList(['user_id' => $users->getPropertyValues('id'), 'type' => Model::TYPE_QRCODE])
                                         ->indexByCallback(
                                             static function ($token) {
                                                 /** @var Model $token */
@@ -126,6 +127,7 @@ class Controller extends Base
             if (!$destination || $destination === self::DESTINATION_HOMEPAGE) {
                 $redirect = sprintf('/homepage/%d', $folder->getId());
             }
+            $expiry  = (new \Alaress_Date_Format())->addMonths((int)$expiryMonth);
             foreach ($selectedStudents as $student) {
                 // redirects
                 if ($redirect) {
@@ -135,18 +137,21 @@ class Controller extends Base
                 }
                 // tokens
                 if ($tokens->offsetExists($student->getId())) {
-                    // already generated
+                    // already generated, update expiry
+                    /** @var Model $token */
+                    $token = $tokens->offsetGet($student->getId());
+                    $token->setExpiry($expiry);
+                    $this->tokenMapper->save($token);
                     continue;
                 }
                 try {
-                    $newToken = $this->tokenMapper->generateForUser($student, $this->getUser());
+                    $newToken = $this->tokenMapper->generateForUser($student, $this->getUser(), $expiry, Model::TYPE_QRCODE);
                     $tokens->offsetSet($student->getId(), $newToken);
                 } catch (MapperException $e) {
                     // skip for now
                 }
             }
 
-            $expiry  = (new \Alaress_Date_Format())->addMonths((int)$expiryMonth);
             $urlBase = (new Factory($this->getConfigLoader()))
                 ->buildFullyQualified()
                 ->setPath($this->router->generate('api.initSessionFromQueryString'));
