@@ -64,7 +64,8 @@
 
         {% if hasHtmlEditor %}
         $.fn.alaressEditor({
-            targetElements: settingsForm.find('[data-html-editor]')
+            targetElements: settingsForm.find('[data-html-editor]'),
+            baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href
         });
         {% endif %}
 
