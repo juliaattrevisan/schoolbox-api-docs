@@ -1080,12 +1080,14 @@
                     {jwtIdToUse: 'new'})
                     .done(function (data) {
                         $('#userToken-text').val(data.token);
-                        let html = '<li class="actions-small-1" data-token><div class="list-item"><div class="card small-4">'
+                        let html = '<li class="actions-small-1" data-token><div class="list-item"><div class="card small-3">'
                                 + data.createdAt +
-                                '</div><div class="card small-4">'
+                                '</div><div class="card small-3">'
                                 + data.expiry +
-                                '</div><div class="card small-4">'
+                                '</div><div class="card small-3">'
                                 + data.createdBy +
+                                '</div><div class="card small-3">Not set'
+                                +
                                 '</div></div><nav><a href="#" data-delete-token="'
                                 + data.jwtId +
                                 '" class="icon-delete" title="Remove"></a></nav></li>';
