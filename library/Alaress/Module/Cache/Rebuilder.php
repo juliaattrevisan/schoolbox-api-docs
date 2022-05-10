@@ -20,6 +20,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Schoolbox\IConfigLoader;
 
 /**
  * Method for rebuilding the cache for the route table and module registrations.
@@ -31,6 +32,13 @@ class Rebuilder
      * implementations require this to build their modules.
      */
     private ContainerInterface $di;
+
+    /**
+     * Config loader: needs to be cleared before rebuilding cache, because
+     * config changes may trigger a rebuild, and those changes need to come
+     * through.
+     */
+    private IConfigLoader $config;
 
     /**
      * Route table: once built, modules add their routes here.
@@ -53,17 +61,20 @@ class Rebuilder
      * Constructor
      *
      * @param ContainerInterface   $di
+     * @param IConfigLoader        $config
      * @param Router               $router
      * @param ClientInterface      $redis
      * @param LoggerInterface|null $logger
      */
     public function __construct(
         ContainerInterface $di,
+        IConfigLoader $config,
         Router $router,
         ClientInterface $redis,
         ?LoggerInterface $logger
     ) {
         $this->di     = $di;
+        $this->config = $config;
         $this->router = $router;
         $this->redis  = $redis;
         $this->logger = $logger ?? new NullLogger();
@@ -93,8 +104,11 @@ class Rebuilder
 
         // Before this runs: clear the route table and module registrations,
         // so that they may be built afresh.
+        // Clear config too: it must be reloaded so that config changes are
+        // recognised on module load.
         $this->router->setRoutes(new RouteCollection(new RouteFactory()));
         Registry::setRegistrations([]);
+        $this->config->dropCache();
 
         $this->loadAllModules($siteSchoolCode);
 

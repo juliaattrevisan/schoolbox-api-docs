@@ -413,6 +413,7 @@ abstract class Kernel
                 ModuleCache\Rebuilder::class,
                 [
                     'di'     => $di,
+                    'config' => $di->lazyGet('config'),
                     'router' => $di->lazyGet('router'),
                     'redis'  => $di->lazyGet('redis.storage'),
                     'logger' => null,
