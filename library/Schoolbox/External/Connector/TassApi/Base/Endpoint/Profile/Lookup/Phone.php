@@ -92,7 +92,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'tkco'
+            'commtype' => $this->communicationTypes
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
