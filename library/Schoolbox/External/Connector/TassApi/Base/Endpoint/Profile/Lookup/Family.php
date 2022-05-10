@@ -118,7 +118,6 @@ class Family
      * @param string $spousePrefix
      * @param int    $addnumFather
      * @param int    $addnumMother
-     * @param string|null $communicationTypes
      * @param array  $phones
      */
     public function __construct(
@@ -126,7 +125,6 @@ class Family
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
-        ?string $communicationTypes,
         array $phones
     ) {
         $this->api = $api;
@@ -140,8 +138,6 @@ class Family
          */
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
-
-        $this->communicationTypes = $communicationTypes;
 
         /* Phone lookup; data from another endpoint
          */

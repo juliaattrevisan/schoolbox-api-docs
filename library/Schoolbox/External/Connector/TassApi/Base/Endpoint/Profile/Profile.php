@@ -310,7 +310,6 @@ class Profile implements IStrategy
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            $this->communicationTypes,
             (new Phone(
                 $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                 $this->fatherAddressDescription,
