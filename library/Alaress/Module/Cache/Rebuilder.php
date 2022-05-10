@@ -155,7 +155,7 @@ class Rebuilder
         // All modules have been registered: now build their routes
         foreach (Registry::getRegistrations() as $basename => $registration) {
             $this->logger->debug(sprintf('Loading routes from module: %s (%s)', $basename, $registration['class']));
-            Registry::buildModuleFromRegistration($this->di, $basename);
+            Registry::buildModuleFromRegistration($this->di, $basename, true);
         }
     }
 }

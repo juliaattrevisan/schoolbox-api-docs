@@ -95,17 +95,24 @@ class Registry
      * need to be reloaded as the preloads+permissions are set up in the same
      * process as setting up the module's routes.
      *
-     * @param ContainerInterface $di       The DI container all modules require.
-     * @param string             $basename The name of the registered module.
+     * @param ContainerInterface $di           The DI container all modules require.
+     * @param string             $basename     The name of the registered module.
+     * @param bool               $forceRebuild If true: ignore the cache of prebuilt modules, and reinstall all of the
+     *                                         routes for this module.
      * @return Module
      * @throws LogicException if no module with basename `$basename` has been
      *                        registered using `register()`
      */
-    public static function buildModuleFromRegistration(ContainerInterface $di, string $basename): Module
-    {
-        $builtModule = self::$moduleCache[$basename] ?? null;
-        if (isset($builtModule)) {
-            return $builtModule;
+    public static function buildModuleFromRegistration(
+        ContainerInterface $di,
+        string $basename,
+        bool $forceRebuild = false
+    ): Module {
+        if (!$forceRebuild) {
+            $builtModule = self::$moduleCache[$basename] ?? null;
+            if (isset($builtModule)) {
+                return $builtModule;
+            }
         }
         $registration = self::retrieveRegistration($basename);
         $class        = $registration['class'];

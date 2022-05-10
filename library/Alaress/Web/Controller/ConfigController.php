@@ -11,6 +11,7 @@ namespace Alaress\Web\Controller;
 
 use Alaress\Database\Predicate;
 use Alaress\Module\Cache\Rebuilder;
+use Closure;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\Config;
@@ -80,7 +81,10 @@ abstract class ConfigController extends Base
 
 
     /**
-     * Saves posted config to database
+     * Saves posted config to database.
+     *
+     * Also triggers a rebuild of routes if a setting which affects routes has
+     * changed.
      *
      * @param array             $post
      * @param Predicate\Builder $pb
@@ -93,6 +97,7 @@ abstract class ConfigController extends Base
         /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
 
+        $rebuildModules = false;
         foreach ($post as $name => $value) {
             if (!$existingConfigs->keyExists($name)) {
                 // Ignore posted config not for this module
@@ -105,8 +110,34 @@ abstract class ConfigController extends Base
             if ($newValue !== $existingConfig->getValue()) {
                 $existingConfig->setValue($newValue);
                 $this->configMapper->save($existingConfig);
+                $rebuildModules = $rebuildModules || in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES);
             }
         }
+
+        if ($rebuildModules) {
+            $this->response->content->set([
+                'format'     => 'noContent',
+                'postOutput' => [
+                    $this->buildRebuildModuleCacheCallback(),
+                ],
+            ]);
+        }
+    }
+
+
+    /**
+     * Create a callback for rebuilding the module cache, suitable for use as a
+     * `postOutput` callback.
+     *
+     * @return Closure
+     */
+    protected function buildRebuildModuleCacheCallback(): Closure
+    {
+        return Closure::fromCallable(
+            function () {
+                $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
+            }
+        );
     }
 
 

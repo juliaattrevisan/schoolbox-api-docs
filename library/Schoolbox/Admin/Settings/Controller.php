@@ -208,9 +208,7 @@ class Controller extends ConfigController
             $this->getResponse()->content->set([
                 'format'     => 'noContent',
                 'postOutput' => [
-                    function () {
-                        $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
-                    }
+                    $this->buildRebuildModuleCacheCallback(),
                 ],
             ]);
         }
