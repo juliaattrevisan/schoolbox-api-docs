@@ -2,29 +2,21 @@
 assessment
 #}
 <div class="row row__{{ page }}-details">
-    <div class="small-10 columns">
-        <h3 class="heading__tertiary">{{ assessment.title }}</h3>
+    <div class="feedback-assessment columns">
+        <p class="item-title">Assessment</p>
+        <h3 class="heading__tertiary">
+            {{ assessment.title }}
+        </h3>
     </div>
-    <div class="small-2 columns">
-        {% if feedback %}
 
-            {% set grade = feedback.humanReadableMark %}
-            {% if showGrades and grade %}
-                <h3 class="heading__tertiary text-right">{{ grade }}</h3>
-            {% endif %}
-        {% endif %}
-
-        {# Was this really how we did it?
-         # I could have sworn there was a real way to determine an assessment's class
-         # rather than this random loose comparison
+    {# If there's no feedback, don't render anything else about
+     # rubrics, comments and grades - nothing to show
+     #}
+    {% if feedback %}
+        {# If this feedback has a rubric grid, show that
+         # Then show the comment below it
          #}
-        {% if assessment.familyName == 'project' %}
-            {% set participant = assessment.allParticipants[student.id] %}
-            <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
-        {%endif%}
-    </div>
-    <div class="small-12 columns">
-        {% if showRubrics and feedback and feedback.rubricMarkedGrid %}
+        {% if showRubrics and feedback.rubricMarkedGrid %}
             <div class="rubric-wrap">
                 {% include '@rubric/grid.twig' with {
                     rubricGrid:       feedback.rubricMarkedGrid.grid,
@@ -32,15 +24,68 @@ assessment
                     learner: student,
                     showDescriptorValue: true,
                     showGroupTotal: true,
-                    showRubricTotal: true,
+                    showRubricTotal: false,
                     selfAssessmentFeedback: null
                 } only %}
             </div>
-        {% endif %}
-        {% if showComments and feedback and feedback.comment %}
-            <div class="small-12 columns">
-                <p>{{ feedback.comment | linkify | nl2br }}</p>
+
+            {# Only show comment if it exists
+             # Otherwise, just occupy space
+             # Foundation-related behaviour requires a character to do that
+             #}
+            {% if showComments %}
+                <div class="feedback-rubric-comment columns">
+                    <p class="item-title">Comment</p>
+                    {% if feedback.comment %}
+                        <p>{{ feedback.comment | linkify | nl2br }}</p>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Show the grade column if allowed
+             # and if there's a meaningful value
+             #}
+            {% set grade = feedback.humanReadableMark %}
+            {% if showGrades and grade %}
+                <div class="feedback-grade columns">
+                    <p class="item-title text-right">Result</p>
+                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                </div>
+            {% endif %}
+        {% else %}
+            {# Only show comment if it exists
+             # Otherwise, just occupy space
+             # Foundation-related behaviour requires a character to do that
+             #}
+            {% if showComments %}
+                <div class="feedback-comment columns">
+                    {% if feedback.comment %}
+                        <p class="item-title">Comment</p>
+                        <p>{{ feedback.comment | linkify | nl2br }}</p>
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="feedback-grade columns">
+                {% set grade = feedback.humanReadableMark %}
+                {% if showGrades and grade %}
+                    <p class="item-title text-right">Result</p>
+                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                {% endif %}
+
+                {# Was this really how we did it?
+                 # I could have sworn there was a real way to determine an assessment's class
+                 # rather than this random loose comparison
+                 #}
+                {% if assessment.familyName == 'project' %}
+                    {% set participant = assessment.allParticipants[student.id] %}
+                    <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
+                {% endif %}
             </div>
         {% endif %}
-    </div>
+    {% endif %}
 </div>
