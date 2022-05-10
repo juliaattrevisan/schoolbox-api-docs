@@ -40,8 +40,8 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $name;
 
-    /** @var Venue $venue */
-    protected $venue;
+    /** @var Venue|null $venue */
+    protected ?Venue $venue = null;
 
     /** @var Team $homeTeam */
     protected $homeTeam;
@@ -362,7 +362,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Venue
+     * @return Venue|null
      */
     public function getVenue()
     {
@@ -370,10 +370,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Venue $venue
-     * @return static
+     * @param Venue|null $venue
+     * @return $this
      */
-    public function setVenue($venue)
+    public function setVenue(?Venue $venue): self
     {
         $this->venue = $venue;
         return $this;

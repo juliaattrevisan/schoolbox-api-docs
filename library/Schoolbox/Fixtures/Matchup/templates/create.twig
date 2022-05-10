@@ -17,9 +17,6 @@
                 seasonId: {
                     required: true
                 },
-                venueId: {
-                    required: true,
-                },
                 homeTeamId: {
                     required: true,
                 },
@@ -28,7 +25,6 @@
                 }
             },
             messages: {
-                'venueId': 'Please choose a venue.',
                 'name': 'Please enter a match name.',
                 'seasonId': 'Please choose a season',
                 'startAtDate': {
@@ -235,8 +231,8 @@
                     </div>
 
                     <div class="small-12 columns">
-                        <label for="venue" class="required">Venue</label>
-                        <input id="venue" name="venueId" type="text" value='' placeholder="Search Venues" required />
+                        <label for="venue">Venue</label>
+                        <input id="venue" name="venueId" type="text" value='' placeholder="Search Venues" />
                     </div>
                 </fieldset>
 
