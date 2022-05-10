@@ -54,6 +54,7 @@ class Phone
     /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
+     *
      * @var string|null
      */
     private ?string $communicationTypes;
@@ -91,7 +92,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => $this->communicationTypes ?: 'tkco'
+            'commtype' => 'tkco'
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
