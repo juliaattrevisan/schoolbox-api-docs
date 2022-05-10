@@ -44,6 +44,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->injector->get('moduleCache.rebuilder'),
             new Quoter(),
         );
     }

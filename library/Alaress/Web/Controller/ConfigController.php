@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Web\Controller;
 
 use Alaress\Database\Predicate;
+use Alaress\Module\Cache\Rebuilder;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\Config;
@@ -28,16 +29,27 @@ abstract class ConfigController extends Base
     /** @var FieldStrategyFactory */
     private $fieldStrategyFactory;
 
+    /**
+     * Module/route cache rebuilder: required as changing config settings may
+     * change the modules and routes available.
+     */
+    protected Rebuilder $rebuilder;
 
     /**
-     * @param ConfigMapper                             $configMapper
-     * @param FieldStrategyFactory                     $fieldStrategyFactory
-
+     * Constructor
+     *
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
      */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory)
-    {
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder
+    ) {
         $this->configMapper         = $configMapper;
         $this->fieldStrategyFactory = $fieldStrategyFactory;
+        $this->rebuilder            = $rebuilder;
     }
 
     /**
