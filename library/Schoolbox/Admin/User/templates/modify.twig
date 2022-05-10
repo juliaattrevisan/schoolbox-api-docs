@@ -588,23 +588,27 @@
                         <ul class="action-list" data-token-list>
                             <li class="actions-small-1 row-header">
                                 <div class="list-item">
-                                    <div class="small-4 columns">Created</div>
-                                    <div class="small-4 columns">Expires</div>
-                                    <div class="small-4 columns">Created by</div>
+                                    <div class="small-3 columns">Created</div>
+                                    <div class="small-3 columns">Expires</div>
+                                    <div class="small-3 columns">Created by</div>
+                                    <div class="small-3 columns">Type</div>
                                 </div>
                             </li>
 
                             {% for token in tokens %}
                                 <li class="actions-small-1" data-token>
                                     <div class="list-item">
-                                        <div class="card small-4">
+                                        <div class="card small-3">
                                             {{ token.createdAt.short }}
                                         </div>
-                                        <div class="card small-4">
+                                        <div class="card small-3">
                                             {{ token.expiry.short }}
                                         </div>
-                                        <div class="card small-4">
+                                        <div class="card small-3">
                                             {{ token.createdBy.fullName }}
+                                        </div>
+                                        <div class="card small-3">
+                                            {{ token.type ?? 'Not set'}}
                                         </div>
                                     </div>
                                     <nav>
