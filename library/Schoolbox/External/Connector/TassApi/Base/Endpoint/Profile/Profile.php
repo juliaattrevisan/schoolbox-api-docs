@@ -136,9 +136,28 @@ class Profile implements IStrategy
     /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
-     * @var string|null
+     *
+     * Communication Rules ("commrules") decide who can actually be a parent of a student. In TASS
+     * there's about a dozen tickboxes which can be turned on or off, for a given parent. Some schools
+     * use TKCO tickbox to decide who can be a parent; other schools use another tickbox. This is
+     * configurable in admin under "TASS Communication Rules Type Code Filter."
+     *
+     * The tass api getParents endpoint gives you a list of people who are allegedly parents of students.
+     * However, this list does not care about commrules. The getCommunicationRulesDetails endpoint
+     * tells you, though - so to decide who is meant to come out of suds as a parent of a student,
+     * you need to:
+     *
+     * a) get the list of potential parents from getParents endpoint
+     * b) get the list of commrules for those potential parents, from the getCommunicationRulesDetails endpoint
+     * c) if a parent has a commrule found in (b), then they can be a parent as listed in (a)
+     *    otherwise, they should be unlisted from (a)
+     *
+     * $communicationTypes uses "tkco" as a default, if empty in admin
+     * Otherwise, use the csv string provided there
+     *
+     * @var string
      */
-    private ?string $communicationTypes;
+    private string $communicationTypes;
 
 
     /**
@@ -193,7 +212,7 @@ class Profile implements IStrategy
      * @param int                             $addnumMother
      * @param string                          $fatherAddressDescription
      * @param string                          $motherAddressDescription
-     * @param string|null                     $communicationTypes
+     * @param string                          $communicationTypes
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -211,7 +230,7 @@ class Profile implements IStrategy
         int $addnumMother,
         string $fatherAddressDescription,
         string $motherAddressDescription,
-        ?string $communicationTypes,
+        string $communicationTypes,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
