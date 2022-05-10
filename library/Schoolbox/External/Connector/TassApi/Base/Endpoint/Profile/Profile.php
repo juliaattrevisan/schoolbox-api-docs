@@ -284,12 +284,12 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//        $this->log->info('Downloading staff data (this might take a while)');
-//
-//        $this->importStaff();
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+        $this->log->info('Downloading staff data (this might take a while)');
+
+        $this->importStaff();
     }
 
 
