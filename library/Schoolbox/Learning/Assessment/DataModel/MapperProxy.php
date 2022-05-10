@@ -442,8 +442,6 @@ class MapperProxy
                 JOIN participant_plan pp ON pp.assessment_id = a.assessment_id AND pp.deleted_at IS NULL
                 JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
                 JOIN assess_attempt aa ON a.assess_id = aa.assess_id AND pc.user_id = aa.user_id AND aa.deleted_at IS NULL
-                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id AND ar.deleted_at IS NULL
-                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id AND aq.deleted_at IS NULL
             WHERE
                 a.availability = 'assess'
                 AND a.assessment_id IN ({$assessmentIdBindings2['placeholders']})

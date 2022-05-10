@@ -280,7 +280,6 @@ class Mapper extends BaseMapper
             FROM assess_attempt aa
             JOIN assess q ON q.assess_id = aa.assess_id
             LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-            LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
             WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
             AND ar.deleted_at IS NULL
             GROUP BY aa.assess_id, aa.attempt_id
