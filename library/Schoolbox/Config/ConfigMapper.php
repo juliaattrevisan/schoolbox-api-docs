@@ -180,6 +180,8 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
 
+    public const NAME_REPORT_TITLE = 'report_title';
+
     public const NAME_TASKD_REDIS_URL = 'taskd_redis_url';
     public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
 

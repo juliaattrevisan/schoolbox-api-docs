@@ -236,7 +236,7 @@ class Controller extends ConfigController
                 [
                     'token'     => $this->tokenBuilder->generate($this->getUser()),
                     'content'   => $reports,
-                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-report-export.zip',
+                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-' . preg_replace('/[^a-zA-Z0-9\-\_]/', '_', trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE))) . '.zip',
                     'gotenberg' => [
                         'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
@@ -246,7 +246,7 @@ class Controller extends ConfigController
                         ->setQuery(null)
                         ->toString(),
                 [
-                    'message' => 'Your summative report export is ready to download',
+                    'message' => sprintf('Your summative report %s is ready to download', $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ],
