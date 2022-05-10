@@ -204,9 +204,8 @@ function upgrade_instances(){
 }
 
 function restart_php_fpm(){
-  # TODO shouldn't this reload php8-fpm?
-  log "Reloading php7.4-fpm ..."
-  service php7.4-fpm reload         # Ensure web requests use upgraded code
+  log "Reloading php-fpm ..."
+  service "$(systemctl -a  --plain | grep -Eo 'php.+fpm')" reload         # Ensure web requests use upgraded code
 }
 
 function remove_maintenance_page(){
