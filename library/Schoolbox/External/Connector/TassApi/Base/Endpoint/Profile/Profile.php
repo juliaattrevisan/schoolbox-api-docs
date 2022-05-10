@@ -534,10 +534,6 @@ class Profile implements IStrategy
             /* Time for importing parents
              */
             $this->importParentsOfStudent($studentBaseProfile, $families);
-
-            /* FIXME glitch suds
-             */
-            return;
         }
 
         /* Show some basic diagnostics
