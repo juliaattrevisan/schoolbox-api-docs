@@ -394,6 +394,10 @@ class Family
             $family[$node]['first_name']
         ]);
 
+        /* If the Phones lookup contains data for this user code,
+         * then they have one of the commsrules that determines suds parentage
+         * and should be associated with the student
+         */
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
@@ -454,7 +458,11 @@ class Family
             $family[$node]['first_name']
         ]);
 
-        $defaultPerson = [
+        /* If the Phones lookup contains data for this user code,
+         * then they have one of the commsrules that determines suds parentage
+         * and should be associated with the student
+         */
+        $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
@@ -464,12 +472,6 @@ class Family
             'relationship' => $family[$node]['description'],
             'validCommRule' => false
         ];
-
-        /* If the phones lookup contains data for this user code,
-         * then they have one of the commsrules that determines suds parentage
-         * and should be associated with the student
-         */
-        $person = $this->phones[$family['user_code']][$node] ?? $defaultPerson;
 
         /* Assign an externalId to this person
          */
