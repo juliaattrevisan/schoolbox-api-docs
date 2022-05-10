@@ -19,26 +19,34 @@ class Calendar_Api_Config_Connector_EOTC extends Calendar_Api_Config_Connector_A
      */
     protected string $connectorClass = 'EOTC';
 
-    /**
-     * @var RosettaStone
-     */
-    private $stone;
 
     /**
-     * Calendar_Api_Config_Connector_EOTC constructor.
+     * @var RosettaStone|null
      */
-    public function __construct()
-    {
-        // TODO inject RosettaStone
-        $stoneFactory = new RosettaStoneFactory();
-        $this->stone  = $stoneFactory->build(Schoolbox\L10n\Mapper::getInstance());
-    }
+    private ?RosettaStone $stone = null;
+
+
+    /**
+     * @var RosettaStoneFactory|null
+     */
+    private ?RosettaStoneFactory $stoneFactory = null;
+
 
     /**
      * {@inheritdoc}
      */
     public function getDefaultLabel(): string
     {
+        /* Only spawn stones and stoneFactory once
+         */
+        if (!$this->stoneFactory) {
+            $this->stoneFactory = new RosettaStoneFactory();
+        }
+
+        if (!$this->stone) {
+            $this->stone = $this->stoneFactory->build(Schoolbox\L10n\Mapper::getInstance());
+        }
+
         return $this->stone->translate('eotc', false, true);
     }
 
