@@ -739,6 +739,21 @@ class Profile implements IStrategy
                 $relationship = trim((string)$parent['relationship']);
                 $title = '';
 
+                /* $parent is an array that contains a boolean key, validCommRule
+                 * This bool decides whether $parent should be associated with the student
+                 * in schoolbox; if not, log it here and skip them
+                 */
+                if ($parent['validCommRule']) {
+                    $this->log->debug(sprintf(
+                        'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
+
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
                  *
