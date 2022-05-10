@@ -553,8 +553,9 @@ class Mapper extends BaseMapper
     /**
      * update the quiz response score
      * no save call, or return, just DB direct query
+     * @param int|Model $attempt
      */
-    public function updateMarks(int|Model $attempt)
+    public function updateMarks($attempt)
     {
         /**
          * collate all marks and total possible marks, and update this field.
