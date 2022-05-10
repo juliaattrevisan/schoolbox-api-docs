@@ -86,14 +86,6 @@ class Family
 
 
     /**
-     * TASS communication rules type codes (in comma separated format) for all guardian relationships
-     * that can be associated with students
-     * @var string|null
-     */
-    private ?string $communicationTypes;
-
-
-    /**
      * An array of phone numbers indexed by family code
      *
      * @var array
