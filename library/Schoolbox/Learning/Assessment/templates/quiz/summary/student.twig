@@ -145,7 +145,7 @@
                         <td>
                             {% if finished %}
                                 {% set totalMark       = attempt.maxMark %}
-                                {% set totalMarkGraded = attempt.maxMark %}
+                                {% set totalMarkGraded = attempt.totalMarkGraded %}
                                 {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
                                 {% if totalMarkGraded < totalMark %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
