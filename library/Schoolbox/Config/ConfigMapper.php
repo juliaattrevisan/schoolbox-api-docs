@@ -195,6 +195,51 @@ class ConfigMapper extends Mapper
     public const NAME_SCHOOLDATA_IMPORT_DATA_SOURCE = 'schooldata_import_data_source';
 
     /**
+     * Config settings which may affect the behaviour of the router daemon.
+     *
+     * If any of these settings change: send a reload message to the router
+     * daemon.
+     */
+    public const SETTINGS_AFFECTING_ROUTED = [
+        'messaging_enabled',
+        'mail_replyto_enabled',
+        'feedback_url',
+        'feedback_text',
+    ];
+
+    /**
+     * Config settings which may affect the behaviour of the schedule daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the schedule daemon.
+     */
+    public const SETTINGS_AFFECTING_SCHEDULED = [
+        'restrict_parent_duework_access',
+        'restrict_student_submissions',
+        'restrict_parent_grades',
+    ];
+
+    /**
+     * Config settings which affect the modules and routes available to this
+     * instance.
+     *
+     * If any of these settings change: rebuild the route and module tables.
+     */
+    public const SETTINGS_AFFECTING_MODULES = [
+        ConfigMapper::NAME_LMS_ENABLED,
+        ConfigMapper::NAME_PASTORAL_ENABLED,
+        ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+        ConfigMapper::NAME_BADGES_ENABLED,
+        ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED,
+        ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED,
+        ConfigMapper::NAME_FIXTURES_ENABLED,
+        ConfigMapper::NAME_TOURS_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_TYPE,
+        ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+    ];
+
+    /**
      * @throws \InvalidArgumentException
      */
     protected function mapping(): void
