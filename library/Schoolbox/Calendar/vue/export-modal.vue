@@ -70,7 +70,7 @@ export default {
             this.$refs.modal.open();
         },
 
-        test() {
+        checkDropdownRequirement() {
             let values = Object.assign({}, this.form);
 
             /* Check that the corresponding dropdown has a meaningful value
@@ -180,7 +180,7 @@ export default {
 
             <ul class="flex-list buttons">
                 <li><button @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
-                <li><input type="submit" value="Download CSV" @click.prevent="test"/></li>
+                <li><input type="submit" value="Download CSV" @click.prevent="checkDropdownRequirement"/></li>
             </ul>
         </form>
 
