@@ -207,6 +207,8 @@
 
         // inject the placeholder entity
         this.injectPlaceholders();
+
+        masonry.refreshPalette();
     }
 
 

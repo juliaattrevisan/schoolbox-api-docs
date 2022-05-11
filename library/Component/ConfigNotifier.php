@@ -39,7 +39,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param TriggerBundleInterface $bundle
      * @return void
      */
-    public function bundleTriggers($bundle)
+    public function bundleTriggers($bundle): void
     {
         $method = $bundle->getEvent()->getAction();
 
@@ -97,6 +97,12 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
     public function notifySystemUpdated(Component_Config $model, User $effector = null, array $diff = [])
     {
         if (!$this->definitionIsSource($model)) {
+            return;
+        }
+
+        /* Exit early if nothing changed here
+         */
+        if (!\count($diff)) {
             return;
         }
 
