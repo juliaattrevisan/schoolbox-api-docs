@@ -31,6 +31,7 @@
                {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][name]"{% endif %}
                {% if showNames %}id="i{{ criterion.id }}"{% endif %}
                {% if readonly %}readonly{% endif %}
+                maxlength="900"
         />{{ new ? '' : criterion.name }}</textarea>
 
         {# Input for criterion curriculum codes #}

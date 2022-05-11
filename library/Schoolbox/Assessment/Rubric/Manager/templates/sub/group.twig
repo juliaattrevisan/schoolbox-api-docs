@@ -25,6 +25,7 @@
                data-template="rubric-group-name"
                {% if group %}name="crits[{{ group.id }}][name]"{% endif %}
                {% if readonly > 0 %}readonly{% endif %}
+               maxlength="900"
         />{{ group.name ?? '' }}</textarea>
 
         {# Input for group curriculum codes #}
