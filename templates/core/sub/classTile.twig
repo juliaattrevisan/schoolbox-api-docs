@@ -44,6 +44,7 @@
                 {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}" class="icon-achievement">Badge Report</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
                 {% set routes = {} %}
+                {% set intellischoolRoute = routeLookupIfAuthorized('intellischool.getClassAnalytics', {folderId: class.id}) %}
                 {% if courses | length %}
                     {% for courseSpecId, courseSpecTitle in courses %}
                         {# get the route for analytics #}
@@ -54,12 +55,17 @@
                         {% endif %}
                     {% endfor %}
                 {% endif %}
-                {% if routes  %}
+                {% if routes or intellischoolRoute %}
                     <li class="separator">Analytics</li>
                     {% for route in routes %}
                         <li><a href="{{ route.url }}" class="icon-poll">{{ route.title }}</a></li>
                     {% endfor %}
+                    {% if intellischoolRoute %}
+                        <li><a href="{{ intellischoolRoute }}" class="icon-intellischool">Albitros Analytics</a></li>
+                    {% endif %}
                 {% endif %}
+
+
 
             </ul>
         {% endif %}

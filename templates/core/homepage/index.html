@@ -20,7 +20,7 @@
     }
 </style>
 <script type="text/javascript">
-    var colours = {}; //the PhpLib below adds original, pickers, and default objects to colours, each with the colour variables below 
+    var colours = {}; //the PhpLib below adds original, pickers, and default objects to colours, each with the colour variables below
     // <!-- BEGIN colour_list -->
     // Colourset for {COLOUR_ARRAY} colours
     colours['{COLOUR_ARRAY}'] = {
@@ -192,17 +192,26 @@
                     </li>
                     <!-- END award_list_link -->
 
-                    <!-- BEGIN class_analytics_link -->
-                    <li>
-                        <a href="{CLASS_ANALYTICS_LINK}" class="icon-intellischool">Class Analytics</a>
-                    </li>
-                    <!-- END class_analytics_link -->
-
                     <!-- BEGIN qrcode_link -->
                     <li>
                         <a href="{QRCODE_LINK}" class="icon-tiles">Generate Login Codes</a>
                     </li>
                     <!-- END qrcode_link -->
+
+                    <!-- BEGIN analytics_section -->
+                    <li class="separator">Analytics</li>
+                    <!-- BEGIN schoolbox_analytics_link -->
+                    <li>
+                        <a href="{SCHOOLBOX_ANALYTICS_LINK}" class="icon-poll">{SCHOOLBOX_ANALYTICS_LINK_TITLE}</a>
+                    </li>
+                    <!-- END schoolbox_analytics_link -->
+
+                    <!-- BEGIN class_analytics_link -->
+                    <li>
+                        <a href="{CLASS_ANALYTICS_LINK}" class="icon-intellischool">Albitros Analytics</a>
+                    </li>
+                    <!-- END class_analytics_link -->
+                    <!-- END analytics_section -->
                 </ul>
             </div>
             <!-- END manage_class -->

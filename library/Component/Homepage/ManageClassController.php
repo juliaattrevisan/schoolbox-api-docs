@@ -108,7 +108,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
-        $this->setBlock($templateHandle, 'class_analytics_link', 'class_analytics_link_block');
+        $this->setBlock($templateHandle, 'analytics_section', 'analytics_section_block');
+        $this->setBlock('analytics_section', 'class_analytics_link', 'class_analytics_link_block');
+        $this->setBlock('analytics_section', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
@@ -300,6 +302,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('course_link_block', '');
         }
 
+        //analytics space
+        $this->setVar('analytics_section_block', '');
+        $hasAnalytics = false;
         // Class analytics link
         $this->setVar('class_analytics_link_block', '');
         if ($isClassPage) {
@@ -309,11 +314,42 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 'folderId' => $this->getContext()->getId(),
             ];
             if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
+                $hasAnalytics = true;
                 $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
                 $this->parse('class_analytics_link_block', 'class_analytics_link');
             }
         }
 
+        //schoolbox analytics
+        $this->setVar('schoolbox_analytics_link_block', '');
+        /**
+         * grab magic code to grab course IDs this is part of
+         */
+        $classListFactory = new Folder\ClassListFactory($this->getSitePage()->getDi()->get('databaseInternal'));
+        $courses = $classListFactory->findFoldersWithDueImportedAssessments(
+            [$this->getContext()->getId()],
+            $currentTerm->getStart(),
+            $currentTerm->getActualFinish()
+        );
+        if (0 !== count($courses[$this->getContext()->getId()])) {
+            $hasAnalytics = true;
+            $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
+            foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
+                $params             = [
+                    'courseSpecId'   => $courseid,
+                    'folderId' => $this->getContext()->getId(),
+                    'termCode' => $currentTerm->getCode(),
+                ];
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
+                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK', $this->getRouter()->generate($schoolboxAnalytics, $params));
+                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
+                    $this->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+                }
+            }
+        }
+        if ($hasAnalytics) {
+            $this->parse('analytics_section_block', 'analytics_section');
+        }
         return $hasClassActions;
     }
 
