@@ -20,7 +20,9 @@ class Helper
     protected ?array $folderCodes = null;
 
     /**
-     *
+     * YearLevel Mapper is being used to get the collection of year levels,
+     * and provide the database interface for building specific queries
+     * @param YearLevelMapper $mapper
      */
     public function __construct(YearLevelMapper $mapper)
     {
@@ -31,7 +33,7 @@ class Helper
      * @param string $assessmentId
      * @return array
      */
-    public function getAssessment(string $assessmentId)
+    public function getAssessment(string $assessmentId): array
     {
         return $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0);
     }
@@ -138,7 +140,10 @@ class Helper
     }
 
     /**
-     *
+     * returns the count of all assessments that match the filtered search
+     * This is not limited by the `limit` or `cursor` parameters
+     * @param array $filter
+     * @return int
      */
     public function searchForAssessmentsCount(array $filter): int
     {
@@ -317,7 +322,7 @@ WHERE
     /**
      * get nice yearlevel objects
      */
-    public function getYearlevel(int $yearLevelId)
+    public function getYearlevel(int $yearLevelId): YearLevelModel
     {
         if (null === $this->yearLevels) {
             $this->yearLevels = $this->mapper->findAll()->indexBy('id');
@@ -327,8 +332,11 @@ WHERE
 
     /**
      * get nice folderCode objects
+     * if the folder has no code, it will return null
+     * if the folder has a single code, it will return a string of the code
+     * if a folder has multiple codes, it will create an array with each code contained
      */
-    public function getFolderCode(int $folderId)
+    public function getFolderCode(int $folderId): ?array
     {
         if (null === $this->folderCodes) {
             $statement = $this->mapper->getDatabase()->prepare("
