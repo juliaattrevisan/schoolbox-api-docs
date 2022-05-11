@@ -108,21 +108,21 @@ class Report_Staff extends Report_Abstract
             foreach ($allStaff as $currentStaff) {
                 $this->getPage()->setVar(
                     array(
-                        'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
-                        'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode']),
-                        'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']),
-                        'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
-                        'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
+                        'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID'] ?? ''),
+                        'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode'] ?? ''),
+                        'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle'] ?? ''),
+                        'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName'] ?? ''),
+                        'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname'] ?? ''),
                         'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
                         'STAFF_ROLE_ALTERNATE' => Scrub::text(implode(', ', $currentStaff['JobPositionDescriptionAlternate'])),
-                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartment']),
-                        'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
-                        'STAFF_CATEGORY'   => Scrub::text($currentStaff['StaffCategoryType']),
-                        'STAFF_EXTENSION'  => Scrub::text($currentStaff['StaffExtension']),
-                        'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone']),
-                        'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail']),
-                        'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone']),
-                        'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail']),
+                        'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartment'] ?? ''),
+                        'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription'] ?? ''),
+                        'STAFF_CATEGORY'   => Scrub::text($currentStaff['StaffCategoryType'] ?? ''),
+                        'STAFF_EXTENSION'  => Scrub::text($currentStaff['StaffExtension'] ?? ''),
+                        'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone'] ?? ''),
+                        'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail'] ?? ''),
+                        'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone'] ?? ''),
+                        'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail'] ?? ''),
                     )
                 );
                 $this->getPage()->parse('staff_block', 'staff', true);
