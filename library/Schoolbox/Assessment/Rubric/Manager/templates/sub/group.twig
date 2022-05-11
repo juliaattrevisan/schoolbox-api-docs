@@ -8,6 +8,9 @@
 {% set readonly  = not allowModifyUsed and group is not null and group.usage|length > 0 %}
 {% set new       = group is null %}
 {% set groupId   = new ? 0 : group.id %}
+{% set maxCapabilityLength = 900 %}
+{# maxCapabilityLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
+so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
 <li class="actions-small-0">
     <div class="list-item">
         {# Hidden input for group ID #}
@@ -25,7 +28,7 @@
                data-template="rubric-group-name"
                {% if group %}name="crits[{{ group.id }}][name]"{% endif %}
                {% if readonly > 0 %}readonly{% endif %}
-               maxlength="900"
+               maxlength="{{ maxCapabilityLength }}"
         />{{ group.name ?? '' }}</textarea>
 
         {# Input for group curriculum codes #}
