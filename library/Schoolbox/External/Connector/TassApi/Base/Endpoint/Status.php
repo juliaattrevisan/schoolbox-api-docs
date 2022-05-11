@@ -56,17 +56,26 @@ class Status implements IStatus
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \JsonException
      */
     public function isReachable(): bool
     {
+        /* Try accessing an intentionally broken place
+         */
+        $flag = 'Invalid request';
+
         try {
             (new Api($this->host, $this->key, Codec\DSN::MODULE_LMS_INTEGRATION))->retrieveDocument('getStudents', [
-                'currentstatus' => 'current'
+                'test' => true
             ]);
-
-            return true;
         } catch (RuntimeException $e) {
-            // noop - something died
+            /* We only need to know that the server is alive; even if we
+             * get an error message in response, it tells us the server is here
+             * and waiting to accept actual calls with valid data
+             */
+            if (strpos($e->getMessage(), $flag) !== false) {
+                return true;
+            }
         }
 
         return false;
