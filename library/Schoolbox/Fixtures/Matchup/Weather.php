@@ -107,12 +107,21 @@ class Weather
         if ($matchDayDiff >= 0) {
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
+             * Don't bother if the match hasn't got a venue
+             * Dont' bother if the venue hasn't got any lat/long coords
+             *     (imported from clipboard, since their venues don't have lat/long coords)
              */
-            if ($matchDayDiff < $this->forecastLength) {
+            if ($matchDayDiff < $this->forecastLength &&
+                null !== $matchup->getVenue() &&
+                '' !== trim((string)$matchup->getVenue()->getLatitude()) &&
+                '' !== trim((string)$matchup->getVenue()->getLongitude())
+            ) {
                 $forecast = $this->api->getForecastByDate($matchDay, $matchup->getVenue()->getLatitude(), $matchup->getVenue()->getLongitude());
+
                 if (!empty($forecast)) {
                     $this->hasResults = true;
                 }
+
                 return $forecast;
             }
         }
