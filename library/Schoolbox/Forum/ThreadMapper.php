@@ -403,7 +403,6 @@ WHERE
     public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
-        $post_mapper = $this->getJoinMapper('post');
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             $thread = $this->hydrate($row)
