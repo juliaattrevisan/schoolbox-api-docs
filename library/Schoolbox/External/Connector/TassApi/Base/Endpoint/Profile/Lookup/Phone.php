@@ -54,9 +54,10 @@ class Phone
     /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
-     * @var string|null
+     *
+     * @var string
      */
-    private ?string $communicationTypes;
+    private string $communicationTypes;
 
 
     /**
@@ -67,9 +68,9 @@ class Phone
      * @param IApi   $api
      * @param string $fatherAddressDescription
      * @param string $motherAddressDescription
-     * @param string|null $communicationTypes
+     * @param string $communicationTypes
      */
-    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, ?string $communicationTypes)
+    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription, string $communicationTypes)
     {
         $this->api = $api;
         $this->fatherAddressDescription = $fatherAddressDescription;
@@ -91,7 +92,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => $this->communicationTypes ?: 'tkco'
+            'commtype' => $this->communicationTypes
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
@@ -198,6 +199,7 @@ class Phone
                         'work' => '',
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipM,
+                        'validCommRule' => true
                     ];
                 } elseif ($address['address_description'] === $this->fatherAddressDescription) {
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
@@ -211,6 +213,7 @@ class Phone
                         'work' => '',
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipF,
+                        'validCommRule' => true
                     ];
                 } else {
                     /* Nukular family: fields are distributed among the guys in the fam
@@ -226,6 +229,7 @@ class Phone
                         'work' => '',
                         'email' => $email1,
                         'relationship' => $relationshipM,
+                        'validCommRule' => true
                     ];
 
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
@@ -239,6 +243,7 @@ class Phone
                         'work' => '',
                         'email' => $email2,
                         'relationship' => $relationshipF,
+                        'validCommRule' => true
                     ];
                 }
             }

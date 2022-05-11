@@ -212,9 +212,7 @@ class Factory implements IFactory
                     (int)Loader::getInstance()->get('external_tass_addnum_mother'),
                     (string)Loader::getInstance()->get('external_tass_address_description_father'),
                     (string)Loader::getInstance()->get('external_tass_address_description_mother'),
-                    (string)Loader::getInstance()->get('external_tass_commrules_typecode') === ''
-                        ? null
-                        : (string)Loader::getInstance()->get('external_tass_commrules_typecode'),
+                    trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),

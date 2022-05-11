@@ -86,14 +86,6 @@ class Family
 
 
     /**
-     * TASS communication rules type codes (in comma separated format) for all guardian relationships
-     * that can be associated with students
-     * @var string|null
-     */
-    private ?string $communicationTypes;
-
-
-    /**
      * An array of phone numbers indexed by family code
      *
      * @var array
@@ -118,7 +110,6 @@ class Family
      * @param string $spousePrefix
      * @param int    $addnumFather
      * @param int    $addnumMother
-     * @param string|null $communicationTypes
      * @param array  $phones
      */
     public function __construct(
@@ -126,7 +117,6 @@ class Family
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
-        ?string $communicationTypes,
         array $phones
     ) {
         $this->api = $api;
@@ -140,8 +130,6 @@ class Family
          */
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
-
-        $this->communicationTypes = $communicationTypes;
 
         /* Phone lookup; data from another endpoint
          */
@@ -278,6 +266,10 @@ class Family
 
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
+                /* Everyone coming out of getParents() is a physical parent, known to tass.
+                 * The communication rules decide whether this physical parent should be
+                 * associated with the student in suds; use validCommRule boolean to decide
+                 */
                 if (isset($family['students'])) {
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
@@ -390,11 +382,10 @@ class Family
             $family[$node]['first_name']
         ]);
 
-        // if communication types are explicitly specified, do not populate parent who is not in $this->phones
-        if ($this->communicationTypes && !isset($this->phones[$family['user_code']][$node])) {
-            return [];
-        }
-
+        /* If the Phones lookup contains data for this user code,
+         * then they have one of the commsrules that determines suds parentage
+         * and should be associated with the student
+         */
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
@@ -403,6 +394,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'validCommRule' => false
         ];
 
         /* Find the first non-empty email address from the two possibilities
@@ -454,13 +446,10 @@ class Family
             $family[$node]['first_name']
         ]);
 
-        // if communication types are explicitly specified, do not populate parent who is not in $this->phones
-        // this is the case for when, there is two past students where the parent does have TKCO ticked,
-        // but the current student does not.
-        if ($this->communicationTypes && !isset($this->phones[$family['user_code']][$node])) {
-            return [];
-        }
-
+        /* If the Phones lookup contains data for this user code,
+         * then they have one of the commsrules that determines suds parentage
+         * and should be associated with the student
+         */
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
             'surname' => $family[$node]['surname'],
@@ -469,6 +458,7 @@ class Family
             'work' => '',
             'email' => '',
             'relationship' => $family[$node]['description'],
+            'validCommRule' => false
         ];
 
         /* Assign an externalId to this person

@@ -71,6 +71,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Default TASS Communication Rule
+     */
+    private const DEFAULT_COMMUNICATION_RULE = 'tkco';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -136,9 +142,28 @@ class Profile implements IStrategy
     /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
-     * @var string|null
+     *
+     * Communication Rules ("commrules") decide who can actually be a parent of a student. In TASS
+     * there's about a dozen tickboxes which can be turned on or off, for a given parent. Some schools
+     * use TKCO tickbox to decide who can be a parent; other schools use another tickbox. This is
+     * configurable in admin under "TASS Communication Rules Type Code Filter."
+     *
+     * The tass api getParents endpoint gives you a list of people who are allegedly parents of students.
+     * However, this list does not care about commrules. The getCommunicationRulesDetails endpoint
+     * tells you, though - so to decide who is meant to come out of suds as a parent of a student,
+     * you need to:
+     *
+     * a) get the list of potential parents from getParents endpoint
+     * b) get the list of commrules for those potential parents, from the getCommunicationRulesDetails endpoint
+     * c) if a parent has a commrule found in (b), then they can be a parent as listed in (a)
+     *    otherwise, they should be unlisted from (a)
+     *
+     * $communicationTypes uses "tkco" as a default, if empty in admin
+     * Otherwise, use the csv string provided there
+     *
+     * @var string
      */
-    private ?string $communicationTypes;
+    private string $communicationTypes;
 
 
     /**
@@ -193,7 +218,7 @@ class Profile implements IStrategy
      * @param int                             $addnumMother
      * @param string                          $fatherAddressDescription
      * @param string                          $motherAddressDescription
-     * @param string|null                     $communicationTypes
+     * @param string                          $communicationTypes
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -211,7 +236,7 @@ class Profile implements IStrategy
         int $addnumMother,
         string $fatherAddressDescription,
         string $motherAddressDescription,
-        ?string $communicationTypes,
+        string $communicationTypes,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -228,7 +253,14 @@ class Profile implements IStrategy
         $this->addnumMother = $addnumMother;
         $this->fatherAddressDescription = $fatherAddressDescription;
         $this->motherAddressDescription = $motherAddressDescription;
-        $this->communicationTypes = $communicationTypes;
+
+        /* If $communicationTypes is an empty string, default it to "tkco"
+         * which is the default communication rule specified by TASS The Organisation
+         */
+        $this->communicationTypes = '' === $communicationTypes ? self::DEFAULT_COMMUNICATION_RULE : $communicationTypes;
+
+        /* Various mappers
+         */
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -268,12 +300,16 @@ class Profile implements IStrategy
     {
         /* Build some lookups to save on traversal and api banging
          */
+        $this->log->debug(sprintf(
+            'Fetching data using TASS Communication Rules: %s',
+            $this->communicationTypes
+        ));
+
         $families = (new Lookup\Family(
             $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            $this->communicationTypes,
             (new Phone(
                 $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
                 $this->fatherAddressDescription,
@@ -697,6 +733,21 @@ class Profile implements IStrategy
                 $phoneWork = trim((string)$parent['work']);
                 $relationship = trim((string)$parent['relationship']);
                 $title = '';
+
+                /* $parent is an array that contains a boolean key, validCommRule
+                 * This bool decides whether $parent should be associated with the student
+                 * in schoolbox; if not, log it here and skip them
+                 */
+                if (!$parent['validCommRule']) {
+                    $this->log->debug(sprintf(
+                        'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
+                        $firstname,
+                        $lastname,
+                        $externalId
+                    ));
+
+                    continue;
+                }
 
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
