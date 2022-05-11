@@ -75,9 +75,13 @@ class Model
 
 
     /**
-     * @var int
+     * This always initialises into a meaningful default
+     * All events are timed events unless otherwise stated to be all day events
+     * Specifying an event as All Day causes it to render differently in the ui
+     *
+     * @var bool
      */
-    private int $allday;
+    private bool $allday = false;
 
 
     /**
@@ -282,19 +286,19 @@ class Model
 
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getAllday(): int
+    public function getAllday(): bool
     {
         return $this->allday;
     }
 
 
     /**
-     * @param int $allday
+     * @param bool $allday
      * @return Model
      */
-    public function setAllday(int $allday): self
+    public function setAllday(bool $allday): self
     {
         $this->allday = $allday;
         return $this;
@@ -310,7 +314,6 @@ class Model
         $this->finishAt = $finishAt;
         return $this;
     }
-
 
 
     /**
