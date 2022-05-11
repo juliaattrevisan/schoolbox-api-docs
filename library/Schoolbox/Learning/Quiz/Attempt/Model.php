@@ -301,7 +301,8 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * The total mark value of this attempt which has been graded.
+     * The total mark value of this attempt which has been graded
+     * the total available marks the user could have received.
      *
      * @return float
      */
@@ -309,7 +310,7 @@ class Model implements ISoftDeletable
     {
         // Is this reviewed? If so then 100% of marks are graded.
         if ($this->isReviewed()) {
-            return $this->getMark();
+            return $this->getMaxMark();
         }
         $totalMark = 0;
         foreach ($this->answers as $answer) {
