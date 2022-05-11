@@ -178,8 +178,12 @@ class Helper
     student.synergy_id as `studentExternalId`,
 
     COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
-    COALESCE(submission_return.mark, lti_assessment_score.score_given) as `mark`,
+    COALESCE(submission_return.mark, lti_assessment_score.score_given, assess_attempt.mark) as `mark`,
+    COALESCE(
     submission_return.norm_mark,
+    (lti_assessment_score.score_given / lti_assessment_score.score_maximum * 100),
+    (assess_attempt.mark / assess_attempt.max_mark * 100)
+    ) as `norm_mark`,
 
     staff.id as `staffId`,
     staff.title as `staffTitle`,
