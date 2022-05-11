@@ -455,7 +455,7 @@ function onClearAllSelected () {
                 </transition-group>
             </div><!-- .search-results -->
         </div><!-- .search-results-container -->
-        <div :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
+        <div v-if="hasSelectedClasses" :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
             <class-selector-selected-class 
                 v-for="selectedClass in selectedClasses" 
                 :key="selectedClass.id"  
