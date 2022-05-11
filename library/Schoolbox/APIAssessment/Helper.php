@@ -89,23 +89,27 @@ class Helper
                 'code' => $row['folderCode'],
                 'yearLevel' => $yearLevel,
             ];
-            $output[] = [
-                'id'  => $row['id'],
-                'title'         => $row['title'],
-                'assessmentType' => $row['assessmentType'],
-                'commonAssessment' => (bool)$row['commonAssessment'],
-                'workType'      => [
-                    'name'  => $row['workTypeName'],
-                    'id'    => $row['workTypeId']
-                ],
-                'folder'        => $folder,
-                'weighted'      => $weighted,
-                'dueDate'      => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
-
-            ];
+            if (!isset($output[$row['id']])) {
+                $output[$row['id']] = [
+                    'id'               => $row['id'],
+                    'title'            => $row['title'],
+                    'assessmentType'   => $row['assessmentType'],
+                    'commonAssessment' => (bool)$row['commonAssessment'],
+                    'workType'         => [
+                        'name' => $row['workTypeName'],
+                        'id'   => $row['workTypeId']
+                    ],
+                    'folder'           => $folder,
+                    'weighted'         => $weighted,
+                    'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
+                ];
+            }
+            if (!isset($output[$row['id']]['participants'])) {
+                $output[$row['id']]['participants'] = [];
+            }
             if (null !== $row['student_id'] && 'instructor' ===  $row['reviewRoute']) {
                 $completionDate = new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT);
-                $output['participants'][] = [
+                $output[$row['id']]['participants'][$row['student_id']] = [
                     'learner'        => [
                         'id'         => $row['student_id'],
                         'title'      => $row['studentTitle'],
