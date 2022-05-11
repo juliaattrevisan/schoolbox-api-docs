@@ -337,7 +337,33 @@ WHERE
             $statement->execute();
             $this->folderCodes = [];
             foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                $this->folderCodes[$row['folder_id']] = $row['code'];
+                /**
+                 * lets go backwards for the checks, if the entry has not been saved, save it now.
+                 */
+                if (!isset($this->folderCodes[$row['folder_id']])) {
+                    $this->folderCodes[$row['folder_id']] = $row['code'];
+                    continue;
+                }
+                /**
+                 * the folder ID exists, there check if its an array and append the current folder code.
+                 */
+                if (is_array($this->folderCodes[$row['folder_id']])) {
+                    $this->folderCodes[$row['folder_id']][] = $row['code'];
+                } else {
+                    /**
+                     * entry is not an array, lets change it to one now...
+                     * and whilst we are at is, lets append the new code.
+                     */
+                    /**
+                     * let's be completly specific about the movement of data.
+                     * I don't know the order values are assigned, or if that will change in the future
+                     *
+                     * original idea was to:
+                     * `$this->folderCodes[$row['folder_id']] = [$this->folderCodes[$row['folder_id']], $row['code']];`
+                     */
+                    $oldCode = $this->folderCodes[$row['folder_id']];
+                    $this->folderCodes[$row['folder_id']] = [$oldCode, $row['code']];
+                }
             }
         }
         return $this->folderCodes[$folderId] ?? null;
