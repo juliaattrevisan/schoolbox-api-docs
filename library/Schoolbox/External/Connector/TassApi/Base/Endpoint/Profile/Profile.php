@@ -738,7 +738,7 @@ class Profile implements IStrategy
                  * This bool decides whether $parent should be associated with the student
                  * in schoolbox; if not, log it here and skip them
                  */
-                if ($parent['validCommRule']) {
+                if (!$parent['validCommRule']) {
                     $this->log->debug(sprintf(
                         'Parent %s %s (%s) was a known parent, but tass comms rules prevents their association; skipping',
                         $firstname,
