@@ -144,10 +144,10 @@
                         </td>
                         <td>
                             {% if finished %}
-                                {% set totalMark       = attempt.totalMark %}
+                                {% set totalMark       = attempt.maxMark %}
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
                                 {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
-                                {% if totalMarkGraded < totalMark %}
+                                {% if not attempt.isReviewed %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
                                     {{ markVisible.showIfVisible(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
                                 {% endif %}

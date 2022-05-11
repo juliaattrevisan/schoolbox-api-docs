@@ -63,6 +63,8 @@ class Mapper extends BaseMapper
         $this->joins('reviewer_id', UserMapper::class, 'id', null, null, 'reviewer', 'reviewer');
         $this->uses('reviewed_at', self::TYPE_DATETIME, null, 'reviewed');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
+        $this->uses('mark', self::TYPE_DECIMAL);
+        $this->uses('max_mark', self::TYPE_DECIMAL);
 
         $this->hasJoin('answers', array(
             'mapper'    => QuizAnswerMapper::class,
@@ -266,8 +268,8 @@ class Mapper extends BaseMapper
         $query = "
             SELECT
                 aa.attempt_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark,
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark,
                 (
                     SELECT `as`.section_id
                     FROM assess_section `as`
@@ -278,7 +280,6 @@ class Mapper extends BaseMapper
             FROM assess_attempt aa
             JOIN assess q ON q.assess_id = aa.assess_id
             LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-            LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
             WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
             AND ar.deleted_at IS NULL
             GROUP BY aa.assess_id, aa.attempt_id
@@ -304,8 +305,8 @@ class Mapper extends BaseMapper
                 aa.user_id,
                 aa.attempt_id,
                 aq.section_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark
             FROM assess_attempt aa
                 LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
                 LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
@@ -535,7 +536,9 @@ class Mapper extends BaseMapper
     {
         $attempt->setReviewed(Alaress_Date_Format::now());
         $attempt->setReviewer($reviewer);
-        return $this->save($attempt);
+        $saved = $this->save($attempt);
+        $this->updateMarks($attempt);
+        return $saved;
     }
 
     /**
@@ -545,5 +548,41 @@ class Mapper extends BaseMapper
     private function getQuizMapper(): QuizMapper
     {
         return $this->getJoinMapper('quiz');
+    }
+
+    /**
+     * update the quiz response score
+     * no save call, or return, just DB direct query
+     * @param int|Model $attempt
+     */
+    public function updateMarks($attempt)
+    {
+        /**
+         * collate all marks and total possible marks, and update this field.
+         */
+        $query =  $this->getDatabase()->prepare("
+        UPDATE assess_attempt,
+            (SELECT
+                 SUM(ar.mark)  AS mark,
+                 SUM(aq.marks) AS max_mark,
+                 aa.attempt_id
+             FROM assess_attempt aa
+                      JOIN assess q ON q.assess_id = aa.assess_id
+                      LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                      LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+             WHERE aa.attempt_id = :attemptId
+               AND ar.deleted_at IS NULL
+               AND aq.deleted_at IS NULL
+             GROUP BY aa.assess_id, aa.attempt_id) as newVal
+        SET
+            assess_attempt.max_mark = newVal.max_mark,
+            assess_attempt.mark  = newVal.mark
+        WHERE assess_attempt.attempt_id = newVal.attempt_id;
+        ");
+        if (is_int($attempt)) {
+            $query->execute(['attemptId' => $attempt]);
+        } else {
+            $query->execute(['attemptId' => $attempt->getId()]);
+        }
     }
 }

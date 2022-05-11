@@ -69,52 +69,14 @@ class Model implements ISoftDeletable
     private $answers;
 
     /**
-     * The mark that the user has received for this attempt.
-     *
-     * @return float
+     * @var null|float
      */
-    public function getMark(): float
-    {
-        $mark = 0;
-        foreach ($this->answers as $answer) {
-            $mark += $answer->getMark();
-        }
-        return $mark;
-    }
+    private ?float $mark = null;
 
     /**
-     * The total number of marks available for this attempt.
-     *
-     * @return float
+     * @var null|float
      */
-    public function getTotalMark(): float
-    {
-        $totalMark = 0;
-        foreach ($this->answers as $answer) {
-            $totalMark += $answer->getQuestion()->getMarks();
-        }
-        return $totalMark;
-    }
-
-    /**
-     * The total mark value of this attempt which has been graded.
-     *
-     * @return float
-     */
-    public function getTotalMarkGraded(): float
-    {
-        // Is this reviewed? If so then 100% of marks are graded.
-        if ($this->isReviewed()) {
-            return $this->getTotalMark();
-        }
-        $totalMark = 0;
-        foreach ($this->answers as $answer) {
-            if ($answer->getAutoMarked()) {
-                $totalMark += $answer->getQuestion()->getMarks();
-            }
-        }
-        return $totalMark;
-    }
+    private ?float $max_mark = null;
 
     /**
      * Is this deleted?
@@ -300,5 +262,62 @@ class Model implements ISoftDeletable
     {
         $this->reviewer = $reviewer;
         return $this;
+    }
+
+    /**
+     * @param null|float $mark
+     * @return static
+     */
+    public function setMark(?float $mark): self
+    {
+        $this->mark = $mark;
+        return $this;
+    }
+
+    /**
+     * @return null|float
+     */
+    public function getMark(): ?float
+    {
+        return $this->mark;
+    }
+
+    /**
+     * @param null|float $max_mark
+     * @return static
+     */
+    public function setMaxMark(?float $max_mark): self
+    {
+        $this->max_mark = $max_mark;
+        return $this;
+    }
+
+    /**
+     * @return null|float
+     */
+    public function getMaxMark(): ?float
+    {
+        return $this->max_mark;
+    }
+
+    /**
+     * The total mark value of this attempt which has been graded
+     * the total available marks the user could have received.
+     *
+     * @return float
+     */
+    public function getTotalMarkGraded(): float
+    {
+        // Is this reviewed? If so then 100% of marks are graded.
+        if ($this->isReviewed()) {
+            return $this->getMaxMark();
+        }
+        $totalMark = 0;
+        foreach ($this->answers as $answer) {
+            if ($answer->getAutoMarked()) {
+                $totalMark += $answer->getQuestion()->getMarks();
+            }
+        }
+        return $totalMark;
     }
 }

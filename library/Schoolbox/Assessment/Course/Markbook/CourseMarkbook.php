@@ -750,7 +750,7 @@ class CourseMarkbook
              * and create a list of all grades / weightings and list the users that have these
              */
             foreach ($course as $studentId => $studentStatistic) {
-                if ($studentStatistic['published']['norm'] !== null) {
+                if (isset($studentStatistic['published']['norm'])) {
                     $rankList[] = [
                         'id'    => $studentId,
                         'grade' => $studentStatistic['published']['norm'],

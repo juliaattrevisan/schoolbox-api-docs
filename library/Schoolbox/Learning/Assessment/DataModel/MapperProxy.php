@@ -435,15 +435,13 @@ class MapperProxy
                 a.weight AS weight,
                 null AS mark_type,
                 aa.user_id AS user_id,
-                SUM(ar.mark)  AS mark,
-                SUM(aq.marks) AS max_mark,
+                aa.mark  AS mark,
+                aa.max_mark AS max_mark,
                 aa.reviewed_at AS published_at
            FROM assess a
                 JOIN participant_plan pp ON pp.assessment_id = a.assessment_id AND pp.deleted_at IS NULL
                 JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
                 JOIN assess_attempt aa ON a.assess_id = aa.assess_id AND pc.user_id = aa.user_id AND aa.deleted_at IS NULL
-                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id AND ar.deleted_at IS NULL
-                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id AND aq.deleted_at IS NULL
             WHERE
                 a.availability = 'assess'
                 AND a.assessment_id IN ({$assessmentIdBindings2['placeholders']})
