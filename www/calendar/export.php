@@ -417,7 +417,6 @@ try {
             break;
 
         case 'event_type':
-
             /* Check if $_GET['group'] is a meaningful value before event
              * trying to find a folder
              */
