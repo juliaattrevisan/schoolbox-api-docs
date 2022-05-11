@@ -2069,7 +2069,6 @@ abstract class Mapper implements IMapper, Serializable
      *                                           (defaults to false)
      *                                           * order:         a set of key-value pairs:
      *                                           key: column name, value: ASC or DESC
-     *                                           * max_statement_time: Override default query run time limit
      *
      * @return GenericCollection
      */
@@ -2223,9 +2222,6 @@ abstract class Mapper implements IMapper, Serializable
     protected function prepareSelect($select, $from, Builder $predicate, array $columnList, array $options = [])
     {
         $query = "$select $from";
-        if (array_key_exists('max_statement_time', $options)) {
-            $query = "SET STATEMENT max_statement_time = {$options['max_statement_time']} FOR $query";
-        }
 
         // Compatibility with old deleted option: if a non-array was passed,
         // assume that we're asking for whether the item was deleted.
