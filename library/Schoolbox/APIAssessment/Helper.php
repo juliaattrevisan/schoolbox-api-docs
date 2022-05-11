@@ -13,7 +13,7 @@ class Helper
     /**
      * @var GenericCollection | YearLevelModel[] | null
      */
-    protected GenericCollection | YearLevelModel | null $yearLevels = null;
+    protected ?GenericCollection $yearLevels = null;
 
     protected YearLevelMapper $mapper;
 
