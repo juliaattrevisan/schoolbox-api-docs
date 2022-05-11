@@ -17,6 +17,8 @@ class Helper
 
     protected YearLevelMapper $mapper;
 
+    protected ?array $folderCodes = null;
+
     /**
      *
      */
@@ -86,7 +88,7 @@ class Helper
             $folder = [
                 'id' => $row['folderId'],
                 'name' => $row['folderName'],
-                'code' => $row['folderCode'],
+                'code' => $this->getFolderCode($row['folderId']),
                 'yearLevel' => $yearLevel,
             ];
             if (!isset($output[$row['id']])) {
@@ -319,5 +321,25 @@ WHERE
             $this->yearLevels = $this->mapper->findAll()->indexBy('id');
         }
         return $this->yearLevels[$yearLevelId];
+    }
+
+    /**
+     * get nice folderCode objects
+     */
+    public function getFolderCode(int $folderId)
+    {
+        if (null === $this->folderCodes) {
+            $statement = $this->mapper->getDatabase()->prepare("
+            SELECT folder_id, code
+            FROM folder_code
+            WHERE deleted_at is NULL
+            ");
+            $statement->execute();
+            $this->folderCodes = [];
+            foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $this->folderCodes[$row['folder_id']] = $row['code'];
+            }
+        }
+        return $this->folderCodes[$folderId] ?? null;
     }
 }
