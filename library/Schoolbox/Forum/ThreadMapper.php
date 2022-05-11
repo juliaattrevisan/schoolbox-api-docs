@@ -408,7 +408,8 @@ WHERE
         while ($row = $statement->fetch()) {
             $thread = $this->hydrate($row)
                          ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
-                         ->setLastPost($post_mapper->findById($row['last_post_id']));
+                         ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
+                         ->setLastPostUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'));
             $collection[$thread->getId()] = $thread;
         }
 
