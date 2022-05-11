@@ -708,6 +708,8 @@ class Controller extends Base
         /** @var \Schoolbox\Learning\Badge\Award\Model $award */
         foreach ($awards as $award) {
             $studentAwards[$award->getRecipient()->getId()][$award->getBadgeIndex()] ??= $translator($award);
+
+            $studentAwards[$award->getRecipient()->getId()][$award->getBadgeIndex()]['count'] ??= 0;
             $studentAwards[$award->getRecipient()->getId()][$award->getBadgeIndex()]['count']++;
         }
 

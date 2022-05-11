@@ -45,7 +45,7 @@ if (is_numeric($_POST['type'])) {
 $guests = [];
 
 if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
-    $guests = ('' === $_POST['guests'] || null === $_POST['guests']) ? [] : explode(',', $_POST['guests']);
+    $guests = (!isset($_POST['guests']) || '' === (string)$_POST['guests']) ? [] : explode(',', $_POST['guests']);
 }
 
 $event
