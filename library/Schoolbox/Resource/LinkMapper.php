@@ -186,15 +186,15 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         /* Special case misrepresentations in db
          */
-        if ($options['sort'] === 'Date') {
+        if ('Date' === ($options['sort'] ?? null)) {
             $sort = 'submitted';
         } else {
             $sort = 'description';
         }
 
-        $sortDir = strtoupper($options['sortdir']) === 'DESC' ? 'DESC' : 'ASC';
+        $sortDir = strtoupper($options['sortdir'] ?? null) === 'DESC' ? 'DESC' : 'ASC';
 
-        $limit = (int)$options['size'];
+        $limit = $options['size'] ?? null;
 
         $hiddenClause = $includeHidden ? '' : ' AND l.hidden = 0 ';
 
@@ -212,7 +212,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             ORDER BY l.{$sort} {$sortDir}
         ";
 
-        if ($options['size']) {
+        if ($limit) {
             $query .= "LIMIT {$limit}";
         }
 

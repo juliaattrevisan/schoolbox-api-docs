@@ -110,7 +110,6 @@ if (!$count['all']) {
     $oldHandlerRenderers = new \Schoolbox\Collection();
     $oldHandlerRenderers->add(new \Schoolbox\Blog\Homepage\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Wiki\Search\Renderer($page, $result, $count, 0));
-    $oldHandlerRenderers->add(new \Schoolbox\Forum\Search\Renderer($page, $result, $count, 0));
     $oldHandlerRenderers->add(new \Schoolbox\Calendar\Event\Search\Renderer($page, $result, $count, 0));
 
     /* Draw them

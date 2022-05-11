@@ -11,7 +11,7 @@ define('AJAX_ENABLED', 1);
 define('AJAX_DISABLED', 0);
 
 // Always use the sitepage from DI
-/** @var SitePage $page */
+/** @var SitePage $this */
 $page = $this;
 $page->injectGlobalVars();
 
@@ -31,10 +31,6 @@ $handle = [
     'wiki' => [
         'handler' => new Wiki(),
         'renderer' => new \Schoolbox\Wiki\Search\Renderer($this, [], [], 0),
-    ],
-    'forum' => [
-        'handler' => new Forum(),
-        'renderer' => new \Schoolbox\Forum\Search\Renderer($this, [], [], 0),
     ],
     'event' => [
         'handler' => new Calendar(),
@@ -61,7 +57,8 @@ $omaha = [
     'file',
     'link',
     'textbox',
-    'news'
+    'news',
+    'forum'
 ];
 
 // Order of results, independent of whether it has landed on Omaha or not

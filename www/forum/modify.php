@@ -14,7 +14,8 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-$forumHandler = new Forum();
+$threadMapper = ThreadMapper::getInstance();
+$postMapper = PostMapper::getInstance();
 $groupHandler = new Group();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
@@ -32,12 +33,12 @@ if (is_numeric($this->arg[0])) {
     try {
         $folder = FolderMapper::getInstance()->findById($this->arg[0]);
     } catch (Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     /* Forum exists
      */
-    if (!$forumHandler->hasForum($folder->getId())) {
+    if (!$threadMapper->isComponent($folder->getId())) {
         SitePage::localRedir('/homepage/' . $folder->getId());
     }
 
@@ -46,10 +47,10 @@ if (is_numeric($this->arg[0])) {
     $access      = Access::getInstance();
     $accessLevel = $access->getFolderAccess($_SESSION['user'], $folder->getId());
     if ($accessLevel < UserAccess::ACCESS_READ) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
     if ($groupHandler->hasChildAccessOnly($folder->getId(), $_SESSION['user']->getId())) {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
     $this->setTitle(Scrub::text($folder->getName() . ' Forum'));
@@ -68,22 +69,22 @@ if (is_numeric($this->arg[0])) {
      */
     if (is_numeric($this->arg[2] ?? null) && $this->arg[2] > 0) {
         try {
-            $post   = PostMapper::getInstance()->findById($this->arg[2]);
-            $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+            $post   = $postMapper->findById($this->arg[2]);
+            $thread = $threadMapper->findById($post->getThread()->getId());
         } catch (Exception $e) {
-            error(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check user owns post
          */
         if ($post->getOwner()->getId() != $_SESSION['id'] && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* check locked
          */
         if ($thread->isLocked() && $accessLevel < UserAccess::ACCESS_WRITE) {
-            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // first!
@@ -123,16 +124,15 @@ if (is_numeric($this->arg[0])) {
         /* Add new reply
          */
         try {
-            $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
+            $thread = $threadMapper->findById($this->arg[1]);
         } catch (Exception $e) {
-            error(ErrorMapper::ERROR_INFORMATION_MISSING);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Check locked
          */
-        /** @var \Schoolbox\Forum\Thread $thread */
         if ($accessLevel < UserAccess::ACCESS_WRITE && $thread->isLocked()) {
-            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         /* Only inject a blockquote when creating a new reply
@@ -146,7 +146,7 @@ if (is_numeric($this->arg[0])) {
 
         if (is_numeric($quotePostID) && $quotePostID > 0) {
             try {
-                $quote = PostMapper::getInstance()->findById($quotePostID);
+                $quote = $postMapper->findById($quotePostID);
 
                 $this->setVar(array(
                         'QUOTE_ID' => $quotePostID,
@@ -217,5 +217,5 @@ if (is_numeric($this->arg[0])) {
 
     $this->setVar($output);
 } else {
-    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

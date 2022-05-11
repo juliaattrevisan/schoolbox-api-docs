@@ -11,15 +11,18 @@
 
 namespace Schoolbox\Forum;
 
-use Alaress\Async\Notification\Instance\Instance;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Forum\Search\Result;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Searchable;
+use Schoolbox\User;
 
-class PostMapper extends Mapper implements FeedableMapperInterface
+class PostMapper extends Mapper implements FeedableMapperInterface, Searchable
 {
     /** @var int */
     public const FORUM_POSTS_PER_PAGE = 15;
@@ -279,5 +282,50 @@ class PostMapper extends Mapper implements FeedableMapperInterface
         }
 
         return $collection;
+    }
+
+    /**
+     * @param Post $post
+     * @return false|float
+     */
+    public function getPageNumber(Post $post)
+    {
+        $stmt = $this->database->prepare("SELECT count(*) as postCount FROM forumPost
+        WHERE deleted = 'false'
+            AND threadID = :threadId
+            AND postID <= :postId");
+        $stmt->execute([
+                'threadId' => $post->getThread()->getId(),
+                'postId' => $post->getId(),
+                ]);
+
+        return ceil($stmt->fetch()['postCount'] / self::FORUM_POSTS_PER_PAGE);
+    }
+
+    /**
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
+     *
+     * This also returns a count of all the items found in the search, not limited
+     * by params
+     *
+     * @param ArticleResolver $articleResolver
+     * @param User            $user
+     * @param string          $keyword
+     * @param int             $offset
+     * @param int             $limit
+     * @param string          $sortProperty
+     * @param string          $sortDirection
+     * @return Result | Collection
+     */
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
+    {
+        if ($limit == 0) {
+            $limit = self::DEFAULT_LIMIT;
+        }
+
+        $searcher = new Result();
+        $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
+
+        return $searcher;
     }
 }

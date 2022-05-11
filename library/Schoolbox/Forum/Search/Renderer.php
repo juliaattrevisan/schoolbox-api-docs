@@ -10,14 +10,15 @@
 
 namespace Schoolbox\Forum\Search;
 
-use Schoolbox\Resource\Search\Renderer\Handler;
+use Schoolbox\Forum\Post;
+use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
+use Schoolbox\Resource\Search\Renderer\Base;
 use Scrub;
 use TextFormatter;
-use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
-class Renderer extends Handler
+class Renderer extends Base
 {
 
     /**
@@ -35,44 +36,44 @@ class Renderer extends Handler
     protected $tabName = 'Forums';
 
     /**
-     * Render
+     * Render html fragment
+     *
+     * @param MapperResult $mapperResult
+     * @param string|null $type
      */
-    public function render()
+    public function render(MapperResult $mapperResult, $type)
     {
-        $folderMapper = FolderMapper::getInstance();
-        $userHandler = new \User();
+        if ($mapperResult->getCount()) {
+            $folderMapper = FolderMapper::getInstance();
+            $userHandler = new \User();
 
-        $result = $this->getResult($this->getType());
-
-        if (!empty($result)) {
             $this->getPage()->setFile('forum_t', 'resource/forum/search/results.html');
             $this->getPage()->setBlock('forum_t', 'forum', 'forum_block');
             $this->getPage()->setVar(array(
-                'FORUM_DISP_COUNT' => count($this->getResult($this->getType())),
-                'FORUM_COUNT' => $this->getCount($this->getType()),
-            ));
+                                         'FORUM_DISP_COUNT' => $mapperResult->getResult()->count(),
+                                         'FORUM_COUNT' => $mapperResult->getCount(),
+                                     ));
 
-            foreach ($result as $forum) {
+            foreach ($mapperResult->getResult() as $post) {
+                /** @var Post $post */
                 try {
-                    $folder = $folderMapper->findCheaplyById($forum['categoryID']);
-                    $forum['breadcrumb'] = '';
+                    $folder = $folderMapper->findCheaplyById($post->getThread()->getCategory()->getId());
+                    $forumBreadcrumb = '';
 
                     foreach ($folderMapper->breadcrumb($folder, true) as $i => $breadcrumb) {
-                        $forum['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
+                        $forumBreadcrumb .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
                     }
-
-                    $createdTime = new Alaress_Date_Format($forum['date'], 'Y-m-d H:i:s');
 
                     $this->getPage()->setVar(
                         array(
-                            'FORUM_CID'        => $forum['categoryID'],
-                            'FORUM_THREADID'   => $forum['threadID'],
-                            'FORUM_TITLE'      => Scrub::text($forum['threadTitle']),
-                            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($forum['body']), 150),
-                            'FORUM_OWNER'      => $forum['uid'],
-                            'FORUM_OWNER_NAME' => $userHandler->formatName($forum),
-                            'FORUM_CREATED'    => $createdTime->getRelativeTime(),
-                            'FORUM_BREADCRUMB' => $forum['breadcrumb'],
+                            'FORUM_CID'        => $post->getThread()->getCategory()->getId(),
+                            'FORUM_THREADID'   => $post->getThread()->getId(),
+                            'FORUM_TITLE'      => $post->getThread()->getTitle(),
+                            'FORUM_BODY'       => TextFormatter::cutSentence(Scrub::html2text($post->getBody()), 150),
+                            'FORUM_OWNER'      => $post->getOwner()->getId(),
+                            'FORUM_OWNER_NAME' => $post->getOwner()->getFullName(),
+                            'FORUM_CREATED'    => $post->getDate()->getRelativeTime(),
+                            'FORUM_BREADCRUMB' => $forumBreadcrumb,
                         )
                     );
 
@@ -81,14 +82,19 @@ class Renderer extends Handler
                     //noop
                 }
             }
-
-            $this->outputSeeMore();
+            $this->getPage()->setBlock($this->getType() . '_t', 'see_more', 'see_more_block');
+            /* "outputMore"
+            */
+            if ($type == 'all' && $mapperResult->getCount() > \Config::get('search_all_limit')) {
+                $this->getPage()->setVar('MORE_COUNT', $mapperResult->getCount());
+                $this->getPage()->parse('see_more_block', 'see_more');
+            } else {
+                $this->getPage()->setVar('see_more_block', '');
+            }
 
             $this->getPage()->parse('RESULT', 'forum_t', true);
         } else {
-            $this->getPage()->setVar('see_more_block', '');
-
-            return;
+            return ;
         }
     }
 }

@@ -11,16 +11,18 @@
 
 namespace Schoolbox\Forum;
 
-use Alaress\Async\Notification\Instance\Instance;
 use PDO;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\GenericCollection;
+use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
-class ThreadMapper extends Mapper implements FeedableMapperInterface
+class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageCleanable
 {
-
+    const FORUM_THREADS_PER_PAGE = 30;
     protected function mapping()
     {
         $this->hasTable('forumThread');
@@ -164,7 +166,6 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface
             $this->throwIfDeleted($thread);
 
             $thread->setFirstPost($post_mapper->hydrate($row, 'firstPost'));
-            $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
 
             return $thread;
         } else {
@@ -291,7 +292,7 @@ FROM        `component_instance`
     JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
     JOIN   `component_config_instance` `cci` ON
             `ccd`.`id` = `cci`.`component_config_definition_id` AND
-            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = ':id1'
+            `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = :id1
 
 WHERE
   `component_instance`.module = 'homepage'
@@ -311,5 +312,127 @@ WHERE
          * no results from either homepage or alt sourcing, no forum enabled
          */
         return false;
+    }
+
+    /**
+     * Soft-deletes Forum for specified homepage
+     *
+     * @param int $cid
+     * @return void
+     */
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('categoryID', $cid);
+    }
+
+    /**
+     * @param int $categoryID
+     * @param array $config
+     * @return array|bool
+     */
+    public function getRecentThreadList(int $categoryID, array $config)
+    {
+        /* Set default sorting to threads, but leave options for other sort fields
+         */
+        $params = [
+            'categoryID'    => $categoryID,
+        ];
+
+        $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id
+                  FROM forumThread t
+                  LEFT JOIN user u ON u.id = t.userID
+                  WHERE t.categoryID = :categoryID
+                  AND t.deleted = 'false'
+                  ORDER BY ";
+
+        if ($config['sort'] == 'Posts') {
+            $query .= ' t.last_post_date DESC ';
+        } elseif ($config['sort'] == 'Threads') {
+            $query .= 't.date DESC ';
+        } else {
+            $query .= 't.date DESC ';
+        }
+
+        if ($config['size'] != 0 && $config['size'] != '') {
+            $query .= " LIMIT 0, :size";
+            $params['size'] = (int)$config['size'];
+        }
+        $statement = $this->database->prepare($query);
+        foreach ($params as $param => $value) {
+            $statement->bindValue($param, $value, PDO::PARAM_INT);
+        }
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('owner', 'owner')},
+                   {$this->getJoinColumnString('lastPoster', 'lastPoster')},
+                   {$this->getJoinColumnString('post', 'post')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM       {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
+            INNER JOIN {$this->getJoinSql('lastPoster', '', 'lastPoster', true)}
+            LEFT JOIN {$this->getJoinSql('post', '', 'post', false)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $thread = $this->hydrate($row)
+                         ->setUser($this->hydrateJoin($row, 'owner', 'owner'))
+                         ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
+                         ->setLastPostUser($this->hydrateJoin($row, 'lastPoster', 'lastPoster'));
+            $collection[$thread->getId()] = $thread;
+        }
+
+        return $collection;
+    }
+
+    /**
+     * find post count for a list of forum threads
+     */
+    public function findPostCount(Collection $threads): array
+    {
+        $statement = $this->database->prepare("
+            SELECT threadID, count(*) -1 as count
+            FROM forumPost
+            WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")
+                AND
+                deleted = 'false'
+            GROUP BY threadID
+        ");
+        $statement->execute();
+        $postCounts = [];
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $postCounts[$row['threadID']] = $row['count'];
+        }
+        return $postCounts;
     }
 }

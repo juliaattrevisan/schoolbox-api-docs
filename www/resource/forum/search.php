@@ -15,6 +15,9 @@ if (!isset($this)) {
     die('No direct access permitted');
 }
 /** @var SitePage $this */
+/** @var SitePage $page */
+/** @var int $current_page */
+/** @var string $keyword */
 
 /* Old handler junk
  */
@@ -24,30 +27,30 @@ require_once('./resource/searchConfig.php');
  */
 require_once('./resource/searchClean.php');
 
-/**
- * Execute searches for all handlers and mappers
- */
-$forumHandler = new Forum();
 $type = 'forum';
 
-/* search() calls access a global counter array, $count
+/* Omaha Beach!
+ *
+ * These have landed
+ * When you add more, remove them from the searchConfig pseudo-registry
+ *
+ * Everything here is self-contained
  */
-$result[$type] = $forumHandler->search($keyword, 0, Config::get('search_all_limit'), $count[$type]);
+$articleResolver = $this->getDi()->get('commsNewsArticleResolver');
 
-$count['all'] = array_sum($count);
+$mapper = new \Schoolbox\Resource\Search\Results($page, $type);
+$mapper->search(
+    $articleResolver,
+    $_SESSION['user'],
+    $keyword,
+    ($current_page - 1) * Config::get('search_type_limit'),
+    Config::get('search_type_limit'),
+    'score',
+    'desc'
+);
+$mapper->render();
+$mapper->renderPagination($current_page);
 
-/* You can save a db request by using the first $result[$type] and
- * traversing to $currentPage-1 manually in php, manually constructing
- * the page's contents
- */
-$result[$type] = $forumHandler->search($keyword, ($current_page - 1) * Config::get('search_type_limit'), Config::get('search_type_limit'), $count[$type]);
-
-$renderer = new \Schoolbox\Forum\Search\Renderer($page, $result, $count, $current_page);
-$renderer->render();
-$renderer->renderPagination();
-
-// render final output
-$page->parse(TEMPLATE_content, 'RESULT', true);
 $page->outputPage(true);
 
 exit();

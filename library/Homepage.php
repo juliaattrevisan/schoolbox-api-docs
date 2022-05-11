@@ -112,7 +112,6 @@ class Homepage
         $homepageCleanables = [
             new Assess_Main(),
             new Chat(),
-            new Forum(),
             new Poll(),
             new Survey_Main(),
             new TextBox(),
@@ -125,6 +124,7 @@ class Homepage
             Schoolbox\Comms\News\Audience\Simple\Mapper::getInstance(),
             Schoolbox\Comms\News\Audience\Complex\Mapper::getInstance(),
             Schoolbox\Blog\Homepage\Post\Mapper::getInstance(),
+            \Schoolbox\Forum\ThreadMapper::getInstance(),
         ];
 
         foreach ($homepageCleanables as $homepageCleanable) {

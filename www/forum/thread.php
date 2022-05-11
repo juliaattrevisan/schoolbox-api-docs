@@ -17,6 +17,7 @@ if (!isset($this)) {
 
 $access = Access::getInstance();
 $threadMapper = ThreadMapper::getInstance();
+$postMapper = PostMapper::getInstance();
 
 /** @var \Schoolbox\User $currentUser */
 $currentUser = $_SESSION['user'];
@@ -129,7 +130,7 @@ $threadMapper->save($thread);
 
 /* output pagination
  */
-$postList = $thread->getPosts();
+$postList = $postMapper->findByColumn('threadID', $thread->getId());
 $pageNum = $this->arg[1] ?? 1;
 
 $postPerPage = PostMapper::FORUM_POSTS_PER_PAGE;
