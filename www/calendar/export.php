@@ -112,9 +112,26 @@ function buildApiClass(string $class, array $params, bool $enabled, ?HubInterfac
     return new Calendar_Api_Composite();
 }
 
+// Always output here
+switch ($_GET['format'] ?? '') {
+    case 'csv':
+        $exporter = new CSVExporter();
+        break;
+    case 'json':
+        $exporter = new JsonExporter();
+        break;
+    default:
+        $exporter = new VCalExporter();
+}
 
-// Actually build the export
+/* The export mechanism determines the way you display errors
+ * vcal and json should just http_response_code() whatever their problems are
+ * because they're accessed from some other app
+ *
+ * csv, however, should tell the user what went wrong
+ */
 try {
+    // Actually build the export
     $token              = $_GET['token'];
     $export_type        = $_GET['export'];
     $filename           = 'calendar';
@@ -201,7 +218,7 @@ try {
         case 'personal':
             $api = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Personal::class,
-                [$user, $viewer],
+                [ $user, $viewer ],
                 true,
                 $sentry
             );
@@ -212,17 +229,20 @@ try {
         case 'group':
             $export_id = (int)$_GET['group'];
 
-            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($export_id);
-
+            /* Check if $_GET['group'] is a meaningful value before event
+             * trying to find a folder
+             */
             if ($export_id <= 0) {
-                throw new SchoolboxException('A group ID must be provided', 400);
+                throw new SchoolboxException('Please select a group', 400);
             }
+
+            $folder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($export_id);
 
             $api = new Calendar_Api_Composite();
 
             $api->add(buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Group::class,
-                [$user, $viewer, $export_id],
+                [ $user, $viewer, $export_id ],
                 true,
                 $sentry
             ));
@@ -238,8 +258,8 @@ try {
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\ClassEntryMapper::getInstance(),
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Schoolbox\UserMapper::getInstance(),
                     \Timetable_ColourMapper::getInstance()
                 ],
@@ -256,9 +276,9 @@ try {
                     $viewer,
                     $folder->getCodes(),
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -270,12 +290,12 @@ try {
         case 'campus':
             $export_id = (int)$_GET['campus'];
             if ($export_id <= 0) {
-                throw new SchoolboxException('A campus ID must be provided', 400);
+                throw new SchoolboxException('Please select a campus', 400);
             }
 
             $api = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Campus::class,
-                [$user, $viewer, $export_id],
+                [ $user, $viewer, $export_id ],
                 true,
                 $sentry
             );
@@ -290,7 +310,7 @@ try {
 
             $api = buildApiClass(
                 Calendar_Api_EventType_Submission_Schoolbox_Default::class,
-                [$user, $viewer, $assessmentDataSource, $visibility, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                [ $user, $viewer, $assessmentDataSource, $visibility, \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
                 true,
                 $sentry
             );
@@ -301,7 +321,7 @@ try {
         case 'timetable':
             $api = buildApiClass(
                 Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                [ $user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
                 true,
                 $sentry
             );
@@ -314,7 +334,7 @@ try {
         case 'timetabledays':
             $api = buildApiClass(
                 Calendar_Api_EventType_TimetableDays_External_Default::class,
-                [$user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                [ $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
                 true,
                 $sentry
             );
@@ -329,7 +349,7 @@ try {
              */
             $api = buildApiClass(
                 Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
-                [$user, $viewer],
+                [ $user, $viewer ],
                 (bool)$config->get('resource_booking_enabled'),
                 $sentry
             );
@@ -343,7 +363,7 @@ try {
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if ($config->get('resource_booking_enabled')) {
-                $item = ItemMapper::getInstance()->findById($resourceId);
+                $item     = ItemMapper::getInstance()->findById($resourceId);
                 $roomCode = trim($item->getRoomCode());
 
                 // Add the resource API
@@ -351,7 +371,7 @@ try {
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $user,
                     $user,
-                    [$resourceId]
+                    [ $resourceId ]
                 );
 
                 $api->add($resourceApi);
@@ -363,7 +383,7 @@ try {
                         $user,
                         $user,
                         $kernel->getDependencyInjector()->get('externalTimetable'),
-                        [$roomCode => $item->getId()]
+                        [ $roomCode => $item->getId() ]
                     );
 
                     $api->add($timetableApi);
@@ -380,11 +400,11 @@ try {
              */
             if ($config->get('resource_booking_enabled')) {
                 $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'));
-                $api = $apiFactory->buildFromResourceCollection(
+                $api        = $apiFactory->buildFromResourceCollection(
                     ItemMapper::getInstance()->findByColumn(
                         'resource_category_id',
                         $resourceCategoryId,
-                        ['order' => ['name' => 'asc',]]
+                        [ 'order' => [ 'name' => 'asc', ] ]
                     )
                 );
 
@@ -397,9 +417,16 @@ try {
             break;
 
         case 'event_type':
+            /* Check if $_GET['group'] is a meaningful value before event
+             * trying to find a folder
+             */
+            if ($eventTypeId <= 0) {
+                throw new SchoolboxException('Please select an event type', 400);
+            }
+
             $api = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Type::class,
-                [$user, $viewer, $eventTypeId],
+                [ $user, $viewer, $eventTypeId ],
                 true,
                 $sentry
             );
@@ -421,7 +448,7 @@ try {
 
             $api->add(buildApiClass(
                 Calendar_Api_EventType_Event_External_Default::class,
-                [$user, $viewer, $externalEvents],
+                [ $user, $viewer, $externalEvents ],
                 true,
                 $sentry
             ));
@@ -452,8 +479,8 @@ try {
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\ClassEntryMapper::getInstance(),
                     \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Schoolbox\UserMapper::getInstance(),
                     \Timetable_ColourMapper::getInstance()
                 ],
@@ -470,9 +497,9 @@ try {
                     $viewer,
                     null,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -486,7 +513,7 @@ try {
         case 'eotc_all':
             $api = buildApiClass(
                 Calendar_Api_EventType_Custom_EOTC_Default::class,
-                [$user, $viewer],
+                [ $user, $viewer ],
                 (bool)$config->get('eotc_enabled'),
                 $sentry
             );
@@ -495,10 +522,10 @@ try {
         case 'all':
         case 'all_external':
             // All day events, but exclude other sources
-            $api = new Calendar_Api_Composite();
+            $api    = new Calendar_Api_Composite();
             $subApi = buildApiClass(
                 Calendar_Api_EventType_Event_Schoolbox_Default::class,
-                [$user, $viewer],
+                [ $user, $viewer ],
                 true,
                 $sentry
             );
@@ -509,14 +536,14 @@ try {
             if ($resourceBookingEnabled) {
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_ResourceBooking_Booking_Default::class,
-                    [$user, $viewer],
+                    [ $user, $viewer ],
                     true,
                     $sentry
                 );
                 $api->add($subApi);
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_ResourceBooking_Moderation_Default::class,
-                    [$user, $viewer],
+                    [ $user, $viewer ],
                     true,
                     $sentry
                 );
@@ -528,7 +555,7 @@ try {
             if ($eotcEnabled) {
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Custom_EOTC_Default::class,
-                    [$user, $viewer],
+                    [ $user, $viewer ],
                     true,
                     $sentry
                 );
@@ -540,7 +567,7 @@ try {
                 //build timetable
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class,
-                    [$user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance()],
+                    [ $user, $viewer, $kernel->getDependencyInjector()->get('config'), \Schoolbox\Calendar\EventTypeMapper::getInstance() ],
                     true,
                     $sentry
                 );
@@ -558,7 +585,7 @@ try {
 
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Event_External_Default::class,
-                    [$user, $viewer, $externalEvents],
+                    [ $user, $viewer, $externalEvents ],
                     true,
                     $sentry
                 );
@@ -567,7 +594,7 @@ try {
                 //build vcal source
                 $subApi = buildApiClass(
                     Calendar_Api_EventType_Event_Vcal_Default::class,
-                    [$user, $viewer],
+                    [ $user, $viewer ],
                     true,
                     $sentry
                 );
@@ -599,8 +626,8 @@ try {
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                         \Schoolbox\External\ClassEntryMapper::getInstance(),
                         \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                        \Schoolbox\External\Event\Mapper ::getInstance(),
-                        \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
+                        \Schoolbox\External\Event\Mapper::getInstance(),
+                        \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                         \Schoolbox\UserMapper::getInstance(),
                         \Timetable_ColourMapper::getInstance()
                     ],
@@ -617,16 +644,16 @@ try {
                         $viewer,
                         null,
                         \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                        \Schoolbox\External\Event\Mapper ::getInstance(),
-                        \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
-                        \Schoolbox\External\Event\Roletype\Mapper ::getInstance()
+                        \Schoolbox\External\Event\Mapper::getInstance(),
+                        \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                        \Schoolbox\External\Event\Roletype\Mapper::getInstance()
                     ],
                     true,
                     $sentry
                 ));
 
                 //set the end of the export
-                $endTimestamp   = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+                $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             }
             break;
 
@@ -639,20 +666,17 @@ try {
             break;
     }
 } catch (Throwable $e) {
+    /* Figure out how to render errors based on the export format
+     * CSV errors can render to screen
+     */
+    if ($exporter instanceof CSVExporter) {
+        throw $e;
+    }
+
+    /* Everything else is probably accessed by another app
+     */
     http_response_code($e->getCode());
     exit;
-}
-
-// Always output here
-switch ($_GET['format'] ?? '') {
-    case 'csv':
-        $exporter = new CSVExporter();
-        break;
-    case 'json':
-        $exporter = new JsonExporter();
-        break;
-    default:
-        $exporter = new VCalExporter();
 }
 
 $renderer = new Renderer(

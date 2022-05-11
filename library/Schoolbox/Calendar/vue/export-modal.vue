@@ -69,8 +69,37 @@ export default {
         open() {
             this.$refs.modal.open();
         },
-    }
 
+        checkDropdownRequirement() {
+            let values = Object.assign({}, this.form);
+
+            /* Check that the corresponding dropdown has a meaningful value
+             */
+            const TYPE_GROUP = 'group';
+            const TYPE_CAMPUS = 'campus';
+            const TYPE_EVENTTYPE = 'event_type';
+
+            /* Non-dropdown options don't need additional checking
+             */
+            if (TYPE_CAMPUS !== values.export && TYPE_GROUP !== values.export && TYPE_EVENTTYPE !== values.export) {
+                this.$refs.exportForm.submit();
+            }
+
+            /* Check a dropdown option was provided
+             */
+            if (TYPE_GROUP === values.export && '' !== values.group.toString()) {
+                this.$refs.exportForm.submit();
+            } else if (TYPE_CAMPUS === values.export && '' !== values.campus.toString()) {
+                this.$refs.exportForm.submit();
+            } else if (TYPE_EVENTTYPE === values.export && '' !== values.event_type.toString()) {
+                this.$refs.exportForm.submit();
+            }
+
+            /* Do nothing for now
+             */
+            return false;
+        }
+    }
 }
 
 </script>
@@ -159,7 +188,7 @@ export default {
 
             <ul class="flex-list buttons">
                 <li><button @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
-                <li><input type="submit" value="Download CSV" /></li>
+                <li><input type="submit" value="Download CSV" @click.prevent="checkDropdownRequirement"/></li>
             </ul>
         </form>
 
