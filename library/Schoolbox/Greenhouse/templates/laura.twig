@@ -7,10 +7,24 @@
     }
 
     .wait-content {
-        border: 1px solid blueviolet;
-        height: 15rem;
+        border: 1px solid darkgrey;
+        height: 25rem;
+        width: 50%;
+        margin: auto;
+        margin-top: 2em;
     }
 
+    .report-count {
+        width: 50%;
+        margin: auto;
+        margin-top: 3em;
+    }
+    .report-warning {
+        width: 50%;
+        margin: auto;
+        margin-top: 2em;
+        margin-bottom: 2em;
+    }
 
 </style>
 <div class="admin-container row">
@@ -21,13 +35,14 @@
             <div class="wait-content">
 
             </div>
-            <div>
+            <div class="report-count">
+                <h2>Compiling reports</h2>
                 <p>We are currently working on collating your student reports for {{reportCount}} students into a zip file…..
                     We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minutes
                     Feel free to continue working, we will send you a notification when the file is ready to download
                 </p>
             </div>
-            <div class="alert-box alert">
+            <div class="alert-box alert report-warning">
                 {% if warnings %}
                     <p>Please note that we encountered the following issues while processing your request:</p>
                     {% for warning in warnings %}
