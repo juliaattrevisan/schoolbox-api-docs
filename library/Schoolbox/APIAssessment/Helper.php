@@ -54,10 +54,10 @@ class Helper
         }
         $statement = $this->mapper->getDatabase()->prepare($query);
         if (0 !== $limit) {
-            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+            $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
         if (0 !== $cursor) {
-            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
+            $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
         }
         foreach ($params as $label => $value) {
             $statement->bindValue($label, $value);
