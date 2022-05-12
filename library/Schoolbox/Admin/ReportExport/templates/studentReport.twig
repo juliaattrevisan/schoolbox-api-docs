@@ -31,34 +31,6 @@
         margin-top: 2em;
     }
 
-    /* Dimensioning
-     * Foundation classes small-* etc. are now arbitrarily defined here
-     * with percentage widths. They no longer need to add up to 12
-     */
-    .small-1 {
-        width:9%;
-    }
-
-    .small-2 {
-        width:12%;
-    }
-
-    .small-4 {
-        width:33% !important;
-    }
-
-    .small-5 {
-        width: 41%;
-    }
-
-    .small-6 {
-        width: 50%;
-    }
-
-    .small-10 {
-        width: 75%;
-    }
-
     .text-right {
         text-align: right;
         margin-left: 1em;
@@ -76,7 +48,8 @@
         min-width: 50%;
     }
     .logo{
-        max-width: 200px;
+        max-width: 170px;
+        padding-top: 1em;
     }
     .header-content div:nth-child(2) h1 {
         text-align: right;
@@ -138,10 +111,7 @@
         table-layout: fixed;
         width: 100% ;
     }
-    th {
-        width: 30%;
-        background-color: lightgrey;
-    }
+
     th p{
         color: #333333;
         text-align: left;
@@ -230,6 +200,7 @@
 
     .heading__tertiary {
         font-size: 1rem;
+        padding-bottom: 1rem;
     }
 
     .heading__subject {
@@ -264,8 +235,6 @@
         white-space: pre-wrap;
     }
 
-    /* Begin Steve Quarantine Styles
-     */
 
     /* Make background colours print
      */
@@ -363,8 +332,13 @@
         border-top: 0;
     }
 
-    /* End Steve Quarantine Styles
-     */
+    .logo-content {
+        float: right;
+        margin-top: -6em;
+        padding-left: 2em;
+        padding-bottom: 2em;
+    }
+
 
     @page {
         counter-increment: page;
@@ -426,12 +400,13 @@
                     <h3 class="heading__secondary">{{ student.year.longName ?? '' }}</h3>
                 </div>
             </div>
-            <div class="row row__margin-bottom">
-                <h1 class="heading__secondary">{{ config.school_name }}</h1>
-                {% if config.report_school_logo %}
-                    <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
-                {% endif %}
-            </div>
+
+        </div>
+        <div class="row row__margin-bottom logo-content">
+            <h1 class="heading__secondary">{{ config.school_name }}</h1>
+            {% if config.report_school_logo %}
+                <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+            {% endif %}
         </div>
         <div class="row row__margin-bottom">
             {{ config.report_export_introduction | purify }}
