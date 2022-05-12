@@ -106,35 +106,15 @@ class Helper
                     'folder'           => $folder,
                     'weighted'         => $weighted,
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
+                    'participants'     => null,
                 ];
             }
-            if (!isset($output[$row['id']]['participants'])) {
-                $output[$row['id']]['participants'] = [];
-            }
-            if (null !== $row['student_id'] && 'instructor' ===  $row['reviewRoute']) {
-                $completionDate = new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT);
-                $output[$row['id']]['participants'][$row['student_id']] = [
-                    'learner'        => [
-                        'id'         => $row['student_id'],
-                        'title'      => $row['studentTitle'],
-                        'firstName'  => $row['studentFirstname'],
-                        'lastName'   => $row['studentLastname'],
-                        'externalId' => $row['studentExternalId'],
-                    ],
-                    'mark'           => $row['mark'],
-                    'normalisedMark' => $row['norm_mark'],
-                    'comment'        => $row['comment'],
-                    'date'           => $completionDate->toIso8601String(),
-                    'instructor'     => [
-                        'id'         => $row['staffId'],
-                        'title'      => $row['staffTitle'],
-                        'firstName'  => $row['staffFirstname'],
-                        'lastName'   => $row['staffLastname'],
-                        'externalId' => $row['staffExternalId'],
-                    ]
 
-                ];
-            }
+        }
+        //get feedback items
+        $feedbacks = $this->getAssessmentFeedback(array_keys($output));
+        foreach ($feedbacks as $assessmentID => $feedback) {
+            $output['$assessmentID']['participants'] = $feedback;
         }
         return $output;
     }
@@ -171,56 +151,41 @@ class Helper
     {
         $params = [];
 
-        $select  = $this->getBaseSelect();
-        $select .= ",
-        markTypeTable.hr_name AS markType,
-    COALESCE(task_completion.completion_date, submission_return.created_at) as `completionDate`,
-    v_most_recent_feedback.feedback_table, v_most_recent_feedback.feedback_id, v_most_recent_feedback.student_id,
-    v_most_recent_feedback.review_route as `reviewRoute`,
-    student.title as `studentTitle`,
-    student.firstname as `studentFirstname`,
-    student.lastname as `studentLastname`,
-    student.synergy_id as `studentExternalId`,
-
-    COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
-    COALESCE(submission_return.mark, lti_assessment_score.score_given, assess_attempt.mark) as `mark`,
+//        $select  = $this->getBaseSelect();
+        $select = "SELECT
+    assessment.id,
+    assessment.title,
+    assessment.weight,
+    assessment.course_managed as commonAssessment,
+    lu_work_type.name as `workTypeName`,
+    lu_work_type.id as `workTypeId`,
+    assessment.due_date,
+    v_assessment_relation.folder_id as `folderId`,
     COALESCE(
-    submission_return.norm_mark,
-    (lti_assessment_score.score_given / lti_assessment_score.score_maximum * 100),
-    (assess_attempt.mark / assess_attempt.max_mark * 100)
-    ) as `norm_mark`,
-
-    staff.id as `staffId`,
-    staff.title as `staffTitle`,
-    staff.firstname as `staffFirstname`,
-    staff.lastname as `staffLastname`,
-    staff.synergy_id as `staffExternalId`
+            if(task.id, 'Task', null),
+            if(assess.assessment_id, 'Quiz', null),
+            if(lti_assessment.assessment_id, 'LTI', null),
+            if(submission_box.id, 'DueWork', null),
+            if(project.id, 'Project', null)
+        ) as `assessmentType`,
+    folder.name as `folderName`,
+    (SELECT group_concat(id) from lu_year_level
+                                      LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
+     where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`,
+    markTypeTable.hr_name AS markType
     ";
 
         $from = "FROM v_assessment_relation
-JOIN assessment on v_assessment_relation.assessment_id = assessment.id
-LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
-LEFT JOIN task on assessment.id = task.assessment_id
-LEFT JOIN assess on assessment.id = assess.assessment_id
-LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
-LEFT JOIN project on assessment.id = project.assessment_id
-LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
-LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
+         JOIN assessment on v_assessment_relation.assessment_id = assessment.id
+         LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
+         LEFT JOIN task on assessment.id = task.assessment_id
+         LEFT JOIN assess on assessment.id = assess.assessment_id
+         LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
+         LEFT JOIN project on assessment.id = project.assessment_id
+         LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+         LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
 
-LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
-
-LEFT JOIN v_most_recent_feedback on assessment.id = v_most_recent_feedback.assessment_id
-
-LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
-LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
-LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
-
-LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
-
-LEFT JOIN assess_attempt on (v_most_recent_feedback.feedback_id = assess_attempt.attempt_id AND v_most_recent_feedback.feedback_table = 'assess_attempt')
-
-LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id, assess_attempt.reviewer_id) = staff.id
-
+         LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
 ";
         $where = "
 WHERE
@@ -293,30 +258,84 @@ WHERE
         ];
     }
 
-    private function getBaseSelect()
+    private function getAssessmentFeedback($assessmentIds)
     {
-        return "
+        $statement = $this->mapper->getDatabase()->query("
         SELECT
     assessment.id,
-    assessment.title,
-    assessment.weight,
-    assessment.course_managed as commonAssessment,
-    lu_work_type.name as `workTypeName`,
-    lu_work_type.id as `workTypeId`,
-    assessment.due_date,
-    v_assessment_relation.folder_id as `folderId`,
     COALESCE(
-            if(task.id, 'Task', null),
-            if(assess.assessment_id, 'Quiz', null),
-            if(lti_assessment.assessment_id, 'LTI', null),
-            if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null)
-        ) as `assessmentType`,
-    folder.name as `folderName`,
-    (SELECT group_concat(id) from lu_year_level
-            LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-                    where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`
-        ";
+            task_completion.completion_date,
+            submission_return.created_at,
+            lti_assessment_score.created_at,
+            assess_attempt.reviewed_at
+        ) as `completionDate`,
+    v_most_recent_feedback.student_id,
+    student.title as `studentTitle`,
+    student.firstname as `studentFirstname`,
+    student.lastname as `studentLastname`,
+    student.synergy_id as `studentExternalId`,
+
+    COALESCE(submission_return.comment, lti_assessment_score.comment) as `comment`,
+    COALESCE(submission_return.mark, lti_assessment_score.score_given, assess_attempt.mark) as `mark`,
+    COALESCE(
+            submission_return.norm_mark,
+            (lti_assessment_score.score_given / lti_assessment_score.score_maximum * 100),
+            (assess_attempt.mark / assess_attempt.max_mark * 100)
+        ) as `norm_mark`,
+
+    staff.id as `staffId`,
+    staff.title as `staffTitle`,
+    staff.firstname as `staffFirstname`,
+    staff.lastname as `staffLastname`,
+    staff.synergy_id as `staffExternalId`
+FROM v_assessment_relation
+         JOIN assessment on v_assessment_relation.assessment_id = assessment.id
+         LEFT JOIN v_most_recent_feedback on assessment.id = v_most_recent_feedback.assessment_id
+
+         LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
+         LEFT JOIN task_completion on (v_most_recent_feedback.feedback_id = task_completion.id AND v_most_recent_feedback.feedback_table = 'task_completion')
+         LEFT JOIN submission_return on (v_most_recent_feedback.feedback_id = submission_return.id AND v_most_recent_feedback.feedback_table = 'submission_return')
+
+         LEFT JOIN lti_assessment_score on (v_most_recent_feedback.feedback_id = lti_assessment_score.id AND v_most_recent_feedback.feedback_table = 'lti_assessment_score')
+
+         LEFT JOIN assess_attempt on (v_most_recent_feedback.feedback_id = assess_attempt.attempt_id AND v_most_recent_feedback.feedback_table = 'assess_attempt')
+
+         LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id, assess_attempt.reviewer_id) = staff.id
+WHERE
+v_most_recent_feedback.review_route = 'instructor' AND
+    v_assessment_relation.assessment_id in (" . implode(',', $assessmentIds) . ")"
+        );
+        $statement->execute();
+        $feedbackItems = [];
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($feedbackItems[$row['id']])) {
+                $feedbackItems[$row['id']] = [];
+            }
+
+                $feedbackItems[$row['id']][$row['student_id']] = [
+                        'learner'        => [
+                            'id'         => $row['student_id'],
+                            'title'      => $row['studentTitle'],
+                            'firstName'  => $row['studentFirstname'],
+                            'lastName'   => $row['studentLastname'],
+                            'externalId' => $row['studentExternalId'],
+                        ],
+                        'mark'           => $row['mark'],
+                        'normalisedMark' => $row['norm_mark'],
+                        'comment'        => $row['comment'],
+                        'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                        'instructor'     => [
+                            'id'         => $row['staffId'],
+                            'title'      => $row['staffTitle'],
+                            'firstName'  => $row['staffFirstname'],
+                            'lastName'   => $row['staffLastname'],
+                            'externalId' => $row['staffExternalId'],
+                        ]
+
+                    ];
+
+        }
+        return $feedbackItems;
     }
 
     /**
@@ -336,7 +355,7 @@ WHERE
      * if the folder has a single code, it will return a string of the code
      * if a folder has multiple codes, it will create an array with each code contained
      */
-    public function getFolderCode(int $folderId): ?array
+    public function getFolderCode(int $folderId)
     {
         if (null === $this->folderCodes) {
             $statement = $this->mapper->getDatabase()->prepare("
