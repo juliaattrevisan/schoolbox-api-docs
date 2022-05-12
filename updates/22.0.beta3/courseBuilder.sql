@@ -1,12 +1,17 @@
-DELETE from component_config_instance
-where component_config_definition_id = (SELECT id FROM component_config_definition
-    WHERE
-    component_definition_id = (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Builder\\Controller')
+#delete all component instance config for the Course Builder
+DELETE component_config_instance FROM component_config_instance
+          JOIN component_config_definition on component_config_instance.component_config_definition_id = component_config_definition.id
+         JOIN component_definition on component_config_definition.component_definition_id = component_definition.id
+where component_config_instance.component_config_definition_id = component_config_definition.id
 AND
-    label ='Show Title to Read-Only Users');
+        component_definition.class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Builder\\Controller'
+AND
+        component_config_definition.label ='Show Title to Read-Only Users';
 
-DELETE FROM component_config_definition
+#delete the base config for the Course Builder
+DELETE component_config_definition FROM component_config_definition
+         JOIN component_definition on component_config_definition.component_definition_id = component_definition.id
 WHERE
-    component_definition_id = (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Builder\\Controller')
+    component_definition.class = 'Schoolbox\\Learning\\Assessment\\Component\\Homepage\\Builder\\Controller'
 AND
-    label ='Show Title to Read-Only Users';
+        component_config_definition.label ='Show Title to Read-Only Users';
