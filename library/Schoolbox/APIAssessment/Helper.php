@@ -3,7 +3,6 @@
 namespace Schoolbox\APIAssessment;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use PDO;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
@@ -39,7 +38,10 @@ class Helper
     }
 
     /**
-     *
+     * search's assessments based on filter, and will also include feedback items for those assessments.
+     * filter can include:
+     * assessmentId, assessmentType, folderId, weighted, weightType (id / name)
+     * dueDate (from/to), yearLevel (id / name), title
      */
     public function searchForAssessments(array $filter, int $limit, int $cursor): array
     {
@@ -109,12 +111,11 @@ class Helper
                     'participants'     => null,
                 ];
             }
-
         }
         //get feedback items
         $feedbacks = $this->getAssessmentFeedback(array_keys($output));
         foreach ($feedbacks as $assessmentID => $feedback) {
-            $output['$assessmentID']['participants'] = $feedback;
+            $output[$assessmentID]['participants'] = $feedback;
         }
         return $output;
     }
@@ -122,6 +123,10 @@ class Helper
     /**
      * returns the count of all assessments that match the filtered search
      * This is not limited by the `limit` or `cursor` parameters
+     * filter can include:
+     * assessmentId, assessmentType, folderId, weighted, weightType (id / name)
+     * dueDate (from/to), yearLevel (id / name), title
+     *
      * @param array $filter
      * @return int
      */
@@ -146,12 +151,18 @@ class Helper
     /**
      * search base
      * build the search query for both count, and json response
+     * will limit / build the query based on the filter
+     * filter can include:
+     * assessmentId, assessmentType, folderId, weighted, weightType (id / name)
+     * dueDate (from/to), yearLevel (id / name), title
+     *
+     * @param array $filter
+     * @return array [sql query, param (param key => param value)]
      */
     private function buildSearch(array $filter)
     {
         $params = [];
 
-//        $select  = $this->getBaseSelect();
         $select = "SELECT
     assessment.id,
     assessment.title,
@@ -258,7 +269,13 @@ WHERE
         ];
     }
 
-    private function getAssessmentFeedback($assessmentIds)
+    /**
+    * give this an array of assessment id's and it will get all the assessment feedback items,
+    * and return a nice array of them all indexed by the assessment ID
+    * @param array $assessmentIds
+    * @return array
+    */
+    private function getAssessmentFeedback(array $assessmentIds): array
     {
         $statement = $this->mapper->getDatabase()->query("
         SELECT
@@ -303,8 +320,7 @@ FROM v_assessment_relation
          LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id, assess_attempt.reviewer_id) = staff.id
 WHERE
 v_most_recent_feedback.review_route = 'instructor' AND
-    v_assessment_relation.assessment_id in (" . implode(',', $assessmentIds) . ")"
-        );
+    v_assessment_relation.assessment_id in (" . implode(',', $assessmentIds) . ")");
         $statement->execute();
         $feedbackItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -312,28 +328,26 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 $feedbackItems[$row['id']] = [];
             }
 
-                $feedbackItems[$row['id']][$row['student_id']] = [
-                        'learner'        => [
-                            'id'         => $row['student_id'],
-                            'title'      => $row['studentTitle'],
-                            'firstName'  => $row['studentFirstname'],
-                            'lastName'   => $row['studentLastname'],
-                            'externalId' => $row['studentExternalId'],
-                        ],
-                        'mark'           => $row['mark'],
-                        'normalisedMark' => $row['norm_mark'],
-                        'comment'        => $row['comment'],
-                        'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
-                        'instructor'     => [
-                            'id'         => $row['staffId'],
-                            'title'      => $row['staffTitle'],
-                            'firstName'  => $row['staffFirstname'],
-                            'lastName'   => $row['staffLastname'],
-                            'externalId' => $row['staffExternalId'],
-                        ]
-
-                    ];
-
+            $feedbackItems[$row['id']][$row['student_id']] = [
+                    'learner'        => [
+                        'id'         => $row['student_id'],
+                        'title'      => $row['studentTitle'],
+                        'firstName'  => $row['studentFirstname'],
+                        'lastName'   => $row['studentLastname'],
+                        'externalId' => $row['studentExternalId'],
+                    ],
+                    'mark'           => $row['mark'],
+                    'normalisedMark' => $row['norm_mark'],
+                    'comment'        => $row['comment'],
+                    'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                    'instructor'     => [
+                        'id'         => $row['staffId'],
+                        'title'      => $row['staffTitle'],
+                        'firstName'  => $row['staffFirstname'],
+                        'lastName'   => $row['staffLastname'],
+                        'externalId' => $row['staffExternalId'],
+                    ]
+                ];
         }
         return $feedbackItems;
     }
