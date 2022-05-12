@@ -441,7 +441,7 @@ class Controller extends Base
              * Go to the detail screen to see the outcome of your changes
              * and also use that screen to advance to the next step
              */
-            if ($article->isPublished() && $data[Querystring::RETURN_URL]) {
+            if ($article->isPublished() && isset($data[Querystring::RETURN_URL])) {
                 $nextStep = Querystring::decode($data[Querystring::RETURN_URL]);
             } else {
                 $nextStep = $this->getRouter()->generate('commsNews.getDetail', $routeParams);

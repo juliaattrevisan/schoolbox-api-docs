@@ -569,7 +569,7 @@ class Controller extends Base
 
         // Only save severity if it is enabled by policy
 
-        if ($post['severity'] && $this->getConfigLoader()->get('pastoral_severity')) {
+        if ($this->getConfigLoader()->get('pastoral_severity') && $post['severity']) {
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
@@ -658,7 +658,7 @@ class Controller extends Base
 
         // Save groups the report is shared with
 
-        if (is_array($post['group'])) {
+        if (is_array($post['group'] ?? false)) {
             $groupsCollection = new Collection();
 
             foreach ($post['group'] as $groupId => $checked) {

@@ -49,17 +49,17 @@ class Student extends IteratorIterator
         $student
             ->setId($currentResult['student_id'])
             ->setTitle($currentResult['student_title'] ?? '')
-            ->setGivenName($currentResult['student_given_name'])
+            ->setGivenName($currentResult['student_given_name'] ?? '')
             ->setPreferredName($currentResult['student_preferred'] ?? '')
-            ->setLastname($currentResult['student_surname'])
+            ->setLastname($currentResult['student_surname'] ?? '')
             ->setGender($currentResult['student_gender'] ?? null);
 
         $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description'] ?? null);
         $student->getForm()->setDescription($currentResult['student_form_description'] ?? '');
 
-        $student->getHouse()->setCode($currentResult['student_house']);
+        $student->getHouse()->setCode($currentResult['student_house'] ?? '');
 
-        $student->getAccount()->setLogin($currentResult['network_login']);
+        $student->getAccount()->setLogin($currentResult['network_login'] ?? '');
 
         /* Emails - one for every item in stack
          */
@@ -76,7 +76,7 @@ class Student extends IteratorIterator
          * is not strictly yes/no; sometimes it contains B, W, D, etc.
          * It's really a Student Boarder Type, more than anything
          */
-        if (strlen($currentResult['student_boarding_house'])) {
+        if (isset($currentResult['student_boarding_house']) && strlen($currentResult['student_boarding_house'])) {
             $boardingHouse = new User\Common\BoardingHouse();
             $boardingHouse->setCode($currentResult['student_boarding_house']);
 
@@ -86,7 +86,7 @@ class Student extends IteratorIterator
         /* Campus
          */
         $campus = new User\Common\Campus();
-        $campus->setCode($currentResult['student_campus']);
+        $campus->setCode($currentResult['student_campus'] ?? '');
 
         $student->getCampus()->add($campus);
 

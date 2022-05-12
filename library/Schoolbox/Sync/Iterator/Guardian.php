@@ -59,9 +59,9 @@ class Guardian extends IteratorIterator
         $guardian
             ->setId($currentResult['student_contact_id'])
             ->setTitle($currentResult['student_contact_title'] ?? '')
-            ->setGivenName($currentResult['student_contact_given_name'])
-            ->setPreferredName($currentResult['student_contact_preferred'])
-            ->setLastname($currentResult['student_contact_surname'])
+            ->setGivenName($currentResult['student_contact_given_name'] ?? '')
+            ->setPreferredName($currentResult['student_contact_preferred'] ?? '')
+            ->setLastname($currentResult['student_contact_surname'] ?? '')
         ;
 
         if (array_key_exists('student_contact_type', $currentResult)) {
@@ -79,7 +79,7 @@ class Guardian extends IteratorIterator
          */
         $guardian
             ->getAccount()
-            ->setLogin($currentResult['student_contact_network_login'])
+            ->setLogin($currentResult['student_contact_network_login'] ?? '')
         ;
 
         // Add details for each one of their students
@@ -89,22 +89,22 @@ class Guardian extends IteratorIterator
             $student
                 ->setId($row['student_id'] ?? '')
                 ->setPreferredName($row['student_preferred'] ?? '')
-                ->setLastname($row['student_surname'])
-                ->setGender($row['student_gender'])
+                ->setLastname($row['student_surname'] ?? '')
+                ->setGender($row['student_gender'] ?? '')
             ;
 
-            $student->getYear()->setLevel($row['student_year_level']);
+            $student->getYear()->setLevel($row['student_year_level'] ?? '');
             $student->getForm()->setDescription($row['student_form_description'] ?? '');
 
             /* Campus
              */
             $campus = new User\Common\Campus();
-            $campus->setCode($row['student_campus']);
+            $campus->setCode($row['student_campus'] ?? '');
             $student->getCampus()->add($campus);
 
             /* House
              */
-            $student->getHouse()->setCode($row['student_house']);
+            $student->getHouse()->setCode($row['student_house'] ?? '');
 
             $guardian->addStudent($student);
 

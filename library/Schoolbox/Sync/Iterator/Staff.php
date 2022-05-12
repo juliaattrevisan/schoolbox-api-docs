@@ -51,10 +51,10 @@ class Staff extends IteratorIterator
         $staff         = new User\Staff();
         $staff
             ->setId($currentResult['staff_id'])
-            ->setTitle($currentResult['staff_title'])
+            ->setTitle($currentResult['staff_title'] ?? '')
             ->setPreferredName($currentResult['staff_preferred_name'] ?? '')
             ->setGivenName($currentResult['staff_given_name'] ?? '')
-            ->setLastname($currentResult['staff_surname'])
+            ->setLastname($currentResult['staff_surname'] ?? '')
             ->getMeta()
             ->setDepartment($currentResult['staff_department'] ?? null);
 
@@ -62,13 +62,15 @@ class Staff extends IteratorIterator
             $staff->getYear()->setLevel($currentResult['staff_year_level'])->setDescription($currentResult['staff_year_level_description'] ?? '');
         }
 
-        $staff->getMeta()->getCategory()->setCode($currentResult['staff_category'])->setType($currentResult['staff_category_type']);
+        if (isset($currentResult['staff_category'])) {
+            $staff->getMeta()->getCategory()->setCode($currentResult['staff_category'])->setType($currentResult['staff_category_type'] ?? '');
+        }
 
         /* Account
          */
-        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag'] ?? false);
+        $staff->getAccount()->setLogin($currentResult['network_login'] ?? '')->setActive($currentResult['active_flag'] ?? false);
 
-        $staff->getHouse()->setCode($currentResult['staff_house']);
+        $staff->getHouse()->setCode($currentResult['staff_house'] ?? '');
 
         /* Email - one for every item in stack
          */
@@ -90,7 +92,7 @@ class Staff extends IteratorIterator
         /* Campus
          */
         $campus = new User\Common\Campus();
-        $campus->setCode($currentResult['staff_campus']);
+        $campus->setCode($currentResult['staff_campus'] ?? '');
 
         $staff->getCampus()->add($campus);
 

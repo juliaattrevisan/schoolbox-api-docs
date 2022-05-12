@@ -81,6 +81,7 @@ class Factory
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
         $context = $assessment->getContext();
+        $path = '';
 
         if ($context instanceof Project) {
             $routeName   = 'learningAssessment.getStatus';
@@ -101,8 +102,6 @@ class Factory
         } elseif ($context instanceof UnitImplementation) {
             if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
-            } else {
-                $path = '';
             }
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
