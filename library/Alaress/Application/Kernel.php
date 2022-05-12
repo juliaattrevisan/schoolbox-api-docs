@@ -1862,7 +1862,14 @@ abstract class Kernel
     {
         /** @var ModuleCache\Cache $moduleCache */
         $moduleCache = $this->di->get('moduleCache');
-        $routes      = $moduleCache->fetchRouteTable();
+        try {
+            $routes = $moduleCache->fetchRouteTable();
+        } catch (ModuleCache\FetchException $e) {
+            /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
+            $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
+            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            $routes = $moduleCache->fetchRouteTable();
+        }
 
         /** @var Router $router */
         $router = $this->di->get('router');
@@ -1876,7 +1883,14 @@ abstract class Kernel
     {
         /** @var ModuleCache\Cache $moduleCache */
         $moduleCache = $this->di->get('moduleCache');
-        $modules     = $moduleCache->fetchModuleRegistrations();
+        try {
+            $modules = $moduleCache->fetchModuleRegistrations();
+        } catch (ModuleCache\FetchException $e) {
+            /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
+            $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
+            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            $modules = $moduleCache->fetchModuleRegistrations();
+        }
         Registry::setRegistrations($modules);
     }
 }
