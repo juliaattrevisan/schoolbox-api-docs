@@ -168,6 +168,7 @@ foreach ($typeList as $type) {
                         $currentConfig->render($this);
                         $this->setVar('error_message_block', '');
                         if ($currentConfig->getFailedCount() >= 5) {
+                            $this->setVar('ERROR_COUNT', Calendar_Api_Config_Record::MAXFAILED);
                             $this->parse('error_message_block', 'error_message');
                         }
                         /* Parse connector row
