@@ -260,10 +260,11 @@ abstract class Alaress_Cache_Abstract
             /**
              * check scheme, if webcal, update the scheme to http
              */
-            if ('webcal' === parse_url($url, PHP_URL_SCHEME)) {
-                $url = str_replace('webcal', 'http', $url);
+            $url = new \Laminas\Uri\Uri($url);
+            if ('webcal' === $url->getScheme()) {
+                $url->setScheme('http');
             }
-            $httpClient->get($url, ['headers' => $headers, 'sink' => $this->cachedFile]);
+            $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;
         }
