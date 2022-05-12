@@ -49,8 +49,7 @@ class Cache
      * Fetch module registrations from cache.
      *
      * @return array
-     * @throws FetchException if the module registration isn't in cache, or
-     *                        it can't be decoded into an array.
+     * @throws FetchException if the module registration isn't in cache.
      * @throws TypeError      if somehow the module registration once decoded
      *                        is not an array?
      */
@@ -71,6 +70,9 @@ class Cache
      * Fetch route table from cache.
      *
      * @return RouteCollection
+     * @throws FetchException if the route table isn't in cache.
+     * @throws TypeError      if somehow the route table once decoded is not a
+     *                        `RouteCollection`?
      */
     public function fetchRouteTable(): RouteCollection
     {
@@ -78,8 +80,6 @@ class Cache
         if (!isset($routesSerialized)) {
             throw new FetchException('Route table not found in cache');
         }
-
-        // Is unserializing this lump any better than loading all modules?
         return unserialize($routesSerialized);
     }
 }
