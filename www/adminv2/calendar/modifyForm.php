@@ -117,6 +117,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
              */
             foreach ($allConfigs as $currentConfig) {
                 $currentConfig->activate();
+                //reset failed count, as they user may have fixed the issue.... may..
+                $currentConfig->setFailedCount(0);
                 Calendar_Api_Config_Mapper::getInstance()->save([$currentConfig]);
             }
         }
