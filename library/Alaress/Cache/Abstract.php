@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException as RequestException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * Alaress_Cache_Abstract
@@ -139,6 +140,7 @@ abstract class Alaress_Cache_Abstract
      * @param string[]  $headers
      * @return self
      * @throws InvalidArgumentException if `$url` is empty
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function init(string $url, array $headers = []): \Alaress_Cache_Abstract
     {
@@ -168,6 +170,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return void
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function retrieveStreamContents(): void
     {
@@ -200,6 +203,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return $this
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
      */
     protected function newCacheUpdate(): \Alaress_Cache_Abstract
     {
@@ -233,6 +237,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return bool
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
      */
     protected function saveStreamContents(): bool
     {
@@ -269,7 +274,7 @@ abstract class Alaress_Cache_Abstract
             }
             $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
         } catch (RequestException $e) {
-            return false;
+            throw new SchoolboxException("something failed....", 0, $e);
         }
 
         return true;

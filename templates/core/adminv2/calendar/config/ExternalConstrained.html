@@ -3,6 +3,11 @@
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value="{CONNECTOR_CLASS}" />
 <div class="columns medium-4">
     <div class="content">
+        <!-- BEGIN error_message -->
+        <div class="alert-box alert">
+            This calendar subscription has failed 5 times, please fix.
+        </div>
+        <!-- END error_message -->
         <label>Label
             <input type='text' name="record[{CONNECTOR_ID}][label]" value="{CONNECTOR_LABEL}" />
         </label>

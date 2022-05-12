@@ -44,6 +44,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         $this->uses('connector_class', self::TYPE_STRING, null, 'connectorClass');
         $this->uses('config', self::TYPE_STRING, null, 'config');
         $this->uses('status', self::TYPE_INTEGER, null, 'status');
+        $this->uses('failed_count', self::TYPE_INTEGER, null, 'failedCount');
     }
 
     /**

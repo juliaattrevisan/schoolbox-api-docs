@@ -72,6 +72,7 @@ class Original extends \Alaress_Cache_Abstract
      * @return self
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function initPost(SocialStream_Post_Abstract $post): Original
     {
@@ -105,6 +106,7 @@ class Original extends \Alaress_Cache_Abstract
      * @return void
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function retrieveStreamContents(): void
     {

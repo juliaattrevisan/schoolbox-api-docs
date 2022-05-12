@@ -56,6 +56,7 @@ class Vcal
      * @throws InvalidArgumentException if the config has no URL
      * @throws InvalidDataException     if the URL contains bad data
      * @throws ParseException           if the URL contains bad data
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function write(CalendarConfig $config): void
     {
@@ -93,6 +94,7 @@ class Vcal
      * @param CalendarConfig $config
      * @return string|null
      * @throws InvalidArgumentException if the config has no URL
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     private function retrieveSource(CalendarConfig $config): ?string
     {
