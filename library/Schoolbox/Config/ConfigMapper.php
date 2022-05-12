@@ -136,6 +136,7 @@ class ConfigMapper extends Mapper
     public const NAME_JWT_PUBLIC_KEY  = 'jwt_public_key';
     public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';
     public const NAME_JWT_LEEWAY      = 'jwt_leeway';
+    public const NAME_QR_LOGIN_ENABLED = 'qr_login_enabled';
     public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
     public const NAME_SITE_VERSION = 'site_version';
@@ -145,6 +146,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_GOTENBERG_HOST = 'gotenberg_host';
     public const NAME_GOTENBERG_API_KEY = 'gotenberg_api_key';
+    public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 

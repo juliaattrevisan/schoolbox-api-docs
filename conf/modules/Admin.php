@@ -26,7 +26,8 @@ class Admin extends ModuleLoader
 
             // Bulk course import
             $this->loadModule($di, \Schoolbox\Admin\BulkCourseImport\Module::class, '/adminv2/bulkCourseImport');
-
+        }
+        if ($di->get('config')->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED)) {
             // Report export
             $this->loadModule($di, \Schoolbox\Admin\ReportExport\Module::class, '/adminv2/report-export');
         }

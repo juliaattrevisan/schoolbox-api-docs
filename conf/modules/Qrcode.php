@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Qrcode\Module;
 
 class Qrcode implements ModuleConfigInterface
@@ -21,6 +22,9 @@ class Qrcode implements ModuleConfigInterface
     public function configure(ContainerInterface $di): void
     {
         $module = new Module($di);
-        $module->registerModule('/qrcode');
+
+        if ($di->get('config')->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)) {
+            $module->registerModule('/qrcode');
+        }
     }
 }

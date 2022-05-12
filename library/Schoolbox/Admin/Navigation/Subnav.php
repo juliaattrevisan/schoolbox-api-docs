@@ -374,7 +374,7 @@ class Subnav
                     ],
                     '/adminv2/report-export'                => [
                         'name'        => 'Report Export',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
                         'children'    => [],
                         'description' => '',
                     ],

@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -50,6 +51,7 @@ class Module extends BaseModule
 
         $canGenerate = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_QR_LOGIN_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\All(
