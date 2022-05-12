@@ -12,6 +12,7 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Exception\UnreachableException;
 use Alaress\Lock\InstanceLockFactory;
+use Alaress\Lock\LockRefreshException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -206,6 +207,7 @@ abstract class App
      * @return LockInterface
      *
      * @noinspection PhpDocMissingThrowsInspection
+     * @throws \RuntimeException
      */
     protected function acquireLock(string $lockName, ?float $timeout): LockInterface
     {
@@ -215,19 +217,57 @@ abstract class App
         $lock        = $lockFactory->createLock($lockName, $timeout);
 
         // Try to acquire this lock
-        $acquired = false;
         try {
             $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            // Couldn't acquire the lock: this is okay
-            // The calling code will check if the lock is acquired
+        } catch (\Exception $e) {
+            /* Any weird exception being thrown here - lock-related or otherwise -
+             * is going to preclude a proper lock acquisition and you should be
+             * prevented from doing whatever you're doing
+             */
+            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
+            $this->logger->warning($message);
+
+            throw new \RuntimeException($message);
         }
+
+        /* You didn't die, but you also couldn't acquire a lock
+         * Drop a nice message because this is an intended behaviour
+         */
         if (!$acquired) {
-            $this->logger->warning(
-                'This process is already running for this instance: trusting it will self-terminate on timeout'
+            $message = sprintf(
+                'Could not acquire %s lock',
+                $lockName
             );
+
+            $this->logger->warning($message);
+
+            throw new \RuntimeException($message);
         }
+
         return $lock;
+    }
+
+
+    /**
+     * An alias to refresh a lock but captures the exception thrown
+     * when a lock expires
+     *
+     * @param LockInterface $lock
+     * @return void
+     * @throws LockRefreshException
+     */
+    protected function refreshLock(LockInterface $lock): void
+    {
+        try {
+            $lock->refresh();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $message = 'Could not refresh lock; perhaps expired';
+
+            $this->logger->warning($message);
+
+            throw new LockRefreshException($message);
+        }
     }
 
 
