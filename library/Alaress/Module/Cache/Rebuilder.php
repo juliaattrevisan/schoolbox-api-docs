@@ -28,6 +28,11 @@ use Schoolbox\IConfigLoader;
 class Rebuilder
 {
     /**
+     * Cache expiry time: let's just say 24 hours.
+     */
+    private const CACHE_EXPIRY = 60 * 60 * 24;
+
+    /**
      * DI container: `\Config\Modules\ModuleConfigInterface::configure`
      * implementations require this to build their modules.
      */
@@ -115,12 +120,14 @@ class Rebuilder
         // The new route table and module registrations have been loaded:
         // dump them into Redis.
         $this->logger->info('Writing route and module configs to Redis cache');
-        $this->redis->set(
+        $this->redis->setex(
             Cache::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID,
+            self::CACHE_EXPIRY,
             serialize($this->router->getRoutes()),
         );
-        $this->redis->set(
+        $this->redis->setex(
             Cache::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID,
+            self::CACHE_EXPIRY,
             json_encode(Registry::getRegistrations()),
         );
     }

@@ -12,6 +12,7 @@ namespace Alaress\Module\Cache;
 use Aura\Router\RouteCollection;
 use JsonException;
 use Predis\ClientInterface;
+use TypeError;
 
 class Cache
 {
@@ -48,13 +49,22 @@ class Cache
      * Fetch module registrations from cache.
      *
      * @return array
-     * @throws JsonException if for some reason the module registrations can't
-     *                       be decoded
+     * @throws FetchException if the module registration isn't in cache, or
+     *                        it can't be decoded into an array.
+     * @throws TypeError      if somehow the module registration once decoded
+     *                        is not an array?
      */
     public function fetchModuleRegistrations(): array
     {
         $modulesEncoded = $this->redis->get(self::MODULE_REGISTRATION_CACHE_KEY_PREFIX . INSTANCE_ID);
-        return json_decode($modulesEncoded, true, 512, JSON_THROW_ON_ERROR);
+        if (!isset($modulesEncoded)) {
+            throw new FetchException('Module registration not found in cache');
+        }
+        try {
+            return json_decode($modulesEncoded, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new FetchException('Module registration found in cache, but is not valid JSON', null, $e);
+        }
     }
 
     /**
@@ -65,6 +75,9 @@ class Cache
     public function fetchRouteTable(): RouteCollection
     {
         $routesSerialized = $this->redis->get(self::ROUTE_TABLE_CACHE_KEY_PREFIX . INSTANCE_ID);
+        if (!isset($routesSerialized)) {
+            throw new FetchException('Route table not found in cache');
+        }
 
         // Is unserializing this lump any better than loading all modules?
         return unserialize($routesSerialized);
