@@ -73,7 +73,7 @@ class Calendar_Api_Config_Record
      * count of times the calendar request has failed, if more than 5 times, display to the system config space
      * @var ?int
      */
-    private int $failedCount = 0;
+    private ?int $failedCount = 0;
     public const MAXFAILED = 5;
 
     /* These configs are base64-encode()'d to get around a weird issue with unserialize
