@@ -33,8 +33,18 @@ class Renderer extends AbstractRenderer
         return ConfigMapper::FIELD_HTML;
     }
 
+    /**
+     * @param Config $config
+     * @return array|string[]
+     */
     protected function getData(Config $config): array
     {
+        /**
+         * grab the standard twig data, and append to the array the base_href for ckeditor to build absolute URLs
+         * this was originally created for the email signature, but will also work with the rest of the config html fields
+         *
+         * This will not update existing entries, only when adding a new link with the ckeditor link dialogue
+         */
         $data =  parent::getData($config);
         $data['BASE_HREF'] = (new \Schoolbox\Url\Factory(ConfigMapper::getInstance()->getConfigLoader()))->buildFullyQualified()->setScheme("https");
         return $data;

@@ -118,14 +118,17 @@ if ($config->get('mail_enable') == 1) {
     /**
      * build the email signature if it is defined, and the user has a schoolbox email
      * matching on user's email domain matches the smtp from address
+     *
+     * but dont build / add a signature if the signature field is empty
      */
     $emailBody = '';
     $signature = $config->get('email_signature');
     $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
     if (
         $config->get('mail_address') === explode('@', $user->getEmail())[1] &&
-        null !== $signature
+        '' !== trim($signature)
     ) {
+        //build signature, and replace requested tokens
         $emailBody = "<br><br>---<br>" . $tokenReplacer->replace(
             $signature,
             [
