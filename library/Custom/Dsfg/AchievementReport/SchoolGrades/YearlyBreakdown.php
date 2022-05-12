@@ -46,6 +46,7 @@ class YearlyBreakdown extends Base
             $totals[$year]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
             $totals[$year]['achievedGrades'] = 0;
+            $totals[$year]['enteredGrades']  = 0;
 
             /* Choose which values to accumulate, from either
              * term4 or term2 (depending on which is available)
@@ -58,6 +59,7 @@ class YearlyBreakdown extends Base
                 $yearStack[$year][$courseName]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
                 $yearStack[$year][$courseName]['achievedGrades'] = 0;
+                $yearStack[$year][$courseName]['enteredGrades']  = 0;
 
                 /* Explore all the areas
                  */

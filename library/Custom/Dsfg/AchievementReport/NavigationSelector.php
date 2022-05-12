@@ -340,6 +340,10 @@ class NavigationSelector
      */
     private function hasCoCurricular(): bool
     {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
         $params = [
             'externalId' => $this->externalUser['StudentID'],
         ];
