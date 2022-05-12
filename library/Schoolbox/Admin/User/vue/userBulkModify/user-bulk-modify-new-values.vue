@@ -128,7 +128,7 @@ export default {
                     body: this.getUpdateUsersFormData(),
                 });
                 const responseData = await response.json();
-                this.checkUpdateResponse(responseData);
+                this.checkUpdateResponse(response, responseData);
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -161,13 +161,17 @@ export default {
          * Check for any issues in the returned update
          * 
          * @param { Object }
+         * @param { Object }
          */
-        checkUpdateResponse (responseData) {
-            if (responseData.status && responseData.status === 501) { //the update was not unable to take place
-                this.hasDataError = true; //so notify of the error
-                this.logData = [responseData.title]; //and retrieve the returned error response
-            } else { //otherwise a successful update is assumed
+        checkUpdateResponse (response, responseData) {
+            if (response.ok) { //successful response
                 this.logData = responseData;
+            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error 
+                this.hasDataError = true; 
+                this.logData = [responseData.title]; //which comes in with an error message
+            } else { 
+                this.hasDataError = true; 
+                this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
             }
         },
 
