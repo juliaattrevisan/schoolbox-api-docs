@@ -83,3 +83,19 @@ LoadError.parameters = {
 LoadError.args = {
     endpoint: endpoint,
 }
+
+export const PreSelectedClass = Template.bind({});
+PreSelectedClass.parameters = {
+    controls: { hideNoControlsWarning: true },
+    msw: {
+        handlers: {
+            auth: rest.get(endpoint, (req, res, ctx) => {
+                return res(ctx.status(403))
+            }),
+        }
+    }
+}
+PreSelectedClass.args = {
+    endpoint: '',
+    previouslySelectedClass: { id: 80, name: '9A English (9ENGA)' },
+}

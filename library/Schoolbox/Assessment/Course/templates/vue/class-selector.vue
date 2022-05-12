@@ -28,6 +28,7 @@ const props = defineProps({
     previouslySelectedClass: { 
         type: Object,
         required: false,
+        default: {},
     },
 });
 
@@ -524,7 +525,7 @@ function onClearAllSelected () {
 }
 
     .selected-classes-container__disabled {
-        opacity: 0.8;
+        opacity: 0.7;
     }
 
 .extra-actions-container {
