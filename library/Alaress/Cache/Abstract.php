@@ -259,6 +259,9 @@ abstract class Alaress_Cache_Abstract
             }
             /**
              * check scheme, if webcal, update the scheme to http
+             * libcurl which is what `GuzzleClient->get` is using under the hood doesnt understand webmail
+             * so lets just replace that here to http. and hope the remote server will redirect to https
+             * not just error out, or serve the data on http.
              */
             $url = new \Laminas\Uri\Uri($url);
             if ('webcal' === $url->getScheme()) {
