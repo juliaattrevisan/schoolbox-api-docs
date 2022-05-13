@@ -347,13 +347,15 @@ switch ($_POST['module']) {
 
                 // if cache exists, update $setting info from cache
                 if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
+                    $samlCert = "-----BEGIN CERTIFICATE-----\n";
+
                     try {
-                        $samlCert = "-----BEGIN CERTIFICATE-----\n";
                         $samlCert.= IdPMetadataParser::parseXML($idpMetadata->getStreamContents())['idp']['x509cert'];
-                        $samlCert.= "\n-----END CERTIFICATE-----";
                     } catch (Exception $e) {
                         $cache->invalidateCache();
                     }
+
+                    $samlCert.= "\n-----END CERTIFICATE-----";
                 }
             } catch (Exception $e) {
                 //noop, metadata url invalid
