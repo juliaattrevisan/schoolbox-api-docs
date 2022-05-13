@@ -308,7 +308,7 @@ WHERE
     staff.lastname as `staffLastname`,
     staff.synergy_id as `staffExternalId`
 FROM v_assessment_relation
-         JOIN assessment on v_assessment_relation.assessment_id = assessment.id
+         INNER JOIN assessment on v_assessment_relation.assessment_id = assessment.id
          LEFT JOIN v_most_recent_feedback on assessment.id = v_most_recent_feedback.assessment_id
 
          LEFT JOIN user student on v_most_recent_feedback.student_id = student.id
