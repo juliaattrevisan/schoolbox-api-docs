@@ -277,14 +277,13 @@ class Sessions implements IStrategy
                             'home_team_id' => $team->getId(),
                             'start_at' => $startAt->getDatabase(),
                             'finish_at' => $finishAt->getDatabase(),
-                            'venue_id' => $venue->getId()
                         ]);
 
                         $this->log->debug(sprintf(
                             'Reusing matchup %s on %s, at venue %s',
                             $matchup->getDisplayName(),
                             $matchup->getStartAt()->getDatabase(),
-                            $matchup->getVenue()->getName()
+                            null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
                     } catch (\Schoolbox\Mapper\Exception $e) {
                         $matchup = $this->matchupMapper->createModel()
@@ -300,7 +299,7 @@ class Sessions implements IStrategy
                             'Creating matchup %s on %s, at venue %s',
                             $matchup->getDisplayName(),
                             $matchup->getStartAt()->getDatabase(),
-                            $matchup->getVenue()->getName()
+                            null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
                     }
 
@@ -397,30 +396,19 @@ class Sessions implements IStrategy
      * (venues are optional in clipboard)
      *
      * @param string|null $venueName
-     * @return \Schoolbox\Fixtures\Venue\Model
+     * @return \Schoolbox\Fixtures\Venue\Model|null
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
-    private function findVenue(?string $venueName): \Schoolbox\Fixtures\Venue\Model
+    private function findVenue(?string $venueName): ?\Schoolbox\Fixtures\Venue\Model
     {
         /* If venue name wasn't specified, find a placeholder
          * generating one if it doesn't already exist
          */
-        if ('' === (string)$venueName) {
-            try {
-                $venue = $this->venueMapper->findOneByColumn('name', self::UNSPECIFIED_LOCATION);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $venue = $this->venueMapper->createModel()
-                    ->setName(self::UNSPECIFIED_LOCATION);
-
-                if ($this->perform) {
-                    $this->venueMapper->save($venue);
-                }
-            }
-
-            return $venue;
+        if ('' === trim((string)$venueName)) {
+            return null;
         }
 
         /* Set up a Venue instance for this Matchup,
