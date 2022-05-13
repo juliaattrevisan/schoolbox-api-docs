@@ -57,8 +57,8 @@ function onRemoveSelected () {
     color: #000;
     display: flex;
     font-size: 0.8125rem;
-    gap: 0.5rem;
     min-height: auto;
+    margin: 0 0.5rem 0.5rem 0;
     padding: 5px 10px;
     text-align: left;
     transition: all 0.3s;
@@ -68,6 +68,7 @@ function onRemoveSelected () {
     background: var(--body-background);
     border-radius: 1rem;
     height: 1rem;
+    margin-left: 0.5rem;
     min-height: 0;
     margin-top: 3px;
     padding: 0;

@@ -518,7 +518,6 @@ function onClearAllSelected () {
     border: 1px solid var(--form-border-color);
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
     margin-top: -1px; //to sit against .search-input
     min-height: 50px;
     padding: 0.5rem;
