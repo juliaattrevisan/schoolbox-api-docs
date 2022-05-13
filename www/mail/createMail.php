@@ -10,6 +10,7 @@
 use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
 use Schoolbox\UserMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -17,12 +18,15 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
+$config = ConfigLoader::getInstance();
+/** @var \Schoolbox\User $currentUser */
+$user = $_SESSION['user'];
 
 $groupHandler = new Group();
 $externalHandler = new External_User();
 $userMapper = UserMapper::getInstance();
 
-if (Config::get('mail_enable') == 1) {
+if ($config->get('mail_enable') == 1) {
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $invalidEmails = [];
@@ -111,6 +115,32 @@ if (Config::get('mail_enable') == 1) {
         }
     }
 
+    /**
+     * build the email signature if it is defined, and the user has a schoolbox email
+     * matching on user's email domain matches the smtp from address
+     *
+     * but dont build / add a signature if the signature field is empty
+     */
+    $emailBody = '';
+    $signature = $config->get('email_signature');
+    $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
+    if (
+        $config->get('mail_address') === explode('@', $user->getEmail())[1] &&
+        '' !== trim($signature)
+    ) {
+        //build signature, and replace requested tokens
+        $emailBody = "<p>&nbsp;</p><p>---</p>" . $tokenReplacer->replace(
+            $signature,
+            [
+                '[title]'     => $user->getTitle(),
+                '[firstname]' => $user->getFirstname(),
+                '[surname]'   => $user->getLastname(), //surname as that is the language we are using in admin user modify
+                '[fullname]'  => $user->getFullName(),
+                '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $user->getEmail(), $user->getEmail()),
+                '[position]'  => $user->getPositionTitle(),
+            ]
+        );
+    }
     $page->setFile(TEMPLATE_content, 'mail/send.html');
     $page->setTitle('Webmail');
     $page->setTab('webmail');
@@ -139,7 +169,7 @@ if (Config::get('mail_enable') == 1) {
 
     $output = array(
         'SUBJECT' => ($_REQUEST['subject'] ?? false) ? Scrub::text($_REQUEST['subject']) : '',
-        'BODY'    => '',
+        'BODY'    => $emailBody,
         'REPLYTO' => json_encode($addressLists['replyto']),
         'CC'      => json_encode($addressLists['cc']),
         'BCC'     => json_encode($addressLists['bcc']),
@@ -156,7 +186,7 @@ if (Config::get('mail_enable') == 1) {
 
     $page->setVar($output);
 
-    $uri = (new \Schoolbox\Url\Factory($page->getDi()->get('config')->getInstance()))->buildFullyQualified()->setScheme("https");
+    $uri = (new \Schoolbox\Url\Factory($config))->buildFullyQualified()->setScheme("https");
     $urlOrigin = array( 'BASE_HREF' => $uri );
     $page->setVar($urlOrigin);
 

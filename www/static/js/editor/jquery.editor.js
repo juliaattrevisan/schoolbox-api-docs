@@ -160,7 +160,7 @@
      * Retrieve a standard configuration for comment CKEditor instances.
      *
      * @param { Object } overrideConfig any overrides of the default configuration
-     * 
+     *
      * @returns { Object }
      */
     $.alaressEditorConfigForComments = function (overrideConfig = {}) {
@@ -199,6 +199,33 @@
                 'fullname',
                 'house',
                 'year',
+            ],
+            marker: '[',
+            minChars: 0,
+            itemTemplate: '<li data-id="{id}">{name}]</li>',
+            outputTemplate: '{name}] ',
+        });
+        return init(options);
+    };
+
+    /**
+     * Retrieve a configuration for a CKEditor instance, including user tokens
+     * autocomplete configuration. specific to the email signature ckeditor in admin
+     *
+     * @param {Object|null} [options] Any overrides of the default configuration
+     * @returns {Object}
+     */
+    $.alaressEditorConfigWithUserEmailTokens = function (options) {
+        options = options || {};
+        options.mentions = options.mentions || [];
+        options.mentions.push({
+            feed: [
+                'title',
+                'firstname',
+                'surname',//surname as that is the language we are using in admin user modify
+                'fullname',
+                'email',
+                'position',
             ],
             marker: '[',
             minChars: 0,
