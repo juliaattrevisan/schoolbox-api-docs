@@ -12,7 +12,7 @@ use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Url\Factory;
-use OneLogin\Saml2\IdPMetadataParser;
+use Schoolbox\Admin\Home\SamlCertHelper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -28,7 +28,7 @@ if (!isset($_POST['module'])) {
     die();
 }
 
-/** @var IConnector $config */
+/** @var IConfigLoader $config */
 $config = $kernel->get('config');
 
 switch ($_POST['module']) {
@@ -336,44 +336,14 @@ switch ($_POST['module']) {
         break;
     case 'service_saml_cert':
         $samlCert = $config->get('saml_idp_certificate');
-
         if (!$samlCert) {
-            try {
-                $url = new \Laminas\Uri\Uri($config->get('saml_idp_metadata_url'));
-                $idpMetadataUrl = $url->toString();
-
-                $cache = new Alaress_Saml_Cache();
-                $idpMetadata = $cache->init($idpMetadataUrl);
-
-                // if cache exists, update $setting info from cache
-                if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
-                    $samlCert = "-----BEGIN CERTIFICATE-----\n";
-
-                    try {
-                        $samlCert.= IdPMetadataParser::parseXML($idpMetadata->getStreamContents())['idp']['x509cert'];
-                    } catch (Exception $e) {
-                        $cache->invalidateCache();
-                    }
-
-                    $samlCert.= "\n-----END CERTIFICATE-----";
-                }
-            } catch (Exception $e) {
-                //noop, metadata url invalid
-            }
+            $samlCert = SamlCertHelper::getSamlCertFromMetadataUrl($config->get('saml_idp_metadata_url'));
         }
 
-        $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
-        if ($validTo === null) {
-            $output[] = array('SAML_LIGHT'  => 'alert',
-                            'SAML_MESSAGE' => 'ERROR encountered'
-            );
-            break;
-        }
-
-        $daysBeforeExpiry = floor(($validTo - time()) / 60 / 60 / 24);
+        $daysBeforeExpiry = floor(SamlCertHelper::getDaysBeforeExpiry($samlCert));
 
         //get plural/singular form of 'day'
-        if (abs($daysBeforeExpiry) === 1) {
+        if (abs($daysBeforeExpiry) == 1) {
             $dayOrDays = "day";
         } else {
             $dayOrDays = "days";
