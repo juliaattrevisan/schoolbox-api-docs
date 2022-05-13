@@ -56,7 +56,7 @@ export function isOpen (component) {
  */
 export async function open (component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+    gsap.to(collapseButton, { rotation: 0, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'uncollapsed');
     await slideDown(collapsePanel, ANIMATE_SPEED);
@@ -69,7 +69,7 @@ export async function open (component) {
  */
 export async function close (component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+    gsap.to(collapseButton, { rotation: 180, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute('data-collapse-state', 'collapsed');
     await slideUp(collapsePanel, ANIMATE_SPEED);
