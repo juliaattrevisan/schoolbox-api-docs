@@ -12,6 +12,7 @@ use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Url\Factory;
+use OneLogin\Saml2\IdPMetadataParser;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -336,6 +337,12 @@ switch ($_POST['module']) {
     case 'service_saml_cert':
         $samlCert = $config->get('saml_public_cert');
         $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
+        if ($validTo === null) {
+            $output[] = array('SAML_LIGHT'  => 'alert',
+                            'SAML_MESSAGE' => 'ERROR encountered'
+            );
+            break;
+        }
 
         $daysBeforeExpiry = floor(($validTo - time()) / 60 / 60 / 24);
 
