@@ -335,7 +335,32 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $samlCert = $config->get('saml_public_cert');
+        $samlCert = $config->get('saml_idp_certificate');
+
+        if (!$samlCert) {
+            try {
+                $url = new \Laminas\Uri\Uri($config->get('saml_idp_metadata_url'));
+                $idpMetadataUrl = $url->toString();
+
+                $cache = new Alaress_Saml_Cache();
+                $idpMetadata = $cache->init($idpMetadataUrl);
+
+                // if cache exists, update $setting info from cache
+                if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
+                    try {
+                        $samlCert = "-----BEGIN CERTIFICATE-----\n";
+                        $samlCert.= IdPMetadataParser::parseXML($idpMetadata->getStreamContents())['idp']['x509cert'];
+                        $samlCert.= "\n-----END CERTIFICATE-----";
+                    } catch (Exception $e) {
+                        $cache->invalidateCache();
+                        SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+                    }
+                }
+            } catch (Exception $e) {
+                //noop, metadata url invalid
+            }
+        }
+
         $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
         if ($validTo === null) {
             $output[] = array('SAML_LIGHT'  => 'alert',
