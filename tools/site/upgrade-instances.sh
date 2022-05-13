@@ -147,11 +147,11 @@ function upgrade_instances(){
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
     # 2. Primary upgrades from v1 to v2, creates data dirs for v1, then update scripts create for v2
     # 3. Non-primary is now lacking v2 dirs. Need to ensure cron regularly checks configured data dirs exist on non-primaries.
+    local args=(--instance "$i")
     if [[ $verbose == 1 ]]; then
-      "$site_root"/tools/site/create-data-dirs.sh --instance "$i" --verbose >> "$instance_log_file" 2>&1
-    else
-      "$site_root"/tools/site/create-data-dirs.sh --instance "$i" >> "$instance_log_file" 2>&1
+      args+=(--verbose)
     fi
+    "$site_root"/tools/site/create-data-dirs.sh "${args[@]}" >> "$instance_log_file" 2>&1
 
     if [[ $is_primary_host == '1' ]]; then
     {
@@ -233,16 +233,14 @@ function rebuild_cron_jobs(){
   else
     log "---removing cron jobs on secondary host---";
   fi
-
-  if [[ $verbose == 0 ]] && [[ $single_instance_mode == 0 ]]; then
-    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host"
-  elif [[ $verbose == 0 ]] && [[ $single_instance_mode == 1 ]]; then
-    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" --instance "$instance_list"
-  elif [[ $verbose == 1 ]] && [[ $single_instance_mode == 0 ]]; then
-    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" -v
-  else
-    schoolboxcloud-rebuild-cronjobs --is-primary-host "$is_primary_host" --instance "$instance_list" -v
+  local args=(--is-primary-host "$is_primary_host")
+  if [[ $verbose == 1 ]]; then
+    args+=(-v)
   fi
+  if [[ $single_instance_mode == 1 ]]; then
+    args+=(--instance "$instance_list")
+  fi
+  schoolboxcloud-rebuild-cronjobs "${args[@]}"
 }
 
 function reload_binding_cache(){
