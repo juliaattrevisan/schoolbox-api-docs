@@ -5,7 +5,11 @@
         <div class="content">
             <!-- BEGIN error_message -->
             <div class="alert-box alert">
-                This calendar subscription has failed {ERROR_COUNT} times, please fix.
+                This calendar subscription has failed {ERROR_COUNT} times<br>
+                It may be one of the following issues:<br>
+                The request to the remote server has timed out. <br>
+                The remote server is unavailable.<br>
+                There is an issue with the format of the URL.<br>
             </div>
             <!-- END error_message -->
             <div id="error_{CONNECTOR_ID}" data-calendar-error class="alert-box alert" style="display:none">
