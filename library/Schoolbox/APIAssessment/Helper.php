@@ -223,7 +223,7 @@ WHERE
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight";
-            if ($filter['weighted'] === true) {
+            if ((bool)$filter['weighted'] === true) {
                 $where .= " != 0.00 ";
             } else {
                 $where .= " = 0.00 ";
