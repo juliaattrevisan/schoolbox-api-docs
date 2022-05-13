@@ -274,7 +274,7 @@ abstract class Alaress_Cache_Abstract
             }
             $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
         } catch (RequestException $e) {
-            throw new SchoolboxException("something failed....", 0, $e);
+            throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
         }
 
         return true;

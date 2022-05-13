@@ -101,6 +101,15 @@ class PreparseVcal extends CliTool\App
                     $e->getMessage()
                 )
             );
+        } catch (\Schoolbox\Application\Exception\Exception $e) {
+            $this->getLogger()->warning(
+                sprintf(
+                    'Could not cache source: %s',
+                    $e->getMessage()
+                )
+            );
+            $config->addFailedCount();
+            Calendar_Api_Config_Mapper::getInstance()->save($config);
         }
     }
 }

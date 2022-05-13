@@ -106,10 +106,6 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
                 'name' => 'GROUP_NAME'
             ]
         );
-        /**
-         * is the endpoint dead?
-         */
-        $var = false;
     }
 
     /**
