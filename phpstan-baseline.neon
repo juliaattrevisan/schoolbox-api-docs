@@ -4851,11 +4851,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php
 
 		-
-			message: "#^Variable \\$path might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Breadcrumb/Factory.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Api.php
