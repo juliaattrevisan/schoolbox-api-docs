@@ -4,6 +4,7 @@ namespace Schoolbox\APIAssessment;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\GenericCollection;
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
@@ -277,6 +278,7 @@ WHERE
     */
     private function getAssessmentFeedback(array $assessmentIds): array
     {
+        $bindings = Builder::getBindings($assessmentIds, 'ids');
         $statement = $this->mapper->getDatabase()->query("
         SELECT
     assessment.id,
@@ -320,7 +322,7 @@ FROM v_assessment_relation
          LEFT JOIN user staff on COALESCE(task_completion.marking_user_id, submission_return.marker, lti_assessment_score.marking_user_id, assess_attempt.reviewer_id) = staff.id
 WHERE
 v_most_recent_feedback.review_route = 'instructor' AND
-    v_assessment_relation.assessment_id in (" . implode(',', $assessmentIds) . ")");
+    v_assessment_relation.assessment_id in ({$bindings->getPlaceholder()})", $bindings->getParams());
         $statement->execute();
         $feedbackItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
