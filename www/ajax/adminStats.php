@@ -353,7 +353,6 @@ switch ($_POST['module']) {
                         $samlCert.= "\n-----END CERTIFICATE-----";
                     } catch (Exception $e) {
                         $cache->invalidateCache();
-                        SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
                     }
                 }
             } catch (Exception $e) {
