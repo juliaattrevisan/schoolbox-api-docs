@@ -143,14 +143,9 @@ class Helper
             $statement->bindValue($label, $value);
         }
         $statement->execute();
-        $count = 0;
-        /**
-         * build the whole thing
-         */
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $count++;
-        }
-        return $count;
+
+        //use the magic rowCount function to grab how many assessments exist based on that search filter
+        return $statement->rowCount();
     }
 
     /**
