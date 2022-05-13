@@ -198,8 +198,11 @@ if (!empty($_POST['accessLevel'])) {
         /* Set new owner/administrator */
         $user = new User();
         $user->setId($userId);
-        $ua = new UserAccess();
-        $ua->setFavourite(false);
+        //find the actual userAccess object, not just create a new one and blow away the old object...
+        $ua = $uaMapper->findOneByColumnList([
+                   'uid' => $user->getId(),
+                   'sid' => $categoryId,
+               ]);
         if ($accessLevel == UserAccess::ACCESS_FULL) {
             //check if member is allowed to become a owner
             if (!$groupHandler->allowOwner($userId)) {
