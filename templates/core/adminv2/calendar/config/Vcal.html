@@ -8,12 +8,16 @@
                 This calendar subscription has failed {ERROR_COUNT} times, please fix.
             </div>
             <!-- END error_message -->
+            <div id="error_{CONNECTOR_ID}" data-calendar-error class="alert-box alert" style="display:none">
+                This calendar subscription has failed.
+                There is something wrong with the URL.
+            </div>
         <label>Label
             <input type='text' name="record[{CONNECTOR_ID}][label]" value="{CONNECTOR_LABEL}" />
         </label>
 
         <label>URL
-            <input type='text' id="update_{CONNECTOR_ID}" class='updateConfig' name="record[{CONNECTOR_ID}][url]" value="{URL}" />
+            <input type='text' id="update_{CONNECTOR_ID}" class='updateConfig' name="record[{CONNECTOR_ID}][url]" value="{URL}" data-calendar-url data-calendar-id="{CONNECTOR_ID}"/>
         </label>
         <label>Authorisation
             <input type='text' name="record[{CONNECTOR_ID}][authorization]" value="{AUTHORIZATION}" />
