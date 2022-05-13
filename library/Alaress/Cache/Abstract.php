@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException as RequestException;
+use GuzzleHttp\Exception as GuzzleException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
@@ -273,7 +274,7 @@ abstract class Alaress_Cache_Abstract
                 $url->setScheme('http');
             }
             $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
-        } catch (RequestException $e) {
+        } catch (RequestException | GuzzleException\ConnectException $e) {
             throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
         }
 
