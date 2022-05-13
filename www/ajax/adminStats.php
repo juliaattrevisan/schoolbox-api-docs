@@ -337,7 +337,7 @@ switch ($_POST['module']) {
         $samlCert = $config->get('saml_public_cert');
         $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
 
-        $daysBeforeExpiry = ($validTo - time()) / 60 / 60 / 24;
+        $daysBeforeExpiry = floor(($validTo - time()) / 60 / 60 / 24);
 
         //get plural/singular form of 'day'
         if (abs($daysBeforeExpiry) === 1) {
