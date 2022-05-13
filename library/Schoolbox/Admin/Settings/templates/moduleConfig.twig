@@ -63,10 +63,10 @@
         {% endif %}
 
         {% if hasHtmlEditor %}
-        $.fn.alaressEditor({
+        $.fn.alaressEditor($.alaressEditorConfigWithUserEmailTokens({
             targetElements: settingsForm.find('[data-html-editor]'),
             baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href
-        });
+        }));
         {% endif %}
 
         {% if hasResourcePicker %}

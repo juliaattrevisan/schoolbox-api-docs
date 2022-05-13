@@ -129,12 +129,13 @@ if ($config->get('mail_enable') == 1) {
         '' !== trim($signature)
     ) {
         //build signature, and replace requested tokens
-        $emailBody = "<br><br>---<br>" . $tokenReplacer->replace(
+        $emailBody = "<p>&nbsp;</p><p>---</p>" . $tokenReplacer->replace(
             $signature,
             [
                 '[title]'     => $user->getTitle(),
                 '[firstname]' => $user->getFirstname(),
-                '[lastname]'  => $user->getLastname(),
+                '[surname]'   => $user->getLastname(), //surname as that is the language we are using in admin user modify
+                '[fullname]'  => $user->getFullName(),
                 '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $user->getEmail(), $user->getEmail()),
                 '[position]'  => $user->getPositionTitle(),
             ]
