@@ -118,12 +118,20 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
         foreach ($matchups as $matchup) {
             $instance = new \Calendar\Event\Type\Fixtures\Event();
 
+            /* Venues are now optional in matchups
+             * Only try to represent it meaningfully if it actually existed
+             */
+            $location = '';
+
+            if (null !== $matchup->getVenue()) {
+                $location = $matchup->getVenue()->getName()  . ( $matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress(). ')': '')
+            }
+
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($matchup->getName());
             $instance->setStartTime($matchup->getStartAt());
             $instance->setEndTime($matchup->getFinishAt());
             $instance->setAllDay(false);
-            $location = $matchup->getVenue()->getName()  . ( $matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress(). ')': '');
             $instance->setLocation($location);
             $instance->setColour($eventColor);
             $instance->setType($eventType);
