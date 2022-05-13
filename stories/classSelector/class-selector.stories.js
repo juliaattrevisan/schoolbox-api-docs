@@ -4,7 +4,7 @@ import { rest } from 'msw';
 import { data } from './dataClassSelector';
 
 export default {
-    title: 'IN PROGRESS/ClassSelector',
+    title: 'Components/Selectors/ClassSelector',
     component: ClassSelector,
     parameters: {
         docs: {
