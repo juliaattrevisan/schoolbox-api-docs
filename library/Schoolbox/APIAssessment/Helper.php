@@ -2,6 +2,7 @@
 
 namespace Schoolbox\APIAssessment;
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\GenericCollection;
 use PDO;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -34,7 +35,7 @@ class Helper
      */
     public function getAssessment(string $assessmentId): array
     {
-        return $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0);
+        return $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0)[0];
     }
 
     /**
@@ -112,12 +113,16 @@ class Helper
                 ];
             }
         }
+        //if there are no assessments, just return an error, saying the assessment does not exist?
+        if (empty($output)) {
+            throw new SchoolboxException("No assessments found");
+        }
         //get feedback items
         $feedbacks = $this->getAssessmentFeedback(array_keys($output));
         foreach ($feedbacks as $assessmentID => $feedback) {
-            $output[$assessmentID]['participants'] = $feedback;
+            $output[$assessmentID]['participants'] = array_values($feedback);
         }
-        return $output;
+        return array_values($output);
     }
 
     /**

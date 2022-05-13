@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\APIAssessment;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\YearLevel\Mapper;
@@ -51,7 +52,16 @@ class Controller extends Base
         }
 
         //get all assessment info for object
-        $output = $this->assessmentHelper->getAssessment($assessmentId);
+        try {
+            $output = $this->assessmentHelper->getAssessment($assessmentId);
+        } catch (SchoolboxException $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
 
         /**
          * build the whole thing
@@ -91,7 +101,13 @@ class Controller extends Base
             return; //exit early there is a malformed keyword for search
         }
 
-        $output = $this->assessmentHelper->searchForAssessments($filter, $limit, $cursor);
+        try {
+            $output = $this->assessmentHelper->searchForAssessments($filter, $limit, $cursor);
+            $count = $this->assessmentHelper->searchForAssessmentsCount($filter);
+        } catch (SchoolboxException $e) {
+            $output = [];
+            $count = 0;
+        }
 
         /**
          * now we have the user id's that match the search result, create the standard user array with hydration.
@@ -102,7 +118,7 @@ class Controller extends Base
                 [
                     'data'  =>  $output,
                     'metadata'  => [
-                        'count' => $this->assessmentHelper->searchForAssessmentsCount($filter),
+                        'count' => $count,
                         'cursor' => end($output)['id'] ?? null
                     ]
                 ]
