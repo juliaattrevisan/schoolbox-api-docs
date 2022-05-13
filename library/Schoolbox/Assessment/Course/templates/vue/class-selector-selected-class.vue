@@ -67,6 +67,7 @@ function onRemoveSelected () {
 .remove-button {
     background: var(--body-background);
     border-radius: 1rem;
+    flex: 0 0 1rem;
     height: 1rem;
     margin-left: 0.5rem;
     min-height: 0;
