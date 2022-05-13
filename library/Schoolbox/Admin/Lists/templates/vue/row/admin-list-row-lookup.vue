@@ -45,6 +45,19 @@ export default {
         },
 
         /**
+         * Depending on the external database selection, this field may not always be a lookup with fixed values to select.
+         * For example on Synergetic, this field could be a text input field and the user could have entered something like 'asdafsdf' for the input.
+         * Upon returning to a external database where the field becomes a lookup again, this would error as it can't find 'asdafsdf' in the validatedLookup list.
+         * So we need to check for a valid selection, and set the selection to null if nothing can be found that matches.
+         * 
+         * @returns { Boolean } 
+         */
+        isCurrentSelectionValid () {
+            const currentSelection = this.row[this.field.id];
+            return this.validatedLookup.some(option => option.key === currentSelection) && !this.row.isNew; //exists and the row isn't new
+        },
+
+        /**
          * If the current selection is deleted, we should provide the option to select a blank field,
          * as well as including any options that aren't deleted
          * If there's no options that aren't deleted, there will be no options within the select input
@@ -71,13 +84,16 @@ export default {
     methods: {
 
         /**
-         * To properly dispay this.availableOptions, need to reference the currentSelection
+         * To properly display this.availableOptions, need to reference the currentSelection
          * Using this method just makes it easier to reference, as we are using the 
          * combination of row, referenced with field id, which is a little confusing otherwise
          */
         getCurrentSelection () {
-            if (this.row[this.field.id] && !this.row.isNew) { //if it's not null, or not a new row entry, will be a reference to the field.lookup.key
+            if (this.isCurrentSelectionValid) { //selection is valid
                 this.currentSelection = this.validatedLookup.find((option) => option.key === this.row[this.field.id]);
+            } else { //otherwise we can't find any matches, so net to null, allowing the user to make a selection or leave it as 'Not Selected'
+                this.row[this.field.id] = null;
+                this.currentSelection = { value: null, key: null, deleted: false };
             }
         },
 
