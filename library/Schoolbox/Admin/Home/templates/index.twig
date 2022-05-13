@@ -92,8 +92,8 @@
             });
 
             {% if saml_enabled %}
-            // Replace the default saml status with 'loading...'
-            $('[data-light="saml_cert"]').html('Loading...');
+            // Replace the default saml status with 'Testing...'
+            $('[data-light="saml_cert"]').html('Testing...');
             // Load service statuses via ajax
             $.post('/ajax/adminStats.php', { module : 'service_saml_cert' }, function(data)
             {
@@ -499,7 +499,7 @@
                                     SAML Public Cert Expiry
                                 </div>
                                 <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="saml_cert">loading...</span>
+                                    <span class="full-width neutral label" data-light="saml_cert">testing...</span>
                                 </div>
                             </li>
                             {% endif %}
