@@ -59,6 +59,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Auth\Remember;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -96,6 +97,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy as QuizAttemptMapperProxy;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Response\SubSource\Lti as ResponseSubSourceLti;
@@ -1420,6 +1422,14 @@ abstract class Kernel
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                     'router'                   => $di->lazyGet('router'),
+                    'replicator'               => $di->lazyNew(
+                        Replicator::class,
+                        [
+                            'assessmentMapperProxy' => $di->lazyGet('assessmentDataSource'),
+                            'quizMapper'            => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
+                            'rubricMapper'          => $di->lazyNew(DataSource::class),
+                        ]
+                    ),
                 ]
             )
         );

@@ -4,7 +4,7 @@
             <li id='{{ unit.locationId }}' data-title='{{ unit.locationTitle }}' class='' data-jstree='{"type":"unit"}'>
                 {{ unit.title }}
                 <ul>
-                    {% for project in unitProjects[unit.id] %}
+                    {% for project in unitProjects[unit.id] ?? [] %}
                         <li id="{{ project.locationId }}" data-title='{{ project.locationTitle }}' class=""
                             data-jstree='{"type":"project"}'>
                             {{ project.title }}
@@ -23,7 +23,7 @@
 </div>
 <link rel="stylesheet" href="{{ CDN_PREFIX }}/js/vendors/jstree/dist/themes/default/style.css"/>
 <script>
-    const script = document.createElement('script');
+    var script = document.createElement('script');
     script.onload = () => {
         $("#location-tree")
             .on('ready.jstree', function (event, jstree) {

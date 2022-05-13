@@ -26,7 +26,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Turnitin;
-use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -97,6 +96,10 @@ class Transactor
      */
     protected $router;
 
+    /**
+     * @var Replicator
+     */
+    protected Replicator $replicator;
 
     /**
      * Transactor constructor.
@@ -109,6 +112,7 @@ class Transactor
      * @param SingleFile\Mapper                     $submissionFileMapper
      * @param QuizMapper                            $quizMapper
      * @param Router                                $router
+     * @param Replicator                            $replicator
      */
     public function __construct(
         FolderMapper $folderMapper,
@@ -118,7 +122,8 @@ class Transactor
         DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
         SingleFile\Mapper $submissionFileMapper,
         QuizMapper $quizMapper,
-        Router $router
+        Router $router,
+        Replicator $replicator
     ) {
         $this->folderMapper = $folderMapper;
         $this->unitImplementationMapper = $unitImplementationMapper;
@@ -128,6 +133,7 @@ class Transactor
         $this->submissionFileMapper = $submissionFileMapper;
         $this->quizMapper = $quizMapper;
         $this->router = $router;
+        $this->replicator = $replicator;
     }
 
 
@@ -209,6 +215,13 @@ class Transactor
         if ($originalAssessment && $this->assessment->getId() !== $originalAssessment->getId()) {
             if ($this->assessment instanceof Quiz) {
                 $this->quizMapper->copyQuizConstituents($originalAssessment->getId(), $this->assessment->getId());
+            }
+            if ($this->assessment instanceof Project) {
+                /** @var Project $originalAssessment */
+                $projectAssessments = $originalAssessment->getAssessables();
+                foreach ($projectAssessments as $projectAssessment) {
+                    $this->replicator->replicateInNewContext($projectAssessment, $this->assessment, $currentUser);
+                }
             }
             $this->assessmentMapperProxy->delete($originalAssessment);
             $relocated = true;
