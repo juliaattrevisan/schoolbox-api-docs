@@ -11,6 +11,7 @@ use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
 use Schoolbox\UserMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -27,6 +28,10 @@ $externalHandler = new External_User();
 $userMapper = UserMapper::getInstance();
 
 if ($config->get('mail_enable') == 1) {
+    //check if the user actually has an email
+    if ('' === $user->getEmail()) {
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EMAIL_NOT_FOUND);
+    }
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $invalidEmails = [];
@@ -192,5 +197,5 @@ if ($config->get('mail_enable') == 1) {
 
     $page->outputPage();
 } else {
-    error(7);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EMAIL_SEND);
 }
