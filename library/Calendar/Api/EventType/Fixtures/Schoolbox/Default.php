@@ -124,7 +124,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $location = '';
 
             if (null !== $matchup->getVenue()) {
-                $location = $matchup->getVenue()->getName()  . ( $matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress(). ')': '')
+                $location = $matchup->getVenue()->getName() . ($matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress() . ')' : '');
             }
 
             $instance->setConnectorId($this->getConnectorId());

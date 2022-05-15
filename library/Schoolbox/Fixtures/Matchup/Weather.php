@@ -111,7 +111,8 @@ class Weather
              * Dont' bother if the venue hasn't got any lat/long coords
              *     (imported from clipboard, since their venues don't have lat/long coords)
              */
-            if ($matchDayDiff < $this->forecastLength &&
+            if (
+                $matchDayDiff < $this->forecastLength &&
                 null !== $matchup->getVenue() &&
                 '' !== trim((string)$matchup->getVenue()->getLatitude()) &&
                 '' !== trim((string)$matchup->getVenue()->getLongitude())
