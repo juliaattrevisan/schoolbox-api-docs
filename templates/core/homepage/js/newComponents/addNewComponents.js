@@ -66,12 +66,20 @@ function initOnProcessingEndListener () {
 }
 
 /**
- * Run through each Draggable instance and enable/disable
+ * Run through each Draggable instance and enable/disable to prevent rapid fire clicks
  * 
  * @param { Boolean }  
  */
 function updateDraggablesStatus (isEnabled) {
-    __draggablesList.forEach((draggable) => isEnabled ? draggable.enable() : draggable.disable()); 
+    __draggablesList.forEach((draggable) => {
+        if (isEnabled) {
+            draggable.enable();
+            draggable.target.style.pointerEvents = 'auto';
+        } else {
+            draggable.disable();
+            draggable.target.style.pointerEvents = 'none';
+        }
+    }); 
 }
 
 /**
