@@ -238,6 +238,8 @@ class ConfigMapper extends Mapper
         ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
         ConfigMapper::NAME_EXTERNAL_TYPE,
         ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+        ConfigMapper::NAME_QR_LOGIN_ENABLED,
+        ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED,
     ];
 
     /**
