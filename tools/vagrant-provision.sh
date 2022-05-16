@@ -472,3 +472,6 @@ then
     echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
     "$SITE_ROOT"/post-provision.sh;
 fi
+
+# update all dates to current time
+"$SITE_ROOT"/tools/increment-instance-dates.php;
