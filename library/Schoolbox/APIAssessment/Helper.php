@@ -275,8 +275,10 @@ WHERE
             $params['searchParam'] = '%' . $this->mapper->getDatabase()->getQuoter()->escapeForLike($filter['title']) . '%';
         }
         if (array_key_exists('project', $filter)) {
-            $where .= " AND projectParent.assessment_id = :projectID ";
-            $params['projectID'] = $filter['project']['id'];
+            if (array_key_exists('id', $filter['project'])) {
+                $where               .= " AND projectParent.assessment_id = :projectID ";
+                $params['projectID'] = $filter['project']['id'];
+            }
         }
         return [
             $select . $from . $where,
