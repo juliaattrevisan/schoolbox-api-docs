@@ -200,6 +200,7 @@ if (!empty($_POST['accessLevel'])) {
         $user->setId($userId);
         //find the actual userAccess object, not just create a new one and blow away the old object...
         $ua = $uaMapper->findOneByColumnList([
+                   'service' => UserAccess::SERVICE_HOMEPAGE,
                    'uid' => $user->getId(),
                    'sid' => $categoryId,
                ]);
