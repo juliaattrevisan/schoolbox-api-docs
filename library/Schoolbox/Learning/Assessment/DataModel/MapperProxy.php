@@ -1280,6 +1280,11 @@ class MapperProxy
              */
             $taskMapper->save($subObject);
             $taskMapper->saveFiles($subObject);
+
+            // TODO Remove this hack in SA-6049 (see description above)
+            if (!$isCreate) {
+                $this->baseMapper->save($dataModel);
+            }
         } elseif ($subObject instanceof SubmissionBox) {
             // Legacy DueWork SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
@@ -1315,12 +1320,27 @@ class MapperProxy
             }
 
             $boxMapper->saveFiles($subObject);
+
+            // TODO Remove this hack in SA-6049 (see description above)
+            if (!$isCreate) {
+                $this->baseMapper->save($dataModel);
+            }
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
             QuizMapper::getInstance()->save($subObject);
+
+            // TODO Remove this hack in SA-6049 (see description above)
+            if (!$isCreate) {
+                $this->baseMapper->save($dataModel);
+            }
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
+
+            // TODO Remove this hack in SA-6049 (see description above)
+            if (!$isCreate) {
+                $this->baseMapper->save($dataModel);
+            }
         } elseif ($subObject instanceof Project) {
             // TODO Remove this hack in SA-6049 (see description above)
             if (!$isCreate) {
@@ -1338,10 +1358,6 @@ class MapperProxy
                     $this->save($projectAssessable, $currentUser);
                 }
             }
-        }
-        // TODO Remove this hack in SA-6049 (see description above)
-        if (!$isCreate) {
-            $this->baseMapper->save($dataModel);
         }
 
         // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information
