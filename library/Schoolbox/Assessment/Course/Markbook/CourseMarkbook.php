@@ -528,9 +528,7 @@ class CourseMarkbook
 
                         if ($isTopLevelAssessable) {
                             // First time we've encountered this row (user + course-import) ?
-                            if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                                $studentAverageMarks[$courseImplId][$userId]['any'] = ['sum' => 0, 'weight' => 0];
-                            }
+                            $studentAverageMarks[$courseImplId][$userId]['any'] ??= ['sum' => 0, 'weight' => 0];
                             $studentAverageMarks[$courseImplId][$userId]['any']['sum']    += $weight * $authNormMark;
                             $studentAverageMarks[$courseImplId][$userId]['any']['weight'] += $weight;
                         }
@@ -562,9 +560,7 @@ class CourseMarkbook
 
                         if ($isTopLevelAssessable) {
                             // First time we've encountered this row (user + course-import) ?
-                            if (!\is_array($studentAverageMarks[$courseImplId][$userId])) {
-                                $studentAverageMarks[$courseImplId][$userId]['published'] = ['sum' => 0, 'weight' => 0];
-                            }
+                            $studentAverageMarks[$courseImplId][$userId]['published'] ??= ['sum' => 0, 'weight' => 0];
                             $studentAverageMarks[$courseImplId][$userId]['published']['sum']    += $weight * $publishedNormMark;
                             $studentAverageMarks[$courseImplId][$userId]['published']['weight'] += $weight;
                         }

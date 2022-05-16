@@ -568,9 +568,8 @@ class Controller extends Base
         $pastoralReport->setInvolved($post['involved'] ?? false);
 
         // Only save severity if it is enabled by policy
-
-        if ($post['severity'] && $this->getConfigLoader()->get('pastoral_severity')) {
-            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
+        if ($this->getConfigLoader()->get('pastoral_severity')) {
+            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity'] ?? null));
         }
 
         if (!empty($post['date-option']) && $post['date-option'] === PastoralReport::ABSOLUTE_DATE) {
@@ -658,7 +657,7 @@ class Controller extends Base
 
         // Save groups the report is shared with
 
-        if (is_array($post['group'])) {
+        if (is_array($post['group'] ?? false)) {
             $groupsCollection = new Collection();
 
             foreach ($post['group'] as $groupId => $checked) {
