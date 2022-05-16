@@ -187,7 +187,11 @@ function onNewComponentClicked (event) {
 function onDragStart (event) {
     if (!__isProcessing) {
         __isProcessing = true;
-        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+        try {
+            updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+        } catch (error) {
+            updateNewComponentVars(event.target.querySelector(COMPONENT_SELECTOR)); //otherwise look down the tree, as the <li></li> could be the event.target
+        }
         __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
         __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
         updateDocumentOnDragStart();
@@ -443,6 +447,11 @@ function animateFlip (state) {
  */
 function onDragEnd () {
     document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
+    if (isNewComponentOverPage()) { //add the component to the page
+        checkNewDraggedComponentOnPage();
+    } else if (__hasNewComponent) { //if the new component has been added to page already, but it back into the tabs
+        putDraggedComponentBackIntoTabs();
+    }
     if (__hasNewComponent) {
         reinsertNewComponentButton(); //ensure there's no shifts in the tabs with the new component taken out, adding the clone in place straight away
     }
