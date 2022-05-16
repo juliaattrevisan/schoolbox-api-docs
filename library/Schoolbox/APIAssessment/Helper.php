@@ -227,9 +227,11 @@ WHERE
         ) = :assessmentType ";
             $params['assessmentType'] = $filter['assessmentType'];
         }
-        if (array_key_exists('folderId', $filter)) {
-            $where .= " AND v_assessment_relation.folder_id = :folderId ";
-            $params['folderId'] = $filter['folderId'];
+        if (array_key_exists('folder', $filter)) {
+            if (array_key_exists('id', $filter['folder'])) {
+                $where              .= " AND v_assessment_relation.folder_id = :folderId ";
+                $params['folderId'] = $filter['folder']['id'];
+            }
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight";
