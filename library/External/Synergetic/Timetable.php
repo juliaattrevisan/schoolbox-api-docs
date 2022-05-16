@@ -974,7 +974,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $query  = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
             $result = $this->getDatabase()->getRow($query);
 
-            $this->days[$campus->getExtTimetableCode()] = !$result ? 0 : $result['CycleDays'];
+            $this->days[$campus->getExtTimetableCode()] = $result['CycleDays'] ?? 0;
         }
 
         return $this->days[$campus->getExtTimetableCode()];

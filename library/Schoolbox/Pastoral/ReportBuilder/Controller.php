@@ -569,7 +569,7 @@ class Controller extends Base
 
         // Only save severity if it is enabled by policy
 
-        if ($this->getConfigLoader()->get('pastoral_severity') && $post['severity']) {
+        if ($this->getConfigLoader()->get('pastoral_severity') && ($post['severity'] ?? null)) {
             $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
         }
 
