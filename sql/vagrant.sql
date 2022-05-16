@@ -19,7 +19,7 @@ UPDATE config SET value='guest' WHERE name='amqp_pass';
 UPDATE config SET value='localhost' WHERE name='amqp_host';
 UPDATE config SET value='tcp://127.0.0.1:6379' WHERE name='redis_url';
 UPDATE config SET value='1' WHERE name = 'debug_templates';
-UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');
+UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','summative_report_enabled');
 UPDATE config SET value='schoolbox' WHERE name='external_db_user';
 UPDATE config SET value='https://portal.synergetic.dev.schoolbox.cloud' WHERE name='external_portal';
 UPDATE config SET value='dev' WHERE name='site_type';
