@@ -134,7 +134,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
-            LEFT JOIN `groups` ON user.`group_id` = groups.`id`
+            LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`
             WHERE `category_id` = $category_id
             AND chat_poll.time >= '{$this->db->quote($time->format('Y-m-d H:i:s'))}'
         ";

@@ -46,9 +46,9 @@ class Login
     {
         $query = '
              SELECT
-                groups.name,
-                groups.id,
-                (SELECT COUNT(*) FROM login_log JOIN user ON login_log.username=user.username AND  `user`.created_at <=  :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start) WHERE login=1 AND date >= :start AND date <= :end AND user.group_id = groups.id ) AS total
+                `groups`.name,
+                `groups`.id,
+                (SELECT COUNT(*) FROM login_log JOIN user ON login_log.username=user.username AND  `user`.created_at <=  :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start) WHERE login=1 AND date >= :start AND date <= :end AND user.group_id = `groups`.id ) AS total
                 FROM `groups`
             WHERE   `groups`.deleted_at IS NULL';
 
@@ -70,14 +70,14 @@ class Login
     public function uniqueLoginByGroup(Alaress_Date_Format $start, Alaress_Date_Format $end): array
     {
         $query = '
-            SELECT groups.`name`,
+            SELECT `groups`.`name`,
             (
                 SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
                 INNER JOIN login_log ON `user`.username = login_log.username
-                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.created_at <=  :end AND
+                WHERE group_id = `groups`.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.created_at <=  :end AND
                       (`user`.deleted_at IS NULL OR `user`.deleted_at > :start)
             ) AS total
-            FROM groups
+            FROM `groups`
             WHERE `groups`.deleted_at IS NULL';
 
         $statement = $this->database->prepareQuery($query);
@@ -111,12 +111,12 @@ class Login
         }
 
         $query = "
-                SELECT groups.id, groups.`name`, COUNT(*) total
-                FROM groups
-                JOIN `user` ON groups.id=`user`.group_id
+                SELECT `groups`.id, `groups`.`name`, COUNT(*) total
+                FROM `groups`
+                JOIN `user` ON `groups`.id=`user`.group_id
                 WHERE {$userWhere} AND `groups`.deleted_at IS NULL
-                GROUP BY groups.id
-                ORDER BY groups.`name`";
+                GROUP BY `groups`.id
+                ORDER BY `groups`.`name`";
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute($params);

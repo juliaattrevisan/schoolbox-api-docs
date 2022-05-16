@@ -195,7 +195,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
             sprintf(" WHERE (%s)", implode(') AND (', $sqlFilter)) :
             '';
 
-        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username AND `user`.`deleted_at` IS NULL LEFT JOIN `groups` ON `user`.`group_id` = groups.id";
+        $joins = "LEFT JOIN `user` ON `user`.`username` = login_log.username AND `user`.`deleted_at` IS NULL LEFT JOIN `groups` ON `user`.`group_id` = `groups`.id";
 
         // Get count separately from data
         $countStatement = $this->db->prepare("SELECT COUNT(*) FROM login_log $joins $sqlFilterString");
@@ -217,8 +217,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                         title,
                         firstname,
                         lastname,
-                        groups.name as role,
-                        groups.group_type as roletype,
+                        `groups`.name as role,
+                        `groups`.group_type as roletype,
                         jwt_id
                       FROM login_log
                       $joins
