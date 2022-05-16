@@ -42,12 +42,12 @@ class SamlCertHelper
                 $samlCert = "-----BEGIN CERTIFICATE-----\n";
 
                 try {
-                    $samlCert.= IdPMetadataParser::parseXML($idpMetadataCache->getStreamContents())['idp']['x509cert'];
+                    $samlCert .= IdPMetadataParser::parseXML($idpMetadataCache->getStreamContents())['idp']['x509cert'];
                 } catch (\Exception $e) {
                     $cache->invalidateCache();
                 }
 
-                $samlCert.= "\n-----END CERTIFICATE-----";
+                $samlCert .= "\n-----END CERTIFICATE-----";
             }
         } catch (\Exception $e) {
             //noop, metadata url invalid
