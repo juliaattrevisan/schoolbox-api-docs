@@ -126,10 +126,10 @@ class Controller extends Base
 
         try {
             $defaultOwner       = $this->getUserMapper()->findById($post["defaultOwnerId"]);
-            $importParentAccess = $post["importParentAccess"] === 'on';
-            $importRecords      = $post["importRecords"] === 'on';
-            $deleteRecords      = $post["deleteRecords"] === 'on';
-            $importAttachments  = $post["importAttachments"] === 'on';
+            $importParentAccess = 'on' === ($post["importParentAccess"] ?? 'off');
+            $importRecords      = 'on' === ($post["importRecords"] ?? 'off');
+            $deleteRecords      = 'on' === ($post["deleteRecords"] ?? 'off');
+            $importAttachments  = 'on' === ($post["importAttachments"] ?? 'off');
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
