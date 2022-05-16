@@ -1,17 +1,284 @@
+<style>
+
+    .wait-content {
+        width: 50%;
+        margin: auto;
+    }
+
+    .wait-content h1 {
+        font-weight: bold;
+        text-align: center;
+        margin-top: 1em;
+    }
+
+    .report-count p {
+      font-size: 1em;
+    }
+
+    #wave-1 {
+        animation: waves 3.5s ease-in-out infinite;
+    }
+
+    #wave-2 {
+        animation: waves-alt 3s ease-in-out infinite;
+    }
+
+    #wave-3 {
+        animation: waves 3.5s ease-in-out infinite;
+    }
+
+    #wave-4 {
+        animation: waves-alt 3s ease-in-out infinite;
+    }
+
+    #wave-6{
+        animation: waves 3s ease-in-out infinite;
+    }
+
+    #wave-7 {
+        animation: waves-alt 3.5s ease-in-out infinite;
+    }
+
+    #wave-9 {
+        animation: waves 3s ease-in-out infinite;
+    }
+
+    #big-bottle {
+        animation: bottle-bounce 2.5s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    #wave-5 {
+        animation: wave-bounce 2.5s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+     #small-bottle {
+         animation: small-bottle-bounce 3s ease-in-out infinite;
+         transform-box: fill-box;
+         transform-origin: center;
+     }
+    #wave-8 {
+        animation: small-wave-bounce 3s ease-in-out infinite;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    @keyframes waves {
+        0% {
+            transform: translateX(0em);
+        }
+        50% {
+            transform: translateX(0.3em);
+        }
+        100% {
+            transform: translateX(0em);
+        }
+    }
+    @keyframes waves-alt {
+        0% {
+            transform: translateX(0em);
+        }
+        50% {
+            transform: translateX(-0.4em);
+        }
+        100% {
+            transform: translateX(0em);
+        }
+    }
+    @keyframes waves {
+        0% {
+            transform: translateX(0em);
+        }
+        50% {
+            transform: translateX(0.3em);
+        }
+        100% {
+            transform: translateX(0em);
+        }
+    }
+    @keyframes bottle-bounce {
+        0% {
+            transform: scale(1) translateY(0em);
+        }
+        50% {
+            transform: scale(1.01, 1) translateY(0.1em);
+        }
+        100% {
+            transform:  scale(1) translateY(0em);
+        }
+    }
+
+    @keyframes small-bottle-bounce {
+        0% {
+            transform: scale(1) translateY(0em);
+        }
+        50% {
+            transform: scale(1.06, 1) translateY(0.2em);
+        }
+        100% {
+            transform:  scale(1) translateY(0em);
+        }
+    }
+
+    @keyframes wave-bounce {
+        0% {
+            transform: scale(1) translateY(0em);
+        }
+        50% {
+            transform: scale(1.025, 1) translateY(0.125em);
+        }
+        100% {
+            transform:  scale(1) translateY(0em);
+        }
+    }
+
+    @keyframes small-wave-bounce {
+        0% {
+            transform: scale(1) translateY(0em);
+        }
+        50% {
+            transform: scale(1.03, 1) translateY(0.15em);
+        }
+        100% {
+            transform:  scale(1) translateY(0em);
+        }
+    }
+
+    /*Small devices*/
+    @media (min-width: 425px) {
+
+        .island {
+            width: 100%;
+            margin: auto;
+        }
+
+        .wait-content svg {
+            transform: scale(1);
+            margin-top: 1em;
+            margin-left: -90px;
+        }
+
+        .report-count {
+            margin-top: 1em;
+            text-align: center;
+        }
+
+        .report-warning {
+            margin-top: 1em;
+        }
+    }
+
+    /*Medium devices (tablets, 768px and up)*/
+    @media (min-width: 768px) {
+
+        .wait-content svg {
+            transform: scale(1);
+            margin-top: 5em;
+            margin-left: -10px;
+            display: block;
+            margin: auto;
+        }
+
+        .wait-content h1 {
+            margin-top: 0.5em;
+        }
+
+        .report-count {
+            width: 85%;
+            text-align: center;
+            margin: auto;
+        }
+
+        .report-count p {
+            font-size: 0.9em;
+
+        }
+
+        .report-warning {
+            width: 85%;
+            margin: auto;
+            margin-top: 1.5em;
+            margin-bottom: 1.5em;
+        }
+
+        .island {
+            width: 100%;
+        }
+
+    }
+
+    /*Large devices (desktops, 992px and up)*/
+    @media (min-width: 992px) {
+
+        .wait-content svg {
+            display: block;
+            margin: auto;
+            transform: scale(1.4);
+            margin-top: 6em;
+            margin-left: -25px;
+        }
+
+        .report-count {
+            width: 75%;
+            margin: auto;
+            margin-top: 6em;
+            text-align: center;
+        }
+
+        .report-warning {
+            width: 75%;
+
+        }
+
+    }
+
+    /*Extra large devices (large desktops, 1200px and up)*/
+    @media (min-width: 1200px) {
+
+        .wait-content svg {
+            display: block;
+            margin: auto;
+            transform: scale(1.75);
+            margin-top: 7em;
+            padding-left: 4em;
+        }
+
+        .report-count {
+            width: 60%;
+            margin: auto;
+            margin-top: 6em;
+            text-align: center;
+        }
+
+        .report-warning {
+            width: 60%;
+            margin: auto;
+            margin-top: 2em;
+            margin-bottom: 2em;
+        }
+
+    }
+
+</style>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 <div class="admin-container row">
-
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-        {% if reportCount == 0 %}
-            No report will be generated.
-        {% else %}
-            {{ reportCount }} reports will be generated.
-        {% endif %}
-        {% for warning in warnings %}
-            {{ warning }}<br>
-        {% endfor %}
+        <div class="small-12 island">
+            <section class="content">
+            {% if reportCount == 0 %}
+                No report will be generated.
+            {% else %}
+                {{ reportCount }} reports will be generated.
+            {% endif %}
+            {% for warning in warnings %}
+                {{ warning }}<br>
+            {% endfor %}
+            </section>
+        </div>
     </div>
 </div>
