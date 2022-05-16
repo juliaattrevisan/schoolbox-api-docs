@@ -29,7 +29,7 @@ $userMapper = UserMapper::getInstance();
 
 if ($config->get('mail_enable') == 1) {
     //check if the user actually has an email
-    if ('' === $user->getEmail()) {
+    if ('' === trim((string)$user->getEmail())) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EMAIL_NOT_FOUND);
     }
     // Parse out list of emails passed
