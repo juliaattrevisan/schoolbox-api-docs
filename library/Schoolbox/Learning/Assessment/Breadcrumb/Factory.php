@@ -88,6 +88,7 @@ class Factory
             $routeParams = [
                 'assessment'   => $context,
                 'assessmentId' => $context->getId(),
+                'studentId' => $user->getId()
             ];
 
             if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
