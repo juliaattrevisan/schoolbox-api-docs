@@ -1280,11 +1280,6 @@ class MapperProxy
              */
             $taskMapper->save($subObject);
             $taskMapper->saveFiles($subObject);
-
-            // TODO Remove this hack in SA-6049 (see description above)
-            if (!$isCreate) {
-                $this->baseMapper->save($dataModel);
-            }
         } elseif ($subObject instanceof SubmissionBox) {
             // Legacy DueWork SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
@@ -1320,33 +1315,32 @@ class MapperProxy
             }
 
             $boxMapper->saveFiles($subObject);
-
-            // TODO Remove this hack in SA-6049 (see description above)
-            if (!$isCreate) {
-                $this->baseMapper->save($dataModel);
-            }
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
             QuizMapper::getInstance()->save($subObject);
-
-            // TODO Remove this hack in SA-6049 (see description above)
-            if (!$isCreate) {
-                $this->baseMapper->save($dataModel);
-            }
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
+        }
 
-            // TODO Remove this hack in SA-6049 (see description above)
-            if (!$isCreate) {
-                $this->baseMapper->save($dataModel);
-            }
-        } elseif ($subObject instanceof Project) {
-            // TODO Remove this hack in SA-6049 (see description above)
-            if (!$isCreate) {
-                $this->baseMapper->save($dataModel);
-            }
+        // TODO Remove this hack in SA-6049 (see description above)
+        if (!$isCreate) {
+            $this->baseMapper->save($dataModel);
+        }
 
+        /* A subobject can never be a Due Work *and* a Quiz at the same time, for example
+         * so this if() is mutually exclusive to all the other previous ones. In the case
+         * of Projects, none of the previous if/else statements execute, $dataModel saves,
+         * then the Project's subobjects save and you dodge around the mapper cache fun
+         * that's described in SA-6049. You can also dodge a double-tap like this (see
+         * previous commit in this history)
+         *
+         * For other assessments like Due Work, Task and Quiz - their pieces are saved,
+         * then $dataModel saves, doing the same steps as it always did before this change.
+         * However, this "$subObject instanceof Project" never executes so you're also
+         * in the clear from that.
+         */
+        if ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
