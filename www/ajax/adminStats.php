@@ -335,12 +335,30 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $samlCert = $config->get('saml_idp_certificate');
-        if (!$samlCert) {
-            $samlCert = SamlCertHelper::getSamlCertFromMetadataUrl($config->get('saml_idp_metadata_url'));
+        $databaseSamlCert = $config->get('saml_idp_certificate');
+        $samlCertMetadataUrl = $config->get('saml_idp_metadata_url');
+
+        $daysBeforeExpiry = null;
+
+        //if database cert field contains a value, get the days before expiry
+        if ($databaseSamlCert) {
+            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
         }
 
-        $daysBeforeExpiry = floor(SamlCertHelper::getDaysBeforeExpiry($samlCert));
+        if ($daysBeforeExpiry === null) {
+            if ($samlCertMetadataUrl) {
+                $metadataSamlCert = SamlCertHelper::getSamlCertFromMetadataUrl($samlCertMetadataUrl);
+                $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($metadataSamlCert);
+            }
+        }
+
+        if ($daysBeforeExpiry === null) {
+            //code will only reach here if both saml configs exist but are invalid
+            $output[] = array('SAML_LIGHT'  => 'alert',
+                              'SAML_MESSAGE' => 'Invalid SAML config',
+            );
+            break;
+        }
 
         //get plural/singular form of 'day'
         if (abs($daysBeforeExpiry) == 1) {

@@ -4,6 +4,8 @@ namespace Schoolbox\Admin\Home;
 
 use OneLogin\Saml2\IdPMetadataParser;
 
+use function PHPUnit\Framework\arrayHasKey;
+
 /**
  * Functions for processing SAML certificate
  */
@@ -16,10 +18,20 @@ class SamlCertHelper
      * @return float  Days before the $cert expires,
      *                negative if past expiry
      */
-    public static function getDaysBeforeExpiry(string $samlCert): ?float
+    public static function getDaysBeforeExpiry(string $samlCert)
     {
-        $validTo = openssl_x509_parse($samlCert)['validTo_time_t'];
-        return ($validTo - time()) / 60 / 60 / 24;
+        $samlCertMetadata = @openssl_x509_parse($samlCert);
+
+        if (!is_array($samlCertMetadata)) {
+            return null;
+        }
+
+        if (array_key_exists('validTo_time_t', $samlCertMetadata)) {
+            return ($samlCertMetadata['validTo_time_t'] - time()) / 60 / 60 / 24;
+        } else {
+            //returns null if the expiry date cannot be found
+            return null;
+        }
     }
 
     /**
