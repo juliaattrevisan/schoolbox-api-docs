@@ -195,7 +195,7 @@ class Config
               r.id role_id, COALESCE(rp.mask, 'MU') mask, COALESCE(rp.role_default, 'MU') def
             FROM msg_namespace n
             LEFT JOIN msg_source s ON n.id = s.namespace
-            LEFT JOIN groups r ON r.group_type = s.role_type
+            LEFT JOIN `groups` r ON r.group_type = s.role_type
             LEFT JOIN msg_route_perm rp ON rp.msg_source_id = s.id AND rp.role_id = r.id
 
             WHERE r.id IN ($roleIds)

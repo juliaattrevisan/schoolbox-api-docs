@@ -29,7 +29,7 @@ class CMS
     public function log(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $object)
     {
         $query = "
-                SELECT groups.name, COUNT(*) as total FROM cmsLog JOIN `user` ON cmsLog.user = `user`.id JOIN groups ON user.group_id = groups.id
+                SELECT `groups`.name, COUNT(*) as total FROM cmsLog JOIN `user` ON cmsLog.user = `user`.id JOIN `groups` ON user.group_id = `groups`.id
                 WHERE object = :object AND action = :action AND
                 `time` >= :start AND `time` <= :end
                 GROUP BY group_id";

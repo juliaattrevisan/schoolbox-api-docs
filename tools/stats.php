@@ -27,29 +27,29 @@ $app = new class extends CliTool\App {
 
         $queryList = [
             //Users
-            'students_enabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "student")',
-            'students_disabled' => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "student")',
-            'students_deleted'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "student")',
-            'staff_enabled'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "staff")',
-            'staff_disabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "staff")',
-            'staff_deleted'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "staff")',
-            'parents_enabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "parent")',
-            'parents_disabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "parent")',
-            'parents_deleted'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "parent")',
-            'guests_enabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "guest")',
-            'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "guest")',
-            'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM groups g WHERE g.group_type = "guest")',
+            'students_enabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'students_disabled' => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'students_deleted'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "student")',
+            'staff_enabled'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
+            'staff_disabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
+            'staff_deleted'     => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "staff")',
+            'parents_enabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
+            'parents_disabled'  => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
+            'parents_deleted'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "parent")',
+            'guests_enabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
+            'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
+            'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
 
             //Logins
             'unique_logins_yesterday' => 'SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 and DATE(date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY) GROUP BY DATE(date)',
-            'unique_logins_yesterday_student' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "student" GROUP BY DATE(date)',
-            'unique_logins_yesterday_staff' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "staff" GROUP BY DATE(date)',
-            'unique_logins_yesterday_parent' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "parent" GROUP BY DATE(date)',
-            'unique_logins_yesterday_guest' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "guest" GROUP BY DATE(date)',
-            'logins_student'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON user.group_id = groups.id WHERE login = 1 and groups.group_type = "student"',
-            'logins_staff'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON user.group_id = groups.id WHERE login = 1 and groups.group_type = "staff"',
-            'logins_parent'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON user.group_id = groups.id WHERE login = 1 and groups.group_type = "parent"',
-            'logins_guests'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN groups ON user.group_id = groups.id WHERE login = 1 and groups.group_type = "guest"',
+            'unique_logins_yesterday_student' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "student" GROUP BY DATE(date)',
+            'unique_logins_yesterday_staff' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "staff" GROUP BY DATE(date)',
+            'unique_logins_yesterday_parent' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "parent" GROUP BY DATE(date)',
+            'unique_logins_yesterday_guest' => 'SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 and DATE (date) = SUBDATE(DATE(NOW()),INTERVAL 1 DAY)  AND group_type = "guest" GROUP BY DATE(date)',
+            'logins_student'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "student"',
+            'logins_staff'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "staff"',
+            'logins_parent'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "parent"',
+            'logins_guests'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "guest"',
             'logins'            => 'SELECT count(*) FROM login_log l WHERE login = 1',
 
             //LMS
@@ -121,8 +121,8 @@ $app = new class extends CliTool\App {
 
             //ePortfolio
             'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
-            'eportfolio_enabled_student' => 'SELECT COUNT(*) FROM user JOIN groups ON user.group_id = groups.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "student"',
-            'eportfolio_enabled_staff' => 'SELECT COUNT(*) FROM user JOIN groups ON user.group_id = groups.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "staff"',
+            'eportfolio_enabled_student' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "student"',
+            'eportfolio_enabled_staff' => 'SELECT COUNT(*) FROM user JOIN `groups` ON user.group_id = `groups`.id WHERE user.deleted_at is null AND eportfolio_enabled = 1 and group_type = "staff"',
             'eportfolio_blog_posts' => 'SELECT COUNT(*) FROM eportfolio_component_blog WHERE deleted_at is null',
             'showcased_work'        => 'SELECT COUNT(*) FROM eportfolio_showcase_item WHERE deleted_at is null',
 

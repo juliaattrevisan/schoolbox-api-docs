@@ -131,7 +131,7 @@ class RelationshipFilterer
         $query = "
             SELECT u.id
             FROM user u
-            JOIN groups g on u.group_id = g.id
+            JOIN `groups` g on u.group_id = g.id
             WHERE u.synergy_id IN ({$externalIdBindings['placeholders']})
             AND g.group_type = ?
             AND u.deleted_at IS NULL

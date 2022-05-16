@@ -92,7 +92,7 @@ class RoleType extends SimpleStrategy
         }
 
         $groupAlias = "g_$paramPrefix";
-        $join       = "JOIN groups $groupAlias ON $userTableAlias.group_id = $groupAlias.id";
+        $join       = "JOIN `groups` $groupAlias ON $userTableAlias.group_id = $groupAlias.id";
 
         $pb = $this->newPb($paramPrefix)->in("$groupAlias.group_type", $filtered);
 
