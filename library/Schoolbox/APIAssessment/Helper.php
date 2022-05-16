@@ -97,6 +97,12 @@ class Helper
                 'code' => $this->getFolderCode($row['folderId']),
                 'yearLevel' => $yearLevel,
             ];
+            $project = null;
+            if (null !== $row['project']) {
+                $project = [
+                    'id' => $row['project'],
+                ];
+            }
             if (!isset($output[$row['id']])) {
                 $output[$row['id']] = [
                     'id'               => $row['id'],
@@ -108,6 +114,7 @@ class Helper
                         'id'   => $row['workTypeId']
                     ],
                     'folder'           => $folder,
+                    'project'          => $project,
                     'weighted'         => $weighted,
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'participants'     => null,
@@ -184,7 +191,8 @@ class Helper
     (SELECT group_concat(id) from lu_year_level
                                       LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
      where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`,
-    markTypeTable.hr_name AS markType
+    markTypeTable.hr_name AS markType,
+        projectParent.assessment_id as `project`
     ";
 
         $from = "FROM v_assessment_relation
@@ -198,6 +206,8 @@ class Helper
          LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
 
          LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+
+        LEFT JOIN project projectParent on projectParent.id = v_assessment_relation.project_assessment_id
 ";
         $where = "
 WHERE
@@ -263,6 +273,12 @@ WHERE
         if (array_key_exists('title', $filter)) {
             $where .= " AND assessment.title like :searchParam ";
             $params['searchParam'] = '%' . $this->mapper->getDatabase()->getQuoter()->escapeForLike($filter['title']) . '%';
+        }
+        if (array_key_exists('project', $filter)) {
+            if (array_key_exists('id', $filter['project'])) {
+                $where               .= " AND projectParent.assessment_id = :projectID ";
+                $params['projectID'] = $filter['project']['id'];
+            }
         }
         return [
             $select . $from . $where,
