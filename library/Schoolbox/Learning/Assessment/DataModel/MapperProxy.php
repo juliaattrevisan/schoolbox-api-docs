@@ -1322,6 +1322,11 @@ class MapperProxy
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof Project) {
+            // TODO Remove this hack in SA-6049 (see description above)
+            if (!$isCreate) {
+                $this->baseMapper->save($dataModel);
+            }
+
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
