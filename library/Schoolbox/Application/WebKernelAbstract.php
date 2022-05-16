@@ -128,7 +128,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100")
                 ) {
                     $code    = 599;
-                    $message = "Unfortunately your query was taking longer than " . SQL_MAX_STATEMENT_TIME_SECONDS . " seconds. To avoid further disruption to the system we have stopped this request. Please try again later as this may be a temporary performance issue.";
+                    $message = "Unfortunately your query was taking too long. To avoid further disruption to the system we have stopped this request. Please try again later as this may be a temporary performance issue.";
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';

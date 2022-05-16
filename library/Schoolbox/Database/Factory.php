@@ -121,7 +121,6 @@ class Factory
         }
 
         $connectorInternal->setTimezone($this->fetchTimezone($connectorInternal));
-        $connectorInternal->executeQuery("SET SESSION max_statement_time = CAST(? AS INT)", [SQL_MAX_STATEMENT_TIME_SECONDS]);
 
         return $connectorInternal;
     }
