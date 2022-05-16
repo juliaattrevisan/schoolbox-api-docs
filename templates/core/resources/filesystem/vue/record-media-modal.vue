@@ -489,6 +489,7 @@ export default {
     background: black;
     overflow: hidden;
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
+    z-index: 1;
     h2, h3 {
         max-width: none;
     }
@@ -499,6 +500,10 @@ export default {
 		margin: 0 2px;
         width: 100%;
 	}
+}
+
+.component-action {
+    z-index: 2;
 }
 
 .fade-enter-active, .fade-leave-active {
