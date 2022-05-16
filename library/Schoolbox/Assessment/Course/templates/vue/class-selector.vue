@@ -14,10 +14,22 @@ import { gsap } from 'gsap/all';
 
 
 const props = defineProps({
-    endpoint: { //the endpoint to retrieve all the classes from
+    /**
+     * the endpoint to retrieve all the classes from
+     */
+    endpoint: {
         type: String,
         required: true,
-    }
+    },
+    /**
+     * for the Modify Course page, the class-selector will be disabled but it should contain the 
+     * Class that was previously selected. The class will be one we have access the Modify Course page from
+     */
+    previouslySelectedClass: { 
+        type: Object,
+        required: false,
+        default: {},
+    },
 });
 
 
@@ -30,6 +42,25 @@ const props = defineProps({
 const isLoading = ref(true);
 const hasLoadError = ref(false);
 const classes = ref([]); //all the classes
+
+/**
+ * a class has already been previously selected, so the class-selector is not enabled
+ * It's disabled from outside the Vue component within library/Schoolbox/Assessment/Course/templates/import.twig
+ * 
+ * @returns { Boolean } 
+ */
+const hasPreviouslySelectedClass = computed(() => {
+    return props.previouslySelectedClass.id !== undefined;
+});
+
+/**
+ * 
+ * 
+ * @returns { Boolean } 
+ */
+const isClassSelectorActive = computed(() => {
+    return props.previouslySelectedClass.id === undefined;
+});
 
 /**
  * to notify whether still loading the results or not
@@ -47,8 +78,19 @@ const inputPlaceholder = computed(() => {
 });
 
 onMounted(() => {
-    loadClassList();
+    if (hasPreviouslySelectedClass.value) { //when this is set, the class-selector is disabled from a parent outside this Vue component
+        addPreviouslySelectedClass();
+    } else { //otherwise we assume we can edit the class selector
+        loadClassList();
+    }
 });
+
+/**
+ * just show the previously selected class on the disabled class selector
+ */
+function addPreviouslySelectedClass () {
+    selectedClasses.value = [props.previouslySelectedClass];
+}
 
 /**
  * load all the classes for searching
@@ -217,7 +259,7 @@ function onBeforeOnEnter (element) {
 }
 
 /**
- * how it element animates on
+ * how the element animates on
  *
  * @param { DOMElement } element - the element that's animating
  * @param { Function } done - to be called once animation is complete
@@ -377,6 +419,7 @@ function onClearAllSelected () {
         <label class="required">Class(es)</label>
         <input id="import_folders" name="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
+            v-if="isClassSelectorActive"
             v-model="query"
             ref="queryInputEl"
             type="text"
@@ -413,16 +456,17 @@ function onClearAllSelected () {
                 </transition-group>
             </div><!-- .search-results -->
         </div><!-- .search-results-container -->
-        <div class="selected-classes-container">
+        <div v-if="hasSelectedClasses" :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
             <class-selector-selected-class 
                 v-for="selectedClass in selectedClasses" 
                 :key="selectedClass.id"  
-                :class-item="selectedClass"  
+                :class-item="selectedClass"
+                :is-class-selector-active="isClassSelectorActive"
                 @remove="onRemoveClassSelected"  
             />
         </div><!-- .selected-classes-container -->
         <div class="extra-actions-container">
-            <button v-if="hasSelectedClasses" class="button icon-delete clear-all-button" aria-label="Clear all Classes" @click.prevent="onClearAllSelected">Clear all Classes</button>
+            <button v-if="isClassSelectorActive && hasSelectedClasses" class="button icon-delete clear-all-button" aria-label="Clear all Classes" @click.prevent="onClearAllSelected">Clear all Classes</button>
         </div>
     </div>
 </template>
@@ -472,13 +516,16 @@ function onClearAllSelected () {
 
 .selected-classes-container {
     border: 1px solid var(--form-border-color);
-    border-top: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    margin-top: -1px; //to sit against .search-input
     min-height: 50px;
     padding: 0.5rem;
 }
+
+    .selected-classes-container__disabled {
+        opacity: 0.7;
+    }
 
 .extra-actions-container {
     display: flex;
