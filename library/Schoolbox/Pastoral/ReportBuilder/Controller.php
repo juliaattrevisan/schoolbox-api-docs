@@ -567,11 +567,7 @@ class Controller extends Base
         $pastoralReport->setOrderCsv($post['order']);
         $pastoralReport->setInvolved($post['involved'] ?? false);
 
-        // Only save severity if it is enabled by policy
-
-        if ($this->getConfigLoader()->get('pastoral_severity') && ($post['severity'] ?? null)) {
-            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity']));
-        }
+        $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity'] ?? null));
 
         if (!empty($post['date-option']) && $post['date-option'] === PastoralReport::ABSOLUTE_DATE) {
             $pastoralReport->setUsesRelativeDate(false);
