@@ -482,6 +482,9 @@ function onClearAllSelected () {
     &::placeholder {
         font-style: italic;
     }
+    &:placeholder-shown { //to show there's more text in the placeholder on smaller screens
+        text-overflow: ellipsis;
+    }
 }
 
 .search-results-container {
