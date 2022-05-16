@@ -207,8 +207,7 @@ class Helper
 
          LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
 
-        LEFT JOIN project_assessment on assessment.id = project_assessment.assessment_id
-        LEFT JOIN project projectParent on projectParent.id = project_assessment.project_id
+        LEFT JOIN project projectParent on projectParent.id = v_assessment_relation.project_assessment_id
 ";
         $where = "
 WHERE
