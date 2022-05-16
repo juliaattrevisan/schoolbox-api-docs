@@ -973,17 +973,19 @@ class Controller extends Base
                     'default'    => false,
                     'popOutList' => 'displayOptions',
                 ],
-                'qrcodeEnabled'  => [
+            ],
+        ];
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)) {
+            $return['year-levels']['fields']['qrcodeEnabled'] =
+                [
                     'caption'    => 'QR Code Generation Enabled',
                     'tooltip'    => 'If toggled to \'ON\', QR Code generation will be enabled for the students in this year level.',
                     'checkbox'   => true,
                     'mandatory'  => true,
                     'default'    => false,
                     'popOutList' => 'displayOptions',
-                ],
-            ],
-        ];
-
+                ];
+        }
 
         $return['evidence-tag'] = [
             'title'             => 'Learning Moments',

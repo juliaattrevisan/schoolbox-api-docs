@@ -20,7 +20,7 @@ UPDATE config SET editable='false' WHERE name = 'site_school_code';
 UPDATE config SET hidden='true',value='0' WHERE name IN ('debug_mode','debug_xhprof');
 UPDATE config SET value='0' WHERE name = 'debug_show_stack_trace';
 UPDATE config SET value='0' WHERE name = 'debug_templates';
-UPDATE config SET value='0',editable='false' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');
+UPDATE config SET value='0',editable='false' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','summative_report_enabled');
 UPDATE config SET value='' WHERE name='external_db_user';
 UPDATE config SET value='' WHERE name='external_db_passwd';
 UPDATE config SET value='' WHERE name='external_portal';

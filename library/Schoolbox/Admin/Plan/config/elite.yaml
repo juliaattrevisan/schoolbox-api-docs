@@ -18,6 +18,8 @@ config:
   kami_enabled: {edit: true}
   geosnapshot_enabled: {edit: true}
   lms_enabled: {value: true}
+  qr_login_enabled: {value: true, edit: false}
+  summative_report_enabled: {edit: true}
 
   #Pastoral
   external_pastoral: {hide: false}
