@@ -16,6 +16,7 @@ const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 let __draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let __newComponent; //the component that's currently being dragged/sorted around
 let __referenceElement; //the element that subs in for the __newComponent being sorted, so we know where it's going to be placed
+let __isDragging = false; //the onDrag can still fire if moving quickly even though the drag has been released, so need to add an extra check
 let __hasNewComponent = false; //to know whether to update the DB with sort change
 let __isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let __isScrolling = false;
@@ -185,13 +186,16 @@ function onNewComponentClicked (event) {
  * that contains the COMPONENT_SELECTOR
  */
 function onDragStart (event) {
-    updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-    __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
-    __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
-    updateDocumentOnDragStart();
-    disableAllOtherDraggables();
-    extractNewComponent();
-    updateSortableElements(); //ensure we have the most up to date positions
+    if (!__isDragging) {
+        __isDragging = true;
+        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+        __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
+        __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
+        updateDocumentOnDragStart();
+        disableAllOtherDraggables();
+        extractNewComponent();
+        updateSortableElements(); //ensure we have the most up to date positions
+    }
 }
 
 /**
@@ -312,7 +316,7 @@ function canCheckForChange () {
         top: __newComponent.getBoundingClientRect().top + window.scrollY
     }
     const distance = Math.sqrt(Math.pow(__startDragPoint.left - currentDragPoint.left, 2) + Math.pow(__startDragPoint.top - currentDragPoint.top, 2));
-    return distance > MIN_MOVEMENT && !__isScrolling && !__isFlipping;
+    return distance > MIN_MOVEMENT && __isDragging && !__isScrolling && !__isFlipping;
 }
 
 /**
@@ -473,6 +477,7 @@ function onAlignNewComponentComplete () {
     } else {
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
+    __isDragging = false;
 }
 
 /**
