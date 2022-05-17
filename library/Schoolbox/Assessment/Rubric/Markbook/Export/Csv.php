@@ -233,8 +233,11 @@ class Csv extends AbstractCSV
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
             if (empty($this->exclusions[$assessmentId][$studentId])) {
-                if ($result = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]) {
-                    $studentMark = $this->descriptorsOnly && $result['humanReadableMark'] ? "\xA0" . $result['humanReadableMark'] : $result['selectedDescriptorText'];
+                $result = $student['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId] ?? null;
+                if (is_array($result)) {
+                    $studentMark = $this->descriptorsOnly && ($result['humanReadableMark'] ?? null)
+                        ? ("\xA0" . $result['humanReadableMark'])
+                        : $result['selectedDescriptorText'];
                 } else {
                     $studentMark = '';
                 }
