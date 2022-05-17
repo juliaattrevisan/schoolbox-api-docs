@@ -136,6 +136,10 @@ class Report extends CliTool\App
 
             // Atlas API?
             '^atlasApi:' . INSTANCE_ID . '.',
+
+            // Aura route and module caches
+            'routeCache:' . INSTANCE_ID,
+            'moduleCache:' . INSTANCE_ID,
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
@@ -176,10 +180,6 @@ class Report extends CliTool\App
 
             // Access tokens for LTI assessments
             '^accessToken:' . INSTANCE_ID . ':.+',
-
-            // Aura route and module caches
-            'routeCache:' . INSTANCE_ID,
-            'moduleCache:' . INSTANCE_ID,
 
             // Etherpad patterns
             '^pad:g\.',

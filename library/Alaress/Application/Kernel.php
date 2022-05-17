@@ -404,7 +404,7 @@ abstract class Kernel
             'moduleCache',
             $di->lazyNew(
                 ModuleCache\Cache::class,
-                ['redis' => $di->lazyGet('redis.storage')]
+                ['redis' => $di->lazyGet('redis.cache')]
             )
         );
         $di->set(
@@ -415,7 +415,7 @@ abstract class Kernel
                     'di'     => $di,
                     'config' => $di->lazyGet('config'),
                     'router' => $di->lazyGet('router'),
-                    'redis'  => $di->lazyGet('redis.storage'),
+                    'redis'  => $di->lazyGet('redis.cache'),
                     'logger' => null,
                 ]
             )
