@@ -1857,6 +1857,9 @@ abstract class Kernel
 
     /**
      * Inits all routes based on the pre-generated route table.
+     *
+     * If the pre-generated route table doesn't exist or is corrupt: rebuild it
+     * and then init the routes.
      */
     protected function initRoutes(): void
     {
@@ -1878,6 +1881,9 @@ abstract class Kernel
 
     /**
      * Registers modules based on the pre-generated module cache.
+     *
+     * If the pre-generated module cache doesn't exist or is corrupt: rebuild it
+     * and then init the modules.
      */
     protected function initModules(): void
     {

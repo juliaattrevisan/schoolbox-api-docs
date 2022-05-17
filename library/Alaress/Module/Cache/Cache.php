@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Alaress\Module\Cache;
 
 use Aura\Router\RouteCollection;
-use JsonException;
 use Predis\ClientInterface;
+use Throwable;
 use TypeError;
 
 class Cache
@@ -61,8 +61,8 @@ class Cache
         }
         try {
             return json_decode($modulesEncoded, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw new FetchException('Module registration found in cache, but is not valid JSON', null, $e);
+        } catch (Throwable $e) {
+            throw new FetchException('Module registration found in cache, but is not valid JSON', 0, $e);
         }
     }
 
@@ -80,6 +80,10 @@ class Cache
         if (!isset($routesSerialized)) {
             throw new FetchException('Route table not found in cache');
         }
-        return unserialize($routesSerialized);
+        try {
+            return unserialize($routesSerialized);
+        } catch (Throwable $e) {
+            throw new FetchException('Route table found in cache, but is not unserializable', 0, $e);
+        }
     }
 }
