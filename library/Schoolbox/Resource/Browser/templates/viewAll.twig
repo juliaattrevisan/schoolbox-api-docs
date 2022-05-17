@@ -12,7 +12,8 @@
 <div id="view-all-files-container">
     <view-all-files
         :can-edit="{{ canEdit ? 'true' : 'false' }}"
-        :component-instance-config="{{ componentInstanceConfig|json_encode }}"
+        sort-dir="{{ sortDir }}"
+        sort-by="{{ sortBy }}"
         :files="{{ files|json_encode }}"
         :preset-filters="{{ filter|json_encode }}"
         referrer="{{ referrer }}"

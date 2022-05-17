@@ -31,8 +31,12 @@ export default {
             type: Boolean,
             required: true,
         },
-        componentInstanceConfig: { //any config used within the homepage component instance, currently used to set initial sorting
-            type: Object,
+        sortDir: {
+            type: String,
+            required: true,
+        },
+        sortBy: {
+            type: String,
             required: true,
         },
         files: { //all files within the component
@@ -110,8 +114,8 @@ export default {
                     edit: '',
                 },
                 orderBy: { //use the passed through component instance config to match the initial sorting
-                    ascending: this.componentInstanceConfig.sortdir.value === 'asc' ? true : false,
-                    column: this.componentInstanceConfig.sort.value === 'name' ? 'name' : 'dateModified.formatted',
+                    ascending: this.sortDir === 'asc',
+                    column: this.sortBy === 'name' ? 'name' : 'dateModified.formatted',
                 },
                 perPage: 100,
                 perPageValues: [100, 200, 300],
@@ -507,7 +511,7 @@ export default {
                             @on-file-uploaded="onFileSuccess"
                         />
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
-                        <div class="component-action">
+                        <div v-if="canEdit" class="component-action">
                             <section>
                                 <p><a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file">Select a file</a> or drag and drop multiple onto this component</p>
                             </section>

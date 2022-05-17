@@ -25,7 +25,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * @see Component_Config_Filter for how this data is passed in/out of the database
      * @var string[]
      */
-    protected $filterFields = ['document', 'audio', 'video', 'image', 'other'];
+    protected $filterFields = \Schoolbox\Resource\File\Model::FILTER_FIELDS;
 
     /**
      * Available sort fields for this component.
@@ -86,17 +86,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'has_file', 'has_file_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        $configValue       = (int)$this->getConfig('filter');
-        $filter            = [];
-        $countFilterFields = count($this->filterFields);
-        for ($i = 0; $i < $countFilterFields; $i++) {
-            $j = $configValue % 2;
-            if ($j) {
-                $filter[] = $this->filterFields[$i];
-            }
-            $configValue = (int)$configValue / 2;
-        }
-
+        $filter = Component_Config_Filter::getSelectedFilters((int)$this->getConfig('filter'), $this->filterFields);
 
         $fileList = $this->fileMapper->findForFolders(
             [$this->getSource()->getId()],

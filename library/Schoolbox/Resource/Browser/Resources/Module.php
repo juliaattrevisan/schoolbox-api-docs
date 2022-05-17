@@ -32,18 +32,42 @@ class Module extends AbstractModule
      */
     protected function registerRoutes(): void
     {
-        $preloadFile = function ($params) {
+        $preloadFile           = function ($params) {
             return $this->preloadFile($params);
         };
         $getHomepageIdCallback = function ($params) {
             return $this->preloadFile($params)['file']->getFolder()->getId();
         };
+        $preloadFolder         = function ($params) {
+            return $this->preloadFolder($params);
+        };
 
-        $hasEditAccess = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getHomepageIdCallback, Access::getInstance())
-        );
+        $hasEditAccess =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, $getHomepageIdCallback, Access::getInstance())
+                )
+            );
 
+        $hasFolderReadAccess =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_READ,
+                        function ($params): int {
+                            return $params['sourceFolder']->getId();
+                        },
+                        Access::getInstance()
+                    )
+                )
+            );
+
+        $this->register('GET', '/folder/{componentID:\d+}/files/{sourceFolderID:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
+        $this->register('GET', '/folder/files/{sourceFolderID:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
         $this->register('PATCH', '/file/{fileId}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
     }
 
@@ -56,8 +80,7 @@ class Module extends AbstractModule
     public function initRoutes(Router $router, $basePath)
     {
         parent::initRoutes($router, $basePath);
-        $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens([ 'linkId' => '\d+' ]);
-        $this->addGetRoute($router, 'showFiles', $basePath, '/folder/{componentID}/files/{sourceFolderID}')->addTokens([ 'componentID' => '\d+', 'sourceFolderID' => '\d+' ]);
+        $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens(['linkId' => '\d+']);
     }
 
     /**
@@ -77,10 +100,10 @@ class Module extends AbstractModule
             )
         );
         return (
-            new Controller(
-                $this->getMapperFactory()->get(Resource\File\Mapper::class),
-                $this->getMapperFactory()->get(\Component_InstanceMapper::class),
-            ))
+        new Controller(
+            $this->getMapperFactory()->get(Resource\File\Mapper::class),
+            $this->getMapperFactory()->get(\Component_InstanceMapper::class),
+        ))
             ->setLinkMapper($this->getMapperFactory()->get(Resource\LinkMapper::class))
             ->setFileMapper($this->getMapperFactory()->get(Resource\File\Mapper::class))
             ->setConfig($this->getConfig())
@@ -98,6 +121,7 @@ class Module extends AbstractModule
      *
      * @param array $params
      * @return array
+     * @throws Resource\Exception
      */
     private function preloadFile(array $params): array
     {
@@ -112,6 +136,28 @@ class Module extends AbstractModule
 
         return [
             'file' => $file,
+        ];
+    }
+
+    /**
+     * Preload folder
+     *
+     * @param array $params
+     * @return array
+     */
+    private function preloadFolder(array $params): array
+    {
+        if (($params['sourceFolder'] ?? null) instanceof Resource\Folder\Model) {
+            return $params;
+        }
+        try {
+            $folder = $this->getMapperFactory()->get(Resource\Folder\Mapper::class)->findById($params['sourceFolderID']);
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'sourceFolder' => $folder,
         ];
     }
 }
