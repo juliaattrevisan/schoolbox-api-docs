@@ -5,7 +5,6 @@
     }
 
     .wait-content h1 {
-        font-weight: bold;
         margin-bottom: 1rem;
     }
 
@@ -488,7 +487,8 @@
                 <div class="report-count">
                     <h3>We are currently working on collating your student reports for {{ reportCount }} student{{ reportCount > 1 ? 's' : '' }} into a zip file.
                        {# (number of reports * 5 seconds for each report) / 60 seconds for minutes, then round up to the closest minute - #}
-                       We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minute{{ reportCount > 1 ? 's' : '' }}.
+                       {% set minutes = ((reportCount * 5) /60) |round (0, 'ceil') %}
+                       We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minute{{ minutes > 1 ? 's' : '' }}.
                        Feel free to move away from this page and continue working, we will send you a notification when the file is ready to download.
                     </h3>
                 </div><!-- .report-count -->
