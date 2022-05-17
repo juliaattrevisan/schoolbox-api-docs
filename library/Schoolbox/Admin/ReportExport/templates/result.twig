@@ -183,7 +183,9 @@
         <div class="small-12 island">
             <section class="content">
                 {% if reportCount == 0 %}
-                <h1>No reports will be generated.</h1>
+                <div class="alert-box warning">
+                    Sorry, no reports will be generated. Please ensure students were included in the report generation.
+                </div>
                 {% else %}
                 <div class="wait-content">
                     <h1>We're compiling your reports now</h1>
@@ -492,9 +494,9 @@
                 {% if warnings %}
                 <div class="alert-box warning report-warning">
                     Please note that we encountered the following issues while processing your request:<br>
-                        {% for warning in warnings %}
-                            <em>{{ warning }}</em><br>
-                        {% endfor %}
+                    {% for warning in warnings %}
+                        <em>{{ warning }}</em><br>
+                    {% endfor %}
                 </div>
                 {% endif %}
                 {% endif %}
