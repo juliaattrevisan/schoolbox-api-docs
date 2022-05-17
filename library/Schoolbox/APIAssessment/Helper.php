@@ -243,8 +243,12 @@ WHERE
         }
         if (array_key_exists('workType', $filter)) {
             if (array_key_exists('id', $filter['workType'])) {
-                $where .= " AND assessment.work_type_id = :workTypeID ";
-                $params['workTypeID'] = $filter['workType']['id'];
+                if (in_array($filter['workType']['id'], [null, 'null', ''])) {
+                    $where .= " AND assessment.work_type_id is null ";
+                } else {
+                    $where .= " AND assessment.work_type_id = :workTypeID ";
+                    $params['workTypeID'] = $filter['workType']['id'];
+                }
             } elseif (array_key_exists('name', $filter['workType'])) {
                 $where .= " AND lu_work_type.name = :workTypeName ";
                 $params['workTypeName'] = $filter['workType']['name'];
