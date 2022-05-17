@@ -571,7 +571,7 @@ class Controller extends Base
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition'] ?? null);
-            $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect']);
+            $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect'] ?? null);
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
