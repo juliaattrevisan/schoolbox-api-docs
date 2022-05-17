@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\User;
 
 use Alaress\Database\Predicate\Bindings;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\User;
@@ -186,6 +187,14 @@ class BulkUpdater
          */
         if (!in_array(self::UNCHANGED, $campusIds, false)) {
             $this->campusIds = array_map('intval', $campusIds);
+            //check if campus still exists... yay multiplayer schoolbox
+            $bindings           = Builder::getBindings($this->campusIds, 'c');
+            $validCampusId =  $this->userBulkMapper->getDatabase()->query("SELECT count(*) as campusCount FROM luCampus WHERE id in ({$bindings->getPlaceholder()}) AND deleted_at is NULL", $bindings->getParams());
+            $validCampusId->execute();
+            $campusCount = (int)$validCampusId->fetch()['campusCount'];
+            if (count($this->campusIds) !== $campusCount) {
+                throw new SchoolboxException("Campus has been deleted or does not exist.");
+            }
         }
 
         /* Remember these scalars as they are
