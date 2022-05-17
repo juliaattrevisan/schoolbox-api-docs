@@ -249,8 +249,8 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        if (!empty($post['id'])) {
-            $item = $this->getMenuSideMapper()->findById($post['id']);
+        if (!empty($post->get('id'))) {
+            $item = $this->getMenuSideMapper()->findById($post->get('id'));
         } else {
             $item = new MenuSide();
 
@@ -259,15 +259,15 @@ class Controller extends Base
             $item->setSortOrder($itemOrder->getSortOrder() + 1);
         }
 
-        $item->setTitle($post['title']);
-        $item->setUrl(trim($post['url']));
-        $item->setTarget($post['target']);
+        $item->setTitle($post->get('title'));
+        $item->setUrl(trim($post->get('url')));
+        $item->setTarget($post->get('target'));
         $this->getMenuSideMapper()->save($item);
 
         $this->getMenuSideCampusMapper()->deleteByColumn('menu_side_id', $item->getId());
 
-        if (is_array($post['campuses'])) {
-            foreach ($post['campuses'] as $campusId) {
+        if (is_array($post->get('campuses'))) {
+            foreach ($post->get('campuses') as $campusId) {
                 $menuSideCampus = new MenuSideCampus();
                 $menuSideCampus->setMenuSideId($item->getId());
                 $menuSideCampus->setCampusId($campusId);
@@ -277,8 +277,8 @@ class Controller extends Base
 
         $this->getMenuSideRoleMapper()->deleteByColumn('menu_side_id', $item->getId());
 
-        if (is_array($post['roles'])) {
-            foreach ($post['roles'] as $roleId) {
+        if (is_array($post->get('roles'))) {
+            foreach ($post->get('roles') as $roleId) {
                 $menuSideRole = new MenuSideRole();
                 $menuSideRole->setMenuSideId($item->getId());
                 $menuSideRole->setRoleId($roleId);
