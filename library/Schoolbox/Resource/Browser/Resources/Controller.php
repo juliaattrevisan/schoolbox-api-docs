@@ -147,7 +147,7 @@ class Controller extends AbstractController
 
         //grab the referrer so the saved filters can be recalled only when returning from the edit page
         $referrer = 'component';
-        if (strpos($_SERVER['HTTP_REFERER'], 'cms/file') !== false) {
+        if (strpos(($_SERVER['HTTP_REFERER'] ?? ''), 'cms/file') !== false) {
             $referrer = 'edit';
         }
         //just dump the lot to the page for front end use.
