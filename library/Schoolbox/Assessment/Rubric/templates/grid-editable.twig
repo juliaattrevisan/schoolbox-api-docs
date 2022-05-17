@@ -27,7 +27,7 @@
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
             <th colspan="{{ rubricGrid.levels|length + 3 }}">
-                <textarea data-spawn="group" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}" maxlength="900"></textarea>
+                <textarea data-group-grid-text data-spawn="group" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}"></textarea>
             </th>
         </tr>
         </tbody>
@@ -126,6 +126,21 @@
 */
 
         }
-
+        /**
+         * only add maxlength to fields that actually change.
+         * to then only validate those fields characters count
+         */
+        $('[data-group-row-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', 900);
+        });
+        $('[data-group-edit-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', 900);
+        });
+        $('[data-group-grid-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', 900);
+        });
+        $('[data-criterion-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', 900);
+        });
     });
 </script>
