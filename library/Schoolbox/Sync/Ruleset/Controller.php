@@ -721,7 +721,7 @@ class Controller extends Base
                     continue;
                 }
 
-                $effectArgs = (array)$effectData['arguments'];
+                $effectArgs = (array)($effectData['arguments'] ?? ['']);
 
                 // ensure this is in the right order
                 ksort($effectArgs);
