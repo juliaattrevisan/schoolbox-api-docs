@@ -1,3 +1,4 @@
+{% set warnings = ["X warning","Y warning"] %}
 <style>
 
     .wait-content {
@@ -8,11 +9,7 @@
     .wait-content h1 {
         font-weight: bold;
         text-align: center;
-        margin-top: 1em;
-    }
-
-    .report-count p {
-      font-size: 1em;
+        margin-top: 1rem;
     }
 
     #wave-1, #wave-3 {
@@ -57,106 +54,87 @@
     
     @keyframes waves {
         0% {
-            transform: translateX(0rem);
+            transform: translateX(0);
         }
         50% {
             transform: translateX(0.3rem);
         }
         100% {
-            transform: translateX(0rem);
+            transform: translateX(0);
         }
     }
     @keyframes waves-alt {
         0% {
-            transform: translateX(0em);
+            transform: translateX(0);
         }
         50% {
-            transform: translateX(-0.4em);
+            transform: translateX(-0.4rem);
         }
         100% {
-            transform: translateX(0em);
+            transform: translateX(0);
         }
     }
-    @keyframes waves {
+    @keyframes wave-bounce {
         0% {
-            transform: translateX(0em);
+            transform: scale(1) translateY(0);
         }
         50% {
-            transform: translateX(0.3em);
+            transform: scale(1.025, 1) translateY(0.125rem);
         }
         100% {
-            transform: translateX(0em);
+            transform:  scale(1) translateY(0);
+        }
+    }
+    @keyframes small-wave-bounce {
+        0% {
+            transform: scale(1) translateY(0);
+        }
+        50% {
+            transform: scale(1.03, 1) translateY(0.15rem);
+        }
+        100% {
+            transform:  scale(1) translateY(0);
         }
     }
     @keyframes bottle-bounce {
         0% {
-            transform: scale(1) translateY(0em);
+            transform: scale(1) translateY(0);
         }
         50% {
-            transform: scale(1.01, 1) translateY(0.1em);
+            transform: scale(1.01, 1) translateY(0.1rem);
         }
         100% {
-            transform:  scale(1) translateY(0em);
+            transform:  scale(1) translateY(0);
         }
     }
-
     @keyframes small-bottle-bounce {
         0% {
-            transform: scale(1) translateY(0em);
+            transform: scale(1) translateY(0);
         }
         50% {
-            transform: scale(1.06, 1) translateY(0.2em);
+            transform: scale(1.06, 1) translateY(0.2rem);
         }
         100% {
-            transform:  scale(1) translateY(0em);
-        }
-    }
-
-    @keyframes wave-bounce {
-        0% {
-            transform: scale(1) translateY(0em);
-        }
-        50% {
-            transform: scale(1.025, 1) translateY(0.125em);
-        }
-        100% {
-            transform:  scale(1) translateY(0em);
-        }
-    }
-
-    @keyframes small-wave-bounce {
-        0% {
-            transform: scale(1) translateY(0em);
-        }
-        50% {
-            transform: scale(1.03, 1) translateY(0.15em);
-        }
-        100% {
-            transform:  scale(1) translateY(0em);
+            transform:  scale(1) translateY(0);
         }
     }
 
     /*Small devices*/
     @media (min-width: 425px) {
 
-        .island {
-            width: 100%;
-            margin: auto;
-        }
-
         .wait-content svg {
             transform: scale(1);
-            margin-top: 1em;
+            margin-top: 1rem;
             margin-left: -90px;
         }
 
         .report-count {
-            margin-top: 1em;
+            margin-top: 1rem;
             text-align: center;
         }
 
         .report-warning {
-            margin-top: 1em;
+            margin-top: 1rem;
         }
     }
 
@@ -165,14 +143,12 @@
 
         .wait-content svg {
             transform: scale(1);
-            margin-top: 5em;
-            margin-left: -10px;
             display: block;
             margin: auto;
         }
 
         .wait-content h1 {
-            margin-top: 0.5em;
+            margin-top: 0.5rem;
         }
 
         .report-count {
@@ -181,19 +157,9 @@
             margin: auto;
         }
 
-        .report-count p {
-            font-size: 0.9em;
-        }
-
         .report-warning {
             width: 85%;
-            margin: auto;
-            margin-top: 1.5em;
-            margin-bottom: 1.5em;
-        }
-
-        .island {
-            width: 100%;
+            margin: 1.5rem auto;
         }
 
     }
@@ -203,16 +169,13 @@
 
         .wait-content svg {
             display: block;
-            margin: auto;
+            margin: 6rem auto auto -25px;
             transform: scale(1.4);
-            margin-top: 6em;
-            margin-left: -25px;
         }
 
         .report-count {
             width: 75%;
-            margin: auto;
-            margin-top: 6em;
+            margin: 6rem auto auto auto;
             text-align: center;
         }
 
@@ -227,24 +190,20 @@
 
         .wait-content svg {
             display: block;
-            margin: auto;
+            margin: 7rem auto auto auto;
             transform: scale(1.75);
-            margin-top: 7em;
-            padding-left: 4em;
+            padding-left: 4rem;
         }
 
         .report-count {
             width: 60%;
-            margin: auto;
-            margin-top: 6em;
+            margin: 6rem auto auto auto;
             text-align: center;
         }
 
         .report-warning {
             width: 60%;
-            margin: auto;
-            margin-top: 2em;
-            margin-bottom: 2em;
+            margin: 2rem auto;
         }
 
     }
@@ -258,16 +217,9 @@
     <div class="admin-content">
         <div class="small-12 island">
             <section class="content">
-            {% if reportCount == 0 %}
-                No report will be generated.
-            {% else %}
-                {{ reportCount }} reports will be generated.
-            {% endif %}
-            {% for warning in warnings %}
-                {{ warning }}<br>
-            {% endfor %}
-            </section>
-            <section class="content">
+                {% if reportCount == 0 %}
+                <h1>No reports will be generated.</h1>
+                {% else %}
                 <div class="wait-content">
                     <h1>We're compiling your reports now</h1>
                     <svg width="456" height="288" viewBox="0 0 456 288" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -565,19 +517,20 @@
                     </svg>
                 </div><!-- .wait-content -->
                 <div class="report-count">
-                    <p>We are currently working on collating your student reports for {{reportCount}} students into a zip file...<br>
-                        We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minutes
-                        Feel free to continue working, we will send you a notification when the file is ready to download.
-                    </p>
+                    <h3>We are currently working on collating your student reports for {{ reportCount }} students into a zip file...<br>
+                       We expect this to take approximately {{ ((reportCount * 5) /60) |round (0, 'ceil') }} minutes
+                       Feel free to continue working, we will send you a notification when the file is ready to download.
+                    </h3>
                 </div><!-- .report-count -->
                 <div class="alert-box warning report-warning">
                     {% if warnings %}
-                    <p>Please note that we encountered the following issues while processing your request:</p>
+                    Please note that we encountered the following issues while processing your request:<br>
                         {% for warning in warnings %}
-                            {{ warning }} <br>
+                            <em>{{ warning }}</em><br>
                         {% endfor %}
                     {% endif %}
                 </div>
+                {% endif %}
             </section>
         </div>
     </div>
