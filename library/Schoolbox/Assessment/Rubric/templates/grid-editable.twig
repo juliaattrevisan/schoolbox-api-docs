@@ -130,16 +130,16 @@
          * only add maxlength to fields that actually change.
          * to then only validate those fields characters count
          */
-        document.querySelector('[data-group-row-text]').addEventListener('change', (event) => {
+        $('[data-group-row-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', 900);
         });
-        document.querySelector('[data-group-edit-text]').addEventListener('change', (event) => {
+        $('[data-group-edit-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', 900);
         });
-        document.querySelector('[data-group-grid-text]').addEventListener('change', (event) => {
+        $('[data-group-grid-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', 900);
         });
-        document.querySelector('[data-criterion-text]').addEventListener('change', (event) => {
+        $('[data-criterion-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', 900);
         });
     });
