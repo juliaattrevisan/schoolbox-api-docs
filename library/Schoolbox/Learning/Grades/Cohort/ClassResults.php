@@ -142,7 +142,7 @@ class ClassResults
         $sortedSpecificationIds = [];
 
         foreach (array_flip($inputImplementationIds) as $inputImplementationId => $i) {
-            $sortedSpecificationIds[] = $assessmentTuples[$inputImplementationId];
+            $sortedSpecificationIds[] = $assessmentTuples[$inputImplementationId] ?? null;
         }
 
         /* Index the result set, forcing the $assessments collection to be in the same
