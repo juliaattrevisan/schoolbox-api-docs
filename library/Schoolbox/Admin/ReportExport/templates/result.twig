@@ -179,13 +179,15 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
+        {% if reportCount == 0 %}
+        <div class="columns">
+            <div class="alert-box warning">
+                Sorry, no reports will be generated. Please ensure students were included in the report generation.
+            </div>
+        </div>
+        {% else %}
         <div class="small-12 island">
             <section class="content">
-                {% if reportCount == 0 %}
-                <div class="alert-box warning">
-                    Sorry, no reports will be generated. Please ensure students were included in the report generation.
-                </div>
-                {% else %}
                 <div class="wait-content">
                     <h1>We're compiling your reports now</h1>
                     <div class="svg-container">
@@ -500,8 +502,8 @@
                     {% endfor %}
                 </div>
                 {% endif %}
-                {% endif %}
             </section>
         </div>
+        {% endif %}
     </div>
 </div>
