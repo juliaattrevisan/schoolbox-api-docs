@@ -319,7 +319,7 @@ class Factory
      */
     public function isBoolean(string $field): bool
     {
-        return $this->allFields[$field]['type'] === self::TYPE_BOOLEAN;
+        return ($this->allFields[$field]['type'] ?? null) === self::TYPE_BOOLEAN;
     }
 
 
@@ -331,7 +331,7 @@ class Factory
      */
     public function isCollection(string $field): bool
     {
-        return $this->allFields[$field]['type'] === self::TYPE_COLLECTION;
+        return ($this->allFields[$field]['type'] ?? null) === self::TYPE_COLLECTION;
     }
 
 
@@ -343,7 +343,7 @@ class Factory
      */
     public function isLookup(string $field): bool
     {
-        return $this->allFields[$field]['type'] === self::TYPE_LOOKUP;
+        return ($this->allFields[$field]['type'] ?? null) === self::TYPE_LOOKUP;
     }
 
 
@@ -355,7 +355,7 @@ class Factory
      */
     public function isString(string $field): bool
     {
-        return $this->allFields[$field]['type'] === self::TYPE_STRING;
+        return ($this->allFields[$field]['type'] ?? null) === self::TYPE_STRING;
     }
 
 
