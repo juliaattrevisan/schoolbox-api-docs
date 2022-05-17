@@ -199,8 +199,8 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        if (!empty($post['id'])) {
-            $item = $this->getMenuTopMapper()->findById($post['id']);
+        if (!empty($post->get('id'))) {
+            $item = $this->getMenuTopMapper()->findById($post->get('id'));
         } else {
             $item = new MenuTop();
             $item->setPlanHide(false);
@@ -219,36 +219,36 @@ class Controller extends Base
             }
         }
 
-        $item->setTitle($post['title']);
-        $item->setText($post['text']);
-        $item->setIcon($post['icon']);
-        $item->setUrl($post['url']);
-        $item->setTarget($post['target']);
-        $item->setWebmail($post['webmail'] ?? '');
+        $item->setTitle($post->get('title'));
+        $item->setText($post->get('text'));
+        $item->setIcon($post->get('icon'));
+        $item->setUrl($post->get('url'));
+        $item->setTarget($post->get('target'));
+        $item->setWebmail($post->get('webmail', ''));
 
         // Populate token
-
-        if (stripos($post['url'], '/learning/classes') === 0) {
+        $url = $post->get('url');
+        if (stripos($url, '/learning/classes') === 0) {
             $item->setToken('CLASSES');
-        } elseif (stripos($post['url'], '/learning/due') === 0) {
+        } elseif (stripos($url, '/learning/due') === 0) {
             $item->setToken('SUBMISSION');
-        } elseif (stripos($post['url'], '/timetable') === 0) {
+        } elseif (stripos($url, '/timetable') === 0) {
             $item->setToken('TIMETABLE');
-        } elseif (stripos($post['url'], '/calendar/week') === 0) {
+        } elseif (stripos($url, '/calendar/week') === 0) {
             $item->setToken('CALENDAR');
-        } elseif (stripos($post['url'], '/news') === 0) {
+        } elseif (stripos($url, '/news') === 0) {
             $item->setToken('NEWS');
-        } elseif (stripos($post['url'], '/learning/grades') === 0) {
+        } elseif (stripos($url, '/learning/grades') === 0) {
             $item->setToken('GRADE');
-        } elseif (stripos($post['url'], '/course/list') === 0) {
+        } elseif (stripos($url, '/course/list') === 0) {
             $item->setToken('COURSE');
-        } elseif (stripos($post['url'], '/resources') === 0) {
+        } elseif (stripos($url, '/resources') === 0) {
             $item->setToken('RESOURCES');
-        } elseif (stripos($post['url'], '/eportfolio') === 0) {
+        } elseif (stripos($url, '/eportfolio') === 0) {
             $item->setToken('EPORTFOLIO');
-        } elseif (stripos($post['url'], '/my-files') === 0) {
+        } elseif (stripos($url, '/my-files') === 0) {
             $item->setToken('MYFILES');
-        } elseif (stripos($post['url'], '/drives') === 0) {
+        } elseif (stripos($url, '/drives') === 0) {
             $item->setToken('NETWORK');
         } else {
             $item->setToken('');
@@ -258,8 +258,8 @@ class Controller extends Base
 
         $this->getMenuTopCampusMapper()->deleteByColumn('menu_top_id', $item->getId());
 
-        if (is_array($post['campuses'])) {
-            foreach ($post['campuses'] as $campusId) {
+        if (is_array($post->get('campuses'))) {
+            foreach ($post->get('campuses') as $campusId) {
                 $menuTopCampus = new MenuTopCampus();
                 $menuTopCampus->setMenuTopId($item->getId());
                 $menuTopCampus->setCampusId($campusId);
@@ -269,8 +269,8 @@ class Controller extends Base
 
         $this->getMenuTopRoleMapper()->deleteByColumn('menu_top_id', $item->getId());
 
-        if (is_array($post['roles'])) {
-            foreach ($post['roles'] as $roleId) {
+        if (is_array($post->get('roles'))) {
+            foreach ($post->get('roles') as $roleId) {
                 $menuTopRole = new MenuTopRole();
                 $menuTopRole->setMenuTopId($item->getId());
                 $menuTopRole->setRoleId($roleId);
