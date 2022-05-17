@@ -165,6 +165,7 @@ export default {
          */
         checkUpdateResponse (response, responseData) {
             if (response.ok) { //successful response
+                this.hasDataError = false;
                 this.logData = responseData;
             } else if (!response.ok && response.status === 501) { //otherwise check for 501 error 
                 this.hasDataError = true; 
