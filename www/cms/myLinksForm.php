@@ -8,7 +8,7 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 $myLinksHandler = new MyLinks();
 
-$existing = $myLinksHandler->getByID($_POST['linkID']);
+$existing = is_numeric($_POST['linkID'] ?? null) ? $myLinksHandler->getByID($_POST['linkID']) : null;
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
@@ -48,7 +48,7 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
     }
 }
 
-if ($_GET['return']) {
+if ($_GET['return'] ?? false) {
     SitePage::backToTheFuture(1);
 } else {
     SitePage::localRedir('/cms/myLinks');

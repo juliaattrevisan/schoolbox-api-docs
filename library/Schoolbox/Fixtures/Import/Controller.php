@@ -558,7 +558,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->compareKey($row[0], Controller::TYPE_SPORT)) {
+            if ($row && $this->compareKey($row[0], Controller::TYPE_SPORT)) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -609,7 +609,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_POSITION) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_POSITION) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -665,7 +665,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_VENUE) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_VENUE) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -731,7 +731,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_SCHOOL) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_SCHOOL) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -771,7 +771,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_STATUS) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_STATUS) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -810,7 +810,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_SEASON) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_SEASON) {
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -890,7 +890,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_TEAM) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_TEAM) {
                 $error = false;
                 $season = null;
 
@@ -1036,7 +1036,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if ($this->makeKey($row[0]) == Controller::TYPE_COACH) {
+            if ($row && $this->makeKey($row[0]) == Controller::TYPE_COACH) {
                 $error = false;
                 $season = null;
 
@@ -1160,7 +1160,7 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            if (strtolower(trim($row[0])) == Controller::TYPE_FIXTURE) {
+            if ($row && strtolower(trim($row[0])) == Controller::TYPE_FIXTURE) {
                 $error = false;
                 $season = null;
 
