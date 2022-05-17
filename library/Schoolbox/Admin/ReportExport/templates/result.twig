@@ -1,4 +1,3 @@
-{% set warnings = ["X warning","Y warning"] %}
 <style>
 
     .wait-content {
@@ -490,14 +489,14 @@
                        Feel free to continue working, we will send you a notification when the file is ready to download.
                     </h3>
                 </div><!-- .report-count -->
+                {% if warnings %}
                 <div class="alert-box warning report-warning">
-                    {% if warnings %}
                     Please note that we encountered the following issues while processing your request:<br>
                         {% for warning in warnings %}
                             <em>{{ warning }}</em><br>
                         {% endfor %}
-                    {% endif %}
                 </div>
+                {% endif %}
                 {% endif %}
             </section>
         </div>
