@@ -85,10 +85,13 @@ class Component_InstanceMapper extends BaseMapper
     public function hydrate(array $row, $alias = '', $callback = null)
     {
         // Search for an overriding instance class and use that to hydrate the model instead
-
-        $classInstanceOverride = str_replace('Controller', 'Instance', $row['cd.class']);
+        $classInstanceOverride = null;
+        if (isset($row['cd.class'])) {
+            $classInstanceOverride = str_replace('Controller', 'Instance', $row['cd.class']);
+        }
 
         if (
+            isset($classInstanceOverride) &&
             class_exists($classInstanceOverride) &&
             is_subclass_of($classInstanceOverride, Component_Instance::class)
         ) {
