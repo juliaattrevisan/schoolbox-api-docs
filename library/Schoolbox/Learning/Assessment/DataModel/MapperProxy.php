@@ -1323,6 +1323,26 @@ class MapperProxy
             LtiAssessment\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
+        }
+
+        // TODO Remove this hack in SA-6049 (see description above)
+        if (!$isCreate) {
+            $this->baseMapper->save($dataModel);
+        }
+
+        /* A subobject can never be a Due Work *and* a Quiz at the same time, for example
+         * so this if() is mutually exclusive to all the other previous ones. In the case
+         * of Projects, none of the previous if/else statements execute, $dataModel saves,
+         * then the Project's subobjects save and you dodge around the mapper cache fun
+         * that's described in SA-6049. You can also dodge a double-tap like this (see
+         * previous commit in this history)
+         *
+         * For other assessments like Due Work, Task and Quiz - their pieces are saved,
+         * then $dataModel saves, doing the same steps as it always did before this change.
+         * However, this "$subObject instanceof Project" never executes so you're also
+         * in the clear from that.
+         */
+        if ($subObject instanceof Project) {
             // Save sub-projects
             if ($assessable instanceof ProjectObject) {
                 foreach ($assessable->getAssessables() as $projectAssessable) {
@@ -1333,10 +1353,6 @@ class MapperProxy
                     $this->save($projectAssessable, $currentUser);
                 }
             }
-        }
-        // TODO Remove this hack in SA-6049 (see description above)
-        if (!$isCreate) {
-            $this->baseMapper->save($dataModel);
         }
 
         // TODO If at all possible, trigger the assessment notifier here so that it contains all assessment information

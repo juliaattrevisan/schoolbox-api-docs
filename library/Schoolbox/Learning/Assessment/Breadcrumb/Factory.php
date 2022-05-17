@@ -88,6 +88,7 @@ class Factory
             $routeParams = [
                 'assessment'   => $context,
                 'assessmentId' => $context->getId(),
+                'studentId' => $user->getId()
             ];
 
             if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
@@ -121,7 +122,7 @@ class Factory
      * so we give it the contextId/contextType, and decide from there
      *
      * @param AssessmentContext $context
-     * @param IAssessable $assessment
+     * @param IAssessable|null $assessment
      * @return Collection
      */
     public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
