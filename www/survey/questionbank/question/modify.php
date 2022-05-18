@@ -114,7 +114,6 @@ if (!empty($_POST)) {
         'QUESTION_CATEGORY_ID' => $question['question_category_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
-        'QUESTIONTYPE_SELECTED' => $selected,
         'QUESTION' => Scrub::text($question['question']),
         'QUESTION_BANK_REDIRECT_URL' => '/survey/questionbank/contents'
     ));

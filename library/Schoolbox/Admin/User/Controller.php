@@ -737,7 +737,7 @@ class Controller extends Base
 
             /* Remove bad data SA-8244
              */
-            if (\is_array($this->getRequest()->post['attachment'])) {
+            if (\is_array($this->getRequest()->post->get('attachment'))) {
                 $attachments = array_filter($this->getRequest()->post['attachment']);
             }
 

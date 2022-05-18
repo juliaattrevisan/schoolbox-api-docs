@@ -3,6 +3,7 @@
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
+/** @var SitePage $this */
 try {
     $surveyHandler = new \Survey_Main();
     $survey = $surveyHandler->getByID($this->arg[1]);
@@ -12,6 +13,7 @@ try {
 
 try {
     $folderMapper = new FolderMapper();
+    /** @var \Schoolbox\Survey\Model $survey */
     $folder = $folderMapper->findById($survey['category_id']);
 } catch (\Exception $e) {
     error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
@@ -56,7 +58,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 /* Iterate and show
      */
     if (is_array($allQuestions) && count($allQuestions)) {
-        $previousCategory = false;
         $factory = new Survey_Factory();
         foreach ($allQuestions as $currentQuestion) {
             $this->setVar(array(
@@ -112,7 +113,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             $this->setVar(array(
                 'show_delete_block' => ''
             ));
-            $previous = $currentQuestion['question_category_id'];
         }
 
         $this->parse('category_selected_block', 'category_selected');
@@ -154,7 +154,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 
 /* Render out breadcrumbs
  */
-$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail = new Breadcrumbs();
+/** @var \Schoolbox\Resource\Folder\Model $folder */
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => $folder->getName(),
