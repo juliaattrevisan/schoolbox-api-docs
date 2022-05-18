@@ -243,12 +243,16 @@ class Controller extends ConfigController
             $messageFactory = $this->getDi()->get('taskd.messageFactory');
             $userSerializer = new ModelToArray();
 
+            $date = \Alaress_Date_Format::now()->getDatabaseDate();
+            $outfile = $escapedTitle !== ''
+                ? ($date . '-' . $escapedTitle . '.zip')
+                : ($date . '.zip');
             $message = $messageFactory->build(
                 'download-pages',
                 [
                     'token'     => $this->tokenBuilder->generate($this->getUser()),
                     'content'   => $reports,
-                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-' . $escapedTitle . '.zip',
+                    'outfile'   => $outfile,
                     'gotenberg' => [
                         'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
