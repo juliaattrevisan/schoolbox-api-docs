@@ -323,6 +323,23 @@
         padding: 0.33rem;
     }
 
+    /* Removes side padding on student card at top
+     */
+    .card.no-pad {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .card .name {
+        font-size: 1.6rem;
+        margin: 0;
+    }
+
+    .card .year {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
     /* Top-left cell is a meaningless cell
      */
     .rb.markable thead tr th:first-child {
@@ -392,18 +409,22 @@
         <div class="header-content">
             <div class="row row__margin-bottom">
                 <h1>{{ config.report_title }}</h1>
-                <div class="card small-12">
-                    {% if student.portrait is not null %}
+
+                <div class="card {% if not student.portrait %}no-pad{% endif %}">
+                    {% if student.portrait %}
                         <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
                     {% endif %}
-                    <h2 class="heading__primary">{{ student.fullname }}</h2>
-                    <h3 class="heading__secondary">{{ student.year.longName ?? '' }}</h3>
+                    <h2 class="name">{{ student.fullname }}</h2>
+
+                    {# Only show year if it was ever set and meaningful
+                     #}
+                    {% if student.year and student.year.longName != '' %}
+                    <h3 class="year">{{ student.year.longName }}</h3>
+                    {% endif %}
                 </div>
             </div>
-
         </div>
         <div class="row row__margin-bottom logo-content">
-            <h1 class="heading__secondary">{{ config.school_name }}</h1>
             {% if config.report_school_logo %}
                 <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
             {% endif %}
