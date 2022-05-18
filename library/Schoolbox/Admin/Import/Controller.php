@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Import;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
@@ -51,16 +52,20 @@ class Controller extends ConfigController
 
 
     /**
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
+     * Constructor
+     *
+     * @param ConfigMapper                             $configMapper
+     * @param FieldStrategyFactory                     $fieldStrategyFactory
+     * @param Rebuilder                                $rebuilder
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
         \Schoolbox\External\Connector\Log\Mapper $importLogMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->importLogMapper = $importLogMapper;
     }

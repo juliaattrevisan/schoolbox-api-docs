@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Oauth;
 
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Mysql\Quoter;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
@@ -24,13 +25,20 @@ class Controller extends ConfigController
 
 
     /**
+     * Constructor
+     *
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
      * @param Quoter               $quoter
      */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory, Quoter $quoter)
-    {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        Quoter $quoter
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->quoter = $quoter;
     }

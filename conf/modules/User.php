@@ -11,6 +11,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User\Module as UserModule;
 use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
 use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
@@ -29,7 +30,7 @@ class User implements ModuleConfigInterface
 
         // Only load the external SIS academic report module if it is enabled in config
 
-        if ($di->get('config')->get('external_document_report_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED)) {
             $documentReportModule = new UserProfileDocumentManagementModule($di);
             $documentReportModule->registerModule('/user/profile/documents/reports');
         }

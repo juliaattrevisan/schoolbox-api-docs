@@ -9,6 +9,7 @@
 namespace Schoolbox\Admin\News\Policy;
 
 use Alaress\Database\Predicate;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
@@ -30,18 +31,22 @@ class Controller extends ConfigController
 
 
     /**
+     * Constructor
+     *
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
      * @param UserAccessMapper     $userAccessMapper
      * @param Topic\Mapper         $topicMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
         UserAccessMapper $userAccessMapper,
         Topic\Mapper $topicMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->userAccessMapper = $userAccessMapper;
         $this->topicMapper      = $topicMapper;

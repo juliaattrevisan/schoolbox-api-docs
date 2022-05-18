@@ -20,7 +20,6 @@ use Alaress\Database\Predicate;
 
 class Controller extends ConfigController
 {
-
     /**
      * Renders an admin settings page for settings with the specified type
      *
@@ -168,17 +167,10 @@ class Controller extends ConfigController
         /** @var GenericCollection|Config[] $existingConfigs */
         $existingConfigs = $this->getConfigMapper()->findByPredicates($this->buildConfigPredicate($typeLabel))->indexBy(ConfigMapper::COL_NAME);
 
-        // Messaging behavior may be affected by changing configuration.
-        $reRouterSettings = ['messaging_enabled', 'mail_replyto_enabled', 'feedback_url', 'feedback_text'];
-        $reloadReRouter   = false;
-
-        $notifierSettings = [
-            'restrict_parent_duework_access',
-            'restrict_student_submissions',
-            'restrict_parent_grades',
-        ];
-        $dropNotifierConfigCache = false;
-
+        // Do any changed settings necessitate a reload of any processes?
+        $reloadRouteDaemon    = false;
+        $reloadScheduleDaemon = false;
+        $rebuildModules       = false;
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
             if (!$existingConfig->getEditable()) {
@@ -188,26 +180,37 @@ class Controller extends ConfigController
             $newValue        = $valueSerializer->serializeValue($value);
 
             if ($newValue !== $existingConfig->getValue()) {
-                if (\in_array($name, $reRouterSettings, true)) {
-                    $reloadReRouter = true;
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_ROUTED, true)) {
+                    $reloadRouteDaemon = true;
                 }
-                if (\in_array($name, $notifierSettings, true)) {
-                    $dropNotifierConfigCache = true;
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_SCHEDULED, true)) {
+                    $reloadScheduleDaemon = true;
+                }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES, true)) {
+                    $rebuildModules = true;
                 }
                 $existingConfig->setValue(trim($newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
-        if ($reloadReRouter || $dropNotifierConfigCache) {
+        if ($reloadRouteDaemon || $reloadScheduleDaemon) {
             $redisClient = Redis::getSignalQueueClientInstance();
-            if ($redisClient && $reloadReRouter) {
-                // Reload message router
+            if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
             }
-            if ($redisClient && $dropNotifierConfigCache) {
+            if ($redisClient && $reloadScheduleDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
+        }
+        if ($rebuildModules) {
+            // After everything else: reload the route table
+            $this->getResponse()->content->set([
+                'format'     => 'noContent',
+                'postOutput' => [
+                    $this->buildRebuildModuleCacheCallback(),
+                ],
+            ]);
         }
 
         $route = urldecode($this->getRouter()->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));

@@ -11,6 +11,7 @@
 namespace Schoolbox\Admin\LTI;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -30,17 +31,20 @@ class Controller extends ConfigController
     private ProviderMapper $providerMapper;
 
     /**
-     * Controller constructor.
+     * Constructor
+     *
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
      * @param ProviderMapper       $providerMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
         ProviderMapper $providerMapper
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->providerMapper = $providerMapper;
     }

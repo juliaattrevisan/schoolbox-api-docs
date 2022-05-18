@@ -141,6 +141,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
+    public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
 
@@ -159,6 +160,11 @@ class ConfigMapper extends Mapper
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
     public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
+    public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
+    public const NAME_RESOURCE_BOOKING_ENABLED = 'resource_booking_enabled';
+    public const NAME_FIXTURES_ENABLED = 'fixtures_enabled';
+    public const NAME_TOURS_ENABLED = 'tours_enabled';
+    public const NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED = 'external_document_report_enabled';
 
     public const NAME_WEBDAV_ENABLED         = 'webdav_enable';
     public const NAME_GOOGLEDRIVE_ENABLED    = 'googledrive_enabled';
@@ -186,6 +192,55 @@ class ConfigMapper extends Mapper
 
     public const NAME_TASKD_REDIS_URL = 'taskd_redis_url';
     public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
+
+    public const NAME_SCHOOLDATA_IMPORT_DATA_SOURCE = 'schooldata_import_data_source';
+
+    /**
+     * Config settings which may affect the behaviour of the router daemon.
+     *
+     * If any of these settings change: send a reload message to the router
+     * daemon.
+     */
+    public const SETTINGS_AFFECTING_ROUTED = [
+        'messaging_enabled',
+        'mail_replyto_enabled',
+        'feedback_url',
+        'feedback_text',
+    ];
+
+    /**
+     * Config settings which may affect the behaviour of the schedule daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the schedule daemon.
+     */
+    public const SETTINGS_AFFECTING_SCHEDULED = [
+        'restrict_parent_duework_access',
+        'restrict_student_submissions',
+        'restrict_parent_grades',
+    ];
+
+    /**
+     * Config settings which affect the modules and routes available to this
+     * instance.
+     *
+     * If any of these settings change: rebuild the route and module tables.
+     */
+    public const SETTINGS_AFFECTING_MODULES = [
+        ConfigMapper::NAME_LMS_ENABLED,
+        ConfigMapper::NAME_PASTORAL_ENABLED,
+        ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+        ConfigMapper::NAME_BADGES_ENABLED,
+        ConfigMapper::NAME_ASSESSMENT_CALENDAR_ENABLED,
+        ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED,
+        ConfigMapper::NAME_FIXTURES_ENABLED,
+        ConfigMapper::NAME_TOURS_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_DOCUMENT_REPORT_ENABLED,
+        ConfigMapper::NAME_EXTERNAL_TYPE,
+        ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE,
+        ConfigMapper::NAME_QR_LOGIN_ENABLED,
+        ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED,
+    ];
 
     /**
      * @throws \InvalidArgumentException
@@ -317,6 +372,11 @@ class ConfigMapper extends Mapper
 
     /**
      * Override notifications to silence them
+     *
+     * TODO: consider using system-level notifications to reload
+     *       routed/scheduled/modules
+     * (Currently, reloading of daemons and modules is handled in
+     *  `\Schoolbox\Admin\Settings\Controller::postSettings`)
      *
      * @param object $object
      * @param string $verb

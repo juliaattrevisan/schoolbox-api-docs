@@ -11,6 +11,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Item;
@@ -23,7 +24,7 @@ class ResourceBooking implements ModuleConfigInterface
      */
     public function configure(ContainerInterface $di): void
     {
-        if ($di->get('config')->get('resource_booking_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
             $categoryModule = new Category\Module($di);
             $categoryModule->registerModule('/resource-booking/category');
 

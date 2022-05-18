@@ -44,7 +44,8 @@ class Module extends Alaress\Module\Module
         return new Controller(
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
-            new Quoter()
+            $this->injector->get('moduleCache.rebuilder'),
+            new Quoter(),
         );
     }
 

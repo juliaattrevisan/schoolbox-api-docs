@@ -12,6 +12,7 @@ namespace Config\Modules;
 
 use External\Tass\Portal;
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint\Factory;
 
 class TassPortal implements ModuleConfigInterface
@@ -23,7 +24,10 @@ class TassPortal implements ModuleConfigInterface
     {
         $config = $di->get('config');
 
-        if ($config->get('external_type') == 'tass' || $config->get('schooldata_import_data_source') == Factory::TASS_API) {
+        if (
+            $config->get(ConfigMapper::NAME_EXTERNAL_TYPE) == 'tass'
+            || $config->get(ConfigMapper::NAME_SCHOOLDATA_IMPORT_DATA_SOURCE) == Factory::TASS_API
+        ) {
             $module = new Portal\Module($di);
             $module->registerModule('/modules/tassportal');
         }

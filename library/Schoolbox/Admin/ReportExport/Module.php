@@ -96,6 +96,7 @@ class Module extends BaseModule
             $this->injector->get('user.tokenBuilder'),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
+            $this->injector->get('moduleCache.rebuilder'),
         );
     }
 

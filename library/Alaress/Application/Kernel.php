@@ -15,6 +15,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
 use Alaress\Redis;
@@ -27,7 +28,6 @@ use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
 use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouteCollection;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -399,6 +399,27 @@ abstract class Kernel
             );
             return $di->get('redis.storage');
         }));
+
+        $di->set(
+            'moduleCache',
+            $di->lazyNew(
+                ModuleCache\Cache::class,
+                ['redis' => $di->lazyGet('redis.cache')]
+            )
+        );
+        $di->set(
+            'moduleCache.rebuilder',
+            $di->lazyNew(
+                ModuleCache\Rebuilder::class,
+                [
+                    'di'     => $di,
+                    'config' => $di->lazyGet('config'),
+                    'router' => $di->lazyGet('router'),
+                    'redis'  => $di->lazyGet('redis.cache'),
+                    'logger' => null,
+                ]
+            )
+        );
 
         // Task daemon message producer
         $di->set(
@@ -1835,41 +1856,47 @@ abstract class Kernel
     }
 
     /**
-     * Inits all routes based on the pre-generated routes file.
+     * Inits all routes based on the pre-generated route table.
+     *
+     * If the pre-generated route table doesn't exist or is corrupt: rebuild it
+     * and then init the routes.
      */
     protected function initRoutes(): void
     {
-        // Load the list of routes from Redis.
-        /** @var Predis\ClientInterface $redis */
-        $redis            = $this->getDependencyInjector()->get('redis.storage');
-        $routesSerialized = $redis->get(RouteCollection::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
-        if (empty($routesSerialized)) {
-            return;
+        /** @var ModuleCache\Cache $moduleCache */
+        $moduleCache = $this->di->get('moduleCache');
+        try {
+            $routes = $moduleCache->fetchRouteTable();
+        } catch (ModuleCache\FetchException $e) {
+            /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
+            $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
+            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            $routes = $moduleCache->fetchRouteTable();
         }
 
-        // Is unserializing this massive lump any better than loading all modules?
-        // Other approaches:
-        // * on route not found, figure out the module and attempt to match again
-        /** @var RouteCollection $routes */
-        $routes = unserialize($routesSerialized);
-
         /** @var Router $router */
-        $router = $this->get('router');
+        $router = $this->di->get('router');
         $router->setRoutes($routes);
     }
 
     /**
      * Registers modules based on the pre-generated module cache.
+     *
+     * If the pre-generated module cache doesn't exist or is corrupt: rebuild it
+     * and then init the modules.
      */
     protected function initModules(): void
     {
-        // Load the list of modules from Redis.
-        /** @var Predis\ClientInterface $redis */
-        $redis          = $this->getDependencyInjector()->get('redis.storage');
-        $modulesEncoded = $redis->get(Registry::MODULE_CACHE_KEY_PREFIX . INSTANCE_ID);
-        if (empty($modulesEncoded)) {
-            return;
+        /** @var ModuleCache\Cache $moduleCache */
+        $moduleCache = $this->di->get('moduleCache');
+        try {
+            $modules = $moduleCache->fetchModuleRegistrations();
+        } catch (ModuleCache\FetchException $e) {
+            /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
+            $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
+            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            $modules = $moduleCache->fetchModuleRegistrations();
         }
-        Registry::setRegistrations(json_decode($modulesEncoded, true));
+        Registry::setRegistrations($modules);
     }
 }

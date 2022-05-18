@@ -606,16 +606,6 @@ parameters:
 			path: library/Alaress/Web/Output/Html.php
 
 		-
-			message: "#^Call to an undefined method Aura\\\\Router\\\\Router\\:\\:setTokens\\(\\)\\.$#"
-			count: 1
-			path: library/Alaress/Web/Router/RouteCollection.php
-
-		-
-			message: "#^Method Aura\\\\Router\\\\Router\\:\\:addPost\\(\\) invoked with 2 parameters, 0 required\\.$#"
-			count: 3
-			path: library/Alaress/Web/Router/RouteCollection.php
-
-		-
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Dispatcher\\:\\:\\$timer \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/WorkerCrew/Dispatcher.php

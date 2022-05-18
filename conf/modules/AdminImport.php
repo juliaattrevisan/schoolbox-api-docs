@@ -11,6 +11,7 @@ namespace Config\Modules;
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Admin\Import;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Configuration for admin import module
@@ -42,7 +43,7 @@ class AdminImport extends ModuleLoader
 
         /* Pastoral Care
          */
-        if ($di->get('config')->get('pastoral_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
             $this->loadModule($di, Import\Pastoral\Module::class, '/adminv2/import/pastoral');
         }
 

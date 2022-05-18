@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\ReportExport;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\API\Token\Jwt;
@@ -74,6 +75,8 @@ class Controller extends ConfigController
     private Jwt $tokenBuilder;
 
     /**
+     * Constructor
+     *
      * @param UserMapper            $userMapper
      * @param TermMapper            $termMapper
      * @param YearLevelMapper       $yearLevelMapper
@@ -87,6 +90,7 @@ class Controller extends ConfigController
      * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
+     * @param Rebuilder             $rebuilder
      */
     public function __construct(
         UserMapper $userMapper,
@@ -101,9 +105,10 @@ class Controller extends ConfigController
         UserBulkMapper $userBulkMapper,
         Jwt $tokenBuilder,
         ConfigMapper $configMapper,
-        FieldStrategyFactory $fieldStrategyFactory
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder
     ) {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
         $this->userMapper            = $userMapper;
         $this->termMapper            = $termMapper;
         $this->yearLevelMapper       = $yearLevelMapper;

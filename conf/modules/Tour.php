@@ -10,6 +10,7 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Tour\Module as TourModule;
 
 class Tour extends ModuleLoader
@@ -19,7 +20,7 @@ class Tour extends ModuleLoader
      */
     public function configure(ContainerInterface $di): void
     {
-        if ($di->get('config')->get('tours_enabled')) {
+        if ($di->get('config')->get(ConfigMapper::NAME_TOURS_ENABLED)) {
             $this->loadModule($di, TourModule::class, "/tour");
         }
     }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\Admin;
 
 use Alaress\Database\Quoter\Mysql\Quoter;
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Custom\Tigs\Summative\Config;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
@@ -24,13 +25,20 @@ class Controller extends ConfigController
 
 
     /**
+     * Constructor
+     *
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
      * @param Quoter               $quoter
      */
-    public function __construct(ConfigMapper $configMapper, FieldStrategyFactory $fieldStrategyFactory, Quoter $quoter)
-    {
-        parent::__construct($configMapper, $fieldStrategyFactory);
+    public function __construct(
+        ConfigMapper $configMapper,
+        FieldStrategyFactory $fieldStrategyFactory,
+        Rebuilder $rebuilder,
+        Quoter $quoter
+    ) {
+        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->quoter = $quoter;
     }
