@@ -13,11 +13,6 @@
     }
 
 
-    p,
-    .rb-value {
-        font-size: 0.75rem;
-    }
-
     .text-right {
         text-align: right;
         margin-left: 1em;
@@ -70,19 +65,6 @@
     .row__subject-summary-result {
         border: 1px solid dimgrey;
         background-color: lightgrey;
-    }
-    tbody  {
-        text-align: left;
-    }
-    table {
-        table-layout: fixed;
-        width: 100% ;
-    }
-
-    th p{
-        color: #333333;
-        text-align: left;
-        word-wrap: break-word;
     }
 
     .row__subject-details:last-of-type {
@@ -362,8 +344,21 @@
         width: 100%;
     }
 
+    /* Rubric table
+     * This is the only table element we render here
+     */
     table.rb {
         border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.75rem;
+    }
+
+    /* Headings were oddly grey by intent but black we go
+     */
+    th p {
+        text-align: left;
+        word-wrap: break-word;
     }
 
     /* All cells have lines everywhere around it
