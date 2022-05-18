@@ -160,7 +160,7 @@
                                     {# just grab the reviewed mark from the attempt table in the db #}
                                     {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
                                 {% endif  %}
-                                {% if not attempt.isReviewed %}
+                                {% if not attempt.isReviewed and totalMark %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
                                     {{ markVisible.showIfVisible(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
                                 {% endif %}
