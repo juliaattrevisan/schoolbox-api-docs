@@ -22,7 +22,9 @@
          # Foundation-related behaviour requires a character to do that
          #}
         {% if showComments and feedback and feedback.comment %}
-            <p>{{ feedback.comment | linkify | nl2br }}</p>
+            <div class="comment">
+                <p>{{ feedback.comment | linkify | nl2br }}</p>
+            </div>
         {% endif %}
     </div>
 
@@ -42,7 +44,7 @@
              #}
             {% if assessment.familyName == 'project' %}
                 {% set participant = assessment.allParticipants[student.id] %}
-                <h6 text-right">{{ assessment.humanReadableMark(participant, true) }}</h6>
+                <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
             {% endif %}
         </div>
 
