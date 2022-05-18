@@ -203,6 +203,11 @@ class Controller extends ConfigController
         $reports = [];
         $params  = $reportParams->getParams();
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $escapedTitle = preg_replace(
+            '/[^a-zA-Z\d\-_]/',
+            '_',
+            trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE))
+        );
         foreach ($reportStudents as $student) {
             if ($reportParams->getViewAs() === Role::PARENT) {
                 $student->loadParents();
@@ -218,7 +223,12 @@ class Controller extends ConfigController
                 ]);
                 if ($reportPath) {
                     $reports[] = [
-                        'filename' => sprintf("%s.pdf", $student->getExternalId() ?: $student->getId()),
+                        'filename' => sprintf(
+                            "%s/%s - %s.pdf",
+                            ($student->getExternalId() ?: 'unknown'),
+                            $student->getFullName(),
+                            $escapedTitle,
+                        ),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -241,7 +251,7 @@ class Controller extends ConfigController
                 [
                     'token'     => $this->tokenBuilder->generate($this->getUser()),
                     'content'   => $reports,
-                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-' . preg_replace('/[^a-zA-Z0-9\-\_]/', '_', trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE))) . '.zip',
+                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-' . $escapedTitle . '.zip',
                     'gotenberg' => [
                         'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
