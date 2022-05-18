@@ -224,87 +224,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* Name of the subject/folder has a special style
-     * which also encompasses the subject's overall grade
-     */
-    .folder-title {
-        background: lightgrey;
-        border: 1px solid black;
-        clear: both;
-        padding: 0.75rem 0.25rem;
-    }
-
-    /* For some reason there's a thing called a summary result
-     * and another thing called a subject result, but the demo
-     * data makes them all seem the same data? Unsure of the
-     * functional difference between the two
-     */
-    .columns__subject-summary-result,
-    .columns__subject-result {
-        border-left: 1px solid #333;
-        float: right;
-        padding-left: 2rem;
-        text-align: right;
-    }
-
-    /* These appear the name of the assessment and the comment
-     * as little subtitle sort of things
-     */
-    .worktype {
-        color: grey;
-        font-style: italic;
-        margin-top: 0;
-    }
-
-    /* The width of the Assessment and Grade columns
-     * Using small-* names is going to be misleading - specify them explicitly
-     */
-    .feedback-assessment {
-        width: 77%;
-    }
-
-    .feedback-grade {
-        float: right;
-        text-align: right;
-        width: 15%;
-    }
-
-    /* This is a special case when a rubric grid displays
-     * Takes up the width of feedback-assessment + feedback-comment
-     */
-    .feedback-rubric-comment {
-        width: 77%;
-    }
-
-    /* These are used, but derived programmatically - storm thinks they are unused
-     * See the top of assessmentReport.twig which uses the `page` var as css classname
-     */
-    .row__subject-details,
-    .row__subject-summary-details {
-        border-bottom: 1px solid #ccc;
-    }
-
-    /* Push the rubric grid down a little bit, if it exists
-     */
-    .rubric-wrap {
-        display: block;
-        float: left;
-        margin-top: 1rem;
-        margin-bottom: 2rem;
-        width: 100%;
-    }
-
-    /* Rubric heading cells for Capabilities, Indicators, Levels
-     * Use a lighter shade of grey than selected Descriptors
-     */
-    .rb th {
-        background-color: #ececec;
-    }
-
-    .rb th.rb-group-summary {
-        padding: 0.33rem;
-    }
-
     /* header-content is stuff at the top of the report
      * Report title, school name, logo
      */
@@ -393,6 +312,87 @@
      */
     .introduction {
         margin-top: 2rem;
+    }
+
+    /* Name of the subject/folder has a special style
+     * which also encompasses the subject's overall grade
+     */
+    .folder-title {
+        background: lightgrey;
+        border: 1px solid black;
+        clear: both;
+        padding: 0.75rem 0.25rem;
+    }
+
+    /* For some reason there's a thing called a summary result
+     * and another thing called a subject result, but the demo
+     * data makes them all seem the same data? Unsure of the
+     * functional difference between the two
+     */
+    .columns__subject-summary-result,
+    .columns__subject-result {
+        border-left: 1px solid #333;
+        float: right;
+        padding-left: 2rem;
+        text-align: right;
+    }
+
+    /* These appear the name of the assessment and the comment
+     * as little subtitle sort of things
+     */
+    .worktype {
+        color: grey;
+        font-style: italic;
+        margin-top: 0;
+    }
+
+    /* The width of the Assessment and Grade columns
+     * Using small-* names is going to be misleading - specify them explicitly
+     */
+    .feedback-assessment {
+        width: 77%;
+    }
+
+    .feedback-grade {
+        float: right;
+        text-align: right;
+        width: 15%;
+    }
+
+    /* This is a special case when a rubric grid displays
+     * Takes up the width of feedback-assessment + feedback-comment
+     */
+    .feedback-rubric-comment {
+        width: 77%;
+    }
+
+    /* These are used, but derived programmatically - storm thinks they are unused
+     * See the top of assessmentReport.twig which uses the `page` var as css classname
+     */
+    .row__subject-details,
+    .row__subject-summary-details {
+        border-bottom: 1px solid #ccc;
+    }
+
+    /* Push the rubric grid down a little bit, if it exists
+     */
+    .rubric-wrap {
+        display: block;
+        float: left;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    /* Rubric heading cells for Capabilities, Indicators, Levels
+     * Use a lighter shade of grey than selected Descriptors
+     */
+    .rb th {
+        background-color: #ececec;
+    }
+
+    .rb th.rb-group-summary {
+        padding: 0.33rem;
     }
 
     /* Top-left cell is a meaningless cell
