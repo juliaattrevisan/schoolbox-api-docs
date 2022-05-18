@@ -103,10 +103,10 @@ class Mapper extends BaseMapper
     public function getStates()
     {
         $query = '
-            SELECT column_type 
-            FROM information_schema.COLUMNS 
-            WHERE table_schema = ? 
-            AND table_name = ? 
+            SELECT column_type
+            FROM information_schema.COLUMNS
+            WHERE table_schema = ?
+            AND table_name = ?
             AND column_name = ?
         ';
 
@@ -115,11 +115,13 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($args);
 
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
-
-        $states = explode("','", preg_replace("/(enum|set)\('(.+?)'\)/", "\\2", $row['column_type']));
-
-        return $states;
+        if ($statement->rowCount() === 0) {
+            return [''];
+        }
+        return explode(
+            "','",
+            preg_replace("/(enum|set)\('(.+?)'\)/", "\\2", $statement->fetchColumn()),
+        );
     }
 
 
