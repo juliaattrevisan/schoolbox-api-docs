@@ -12,9 +12,6 @@
         vertical-align: middle;
     }
 
-    .report {
-        margin: auto;
-    }
 
     p,
     .rb-value {
@@ -180,6 +177,14 @@
 
     /* Quarantine zone
      */
+
+    /* Vaguely analogous to A4 dimensions so you can preview in browser
+     * otherwise the pdf print wraps in a different place, throwing your judgement
+     */
+    .report {
+        width: 1100px;
+        margin: auto;
+    }
 
     /* Typography
      */
@@ -446,7 +451,7 @@
     }
 </style>
 
-<div class="small-12 island report">
+<div class="report">
     <section class="content">
         <div class="header-content">
             <div class="left">
