@@ -107,7 +107,7 @@
         {% if not is_cloud %}
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
         $.ajax({
-            url: "{{ api_url }}/urlCheck/?url=http://" + location.hostname + "/.well-known/ping",
+            url: "{{ api_url }}/urlCheck/?url=http://" + location.hostname + "/.well-known/acme-challenge/ping",
             success: function() {
                 $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
             },
