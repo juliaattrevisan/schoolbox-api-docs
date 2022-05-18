@@ -337,6 +337,13 @@
         text-align: right;
     }
 
+    /* The width of the Assessment and Grade columns
+     * Using small-* names is going to be misleading - specify them explicitly
+     */
+    .feedback-assessment {
+        width: 77%;
+    }
+
     /* These appear the name of the assessment and the comment
      * as little subtitle sort of things
      */
@@ -346,24 +353,10 @@
         margin-top: 0;
     }
 
-    /* The width of the Assessment and Grade columns
-     * Using small-* names is going to be misleading - specify them explicitly
-     */
-    .feedback-assessment {
-        width: 77%;
-    }
-
     .feedback-grade {
         float: right;
         text-align: right;
         width: 15%;
-    }
-
-    /* This is a special case when a rubric grid displays
-     * Takes up the width of feedback-assessment + feedback-comment
-     */
-    .feedback-rubric-comment {
-        width: 77%;
     }
 
     /* These are used, but derived programmatically - storm thinks they are unused
