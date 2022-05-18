@@ -104,6 +104,7 @@ class YearlyBreakdown extends Base
         foreach ($yearStack as $currentYear => $allCourses) {
             foreach ($allCourses as $courseName => $data) {
                 $yearStack[$currentYear][$courseName]['availableGrades'] = $yearStack[$currentYear][$courseName]['enteredGrades'] - array_sum($yearStack[$currentYear][$courseName]['letters']);
+                $totals[$currentYear]['availableGrades'] ??= 0;
                 $totals[$currentYear]['availableGrades'] += $yearStack[$currentYear][$courseName]['availableGrades'];
             }
         }

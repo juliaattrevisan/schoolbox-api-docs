@@ -625,23 +625,24 @@ class Controller extends Base
         $totalMarkScheme = new MarkScheme\TotalMarkFractional();
 
         foreach ($students as $studentId => $student) {
-            foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
-                foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
-                    if ($capabilityDatabaseMark !== null) {
-                        $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);
-
-                        $normalisedCapabilityMark = ($capabilityDatabaseMark / $capabilityMaxMark) * 100;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $capabilityMarks['humanReadableMark'];
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
-                    } else {
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = null;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = null;
+            foreach (($student['assessments'] ?? []) as $assessmentId => $assessmentMarks) {
+                foreach (($assessmentMarks['capabilities'] ?? []) as $capabilityId => $capabilityMarks) {
+                    $capabilityDatabaseMark      = $decimalHydrator->hydrate($capabilityMarks['databaseMark'] ?? null);
+                    $capabilityMaxMark           = $decimalHydrator->hydrate($capabilityMarks['maxMark'] ?? null);
+                    $humanReadableCapabilityMark = null;
+                    $normalisedCapabilityMark    = null;
+                    if ($capabilityMaxMark) {
+                        $normalisedCapabilityMark = $capabilityDatabaseMark !== null
+                            ? ($capabilityDatabaseMark / $capabilityMaxMark) * 100
+                            : null;
+                        $humanReadableCapabilityMark = $capabilityMarks['humanReadableMark'] ?? null;
                     }
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
 
-                    foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                        $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark']);
-                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark']);
+                    foreach (($capabilityMarks['indicators'] ?? []) as $indicatorId => $indicatorMarks) {
+                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark'] ?? null);
+                        $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark'] ?? null);
                         $humanReadableIndicatorMark = null;
                         $normalisedIndicatorMark    = null;
 

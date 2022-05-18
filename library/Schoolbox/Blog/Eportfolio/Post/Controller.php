@@ -143,8 +143,8 @@ class Controller extends Base
     {
 
         // Update details and save the record
-        $blog->setBody($this->getRequest()->post["body"]);
-        $blog->setHeading($this->getRequest()->post["heading"]);
+        $blog->setBody($this->getRequest()->post->get("body"));
+        $blog->setHeading($this->getRequest()->post->get("heading"));
         $this->getEportfolioBlogMapper()->save($blog);
 
         // Update image gallery pictures
@@ -161,8 +161,8 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        if (is_array($this->getRequest()->post["attachment"])) {
-            $storages = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
+        if (is_array($this->getRequest()->post->get("attachment"))) {
+            $storages = (new CollectorFactory())->build($this->getRequest()->post->get('attachment'))->getAll();
 
             /* Dedupe files that existed concurrently - you dragged file A into the dropzone
              * then (without having saved anything yet) dragged file A and B into the dropzone

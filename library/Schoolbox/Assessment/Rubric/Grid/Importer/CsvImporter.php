@@ -170,7 +170,9 @@ class CsvImporter implements IImporter
             if ($capName === $capabilityName) {
                 // Parse out descriptor values
                 $descriptorNames  = array_slice($this->square[$i], 2);
-                $descriptorValues = $this->square[$i + 1] ? array_slice($this->square[$i + 1], 2) : null;
+                $descriptorValues = array_key_exists($i + 1, $this->square)
+                    ? array_slice($this->square[$i + 1], 2)
+                    : null;
                 $descriptors      = [];
                 foreach ($descriptorNames as $level => $descriptorName) {
                     $descriptorValue = $descriptorValues[$level] ?? '';
