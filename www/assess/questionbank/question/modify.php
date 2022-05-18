@@ -125,7 +125,6 @@ if (!empty($_POST)) {
         'QUESTION_BANK_ID' => $question['question_bank_id'],
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
-        'QUESTIONTYPE_SELECTED' => $selected,
         'QUESTION' => Scrub::text($question['question']),
         'MARKS' => $question['marks'],
         'QUESTION_BANK_REDIRECT_URL' => '/assess/questionbank/contents'

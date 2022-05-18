@@ -5,6 +5,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
 
+/** @var SitePage $this */
 try {
     $quizMapper = new QuizMapper();
     $quiz = $quizMapper->findById($this->arg[1]);
@@ -14,6 +15,7 @@ try {
 
 try {
     $folderMapper = new FolderMapper();
+    /** @var \Schoolbox\Learning\Quiz\Model $quiz */
     $folder = $folderMapper->findById($quiz->getCategory()->getId());
 } catch (\Exception $e) {
     error(\Schoolbox\Error\Mapper::ERROR_CATEGORY_DELETED);
@@ -61,7 +63,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 /* Iterate and show
      */
     if (is_array($allQuestions) && count($allQuestions)) {
-        $previousCategory = false;
         $factory = new Assess_Factory();
         foreach ($allQuestions as $currentQuestion) {
             $this->setVar(array(
@@ -118,7 +119,6 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             $this->setVar(array(
                 'show_delete_block' => ''
             ));
-            $previous = $currentQuestion['question_category_id'];
         }
 
         $this->parse('category_selected_block', 'category_selected');
@@ -161,7 +161,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 $redirectUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 /* Render out breadcrumbs
  */
-$trail = new Breadcrumbs(Schoolbox\Resource\Folder\Mapper::getInstance());
+$trail = new Breadcrumbs();
+/** @var \Schoolbox\Resource\Folder\Model $folder */
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
         'text' => $folder->getName(),

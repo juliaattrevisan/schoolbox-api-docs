@@ -146,7 +146,6 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
         'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
-        'QUESTIONTYPE_SELECTED' => $selected,
     ));
 /* Render contents of this Assess
      */
