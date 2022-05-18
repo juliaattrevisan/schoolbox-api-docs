@@ -276,12 +276,35 @@
 
     /* Name of the subject/folder has a special style
      * which also encompasses the subject's overall grade
+     * Use a flexbox to optionally show a grade
      */
     .folder-title {
         background: lightgrey;
         border: 1px solid black;
-        clear: both;
-        padding: 0.75rem 0.25rem;
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    /* Minimise margins and padding on stuff in the grey folder title blocks
+     */
+    .folder-title h4,
+    .folder-title .grade {
+        margin: 0;
+    }
+
+    .folder-title .left {
+        flex-grow: 2;
+    }
+
+    /* A grade value, suitable for Folder Title
+     * or for an assessment
+     */
+    .grade {
+        border-left: 1px solid #333;
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding-left: 2rem;
+        padding-right: 0.75rem;
     }
 
     /* For some reason there's a thing called a summary result
@@ -500,16 +523,16 @@
             {% for folder in folders %}
                 {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
                 {% set weightedMean = studentGrade.weightedMean %}
-                <div class="row folder-title">
-                    <div class="small-10 columns">
-                        <h3 class="heading__secondary">{{ folder.title }}</h3>
+                <div class="folder-title">
+                    <div class="left">
+                        <h4>{{ folder.title }}</h4>
                     </div>
-                    <div class="small-1 columns columns__subject-summary-result">
-                        {% if showSummaryOverallGrade %}
-                        <h3 class="heading__secondary">{{ weightedMean ?? '' }}</h3>
-                        {% endif %}
-                    </div>
+
+                    {% if showSummaryOverallGrade %}
+                    <p class="grade">{{ weightedMean ?? '' }}</p>
+                    {% endif %}
                 </div>
+
                 {% if (summaryAssessments[folder.id] ?? [])| length %}
                     {% for assessment in summaryAssessments[folder.id] %}
                         {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
