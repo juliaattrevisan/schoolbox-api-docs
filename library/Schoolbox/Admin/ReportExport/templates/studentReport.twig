@@ -329,7 +329,6 @@
         float: left;
         margin-bottom: 2rem;
         position: relative;
-        padding: 0.5rem 1rem 0 1rem;
     }
 
     /* Removes side padding on student card at top when there's no picture
@@ -367,7 +366,16 @@
 
     .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
         float: left;
-        margin: -0.25rem 0.5rem 0 -0.5rem;
+        margin-right: 0.75rem;
+    }
+
+    /* Introductory text
+     * Can't tell what the schools are going to compose here, but I imagined this
+     * as a lead-in paragraph which should typographically be different than the
+     * rest of the body text in this report
+     */
+    .introduction {
+        margin-top: 2rem;
     }
 
     /* Top-left cell is a meaningless cell
@@ -456,7 +464,9 @@
             <p class="year">{{ student.year.longName }}</p>
             {% endif %}
 
-            {{ config.report_export_introduction | purify }}
+            <div class="introduction">
+                {{ config.report_export_introduction | purify }}
+            </div>
         </div>
 
         {# Summary #}
