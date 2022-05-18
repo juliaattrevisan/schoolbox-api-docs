@@ -359,6 +359,19 @@
         .folder-title {
             page-break-before: always; /* ensure each individual subject goes on new page */
         }
+
+        /* This is so so so extremely wasteful if grids are very short
+         * Without javascript it's impossible to html/css a detection to see if a grid fits
+         * and a blanket rule like this will cause all grids to start on a new page - even
+         * if they can fit on an existing one
+         *
+         * .xxxxx { page-break-before: always }
+         *
+         * Instead, avoid page breaks inside an element, which is far superior
+         */
+        .rubric-wrap {
+            page-break-inside: avoid;
+        }
     }
 </style>
 
