@@ -5,6 +5,8 @@ const VALID_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge', 'full'];
 
 export default {
 
+    emits: ['closed'],
+
     props: {
         /**
          * The size of the modal to display.
@@ -82,6 +84,10 @@ export default {
                 'open',
                 {close_on_background_click: this.closeOnBackgroundClick }
             );
+            $(document).on('closed.fndtn.reveal', '[data-reveal]', () => {
+                this.$emit('closed');
+                $(document).off('closed.fndtn.reveal');
+            });
         },
 
         /**
