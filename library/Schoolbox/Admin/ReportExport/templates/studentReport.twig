@@ -319,7 +319,22 @@
      * Using small-* names is going to be misleading - specify them explicitly
      */
     .feedback-assessment {
-        width: 77%;
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    /* Assessment name lives here
+     */
+    .feedback-assessment .left {
+        flex-grow: 2;
+    }
+
+    /* The grade already has a right-margin from container element .feedback-assessment
+     * and also doesn't have a border or anything - resetting padding here mostly centers
+     * the content int his little flexbox place
+     */
+    .feedback-assessment .grade {
+        padding-right: 0;
     }
 
     /* These appear the name of the assessment and the comment
@@ -337,14 +352,6 @@
      */
     .comment {
         margin: 1rem 0rem;
-    }
-
-    /* The grade column always sits adjacent to assessment column
-     */
-    .feedback-grade {
-        float: right;
-        text-align: right;
-        width: 15%;
     }
 
     /* These are used, but derived programmatically - storm thinks they are unused

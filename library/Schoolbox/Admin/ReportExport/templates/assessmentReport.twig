@@ -10,32 +10,29 @@
  # @param IAssessable $assessment
  #}
 <div class="row row__{{ page }}-details">
-    <div class="feedback-assessment columns">
-        <h5>{{ assessment.title }}</h5>
+    <div class="feedback-assessment">
+        <div class="left">
+            <h5>{{ assessment.title }}</h5>
 
-        {% if '' != assessment.workType.name %}
-        <p class="worktype">{{ assessment.workType.name }}</p>
-        {% endif %}
+            {% if '' != assessment.workType.name %}
+            <p class="worktype">{{ assessment.workType.name }}</p>
+            {% endif %}
 
-        {# Only show comment if it exists
-         # Otherwise, just occupy space
-         # Foundation-related behaviour requires a character to do that
-         #}
-        {% if showComments and feedback and feedback.comment %}
-            <div class="comment">
-                <p>{{ feedback.comment | linkify | nl2br }}</p>
-            </div>
-        {% endif %}
-    </div>
-
-    {# If there's no feedback, don't render anything else about
-     # rubrics, comments and grades - nothing to show
-     #}
-    {% if feedback %}
-        <div class="feedback-grade columns">
+            {# Only show comment if it exists
+             # Otherwise, just occupy space
+             # Foundation-related behaviour requires a character to do that
+             #}
+            {% if showComments and feedback and feedback.comment %}
+                <div class="comment">
+                    <p>{{ feedback.comment | linkify | nl2br }}</p>
+                </div>
+            {% endif %}
+        </div>
+        {% if feedback %}
+        <div>
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
-                <h6>{{ grade }}</h6>
+                <p class="grade">{{ grade }}</p>
             {% endif %}
 
             {# Was this really how we did it?
@@ -47,6 +44,14 @@
                 <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
             {% endif %}
         </div>
+        {% endif %}
+    </div>
+
+    {# If there's no feedback, don't render anything else about
+     # rubrics, comments and grades - nothing to show
+     #}
+    {% if feedback %}
+
 
         {# If this feedback has a rubric grid, show that
          # Then show the comment below it
