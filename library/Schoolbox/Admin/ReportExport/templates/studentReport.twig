@@ -12,13 +12,6 @@
         vertical-align: middle;
     }
 
-    p,
-    h1,
-    h2,
-    h3 {
-        color: black;
-    }
-
     .report {
         margin: auto;
     }
@@ -26,9 +19,6 @@
     p,
     .rb-value {
         font-size: 0.75rem;
-    }
-    .island {
-        margin-top: 2em;
     }
 
     .text-right {
@@ -40,28 +30,8 @@
         color: green;
     }
 
-    .header-content{
-        display: flex;
-        justify-content: space-between;
-    }
-    .header-content div:first-child {
-        min-width: 50%;
-    }
-    .logo{
-        max-width: 170px;
-        padding-top: 1em;
-    }
-    .header-content div:nth-child(2) h1 {
-        text-align: right;
-        margin-bottom: 0.25em;
-    }
-
-    .island .content {
-        padding: 0.75rem;
-    }
-
     .island section {
-        margin-bottom: 16px;
+        margin-bottom: 1rem;
     }
 
     .row {
@@ -138,37 +108,9 @@
         margin-top: 1rem;
     }
 
-    .card {
-        float: left;
-        position: relative;
-        padding: 0.5rem 1rem 0 1rem;
-    }
-
     .card.compact {
         min-height: 2.5rem;
         padding: 0 1rem;
-    }
-
-    .card.compact > * {
-        align-items: center;
-        display: flex;
-    }
-
-    .card h2 {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-
-    .compact img {
-        width: 2rem;
-    }
-
-    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
-        float: left;
-        margin: -0.25rem 0.5rem 0 -0.5rem;
     }
 
     .columns {
@@ -249,6 +191,7 @@
     .folder-title {
         background: lightgrey;
         border: 1px solid black;
+        clear: both;
         padding: 0.75rem 0.25rem;
     }
 
@@ -323,7 +266,22 @@
         padding: 0.33rem;
     }
 
-    /* Removes side padding on student card at top
+    /* header-content is stuff at the top of the report
+     * Report title, school name, logo
+     */
+    .header-content h1 {
+        margin-bottom: 2rem;
+    }
+
+    /* The thing that tells you about students
+     */
+    .card {
+        float: left;
+        position: relative;
+        padding: 0.5rem 1rem 0 1rem;
+    }
+
+    /* Removes side padding on student card at top when there's no picture
      */
     .card.no-pad {
         padding-left: 0;
@@ -337,7 +295,29 @@
 
     .card .year {
         font-size: 1.2rem;
-        margin: 0;
+        margin: 0 0 1rem 0;
+    }
+
+    .card.compact > * {
+        align-items: center;
+        display: flex;
+    }
+
+    .card h2 {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .compact img {
+        width: 2rem;
+    }
+
+    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
+        float: left;
+        margin: -0.25rem 0.5rem 0 -0.5rem;
     }
 
     /* Top-left cell is a meaningless cell
@@ -350,16 +330,60 @@
 
     .logo-content {
         float: right;
-        margin-top: -6em;
-        padding-left: 2em;
+        margin-top: 0;
+        max-width: 12rem;
         padding-bottom: 2em;
+        text-align: center;
     }
 
+    .logo-content .logo {
+        max-width: 12rem;
+        margin: 0 0 0 2rem;
+        padding: 0;
+    }
+
+    /* Typography
+     */
+    p,
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    h4 {
+        font-size: 1.3rem;
+    }
+
+    h5 {
+        font-size: 1.15rem;
+    }
+
+    h6 {
+        font-size: 1rem;
+    }
+
+
+    /* Special cosmetic representation of semantic h2
+     */
+    h2.school-name {
+        font-size: 1.25rem;
+    }
 
     @page {
         counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
-        margin: 0.4in 0.1in;
+        margin: 0.25in;
         @bottom-right {
             content: 'Page ' counter(page) ' / ' counter(pages);
         }
@@ -404,34 +428,41 @@
     }
 </style>
 
+<h1>The hope of immigrants setting out for distant shores. </h1>
+<h2>The hope of immigrants setting out for distant shores. </h2>
+<h3>The hope of immigrants setting out for distant shores. </h3>
+<h4>The hope of immigrants setting out for distant shores. </h4>
+<h5>The hope of immigrants setting out for distant shores. </h5>
+<h6>The hope of immigrants setting out for distant shores. </h6>
+
 <div class="small-12 island report">
     <section class="content">
         <div class="header-content">
-            <div class="row row__margin-bottom">
-                <h1>{{ config.report_title }}</h1>
-
-                <div class="card {% if not student.portrait %}no-pad{% endif %}">
-                    {% if student.portrait %}
-                        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
-                    {% endif %}
-                    <h2 class="name">{{ student.fullname }}</h2>
-
-                    {# Only show year if it was ever set and meaningful
-                     #}
-                    {% if student.year and student.year.longName != '' %}
-                    <h3 class="year">{{ student.year.longName }}</h3>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="row row__margin-bottom logo-content">
             {% if config.report_school_logo %}
-                <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+                <div class="logo-content">
+                    <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+                </div>
             {% endif %}
+
+            <h1>{{ config.report_title }}</h1>
+            <h2 class="school-name">{{ config.school_name }}</h2>
         </div>
-        <div class="row row__margin-bottom">
+
+        <div class="card {% if not student.portrait %}no-pad{% endif %}">
+            {% if student.portrait %}
+            <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
+            {% endif %}
+            <h2 class="name">{{ student.fullname }}</h2>
+
+            {# Only show year if it was ever set and meaningful
+             #}
+            {% if student.year and student.year.longName != '' %}
+            <h3 class="year">{{ student.year.longName }}</h3>
+            {% endif %}
+
             {{ config.report_export_introduction | purify }}
         </div>
+
         {# Summary #}
         {% if showSummary %}
             {% for folder in folders %}
