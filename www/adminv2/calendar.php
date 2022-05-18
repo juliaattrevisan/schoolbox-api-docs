@@ -161,11 +161,16 @@ foreach ($typeList as $type) {
                         $this->setBlock('event_type_list', 'luEventType', 'luEventType_block');
                         $this->setBlock('configFragment', 'campus_list', 'campus_list_block');
                         $this->setBlock('configFragment', 'group_list', 'group_list_block');
+                        $this->setBlock('configFragment', 'error_message', 'error_message_block');
 
                         /* Render individual connector inputs
                          */
                         $currentConfig->render($this);
-
+                        $this->setVar('error_message_block', '');
+                        if ($currentConfig->getFailedCount() >= 5) {
+                            $this->setVar('ERROR_COUNT', Calendar_Api_Config_Record::MAXFAILED);
+                            $this->parse('error_message_block', 'error_message');
+                        }
                         /* Parse connector row
                          */
                         $this->parse('connectorConfig_block', 'configFragment', true);

@@ -117,6 +117,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
              */
             foreach ($allConfigs as $currentConfig) {
                 $currentConfig->activate();
+                //reset failed count, as they user may have fixed the issue.... may..
+                $currentConfig->setFailedCount(0);
                 Calendar_Api_Config_Mapper::getInstance()->save([$currentConfig]);
             }
         }
@@ -129,13 +131,16 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
         $enabledConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
         foreach ($enabledConfigs as $enabledConfig) {
             $decodedConfig = $enabledConfig->decodeConfig();
-            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl()) {
+            if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl() && !$enabledConfig->isDead()) {
                 try {
                     $cache->write($decodedConfig);
                 } catch (InvalidArgumentException | ParseException | InvalidDataException $e) {
                     // There was a failure when writing the cache,
                     // or reading from the URL in the config.
                     // Whatever the case, continue
+                } catch (Schoolbox\Application\Exception\Exception $e) {
+                    $enabledConfig->addFailedCount();
+                    Calendar_Api_Config_Mapper::getInstance()->save($enabledConfig);
                 }
             }
         }

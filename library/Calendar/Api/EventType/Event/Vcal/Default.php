@@ -173,7 +173,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         if (!$decodedConfig instanceof Calendar_Api_Config_Connector_Vcal) {
             return $collection;
         }
-        if (!$decodedConfig->getUrl()) {
+        if (!$decodedConfig->getUrl() || $currentConfig->isDead()) {
             return $collection;
         }
 
@@ -205,8 +205,9 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             if (!$cache->keyExists($decodedConfig)) {
                 try {
                     $cache->write($decodedConfig);
-                } catch (InvalidDataException | ParseException $e) {
-                    trigger_error('Failed to write calendar cache: ' . $e->getMessage() . $e->getTraceAsString(), E_USER_WARNING);
+                } catch (InvalidDataException | ParseException | Schoolbox\Application\Exception\Exception $e) {
+                    $currentConfig->addFailedCount();
+                    Calendar_Api_Config_Mapper::getInstance()->save($currentConfig);
                 }
             }
             $allEvents = $cache->read($decodedConfig);

@@ -110,7 +110,7 @@
             <!-- END import -->
 
             <!-- BEGIN subscribe -->
-            <form method='post' action='/adminv2/calendar/modifyForm'>
+            <form method='post' action='/adminv2/calendar/modifyForm' id="subscribeForm">
                 <input type="hidden" name='action' value='subscribe' />
 
                 <!-- BEGIN eventType -->
@@ -158,7 +158,7 @@
                 </div>
                 <!-- END eventType -->
 
-                <input type="submit" value='Save Changes' />
+                <input id="saveChangesForm" type="submit" value='Save Changes' />
             </form>
             <!-- END subscribe -->
 
@@ -334,4 +334,32 @@
             removeConfig: '[data-removesource]'
         });
 	});
+</script>
+<script>
+    $(function () {
+        var urlFields = $('[data-calendar-url]');
+
+        $('#saveChangesForm').click(function (event) {
+            event.preventDefault();
+            var allGood = true;
+            let url;
+            //check all url fields are valid,
+            urlFields.each(function () {
+                //if they are not valid,
+                try {
+                    url = new URL(this.value);
+                    allGood = true;
+                } catch (_) {
+                    //let the user know
+                    allGood = false;
+                    var calId = $(this).data('calendarId');
+                    $('#error_'+calId)[0].style.display = 'block';
+                }
+            });
+            //if there are no issues submit the form
+            if (allGood) {
+                $("#subscribeForm").submit();
+            }
+        });
+    });
 </script>

@@ -230,4 +230,17 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
         $this->label = $label;
         return $this;
     }
+
+    /**
+     * failed Count
+     */
+    public int $failedCount = 0;
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+    public function setFailedCount(int $count)
+    {
+        $this->failedCount = $count;
+    }
 }

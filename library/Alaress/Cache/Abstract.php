@@ -2,6 +2,8 @@
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException as RequestException;
+use GuzzleHttp\Exception as GuzzleException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * Alaress_Cache_Abstract
@@ -139,6 +141,7 @@ abstract class Alaress_Cache_Abstract
      * @param string[]  $headers
      * @return self
      * @throws InvalidArgumentException if `$url` is empty
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function init(string $url, array $headers = []): \Alaress_Cache_Abstract
     {
@@ -168,6 +171,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return void
      * @throws InvalidArgumentException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     protected function retrieveStreamContents(): void
     {
@@ -200,6 +204,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return $this
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
      */
     protected function newCacheUpdate(): \Alaress_Cache_Abstract
     {
@@ -233,6 +238,7 @@ abstract class Alaress_Cache_Abstract
      *
      * @return bool
      * @throws InvalidArgumentException
+     * @throws SchoolboxException
      */
     protected function saveStreamContents(): bool
     {
@@ -268,8 +274,8 @@ abstract class Alaress_Cache_Abstract
                 $url->setScheme('http');
             }
             $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
-        } catch (RequestException $e) {
-            return false;
+        } catch (RequestException | GuzzleException\ConnectException $e) {
+            throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
         }
 
         return true;
