@@ -256,6 +256,7 @@ declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
+  [FACTER_taskd_build_from_local]="$taskd_build_from_local"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
