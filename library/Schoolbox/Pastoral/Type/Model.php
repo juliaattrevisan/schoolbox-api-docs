@@ -69,8 +69,8 @@ class Model implements ISoftDeletable, Sequential
     private ?string $icon = null;
 
 
-    /** @var DocumentClassification|null */
-    protected ?DocumentClassification $documentClassification = null;
+    /** @var DocumentClassification|int|null */
+    protected $documentClassification = null;
 
     /**
      * Optional. Null if not linked to SIS
@@ -104,11 +104,11 @@ class Model implements ISoftDeletable, Sequential
 
 
     /**
-     * @param DocumentClassification|null $documentClassification
+     * @param DocumentClassification|int|null $documentClassification
      *
      * @return self
      */
-    public function setDocumentClassification(?DocumentClassification $documentClassification): self
+    public function setDocumentClassification($documentClassification): self
     {
         $this->documentClassification = $documentClassification;
 
@@ -116,9 +116,9 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return DocumentClassification|null
+     * @return DocumentClassification|int|null
      */
-    public function getDocumentClassification(): ?DocumentClassification
+    public function getDocumentClassification()
     {
         return $this->documentClassification;
     }
