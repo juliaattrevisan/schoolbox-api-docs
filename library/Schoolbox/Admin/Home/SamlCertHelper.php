@@ -28,10 +28,9 @@ class SamlCertHelper
 
         if (array_key_exists('validTo_time_t', $samlCertMetadata)) {
             return ($samlCertMetadata['validTo_time_t'] - time()) / 60 / 60 / 24;
-        } else {
-            //returns null if the expiry date cannot be found
-            return null;
         }
+        //returns null if the expiry date cannot be found
+        return null;
     }
 
     /**
