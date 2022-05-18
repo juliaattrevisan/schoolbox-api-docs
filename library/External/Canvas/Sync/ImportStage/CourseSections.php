@@ -249,7 +249,8 @@ class CourseSections
                         $sectionSisSourceId = $section['sis_source_id'];
                         $classFolder        = $this->courseSectionBridge->getFolderByBySisSourceId($sectionSisSourceId);
                         if ($classFolder === null) {
-                            throw new UnexpectedValueException("Unable to find folder for section.sis_source_id '$sectionSisSourceId'");
+                            $this->log->warning("Unable to find folder for section.sis_source_id '$sectionSisSourceId' (canvas_id: $sectionCanvasId)");
+                            continue;
                         }
                         $courseImpl               = $this->syncCourseSectionToCourseImpl($courseSpecFolder->getCourseSpecification(), $classFolder);
                         $courseImplSynchronised[] = $courseImpl->getId();
