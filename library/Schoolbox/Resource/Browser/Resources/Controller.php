@@ -160,11 +160,13 @@ class Controller extends AbstractController
                 Resource\File\Model::FILTER_FIELDS
             );
             $title         = $componentConfig['componentname']['value'];
+            $breadcrumb    = $title;
             $sortDirection = $componentConfig['sortdir']['value'];
             $sortBy        = $componentConfig['sort']['value'];
         } else {
             $filter        = Resource\File\Model::FILTER_FIELDS;
-            $title         = 'All Files';
+            $breadcrumb    = $accessSource >= UserAccess::ACCESS_WRITE ? 'Manage Files' : 'View Files';
+            $title         = $breadcrumb . ' on ' . $sourceFolder->getNameWithCodes();
             $sortDirection = null;
             $sortBy        = null;
         }
@@ -186,6 +188,7 @@ class Controller extends AbstractController
                     'homepage'       => $homepage,
                     'filter'         => $filter,
                     'files'          => $files,
+                    'breadcrumb'     => $breadcrumb,
                     'title'          => $title,
                     'sortDir'        => $sortDirection,
                     'sortBy'         => $sortBy,
