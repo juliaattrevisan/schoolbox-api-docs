@@ -305,11 +305,11 @@
     /* Push the rubric grid down a little bit, if it exists
      */
     .rubric-wrap {
-        width: 100%;
         display: block;
         float: left;
         margin-top: 1rem;
         margin-bottom: 2rem;
+        width: 100%;
     }
 
     /* Rubric heading cells for Capabilities, Indicators, Levels
@@ -342,7 +342,7 @@
     @page {
         counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
-        margin: 0.1in;
+        margin: 0.4in 0.1in;
         @bottom-right {
             content: 'Page ' counter(page) ' / ' counter(pages);
         }
