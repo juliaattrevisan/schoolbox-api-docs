@@ -11,10 +11,12 @@
  #}
 <div class="row row__{{ page }}-details">
     <div class="feedback-assessment columns">
-        <p class="item-title">Assessment</p>
         <h3 class="heading__tertiary">
             {{ assessment.title }}
         </h3>
+        {% if '' != assessment.workType.name %}
+        <p class="worktype">{{ assessment.workType.name }}</p>
+        {% endif %}
     </div>
 
     {# If there's no feedback, don't render anything else about
@@ -43,7 +45,7 @@
              #}
             {% if showComments %}
                 <div class="feedback-rubric-comment columns">
-                    <p class="item-title">Comment</p>
+                    <p class="worktype">Comment</p>
                     {% if feedback.comment %}
                         <p>{{ feedback.comment | linkify | nl2br }}</p>
                     {% else %}
@@ -58,7 +60,7 @@
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
                 <div class="feedback-grade columns">
-                    <p class="item-title text-right">Result</p>
+                    <p class="worktype text-right">Result</p>
                     <h3 class="heading__tertiary text-right">{{ grade }}</h3>
                 </div>
             {% endif %}
@@ -70,7 +72,7 @@
             {% if showComments %}
                 <div class="feedback-comment columns">
                     {% if feedback.comment %}
-                        <p class="item-title">Comment</p>
+                        <p class="worktype">Comment</p>
                         <p>{{ feedback.comment | linkify | nl2br }}</p>
                     {% else %}
                         &nbsp;
@@ -81,7 +83,7 @@
             <div class="feedback-grade columns">
                 {% set grade = feedback.humanReadableMark %}
                 {% if showGrades and grade %}
-                    <p class="item-title text-right">Result</p>
+                    <p class="worktype text-right">Result</p>
                     <h3 class="heading__tertiary text-right">{{ grade }}</h3>
                 {% endif %}
 
