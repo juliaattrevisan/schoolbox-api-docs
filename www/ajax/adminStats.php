@@ -361,7 +361,7 @@ switch ($_POST['module']) {
         }
 
         //get plural/singular form of 'day'
-        if (abs($daysBeforeExpiry) == 1) {
+        if (floor(abs($daysBeforeExpiry)) === 1.0) {
             $dayOrDays = "day";
         } else {
             $dayOrDays = "days";
