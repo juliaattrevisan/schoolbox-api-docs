@@ -357,10 +357,12 @@
     }
 
     /* Comments, if provided, are generally plaintext but could be ckeditor stuff
-     * Wrap it in a div anyway
+     * Wrap it in a div anyway. If the comment is very long, padding-right stops
+     * it from being directly adjacent to the grade if it exists
      */
     .comment {
-        margin: 1rem 0rem;
+        margin: 1rem 0;
+        padding-right: 2rem;
     }
 
     /* These are used, but derived programmatically - storm thinks they are unused
