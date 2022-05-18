@@ -366,7 +366,7 @@ switch ($_POST['module']) {
 
             if ($daysBeforeExpiry < 0) {
                 $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expired ' . $absDaysBeforeExpiry . ' ' . $dayOrDays . ' ago'
+                                  'SAML_MESSAGE' => 'Expired'
                 );
             } elseif ($daysBeforeExpiry < 7) {
                 $output[] = array('SAML_LIGHT'  => 'alert',
