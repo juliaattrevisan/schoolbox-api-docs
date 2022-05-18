@@ -52,11 +52,11 @@ class User extends DeprecatedModel
 
     public function getByID($id)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, luCampus.name as campusName,
                         IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
                 FROM user
-                    LEFT JOIN groups ON user.group_id = groups.id
+                    LEFT JOIN `groups` ON user.group_id = `groups`.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     LEFT JOIN superusers ON user.id = superusers.id
@@ -68,10 +68,10 @@ class User extends DeprecatedModel
 
     public function getByUsername($username)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
                 FROM user
-                    LEFT JOIN groups ON user.group_id = groups.id
+                    LEFT JOIN `groups` ON user.group_id = `groups`.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
@@ -108,10 +108,10 @@ class User extends DeprecatedModel
 
     public function getBySynergy($sid)
     {
-        $query = "SELECT user.id AS uid, title, firstname, lastname, username, groups.name AS gname, group_id,
+        $query = "SELECT user.id AS uid, title, firstname, lastname, username, `groups`.name AS gname, group_id,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, lyl.name, eportfolio_enabled, house, enabled
                 FROM user
-                    LEFT JOIN groups ON user.group_id = groups.id
+                    LEFT JOIN `groups` ON user.group_id = `groups`.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.synergy_id = '$sid'
@@ -212,7 +212,7 @@ class User extends DeprecatedModel
         /* Allow search on synergy id
          */
         $query = "
-            SELECT user.*, groups.name AS group_name, lu_year_level.name AS year_name
+            SELECT user.*, `groups`.name AS group_name, lu_year_level.name AS year_name
             FROM `user`
             LEFT JOIN `groups` ON `user`.group_id = `groups`.id
             LEFT JOIN `lu_year_level` ON `user`.year_id = `lu_year_level`.id AND `lu_year_level`.deleted_at IS NULL
@@ -259,7 +259,7 @@ class User extends DeprecatedModel
         }
 
         // retrieve results
-        $query = "SELECT user.*, groups.name AS group_name
+        $query = "SELECT user.*, `groups`.name AS group_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
                     WHERE ( firstname = '$keyword'
@@ -301,15 +301,15 @@ class User extends DeprecatedModel
                 firstname,
                 lastname,
                 username,
-                groups.name AS gname,
-                groups.group_type as gtype,
-                groups.id AS gid,
+                `groups`.name AS gname,
+                `groups`.group_type as gtype,
+                `groups`.id AS gid,
                 lyl.name AS year,
                 local_email,
                 alt_email,
                 synergy_id
             FROM user
-            LEFT JOIN groups ON user.group_id = groups.id
+            LEFT JOIN `groups` ON user.group_id = `groups`.id
             LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
             WHERE user.deleted_at IS NULL
             AND
@@ -373,7 +373,7 @@ class User extends DeprecatedModel
 
     public function getGroupList()
     {
-        $query = "SELECT * FROM groups
+        $query = "SELECT * FROM `groups`
                   WHERE deleted_at IS NULL
                   ORDER BY name";
         return $this->db->getAll($query);

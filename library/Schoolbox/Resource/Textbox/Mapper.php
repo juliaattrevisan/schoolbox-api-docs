@@ -169,19 +169,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $dashboardUsageQuery = "
             SELECT
                 {$this->getColumnString()},
-                groups.id, groups.name
+                `groups`.id, `groups`.name
             FROM component_definition cd
             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
             INNER JOIN textBox textBox ON cci.value = textBox.textBoxID
-            INNER JOIN groups ON groups.id = ci.identifier
+            INNER JOIN `groups` ON `groups`.id = ci.identifier
             WHERE cd.`class` = :controller
             AND ccd.`key` = :key
             AND textBox.deleted IS NULL
             AND textBox.categoryID = :folderId
-            AND groups.deleted_at IS NULL
-            GROUP BY groups.id, textBox.textBoxID
+            AND `groups`.deleted_at IS NULL
+            GROUP BY `groups`.id, textBox.textBoxID
         ";
 
         $dashboardUsageStatement = $this->database->prepare($dashboardUsageQuery);

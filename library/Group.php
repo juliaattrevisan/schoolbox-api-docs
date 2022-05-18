@@ -90,7 +90,7 @@ class Group extends DeprecatedModel
      */
     public function getGroupTypeIds($name)
     {
-        $query = "SELECT id FROM groups WHERE group_type = \"{$name}\"";
+        $query = "SELECT id FROM `groups` WHERE group_type = \"{$name}\"";
 
         $allIds = $this->db->getAll($query);
 
@@ -112,7 +112,7 @@ class Group extends DeprecatedModel
      */
     public function getGroupType($groupID)
     {
-        $query = "SELECT group_type FROM groups WHERE id = \"{$groupID}\"";
+        $query = "SELECT group_type FROM `groups` WHERE id = \"{$groupID}\"";
         return $this->db->getOne($query);
     }
 
@@ -684,7 +684,7 @@ class Group extends DeprecatedModel
 
     public function getGroupName($groupID)
     {
-        $query = "SELECT name FROM groups WHERE id = \"{$groupID}\"";
+        $query = "SELECT name FROM `groups` WHERE id = \"{$groupID}\"";
         return $this->db->getOne($query);
     }
 

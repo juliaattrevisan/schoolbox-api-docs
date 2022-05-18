@@ -29,7 +29,7 @@ class Mobile
     public function registered(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
     {
         $query = "SELECT groups.name, COUNT(*) AS total FROM mobile_app_registry
-                  JOIN `user` ON mobile_app_registry.user_id = `user`.id JOIN groups ON user.group_id = groups.id
+                  JOIN `user` ON mobile_app_registry.user_id = `user`.id JOIN `groups` ON user.group_id = `groups`.id
                   WHERE mobile_app_registry.created_at >= :start AND mobile_app_registry.created_at <= :end
                   GROUP BY group_id";
 

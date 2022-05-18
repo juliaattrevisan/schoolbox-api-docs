@@ -101,9 +101,9 @@ HELP;
                 JOIN msg_source ON msg_source.id = msg_reroute.msg_source_id
                 JOIN msg_namespace ON msg_namespace.id = msg_source.namespace
                 JOIN user ON user.id = msg_reroute.user_id AND user.deleted_at IS NULL
-                JOIN groups ON user.group_id = groups.id
-                WHERE groups.id IN ({$roleIdList})
-                  AND groups.deleted_at IS NULL";
+                JOIN `groups` ON user.group_id = `groups`.id
+                WHERE `groups`.id IN ({$roleIdList})
+                  AND `groups`.deleted_at IS NULL";
         if (isset($targetNameSpace)) {
             $sql .= " AND msg_namespace.slug = :slug";
             $params = ['slug' => $targetNameSpace];

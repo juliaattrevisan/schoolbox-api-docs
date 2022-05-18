@@ -19,7 +19,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'IN'          AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence')
   AND src.role_type = 'staff'
   AND src.`key` = 'posted';
@@ -30,7 +30,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'IN'          AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence')
   AND src.role_type = 'student'
   AND src.`key` = 'posted';
@@ -41,7 +41,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'IN'          AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence')
   AND src.role_type = 'parent'
   AND src.`key` = 'posted';

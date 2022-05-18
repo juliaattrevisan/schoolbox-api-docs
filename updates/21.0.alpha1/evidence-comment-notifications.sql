@@ -20,7 +20,7 @@ SELECT
     'MU,DI,IN,MO,EM' AS `mask`,
     'IN,EM'          AS `role_default`
 FROM msg_source src
-         LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+         LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence_comment')
   AND src.role_type = 'staff'
   AND src.`key` = 'commented';
@@ -32,7 +32,7 @@ SELECT
     'MU,DI,IN,MO,EM' AS `mask`,
     'IN,EM'          AS `role_default`
 FROM msg_source src
-         LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+         LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence_comment')
   AND src.role_type = 'student'
   AND src.`key` = 'commented';
@@ -44,7 +44,7 @@ SELECT
     'MU,DI,IN,MO,EM' AS `mask`,
     'MU'             AS `role_default`
 FROM msg_source src
-         LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+         LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence_comment')
   AND src.role_type = 'parent'
   AND src.`key` = 'commented';

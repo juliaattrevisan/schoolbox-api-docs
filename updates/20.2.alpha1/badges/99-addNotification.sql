@@ -22,7 +22,7 @@ SELECT src.id           AS `msg_source_id`,
        'MU,DI,IN,MO,EM' AS `mask`,
        'IN'          AS `role_default`
 FROM msg_source src
-         LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+         LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge')
   AND src.role_type IN ('staff', 'student', 'parent')
   AND src.`key` IN ('awarded', 'goalSet');

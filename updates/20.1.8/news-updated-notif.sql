@@ -17,7 +17,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'MU'             AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'news')
   AND src.role_type = 'staff'
   AND src.`key` = 'updated';
@@ -28,7 +28,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'MU'             AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'news')
   AND src.role_type = 'student'
   AND src.`key` = 'updated';
@@ -39,7 +39,7 @@ INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`
     'MU,DI,IN,MO,EM' AS `mask`,
     'MU'          AS `role_default`
   FROM msg_source src
-  LEFT JOIN groups g ON src.`role_type` = g.`group_type`
+  LEFT JOIN `groups` g ON src.`role_type` = g.`group_type`
   WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'news')
   AND src.role_type = 'parent'
   AND src.`key` = 'updated';
