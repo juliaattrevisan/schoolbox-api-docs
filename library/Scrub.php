@@ -487,4 +487,20 @@ class Scrub
             Config::get('scrub_html_cache_timeout')
         );
     }
+
+
+    /**
+     * Strips unsafe characters from a file name.
+     *
+     * Excludes non-ASCII alphanumeric digits, "-" and "_": replaces with "_".
+     * (Note this excludes "." as well: this is not suited for including
+     *  file extensions.)
+     *
+     * @param string $filename
+     * @return string
+     */
+    public static function filename(string $filename): string
+    {
+        return preg_replace('/[^a-zA-Z\d\-_]/', '_', $filename);
+    }
 }

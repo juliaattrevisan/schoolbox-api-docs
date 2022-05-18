@@ -41,6 +41,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Alaress\Database\Predicate;
 use Schoolbox\Admin\ReportExport\Parameters as ReportParams;
+use Scrub;
 
 /**
  * Class Controller
@@ -203,6 +204,7 @@ class Controller extends ConfigController
         $reports = [];
         $params  = $reportParams->getParams();
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
         foreach ($reportStudents as $student) {
             if ($reportParams->getViewAs() === Role::PARENT) {
                 $student->loadParents();
@@ -217,8 +219,13 @@ class Controller extends ConfigController
                     'student'   => $student,
                 ]);
                 if ($reportPath) {
+                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
+                    $fullName   = Scrub::filename($student->getFullName());
+                    $filename   = $escapedTitle !== ''
+                        ? sprintf('%s - %s', $fullName, $escapedTitle)
+                        : $fullName;
                     $reports[] = [
-                        'filename' => sprintf("%d.pdf", $student->getExternalId() ?: $student->getId()),
+                        'filename' => sprintf("%s/%s.pdf", $externalId, $filename),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -236,12 +243,16 @@ class Controller extends ConfigController
             $messageFactory = $this->getDi()->get('taskd.messageFactory');
             $userSerializer = new ModelToArray();
 
+            $date = \Alaress_Date_Format::now()->getDatabaseDate();
+            $outfile = $escapedTitle !== ''
+                ? ($date . '-' . $escapedTitle . '.zip')
+                : ($date . '.zip');
             $message = $messageFactory->build(
                 'download-pages',
                 [
                     'token'     => $this->tokenBuilder->generate($this->getUser()),
                     'content'   => $reports,
-                    'outfile'   => \Alaress_Date_Format::now()->getDatabaseDate() . '-' . preg_replace('/[^a-zA-Z0-9\-\_]/', '_', trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE))) . '.zip',
+                    'outfile'   => $outfile,
                     'gotenberg' => [
                         'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
