@@ -210,11 +210,17 @@
         font-size: 1rem;
     }
 
+    /* This .feedback-assessment-container element typically has a bottom border for a
+     * separator and a page break in the media query
+     */
+    .feedback-assessment-container {
+        border-bottom: 1px solid #ccc;
+    }
+
     /* The width of the Assessment and Grade columns
      * Using small-* names is going to be misleading - specify them explicitly
      */
     .feedback-assessment {
-        border-bottom: 1px solid #ccc;
         display: flex;
         padding: 0.75rem;
     }
@@ -263,7 +269,6 @@
      */
     .rubric-wrap {
         display: block;
-        float: left;
         margin-top: 1rem;
         margin-bottom: 2rem;
         width: 100%;
@@ -371,10 +376,6 @@
 
         .folder-title {
             page-break-before: always; /* ensure each individual subject goes on new page */
-        }
-
-        table {
-            page-break-before: always;
         }
     }
 </style>

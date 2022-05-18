@@ -9,7 +9,11 @@
  # @param bool $showComments
  # @param IAssessable $assessment
  #}
-<div>
+
+{# Rubric grid is optional and spans full width of the page
+ # so you can't throw it in .feedback-assessment
+ #}
+<div class="feedback-assessment-container">
     <div class="feedback-assessment">
         <div class="left">
             <h5>{{ assessment.title }}</h5>
