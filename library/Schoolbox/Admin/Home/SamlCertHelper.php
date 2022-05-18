@@ -18,7 +18,7 @@ class SamlCertHelper
      * @return float  Days before the $cert expires,
      *                negative if past expiry
      */
-    public static function getDaysBeforeExpiry(string $samlCert)
+    public static function getDaysBeforeExpiry(string $samlCert): ?float
     {
         $samlCertMetadata = @openssl_x509_parse($samlCert);
 
