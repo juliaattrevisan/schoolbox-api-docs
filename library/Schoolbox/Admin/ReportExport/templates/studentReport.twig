@@ -126,13 +126,6 @@
         margin-bottom: 1rem;
     }
 
-    /* rubric */
-
-
-    .markdown li, .markdown p {
-        white-space: pre-wrap;
-    }
-
     /* Quarantine zone
      */
 
@@ -321,6 +314,8 @@
         margin-top: 0;
     }
 
+    /* The grade column always sits adjacent to assessment column
+     */
     .feedback-grade {
         float: right;
         text-align: right;
@@ -399,8 +394,12 @@
         background-color: #ececec;
     }
 
+    /* Capabilities can optionally have a mark
+     */
     .rb th.rb-group-summary {
         padding: 0.33rem;
+        font-size: 1rem;
+        text-align: left;
     }
 
     /* Top-left cell is a meaningless cell
@@ -409,6 +408,12 @@
         background-color: transparent;
         border-left: 0;
         border-top: 0;
+    }
+
+    /* Contents of capabilities, indicators, descriptors can have markdown
+     */
+    .markdown li, .markdown p {
+        white-space: pre-wrap;
     }
 
 
