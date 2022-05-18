@@ -260,7 +260,7 @@ class Csv extends AbstractCSV
     {
         $capabilityMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'];
+            $capabilityMarks[$studentId] = $capability['marks'][$studentId]['humanReadable'] ?? null;
         }
         return $capabilityMarks;
     }
@@ -276,7 +276,7 @@ class Csv extends AbstractCSV
     {
         $indicatorMarks = [];
         foreach ($this->students as $studentId => $student) {
-            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'];
+            $indicatorMarks[$studentId] = $indicator['marks'][$studentId]['humanReadable'] ?? null;
         }
         return $indicatorMarks;
     }
