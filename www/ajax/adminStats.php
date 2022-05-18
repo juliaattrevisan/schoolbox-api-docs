@@ -345,11 +345,9 @@ switch ($_POST['module']) {
             $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
         }
 
-        if ($daysBeforeExpiry === null) {
-            if ($samlCertMetadataUrl) {
-                $metadataSamlCert = SamlCertHelper::getSamlCertFromMetadataUrl($samlCertMetadataUrl);
-                $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($metadataSamlCert);
-            }
+        if (($daysBeforeExpiry === null) && $samlCertMetadataUrl) {
+            $metadataSamlCert = SamlCertHelper::getSamlCertFromMetadataUrl($samlCertMetadataUrl);
+            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($metadataSamlCert);
         }
 
         if ($daysBeforeExpiry === null) {
