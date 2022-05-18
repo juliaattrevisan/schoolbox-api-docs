@@ -84,10 +84,7 @@
         text-align: left;
         word-wrap: break-word;
     }
-    table p {
-        margin: 0.25em;
-        text-align: start;
-    }
+
     .row__subject-details:last-of-type {
         border-bottom: none;
     }
@@ -148,28 +145,7 @@
     }
 
     /* rubric */
-    table.rb {
-        border-collapse: collapse;
-    }
-    .rb th, .rb td {
-        border: solid 1px #8c8c8c;
-        padding: 0px 2px;
-    }
-    .rb-description, .rb-value {
-        color: #acacac;
-    }
 
-    .rb-selected .rb-description, .rb-selected .rb-value {
-        color: black;
-    }
-    .rb-selected {
-        background-color: lightgray !important;
-        border-left: 2px solid black !important;
-    }
-
-    th.rb-final-summary {
-        padding: 0.5rem;
-    }
 
     .markdown li, .markdown p {
         white-space: pre-wrap;
@@ -384,6 +360,40 @@
         margin-top: 1rem;
         margin-bottom: 2rem;
         width: 100%;
+    }
+
+    table.rb {
+        border-collapse: collapse;
+    }
+
+    /* All cells have lines everywhere around it
+     */
+    .rb th, .rb td {
+        border: solid 1px #8c8c8c;
+        padding: 0;
+    }
+
+    /* The value of a descriptor, if such a value exists
+     */
+    .rb-value {
+        color: #acacac;
+    }
+
+    /* All descriptor cells have black text regardless of their selection state
+     */
+    .rb-selected .rb-description, .rb-selected .rb-value {
+        color: black;
+    }
+
+    /* The descriptor that was selected by the instructor
+     */
+    .rb-selected {
+        background-color: lightgray !important;
+        border-left: 2px solid black !important;
+    }
+
+    th.rb-final-summary {
+        padding: 0.5rem;
     }
 
     /* Rubric heading cells for Capabilities, Indicators, Levels
