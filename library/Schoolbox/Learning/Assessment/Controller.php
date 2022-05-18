@@ -293,7 +293,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
-        $data['canRelocate'] = $assessment->isSpecification() && !($assessment instanceof Project);
+        $data['canRelocate'] = $assessment->isSpecification();
 
         /* Course Managed Field and associated checkbox in the ui
          */
@@ -331,16 +331,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $allUnitSpecs = $currentCourseSpec->getUnits();
 
         $unitProjects = new Collection();
-        foreach ($allUnitSpecs as $unitSpec) {
-            $projects    = $this->getAssessmentMapper()->createCollection();
-            $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
-            foreach ($assessables as $assessable) {
-                if (!$assessable instanceof Project) {
-                    continue;
+
+        // if this assessment is not a project, add projects tp relocatable locations
+        if (!$assessment instanceof Project) {
+            foreach ($allUnitSpecs as $unitSpec) {
+                $projects    = $this->getAssessmentMapper()->createCollection();
+                $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
+                foreach ($assessables as $assessable) {
+                    if (!$assessable instanceof Project) {
+                        continue;
+                    }
+                    $projects->add($assessable);
                 }
-                $projects->add($assessable);
+                $unitProjects->offsetSet($unitSpec->getId(), $projects);
             }
-            $unitProjects->offsetSet($unitSpec->getId(), $projects);
         }
         $this->getResponse()->content->set($this->buildContent(
             '@learningAssessment/fragments/assessmentLocationList.twig',
