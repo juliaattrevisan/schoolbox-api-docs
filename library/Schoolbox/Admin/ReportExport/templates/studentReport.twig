@@ -1,8 +1,4 @@
 <style>
-    .island section {
-        margin-bottom: 1rem;
-    }
-
     .text-center, .card.compact [class*=icon-] {
         text-align: center !important;
     }
@@ -363,7 +359,7 @@
     }
 
     @media print {
-        .content, .island {
+        .content {
             padding: 0; /* to get more of the page real estate */
         }
 
@@ -374,104 +370,102 @@
 </style>
 
 <div class="report">
-    <section class="content">
-        <div class="header-content">
-            <div class="left">
-                <h1>{{ config.report_title }}</h1>
-                <h2 class="school-name">{{ config.school_name }}</h2>
-            </div>
-            {% if config.report_school_logo %}
-            <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
-            {% endif %}
+    <div class="header-content">
+        <div class="left">
+            <h1>{{ config.report_title }}</h1>
+            <h2 class="school-name">{{ config.school_name }}</h2>
         </div>
+        {% if config.report_school_logo %}
+        <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+        {% endif %}
+    </div>
 
-        <div class="card {% if not student.portrait %}no-pad{% endif %}">
-            {% if student.portrait %}
-            <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
-            {% endif %}
-            <h3 class="name">{{ student.fullname }}</h3>
+    <div class="card {% if not student.portrait %}no-pad{% endif %}">
+        {% if student.portrait %}
+        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
+        {% endif %}
+        <h3 class="name">{{ student.fullname }}</h3>
 
-            {# Only show year if it was ever set and meaningful
-             #}
-            {% if student.year and student.year.longName != '' %}
-            <p class="year">{{ student.year.longName }}</p>
-            {% endif %}
-
-            <div class="introduction">
-                {{ config.report_export_introduction | purify }}
-            </div>
-        </div>
-
-        {# Summary #}
-        {% if showSummary %}
-            {% for folder in folders %}
-                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
-                {% set weightedMean = studentGrade.weightedMean %}
-                <div class="folder-title">
-                    <div class="left">
-                        <h4>{{ folder.title }}</h4>
-                    </div>
-
-                    {% if showSummaryOverallGrade %}
-                    <p class="grade">{{ weightedMean ?? '' }}</p>
-                    {% endif %}
-                </div>
-
-                {% if (summaryAssessments[folder.id] ?? [])| length %}
-                    {% for assessment in summaryAssessments[folder.id] %}
-                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                        {% include '@adminReportExport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
-                                showGrades: showSummaryGrades,
-                                showComments: showSummaryComments,
-                                showRubrics: showSummaryRubrics,
-                                page: 'subject-summary'
-                            } only %}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
+        {# Only show year if it was ever set and meaningful
+         #}
+        {% if student.year and student.year.longName != '' %}
+        <p class="year">{{ student.year.longName }}</p>
         {% endif %}
 
-        {# Class #}
-        {% if showClass %}
-            {% for folder in folders %}
-                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
-                {% set weightedMean = studentGrade.weightedMean %}
-                <div class="folder-title class-summary">
-                    <div class="left">
-                        <h4>{{ folder.title }}</h4>
-                        {% for teacher in folder.teachers %}
-                            <div class="card compact">
-                                <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
-                                <h5>{{ teacher.fullname }}</h5>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% if showClassOverallGrade and weightedMean %}
-                        <div>
-                            <p class="grade">{{ weightedMean ?? '' }}</p>
+        <div class="introduction">
+            {{ config.report_export_introduction | purify }}
+        </div>
+    </div>
+
+    {# Summary #}
+    {% if showSummary %}
+        {% for folder in folders %}
+            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+            {% set weightedMean = studentGrade.weightedMean %}
+            <div class="folder-title">
+                <div class="left">
+                    <h4>{{ folder.title }}</h4>
+                </div>
+
+                {% if showSummaryOverallGrade %}
+                <p class="grade">{{ weightedMean ?? '' }}</p>
+                {% endif %}
+            </div>
+
+            {% if (summaryAssessments[folder.id] ?? [])| length %}
+                {% for assessment in summaryAssessments[folder.id] %}
+                    {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+                    {% include '@adminReportExport/assessmentReport.twig' with
+                        {
+                            student: student,
+                            assessment: assessment,
+                            feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
+                            showGrades: showSummaryGrades,
+                            showComments: showSummaryComments,
+                            showRubrics: showSummaryRubrics,
+                            page: 'subject-summary'
+                        } only %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {# Class #}
+    {% if showClass %}
+        {% for folder in folders %}
+            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+            {% set weightedMean = studentGrade.weightedMean %}
+            <div class="folder-title class-summary">
+                <div class="left">
+                    <h4>{{ folder.title }}</h4>
+                    {% for teacher in folder.teachers %}
+                        <div class="card compact">
+                            <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
+                            <h5>{{ teacher.fullname }}</h5>
                         </div>
-                    {% endif %}
-                </div>
-
-                {% if (classAssessments[folder.id] ?? [])| length %}
-                    {% for assessment in classAssessments[folder.id] %}
-                        {% include '@adminReportExport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: classAssessmentFeedbacks[assessment.id] ?? null,
-                                showGrades: showClassGrades,
-                                showComments: showClassComments,
-                                showRubrics: showClassRubrics,
-                                page: 'subject'
-                            } only %}
                     {% endfor %}
+                </div>
+                {% if showClassOverallGrade and weightedMean %}
+                    <div>
+                        <p class="grade">{{ weightedMean ?? '' }}</p>
+                    </div>
                 {% endif %}
-            {% endfor %}
-        {% endif %}
-    </section>
+            </div>
+
+            {% if (classAssessments[folder.id] ?? [])| length %}
+                {% for assessment in classAssessments[folder.id] %}
+                    {% include '@adminReportExport/assessmentReport.twig' with
+                        {
+                            student: student,
+                            assessment: assessment,
+                            feedback: classAssessmentFeedbacks[assessment.id] ?? null,
+                            showGrades: showClassGrades,
+                            showComments: showClassComments,
+                            showRubrics: showClassRubrics,
+                            page: 'subject'
+                        } only %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 </div>
