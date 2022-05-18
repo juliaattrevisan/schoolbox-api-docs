@@ -178,6 +178,40 @@
         white-space: pre-wrap;
     }
 
+    /* Quarantine zone
+     */
+
+    /* Typography
+     */
+    p,
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 0.25rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    h4 {
+        font-size: 1.3rem;
+    }
+
+    h5 {
+        font-size: 1.15rem;
+    }
+
+    h6 {
+        font-size: 1rem;
+    }
 
     /* Make background colours print
      */
@@ -269,8 +303,24 @@
     /* header-content is stuff at the top of the report
      * Report title, school name, logo
      */
-    .header-content h1 {
-        margin-bottom: 2rem;
+    .header-content {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Left hand column in the header - contains report title, school name
+     */
+    .header-content .left {
+        flex-grow: 2;
+    }
+
+    /* Special cosmetic representation of semantic h2
+     * If there isn't a logo, the margin-bottom pushes everything else around
+     * to provide appropriate negative space
+     */
+    h2.school-name {
+        font-size: 1.25rem;
+        margin: 0 0 2rem 0;
     }
 
     /* The thing that tells you about students
@@ -328,56 +378,10 @@
         border-top: 0;
     }
 
-    .logo-content {
-        float: right;
-        margin-top: 0;
-        max-width: 12rem;
-        padding-bottom: 2em;
-        text-align: center;
-    }
-
-    .logo-content .logo {
+    .logo {
         max-width: 12rem;
         margin: 0 0 0 2rem;
         padding: 0;
-    }
-
-    /* Typography
-     */
-    p,
-    h1, h2, h3, h4, h5, h6 {
-        color: black;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    h2 {
-        font-size: 1.75rem;
-    }
-
-    h3 {
-        font-size: 1.5rem;
-    }
-
-    h4 {
-        font-size: 1.3rem;
-    }
-
-    h5 {
-        font-size: 1.15rem;
-    }
-
-    h6 {
-        font-size: 1rem;
-    }
-
-
-    /* Special cosmetic representation of semantic h2
-     */
-    h2.school-name {
-        font-size: 1.25rem;
     }
 
     @page {
@@ -428,24 +432,16 @@
     }
 </style>
 
-<h1>The hope of immigrants setting out for distant shores. </h1>
-<h2>The hope of immigrants setting out for distant shores. </h2>
-<h3>The hope of immigrants setting out for distant shores. </h3>
-<h4>The hope of immigrants setting out for distant shores. </h4>
-<h5>The hope of immigrants setting out for distant shores. </h5>
-<h6>The hope of immigrants setting out for distant shores. </h6>
-
 <div class="small-12 island report">
     <section class="content">
         <div class="header-content">
+            <div class="left">
+                <h1>{{ config.report_title }}</h1>
+                <h2 class="school-name">{{ config.school_name }}</h2>
+            </div>
             {% if config.report_school_logo %}
-                <div class="logo-content">
-                    <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
-                </div>
+            <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
             {% endif %}
-
-            <h1>{{ config.report_title }}</h1>
-            <h2 class="school-name">{{ config.school_name }}</h2>
         </div>
 
         <div class="card {% if not student.portrait %}no-pad{% endif %}">
