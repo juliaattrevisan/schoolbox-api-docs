@@ -25,7 +25,8 @@
         externalRedirectUrl: externalRedirectUrl
     } %}
 </div>
-
+{# set a base question number here, so we can use it later... #}
+{% set questionCount = 0 %}
 <div class="row">
     <div class="small-12 island">
         {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
@@ -143,7 +144,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if finished %}
+                            {% if finished and questionCount %}
                                 {% set totalMark       = attempt.maxMark %}
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
                                 {% if not attempt.isReviewed %}
