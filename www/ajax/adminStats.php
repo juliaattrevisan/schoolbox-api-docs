@@ -355,32 +355,31 @@ switch ($_POST['module']) {
             $output[] = array('SAML_LIGHT'  => 'alert',
                               'SAML_MESSAGE' => 'Invalid SAML config',
             );
-            break;
-        }
-
-        //get plural/singular form of 'day'
-        if (floor(abs($daysBeforeExpiry)) === 1.0) {
-            $dayOrDays = "day";
         } else {
-            $dayOrDays = "days";
-        }
+            //get plural/singular form of 'day'
+            if (floor(abs($daysBeforeExpiry)) === 1.0) {
+                $dayOrDays = "day";
+            } else {
+                $dayOrDays = "days";
+            }
 
-        if ($daysBeforeExpiry < 0) {
-            $output[] = array('SAML_LIGHT'  => 'alert',
-                              'SAML_MESSAGE' => 'Expired ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays . ' ago'
-            );
-        } elseif ($daysBeforeExpiry < 7) {
-            $output[] = array('SAML_LIGHT'  => 'alert',
-                              'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
-            );
-        } elseif ($daysBeforeExpiry < 30) {
-            $output[] = array('SAML_LIGHT'  => 'warning',
-                              'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
-            );
-        } else {
-            $output[] = array('SAML_LIGHT'  => 'success',
-                              'SAML_MESSAGE' => 'Valid'
-            );
+            if ($daysBeforeExpiry < 0) {
+                $output[] = array('SAML_LIGHT'  => 'alert',
+                                  'SAML_MESSAGE' => 'Expired ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays . ' ago'
+                );
+            } elseif ($daysBeforeExpiry < 7) {
+                $output[] = array('SAML_LIGHT'  => 'alert',
+                                  'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+                );
+            } elseif ($daysBeforeExpiry < 30) {
+                $output[] = array('SAML_LIGHT'  => 'warning',
+                                  'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+                );
+            } else {
+                $output[] = array('SAML_LIGHT'  => 'success',
+                                  'SAML_MESSAGE' => 'Valid'
+                );
+            }
         }
         break;
     default:
