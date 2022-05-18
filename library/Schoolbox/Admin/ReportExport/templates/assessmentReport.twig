@@ -17,12 +17,36 @@
         {% if '' != assessment.workType.name %}
         <p class="worktype">{{ assessment.workType.name }}</p>
         {% endif %}
+
+        {# Only show comment if it exists
+         # Otherwise, just occupy space
+         # Foundation-related behaviour requires a character to do that
+         #}
+        {% if showComments and feedback and feedback.comment %}
+            <p>{{ feedback.comment | linkify | nl2br }}</p>
+        {% endif %}
     </div>
 
     {# If there's no feedback, don't render anything else about
      # rubrics, comments and grades - nothing to show
      #}
     {% if feedback %}
+        <div class="feedback-grade columns">
+            {% set grade = feedback.humanReadableMark %}
+            {% if showGrades and grade %}
+                <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+            {% endif %}
+
+            {# Was this really how we did it?
+             # I could have sworn there was a real way to determine an assessment's class
+             # rather than this random loose comparison
+             #}
+            {% if assessment.familyName == 'project' %}
+                {% set participant = assessment.allParticipants[student.id] %}
+                <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
+            {% endif %}
+        </div>
+
         {# If this feedback has a rubric grid, show that
          # Then show the comment below it
          #}
@@ -37,64 +61,6 @@
                     showRubricTotal: false,
                     selfAssessmentFeedback: null
                 } only %}
-            </div>
-
-            {# Only show comment if it exists
-             # Otherwise, just occupy space
-             # Foundation-related behaviour requires a character to do that
-             #}
-            {% if showComments %}
-                <div class="feedback-rubric-comment columns">
-                    <p class="worktype">Comment</p>
-                    {% if feedback.comment %}
-                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                    {% else %}
-                        &nbsp;
-                    {% endif %}
-                </div>
-            {% endif %}
-
-            {# Show the grade column if allowed
-             # and if there's a meaningful value
-             #}
-            {% set grade = feedback.humanReadableMark %}
-            {% if showGrades and grade %}
-                <div class="feedback-grade columns">
-                    <p class="worktype text-right">Result</p>
-                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
-                </div>
-            {% endif %}
-        {% else %}
-            {# Only show comment if it exists
-             # Otherwise, just occupy space
-             # Foundation-related behaviour requires a character to do that
-             #}
-            {% if showComments %}
-                <div class="feedback-comment columns">
-                    {% if feedback.comment %}
-                        <p class="worktype">Comment</p>
-                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                    {% else %}
-                        &nbsp;
-                    {% endif %}
-                </div>
-            {% endif %}
-
-            <div class="feedback-grade columns">
-                {% set grade = feedback.humanReadableMark %}
-                {% if showGrades and grade %}
-                    <p class="worktype text-right">Result</p>
-                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
-                {% endif %}
-
-                {# Was this really how we did it?
-                 # I could have sworn there was a real way to determine an assessment's class
-                 # rather than this random loose comparison
-                 #}
-                {% if assessment.familyName == 'project' %}
-                    {% set participant = assessment.allParticipants[student.id] %}
-                    <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
-                {% endif %}
             </div>
         {% endif %}
     {% endif %}

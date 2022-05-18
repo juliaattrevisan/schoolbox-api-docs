@@ -278,11 +278,7 @@
      * Using small-* names is going to be misleading - specify them explicitly
      */
     .feedback-assessment {
-        width: 30%;
-    }
-
-    .feedback-comment {
-        width: 47%;
+        width: 77%;
     }
 
     .feedback-grade {
@@ -309,8 +305,11 @@
     /* Push the rubric grid down a little bit, if it exists
      */
     .rubric-wrap {
-        margin-top: 0.75rem;
-        margin-bottom: 1rem;
+        width: 100%;
+        display: block;
+        float: left;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
     }
 
     /* Rubric heading cells for Capabilities, Indicators, Levels
@@ -318,13 +317,6 @@
      */
     .rb th {
         background-color: #ececec;
-    }
-
-    /* I think floating elements cause this to need such a large margin
-     * since they are no longer in document flow
-     */
-    .rb.markable {
-        margin-top: 4.5rem;
     }
 
     /* Top-left cell is a meaningless cell
