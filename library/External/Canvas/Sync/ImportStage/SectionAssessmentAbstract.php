@@ -500,14 +500,14 @@ abstract class SectionAssessmentAbstract
                 $this->log->debug("Deleting un-synchronised Plan participant (user: '{$user->getFullName()}') (user.externalId: {$user->getExternalId()})");
                 try {
                     $this->participantMapper->delete($participant);
-                } catch (Mapper\Exception $e) {
+                } catch (\Exception $e) {
                     $this->log->debug("Failed to delete participant (user: '{$user->getFullName()}') (user.externalId: {$user->getExternalId()}): " . $e->getMessage() . $e->getTraceAsString());
                 }
                 $this->countParticipantsDeleted++;
             }
             try {
                 $this->participantPlanMapper->delete($plan);
-            } catch (Mapper\Exception $e) {
+            } catch (\Exception $e) {
                 $this->log->debug("Failed to delete plan '{$plan->getName()}' (id: {$plan->getId()}): " . $e->getMessage() . $e->getTraceAsString());
             }
             $this->countPlansDeleted++;
