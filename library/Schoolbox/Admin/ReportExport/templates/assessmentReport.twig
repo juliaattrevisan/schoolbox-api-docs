@@ -11,9 +11,8 @@
  #}
 <div class="row row__{{ page }}-details">
     <div class="feedback-assessment columns">
-        <h3 class="heading__tertiary">
-            {{ assessment.title }}
-        </h3>
+        <h5>{{ assessment.title }}</h5>
+
         {% if '' != assessment.workType.name %}
         <p class="worktype">{{ assessment.workType.name }}</p>
         {% endif %}
@@ -34,7 +33,7 @@
         <div class="feedback-grade columns">
             {% set grade = feedback.humanReadableMark %}
             {% if showGrades and grade %}
-                <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                <h6>{{ grade }}</h6>
             {% endif %}
 
             {# Was this really how we did it?
@@ -43,7 +42,7 @@
              #}
             {% if assessment.familyName == 'project' %}
                 {% set participant = assessment.allParticipants[student.id] %}
-                <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
+                <h6 text-right">{{ assessment.humanReadableMark(participant, true) }}</h6>
             {% endif %}
         </div>
 
