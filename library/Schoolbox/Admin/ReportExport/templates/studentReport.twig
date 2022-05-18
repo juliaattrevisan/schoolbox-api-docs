@@ -258,6 +258,15 @@
         margin: 0 0 2rem 0;
     }
 
+    /* Ensure school logos have a max dimension
+     * so broken svgs don't break YOU
+     */
+    .logo {
+        max-width: 12rem;
+        margin: 0 0 0 2rem;
+        padding: 0;
+    }
+
     /* The thing that tells you about students
      */
     .card {
@@ -396,11 +405,6 @@
         border-top: 0;
     }
 
-    .logo {
-        max-width: 12rem;
-        margin: 0 0 0 2rem;
-        padding: 0;
-    }
 
     @page {
         counter-increment: page;
