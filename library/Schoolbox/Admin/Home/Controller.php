@@ -219,6 +219,7 @@ class Controller extends Base
                     'suds_import_data_enabled' => $sudsEnabled,
                     'suds_import_logs' => $importLogs,
                     'show_port_80_availability_check' => $this->getConfigLoader()->get('show_port_80_availability_check'),
+                    'saml_enabled' => $this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '',
                 ),
             )
         );

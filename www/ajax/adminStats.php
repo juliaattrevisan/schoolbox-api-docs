@@ -12,6 +12,7 @@ use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Url\Factory;
+use Schoolbox\Admin\Home\SamlCertHelper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -27,11 +28,12 @@ if (!isset($_POST['module'])) {
     die();
 }
 
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
+
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        /** @var IConfigLoader $config */
-        $config        = $kernel->get('config');
         $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
         $summary       = $login->userSummary(null);
         $totalUser     = 0;
@@ -331,6 +333,55 @@ switch ($_POST['module']) {
             'kami_status' => $status,
             'kami_light' => $light,
         ];
+        break;
+    case 'service_saml_cert':
+        $databaseSamlCert = $config->get('saml_idp_certificate');
+        $samlCertMetadataUrl = $config->get('saml_idp_metadata_url');
+
+        $daysBeforeExpiry = null;
+
+        //if database cert field contains a value, get the days before expiry
+        if ($databaseSamlCert) {
+            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
+        }
+
+        if (($daysBeforeExpiry === null) && $samlCertMetadataUrl) {
+            $metadataSamlCert = SamlCertHelper::getSamlCertFromMetadataUrl($samlCertMetadataUrl);
+            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($metadataSamlCert);
+        }
+
+        if ($daysBeforeExpiry === null) {
+            //code will only reach here if both saml configs exist but are invalid
+            $output[] = array('SAML_LIGHT'  => 'alert',
+                              'SAML_MESSAGE' => 'Invalid SAML config',
+            );
+        } else {
+            $absDaysBeforeExpiry = abs($daysBeforeExpiry);
+            //get plural/singular form of 'day'
+            if ($absDaysBeforeExpiry === 1) {
+                $dayOrDays = "day";
+            } else {
+                $dayOrDays = "days";
+            }
+
+            if ($daysBeforeExpiry < 0) {
+                $output[] = array('SAML_LIGHT'  => 'alert',
+                                  'SAML_MESSAGE' => 'Expired'
+                );
+            } elseif ($daysBeforeExpiry < 7) {
+                $output[] = array('SAML_LIGHT'  => 'alert',
+                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
+                );
+            } elseif ($daysBeforeExpiry < 30) {
+                $output[] = array('SAML_LIGHT'  => 'warning',
+                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
+                );
+            } else {
+                $output[] = array('SAML_LIGHT'  => 'success',
+                                  'SAML_MESSAGE' => 'Valid'
+                );
+            }
+        }
         break;
     default:
         break;
