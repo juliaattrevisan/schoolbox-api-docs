@@ -115,7 +115,14 @@
         {# Capability mark: needs to be rendered in human-readable form, use the assessment's mark scheme to do so #}
         {% if showSummaryForThisCapability %}
             <tr>
-                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 2 }}">
+                {# Capability Mark spans the following columns:
+                 #     + N descriptors (equivalent to N levels)
+                 #     + Indicator cell (always 1 cell)
+                 #         = N + 1 cells colspan
+                 #
+                 # (It does not span the capability cell itself)
+                 #}
+                <th class="rb-group-summary" colspan="{{ rubricGrid.levels|length + 1 }}">
                     {{ capabilityMark.humanReadableValue ?? '' }}
 
                     {# Self-Assessment #}
