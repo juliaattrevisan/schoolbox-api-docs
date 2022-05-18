@@ -356,8 +356,9 @@ switch ($_POST['module']) {
                               'SAML_MESSAGE' => 'Invalid SAML config',
             );
         } else {
+            $absDaysBeforeExpiry = abs($daysBeforeExpiry);
             //get plural/singular form of 'day'
-            if (floor(abs($daysBeforeExpiry)) === 1.0) {
+            if ($absDaysBeforeExpiry === 1) {
                 $dayOrDays = "day";
             } else {
                 $dayOrDays = "days";
@@ -365,15 +366,15 @@ switch ($_POST['module']) {
 
             if ($daysBeforeExpiry < 0) {
                 $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expired ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays . ' ago'
+                                  'SAML_MESSAGE' => 'Expired ' . $absDaysBeforeExpiry . ' ' . $dayOrDays . ' ago'
                 );
             } elseif ($daysBeforeExpiry < 7) {
                 $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
                 );
             } elseif ($daysBeforeExpiry < 30) {
                 $output[] = array('SAML_LIGHT'  => 'warning',
-                                  'SAML_MESSAGE' => 'Expires in ' . abs($daysBeforeExpiry) . ' ' . $dayOrDays
+                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
                 );
             } else {
                 $output[] = array('SAML_LIGHT'  => 'success',
