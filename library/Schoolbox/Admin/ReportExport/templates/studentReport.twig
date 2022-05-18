@@ -448,12 +448,12 @@
             {% if student.portrait %}
             <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
             {% endif %}
-            <h2 class="name">{{ student.fullname }}</h2>
+            <h3 class="name">{{ student.fullname }}</h3>
 
             {# Only show year if it was ever set and meaningful
              #}
             {% if student.year and student.year.longName != '' %}
-            <h3 class="year">{{ student.year.longName }}</h3>
+            <p class="year">{{ student.year.longName }}</p>
             {% endif %}
 
             {{ config.report_export_introduction | purify }}
