@@ -5,11 +5,14 @@
         <div class="content">
             <!-- BEGIN error_message -->
             <div class="alert-box alert">
-                This calendar subscription has failed {ERROR_COUNT} times<br>
+                This calendar subscription has failed {ERROR_COUNT} times.<br>
                 It may be one of the following issues:<br>
-                The request to the remote server has timed out. <br>
-                The remote server is unavailable.<br>
-                There is an issue with the format of the URL.<br>
+                <ul>
+                    <li>The request to the remote server has timed out. </li>
+                    <li>The remote server is unavailable.</li>
+                    <li>There is an issue with the format of the URL.</li>
+                    <li>The Authorisation token is malformed or expired.</li>
+                </ul>
             </div>
             <!-- END error_message -->
             <div id="error_{CONNECTOR_ID}" data-calendar-error class="alert-box alert" style="display:none">
