@@ -15,10 +15,10 @@ class SamlCertHelper
      * Get days before SAML cert expires
      *
      * @param string $samlCert Certificate of IDP
-     * @return float  Days before the $cert expires,
+     * @return int  Days before the $cert expires,
      *                negative if past expiry
      */
-    public static function getDaysBeforeExpiry(string $samlCert): ?float
+    public static function getDaysBeforeExpiry(string $samlCert): ?int
     {
         $samlCertMetadata = @openssl_x509_parse($samlCert);
 
@@ -27,7 +27,7 @@ class SamlCertHelper
         }
 
         if (array_key_exists('validTo_time_t', $samlCertMetadata)) {
-            return ($samlCertMetadata['validTo_time_t'] - time()) / 60 / 60 / 24;
+            return ((int) floor(($samlCertMetadata['validTo_time_t'] - time()) / 60 / 60 / 24));
         }
         //returns null if the expiry date cannot be found
         return null;
