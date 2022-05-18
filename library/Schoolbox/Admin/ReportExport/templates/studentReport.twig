@@ -80,11 +80,6 @@
         margin-bottom: 0.25rem;
     }
 
-    .card.compact {
-        min-height: 2.5rem;
-        padding: 0 1rem;
-    }
-
     .columns {
         position: relative;
         padding-left: 0.5rem;
@@ -241,11 +236,6 @@
         margin: 0 0 1rem 0;
     }
 
-    .card.compact > * {
-        align-items: center;
-        display: flex;
-    }
-
     .card h2 {
         text-overflow: ellipsis;
         overflow: hidden;
@@ -277,6 +267,7 @@
      * Use a flexbox to optionally show a grade
      */
     .folder-title {
+        align-items: center;
         background: lightgrey;
         border: 1px solid black;
         display: flex;
@@ -300,13 +291,24 @@
 
     /* A folder title in the class summary section
      */
-    .class-summary-title {
-        display: flex;
+    .class-summary {
         padding: 0.75rem;
     }
 
-    .class-summary-title .left {
-        flex-grow: 2;
+    /* Teachers in the Class Summary section have a more space-efficient style
+     * and layout, but we don't need its excess padding
+     */
+    .class-summary .card.compact {
+        display: flex;
+        align-items: center;
+        margin: 0.75rem 0 0 0;
+        padding: 0;
+    }
+
+    /* Special cosmetic representation of semantic h5
+     */
+    .class-summary h5 {
+        font-size: 1rem;
     }
 
     /* For some reason there's a thing called a summary result
@@ -580,13 +582,13 @@
             {% for folder in folders %}
                 {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
                 {% set weightedMean = studentGrade.weightedMean %}
-                <div class="class-summary-title">
+                <div class="folder-title class-summary">
                     <div class="left">
                         <h4>{{ folder.title }}</h4>
                         {% for teacher in folder.teachers %}
                             <div class="card compact">
                                 <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
-                                <h2 class="heading__tertiary">{{ teacher.fullname }}</h2>
+                                <h5>{{ teacher.fullname }}</h5>
                             </div>
                         {% endfor %}
                     </div>
