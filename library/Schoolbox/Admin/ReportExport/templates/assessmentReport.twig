@@ -9,7 +9,7 @@
  # @param bool $showComments
  # @param IAssessable $assessment
  #}
-<div class="row row__{{ page }}-details">
+<div>
     <div class="feedback-assessment">
         <div class="left">
             <h5>{{ assessment.title }}</h5>
@@ -29,45 +29,40 @@
             {% endif %}
         </div>
         {% if feedback %}
-        <div>
-            {% set grade = feedback.humanReadableMark %}
-            {% if showGrades and grade %}
-                <p class="grade">{{ grade }}</p>
-            {% endif %}
+            <div>
+                {% set grade = feedback.humanReadableMark %}
+                {% if showGrades and grade %}
+                    <p class="grade">{{ grade }}</p>
+                {% endif %}
 
-            {# Was this really how we did it?
-             # I could have sworn there was a real way to determine an assessment's class
-             # rather than this random loose comparison
-             #}
-            {% if assessment.familyName == 'project' %}
-                {% set participant = assessment.allParticipants[student.id] %}
-                <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
-            {% endif %}
-        </div>
+                {# Was this really how we did it?
+                 # I could have sworn there was a real way to determine an assessment's class
+                 # rather than this random loose comparison
+                 #}
+                {% if assessment.familyName == 'project' %}
+                    {% set participant = assessment.allParticipants[student.id] %}
+                    <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
+                {% endif %}
+            </div>
         {% endif %}
     </div>
 
     {# If there's no feedback, don't render anything else about
      # rubrics, comments and grades - nothing to show
+     #
+     # If this feedback has a rubric grid, show that
      #}
-    {% if feedback %}
-
-
-        {# If this feedback has a rubric grid, show that
-         # Then show the comment below it
-         #}
-        {% if showRubrics and feedback.rubricMarkedGrid %}
-            <div class="rubric-wrap">
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid:       feedback.rubricMarkedGrid.grid,
-                    rubricMarkedGrid: feedback.rubricMarkedGrid,
-                    learner: student,
-                    showDescriptorValue: true,
-                    showGroupTotal: true,
-                    showRubricTotal: false,
-                    selfAssessmentFeedback: null
-                } only %}
-            </div>
-        {% endif %}
+    {% if feedback and showRubrics and feedback.rubricMarkedGrid %}
+        <div class="rubric-wrap">
+            {% include '@rubric/grid.twig' with {
+                rubricGrid:       feedback.rubricMarkedGrid.grid,
+                rubricMarkedGrid: feedback.rubricMarkedGrid,
+                learner: student,
+                showDescriptorValue: true,
+                showGroupTotal: true,
+                showRubricTotal: false,
+                selfAssessmentFeedback: null
+            } only %}
+        </div>
     {% endif %}
 </div>

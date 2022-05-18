@@ -57,7 +57,6 @@
     }
 
     .row__subject-summary-result,
-    .row__subject-summary-details,
     .row__subject-details {
         margin-top: -1px; /*to avoid 2px borders */
         padding: 0.5rem 0;
@@ -71,11 +70,6 @@
         border-bottom: none;
     }
 
-    .row__subject-summary-details {
-        padding: 0.5rem 0.25rem;
-    }
-
-    .row__subject-summary-details .columns,
     .row__subject-detail .columns {
         margin-bottom: 0.25rem;
     }
@@ -327,6 +321,7 @@
      * Using small-* names is going to be misleading - specify them explicitly
      */
     .feedback-assessment {
+        border-bottom: 1px solid #ccc;
         display: flex;
         padding: 0.75rem;
     }
@@ -367,8 +362,7 @@
     /* These are used, but derived programmatically - storm thinks they are unused
      * See the top of assessmentReport.twig which uses the `page` var as css classname
      */
-    .row__subject-details,
-    .row__subject-summary-details {
+    .row__subject-details {
         border-bottom: 1px solid #ccc;
     }
 
@@ -482,7 +476,7 @@
             padding: 0; /* to get more of the page real estate */
         }
 
-        .class-summary-title {
+        .folder-title {
             page-break-before: always; /* ensure each individual subject goes on new page */
         }
 
