@@ -140,6 +140,16 @@ class Controller extends ConfigController
             $this->router->generate('adminReportExport.postConfig'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
+        // Hack a maxlength into the report title setting
+        if (is_iterable($configContext['settings'] ?? null)) {
+            foreach ($configContext['settings'] as $i => $setting) {
+                $name = $setting['data']['name'] ?? null;
+                if ($name === ConfigMapper::NAME_REPORT_TITLE) {
+                    $configContext['settings'][$i]['data']['maxlength'] = self::FILENAME_MAX_LENGTH;
+                    break;
+                }
+            }
+        }
         $this->getResponse()->content->set(
             [
                 'template' => '@adminReportExport/index.twig',
