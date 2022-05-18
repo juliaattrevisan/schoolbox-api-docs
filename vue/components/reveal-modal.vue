@@ -82,9 +82,9 @@ export default {
             this.modal.foundation(
                 'reveal',
                 'open',
-                {close_on_background_click: this.closeOnBackgroundClick }
+                { close_on_background_click: this.closeOnBackgroundClick }
             );
-            $(document).on('closed.fndtn.reveal', '[data-reveal]', () => {
+            $(document).on('closed.fndtn.reveal', '[data-reveal]', () => { //to respond to the modal closing when requried
                 this.$emit('closed');
                 $(document).off('closed.fndtn.reveal');
             });
