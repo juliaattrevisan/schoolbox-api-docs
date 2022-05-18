@@ -41,6 +41,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Alaress\Database\Predicate;
 use Schoolbox\Admin\ReportExport\Parameters as ReportParams;
+use Scrub;
 
 /**
  * Class Controller
@@ -203,11 +204,7 @@ class Controller extends ConfigController
         $reports = [];
         $params  = $reportParams->getParams();
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-        $escapedTitle = preg_replace(
-            '/[^a-zA-Z\d\-_]/',
-            '_',
-            trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE))
-        );
+        $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
         foreach ($reportStudents as $student) {
             if ($reportParams->getViewAs() === Role::PARENT) {
                 $student->loadParents();
@@ -222,13 +219,13 @@ class Controller extends ConfigController
                     'student'   => $student,
                 ]);
                 if ($reportPath) {
+                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
+                    $fullName   = Scrub::filename($student->getFullName());
+                    $filename   = $escapedTitle !== ''
+                        ? sprintf('%s - %s', $fullName, $escapedTitle)
+                        : $fullName;
                     $reports[] = [
-                        'filename' => sprintf(
-                            "%s/%s - %s.pdf",
-                            ($student->getExternalId() ?: 'unknown'),
-                            $student->getFullName(),
-                            $escapedTitle,
-                        ),
+                        'filename' => sprintf("%s/%s.pdf", $externalId, $filename),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
