@@ -95,28 +95,14 @@ class Controller extends ConfigController
             'schoolData' => '/adminv2/import/schoolDataImport',
         ];
 
-        foreach ($foundConfig as $config) {
-            /** @var Config $config */
-            $type = $config->getType() ? $config->getType()->getType() : '';
-            $url = isset($module[$config->getModule()])
-                ? sprintf($module[$config->getModule()], $type)
-                : sprintf("/adminv2/%s", $config->getModule());
-
-            $jsonPayload[] = [
-                'name'          => $config->getName(),
-                'title'         => $config->getTitle(),
-                'description'   => $config->getDescription(),
-                'module'        => $config->getModule(),
-                'url'           => $url . '#' . $config->getName()
-            ];
-        }
-
         //Also include the navigation elements
         $subnav = new Subnav($this->getConfigLoader());
         $pageList = $subnav->generate();
 
+        $hiddenUrls = [];
         foreach ($pageList as $parentUrl => $parentData) {
             if (!($parentData['visible'] ?? false)) {
+                $hiddenUrls[] = $parentUrl;
                 continue;
             }
 
@@ -134,6 +120,7 @@ class Controller extends ConfigController
 
             foreach ($parentData['children'] as $childUrl => $childData) {
                 if (!($childData['visible'] ?? false)) {
+                    $hiddenUrls[] = $childUrl;
                     continue;
                 }
                 $jsonPayload[] = [
@@ -143,6 +130,26 @@ class Controller extends ConfigController
                     'url'         => $childUrl,
                 ];
             }
+        }
+
+        foreach ($foundConfig as $config) {
+            /** @var Config $config */
+            $type = $config->getType() ? $config->getType()->getType() : '';
+            $url = isset($module[$config->getModule()])
+                ? sprintf($module[$config->getModule()], $type)
+                : sprintf("/adminv2/%s", $config->getModule());
+
+            if (in_array($url, $hiddenUrls)) {
+                continue;
+            }
+
+            $jsonPayload[] = [
+                'name'          => $config->getName(),
+                'title'         => $config->getTitle(),
+                'description'   => $config->getDescription(),
+                'module'        => $config->getModule(),
+                'url'           => $url . '#' . $config->getName()
+            ];
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
