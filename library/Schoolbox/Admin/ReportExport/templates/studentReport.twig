@@ -80,10 +80,6 @@
         margin-bottom: 0.25rem;
     }
 
-    .row__subject-start {
-        margin-top: 1rem;
-    }
-
     .card.compact {
         min-height: 2.5rem;
         padding: 0 1rem;
@@ -302,6 +298,17 @@
         padding-right: 0.75rem;
     }
 
+    /* A folder title in the class summary section
+     */
+    .class-summary-title {
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    .class-summary-title .left {
+        flex-grow: 2;
+    }
+
     /* For some reason there's a thing called a summary result
      * and another thing called a subject result, but the demo
      * data makes them all seem the same data? Unsure of the
@@ -472,7 +479,7 @@
             padding: 0; /* to get more of the page real estate */
         }
 
-        .row__subject-start {
+        .class-summary-title {
             page-break-before: always; /* ensure each individual subject goes on new page */
         }
 
@@ -573,9 +580,9 @@
             {% for folder in folders %}
                 {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
                 {% set weightedMean = studentGrade.weightedMean %}
-                <div class="row row__margin-bottom row__subject-start">
-                    <div class="small-10 columns">
-                        <h2 class="heading__secondary heading__subject">{{ folder.title }}</h2>
+                <div class="class-summary-title">
+                    <div class="left">
+                        <h4>{{ folder.title }}</h4>
                         {% for teacher in folder.teachers %}
                             <div class="card compact">
                                 <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
@@ -584,11 +591,8 @@
                         {% endfor %}
                     </div>
                     {% if showClassOverallGrade and weightedMean %}
-                        <div class="small-2 columns columns__subject-result">
-                            <h3 class="heading__tertiary">{{ weightedMean ?? '' }}</h3>
-                        </div>
-                    {% else %}
-                        <div class="small-2 columns">
+                        <div>
+                            <p class="grade">{{ weightedMean ?? '' }}</p>
                         </div>
                     {% endif %}
                 </div>
