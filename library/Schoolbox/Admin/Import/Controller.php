@@ -130,7 +130,8 @@ class Controller extends ConfigController
          *
          * This is the schooldata endpoint key which we would have assembled manually
          */
-        $postData['schooldata_import_endpoint_key'] = (new DSNFactory())->produceDSNString($postData['schooldata_import_data_source'], $postData['dsn']);
+        $postData['schooldata_import_endpoint_key'] = (new DSNFactory())
+            ->produceDSNString($postData['schooldata_import_data_source'] ?? '', $postData['dsn'] ?? []);
 
         /* We don't need this array element which has no corresponding db rows
          */
