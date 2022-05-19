@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model;
@@ -55,19 +56,32 @@ class CommandLineTool extends App
         $logger = $this->getLogger();
         $logger->info(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
 
-        // Collate assessment files
+        // Collate assessment and folder files
         $assessmentFiles = [];
+        $folderFiles     = [];
         foreach ($statement->getIterator() as $row) {
             $logger->info(sprintf('... folder #%d (%s)', $row['id'], $row['name']));
 
+
             // Get all assessments:
             // filter out anything not in one of the courses
-            $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
             $student     = $this->extractStudentFromFolderName($row['name']);
             if (!$student) {
                 $logger->info('    folder does not contain a student ID: skipping');
                 continue;
             }
+
+            // Collate folder files
+            $files = FileMapper::getInstance()->findByFolderId($row['id']);
+            foreach ($files as $file) {
+                $folderFiles[$student->getExternalId()] ??= [
+                    'student' => $student,
+                    'files'   => [],
+                ];
+                $folderFiles[$student->getExternalId()]['files'][$file->getId()] = $file;
+            }
+
+            $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
             foreach ($assessments as $assessment) {
                 $assessmentFiles[$student->getExternalId()] ??= [
                     'student' => $student,
@@ -77,10 +91,25 @@ class CommandLineTool extends App
             }
         }
 
-        // Collate folder files
-
         // Collate the assessment files into filenames
         $filenames = [];
+        foreach ($folderFiles as $folderFilesTuple) {
+            /** @var User $student */
+            $student = $folderFilesTuple['student'];
+            ksort($folderFilesTuple['files']);
+            foreach (array_values($folderFilesTuple['files']) as $i => $file) {
+                $yearLevel   = $student->getYear()->getName();
+                $externalId  = $student->getExternalId();
+                $filenames[] = sprintf(
+                    '%s/%s_%s_%d.%s',
+                    $yearLevel,
+                    $externalId,
+                    $file->getFilename(),
+                    $i + 1,
+                    $file->getExtension(),
+                );
+            }
+        }
         foreach ($assessmentFiles as $assessmentFilesTuple) {
             /** @var User $student */
             $student = $assessmentFilesTuple['student'];
