@@ -72,22 +72,6 @@ function check_vagrant_box_version() {
   fi
 }
 
-# Ensure .env environment file is present
-function check_env_file_present() {
-  if [ ! -f /usr/share/schoolbox/.env ]; then
-    echo "Error: '.env' environment file missing. See LastPass for details" >&2
-    exit 1
-  fi
-}
-
-# Function to fetch value from .env file by key
-# Usage: value=$(read_var $key)
-function read_var() {
-  VAR=$(grep -E "^\s*$1" /usr/share/schoolbox/.env | xargs)
-  IFS="=" read -ra VAR <<<"$VAR"
-  echo "${VAR[1]}"
-}
-
 function drop_mysql_schema_and_user() {
   # Is mysql installed ? (it won't if packer image build)
   if type mysql 2>/dev/null >&2 && test -f /root/.my.cnf; then
@@ -137,7 +121,7 @@ function deploy_nginx_ssl_cert() {
   # If no extra hostname, just use vagrant cert. Otherwise we'll need the wildcard cert
   if [[ -z $extra_hostname ]]; then
     # Download vagrant cert
-    s3Referer=$(read_var AWS_S3_REFERER)
+    s3Referer="TODO-invalid" # TODO replace this with IAM cred auth
     if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
       echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'"
       exit 1
@@ -181,7 +165,6 @@ function main() {
   create_cache_dir
   create_mount_dir
   check_vagrant_box_version
-  check_env_file_present
   drop_mysql_schema_and_user
   create_ir_conf_file
   remove_old_cron_file
