@@ -33,14 +33,7 @@ class Component_Config_Filter extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
 
-        $filter = array();
-        $configValue = (int)$configValue;
-
-        for ($i = 0; $i < count($this->getFilterFields()); $i++) {
-            $j = $configValue % 2;
-            $filter[$this->getFilterFields()[$i]] = $j;
-            $configValue = (int) $configValue / 2;
-        }
+        $filter = self::getFilter((int)$configValue, $this->getFilterFields());
 
         // has an internal block for the checkboxes
         $page->setBlock($keyblock, 'filters', 'filters_block');
@@ -55,5 +48,42 @@ class Component_Config_Filter extends Component_Config_Abstract
             ));
             $page->parse('filters_block', 'filters', true);
         }
+    }
+
+    /**
+     * Parse the bitmask which represents the selected fields and return
+     * array map of field name and field value
+     * @param int   $configValue
+     * @param array $filterFields
+     * @return array
+     */
+    public static function getFilter(int $configValue, array $filterFields): array
+    {
+        $filter = [];
+        for ($i = 0; $i < count($filterFields); $i++) {
+            $j                         = $configValue % 2;
+            $filter[$filterFields[$i]] = $j;
+            $configValue               = (int)$configValue / 2;
+        }
+        return $filter;
+    }
+
+    /**
+     * Parse the bitmask which represents the selected fields and return
+     * list of selected filter names
+     * @param int   $configValue
+     * @param array $filterFields
+     * @return array
+     */
+    public static function getSelectedFilters(int $configValue, array $filterFields): array
+    {
+        $selectedFilters = [];
+        $allFilter       = self::getFilter($configValue, $filterFields);
+        foreach ($allFilter as $filterName => $filterValue) {
+            if ($filterValue) {
+                $selectedFilters[] = $filterName;
+            }
+        }
+        return $selectedFilters;
     }
 }

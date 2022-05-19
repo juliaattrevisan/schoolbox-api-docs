@@ -58,7 +58,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "manage_textboxes", "manage_textboxes_block");
 
         // My links button
-        $url = 'http://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/homepage/' . $this->getContext()->getId();
+        $url = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/homepage/' . $this->getContext()->getId();
 
         if ($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
             $this->setVar('addmylinks_block', '');
@@ -81,6 +81,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             //has write access
             $this->parse("stats_data_block", "stats_data");
+            $this->setVar('VIEW_FILES_LINK_NAME', 'Manage Files');
 
             /* Allow Manage Textboxes
              */
@@ -90,7 +91,9 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
                 'stats_data_block' => '',
                 'manage_textboxes_block' => ''
             ]);
+            $this->setVar('VIEW_FILES_LINK_NAME', 'View Files');
         }
+        $this->setVar('VIEW_FILES_LINK', $this->getRouter()->generate('resourceBrowser.showFolderFiles', ['sourceFolderID' => $this->getContext()->getId()]));
 
         // User subscription to groups.
         $this->setBlock($templateHandle, 'subscribed', 'subscribed_block');

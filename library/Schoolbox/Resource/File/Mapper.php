@@ -131,7 +131,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
 
         // Put together mimetype filters
         $fileTypeMimes = [
-            'document' => [
+            Model::FILTER_DOCUMENT => [
                 "%pdf%",
                 "%msword%",
                 "%vnd.ms%",
@@ -140,9 +140,9 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 "%document%",
                 "%powerpoint%",
             ],
-            'image' => ["%image%",],
-            'audio' => ["%audio%",],
-            'video' => ["%video%", "%flash%", "%realmedia%",],
+            Model::FILTER_IMAGE => ["%image%",],
+            Model::FILTER_AUDIO => ["%audio%",],
+            Model::FILTER_VIDEO => ["%video%", "%flash%", "%realmedia%",],
         ];
 
         if (!is_array($fileTypes)) {

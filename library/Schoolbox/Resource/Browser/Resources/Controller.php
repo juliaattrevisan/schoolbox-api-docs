@@ -100,49 +100,75 @@ class Controller extends AbstractController
     }
 
     /**
+     * GUI display of files within a folder
+     * @api GET /folder/files/:sourceFolderID
+     *
+     * @param Folder\Model $sourceFolder
+     * @return void
+     * @throws Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function showFolderFiles(Folder\Model $sourceFolder)
+    {
+        $this->showFiles($sourceFolder);
+    }
+
+    /**
      * GUI display of files within a files component source
      * @api GET /folder/:componentID/files/:sourceFolderID
      *
-     * @param int $componentID
-     * @param int $sourceFolderID
-     * @throws Mapper\Exception\NotFound
+     * @param Folder\Model $sourceFolder
+     * @param int|null     $componentID
+     * @return void
      * @throws Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function showFiles(int $componentID, int $sourceFolderID)
+    public function showFiles(Folder\Model $sourceFolder, ?int $componentID = null)
     {
         $filesBuilder = new FilesBuilder($this->fileMapper, $this->componentInstanceMapper, $this->getRouter());
-        $homepage_id = $filesBuilder->getHomepage($componentID);
-        $homepage = $this->folderMapper->findById($homepage_id);
 
         //check perms, on both the source folder, and the homepage it came from, people could bookmark or send the link
-        $accessSource = $this->getAccess($sourceFolderID);
-        $accessHome = $this->getAccess($homepage_id);
-
-        // special case for root, just let that through to the keeper
-        if (($accessSource < UserAccess::ACCESS_READ || $accessHome < UserAccess::ACCESS_READ ) && $sourceFolderID != 0) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        $accessSource = $this->getAccess($sourceFolder->getId());
+        $homepageId   = $componentID ? $filesBuilder->getHomepage($componentID) : null;
+        // local component or not from component
+        if (!$homepageId || $sourceFolder->getId() === $homepageId) {
+            $homepage   = $sourceFolder;
+            $accessHome = $accessSource;
+            $canRead = $accessSource >= UserAccess::ACCESS_READ;
+        } else {
+            // alt sourced
+            $homepage   = $this->folderMapper->findById($homepageId);
+            $accessHome = $this->getAccess($homepage->getId());
+            $canRead = $accessSource >= UserAccess::ACCESS_READ && $accessHome >= UserAccess::ACCESS_READ;
         }
 
-        //check if user has edit perms on source folder
-        $canEdit = ($accessSource >= UserAccess::ACCESS_WRITE);
-
-        //lets get the config for the component
-        $componentConfig = $filesBuilder->getComponentConf($componentID, $homepage_id);
+        // special case for root, just let that through to the keeper
+        if (!$canRead && !$sourceFolder->isRootNode()) {
+            $this->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
 
         //grab all files for component folder
-        $files = $filesBuilder->getFolderData($componentConfig['src']['value'], $accessHome);
+        $files = $filesBuilder->getFolderData($sourceFolder->getId(), $accessHome);
 
-        //build the filter object
-        //weird magic, from the file list component.
-        $filterFields       = ['document', 'audio', 'video', 'image', 'other'];
-        $filter             = [];
-        $countFilterFields  = count($filterFields);
-        for ($i = 0; $i < $countFilterFields; $i++) {
-            $j = $componentConfig['filter']['value'] % 2;
-            if ($j) {
-                $filter[] = $filterFields[$i];
-            }
-            $componentConfig['filter']['value'] = (int)$componentConfig['filter']['value'] / 2;
+        if ($componentID) {
+            //lets get the config for the component
+            $componentConfig = $filesBuilder->getComponentConf($componentID);
+
+            //build the filter object
+            $filter        = \Component_Config_Filter::getSelectedFilters(
+                (int)$componentConfig['filter']['value'],
+                Resource\File\Model::FILTER_FIELDS
+            );
+            $title         = $componentConfig['componentname']['value'];
+            $breadcrumb    = $title;
+            $sortDirection = $componentConfig['sortdir']['value'];
+            $sortBy        = $componentConfig['sort']['value'];
+        } else {
+            $filter        = Resource\File\Model::FILTER_FIELDS;
+            $breadcrumb    = $accessSource >= UserAccess::ACCESS_WRITE ? 'Manage Files' : 'View Files';
+            $title         = $breadcrumb . ' on ' . $sourceFolder->getNameWithCodes();
+            $sortDirection = null;
+            $sortBy        = null;
         }
 
         //grab the referrer so the saved filters can be recalled only when returning from the edit page
@@ -152,22 +178,25 @@ class Controller extends AbstractController
         }
         //just dump the lot to the page for front end use.
         //output results
-        $this->getResponse()->content->set([
-           'template'   => '@resourceBrowser/viewAll.twig',
-           'title'      => $componentConfig['componentname']['value'],
-           'data'       => [
-                    'referrer'                  => $referrer,
-                    'canEdit'                   => $canEdit,
-                    'homepage'                  => $homepage,
-                    'filter'                    => $filter,
-                    'files'                     => $files,
-                    'title'                     => $componentConfig['componentname']['value'],
-                    'componentInstanceConfig'   => $componentConfig,
-                    'componentID'               => $componentID,
-                    'sourceFolderID'            => $sourceFolderID,
-                    'componentFolderId'         => $homepage_id,
-           ],
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'template' => '@resourceBrowser/viewAll.twig',
+                'title'    => $title,
+                'data'     => [
+                    'referrer'       => $referrer,
+                    'canEdit'        => $accessSource >= UserAccess::ACCESS_WRITE,
+                    'homepage'       => $homepage,
+                    'filter'         => $filter,
+                    'files'          => $files,
+                    'breadcrumb'     => $breadcrumb,
+                    'title'          => $title,
+                    'sortDir'        => $sortDirection,
+                    'sortBy'         => $sortBy,
+                    'componentID'    => $componentID,
+                    'sourceFolderID' => $sourceFolder->getId(),
+                ],
+            ]
+        );
     }
 
     /**

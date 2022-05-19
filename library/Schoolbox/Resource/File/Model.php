@@ -36,6 +36,20 @@ class Model extends AbstractFile
     /** @var User $modifiedBy */
     protected $modifiedBy;
 
+    const FILTER_DOCUMENT = 'document';
+    const FILTER_AUDIO    = 'audio';
+    const FILTER_VIDEO    = 'video';
+    const FILTER_IMAGE    = 'image';
+    const FILTER_OTHER    = 'other';
+
+    const FILTER_FIELDS = [
+        self::FILTER_DOCUMENT,
+        self::FILTER_AUDIO,
+        self::FILTER_VIDEO,
+        self::FILTER_IMAGE,
+        self::FILTER_OTHER,
+    ];
+
     /**
      * @return string
      */
