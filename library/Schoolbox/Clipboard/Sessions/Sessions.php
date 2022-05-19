@@ -14,6 +14,7 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -264,8 +265,22 @@ class Sessions implements IStrategy
 
                     $matchupName = trim($session['title']);
 
-                    $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
-                    $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime']));
+                    /*
+                     * Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
+                     * so lets force the creation of the date object to be a UTC timezone,
+                     * then update that object to the local timezone specified from the DB config.
+                     *
+                     * The rest of the system expects all dates to be in a local timezone, NOT UTC
+                     * https://api-docs.clipboard.app/?id=timestamps
+                     */
+                    //grab local TZ from DB
+                    $localTZ = ConfigMapper::getInstance()->getConfigLoader()->get('date_timezone');
+                    $startAt = new \Alaress_Date_Format($session['startDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
+                    //update based on local TZ
+                    $startAt->setTimezone($localTZ);
+                    $finishAt = new \Alaress_Date_Format($session['endDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
+                    //update based on local TZ
+                    $finishAt->setTimezone($localTZ);
 
                     /* See if this matchup exists by taking the bestest guess
                      */
