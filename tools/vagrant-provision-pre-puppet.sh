@@ -122,8 +122,8 @@ function deploy_nginx_ssl_cert() {
   # If no extra hostname, just use vagrant cert. Otherwise we'll need the wildcard cert
   if [[ -z $extra_hostname ]]; then
     # Download vagrant cert
-    s3Referer="TODO-invalid" # TODO replace this with IAM cred auth
-    if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
+    s3Referer="TODO-invalid"
+    if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
       echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'"
       exit 1
     fi
@@ -133,19 +133,12 @@ function deploy_nginx_ssl_cert() {
   else
     # Download wildcard cert
     filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
-    file="certs/$filename"
-    bucket='schoolbox-cloud-tls'
-    resource="/${bucket}/${file}"
-    dateValue="$(date -u +'%a, %d %b %Y %H:%M:%S GMT')"
-    contentType="application/x-compressed-tar"
-    stringToSign="GET\n\n${contentType}\n\nx-amz-date:${dateValue}\n${resource}"
-    signature=$(/bin/echo -en "$stringToSign" | openssl sha1 -hmac "${aws_iam_secret}" -binary | base64)
-    if ! curl --silent --show-error -H "Host: ${bucket}.s3.amazonaws.com" \
-      -H "x-amz-date: ${dateValue}" \
-      -H "Content-Type: ${contentType}" \
-      -H "Authorization: AWS ${aws_iam_key}:${signature}" \
-      https://${bucket}.s3.amazonaws.com/${file} \
-      -o $cache_dir/$filename; then
+
+    if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
+        --iam-access-key "$aws_iam_key" \
+        --iam-secret-key "$aws_iam_secret" \
+        --file-name "certs/$filename" \
+        --cache-dir "$cache_dir"; then
       echo "Unable to download wildcard certificate" >&2
       exit 1
     fi
