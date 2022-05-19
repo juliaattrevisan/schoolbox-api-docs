@@ -285,7 +285,21 @@ class Sessions implements IStrategy
                     $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
                     $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime']));
 
-                    /* See if this matchup exists by taking the bestest guess
+                    /* Event description contains some data that could be updated in Clipboard,
+                     * forcing us to update the $notes every time. We can't skip over matchups
+                     * which existed previously anymore.
+                     */
+                    $notes = sprintf(self::NOTES_TEMPLATE,
+                        $session['activity']['name'],
+                        $session['opponentOrganisation']['name'] ?? '',
+                        $session['result'] ?? '',
+                        $session['organisationScore'] ?? '',
+                        $session['opponentTeam']['name'] ?? '',
+                        $session['opponentScore'] ?? ''
+                    );
+
+                    /* See if this matchup exists by taking the bestest guess,
+                     * then update its Notes in case it changed somehow in Clipboard
                      */
                     try {
                         $matchup = $this->matchupMapper->findOneByColumnList([
@@ -297,22 +311,19 @@ class Sessions implements IStrategy
                             'finish_at' => $finishAt->getDatabase(),
                         ]);
 
+                        /* Event description contains some data that could be updated in Clipboard,
+                         * forcing us to update the $notes every time. We can't skip over matchups
+                         * which existed previously anymore.
+                         */
+                        $matchup->setNotes($notes);
+
                         $this->log->debug(sprintf(
-                            'Reusing matchup %s on %s, at venue %s',
+                            'Updating matchup %s on %s, at venue %s',
                             $matchup->getDisplayName(),
                             $matchup->getStartAt()->getDatabase(),
                             null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        $notes = sprintf(self::NOTES_TEMPLATE,
-                            $session['activity']['name'],
-                            $session['opponentOrganisation']['name'],
-                            $session['result'] ?? '',
-                            $session['organisationScore'] ?? '',
-                            $session['opponentTeam']['name'],
-                            $session['opponentScore']
-                        );
-
                         $matchup = $this->matchupMapper->createModel()
                             ->setName($matchupName)
                             ->setSeason($season)
