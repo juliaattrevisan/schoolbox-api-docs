@@ -20,6 +20,15 @@ class Model
 
 
     /**
+     * This const corresponds to admins having selected Calendar view
+     * in admin - this is the enum which causes /www/timetable.php to
+     * load the suds events screen instead
+     */
+    public const TIMETABLE_VIEW_CALENDAR = 'calendar';
+    public const TIMETABLE_VIEW_TABLE = 'table';
+
+
+    /**
      * These consts correspond to the Classification enum
      */
     public const CLASSIFICATION_EVENT = 'event';

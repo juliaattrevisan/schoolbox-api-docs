@@ -18,6 +18,14 @@ if (!isset($this)) {
     SitePage::localRedir('/timetable/');
 }
 
+/* Redirect to SUDS Timetable calendar screen where you can see the calendar
+ * representation of timetable events; any other selection causes you to see
+ * the classical cyclic timetable grid
+ */
+if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')) {
+    SitePage::localREdir("/timetable/calendar/{$this->arg[0]}");
+}
+
 // If External_DB not enabled do not display page
 if (!Config::get('external_enable')) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
