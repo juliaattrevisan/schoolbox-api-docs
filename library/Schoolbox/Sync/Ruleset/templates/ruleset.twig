@@ -121,6 +121,9 @@ set upsConfig = {
                     <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
                     <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
                     <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
+                    <li class="separator">Help</li>
+                    <li><a class="icon-help" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
+                    <li><a class="icon-help" data-reveal-id="string-match" title="Tell me about how to match strings">About String Matching</a></li>
                 </ul>
             </div>
             <div>
@@ -219,8 +222,6 @@ set upsConfig = {
                                 <li class="separator">Effects</li>
                                 <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
                                 <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
-                                <li class="separator">Help</li>
-                                <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
                             </ul>
                         </li>
                         {% endfor %}
@@ -366,7 +367,59 @@ set upsConfig = {
                         </p>
                     </div>
                 </div>
-
+                <a class="close-reveal-modal">&#215;</a>
+            </div>
+            <div id="string-match" class="reveal-modal" data-reveal>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h3>String Matching</h3>
+                        <p>
+                            When matching against a string, you may use ? to match a single character, or * to match against many characters.  For example “*cat*” will match anything that contains the string “cat”.
+                        </p>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Character</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>*</td>
+                                <td>Matches any number of characters. You can use the asterisk (*) anywhere in a character string.</td>
+                                <td>wh* finds what, white, and why, but not awhile or watch.</td>
+                            </tr>
+                            <tr>
+                                <td>?</td>
+                                <td>Matches a single alphabet in a specific position.</td>
+                                <td>b?ll finds ball, bell, and bill.</td>
+                            </tr>
+                            <tr>
+                                <td>[ ]</td>
+                                <td>Matches characters within the brackets.</td>
+                                <td>b[ae]ll finds ball and bell, but not bill.</td>
+                            </tr>
+                            <tr>
+                                <td>!</td>
+                                <td>Excludes characters inside the brackets.</td>
+                                <td> b[!ae]ll finds bill and bull, but not ball or bell.<br />
+                                    Like “[!a]*” finds all items that do not begin with the letter a.</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                <td>Matches a range of characters. Remember to specify the characters in ascending order (A to Z, not Z to A).</td>
+                                <td>b[a-c]d finds bad, bbd, and bcd.</td>
+                            </tr>
+                            <tr>
+                                <td>#</td>
+                                <td>Matches any single numeric character.</td>
+                                <td>1#3 finds 103, 113, and 123.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <a class="close-reveal-modal">&#215;</a>
             </div>
         </div>
