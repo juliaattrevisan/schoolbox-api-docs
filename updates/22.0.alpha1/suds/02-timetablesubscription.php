@@ -24,11 +24,19 @@ $app = new class extends CliTool\App {
 
         $calendarApiConfigMapper = \Calendar_Api_Config_Mapper::getInstance();
 
-        $newConfig = base64_encode(serialize($config));
-        $statement = $calendarApiConfigMapper->getDatabase()->query("
-            INSERT INTO calendar_connector (event_type, connector_class, config, status) VALUES ('SudsTimetable', 'Schoolbox', '{$newConfig}', 0);
-        ");
-        $statement->execute();
+        $record = $calendarApiConfigMapper
+            ->createModel()
+            ->setEventType('SudsTimetable') // This is actually the classname corresponding to Calendar/Api/Config/Connector/SudsTimetable.php
+            ->setConnectorClass('Schoolbox')
+            ->deactivate()
+            ->encodeConfig($config);
+
+        $query = "
+            INSERT INTO calendar_connector (event_type, connector_class, config, status)
+            VALUES ('SudsTimetable', 'Schoolbox', '{$record->getConfig()}', 0)
+        ";
+
+        $this->getDatabaseInternal()->query($query);
     }
 };
 
