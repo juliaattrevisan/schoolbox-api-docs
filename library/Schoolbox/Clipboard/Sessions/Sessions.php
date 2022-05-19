@@ -41,6 +41,24 @@ class Sessions implements IStrategy
 
 
     /**
+     * This is used as the description in the event modal popup
+     * There isn't one field that corresponds to that usage, but there
+     * is a conglomerate of various fields which result in the same outcome
+     *
+     * This was first defined by Wesley Melbourne, and now inflicts across
+     * all clipboard implementations. Until we get feedback from schools
+     * this is the Best Guess for now
+     */
+    private const NOTES_TEMPLATE =  "
+        Activity: %s<br />
+        Opponent: %s<br />
+        Result: %s<br />
+        Us: %s<br />
+        %s: %s<br />
+    ";
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -286,12 +304,22 @@ class Sessions implements IStrategy
                             null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
                     } catch (\Schoolbox\Mapper\Exception $e) {
+                        $notes = sprintf(self::NOTES_TEMPLATE,
+                            $session['activity']['name'],
+                            $session['opponentOrganisation']['name'],
+                            $session['result'] ?? '',
+                            $session['organisationScore'] ?? '',
+                            $session['opponentTeam']['name'],
+                            $session['opponentScore']
+                        );
+
                         $matchup = $this->matchupMapper->createModel()
                             ->setName($matchupName)
                             ->setSeason($season)
                             ->setDivision($division)
                             ->setVenue($venue)
                             ->setHomeTeam($team)
+                            ->setNotes($notes)
                             ->setStartAt($startAt)
                             ->setFinishAt($finishAt);
 
