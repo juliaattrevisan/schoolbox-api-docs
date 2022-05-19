@@ -91,6 +91,12 @@ export default {
          */
         onCancelDeleteRowSelected () {
             this.$refs.deleteModal.close();
+        },
+
+        /**
+         * Clear the currently selected rowToDelete stored in Pinia's adminListStore.js
+         */
+        onDeleteModalClosed () {
             this.deleteRowCancelled();
         },
 
@@ -102,7 +108,7 @@ export default {
 
 <template>
     <div>
-        <reveal-modal ref="deleteModal">
+        <reveal-modal ref="deleteModal" @closed="onDeleteModalClosed">
             <h2>Please Confirm</h2>
             <div data-alert class="alert-box warning">{{ loadedData.deleteWarning ? loadedData.deleteWarning : 'Are you sure you wish to delete this row?' }}</div>
             <ul class="flex-list buttons">
