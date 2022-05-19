@@ -601,13 +601,13 @@ class Controller extends Base\Base
     public function updateCourse(CourseSpecification $courseSpec)
     {
         $post          = $this->getRequest()->post;
-        $newCourseName = trim($post['name']);
+        $newCourseName = trim($post->get('name', ''));
         if ($newCourseName === '') {
             $this->sendError(new Base\Exception('You need to give the course a name. ', ['Courses must have names.']));
             return;
         }
 
-        $parentFolderId = (int)trim($post['parent']);
+        $parentFolderId = (int)trim($post->get('parent'));
         $originalParentFolderId = $courseSpec->getFolder()->getParent()->getId();
 
         // If course is moved under another folder, validate
@@ -623,7 +623,7 @@ class Controller extends Base\Base
         }
 
         // Save each Unit's name
-        if (\is_array($post['unit'])) {
+        if (\is_array($post->get('unit'))) {
             $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
 
             /* Keep track of how many units were missing names
@@ -633,11 +633,11 @@ class Controller extends Base\Base
 
             // save unit name changes
             foreach ($courseSpec->getUnits() as $unitSpec) {
-                if (!isset($post['unit'][$unitSpec->getId()])) {
+                if (!isset($post->get('unit')[$unitSpec->getId()])) {
                     // no change required
                     continue;
                 }
-                $unitName = trim($post['unit'][$unitSpec->getId()]['name']);
+                $unitName = trim($post->get('unit')[$unitSpec->getId()]['name'] ?? '');
                 if ($unitName === $unitSpec->getFolder()->getName()) {
                     // name is not changed.
                     continue;
@@ -674,7 +674,7 @@ class Controller extends Base\Base
         }
 
         $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
-        $newCurriculumCodes     = isset($post['curriculumCodes']) ? array_filter($post['curriculumCodes']) : [];
+        $newCurriculumCodes     = is_array($post->get('curriculumCodes')) ? array_filter($post->get('curriculumCodes')) : [];
         $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
 
         // If anything changed for course
