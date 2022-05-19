@@ -100,10 +100,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param Team $team
+     * @return $this
      */
-    public function setTeam($team)
+    public function setTeam($team): self
     {
         $this->team = $team;
+        return $this;
     }
 
     /**
@@ -116,10 +118,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param Matchup $matchup
+     * @return $this
      */
-    public function setMatchup($matchup)
+    public function setMatchup($matchup): self
     {
         $this->matchup = $matchup;
+        return $this;
     }
 
     /**

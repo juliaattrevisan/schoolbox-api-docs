@@ -49,13 +49,31 @@ class Sessions implements IStrategy
      * all clipboard implementations. Until we get feedback from schools
      * this is the Best Guess for now
      */
-    private const NOTES_TEMPLATE =  "
-        Activity: %s<br />
-        Opponent: %s<br />
-        Result: %s<br />
-        Us: %s<br />
-        %s: %s<br />
+    private const NOTES_TEMPLATE = "
+        %s
+        <p>%s</p>
     ";
+
+
+    /**
+     * This is used as the description for home team's outcome since all
+     * clipboard teams are Home Teams (we never import enemy teams like this)
+     */
+    private const RESULT_TEMPLATE = "
+        <hr />
+        <h3>Result</h3>
+        <p>
+        Our score: %s<br />
+        Opponent score: %s<br />
+        </p>
+    ";
+
+
+    /**
+     * Cosmetic strings representing match status, as defined by Clipboard
+     */
+    private const STATUS_CANCELLED = '<span class="alert-box warning">Cancelled</span>';
+    private const STATUS_BYE = '<span class="alert-box highlight">Bye</span>';
 
 
     /**
@@ -285,19 +303,6 @@ class Sessions implements IStrategy
                     $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
                     $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime']));
 
-                    /* Event description contains some data that could be updated in Clipboard,
-                     * forcing us to update the $notes every time. We can't skip over matchups
-                     * which existed previously anymore.
-                     */
-                    $notes = sprintf(self::NOTES_TEMPLATE,
-                        $session['activity']['name'],
-                        $session['opponentOrganisation']['name'] ?? '',
-                        $session['result'] ?? '',
-                        $session['organisationScore'] ?? '',
-                        $session['opponentTeam']['name'] ?? '',
-                        $session['opponentScore'] ?? ''
-                    );
-
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
                      */
@@ -310,12 +315,6 @@ class Sessions implements IStrategy
                             'start_at' => $startAt->getDatabase(),
                             'finish_at' => $finishAt->getDatabase(),
                         ]);
-
-                        /* Event description contains some data that could be updated in Clipboard,
-                         * forcing us to update the $notes every time. We can't skip over matchups
-                         * which existed previously anymore.
-                         */
-                        $matchup->setNotes($notes);
 
                         $this->log->debug(sprintf(
                             'Updating matchup %s on %s, at venue %s',
@@ -330,7 +329,6 @@ class Sessions implements IStrategy
                             ->setDivision($division)
                             ->setVenue($venue)
                             ->setHomeTeam($team)
-                            ->setNotes($notes)
                             ->setStartAt($startAt)
                             ->setFinishAt($finishAt);
 
@@ -348,10 +346,48 @@ class Sessions implements IStrategy
                         $this->assignCoach($this->findCoach($assignedStaff), $team);
                     }
 
+                    /* Event description contains some data that could be updated in Clipboard,
+                     * forcing us to update the $notes every time. We can't skip over matchups
+                     * which existed previously anymore.
+                     */
+                    $notes = sprintf(self::NOTES_TEMPLATE,
+                        $this->generateStatus($session),
+                        nl2br(trim((string)$session['studentParentNotes']))
+                    );
+
+                    /* Event description contains some data that could be updated in Clipboard,
+                     * forcing us to update the $notes every time. We can't skip over matchups
+                     * which existed previously anymore.
+                     */
+                    $matchup->setNotes($notes);
+
                     /* We saw this, so we keep this
                      */
                     if ($this->perform) {
                         $this->matchupMapper->save($matchup);
+                    }
+
+                    /* Figure out existing results for the home team
+                     * then update it to whatever it currently is
+                     */
+                    try {
+                        $result = \Schoolbox\Fixtures\Result\Mapper::getInstance()
+                            ->findOneByColumnList([
+                                'match_id' => $matchup->getId(),
+                                'team_id' => $team->getId()
+                            ]);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $result = \Schoolbox\Fixtures\Result\Mapper::getInstance()->createModel()
+                            ->setMatchup($matchup)
+                            ->setTeam($team);
+                    }
+
+                    /* Update home team's description with whatever it is now
+                     */
+                    $result->setDescription($this->generateResult($result, $session));
+
+                    if ($this->perform) {
+                        \Schoolbox\Fixtures\Result\Mapper::getInstance()->save($result);
                     }
                 }
             }
@@ -465,5 +501,50 @@ class Sessions implements IStrategy
         }
 
         return $venue;
+    }
+
+
+    /**
+     * Decide a little html fragment to represent the boolean status of this match:
+     * Bye, or not a Bye; or if a match is cancelled
+     *
+     * @param array $session
+     * @return string
+     */
+    private function generateStatus(array $session): string {
+        if ($session['cancelled']) {
+            return self::STATUS_CANCELLED;
+        }
+
+        if ($session['bye']) {
+            return self::STATUS_BYE;
+        }
+
+        /* Nothing special to tell people about; just use empty string
+         */
+        return '';
+    }
+
+
+    /**
+     * Generate a slab of text for the home team's result description
+     *
+     * @param \Schoolbox\Fixtures\Result\Model $result
+     * @param array                            $session
+     * @return string
+     */
+    private function generateResult(\Schoolbox\Fixtures\Result\Model $result, array $session): string
+    {
+        /* Neither team has anything interesting in the results fields
+         * Nothing to say
+         */
+        if ('' === trim((string)$session['organisationScore']) && '' === trim((string)$session['opponentScore'])) {
+            return '';
+        }
+
+        return sprintf(self::RESULT_TEMPLATE,
+            $session['organisationScore'] ?? '',
+            $session['opponentScore'] ?? ''
+        );
     }
 }
