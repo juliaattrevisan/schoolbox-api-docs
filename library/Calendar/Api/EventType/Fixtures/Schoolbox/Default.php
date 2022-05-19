@@ -146,7 +146,8 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $awayTeamResult = $matchup->getAwayTeamResult() ? $matchup->getAwayTeamResult()->getDescription() : '';
 
             if ($homeTeamResult || $awayTeamResult) {
-                $detail .= sprintf(self::RESULT_TEMPLATE,
+                $detail .= sprintf(
+                    self::RESULT_TEMPLATE,
                     $homeTeamResult,
                     $awayTeamResult
                 );

@@ -56,7 +56,7 @@ class Prepare implements IStrategy
      */
     private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
 
-    
+
     /**
      * @param LoggerInterface                    $log
      * @param bool                               $perform

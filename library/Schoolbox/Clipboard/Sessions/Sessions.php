@@ -355,7 +355,8 @@ class Sessions implements IStrategy
                      * forcing us to update the $notes every time. We can't skip over matchups
                      * which existed previously anymore.
                      */
-                    $notes = sprintf(self::NOTES_TEMPLATE,
+                    $notes = sprintf(
+                        self::NOTES_TEMPLATE,
                         $this->generateStatus($session),
                         nl2br(trim((string)$session['studentParentNotes']))
                     );
@@ -516,7 +517,8 @@ class Sessions implements IStrategy
      * @param array $session
      * @return string
      */
-    private function generateStatus(array $session): string {
+    private function generateStatus(array $session): string
+    {
         if ($session['cancelled']) {
             return self::STATUS_CANCELLED;
         }
@@ -547,7 +549,8 @@ class Sessions implements IStrategy
             return '';
         }
 
-        return sprintf(self::RESULT_TEMPLATE,
+        return sprintf(
+            self::RESULT_TEMPLATE,
             $session['organisationScore'] ?? '',
             $session['opponentScore'] ?? ''
         );
