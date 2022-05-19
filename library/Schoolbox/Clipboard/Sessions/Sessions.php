@@ -170,7 +170,7 @@ class Sessions implements IStrategy
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
         \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
         \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
-        \Schoolbox\Fixtures\Result\Mapper $resultMapper,
+        \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
