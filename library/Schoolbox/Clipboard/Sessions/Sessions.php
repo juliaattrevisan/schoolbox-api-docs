@@ -266,8 +266,11 @@ class Sessions implements IStrategy
                     $matchupName = trim($session['title']);
 
                     /*
-                     * fix issue with grabbing dates from clipboard as they appear to be local times,
-                     * but are actually UTC, just not labelled as UTC
+                     * Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
+                     * so lets force the creation of the date object to be a UTC timezone,
+                     * then update that object to the local timezone specified from the DB config.
+                     *
+                     * The rest of the system expects all dates to be in a local timezone, NOT UTC
                      * https://api-docs.clipboard.app/?id=timestamps
                      */
                     //grab local TZ from DB
