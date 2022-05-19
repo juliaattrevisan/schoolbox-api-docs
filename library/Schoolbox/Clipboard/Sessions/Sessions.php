@@ -267,14 +267,6 @@ class Sessions implements IStrategy
             ]);
 
             foreach ($sessions['data'] as $session) {
-
-                print_r(sprintf(
-                    "%s - %s: %s\n",
-                    $session['startDateTime'],
-                    $session['endDateTime'],
-                    $session['title']
-                ));
-
                 /* Sport identifiers
                  */
                 $teamActivityId = (int)$session['activity']['id'];
