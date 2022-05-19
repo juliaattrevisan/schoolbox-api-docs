@@ -333,7 +333,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $currentTerm->getActualFinish()
         );
         if (0 !== count($courses[$this->getContext()->getId()])) {
-            $hasAnalytics = true;
             $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
             foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
                 $params             = [
@@ -342,6 +341,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                     'termCode' => $currentTerm->getCode(),
                 ];
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
+                    $hasAnalytics = true;
                     $this->setVar('SCHOOLBOX_ANALYTICS_LINK', $this->getRouter()->generate($schoolboxAnalytics, $params));
                     $this->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
                     $this->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
