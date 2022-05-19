@@ -286,7 +286,7 @@ class Controller extends Base
             $response = 'JWT signature is invalid';
             $status   = 401;
         } catch (JWT\ExpiredException $e) {
-            $response = 'JWT expired';
+            $response = empty($e->getMessage()) ? 'JWT expired' : $e->getMessage();
             $status   = 401;
         } catch (SchoolboxAccessDeniedException $e) {
             $response = 'Invalid username or password';
@@ -360,7 +360,9 @@ class Controller extends Base
                         ]
                     );
                     if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
-                        throw new JWT\ExpiredException();
+                        throw new JWT\ExpiredException(
+                            $token->getType() === User\Token\Model::TYPE_QRCODE ? 'This login token is no longer valid. Please request a new token is created for you.' : ''
+                        );
                     }
                 } catch (MapperException $e) {
                     // could not find a token with user id and jwt id
