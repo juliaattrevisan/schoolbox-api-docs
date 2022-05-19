@@ -100,16 +100,6 @@ function create_ir_conf_file() {
     "}" >$instance_registry_conf_file
 }
 
-# Remove old single-instance daemons
-function remove_old_notification_daemons() {
-  for service in socketd digestd routed scheduled; do
-    if systemctl --plain --no-legend | grep -q "schoolbox-$service.service"; then
-      systemctl stop "schoolbox-$service.service"
-    fi
-    find /etc/systemd/system/multi-user.target.wants/ -iname "schoolbox-$service.service" -delete
-  done
-}
-
 function deploy_nginx_ssl_cert() {
   # vagrant does not use LE to deploy SSL certs, we need to deploy certs prior to running puppet so puppet can configure nginx vhosts
   # If no extra hostname, just use vagrant cert. Otherwise we'll need the wildcard cert
@@ -161,7 +151,6 @@ function main() {
   check_vagrant_box_version
   drop_mysql_schema_and_user
   create_ir_conf_file
-  remove_old_notification_daemons
   deploy_nginx_ssl_cert
   remove_old_nginx_certs
 }
