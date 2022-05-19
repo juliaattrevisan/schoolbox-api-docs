@@ -10,6 +10,10 @@ external_db_host: "172.31.15.10"
 external_db_db: "Synergetic_AUVIC_ALARESS_PRD"
 provision_script: "tools/vagrant-provision.sh"
 enable_xdebug: "true"
+# From Sam.Bailey ~2017
+# This is a caching proxy that can be used when in the Melbourne Office for faster downloads.
+# It's a caching proxy, so if you're the first to download a new version it will be same speed as downloading from AWS, but the next person will be faster.
+# data_source: "https://gw-mel.alaress.com.au/sandbox-data"
 data_source: "https://s3-ap-southeast-2.amazonaws.com/schoolbox-data"
 data_filename: "initial.tar.gz"
 # If multiple network interfaces are available, select this interface automatically. If empty, prompt user.

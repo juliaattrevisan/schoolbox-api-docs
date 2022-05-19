@@ -210,6 +210,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       "suppress_instance_configuration" => true,
       "primary_php_majver" => primary_php_majver,
       "taskd_build_from_local" => taskd_build_from_local,
+      "iam_access_key" => "#{aws_iam_key}",
+      "iam_secret_key" => "#{aws_iam_secret}",
     }
   end
 
@@ -227,7 +229,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{instance_registry_url_override}' " \
         + "'#{extra_hostname}' " \
         + "'#{primary_php_majver}' " \
-        + "'#{taskd_build_from_local ? 1 : 0}'"
+        + "'#{taskd_build_from_local ? 1 : 0}'" \
+        + "'#{aws_iam_key}' " \
+        + "'#{aws_iam_secret}' "
+
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
 end
