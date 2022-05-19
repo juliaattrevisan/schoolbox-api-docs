@@ -52,6 +52,10 @@ use Scrub;
  */
 class Controller extends ConfigController
 {
+    /**
+     * Max length for filenames: anything longer causes issues on upload.
+     */
+    private const FILENAME_MAX_LENGTH = 250;
 
     private UserMapper $userMapper;
 
@@ -136,6 +140,16 @@ class Controller extends ConfigController
             $this->router->generate('adminReportExport.postConfig'),
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
+        // Hack a maxlength into the report title setting
+        if (is_iterable($configContext['settings'] ?? null)) {
+            foreach ($configContext['settings'] as $i => $setting) {
+                $name = $setting['data']['name'] ?? null;
+                if ($name === ConfigMapper::NAME_REPORT_TITLE) {
+                    $configContext['settings'][$i]['data']['maxlength'] = self::FILENAME_MAX_LENGTH;
+                    break;
+                }
+            }
+        }
         $this->getResponse()->content->set(
             [
                 'template' => '@adminReportExport/index.twig',
@@ -225,7 +239,11 @@ class Controller extends ConfigController
                         ? sprintf('%s - %s', $fullName, $escapedTitle)
                         : $fullName;
                     $reports[] = [
-                        'filename' => sprintf("%s/%s.pdf", $externalId, $filename),
+                        'filename' => sprintf(
+                            "%s/%s.pdf",
+                            $externalId,
+                            mb_substr($filename, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
+                        ),
                         'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
                     ];
                 }
@@ -245,14 +263,14 @@ class Controller extends ConfigController
 
             $date = \Alaress_Date_Format::now()->getDatabaseDate();
             $outfile = $escapedTitle !== ''
-                ? ($date . '-' . $escapedTitle . '.zip')
-                : ($date . '.zip');
+                ? ($date . '-' . $escapedTitle)
+                : $date;
             $message = $messageFactory->build(
                 'download-pages',
                 [
                     'token'     => $this->tokenBuilder->generate($this->getUser()),
                     'content'   => $reports,
-                    'outfile'   => $outfile,
+                    'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                     'gotenberg' => [
                         'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
