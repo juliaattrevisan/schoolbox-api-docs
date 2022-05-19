@@ -209,6 +209,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.facter = {
       "suppress_instance_configuration" => true,
       "primary_php_majver" => primary_php_majver,
+      "taskd_build_from_local" => taskd_build_from_local,
     }
   end
 
