@@ -133,7 +133,7 @@ class CommandLineTool extends App
                         $i + 1,
                         $file->getExtension(),
                     ),
-                ]
+                ];
             }
         }
 
