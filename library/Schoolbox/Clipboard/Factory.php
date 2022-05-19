@@ -210,7 +210,8 @@ class Factory
                 $venueMapper,
                 $matchupMapper,
                 $coachMapper,
-                $teamCoachMapper
+                $teamCoachMapper,
+                $resultMapper
             ))
             ->add(new Sessions\Cleanup(
                 $this->log,

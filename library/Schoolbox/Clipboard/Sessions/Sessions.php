@@ -137,6 +137,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Result\Mapper
+     */
+    private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
+
+
+    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -155,6 +161,7 @@ class Sessions implements IStrategy
      * @param \Schoolbox\Fixtures\Matchup\Mapper    $matchupMapper
      * @param \Schoolbox\Fixtures\Coach\Mapper      $coachMapper
      * @param \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
+     * @param \Schoolbox\Fixtures\Result\Mapper     $resultMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -166,7 +173,8 @@ class Sessions implements IStrategy
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
         \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
-        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
+        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
+        \Schoolbox\Fixtures\Result\Mapper $resultMapper,
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -178,6 +186,7 @@ class Sessions implements IStrategy
         $this->matchupMapper = $matchupMapper;
         $this->coachMapper = $coachMapper;
         $this->teamCoachMapper = $teamCoachMapper;
+        $this->resultMapper = $resultMapper;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -371,13 +380,13 @@ class Sessions implements IStrategy
                      * then update it to whatever it currently is
                      */
                     try {
-                        $result = \Schoolbox\Fixtures\Result\Mapper::getInstance()
+                        $result = $this->resultMapper
                             ->findOneByColumnList([
                                 'match_id' => $matchup->getId(),
                                 'team_id' => $team->getId()
                             ]);
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        $result = \Schoolbox\Fixtures\Result\Mapper::getInstance()->createModel()
+                        $result = $this->resultMapper->createModel()
                             ->setMatchup($matchup)
                             ->setTeam($team);
                     }
@@ -387,7 +396,7 @@ class Sessions implements IStrategy
                     $result->setDescription($this->generateResult($result, $session));
 
                     if ($this->perform) {
-                        \Schoolbox\Fixtures\Result\Mapper::getInstance()->save($result);
+                        $this->resultMapper->save($result);
                     }
                 }
             }
