@@ -173,8 +173,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Mount the puppet directory and execute the puppet hook.
   # This enables us to invoke current environment code for non-current SB versions.
   # This script runs inside vagrant and can access the shared mount at '/tmp/puppet'
-  config.vm.synced_folder "#{puppet_dir}/vagrant", "/tmp/puppet"
-  config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet"
+  config.vm.synced_folder "#{puppet_dir}/keys", "/tmp/puppet/keys"
+  config.vm.synced_folder "#{puppet_dir}/vagrant/hooks", "/tmp/puppet/hooks"
+  config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet --data-source '#{data_source}' --iam-access-key '#{aws_iam_key}' --iam-secret-key '#{aws_iam_secret}'"
 
 
   # Sync the taskd shared folder, if taskd_build_from_local is on
