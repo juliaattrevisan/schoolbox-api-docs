@@ -52,6 +52,23 @@ function create_mount_dir() {
   mkdir -p /mnt/data
 }
 
+function install_aws_cli(){
+  if type aws &>/dev/null; then
+    echo "aws cli appears to be already present"
+    return
+  fi
+  echo "aws cli appears absent.. installing..."
+  cd $cache_dir || exit
+  if ! curl --silent --show-error "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"; then
+    echo "Unable to download awscliv2.zip" >&2
+    exit 1
+  fi
+  unzip awscliv2.zip
+  ./aws/install --update
+  rm awscliv2.zip
+  rm -r aws
+}
+
 # Ensure running an appropriate era vagrant box
 function check_vagrant_box_version() {
   if [ "$(cat /home/vagrant/.vagrant.buildtimestamp)" -gt 1612117411 ]; then
@@ -146,6 +163,7 @@ function remove_old_nginx_certs() {
 function main() {
   parse_args "$@"
   validate_args "$@"
+  install_aws_cli
   create_cache_dir
   create_mount_dir
   check_vagrant_box_version
