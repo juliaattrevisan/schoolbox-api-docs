@@ -7,7 +7,6 @@
 readonly cache_dir='/usr/share/schoolbox/vagrantcache';
 
 mkdir -p $cache_dir;
-cd $cache_dir || exit 1;  # TODO do we need to?
 
 if [[ $# -ne 6 ]]; then
   error "Script requires 6 params, found $#"
