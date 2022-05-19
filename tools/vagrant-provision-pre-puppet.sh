@@ -131,11 +131,6 @@ function deploy_nginx_ssl_cert() {
   fi
 }
 
-function remove_old_nginx_certs() {
-  # Remove old style named cert/key
-  rm -f /etc/nginx/certs/schoolbox-fullchain.crt /etc/nginx/certs/schoolbox-private.key
-}
-
 function main() {
   parse_args "$@"
   validate_args "$@"
@@ -145,7 +140,6 @@ function main() {
   drop_mysql_schema_and_user
   create_ir_conf_file
   deploy_nginx_ssl_cert
-  remove_old_nginx_certs
 }
 
 main "$@"
