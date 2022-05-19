@@ -325,11 +325,11 @@ class ClassResults
         foreach ($normMarks as $specificationId => $dataSet) {
             /* The hover info thingy on the highcharts
              */
-            $statistics['graphInfo'][] = $graphInfo[$specificationId];
+            $statistics['graphInfo'][] = $graphInfo[$specificationId] ?? null;
 
             /* Yank the name for this specification id
              */
-            $statistics['graphAssessments'][] = $graphAssessments[$specificationId];
+            $statistics['graphAssessments'][] = $graphAssessments[$specificationId] ?? null;
 
             /* Calculate a five-point summary for each assessment spec, consisting of all the grades
              * given to all the participants
@@ -374,7 +374,7 @@ class ClassResults
 
             /* Yank the scatter for this specification id
              */
-            $statistics['graphScatter'][] = $graphScatter[$specificationId];
+            $statistics['graphScatter'][] = $graphScatter[$specificationId] ?? null;
         }
 
         /* Statistics is now a set of everything, but highcharts likes us to encode stuff

@@ -92,7 +92,7 @@ class DSNFactory
      */
     public function produceDSNString(string $type, ?array $dsnParts): ?string
     {
-        if (null === $dsnParts[$type]) {
+        if (!isset($dsnParts[$type])) {
             return null;
         }
 
