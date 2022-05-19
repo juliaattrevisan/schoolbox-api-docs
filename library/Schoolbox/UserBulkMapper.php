@@ -111,12 +111,12 @@ class UserBulkMapper extends UserMapper
         }
 
         if ($searchYearIds !== [self::ANY]) {
+            $addNull = false;
+            if (in_array(0, $searchYearIds)) {
+                $searchYearIds = array_diff($searchYearIds, [0]);
+                $addNull       = true;
+            }
             if (!empty($searchYearIds)) {
-                $addNull = false;
-                if (in_array(0, $searchYearIds)) {
-                    $searchYearIds = array_diff($searchYearIds, [0]);
-                    $addNull       = true;
-                }
                 $yearBindings = Builder::getBindings($searchYearIds, 'sy');
                 $where        = " u.year_id IN ({$yearBindings->getPlaceholder()})";
                 $params       = array_merge($params, $yearBindings->getParams());
