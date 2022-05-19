@@ -24,15 +24,11 @@ $app = new class extends CliTool\App {
 
         $calendarApiConfigMapper = \Calendar_Api_Config_Mapper::getInstance();
 
-        $record = $calendarApiConfigMapper
-            ->createModel()
-            ->setEventType('Fixtures') // This is actually the classname corresponding to Calendar/Api/Config/Connector/Fixtures.php
-            ->setConnectorClass('Schoolbox')
-            ->deactivate()
-            ->encodeConfig($config);
-
-        $calendarApiConfigMapper
-            ->save($record);
+        $newConfig = base64_encode(serialize($config));
+        $statement = $calendarApiConfigMapper->getDatabase()->query("
+            INSERT INTO calendar_connector (event_type, connector_class, config, status) VALUES ('Fixtures', 'Schoolbox', '{$newConfig}', 0);
+        ");
+        $statement->execute();
     }
 };
 
