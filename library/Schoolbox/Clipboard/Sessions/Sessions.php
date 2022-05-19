@@ -26,13 +26,13 @@ class Sessions implements IStrategy
     /**
      * Short-circuit to prevent infinite loops
      */
-    private const MAX_CALLS = 100;
+    private const MAX_CALLS = 400;
 
 
     /**
      * Number of results per page
      */
-    private const NUM_PER_PAGE = 10;
+    private const NUM_PER_PAGE = 100;
 
 
     /**
@@ -246,6 +246,14 @@ class Sessions implements IStrategy
             ]);
 
             foreach ($sessions['data'] as $session) {
+
+                print_r(sprintf(
+                    "%s - %s: %s\n",
+                    $session['startDateTime'],
+                    $session['endDateTime'],
+                    $session['title']
+                ));
+
                 /* Sport identifiers
                  */
                 $teamActivityId = (int)$session['activity']['id'];
