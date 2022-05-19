@@ -25,7 +25,8 @@
         externalRedirectUrl: externalRedirectUrl
     } %}
 </div>
-
+{# set a base question number here, so we can use it later... #}
+{% set questionCount = 0 %}
 <div class="row">
     <div class="small-12 island">
         {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
@@ -143,11 +144,23 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if finished %}
+                            {% if finished and questionCount %}
                                 {% set totalMark       = attempt.maxMark %}
                                 {% set totalMarkGraded = attempt.totalMarkGraded %}
-                                {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
                                 {% if not attempt.isReviewed %}
+                                    {% set totalMark = 0 %}
+                                    {# build the mark based on the question answers (old method) #}
+                                    {% set attemptMark = 0 %}
+                                    {% for answer in attempt.answers %}
+                                        {% set attemptMark = attemptMark + answer.mark %}
+                                        {% set totalMark = totalMark + answer.question.marks %}
+                                    {% endfor %}
+                                    {{ markVisible.showIfVisible(assessment, attemptMark ~ '/' ~ totalMark, '—' ) }}
+                                {% else %}
+                                    {# just grab the reviewed mark from the attempt table in the db #}
+                                    {{ markVisible.showIfVisible(assessment, attempt.mark ~ '/' ~ totalMark, '—' ) }}
+                                {% endif  %}
+                                {% if not attempt.isReviewed and totalMark %}
                                     {% set percentGraded =  (totalMarkGraded/totalMark*100) | round %}
                                     {{ markVisible.showIfVisible(assessment, '(' ~ percentGraded~'% graded' ~ ')', '' ) }}
                                 {% endif %}
