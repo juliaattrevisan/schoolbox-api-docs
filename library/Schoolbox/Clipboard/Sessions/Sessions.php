@@ -264,8 +264,12 @@ class Sessions implements IStrategy
 
                     $matchupName = trim($session['title']);
 
-                    $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime']));
-                    $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime']));
+                    /*
+                     * Append `Z` to the end of the API date objects, as they are 'UTC' format, but do not display like that
+                     * https://api-docs.clipboard.app/?id=timestamps
+                     */
+                    $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['startDateTime'] . 'Z'));
+                    $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($session['endDateTime'] . 'Z'));
 
                     /* See if this matchup exists by taking the bestest guess
                      */
