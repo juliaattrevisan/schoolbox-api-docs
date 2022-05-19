@@ -57,15 +57,23 @@ HELP
         $csv = new Alaress\Csv\Reader($file);
         $csv->setLoadFromFirst(true);
 
-        $resourceMapper = new Item\Mapper();
-        $categoryMapper = new Category\Mapper();
-        $userMapper     = new UserMapper();
+        $resourceMapper  = new Item\Mapper();
+        $categoryMapper  = new Category\Mapper();
+        $userMapper      = new UserMapper();
+        $essentialFields = ['Name', 'Category'];
         foreach ($csv as $row) {
+            // Don't import if essential fields not set
+            foreach ($essentialFields as $essentialField) {
+                if (!isset($row[$essentialField])) {
+                    $log->warning(sprintf('Essential field "%s" not set: skipping', $essentialField));
+                    continue 2;
+                }
+            }
             $log->notice("Attempting to import resource \"{$row['Name']}\"");
 
             // Moderation type: default to moderated
             $modType = new Item\ModerationType\Model();
-            switch (strtolower($row['Moderation Type'])) {
+            switch (strtolower($row['Moderation Type'] ?? '')) {
                 case 'managed':
                     $modType->setId($modType::TYPE_MANAGED);
                     break;
@@ -83,8 +91,8 @@ HELP
 
             $resource
                 ->setName($row['Name'])
-                ->setDescription($row['Description'])
-                ->setRoomCode($row['Room Codes'])
+                ->setDescription($row['Description'] ?? '')
+                ->setRoomCode($row['Room Codes'] ?? '')
                 ->setModerationType($modType)
                 // Guess at timespans
                 ->setMinLeadTime(0)
@@ -105,7 +113,7 @@ HELP
             }
 
             // Set its moderators
-            if ($row['ManagedBy_SynergeticID']) {
+            if ($row['ManagedBy_SynergeticID'] ?? null) {
                 try {
                     $moderator = $userMapper->findByExternalId($row['ManagedBy_SynergeticID']);
                     $resource->addModerator($moderator);

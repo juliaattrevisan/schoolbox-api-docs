@@ -56,11 +56,19 @@ HELP
         $csv = new Alaress\Csv\Reader($file);
         $csv->setLoadFromFirst(true);
 
-        $bookingMapper  = new Booking\Mapper();
-        $eventMapper    = new Schoolbox\Calendar\EventMapper();
-        $resourceMapper = new Item\Mapper();
-        $userMapper     = new UserMapper();
+        $bookingMapper   = new Booking\Mapper();
+        $eventMapper     = new Schoolbox\Calendar\EventMapper();
+        $resourceMapper  = new Item\Mapper();
+        $userMapper      = new UserMapper();
+        $essentialFields = ['shortname', 'bookingcreatoruserid', 'bookingstart', 'bookingEnd'];
         foreach ($csv as $row) {
+            // Don't import if essential fields not set
+            foreach ($essentialFields as $essentialField) {
+                if (!isset($row[$essentialField])) {
+                    $log->warning(sprintf('Essential field "%s" not set: skipping', $essentialField));
+                    continue 2;
+                }
+            }
             // Get the resource to import booking for
             $log->notice("Attempting to import booking for \"{$row['shortname']}\"");
             try {
@@ -100,8 +108,8 @@ HELP
             $event->setAccess(Calendar\Event::ACCESS_PERSONAL);
             $event->setOwner($creator);
             $event->setAuthor($creator);
-            $event->setTitle($row['Bookingshortname']);
-            $event->setDetail(nl2br($row['bookingdescription']));
+            $event->setTitle($row['Bookingshortname'] ?? '');
+            $event->setDetail(nl2br($row['bookingdescription'] ?? ''));
             $event->setType(Calendar\EventTypeMapper::getInstance()->createModel()->setId(1));
             $event->setStartDateTime(new Alaress_Date_Format($startTime));
             $event->setEndDateTime(new Alaress_Date_Format($endTime));
@@ -117,7 +125,7 @@ HELP
             $booking
                 ->setEvent($event)
                 ->setResource($resource)
-                ->setName($row['Bookingshortname'])
+                ->setName($row['Bookingshortname'] ?? '')
                 ->setStatus((new Booking\Status\Model())->setId(Booking\Status\Model::STATUS_APPROVED));
 
             if ($dryRun) {
