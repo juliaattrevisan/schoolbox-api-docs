@@ -18,6 +18,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model;
+use ZipArchive;
 
 /**
  * Command-line tool for downloading files from NCCD courses.
@@ -92,22 +93,26 @@ class CommandLineTool extends App
         }
 
         // Collate the assessment files into filenames
-        $filenames = [];
+        /** @var array<int, array{file:IStorage, path:string}> $files */
+        $files = [];
         foreach ($folderFiles as $folderFilesTuple) {
             /** @var User $student */
             $student = $folderFilesTuple['student'];
             ksort($folderFilesTuple['files']);
             foreach (array_values($folderFilesTuple['files']) as $i => $file) {
-                $yearLevel   = $student->getYear()->getName();
-                $externalId  = $student->getExternalId();
-                $filenames[] = sprintf(
-                    '%s/%s_%s_%d.%s',
-                    $yearLevel,
-                    $externalId,
-                    $file->getFilename(),
-                    $i + 1,
-                    $file->getExtension(),
-                );
+                $yearLevel  = $student->getYear()->getName();
+                $externalId = $student->getExternalId();
+                $files[]    = [
+                    'file' => $file,
+                    'path' => sprintf(
+                        '%s/%s_%s_%d.%s',
+                        $yearLevel,
+                        $externalId,
+                        $file->getFilename(),
+                        $i + 1,
+                        $file->getExtension(),
+                    ),
+                ];
             }
         }
         foreach ($assessmentFiles as $assessmentFilesTuple) {
@@ -115,22 +120,33 @@ class CommandLineTool extends App
             $student = $assessmentFilesTuple['student'];
             ksort($assessmentFilesTuple['files']);
             foreach (array_values($assessmentFilesTuple['files']) as $i => $file) {
-                $yearLevel   = $student->getYear()->getName();
-                $externalId  = $student->getExternalId();
-                $filenames[] = sprintf(
-                    '%s/%s_Evidence_%s_%d.%s',
-                    $yearLevel,
-                    $externalId,
-                    $file->getFilename(),
-                    $i + 1,
-                    $file->getExtension(),
-                );
+                $yearLevel  = $student->getYear()->getName();
+                $externalId = $student->getExternalId();
+                $files[]    = [
+                    'file' => $file,
+                    'path' => sprintf(
+
+                        '%s/%s_Evidence_%s_%d.%s',
+                        $yearLevel,
+                        $externalId,
+                        $file->getFilename(),
+                        $i + 1,
+                        $file->getExtension(),
+                    ),
+                ]
             }
         }
 
-        foreach ($filenames as $filename) {
-            $logger->notice($filename);
+        $zip     = new ZipArchive();
+        $zipFile = tempnam(sys_get_temp_dir(), 'zip');
+        $zip->open($zipFile, ZipArchive::OVERWRITE);
+        foreach ($files as $fileTuple) {
+            $logger->notice($fileTuple['path']);
+
+            // TODO stream
+            $zip->addFromString($fileTuple['path'], $fileTuple['file']->read());
         }
+        $zip->close();
     }
 
     /**
