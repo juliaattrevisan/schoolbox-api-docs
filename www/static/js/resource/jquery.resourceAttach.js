@@ -385,16 +385,12 @@
             return;
         }
 
-        var body = $('body');
-
         // if the modal already exists, destroy it
         this.destroy();
 
         singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
             .data('content', data)
             .data('rtn', this);
-
-        body.append(singletonModal);
 
         // reinit
         $(document)
@@ -414,6 +410,8 @@
 
 
     ResourceAttach.prototype.open = function () {
+
+        $('body').append(singletonModal); //add to the DOM
 
         var self = this;
 
@@ -501,6 +499,7 @@
         if (parentReveal.length) {
             parentReveal.foundation('reveal', 'open');
         }
+        singletonModal.detach(); //remove from the DOM, is added again on .open()
     };
 
 
