@@ -266,7 +266,8 @@ class Sessions implements IStrategy
                     $matchupName = trim($session['title']);
 
                     /*
-                     * fix issue with grabbing dates from clipboard as they are UTC, but labeled as such
+                     * fix issue with grabbing dates from clipboard as they appear to be local times,
+                     * but are actually UTC, just not labelled as UTC
                      * https://api-docs.clipboard.app/?id=timestamps
                      */
                     //grab local TZ from DB
