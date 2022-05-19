@@ -1,165 +1,130 @@
 <style>
-    /* chromeFoundation */
+    .text-center, .card.compact [class*=icon-] {
+        text-align: center !important;
+    }
+
+    /* Quarantine zone
+     */
+
+    /* Vaguely analogous to A4 dimensions so you can preview in browser
+     * otherwise the pdf print wraps in a different place, throwing your judgement
+     */
+    .report {
+        width: 1100px;
+        margin: auto;
+    }
+
+    /* Typography
+     */
+    p,
+    h1, h2, h3, h4, h5, h6 {
+        color: black;
+        margin: 0;
+        padding: 0;
+    }
+
+    h1 {
+        font-size: 2.45rem;
+        margin-bottom: 0.25rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+    }
+
+    h4 {
+        font-size: 1.3rem;
+    }
+
+    h5 {
+        font-size: 1.15rem;
+    }
+
+    h6 {
+        font-size: 1rem;
+    }
+
+    /* Make background colours print
+     */
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        -webkit-print-color-adjust: exact !important;
+        font-family: Arial, sans-serif;
         font-style: normal;
         font-weight: 400;
         line-height: 1.25;
     }
 
-    img {
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    p,
-    h1,
-    h2,
-    h3 {
-        color: black;
-    }
-
-    .report {
-        margin: auto;
-    }
-
-    p,
-    .rb-value {
-        font-size: 0.75rem;
-    }
-    .island {
-        margin-top: 2em;
-    }
-
-    .text-right {
-        text-align: right;
-        margin-left: 1em;
-    }
-
-    .report-category {
-        color: green;
-    }
-
-    .header-content{
-        display: flex;
-        justify-content: space-between;
-    }
-    .header-content div:first-child {
-        min-width: 50%;
-    }
-    .logo{
-        max-width: 170px;
-        padding-top: 1em;
-    }
-    .header-content div:nth-child(2) h1 {
-        text-align: right;
-        margin-bottom: 0.25em;
-    }
-
-    .island .content {
-        padding: 0.75rem;
-    }
-
-    .island section {
-        margin-bottom: 16px;
-    }
-
-    .row {
-        max-width: none;
-    }
-
-    .row:after {
-        clear: both;
-    }
-
-    .row:before, .row:after {
-        content: " ";
-        display: table;
-    }
-
-    .row__margin-bottom {
-        margin-bottom: 1rem;
-    }
-
-    .row__flex {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .row__flex:before,
-    .row__flex:after {
-        content: none;
-    }
-    .row-container {
-        border-bottom: 1px solid lightgray;
-    }
-
-    .row__subject-summary-result,
-    .row__subject-summary-details,
-    .row__subject-details {
-        margin-top: -1px; /*to avoid 2px borders */
-        padding: 0.5rem 0;
-    }
-    .row__subject-summary-result {
-        border: 1px solid dimgrey;
-        background-color: lightgrey;
-    }
-    tbody  {
-        text-align: left;
-    }
-    table {
-        table-layout: fixed;
-        width: 100% ;
-    }
-
-    th p{
-        color: #333333;
-        text-align: left;
-        word-wrap: break-word;
-    }
-    table p {
-        margin: 0.25em;
-        text-align: start;
-    }
-    .row__subject-details:last-of-type {
-        border-bottom: none;
-    }
-
-    .row__subject-summary-details {
-        padding: 0.5rem 0.25rem;
-    }
-
-    .row__subject-summary-details .columns,
-    .row__subject-detail .columns {
-        margin-bottom: 0.25rem;
-    }
-
-    .row__subject-start {
-        margin-top: 1rem;
-    }
-
-    .card {
-        float: left;
-        position: relative;
-        padding: 0.5rem 1rem 0 1rem;
-    }
-
-    .card.compact {
-        min-height: 2.5rem;
-        padding: 0 1rem;
-    }
-
-    .card.compact > * {
+    /* header-content is stuff at the top of the report
+     * Report title, school name, logo
+     */
+    .header-content {
         align-items: center;
         display: flex;
+        margin-bottom: 2rem;
     }
 
-    .card h2 {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        margin-top: 0;
-        margin-bottom: 0;
+    /* Left hand column in the header - contains report title, school name
+     */
+    .header-content .left {
+        flex-grow: 2;
+    }
+
+    /* Special cosmetic representation of semantic h1
+     * The report title should look like it pwns your face
+     * Linux doesn't have a good equivalent to TNR so...I picked a nice one
+     */
+    .header-content h1 {
+        font-weight: normal;
+    }
+
+    /* Special cosmetic representation of semantic h2
+     * If there isn't a logo, the margin-bottom pushes everything else around
+     * to provide appropriate negative space
+     */
+    .header-content h2.school-name {
+        font-size: 1.5rem;
+        font-weight: normal;
+        margin: 0;
+    }
+
+    /* Ensure school logos have a max dimension
+     * so broken svgs don't break YOU
+     */
+    .logo {
+        max-width: 12rem;
+        margin: 0 0 0 2rem;
+        padding: 0;
+    }
+
+    /* The thing that tells you about students
+     */
+    .card {
+        width: 100%;
+        clear: both;
+        float: left;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    /* Removes side padding on student card at top when there's no picture
+     */
+    .card.no-pad {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .card .name {
+        margin: 0;
+    }
+
+    .card .year {
+        font-size: 1.2rem;
+        margin: 0 0 1rem 0;
     }
 
     .compact img {
@@ -168,60 +133,179 @@
 
     .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
         float: left;
-        margin: -0.25rem 0.5rem 0 -0.5rem;
+        margin-right: 0.75rem;
     }
 
-    .columns {
-        position: relative;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        float: left;
+    /* Introductory text
+     * Can't tell what the schools are going to compose here, but I imagined this
+     * as a lead-in paragraph which should typographically be different than the
+     * rest of the body text in this report
+     */
+    .introduction {
+        clear: both;
+        margin-top: 2rem;
+        width: 100%;
     }
 
-    .columns .columns { /* avoid double paddings */
+    /* Name of the subject/folder has a special style
+     * which also encompasses the subject's overall grade
+     * Use a flexbox to optionally show a grade
+     */
+    .folder-title {
+        align-items: center;
+        background: lightgrey;
+        border: 1px solid black;
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    .folder-title .left {
+        flex-grow: 2;
+    }
+
+    /* A grade value, suitable for Folder Title
+     * or for an assessment
+     */
+    .grade {
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding-left: 2rem;
+        padding-right: 0.75rem;
+    }
+
+    /* For some reason there's a thing called a summary result
+     * and another thing called a subject result, but the demo
+     * data makes them all seem the same data? Unsure of the
+     * functional difference between the two
+     */
+
+    /* A folder title in the class summary section
+     */
+    .class-summary {
+        padding: 0.75rem;
+    }
+
+    /* Teachers in the Class Summary section have a more space-efficient style
+     * and layout, but we don't need its excess padding
+     */
+    .class-summary .card.compact {
+        display: flex;
+        align-items: center;
+        margin: 0.75rem 0 0 0;
         padding: 0;
     }
 
-    .text-center, .card.compact [class*=icon-] {
-        text-align: center !important;
-    }
-
-    .heading__primary, .heading__secondary, .heading__tertiary {
-        margin: 0;
-    }
-
-    .heading__primary {
-        font-size: 1.6rem;
-    }
-
-    .heading__secondary {
-        font-size: 1.2rem;
-    }
-
-    .heading__tertiary {
+    /* Special cosmetic representation of semantic h5
+     */
+    .class-summary h5 {
         font-size: 1rem;
-        padding-bottom: 1rem;
     }
 
-    .heading__subject {
-        margin-bottom: 1rem;
+    /* This .feedback-assessment-container element typically has a bottom border for a
+     * separator and a page break in the media query
+     */
+    .feedback-assessment-container {
+        border-bottom: 1px solid #ccc;
     }
 
-    /* rubric */
+    /* The width of the Assessment and Grade columns
+     * Using small-* names is going to be misleading - specify them explicitly
+     */
+    .feedback-assessment {
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    /* Assessment name lives here
+     */
+    .feedback-assessment .left {
+        flex-grow: 2;
+    }
+
+    /* The grade already has a right-margin from container element .feedback-assessment
+     * and also doesn't have a border or anything - resetting padding here mostly centers
+     * the content int his little flexbox place
+     */
+    .feedback-assessment .grade {
+        padding-right: 0;
+    }
+
+    /* These appear the name of the assessment and the comment
+     * as little subtitle sort of things
+     */
+    .worktype {
+        color: grey;
+        font-size: 0.75rem;
+        font-style: italic;
+        margin-top: 0.25rem;
+    }
+
+    /* Comments, if provided, are generally plaintext but could be ckeditor stuff
+     * Wrap it in a div anyway. If the comment is very long, padding-right stops
+     * it from being directly adjacent to the grade if it exists
+     */
+    .comment {
+        margin: 1rem 0;
+        padding-right: 2rem;
+    }
+
+    /* Push the rubric grid down a little bit, if it exists
+     */
+    .rubric-wrap {
+        display: block;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    /* Rubric table
+     * This is the only table element we render here
+     */
     table.rb {
         border-collapse: collapse;
-    }
-    .rb th, .rb td {
-        border: solid 1px #8c8c8c;
-        padding: 0px 2px;
-    }
-    .rb-description, .rb-value {
-        color: #acacac;
+        table-layout: fixed;
+        width: 100%;
+        font-size: 0.75rem;
     }
 
+    /* Headings were oddly grey by intent but black we go
+     */
+    th p {
+        text-align: left;
+        padding-left: 0.25rem;
+        word-wrap: break-word;
+    }
+
+    /* All cells have lines everywhere around it
+     * All cells have padding just because
+     */
+    .rb th, .rb td {
+        border: solid 1px #8c8c8c;
+        padding: 4px;
+    }
+
+    /* All descriptor cells top-align
+     */
+    .rb td {
+        vertical-align: top
+    }
+
+    /* The value of a descriptor, if such a value exists
+     */
+    .rb-value {
+        color: #acacac;
+        display: block;
+        margin-top: 1rem;
+    }
+
+    /* All descriptor cells have black text regardless of their selection state
+     */
     .rb-selected .rb-description, .rb-selected .rb-value {
         color: black;
     }
+
+    /* The descriptor that was selected by the instructor
+     */
     .rb-selected {
         background-color: lightgray !important;
         border-left: 2px solid black !important;
@@ -231,85 +315,6 @@
         padding: 0.5rem;
     }
 
-    .markdown li, .markdown p {
-        white-space: pre-wrap;
-    }
-
-
-    /* Make background colours print
-     */
-    body {
-        -webkit-print-color-adjust: exact !important;
-    }
-
-    /* Name of the subject/folder has a special style
-     * which also encompasses the subject's overall grade
-     */
-    .folder-title {
-        background: lightgrey;
-        border: 1px solid black;
-        padding: 0.75rem 0.25rem;
-    }
-
-    /* For some reason there's a thing called a summary result
-     * and another thing called a subject result, but the demo
-     * data makes them all seem the same data? Unsure of the
-     * functional difference between the two
-     */
-    .columns__subject-summary-result,
-    .columns__subject-result {
-        border-left: 1px solid #333;
-        float: right;
-        padding-left: 2rem;
-        text-align: right;
-    }
-
-    /* These appear the name of the assessment and the comment
-     * as little subtitle sort of things
-     */
-    .item-title {
-        color: grey;
-    }
-
-    /* The width of the Assessment, Comment and Grade columns
-     * Using small-* names is going to be misleading - specify them explicitly
-     */
-    .feedback-assessment {
-        width: 30%;
-    }
-
-    .feedback-comment {
-        width: 47%;
-    }
-
-    .feedback-grade {
-        float: right;
-        text-align: right;
-        width: 15%;
-    }
-
-    /* This is a special case when a rubric grid displays
-     * Takes up the width of feedback-assessment + feedback-comment
-     */
-    .feedback-rubric-comment {
-        width: 77%;
-    }
-
-    /* These are used, but derived programmatically - storm thinks they are unused
-     * See the top of assessmentReport.twig which uses the `page` var as css classname
-     */
-    .row__subject-details,
-    .row__subject-summary-details {
-        border-bottom: 1px solid #ccc;
-    }
-
-    /* Push the rubric grid down a little bit, if it exists
-     */
-    .rubric-wrap {
-        margin-top: 0.75rem;
-        margin-bottom: 1rem;
-    }
-
     /* Rubric heading cells for Capabilities, Indicators, Levels
      * Use a lighter shade of grey than selected Descriptors
      */
@@ -317,11 +322,12 @@
         background-color: #ececec;
     }
 
-    /* I think floating elements cause this to need such a large margin
-     * since they are no longer in document flow
+    /* Capabilities can optionally have a mark
      */
-    .rb.markable {
-        margin-top: 4.5rem;
+    .rb th.rb-group-summary {
+        padding: 0.33rem;
+        font-size: 1rem;
+        text-align: right;
     }
 
     /* Top-left cell is a meaningless cell
@@ -332,159 +338,143 @@
         border-top: 0;
     }
 
-    .logo-content {
-        float: right;
-        margin-top: -6em;
-        padding-left: 2em;
-        padding-bottom: 2em;
+    /* Contents of capabilities, indicators, descriptors can have markdown
+     */
+    .markdown li, .markdown p {
+        white-space: pre-wrap;
     }
 
 
     @page {
         counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
-        margin: 0.1in;
+        margin: 0.25in;
         @bottom-right {
             content: 'Page ' counter(page) ' / ' counter(pages);
         }
     }
 
     @media print {
-        .content, .island {
+        .content {
             padding: 0; /* to get more of the page real estate */
         }
 
-        .row__subject-start {
+        .folder-title {
             page-break-before: always; /* ensure each individual subject goes on new page */
         }
 
-        table {
-            page-break-before: always;
-        }
-    }
-    /* Medium devices (landscape tablets, 768px and up) */
-    @media only screen and (min-width: 768px) {
-        .island{
-            width: 90%;
-        }
-    }
-    /* Large devices (laptops/desktops, 1020px and up) */
-    @media only screen and (min-width: 1020px) {
-        .island {
-            width: 80%;
-        }
-        td {
-            width: 70%;
-        }
-    }
-    /* Larger devices (Desktops/Screens, 1200px and up) */
-    @media only screen and (min-width: 1200px) {
-        .island {
-            width: 70%;
-        }
-        td {
-            width: 70%;
+        /* This is so so so extremely wasteful if grids are very short
+         * Without javascript it's impossible to html/css a detection to see if a grid fits
+         * and a blanket rule like this will cause all grids to start on a new page - even
+         * if they can fit on an existing one
+         *
+         * .xxxxx { page-break-before: always }
+         *
+         * Instead, avoid page breaks inside an element, which is far superior
+         */
+        .rubric-wrap {
+            page-break-inside: avoid;
         }
     }
 </style>
 
-<div class="small-12 island report">
-    <section class="content">
-        <div class="header-content">
-            <div class="row row__margin-bottom">
-                <h1>{{ config.report_title }}</h1>
-                <div class="card small-12">
-                    {% if student.portrait is not null %}
-                        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
-                    {% endif %}
-                    <h2 class="heading__primary">{{ student.fullname }}</h2>
-                    <h3 class="heading__secondary">{{ student.year.longName ?? '' }}</h3>
-                </div>
-            </div>
+<div class="report">
+    <div class="header-content">
+        <div class="left">
+            <h1>{{ config.report_title }}</h1>
+            <h2 class="school-name">{{ config.school_name }}</h2>
+        </div>
+        {% if config.report_school_logo %}
+        <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+        {% endif %}
+    </div>
 
-        </div>
-        <div class="row row__margin-bottom logo-content">
-            <h1 class="heading__secondary">{{ config.school_name }}</h1>
-            {% if config.report_school_logo %}
-                <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
-            {% endif %}
-        </div>
-        <div class="row row__margin-bottom">
+    <div class="card {% if not student.portrait %}no-pad{% endif %}">
+        {% if student.portrait %}
+        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
+        {% endif %}
+        <h3 class="name">{{ student.fullname }}</h3>
+
+        {# Only show year if it was ever set and meaningful
+         #}
+        {% if student.year and student.year.longName != '' %}
+        <p class="year">{{ student.year.longName }}</p>
+        {% endif %}
+
+        <div class="introduction">
             {{ config.report_export_introduction | purify }}
         </div>
-        {# Summary #}
-        {% if showSummary %}
-            {% for folder in folders %}
-                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
-                {% set weightedMean = studentGrade.weightedMean %}
-                <div class="row folder-title">
-                    <div class="small-10 columns">
-                        <h3 class="heading__secondary">{{ folder.title }}</h3>
-                    </div>
-                    <div class="small-1 columns columns__subject-summary-result">
-                        {% if showSummaryOverallGrade %}
-                        <h3 class="heading__secondary">{{ weightedMean ?? '' }}</h3>
-                        {% endif %}
-                    </div>
-                </div>
-                {% if (summaryAssessments[folder.id] ?? [])| length %}
-                    {% for assessment in summaryAssessments[folder.id] %}
-                        {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                        {% include '@adminReportExport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
-                                showGrades: showSummaryGrades,
-                                showComments: showSummaryComments,
-                                showRubrics: showSummaryRubrics,
-                                page: 'subject-summary'
-                            } only %}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+    </div>
 
-        {# Class #}
-        {% if showClass %}
-            {% for folder in folders %}
-                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
-                {% set weightedMean = studentGrade.weightedMean %}
-                <div class="row row__margin-bottom row__subject-start">
-                    <div class="small-10 columns">
-                        <h2 class="heading__secondary heading__subject">{{ folder.title }}</h2>
-                        {% for teacher in folder.teachers %}
-                            <div class="card compact">
-                                <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
-                                <h2 class="heading__tertiary">{{ teacher.fullname }}</h2>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% if showClassOverallGrade and weightedMean %}
-                        <div class="small-2 columns columns__subject-result">
-                            <h3 class="heading__tertiary">{{ weightedMean ?? '' }}</h3>
-                        </div>
-                    {% else %}
-                        <div class="small-2 columns">
-                        </div>
-                    {% endif %}
+    {# Summary #}
+    {% if showSummary %}
+        {% for folder in folders %}
+            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+            {% set weightedMean = studentGrade.weightedMean %}
+            <div class="folder-title">
+                <div class="left">
+                    <h4>{{ folder.title }}</h4>
                 </div>
 
-                {% if (classAssessments[folder.id] ?? [])| length %}
-                    {% for assessment in classAssessments[folder.id] %}
-                        {% include '@adminReportExport/assessmentReport.twig' with
-                            {
-                                student: student,
-                                assessment: assessment,
-                                feedback: classAssessmentFeedbacks[assessment.id] ?? null,
-                                showGrades: showClassGrades,
-                                showComments: showClassComments,
-                                showRubrics: showClassRubrics,
-                                page: 'subject'
-                            } only %}
-                    {% endfor %}
+                {% if showSummaryOverallGrade %}
+                <p class="grade">{{ weightedMean ?? '' }}</p>
                 {% endif %}
-            {% endfor %}
-        {% endif %}
-    </section>
+            </div>
+
+            {% if (summaryAssessments[folder.id] ?? [])| length %}
+                {% for assessment in summaryAssessments[folder.id] %}
+                    {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
+                    {% include '@adminReportExport/assessmentReport.twig' with
+                        {
+                            student: student,
+                            assessment: assessment,
+                            feedback: summaryAssessmentFeedbacks[assessment.id] ?? null,
+                            showGrades: showSummaryGrades,
+                            showComments: showSummaryComments,
+                            showRubrics: showSummaryRubrics,
+                            page: 'subject-summary'
+                        } only %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {# Class #}
+    {% if showClass %}
+        {% for folder in folders %}
+            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+            {% set weightedMean = studentGrade.weightedMean %}
+            <div class="folder-title class-summary">
+                <div class="left">
+                    <h4>{{ folder.title }}</h4>
+                    {% for teacher in folder.teachers %}
+                        <div class="card compact">
+                            <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
+                            <h5>{{ teacher.fullname }}</h5>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if showClassOverallGrade and weightedMean %}
+                    <div>
+                        <p class="grade">{{ weightedMean ?? '' }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if (classAssessments[folder.id] ?? [])| length %}
+                {% for assessment in classAssessments[folder.id] %}
+                    {% include '@adminReportExport/assessmentReport.twig' with
+                        {
+                            student: student,
+                            assessment: assessment,
+                            feedback: classAssessmentFeedbacks[assessment.id] ?? null,
+                            showGrades: showClassGrades,
+                            showComments: showClassComments,
+                            showRubrics: showClassRubrics,
+                            page: 'subject'
+                        } only %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 </div>

@@ -9,80 +9,34 @@
  # @param bool $showComments
  # @param IAssessable $assessment
  #}
-<div class="row row__{{ page }}-details">
-    <div class="feedback-assessment columns">
-        <p class="item-title">Assessment</p>
-        <h3 class="heading__tertiary">
-            {{ assessment.title }}
-        </h3>
-    </div>
 
-    {# If there's no feedback, don't render anything else about
-     # rubrics, comments and grades - nothing to show
-     #}
-    {% if feedback %}
-        {# If this feedback has a rubric grid, show that
-         # Then show the comment below it
-         #}
-        {% if showRubrics and feedback.rubricMarkedGrid %}
-            <div class="rubric-wrap">
-                {% include '@rubric/grid.twig' with {
-                    rubricGrid:       feedback.rubricMarkedGrid.grid,
-                    rubricMarkedGrid: feedback.rubricMarkedGrid,
-                    learner: student,
-                    showDescriptorValue: true,
-                    showGroupTotal: true,
-                    showRubricTotal: false,
-                    selfAssessmentFeedback: null
-                } only %}
-            </div>
+{# Rubric grid is optional and spans full width of the page
+ # so you can't throw it in .feedback-assessment
+ #}
+<div class="feedback-assessment-container">
+    <div class="feedback-assessment">
+        <div class="left">
+            <h5>{{ assessment.title }}</h5>
+
+            {% if '' != assessment.workType.name %}
+            <p class="worktype">{{ assessment.workType.name }}</p>
+            {% endif %}
 
             {# Only show comment if it exists
              # Otherwise, just occupy space
              # Foundation-related behaviour requires a character to do that
              #}
-            {% if showComments %}
-                <div class="feedback-rubric-comment columns">
-                    <p class="item-title">Comment</p>
-                    {% if feedback.comment %}
-                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                    {% else %}
-                        &nbsp;
-                    {% endif %}
+            {% if showComments and feedback and feedback.comment %}
+                <div class="comment">
+                    <p>{{ feedback.comment | linkify | nl2br }}</p>
                 </div>
             {% endif %}
-
-            {# Show the grade column if allowed
-             # and if there's a meaningful value
-             #}
-            {% set grade = feedback.humanReadableMark %}
-            {% if showGrades and grade %}
-                <div class="feedback-grade columns">
-                    <p class="item-title text-right">Result</p>
-                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
-                </div>
-            {% endif %}
-        {% else %}
-            {# Only show comment if it exists
-             # Otherwise, just occupy space
-             # Foundation-related behaviour requires a character to do that
-             #}
-            {% if showComments %}
-                <div class="feedback-comment columns">
-                    {% if feedback.comment %}
-                        <p class="item-title">Comment</p>
-                        <p>{{ feedback.comment | linkify | nl2br }}</p>
-                    {% else %}
-                        &nbsp;
-                    {% endif %}
-                </div>
-            {% endif %}
-
-            <div class="feedback-grade columns">
+        </div>
+        {% if feedback %}
+            <div>
                 {% set grade = feedback.humanReadableMark %}
                 {% if showGrades and grade %}
-                    <p class="item-title text-right">Result</p>
-                    <h3 class="heading__tertiary text-right">{{ grade }}</h3>
+                    <p class="grade">{{ grade }}</p>
                 {% endif %}
 
                 {# Was this really how we did it?
@@ -91,9 +45,28 @@
                  #}
                 {% if assessment.familyName == 'project' %}
                     {% set participant = assessment.allParticipants[student.id] %}
-                    <h3 class="heading__tertiary text-right">{{ assessment.humanReadableMark(participant, true) }}</h3>
+                    <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
                 {% endif %}
             </div>
         {% endif %}
+    </div>
+
+    {# If there's no feedback, don't render anything else about
+     # rubrics, comments and grades - nothing to show
+     #
+     # If this feedback has a rubric grid, show that
+     #}
+    {% if feedback and showRubrics and feedback.rubricMarkedGrid %}
+        <div class="rubric-wrap">
+            {% include '@rubric/grid.twig' with {
+                rubricGrid:       feedback.rubricMarkedGrid.grid,
+                rubricMarkedGrid: feedback.rubricMarkedGrid,
+                learner: student,
+                showDescriptorValue: true,
+                showGroupTotal: true,
+                showRubricTotal: false,
+                selfAssessmentFeedback: null
+            } only %}
+        </div>
     {% endif %}
 </div>
