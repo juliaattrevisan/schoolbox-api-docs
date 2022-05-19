@@ -60,12 +60,8 @@ class Sessions implements IStrategy
      * clipboard teams are Home Teams (we never import enemy teams like this)
      */
     private const RESULT_TEMPLATE = "
-        <hr />
-        <h3>Result</h3>
-        <p>
         Our score: %s<br />
         Opponent score: %s<br />
-        </p>
     ";
 
 
