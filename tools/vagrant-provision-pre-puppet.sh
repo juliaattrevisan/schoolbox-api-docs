@@ -100,12 +100,6 @@ function create_ir_conf_file() {
     "}" >$instance_registry_conf_file
 }
 
-function remove_old_cron_file() {
-  if [[ -f /etc/cron.d/vagrant ]]; then
-    rm /etc/cron.d/vagrant
-  fi
-}
-
 # Remove old single-instance daemons
 function remove_old_notification_daemons() {
   for service in socketd digestd routed scheduled; do
@@ -167,7 +161,6 @@ function main() {
   check_vagrant_box_version
   drop_mysql_schema_and_user
   create_ir_conf_file
-  remove_old_cron_file
   remove_old_notification_daemons
   deploy_nginx_ssl_cert
   remove_old_nginx_certs
