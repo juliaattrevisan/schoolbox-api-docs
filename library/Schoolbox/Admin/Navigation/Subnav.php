@@ -376,7 +376,7 @@ class Subnav
                         'name'        => 'Report Export',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
                         'children'    => [],
-                        'description' => '',
+                        'description' => 'Configure a batch of student summative reports to be printed to PDF for reporting purposes.',
                     ],
                     '/adminv2/grades'                        => [
                         'name'        => 'Grades',
