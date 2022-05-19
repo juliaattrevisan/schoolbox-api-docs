@@ -10,6 +10,9 @@ namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 /**
  * Command-line tool for downloading files from NCCD courses.
@@ -26,10 +29,13 @@ class CommandLineTool extends App
      */
     public function run(): void
     {
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
         // Find every folder which imports the NCCD Information course
         $params = Builder::getArrayPlaceholders(self::COURSE_IDS);
         $query  = "
-            SELECT f.id, f.name, ci.id AS course_implementation_id
+            SELECT DISTINCT f.id, f.name
             FROM folder f
             INNER JOIN course_implementation ci ON f.id = ci.folder_id
             INNER JOIN course_specification  cs ON ci.course_specification_id = cs.id
@@ -38,13 +44,56 @@ class CommandLineTool extends App
             AND   cs.deleted_at IS NULL
             AND   cs.id IN {$params}
             ORDER BY f.name, f.id
+            LIMIT 10
         ";
         $statement = $this->getDatabaseInternal()->executeQuery($query, Builder::getArrayParameters(self::COURSE_IDS));
 
         $logger = $this->getLogger();
         $logger->info(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
         foreach ($statement->getIterator() as $row) {
-            $logger->info(sprintf('#%d (%s)', $row['id'], $row['name']));
+            $logger->info(sprintf('... folder #%d (%s)', $row['id'], $row['name']));
+
+            // Get all assessments:
+            // filter out anything not in one of the courses
+            $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
+            foreach ($assessments as $assessment) {
+                $context = $assessment->getContext();
+                if (
+                    $context instanceof UnitImplementation
+                    && in_array($context->getCourse()->getSpecification()->getId(), self::COURSE_IDS)
+                ) {
+                    $logger->info(sprintf('  ... assessment #%d (%s)', $assessment->getId(), $assessment->getTitle()));
+
+                    // Now: get each participant who's uploaded something
+                    foreach ($assessment->getAllParticipants() as $participant) {
+                        $response = $participant->findMostRecentResponse();
+                        if ($response instanceof DueWorkResponse) {
+                            // Say something about the participant
+                            $logger->info(
+                                sprintf(
+                                    '    ... teacher #%d (%s)',
+                                    $response->getSubmittedBy()->getId(),
+                                    $response->getSubmittedBy()->getFullName(),
+                                )
+                            );
+
+                            // Is there a file here?
+                            if ($response->getAllFiles()->count()) {
+                                foreach ($response->getAllFiles() as $file) {
+                                    $logger->info(
+                                        sprintf(
+                                            '      ... file %s',
+                                            $file->getBasename(),
+                                        )
+                                    );
+                                }
+                            } else {
+                                $logger->info('      ... no files!');
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
