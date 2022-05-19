@@ -50,17 +50,17 @@ function parse_args(){
   local errors='0'
   while [[ $# -gt 0 ]]; do
     case $1 in
-        --$ARG_DATA_SOURCE)
+        --"$ARG_DATA_SOURCE")
         data_source="$2"; shift; shift;
         ;;
-        --$ARG_S3_REFERER)
+        --"$ARG_S3_REFERER")
         s3_referer="$2"; shift; shift;
         ;;
-        --$ARG_FILE_NAME)
+        --"$ARG_FILE_NAME")
         file_name="$2"; shift; shift;
         file_name_short=$(echo "$file_name" | cut -d'?' -f1); # Strip off any '?versionId=abc' trailing part
         ;;
-        --$ARG_CACHE_DIR)
+        --"$ARG_CACHE_DIR")
         cache_dir=${2%/}           # trim trailing slashes
         shift # past argument
         shift # past value
