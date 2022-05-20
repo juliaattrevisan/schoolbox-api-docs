@@ -42,6 +42,38 @@ class Sessions implements IStrategy
 
 
     /**
+     * This is used as the description in the event modal popup
+     * There isn't one field that corresponds to that usage, but there
+     * is a conglomerate of various fields which result in the same outcome
+     *
+     * This was first defined by Wesley Melbourne, and now inflicts across
+     * all clipboard implementations. Until we get feedback from schools
+     * this is the Best Guess for now
+     */
+    private const NOTES_TEMPLATE = "
+        %s
+        <p>%s</p>
+    ";
+
+
+    /**
+     * This is used as the description for home team's outcome since all
+     * clipboard teams are Home Teams (we never import enemy teams like this)
+     */
+    private const RESULT_TEMPLATE = "
+        Our score: %s<br />
+        Opponent score: %s<br />
+    ";
+
+
+    /**
+     * Cosmetic strings representing match status, as defined by Clipboard
+     */
+    private const STATUS_CANCELLED = '<span class="alert-box warning">Cancelled</span>';
+    private const STATUS_BYE = '<span class="alert-box highlight">Bye</span>';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -102,6 +134,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Result\Mapper
+     */
+    private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
+
+
+    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -120,6 +158,7 @@ class Sessions implements IStrategy
      * @param \Schoolbox\Fixtures\Matchup\Mapper    $matchupMapper
      * @param \Schoolbox\Fixtures\Coach\Mapper      $coachMapper
      * @param \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
+     * @param \Schoolbox\Fixtures\Result\Mapper     $resultMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -131,7 +170,8 @@ class Sessions implements IStrategy
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
         \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
-        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper
+        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
+        \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -143,6 +183,7 @@ class Sessions implements IStrategy
         $this->matchupMapper = $matchupMapper;
         $this->coachMapper = $coachMapper;
         $this->teamCoachMapper = $teamCoachMapper;
+        $this->resultMapper = $resultMapper;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -282,7 +323,8 @@ class Sessions implements IStrategy
                     //update based on local TZ
                     $finishAt->setTimezone($localTZ);
 
-                    /* See if this matchup exists by taking the bestest guess
+                    /* See if this matchup exists by taking the bestest guess,
+                     * then update its Notes in case it changed somehow in Clipboard
                      */
                     try {
                         $matchup = $this->matchupMapper->findOneByColumnList([
@@ -295,7 +337,7 @@ class Sessions implements IStrategy
                         ]);
 
                         $this->log->debug(sprintf(
-                            'Reusing matchup %s on %s, at venue %s',
+                            'Updating matchup %s on %s, at venue %s',
                             $matchup->getDisplayName(),
                             $matchup->getStartAt()->getDatabase(),
                             null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
@@ -324,10 +366,49 @@ class Sessions implements IStrategy
                         $this->assignCoach($this->findCoach($assignedStaff), $team);
                     }
 
+                    /* Event description contains some data that could be updated in Clipboard,
+                     * forcing us to update the $notes every time. We can't skip over matchups
+                     * which existed previously anymore.
+                     */
+                    $notes = sprintf(
+                        self::NOTES_TEMPLATE,
+                        $this->generateStatus($session),
+                        nl2br(trim((string)$session['studentParentNotes']))
+                    );
+
+                    /* Event description contains some data that could be updated in Clipboard,
+                     * forcing us to update the $notes every time. We can't skip over matchups
+                     * which existed previously anymore.
+                     */
+                    $matchup->setNotes($notes);
+
                     /* We saw this, so we keep this
                      */
                     if ($this->perform) {
                         $this->matchupMapper->save($matchup);
+                    }
+
+                    /* Figure out existing results for the home team
+                     * then update it to whatever it currently is
+                     */
+                    try {
+                        $result = $this->resultMapper
+                            ->findOneByColumnList([
+                                'match_id' => $matchup->getId(),
+                                'team_id' => $team->getId()
+                            ]);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $result = $this->resultMapper->createModel()
+                            ->setMatchup($matchup)
+                            ->setTeam($team);
+                    }
+
+                    /* Update home team's description with whatever it is now
+                     */
+                    $result->setDescription($this->generateResult($result, $session));
+
+                    if ($this->perform) {
+                        $this->resultMapper->save($result);
                     }
                 }
             }
@@ -441,5 +522,52 @@ class Sessions implements IStrategy
         }
 
         return $venue;
+    }
+
+
+    /**
+     * Decide a little html fragment to represent the boolean status of this match:
+     * Bye, or not a Bye; or if a match is cancelled
+     *
+     * @param array $session
+     * @return string
+     */
+    private function generateStatus(array $session): string
+    {
+        if ($session['cancelled']) {
+            return self::STATUS_CANCELLED;
+        }
+
+        if ($session['bye']) {
+            return self::STATUS_BYE;
+        }
+
+        /* Nothing special to tell people about; just use empty string
+         */
+        return '';
+    }
+
+
+    /**
+     * Generate a slab of text for the home team's result description
+     *
+     * @param \Schoolbox\Fixtures\Result\Model $result
+     * @param array                            $session
+     * @return string
+     */
+    private function generateResult(\Schoolbox\Fixtures\Result\Model $result, array $session): string
+    {
+        /* Neither team has anything interesting in the results fields
+         * Nothing to say
+         */
+        if ('' === trim((string)$session['organisationScore']) && '' === trim((string)$session['opponentScore'])) {
+            return '';
+        }
+
+        return sprintf(
+            self::RESULT_TEMPLATE,
+            $session['organisationScore'] ?? '',
+            $session['opponentScore'] ?? ''
+        );
     }
 }

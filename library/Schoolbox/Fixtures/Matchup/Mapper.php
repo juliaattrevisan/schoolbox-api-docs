@@ -167,7 +167,9 @@ class Mapper extends BaseMapper
          */
         $query = "
             SELECT
-                sm.*,  
+                {$this->getColumnString('sm')},
+                {$this->getJoinColumnString('result', 'sr1')},
+                {$this->getJoinColumnString('result', 'sr2')},
                 {$this->getJoinColumnString('venue', 'sv')}
             FROM sportsfixtures_match sm
             LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}            
@@ -175,6 +177,8 @@ class Mapper extends BaseMapper
             LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
             LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
             LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
+            LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id
+            LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id
             WHERE (stu1.user_id = :userId OR stu2.user_id = :userId)
             AND sm.deleted_at IS NULL
             AND st1.deleted_at IS NULL
@@ -194,20 +198,33 @@ class Mapper extends BaseMapper
         $venues = new Collection();
 
         while ($row = $statement->fetch()) {
-            $matchId = $row['id'];
+            $matchId = $row['sm.id'];
 
             /* Set up us the match in the collection
              * Only hydrate all this stuff if it never existed previously
              */
             if (!($matches->getOffset($matchId) instanceof Matchup)) {
+                /* Hydrate venues, if extant
+                 */
                 /** @var Matchup $matchup */
-                $matchup = $this->hydrate($row);
+                $matchup = $this->hydrate($row, 'sm');
 
-                if (!$venues->getOffset($row['venue_id']) instanceof Venue) {
-                    $venues->setOffset($row['venue_id'], $this->hydrateJoin($row, 'venue', 'sv'));
+                if (!$venues->getOffset($row['sm.venue_id']) instanceof Venue) {
+                    $venues->setOffset($row['sm.venue_id'], $this->hydrateJoin($row, 'venue', 'sv'));
                 }
 
-                $matchup->setVenue($venues->getOffset($row['venue_id']));
+                $matchup->setVenue($venues->getOffset($row['sm.venue_id']));
+
+                /* Hydrate results
+                 */
+                /** @var \Schoolbox\Fixtures\Result\Model $homeTeamResult */
+                $homeTeamResult = $this->hydrateJoin($row, 'result', 'sr1');
+
+                /** @var \Schoolbox\Fixtures\Result\Model $awayTeamResult */
+                $awayTeamResult = $this->hydrateJoin($row, 'result', 'sr2');
+
+                $matchup->setHomeTeamResult($homeTeamResult);
+                $matchup->setAwayTeamResult($awayTeamResult);
 
                 $matches->setOffset($matchup->getId(), $matchup);
             }

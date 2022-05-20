@@ -14,6 +14,17 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 {
 
     /**
+     * The Results section of a matchup's description, as per the modal
+     * The results are optional, and can be empty for either home team or away team, or both
+     */
+    private const RESULT_TEMPLATE = '
+        <h3>Result</h3>
+        <p>%s</p>
+        <p>%s</p>
+    ';
+
+
+    /**
      * @var EventTypeMapper
      */
     private EventTypeMapper $eventTypeMapper;
@@ -127,6 +138,21 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
                 $location = $matchup->getVenue()->getName() . ($matchup->getVenue()->getAddress() ? ' (' . $matchup->getVenue()->getAddress() . ')' : '');
             }
 
+            /* Detail is an aggregation of multiple pieces
+             */
+            $detail = $matchup->getNotes();
+
+            $homeTeamResult = $matchup->getHomeTeamResult() ? $matchup->getHomeTeamResult()->getDescription() : '';
+            $awayTeamResult = $matchup->getAwayTeamResult() ? $matchup->getAwayTeamResult()->getDescription() : '';
+
+            if ($homeTeamResult || $awayTeamResult) {
+                $detail .= sprintf(
+                    self::RESULT_TEMPLATE,
+                    $homeTeamResult,
+                    $awayTeamResult
+                );
+            }
+
             $instance->setConnectorId($this->getConnectorId());
             $instance->setTitle($matchup->getName());
             $instance->setStartTime($matchup->getStartAt());
@@ -136,7 +162,7 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
             $instance->setColour($eventColor);
             $instance->setType($eventType);
             $instance->setMatchup($matchup);
-            $instance->setDetail($matchup->getNotes());
+            $instance->setDetail($detail);
             $instance->setInvolvedTeamIds($involvedTeamIds);
 
             $stack->add($instance);

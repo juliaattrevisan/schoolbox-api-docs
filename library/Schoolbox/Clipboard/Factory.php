@@ -190,13 +190,15 @@ class Factory
             $matchupMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
             $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
             $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
+            $resultMapper = \Schoolbox\Fixtures\Result\Mapper::getInstance();
 
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
                 $this->lock,
                 $matchupMapper,
-                $coachMapper
+                $coachMapper,
+                $resultMapper
             ))
             ->add(new Sessions\Sessions(
                 $this->log,
@@ -208,14 +210,16 @@ class Factory
                 $venueMapper,
                 $matchupMapper,
                 $coachMapper,
-                $teamCoachMapper
+                $teamCoachMapper,
+                $resultMapper
             ))
             ->add(new Sessions\Cleanup(
                 $this->log,
                 $this->perform,
                 $this->lock,
                 $matchupMapper,
-                $coachMapper
+                $coachMapper,
+                $resultMapper
             ));
         }
 
