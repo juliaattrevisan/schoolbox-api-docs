@@ -13,7 +13,8 @@ use Schoolbox\Permission\Access\UserAccess;
 $surveyHandler = new Survey_Main();
 $groupHandler  = new Group();
 
-if (!is_numeric($this->arg[0])) {
+/** @var SitePage $this */
+if (!is_numeric($this->arg[0] ?? false)) {
     error(112);
 }
 
@@ -33,7 +34,7 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 
 $exporter = new Survey_Export_CSV($this->arg[0], new Survey_Factory(), new Survey_Attempt(), new Survey_Question());
 
-if (is_numeric($this->arg[1])) {
+if (is_numeric($this->arg[1] ?? false)) {
     $exporter->setQuestionFilter($this->arg[1]);
 }
 
