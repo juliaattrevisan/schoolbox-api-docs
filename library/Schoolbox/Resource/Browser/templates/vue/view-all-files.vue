@@ -498,7 +498,7 @@ export default {
                     </template>
                     <template #edit="props">
                         <nav class="edit">
-                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view' : 'icon-view-hollow' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
+                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view-hollow' : 'icon-view' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
                             <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                         </nav>
                     </template>
