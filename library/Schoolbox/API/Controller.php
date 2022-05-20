@@ -361,7 +361,7 @@ class Controller extends Base
                     );
                     if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
                         throw new JWT\ExpiredException(
-                            $token->getType() === User\Token\Model::TYPE_QRCODE ? 'This login token is no longer valid. Please request a new token is created for you.' : ''
+                            $token->getType() === User\Token\Model::TYPE_QRCODE ? 'This login token is no longer valid. Please ask for a new token to be created.' : ''
                         );
                     }
                 } catch (MapperException $e) {
