@@ -128,14 +128,19 @@ class Kernel extends WebKernelAbstract
             /**
              * if system is requesting OPTIONS lets give them what the endpoint actually accepts, not just all.
              */
-            $methods = [];
+            $methods = ['OPTIONS'];
             foreach (["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"] as $testMethod) {
                 if (false !== $this->di->get('router')->match($path, ['REQUEST_METHOD' => $testMethod])) {
                     $methods[] = $testMethod;
                 }
             }
             http_response_code(204);
-            header(sprintf('Allow: OPTIONS, %s', implode(', ', $methods)));
+            //return the list of available HTTP methods, only works for AURA routes
+            header(sprintf('Allow: %s', implode(', ', $methods)));
+            //tell CORS what headers are specifically allowed, so api.schoolbox.com.au actually works
+            header("Access-Control-Allow-Headers: X-Requested-With, Origin, Authorization");
+            //initial allow all HTTP METHODS again cause CORS gets sad if we don't do this...
+            header("Access-Control-Allow-Methods: *");
             exit;
         }
         $route = $this->di->get('router')->match($path, $server);
