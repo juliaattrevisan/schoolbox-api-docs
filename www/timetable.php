@@ -22,8 +22,11 @@ if (!isset($this)) {
  * representation of timetable events; any other selection causes you to see
  * the classical cyclic timetable grid
  */
-if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view') && $this->arg[0] !== 'calendar' ) {
-    SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
+if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')) {
+    /* Go to the currently-logged in user id
+     * Disregard whatever the params might have been (don't need them)
+     */
+    SitePage::localRedir("/timetable/calendar/{$_SESSION['user']->getId()}");
 }
 
 // If External_DB not enabled do not display page
