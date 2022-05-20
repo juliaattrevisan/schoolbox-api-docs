@@ -369,9 +369,4 @@ Only teaching staff have a timetable.
 Let's say there was an Employee with the identifier `123`.  When we import them into schoolbox, their externalId will be `E123`. This deconflicts them with a student whose externalId is also `123`.
 
 ## 3.3 Photos
-Photos are always imported into `sis_user_profile` via the `scheduler`. This reuses the `GetStudents` endpoint with additional args that provide photo binary data which we cache locally into storage.
-
-For expedience using `sisImporter`, however, you need to specify the additional arg `--include-photo`. That explicitly downloads and saves the photo binary data. The option is provided so you can quickly download and debug data that isn't related to photos.
-
-As per other live connectors, this obeys the usual `Load Photos From SIS` config flag. 
-
+Photos are imported into `sis_user_profile` via the `scheduler` when `Load Photos From SIS` config flag is on. This reuses the `GetStudents` endpoint with additional args that provide photo binary data which we cache locally into storage.

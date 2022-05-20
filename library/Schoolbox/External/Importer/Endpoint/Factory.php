@@ -13,10 +13,6 @@ use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Calendar\EventMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
-use Schoolbox\Calendar\Relation\PersonalMapper;
-use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -88,26 +84,19 @@ class Factory implements IFactory
 
 
     /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-    /**
      * Factory constructor.
      *
      * @param string          $host
      * @param string          $key
      * @param bool            $perform
      * @param LoggerInterface $logger
-     * @param bool            $includePhoto
      */
-    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger, bool $includePhoto)
+    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger)
     {
         $this->host = $host;
         $this->key = $key;
         $this->perform = $perform;
         $this->logger = $logger;
-        $this->includePhoto = $includePhoto;
     }
 
 
@@ -206,7 +195,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
-                    $this->includePhoto,
+                    Loader::getInstance()->get('photo_sis_import'),
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
                     (int)Loader::getInstance()->get('external_tass_addnum_father'),
                     (int)Loader::getInstance()->get('external_tass_addnum_mother'),

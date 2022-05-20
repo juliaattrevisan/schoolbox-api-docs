@@ -43,19 +43,12 @@ $app = new class extends CliTool\App
      */
     private const OPT_LONG_FILE = 'file:';
 
-    /**
-     * --include-photo
-     * Include portrait photo, if provided. This is only for TassAPI.
-     */
-    private const OPT_LONG_INCLUDE_PHOTO = 'include-photo';
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_FILE,
-            self::OPT_LONG_INCLUDE_PHOTO,
         ];
     }
 
@@ -72,11 +65,10 @@ This is used by UPS to create user accounts.
 
 This also imports timetable data from third party endpoint into local schema.
 
-Usage: sisImporter.php [--file] [--include-photo] [--perform]
+Usage: sisImporter.php [--file] [--perform]
         --perform       Persist changes
         --file          Optional path to a locally-cached xml file e.g. ../../../www/test.xml
                         Absence of this arg will cause the tool to access the api endpoint instead
-        --include-photo Import portrait photo (for Tass API only)
 
 HELP;
             exit;
@@ -98,8 +90,6 @@ HELP;
         $type        = $this->getConfig()->get('schooldata_import_data_source');
         $file        = $this->getOpt(self::OPT_LONG_FILE);
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
-
-        $includePhoto = $this->getOpt(self::OPT_LONG_INCLUDE_PHOTO);
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -149,7 +139,7 @@ NULLTYPE;
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $includePhoto);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
         $randomMapper = UserMapper::getInstance();
 
