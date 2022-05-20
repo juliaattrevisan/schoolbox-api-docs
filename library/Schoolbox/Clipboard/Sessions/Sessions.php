@@ -26,13 +26,13 @@ class Sessions implements IStrategy
     /**
      * Short-circuit to prevent infinite loops
      */
-    private const MAX_CALLS = 100;
+    private const MAX_CALLS = 400;
 
 
     /**
      * Number of results per page
      */
-    private const NUM_PER_PAGE = 10;
+    private const NUM_PER_PAGE = 100;
 
 
     /**
@@ -71,6 +71,15 @@ class Sessions implements IStrategy
      */
     private const STATUS_CANCELLED = '<span class="alert-box warning">Cancelled</span>';
     private const STATUS_BYE = '<span class="alert-box highlight">Bye</span>';
+
+
+    /**
+     * Force date params into clipboard sessions endpoint to get a bigger set of data
+     * This is measured in months - stave defaults are equivalent to "get events from
+     * one month ago till six months in the future"
+     */
+    private const FROM = -1;
+    private const TO = 6;
 
 
     /**
@@ -218,6 +227,16 @@ class Sessions implements IStrategy
          */
         $season = $this->registry->recallSeason();
 
+        /* Clipboard didn't implement their default data window as per their docs
+         *
+         * The default is actually [4 weeks in the past - 4 weeks into the future]
+         * not 6 months into the future as stated in their docs
+         *
+         * Force them to give me more datums
+         */
+        $startDateTime = \Alaress_Date_Format::now()->addMonths(self::FROM)->getDatabaseDate();
+        $endDateTime =  \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
+
         /* Bash through paginated data
          */
         $currentPage = 1;
@@ -236,6 +255,8 @@ class Sessions implements IStrategy
                 'includeStaff' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
+                'startDateTime' => $startDateTime,
+                'endDateTime' => $endDateTime,
                 /* Apparently this should give you "only not cancelled" sessions
                  */
                 'cancelled' => 'false',
