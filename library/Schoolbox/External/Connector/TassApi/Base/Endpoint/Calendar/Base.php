@@ -328,7 +328,7 @@ class Base
                 ->setLocation($location)
                 ->setStartAt($startDatetime)
                 ->setFinishAt($endDatetime)
-                ->setAllday($allDay)
+                ->setAllday((bool)$allDay)
                 ->setType($eventType)
                 ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
                 ->setGuid($guid)
