@@ -316,7 +316,6 @@
         function initRubricGrid() {
             var $maxMarkInput = $('#maxMark');
             var $useRubricSwitch = $('#useRubric');
-            var $grid = $('[data-rb-grid]');
 
             /**
              * Disable the field, but allow us to show its value
@@ -356,7 +355,14 @@
             });
 
             // configure callbacks into the grid
-            $grid.rubricEditable({
+            $rubric.rubricEditable({
+                url: '{{ routeLookup("rubric.create") }}',
+                rubricId: '{{ rubricGrid.id }}',
+                formField: '{{ formField ?? 'rb' }}',
+                levelLimit: {{ levelLimit ?? config.rubric_max_levels }},
+                localisedGroupName: '{{ locale.translate('rubricGroup', false, true) }}',
+                localisedCriterionName: '{{ locale.translate('rubricCriterion', false, true) }}',
+                swap: aniswap,
                 // Recalculate total for all groups, then recalculate grid total
                 afterApplyResultSet: calculateAllGroupTotals
             });
@@ -365,7 +371,7 @@
             processUseRubricClick($useRubricSwitch);
 
             // Dynamically calculate button text on page load
-            $grid.find("[data-group]").each(function() {
+            $rubric.find("[data-group]").each(function() {
                 setRubricMarkButtonText($(this).attr('data-group'));
             })
 
@@ -374,12 +380,12 @@
              * Purposefully placed outside of the document.ready in order to work for a rubric grid that is imported via csv
              * (Yet it appears to work within document.ready regardless?)
              */
-            $grid.on('change', '[data-group-max-value]', calculateGridTotal);
+            $rubric.on('change', '[data-group-max-value]', calculateGridTotal);
 
 
             // Change a descriptor value: update the group's total
             // (cascades to grid total, too)
-            $grid.on(
+            $rubric.on(
                 'change',
                 '[data-descriptor-value], [data-criterion-name]',
                 function () {
@@ -408,7 +414,7 @@
             function calculateAllGroupTotals() {
                 // List of all groups, no duplicates
                 var groupIdentifiers = new Set(
-                    $grid.find('[data-group]')
+                    $rubric.find('[data-group]')
                         .map(function() { return $(this).attr('data-group'); })
                         .toArray()
                 );
@@ -418,6 +424,80 @@
                 calculateGridTotal();
             }
 
+            function aniswap(move, first, second) {
+
+                /*
+                            // put these together for ease of code (apparently not as simple as it sounds...?)
+                            var both = $.merge($(), first);
+                            $.merge(both, second);
+
+                            // cache the top and left positions of each element we're going to be moving around
+                            both.each(function () {
+                                var e = $(this),
+                                        o = e.offset();
+
+                                e.data('otop', o.top);
+                                e.data('oleft', o.left);
+                            });
+                */
+
+                // What kind of swap is this?
+                // * Descriptor or level:     swap names of input elements within first and second
+                // * Capability or indicator: don't swap
+                var sequencerGroup = first.attr('data-sequencer-group');
+                if (sequencerGroup === 'levels' || typeof sequencerGroup === 'undefined') {
+                    var commonInputs = [
+                        '[data-id]',
+                        '[data-level]',
+                        '[data-descriptor-text]',
+                        '[data-descriptor-value]'
+                    ];
+                    commonInputs.forEach(function(input) {
+                        var firstInput  = first.find(input),
+                                secondInput = second.find(input);
+                        if (firstInput.length && secondInput.length) {
+                            var firstName  = firstInput.attr('name'),
+                                    secondName = secondInput.attr('name');
+                            firstInput.attr('name', secondName);
+                            secondInput.attr('name', firstName);
+                        }
+                    });
+                }
+
+                // apply the DOM manipulation
+                first[move](second);
+
+                /*
+                            // set the transform to visually "undo" the DOM respositioning
+                            both.each(function () {
+                                var e = $(this),
+                                        o = e.offset(),
+                                        t = {
+                                            x: e.data('oleft') - o.left,
+                                            y: e.data('otop') - o.top
+                                        };
+
+                                e.css({
+                                    transform: [ 'translateX(', t.x, 'px) translateY(', t.y, 'px)' ].join('')
+                                });
+                            });
+
+                            // set the animation class
+                            both.addClass('animating');
+
+                            setTimeout(function () {
+                                // remove the transforms and let the animation glide them into their natural positions
+                                both.css({ transform: '' });
+
+                                // wait for the duration of the animation, then clear the animation class
+                                setTimeout(function () {
+                                    both.removeClass('animating');
+                                }, 1000);
+
+                            }, 10);
+                */
+
+            }
 
             /**
              * Calculates a group's max available marks, and fills that group's max
@@ -451,7 +531,7 @@
                 var max = 0;
 
                 // iterate the grid, and sum the max of each row
-                $grid.find('[data-group-max-value]').each(function () {
+                $rubric.find('[data-group-max-value]').each(function () {
                     var i = parseFloat($(this).val());
                     if (!isNaN(i)) {
                         max += i;
@@ -469,7 +549,7 @@
                 var $thisMaxValueInput = $(),
                     groupMax = 0;
 
-                $grid.find('[data-group="'+groupIdentifier+'"]').each(function () {
+                $rubric.find('[data-group="'+groupIdentifier+'"]').each(function () {
                     var $criterionRow = $(this),
                         rowMax = 0;
 

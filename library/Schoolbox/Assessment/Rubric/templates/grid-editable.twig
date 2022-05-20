@@ -33,104 +33,15 @@
         </tbody>
     </table>
     </div>
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.rubric-editable.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.sequencer.js"></script>
 {# js specific to the rubric we just injected to...wherever we injected it #}
 <script type="text/javascript">
-
+    var $rubric = $('table[data-rubric]');
     $(function () {
-
-        $('#{{ rubricId }}').rubricEditable({
-            url: '{{ routeLookup("rubric.create") }}',
-            rubricId: '{{ rubricGrid.id }}',
-            formField: '{{ formField }}',
-            levelLimit: {{ levelLimit }},
-            localisedGroupName: '{{ locale.translate('rubricGroup', false, true) }}',
-            localisedCriterionName: '{{ locale.translate('rubricCriterion', false, true) }}',
-            swap: aniswap
-        });
-
-        function aniswap(move, first, second) {
-
-/*
-            // put these together for ease of code (apparently not as simple as it sounds...?)
-            var both = $.merge($(), first);
-            $.merge(both, second);
-
-            // cache the top and left positions of each element we're going to be moving around
-            both.each(function () {
-                var e = $(this),
-                        o = e.offset();
-
-                e.data('otop', o.top);
-                e.data('oleft', o.left);
-            });
-*/
-
-            // What kind of swap is this?
-            // * Descriptor or level:     swap names of input elements within first and second
-            // * Capability or indicator: don't swap
-            var sequencerGroup = first.attr('data-sequencer-group');
-            if (sequencerGroup === 'levels' || typeof sequencerGroup === 'undefined') {
-                var commonInputs = [
-                    '[data-id]',
-                    '[data-level]',
-                    '[data-descriptor-text]',
-                    '[data-descriptor-value]'
-                ];
-                commonInputs.forEach(function(input) {
-                    var firstInput  = first.find(input),
-                        secondInput = second.find(input);
-                    if (firstInput.length && secondInput.length) {
-                        var firstName  = firstInput.attr('name'),
-                            secondName = secondInput.attr('name');
-                        firstInput.attr('name', secondName);
-                        secondInput.attr('name', firstName);
-                    }
-                });
-            }
-
-            // apply the DOM manipulation
-            first[move](second);
-
-/*
-            // set the transform to visually "undo" the DOM respositioning
-            both.each(function () {
-                var e = $(this),
-                        o = e.offset(),
-                        t = {
-                            x: e.data('oleft') - o.left,
-                            y: e.data('otop') - o.top
-                        };
-
-                e.css({
-                    transform: [ 'translateX(', t.x, 'px) translateY(', t.y, 'px)' ].join('')
-                });
-            });
-
-            // set the animation class
-            both.addClass('animating');
-
-            setTimeout(function () {
-                // remove the transforms and let the animation glide them into their natural positions
-                both.css({ transform: '' });
-
-                // wait for the duration of the animation, then clear the animation class
-                setTimeout(function () {
-                    both.removeClass('animating');
-                }, 1000);
-
-            }, 10);
-*/
-
-        }
         /**
          * only add maxlength to fields that actually change.
          * to then only validate those fields characters count
          */
-        {# maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
+                {# maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
         so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
         let maxCapabilityLength = 900, maxIndicatorLength = 900;
         $('[data-group-row-text]').on('change', (event) => {

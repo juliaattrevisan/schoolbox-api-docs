@@ -56,10 +56,10 @@
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js"></script>
 <script type="text/javascript">
+    var $rubric = $('table[data-rubric]');
     $(function() {
         const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
 
-        var $rubric = $('table[data-rubric]');
 
         // Rubric ResultSets Modal
         var $rsReveal     = $('#reveal-resultset');
