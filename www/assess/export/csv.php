@@ -13,7 +13,8 @@ use Schoolbox\Permission\Access\UserAccess;
 $assessHandler = new Assess_Main();
 $groupHandler  = new Group();
 
-if (!is_numeric($this->arg[0])) {
+/** @var SitePage $this */
+if (!is_numeric($this->arg[0] ?? false)) {
     error(112);
 }
 
@@ -34,7 +35,7 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 
 $exporter = new Assess_Export_CSV($this->arg[0], new Assess_Factory(), new Assess_Attempt(), new Assess_Question());
 
-if (is_numeric($this->arg[1])) {
+if (is_numeric($this->arg[1] ?? false)) {
     $exporter->setQuestionFilter($this->arg[1]);
 }
 
