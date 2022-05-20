@@ -25,7 +25,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if (is_array($_SESSION['children'])) {
+        if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
             return true;
         }

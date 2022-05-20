@@ -150,7 +150,7 @@ export default {
     display: block;
     padding: .75rem;
     background: white;
-    transition: back ground 0.2s;
+    transition: background 0.2s;
     &:hover {
         background: $content-ui-hover;
     }
