@@ -23,6 +23,9 @@ if (!isset($this)) {
  * the classical cyclic timetable grid
  */
 if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')) {
+    if (is_numeric($this->arg[0])) {
+        SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
+    }
     /* Go to the currently-logged in user id
      * Disregard whatever the params might have been (don't need them)
      */
