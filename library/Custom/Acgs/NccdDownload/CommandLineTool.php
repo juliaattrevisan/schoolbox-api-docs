@@ -139,12 +139,12 @@ class CommandLineTool extends App
             $student = $assessmentFilesTuple['student'];
             ksort($assessmentFilesTuple['files']);
             foreach (array_values($assessmentFilesTuple['files']) as $i => $file) {
+                /** @var IStorage $file */
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
                 $files[]    = [
                     'file' => $file,
                     'path' => sprintf(
-
                         '%s/%s_Evidence_%s_%d.%s',
                         $yearLevel,
                         $externalId,
@@ -162,8 +162,14 @@ class CommandLineTool extends App
             $logger->notice($fileTuple['path']);
 
             /** @var IStorage $file */
-            $file = $fileTuple['file'];
-            $zip->addFromString($fileTuple['path'], $file->read());
+            $file        = $fileTuple['file'];
+            $fileContent = $file->read();
+            /** @phpstan-ignore-next-line: read() may return false */
+            if ($fileContent === false) {
+                $logger->warning(sprintf('Could not read file "%s": skipping', $file->getFilename()));
+                continue;
+            }
+            $zip->addFromString($fileTuple['path'], $fileContent);
         }
         $zip->close();
     }
