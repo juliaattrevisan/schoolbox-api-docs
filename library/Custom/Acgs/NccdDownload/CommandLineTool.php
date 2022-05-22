@@ -14,10 +14,11 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
-use Schoolbox\YearLevel\Model;
+use Schoolbox\UserMapper;
 use ZipArchive;
 
 /**
@@ -34,6 +35,11 @@ class CommandLineTool extends App
      * The ID(s) of the NCCD information courses.
      */
     private const COURSE_IDS = [468];
+
+    /**
+     * Pattern for extracting an external ID out of the folder.
+     */
+    private const FOLDER_PATTERN = '/\{(?P<externalId>\\d+)\}/';
 
     /**
      * @inheritdoc
@@ -156,14 +162,19 @@ class CommandLineTool extends App
             }
         }
 
-        $zip = new ZipArchive();
-        $zip->open($outfile, ZipArchive::OVERWRITE);
+        $zip       = new ZipArchive();
+        $zipStatus = $zip->open($outfile, ZipArchive::CREATE);
+        if ($zipStatus !== true) {
+            $logger->error(sprintf('Could not create ZIP file (%s)', $zip->getStatusString()));
+            exit(1);
+        }
         foreach ($files as $fileTuple) {
             $logger->notice($fileTuple['path']);
 
             /** @var IStorage $file */
             $file        = $fileTuple['file'];
             $fileContent = $file->read();
+            /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
             /** @phpstan-ignore-next-line: read() may return false */
             if ($fileContent === false) {
                 $logger->warning(sprintf('Could not read file "%s": skipping', $file->getFilename()));
@@ -223,11 +234,13 @@ class CommandLineTool extends App
      */
     private function extractStudentFromFolderName(string $folderName): ?User
     {
-        // TODO extract student external ID from folder name
-        return (new User())
-            ->setYear((new Model())->setName('Year 9'))
-            ->setFirstname('Test')
-            ->setLastname('User')
-            ->setExternalId('12345');
+        if (preg_match(self::FOLDER_PATTERN, $folderName, $matches)) {
+            try {
+                return UserMapper::getInstance()->findByExternalId($matches['externalId']);
+            } catch (Exception $e) {
+                return null;
+            }
+        }
+        return null;
     }
 }
