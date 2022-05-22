@@ -26,15 +26,35 @@ use ZipArchive;
 class CommandLineTool extends App
 {
     /**
+     * Outfile option
+     */
+    private const OPT_LONG_OUTFILE = 'outfile:';
+
+    /**
      * The ID(s) of the NCCD information courses.
      */
     private const COURSE_IDS = [468];
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_OUTFILE];
+    }
 
     /**
      * @inheritDoc
      */
     public function run(): void
     {
+        $logger  = $this->getLogger();
+        $outfile = $this->getOpt(self::OPT_LONG_OUTFILE);
+        if (!$outfile) {
+            $logger->error('An outfile (--outfile) must be supplied.');
+            exit(1);
+        }
+
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
@@ -54,7 +74,6 @@ class CommandLineTool extends App
         ";
         $statement = $this->getDatabaseInternal()->executeQuery($query, Builder::getArrayParameters(self::COURSE_IDS));
 
-        $logger = $this->getLogger();
         $logger->info(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
 
         // Collate assessment and folder files
@@ -137,14 +156,14 @@ class CommandLineTool extends App
             }
         }
 
-        $zip     = new ZipArchive();
-        $zipFile = tempnam(sys_get_temp_dir(), 'zip');
-        $zip->open($zipFile, ZipArchive::OVERWRITE);
+        $zip = new ZipArchive();
+        $zip->open($outfile, ZipArchive::OVERWRITE);
         foreach ($files as $fileTuple) {
             $logger->notice($fileTuple['path']);
 
-            // TODO stream
-            $zip->addFromString($fileTuple['path'], $fileTuple['file']->read());
+            /** @var IStorage $file */
+            $file = $fileTuple['file'];
+            $zip->addFromString($fileTuple['path'], $file->read());
         }
         $zip->close();
     }
