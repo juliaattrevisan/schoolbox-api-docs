@@ -340,8 +340,12 @@ class Classes implements IStrategy
                          */
                         foreach ($class['students'] as $student) {
                             /* Throw warning, but assign them anyway
+                             *
+                             * $class['students'] can contain staff external ids when you have multiple
+                             * teachers involved in a class so you need to check both lookups before
+                             * declaring an externalId potentially missing
                              */
-                            if (!isset($users[$student['externalId']])) {
+                            if (!isset($this->lookup->getStaff()[$student['externalId']]) && !isset($this->lookup->getStudents()[$student['externalId']])) {
                                 $this->log->warning(sprintf(
                                     'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
                                     $student['externalId'],
