@@ -61,6 +61,24 @@ class Controller extends Base
 //        ];
 //        $assignments[] = [
 //            'id' => "assignment_987",
+//            'title' => "broken date",
+//            'start_at' => "2012-07-19T23:59:00-06:00",
+//            'end_at' => null,
+//            'description' => "<b>Broken date, should still work...</b>",
+//            'context_name' => "Broken",
+//            'workflow_state' => "published",
+//            'url' => "https://example.com/api/v1/calendar_events/assignment_987",
+//            'html_url' => "https://ddg.gg",
+//            'all_day_date' => "2021-12-13",
+//            'all_day' => true,
+//            'created_at' => "2012-07-12T10:55:20-06:00",
+//            'updated_at' => "2012-07-12T10:55:20-06:00",
+//            'assignment' => null,
+//            'assignment_overrides' => null,
+//            'important_dates' => true
+//        ];
+//        $assignments[] = [
+//            'id' => "assignment_987",
 //            'title' => "Exam",
 //            'start_at' => "2012-07-19T23:59:00-06:00",
 //            'end_at' => "2036-07-19T23:59:00-06:00",
@@ -77,6 +95,19 @@ class Controller extends Base
 //            'assignment_overrides' => null,
 //            'important_dates' => true
 //        ];
+//        foreach ($assignments as $id => $assignment) {
+//            /**
+//             * if the end_at is null, don't try to convert that to a date
+//             * just leave as null, and get vue to show a nice empty state
+//             */
+//            if ($assignment['end_at'] !== null) {
+//                /**
+//                 * fix date format, from UTC ($assignment['end_at']) to localtime
+//                 */
+//                $date                       = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
+//                $assignments[$id]['end_at'] = $date->getLocal();
+//            }
+//        }
 //        return $this->getResponse()->content->set($this->buildJsonOutput([
 //                                                                             'assignments' => $assignments,
 //                                                                         ]));
@@ -143,10 +174,16 @@ class Controller extends Base
             //fix end_date for assignments to make it more user friendly...
             foreach ($assignments as $id => $assignment) {
                 /**
-                 * fix date format, from UTC ($assignment['end_at']) to localtime
+                 * if the end_at is null, don't try to convert that to a date
+                 * just leave as null, and get vue to show a nice empty state
                  */
-                $date = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
-                $assignments[$id]['end_at'] = $date->getLocal();
+                if ($assignment['end_at'] !== null) {
+                    /**
+                     * fix date format, from UTC ($assignment['end_at']) to localtime
+                     */
+                    $date                       = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
+                    $assignments[$id]['end_at'] = $date->getLocal();
+                }
             }
         } catch (\RuntimeException | \DomainException $e) {
             //catch both Runtime and Domain Exceptions

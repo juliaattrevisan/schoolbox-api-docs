@@ -98,7 +98,8 @@
         <ul v-else class="canvas-assignments">
             <li v-for="assignment in assignments.assignments" :key="assignment.id">
                 {{ assignment.context_name }} <a :href="assignment.html_url">{{ assignment.title }}</a>
-                <div class="meta">Due: <time>{{ assignment.end_at }}</time></div>
+                <div v-if="assignment.end_at" class="meta">Due: <time>{{ assignment.end_at }}</time></div>
+                <div v-else class="meta">&nbsp;</div>
             </li>
         </ul>
 
