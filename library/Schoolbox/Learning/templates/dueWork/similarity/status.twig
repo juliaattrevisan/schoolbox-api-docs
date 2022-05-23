@@ -19,7 +19,11 @@
  # try and figure out which tool to use: turnitin, plag, or neither
  #}
 {% if turnitinApiEnabled %}
-    {% if currentFile.turnitin %}
+    {# Historical turnitin records don't have a report
+     # We only display turnitin reports for non-historical turnitin records
+     # Historical documents should fall back to plagscan
+     #}
+    {% if currentFile.turnitin and not currentFile.turnitin.historical %}
         {# If the turnitin api was configured then assume we're using that
          # unless there is no turnitin file, then check if there is a plagscan file
          #}
