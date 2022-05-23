@@ -355,6 +355,7 @@
             });
 
             // configure callbacks into the grid
+            let $rubric = $('table[data-rubric]');
             $rubric.rubricEditable({
                 url: '{{ routeLookup("rubric.create") }}',
                 rubricId: '{{ rubricGrid.id }}',
