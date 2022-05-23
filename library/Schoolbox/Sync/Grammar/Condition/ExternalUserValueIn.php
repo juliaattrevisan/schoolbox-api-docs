@@ -11,7 +11,6 @@ namespace Schoolbox\Sync\Grammar\Condition;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
-use Schoolbox\User;
 
 class ExternalUserValueIn extends Condition\In
 {
@@ -44,9 +43,16 @@ class ExternalUserValueIn extends Condition\In
         if (is_array($value)) {
             // require ANY, not ALL
             return count(array_intersect($this->validValues, $value));
-        } else {
-            return in_array($value, $this->validValues);
         }
+
+        /* Positions (meta.position.code) manifest in $value as a Collection
+         * This passes none of the array checks and must be treated specially
+         */
+        if ($value instanceof \Schoolbox\Collection) {
+            return count(array_intersect($this->validValues, $value->getAll()));
+        }
+
+        return in_array($value, $this->validValues);
     }
 
 
