@@ -117,8 +117,23 @@
                         <option value="0" selected="selected">All Seasons</option>
                         {% for season in allSeasons %}
                             {% set isCurrent = season.id == division.season.id %}
+
+                            {# If the season ends in a different year than it starts,
+                             # then show the year so it doesn't look weird like this:
+                             #     Jan 1 - Jan 1
+                             #     Mar 5 - Feb 2
+                             #
+                             # Otherwise, if you're in the same year, show it as before:
+                             #     Apr 27 - Aug 4
+                             #}
+                            {% if season.start.year != season.end.year %}
+                                {% set seasonInterval = season.start.dateOnly ~ ' ' ~ season.start.year ~ '—' ~ season.end.dateOnly ~ ' ' ~ season.end.year %}
+                            {% else %}
+                                {% set seasonInterval = season.start.dateOnly ~ '—' ~ season.end.dateOnly %}
+                            {% endif %}
+
                             <option value="{{ season.id }}" {% if isCurrent %} selected="selected" {% endif %}
-                            >{{ season.name }} ({{ season.start.dateOnly }}—{{ season.end.dateOnly }}){% if isCurrent %} *{% endif %}</option>
+                            >{{ season.name }} ({{ seasonInterval }}){% if isCurrent %} *{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
