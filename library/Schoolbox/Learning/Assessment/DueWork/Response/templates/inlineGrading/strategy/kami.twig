@@ -11,7 +11,7 @@
         {% include 'sub/iframeResponsive.twig' with {
             id: 'kami-viewport',
             src: data.session.viewerUrl,
-            allow: 'microphone; camera',
+            allow: 'microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *; fullscreen *',
             dataAttributes: {
                 'for-participant': participant.user.id,
             },
