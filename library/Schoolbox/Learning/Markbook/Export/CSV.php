@@ -141,7 +141,7 @@ class CSV extends AbstractCSV
                 $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
             ];
             if ($this->viewRank) {
-                array_push($studentRowHeaders, $rank[$student->getId()]);
+                $studentRowHeaders[] = $rank[$student->getId()] ?? '';
             }
 
             $studentRow = [];
