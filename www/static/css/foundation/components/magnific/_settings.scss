@@ -47,6 +47,15 @@ img.mfp-img{
     top: -2.75rem;
 }
 
+@media #{$large-down} {
+    .mfp-iframe-holder .mfp-close {
+        right: auto;
+        left: 50%;
+        top: -3rem;
+        margin-left: -20px;
+    }
+}
+
 .mfp-arrow{
 	color: $white;
 	opacity: 0.5;
@@ -92,8 +101,7 @@ img.mfp-img{
 }
 
 @media #{$medium-down} {
-	.mfp-image-holder .mfp-close,
-	.mfp-iframe-holder .mfp-close{
+	.mfp-image-holder .mfp-close {
 		right: auto;
 		left: 50%;
 		top: 0;
