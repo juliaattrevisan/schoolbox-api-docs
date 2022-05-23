@@ -61,7 +61,12 @@
                     url: '{{ routeLookup('course.listNodes') }}?mime=none',
                     token: '{folderId}'
                 }
-            }
+            },
+            jstree: {
+                dnd: {
+                    is_draggable: false,
+                },
+            },
         });
 
         var jstree = tree.jstree(true);
