@@ -29,9 +29,20 @@
         {% if canShowcase %}
             <li>
                 {% if isShowcased %}
-                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio">Remove from ePortfolio</a>
+                    {% if USER.id == student.id %}
+                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio">Remove from ePortfolio</a>
+                    {% else %}
+                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.firstname }}'s ePortfolio">Remove from {{ student.firstname }}'s ePortfolio</a>
+                    {% endif %}
                 {% else %}
-                    <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio">Publish to ePortfolio</a>
+                    {# Decide if you're publishing to your own eportfolio
+                     # or if you're publishing on behalf of a student to *their* eportfolio
+                     #}
+                    {% if USER.id == student.id %}
+                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to ePortfolio">Publish to ePortfolio</a>
+                    {% else %}
+                        <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='1' title="Publish to {{ student.firstname }}'s ePortfolio">Publish to {{ student.firstname }}'s ePortfolio</a>
+                    {% endif %}
                 {% endif %}
             </li>
 
@@ -39,7 +50,21 @@
             <script type="text/javascript">
                 $(function () {
                     $('[data-publish-to-eportfolio]').eportfolioPublish({
-                        userId: '{{ student.id }}'
+                        userId: '{{ student.id }}',
+
+                        {# Managing profile data on behalf of somene else's eportfolio
+                         # means you supply a different dialog string
+                         #}
+                        {% if USER.id != student.id %}
+                            publish: {
+                                text: "Are you sure you want to publish this work to {{ student.firstname }}'s ePortfolio showcase? This will make the work visible to everyone.",
+                                action: 'publish'
+                            },
+                            unpublish: {
+                                text: "Are you sure you want to remove this work from {{ student.firstname }}'s ePortfolio showcase?",
+                                action: 'unpublish'
+                            }
+                        {% endif %}
                     });
                 });
             </script>
