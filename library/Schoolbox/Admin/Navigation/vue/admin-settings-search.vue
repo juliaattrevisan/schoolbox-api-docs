@@ -195,7 +195,7 @@ export default {
             document.addEventListener('keyup', (event) => {
                 const keyName = event.key;
                 const keyOptions = {
-                    'Enter': () => this.selectResult(this.resultsList[this.activeIndex].url),
+                    'Enter': () => this.onEnterKeyPressed(),
                     'ArrowUp': () => this.decrementActiveIndex(),
                     'ArrowDown': () => this.incrementActiveIndex(),
                 }
@@ -203,6 +203,16 @@ export default {
                     keyOptions[keyName]();
                 }
             });
+        },
+
+        /**
+         * an alternative to mouse press, 
+         * select the currently active search result 
+         */
+        onEnterKeyPressed () {
+            if (this.resultsList.length > 0) { //only if there's results to select
+                this.selectResult(this.resultsList[this.activeIndex].url);
+            }
         },
 
         /**
