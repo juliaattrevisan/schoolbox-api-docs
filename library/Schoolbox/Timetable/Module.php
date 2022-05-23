@@ -41,10 +41,13 @@ class Module extends BaseModule
          * Students can only view their own calendar
          * Parents can only view their own students' calendar
          */
-        $getPerms = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+        $getPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
+            )
         );
 
         $preloadUser = function ($params) {
