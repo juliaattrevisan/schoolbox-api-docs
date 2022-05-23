@@ -22,7 +22,7 @@ img.mfp-img{
 }
 
 .mfp-image-holder .mfp-close,
-.mfp-iframe-holder .mfp-close{
+.mfp-iframe-holder .mfp-close {
 	background: rgba(0,0,0,0.5);
 	border-radius: 5rem;
 	top: 0.3rem;
@@ -39,6 +39,14 @@ img.mfp-img{
 		cursor: pointer;
 	}
 }
+
+/* Close Button in the iframe modal has a different offset
+ * than the image version
+ */
+.mfp-iframe-holder .mfp-close {
+    top: -2.75rem;
+}
+
 .mfp-arrow{
 	color: $white;
 	opacity: 0.5;
