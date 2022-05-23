@@ -10,6 +10,9 @@
 {% set readonly  = not allowModifyUsed and criterion is not null and criterion.usage|length > 0 %}
 {% set new       = criterion is null %}
 {% set criterionId = new ? 0 : criterion.id %}
+{% set maxIndicatorLength = 900 %}
+{# maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
+so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
 <li class="actions-small-1"
     data-rubric-criterion-row="{{ criterionId }}"
     {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
@@ -31,6 +34,7 @@
                {% if showNames %}name="crits[{{ group.id }}][items][{{ criterion.id }}][name]"{% endif %}
                {% if showNames %}id="i{{ criterion.id }}"{% endif %}
                {% if readonly %}readonly{% endif %}
+                maxlength="{{ maxIndicatorLength }}"
         />{{ new ? '' : criterion.name }}</textarea>
 
         {# Input for criterion curriculum codes #}

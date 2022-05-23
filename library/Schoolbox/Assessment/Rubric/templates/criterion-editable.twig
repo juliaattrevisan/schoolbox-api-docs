@@ -25,7 +25,7 @@
     {%- else -%}
 
     <label for="{{ critInput }}[on]" class="checkbox-label rb-criterion rb-editable">
-        <textarea name="{{ critInput }}[name]" maxlength="900">{{ crit.name }}</textarea>
+        <textarea data-criterion-text name="{{ critInput }}[name]">{{ crit.name }}</textarea>
     </label>
 
     {%- endif -%}
