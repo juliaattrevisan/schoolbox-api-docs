@@ -7386,11 +7386,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Type/Model.php
 
 		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Condition\\\\ExternalUserValueIn\\:\\:assertIn\\(\\) should return bool but returns int\\<0, max\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Condition/ExternalUserValueIn.php
-
-		-
 			message: "#^Dead catch \\- ReflectionException is never thrown in the try block\\.$#"
 			count: 2
 			path: library/Schoolbox/Sync/Grammar/Factory.php
