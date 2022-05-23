@@ -36,6 +36,7 @@ export default {
             headerFields: state => state.headerFields, //the headerFields to display within the list item
             popOutHeaderField: state => state.popOutHeaderField,  //the title field of the pop out
             popOutFields: state => state.popOutFields, //when a #admin-list-pop-out.vue is in use
+            hasDBid:   state => state.hasDBid, // if true display the db ID on the front end.
         }),
 
         /**
@@ -86,19 +87,21 @@ export default {
 
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
+            <div v-if="hasDBid" class="small-1">{{row.id}}</div>
+
             <div class="list-item">
 
                 <div v-for="(field) in headerFields" :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="field.id">
-                    
+
                     <span class="hide-for-medium-up">{{ field.caption }}</span>
-                    
+
                     <template v-if="field.readonly">
                         <p>{{ row[field.id] }}</p>
                     </template>
 
                     <template v-else-if="field.checkbox">
                         <div class="checklist">
-                            <input 
+                            <input
                                 :id="`${row.id}-${field.caption}`"
                                 type="checkbox"
                                 v-model="row[field.id]"
@@ -131,7 +134,7 @@ export default {
                     <template v-else>
                         <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
                     </template>
-                    
+
                 </div>
 
             </div><!-- .list-item -->

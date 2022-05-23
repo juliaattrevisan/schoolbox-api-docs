@@ -7,18 +7,19 @@ export const useAdminListStore = defineStore('main', {
 
     state: () => ({
         loadedData: null, //contains the loaded data
-        rows: [], //to display and possibly edit the rows 
+        rows: [], //to display and possibly edit the rows
         selectedRow: {}, //to track which row is selected
         rowToDelete: {}, //to track which row could be deleted
         isPopOutOpen: false, //to open and close the list
         selectedPopOutName: '', //to highlight all other rows that have that permission
+        hasDBid: false,
     }),
 
     getters: {
 
         /**
          * Retrieve only those fields that will appear in the header
-         * 
+         *
          * @returns { Array of Objects }
          */
         headerFields (state) {
@@ -26,27 +27,27 @@ export const useAdminListStore = defineStore('main', {
         },
 
         /**
-         * the popOut field that's used in the header, and is the reference for 
+         * the popOut field that's used in the header, and is the reference for
          * the following popOutFields
-         * 
+         *
          * @returns { Object }
          */
         popOutHeaderField () {
             const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
             if (typeof popOutHeaderField !== 'undefined') {
                 return popOutHeaderField;
-            } 
+            }
             return {};
         },
-        
+
         /**
          * Just those fields that are used in a popoutList
-         * 
+         *
          * @returns { Array of Objects }
          */
         popOutFields (state) {
             return state.loadedData.fields.filter((field) => field.popOutList);
-        }, 
+        },
 
     },
 
@@ -61,6 +62,7 @@ export const useAdminListStore = defineStore('main', {
             const sortedRows = orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
             sortedRows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
             this.rows = sortedRows;
+            this.hasDBid = loadedData.hasDBid; // if true display the db ID on the front end.
         },
 
         /**
@@ -105,7 +107,7 @@ export const useAdminListStore = defineStore('main', {
         },
 
         /**
-         * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete 
+         * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete
          */
         deleteRowCancelled () {
             this.rowToDelete = null;
@@ -138,5 +140,5 @@ export const useAdminListStore = defineStore('main', {
         },
 
     },
-    
+
 });
