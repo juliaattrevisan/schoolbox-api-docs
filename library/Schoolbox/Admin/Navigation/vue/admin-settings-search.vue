@@ -66,8 +66,12 @@ export default {
          */
         queryWordList () {
             const allWords = this.query.match(/\b(\w+)\b/g);
-            const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
-            return onlyWordsAboveTwoLetters;
+            if (allWords && allWords.length > 0) {
+                const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
+                return onlyWordsAboveTwoLetters;
+            } else {
+                return [];
+            }
         },
 
         /**
