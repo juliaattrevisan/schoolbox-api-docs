@@ -100,7 +100,7 @@ class Controller extends Base
 //             * if the end_at is null, don't try to convert that to a date
 //             * just leave as null, and get vue to show a nice empty state
 //             */
-//            if ($assignment['end_at'] !== null) {
+//            if ('' !== trim((string)$assignment['end_at'])) {
 //                /**
 //                 * fix date format, from UTC ($assignment['end_at']) to localtime
 //                 */
@@ -177,7 +177,7 @@ class Controller extends Base
                  * if the end_at is null, don't try to convert that to a date
                  * just leave as null, and get vue to show a nice empty state
                  */
-                if ($assignment['end_at'] !== null) {
+                if ('' !== trim((string)$assignment['end_at'])) {
                     /**
                      * fix date format, from UTC ($assignment['end_at']) to localtime
                      */
