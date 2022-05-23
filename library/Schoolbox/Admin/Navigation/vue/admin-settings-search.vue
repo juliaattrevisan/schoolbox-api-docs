@@ -214,7 +214,7 @@ export default {
          * select the currently active search result 
          */
         onEnterKeyPressed () {
-            if (this.resultsList.length > 0) { //only if there's results to select
+            if (this.resultsList.length > 0 && this.activeIndex != -1) { //only if there's results to select and activeIndex is set
                 this.selectResult(this.resultsList[this.activeIndex].url);
             }
         },
