@@ -62,7 +62,7 @@ class Factory
                 // This is the literal string the user entered into the capability mark input field
                 $capabilityCustomMarkInput = $isSelfReflection
                     ? null
-                    : $postCapabilities[$capabilityId]['customMark'];
+                    : ($postCapabilities[$capabilityId]['customMark'] ?? null);
 
                 //if null that is a valid entry
                 if ($capabilityCustomMarkInput === '') {
