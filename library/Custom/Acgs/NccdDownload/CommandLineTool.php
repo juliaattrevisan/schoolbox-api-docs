@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
+use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
@@ -178,6 +179,15 @@ class CommandLineTool extends App
             /** @phpstan-ignore-next-line: read() may return false */
             if ($fileContent === false) {
                 $logger->warning(sprintf('Could not read file "%s": skipping', $file->getFilename()));
+                // Give a hint where it might be found on production?
+                $logger->debug(
+                    sprintf(
+                        'Try downloading from: %s',
+                        (new Uri('https://schoolbox.churchie.com.au/'))
+                            ->setPath('/storage/fetch.php')
+                            ->setQuery(['hash' => $file->getHash()])
+                    )
+                );
                 continue;
             }
             $zip->addFromString($fileTuple['path'], $fileContent);
