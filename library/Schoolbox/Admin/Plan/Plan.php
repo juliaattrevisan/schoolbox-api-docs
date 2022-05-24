@@ -6,7 +6,6 @@ use Alaress\Module\Cache\Rebuilder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Mapper\Exception\NotFound;
 use Symfony\Component\Yaml\Yaml;
 use Schoolbox\Config\ConfigMapper;
 
@@ -177,29 +176,35 @@ HELP
      */
     private function setConfig(array $configList)
     {
-        $configMapper = ConfigMapper::getInstance();
+        $configExistenceQuery = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT configID FROM config WHERE name = :name"
+        );
+        $configHiddenQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET hidden = :hidden WHERE name = :name"
+        );
+        $configEditableQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET editable = :editable WHERE name = :name"
+        );
+        $configValueQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET value = :value WHERE name = :name"
+        );
 
         foreach ($configList as $configName => $item) {
             $this->getLogger()->info("Setting config for '$configName'");
-
-            try {
-                $config = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, $configName);
-
-                if (isset($item['hide'])) {
-                    $config->setHidden($item['hide']);
-                }
-
-                if (isset($item['edit'])) {
-                    $config->setEditable($item['edit']);
-                }
-
-                if (isset($item['value'])) {
-                    $config->setValue($item['value']);
-                }
-
-                $configMapper->save($config);
-            } catch (NotFound $e) {
+            $configExistenceQuery->execute(['name' => $configName]);
+            if ($configExistenceQuery->rowCount() === 0) {
                 $this->getLogger()->warning("Setting '$configName' not found");
+                continue;
+            }
+
+            if (isset($item['hide'])) {
+                $configHiddenQuery->execute(['name' => $configName, 'hidden' => $item['hide'] ? 'true' : 'false']);
+            }
+            if (isset($item['edit'])) {
+                $configEditableQuery->execute(['name' => $configName, 'editable' => $item['edit'] ? 'true' : 'false']);
+            }
+            if (isset($item['value'])) {
+                $configValueQuery->execute(['name' => $configName, 'value' => $item['value']]);
             }
         }
     }
