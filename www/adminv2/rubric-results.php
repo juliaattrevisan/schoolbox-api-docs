@@ -9,8 +9,6 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-define('RESULTSET_MAXLENGTH', 900);
-
 if (!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -52,7 +50,7 @@ if (count($sets)) {
                 'RR_LABEL' => $label,
                 'RR_SANE_LABEL' => htmlentities($label),
                 'RR_RESULT_NUMBER' => $resultNumber++,
-                'RR_MAXLENGTH' => RESULTSET_MAXLENGTH
+                'RR_MAXLENGTH' => \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH
             ));
             $this->parse('list_item_block', 'list_item', true);
             $this->setVar('RR_VALUE', ++$value);
