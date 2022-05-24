@@ -46,10 +46,23 @@ Usage:
 {% endif %}
     <div class="list-item">
         <div class="card small-12">
-            <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
+            {% if folderAccess[courseSpec.folder.id] ?? false %}
+                {# You have WRITE permission in the Course Folder homepage
+                 # Course title links to modify scren; you have a tot option to do the same
+                 #}
+                <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
+                    <div class="icon-course"></div>
+                    <h3>{{ courseSpec.folder.name }}</h3>
+                </a>
+            {% else %}
+                {# You don't have WRITE permission in the Course Folder homepage
+                 # Just show a readonly representation of the course so you know it exists
+                 # and hide the tot menu option
+                 #}
                 <div class="icon-course"></div>
                 <h3>{{ courseSpec.folder.name }}</h3>
-            </a>
+            {% endif %}
+
             <p class="meta">
                 {% if cparents|length %}
                 {{ cparents[0].name }}
@@ -107,8 +120,15 @@ Usage:
             </li>
         {% endif %}
 
+        {# Check if you have WRITE access into the Course Folder's homepage
+         # If you do, provide a Modify link so you can edit its contents
+         # Otherwise, omit the link entirely
+         #}
+        {% if folderAccess[courseSpec.folder.id] ?? false %}
         <li><a href="{{ routeLookup('course.modifyCourse', {id: courseSpec.id}) }}" class="icon-modify">Modify</a></li>
-            {# Course delete: standard folder delete -#}
+        {% endif %}
+
+        {# Course delete: standard folder delete -#}
         {% if USER.isSuperuser() %}
         <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: courseSpec.id}) }}" class="icon-delete" data-course-delete-id="{{ courseSpec.id }}" data-action="course-delete">Delete</a></li>
         {% endif %}
