@@ -1,7 +1,7 @@
 #!/bin/bash
 # Can be invoked to either:
 # 1. Builds and runs a taskd container from local source, or
-# 2. Stops and removes any taskd containers build from local source.
+# 2. Stops and removes any taskd containers built from local source.
 
 # Global const
 readonly ARG_LOCAL="local"                              # If present, build image from local source. If absent, remove locally-built containers.
