@@ -33,6 +33,11 @@ class CommandLineTool extends App
     private const OPT_LONG_OUTFILE = 'outfile:';
 
     /**
+     * Outfile option
+     */
+    private const OPT_LONG_LIMIT = 'limit:';
+
+    /**
      * The ID(s) of the NCCD information courses.
      */
     private const COURSE_IDS = [468];
@@ -47,7 +52,7 @@ class CommandLineTool extends App
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_OUTFILE];
+        return [self::OPT_LONG_OUTFILE, self::OPT_LONG_LIMIT];
     }
 
     /**
@@ -77,8 +82,13 @@ class CommandLineTool extends App
             AND   cs.deleted_at IS NULL
             AND   cs.id IN {$params}
             ORDER BY f.name, f.id
-            LIMIT 10
         ";
+        $limit = $this->getOptAsInt(self::OPT_LONG_LIMIT);
+        if ($limit) {
+            // I'd rather use bound params for this,
+            // but I can't get them to bind using this API
+            $query .= sprintf(' LIMIT %d', $limit);
+        }
         $statement = $this->getDatabaseInternal()->executeQuery($query, Builder::getArrayParameters(self::COURSE_IDS));
 
         $logger->info(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
