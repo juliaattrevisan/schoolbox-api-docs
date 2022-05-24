@@ -921,6 +921,19 @@ class Controller extends Base\Base
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
 
+        /* For each of the courses found in $data['courses'], decide if it's a courseSpec
+         * (it should already be, but we're specifically editing courseSpecs only
+         * in this usage - if you pollute the data, don't get sick from it)
+         *
+         * Then look at its folder instance and find out if you have WRITE+ access to it
+         * If you have write access to the courseSpec's folder context, you can modify
+         * the course - otherwise, deny the link but show it in the index anyway I guess
+         *
+         * (Staff members who don't have permissions to edit might still find it useful
+         * to see what's in here)
+         */
+
+
         if ($this->getRequest()->isXhr()) {
             $options = [
                 'hasClose'         => true,
