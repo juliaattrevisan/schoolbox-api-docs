@@ -58,11 +58,18 @@ function setRubricResultSets($items)
         }
 
         foreach ($results as $value => $label) {
-            printf("[%s][%s] = %s\n", $setID, $value, $label);
+            /* Forcibly truncate $label values so they don't exceed Model/LABEL_MAXLENGTH chars
+             * This is the maximum width allowed in our db schema and will cause sentry errors
+             * unless we forcibly ensure that it doesn't exceed the space available
+             */
+            $truncatedLabel = substr($label, 0, \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH);
+
+            printf("[%s][%s] = %s\n", $setID, $value, $truncatedLabel);
+
             $stmt->execute(array(
                 'setid' => $setID + 1, // because SQL begins at 1...
                 'value' => $value,
-                'label' => $label
+                'label' => $truncatedLabel
             ));
         }
     }
