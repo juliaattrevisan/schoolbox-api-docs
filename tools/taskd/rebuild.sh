@@ -3,6 +3,7 @@
 # Global vars
 pull_from_dockerhub=0;
 dockerhub_access_token='';
+declare env_file
 
 # Read command line options
 function parse_args() {
