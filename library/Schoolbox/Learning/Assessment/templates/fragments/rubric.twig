@@ -56,7 +56,6 @@
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js"></script>
 <script type="text/javascript">
-    var $rubric = $('table[data-rubric]');
     $(function() {
         const capabilityMarkTypeNone = parseInt('{{ markTypeNone }}');
 
@@ -90,6 +89,7 @@
             switch ($button.data('action')) {
                 case 'applyResultSet':
 
+                    let $rubric = $('table[data-rubric]');
                     rubricEditable = $rubric.data('plugin_rubricEditable');
 
                     if (rubricEditable) {
@@ -142,6 +142,7 @@
             var $descriptorsChanged = $('[data-descriptors-changed]').hide();
 
             // Each time we change the value of a descriptor
+            let $rubric = $('table[data-rubric]');
             $rubric.on('blur keyup', '[data-descriptor-value-original]', function(){
                 detectChangedDescriptorValues();
             });
