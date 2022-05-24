@@ -16,9 +16,8 @@ export default {
             isSortable: state => state.loadedData.isSortable, //allows space for the drag/n drop UI
             canDelete: state => state.loadedData.canDelete, //allows space for the delete UI
             headerFields: state => state.headerFields, //allows space for the delete UI
-            hasDBid: state => state.hasDBid, //displays the DB id for each list item
         }),
-
+        
     }
 
 }
@@ -28,7 +27,7 @@ export default {
     <div :class="`${ isSortable ? 'sortable' : '' }`">
         <header :class="`list-header actions-small-${ canDelete ? '1' : '0' }`">
             <div class="list-item">
-                <div v-for="(field, index) in headerFields" :key="index" :class="`small-11 medium-${ field.width ? field.width : '2' } column`">
+                <div v-for="(field, index) in headerFields" :key="index" :class="`small-12 medium-${ field.width ? field.width : '2' } column`">
                     {{ field.caption }}
                     <span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span>
                 </div>
