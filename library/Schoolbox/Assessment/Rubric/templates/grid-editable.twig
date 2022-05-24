@@ -58,5 +58,8 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         $('[data-criterion-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', maxIndicatorLength);
         });
+        $('[data-descriptor-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', maxIndicatorLength);
+        });
     });
 </script>
