@@ -324,6 +324,11 @@ class Controller extends Base
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
                 'showId'            => true,                                    // Set this to true to display the db ID on the front end.
                 'fields'            => [                                        // This is a list of all of the updateable fields
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
                         'width'     => 2,                                       // Width of the column on anything bigger than 'small'
@@ -340,7 +345,7 @@ class Controller extends Base
                     'permissions' => [
                         'caption'             => 'Permissions',
                         'key'                 => 'permissions',
-                        'width'               => 8,
+                        'width'               => 7,
                         'tooltip'             => 'Permissions can be customised for each staff role. This can limit the visibility and access to parts of the instance.',
                         'mandatory'           => true,
                         'isPopOutList'        => true,
@@ -432,9 +437,14 @@ class Controller extends Base
                 'delete'            => true,
                 'showId'            => true,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'house'         => [
                         'caption'   => 'Name',
-                        'width'     => 12,
+                        'width'     => 11,
                         'maxLength' => 50,
                         'mandatory' => true,
                         'default'   => '',
@@ -532,6 +542,11 @@ class Controller extends Base
                 'showId'            => true,
                 'deleteFailMsg'     => 'This campus cannot be deleted as it has users assigned to it.',
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 5,
@@ -549,7 +564,7 @@ class Controller extends Base
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 2,
+                        'width'     => 1,
                         'default'   => null,
                     ]
                 ]
@@ -895,6 +910,11 @@ class Controller extends Base
             'showId' => true,
             'mapper' => YearLevel\Mapper::class,
             'fields' => [
+                'id' => [
+                    'caption'   => 'DB ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
                     'width'     => 1,
@@ -912,7 +932,7 @@ class Controller extends Base
                 'displayOptions' => [
                     'caption'             => 'Display Options',
                     'key'                 => 'displayOptions',
-                    'width'               => 9,
+                    'width'               => 8,
                     'mandatory'           => true,
                     'isPopOutList'        => true,
                 ],

@@ -87,8 +87,6 @@ export default {
 
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
-            <div v-if="hasDBid" class="small-1 text-center">{{row.id}}</div>
-
             <div class="list-item">
 
                 <div v-for="(field) in headerFields" :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="field.id">

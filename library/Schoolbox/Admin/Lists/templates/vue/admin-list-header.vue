@@ -28,9 +28,6 @@ export default {
     <div :class="`${ isSortable ? 'sortable' : '' }`">
         <header :class="`list-header actions-small-${ canDelete ? '1' : '0' }`">
             <div class="list-item">
-                <div v-if="hasDBid" class="small-1 column">
-                    DB ID
-                </div>
                 <div v-for="(field, index) in headerFields" :key="index" :class="`small-11 medium-${ field.width ? field.width : '2' } column`">
                     {{ field.caption }}
                     <span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span>
