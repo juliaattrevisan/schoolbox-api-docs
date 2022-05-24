@@ -463,7 +463,9 @@ docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingma
 # Start and rebuild task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir
 if [ $taskd_build_from_local -gt 0 ]; then
-  "$SITE_ROOT"/tools/taskd/rebuild.sh
+  if ! "$SITE_ROOT"/tools/taskd/rebuild.sh; then
+    exit 1
+  fi
 else
   accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
   if [[ -z $accessToken ]]; then
@@ -473,7 +475,9 @@ else
     # otherwise this error gets raised:
     # "Cannot autolaunch D-Bus without X11 $DISPLAY"
     apt install -y pass
-    "$SITE_ROOT"/tools/taskd/rebuild.sh --pull-from-dockerhub --dockerhub-access-token=$accessToken
+    if ! "$SITE_ROOT"/tools/taskd/rebuild.sh --pull-from-dockerhub --dockerhub-access-token=$accessToken; then
+      exit 1
+    fi
   fi
 fi;
 

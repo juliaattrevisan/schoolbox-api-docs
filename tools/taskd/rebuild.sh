@@ -90,6 +90,12 @@ else
 
   # build image: /tmp/taskd is assumed
   echo "[SB][`date +%Y-%m-%d\ %X`] Rebuilding task daemon image";
+  if [[ ! -d /tmp/taskd ]]; then
+    echo "[SB][$(date +%Y-%m-%d\ %X)] Docker context path '/tmp/taskd' does not exist." >&2
+    echo "[SB][$(date +%Y-%m-%d\ %X)] This generally indicates you've just changed the value of 'taskd_build_from_local' in your vagrant file." >&2
+    echo "[SB][$(date +%Y-%m-%d\ %X)] Please try a \`vagrant reload && vagrant provision\`" >&2
+    exit 1
+  fi
   docker build -q -t alaress/taskd:latest --network host /tmp/taskd
 
   start_container $env_file;
