@@ -74,7 +74,7 @@ OPTIONS
         Available plans: $plans.
 
     --reset
-        Resets the instance's dataset to its current plan.
+        Resets the instance's dataset to reflect the default features available for its current plan.
 
 
 HELP
@@ -93,28 +93,81 @@ HELP
             exit;
         }
 
+        // Setting the plan for a single instance
         $plan = $this->getOpt(self::OPT_LONG_PLAN);
-
         if ($plan) {
-            // Setting the plan for a single instance
-            $planConfigFile = __DIR__ . '/config/' . $plan . '.yaml';
+            $planConfig = $this->extractPlanConfig((string)$plan);
 
-            if (is_file($planConfigFile) && is_readable($planConfigFile)) {
-                $planConfig = Yaml::parseFile($planConfigFile);
-            } else {
+            // Plan not found? That's an error
+            if (!isset($planConfig)) {
                 $this->getLogger()->error("The plan '$plan' is not an available configuration, check the config exists");
                 exit(1);
             }
 
             $this->getLogger()->info("Setting plan to '$plan'");
-
-            $this->setConfig($planConfig['config']);
-            $this->setTopMenu($planConfig['topMenu']);
-            $this->setComponents($planConfig['components']);
-            $this->rebuildModuleCache();
-        } else {
+            $this->applyPlan($planConfig);
             exit;
         }
+
+        // Resetting the plan to its defaults
+        $reset = $this->getOpt(self::OPT_LONG_RESET);
+        if ($reset) {
+            $plan = strtolower((string)$this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN));
+
+            // Plan empty or not found?
+            // Exit but not with an error, as this might be a custom plan.
+            if ($plan === '') {
+                $this->getLogger()->warning("This instance has no plan set: assuming it is running a custom plan, and not resetting");
+                exit;
+            }
+            $planConfig = $this->extractPlanConfig($plan);
+            if (!isset($planConfig)) {
+                $this->getLogger()->warning("This instance's current plan '$plan' is not an available configuration: assuming it is running a custom plan, and not resetting");
+                exit;
+            }
+
+            $this->getLogger()->info("Resetting plan to '$plan' defaults");
+            $this->applyPlan($planConfig);
+            exit;
+        }
+
+        // Neither plan nor reset: output an error
+        $this->getLogger()->error("Either the --plan or --reset option must be provided; alternately, use the -h or --help options for help.");
+        exit(1);
+    }
+
+
+    /**
+     * Extracts plan config out of the plan's YAML file.
+     *
+     * @param string $plan
+     * @return array|null The plan's config, or null if it doesn't exist.
+     */
+    private function extractPlanConfig(string $plan): ?array
+    {
+        $planConfigFile = __DIR__ . '/config/' . $plan . '.yaml';
+        if (is_file($planConfigFile) && is_readable($planConfigFile)) {
+            return Yaml::parseFile($planConfigFile);
+        }
+        return null;
+    }
+
+    /**
+     * Applies the plan's config to the instance.
+     *
+     * Once everything's done, rebuilds the module cache.
+     *
+     * @param array $planConfig
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function applyPlan(array $planConfig): void
+    {
+        $this->setConfig($planConfig['config']);
+        $this->setTopMenu($planConfig['topMenu']);
+        $this->setComponents($planConfig['components']);
+        $this->rebuildModuleCache();
     }
 
     /**

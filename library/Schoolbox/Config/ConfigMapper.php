@@ -139,6 +139,7 @@ class ConfigMapper extends Mapper
     public const NAME_QR_LOGIN_ENABLED = 'qr_login_enabled';
     public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
+    public const NAME_SITE_PLAN = 'site_plan';
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
     public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
