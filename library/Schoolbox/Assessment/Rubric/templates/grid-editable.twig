@@ -4,6 +4,9 @@
 {# Use assessment ID I suppose #}
 {% set rubricId  = 'rb-' ~ rubricGrid.id %}
 {% set levelLimit = levelLimit ?? config.rubric_max_levels %}
+{% set maxCapabilityLength = 900 %}
+{# maxCapabilityLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
+so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
 
     <input type="hidden" name="formField" value="{{ formField }}" />
     <h3 class="subheader show-for-medium-down">Levels</h3>
@@ -27,7 +30,7 @@
         {%- endfor %}
         <tr class="rb-group-header rb-new-group">
             <th colspan="{{ rubricGrid.levels|length + 3 }}">
-                <textarea data-group-grid-text data-spawn="group" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}"></textarea>
+                <textarea data-group-grid-text data-spawn="group" placeholder="+ Type to add new {{ locale.translate('rubricGroup') }}" maxlength="{{ maxCapabilityLength }}"></textarea>
             </th>
         </tr>
         </tbody>
@@ -42,7 +45,7 @@
          */
         {# maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
         so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
-        let maxCapabilityLength = 900, maxIndicatorLength = 900;
+        let maxCapabilityLength = 900, maxIndicatorLength = 900, maxDescriptorLength = 900;
         $('[data-group-row-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', maxCapabilityLength);
         });
@@ -54,6 +57,9 @@
         });
         $('[data-criterion-text]').on('change', (event) => {
             event.target.setAttribute('maxlength', maxIndicatorLength);
+        });
+        $('[data-descriptor-text]').on('change', (event) => {
+            event.target.setAttribute('maxlength', maxDescriptorLength);
         });
     });
 </script>

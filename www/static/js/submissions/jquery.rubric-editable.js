@@ -25,7 +25,14 @@
         localisedCriterionName: 'Indicator',
 };
 
-    function RubricEditable(element, options) {
+    /**
+     * maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
+     * so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...
+     */
+    let maxCapabilityLength = 900, maxIndicatorLength = 900;
+
+
+        function RubricEditable(element, options) {
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
@@ -169,6 +176,14 @@
                     $toastFeedback.toastTimeout({text: cellTypeName + ' created!', css: 'success'});
 
                     $rb.sequencer('refresh');
+
+                    //re start the onchange maxlength check for new objects....
+                    $('[data-group-edit-text]').on('change', (event) => {
+                        event.target.setAttribute('maxlength', maxCapabilityLength);
+                    });
+                    $('[data-criterion-text]').on('change', (event) => {
+                        event.target.setAttribute('maxlength', maxIndicatorLength);
+                    });
                 })
                 .fail(function (data){
                     $toastFeedback.toastTimeout({text: data.responseText, css: 'alert'});
