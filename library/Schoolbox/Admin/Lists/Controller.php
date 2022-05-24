@@ -327,7 +327,7 @@ class Controller extends Base
                     'id' => [
                         'caption'   => 'DB ID',
                         'width'     => 1,
-                        'readonly'  => true,
+                        'readonly'  => true,                                    // set field to readonly, so the user can not modify the db value...
                     ],
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
