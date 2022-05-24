@@ -59,7 +59,11 @@ if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
 fi
-taskd_build_from_local="${12}";
+taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
+if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
+  error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
+  exit 1
+fi
 aws_iam_key=${13}
 aws_iam_secret=${14}
 
