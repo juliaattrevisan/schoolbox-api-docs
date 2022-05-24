@@ -87,7 +87,7 @@ export default {
 
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
-            <div v-if="hasDBid" class="small-1">{{row.id}}</div>
+            <div v-if="hasDBid" class="small-1 text-center">{{row.id}}</div>
 
             <div class="list-item">
 
