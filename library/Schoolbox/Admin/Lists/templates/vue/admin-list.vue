@@ -43,25 +43,24 @@ export default {
 
     data () {
         return {
-            isDataLoaded: false,
-            hasDataLoadError: false,
+            isDataLoaded: false, 
+            hasDataLoadError: false, 
             popOutHeight: 0, //so the popout can allow enough vertical space to fit the pop out
-            hasDBid: false, // if true display the db ID on the front end.
         }
     },
 
     computed: {
 
-        ...mapState(useAdminListStore, ['loadedData', 'rows', 'selectedRow', 'isPopOutOpen', 'headerFields', 'hasDBid']),
+        ...mapState(useAdminListStore, ['loadedData', 'rows', 'selectedRow', 'isPopOutOpen', 'headerFields']),
 
         /**
          * Whether the admin-list-pop-out.vue is requred
-         *
+         * 
          * @returns { Boolean }
          */
         hasPopOut () {
-            return this.loadedData.fields.some((field) => field.hasOwnProperty('isPopOutList'));
-        },
+            return this.loadedData.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
+        }, 
 
         /**
          * Retrieve any styles of the list that change with state
@@ -111,7 +110,7 @@ export default {
                     $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
                 });
             }
-        },
+        }, 
 
         /**
          * As the list wasn't visible, check for sortable feature again
@@ -126,7 +125,7 @@ export default {
         onPopOutMounted (popOutHeight) {
             this.popOutHeight = popOutHeight;
         },
-
+        
         /**
          * To make the new row 'grow' into the list
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
@@ -168,11 +167,11 @@ export default {
     <div>
 
         <div v-if="isDataLoaded">
-
+        
             <div class="small-12 island">
-
+                
                 <transition name="fade" mode="out-in" @after-enter="onListAfterEnter">
-
+                    
                     <admin-list-no-rows v-if="rows.length === 0" key="empty-list" />
 
                     <form v-else method="post" action="/adminv2/lists/save" key="list">
@@ -189,12 +188,12 @@ export default {
                                     :class="`information-list ${ loadedData.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
                                     :style="listStyles"
                                     v-bind:css="false"
-                                    data-sortable
+                                    data-sortable 
                                     data-list
                                     @before-enter="onRowBeforeEnter"
                                     @enter="onRowEnter"
                                     @leave="onRowLeave"
-                                >
+                                >    
                                     <admin-list-row
                                         v-for="(row, index) in rows"
                                         :key="`key-${index}`"
@@ -204,7 +203,7 @@ export default {
 
                                 <admin-list-pop-out
                                     v-if="hasPopOut"
-                                    :table-name="tableName"
+                                    :table-name="tableName" 
                                     @on-pop-out-mounted="onPopOutMounted"
                                 />
 
@@ -214,25 +213,25 @@ export default {
 
                         </section>
 
-
-                        <input type="submit"
-                            @click.prevent="saveRows_onSaveSelected"
-                            @keyup.enter="saveRows_onSaveSelected"
-                            :value="saveRows_saveStatus"
-                            :disabled="saveRows_isProcessing"
+                        
+                        <input type="submit" 
+                            @click.prevent="saveRows_onSaveSelected" 
+                            @keyup.enter="saveRows_onSaveSelected" 
+                            :value="saveRows_saveStatus" 
+                            :disabled="saveRows_isProcessing" 
                         />
 
                     </form>
 
-                </transition>
+                </transition>    
 
-            </div>
+            </div>  
 
             <toast ref="toast"></toast>
 
-            <admin-list-delete-row
-                v-if="loadedData.canDelete"
-                :table-name="tableName"
+            <admin-list-delete-row 
+                v-if="loadedData.canDelete" 
+                :table-name="tableName" 
             />
 
         </div>
@@ -241,7 +240,7 @@ export default {
             <div class="small-12 island">
                 <section class="content">
                     <div data-alert class="alert-box alert">
-                        Sorry, we are currently unable to load this List data. Please contact Schoolbox Support it the problem persists.
+                        Sorry, we are currently unable to load this List data. Please contact Schoolbox Support it the problem persists. 
                     </div>
                 </section>
             </div>
