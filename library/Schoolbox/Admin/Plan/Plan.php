@@ -6,7 +6,6 @@ use Alaress\Module\Cache\Rebuilder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Mapper\Exception\NotFound;
 use Symfony\Component\Yaml\Yaml;
 use Schoolbox\Config\ConfigMapper;
 
@@ -15,13 +14,23 @@ use Schoolbox\Config\ConfigMapper;
  */
 class Plan extends CliTool\App
 {
-
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_PLAN = 'plan:';
+    private const OPT_LONG_RESET = 'reset';
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_PLAN];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_PLAN, self::OPT_LONG_RESET,];
     }
 
     /** @inheritDoc */
@@ -30,38 +39,134 @@ class Plan extends CliTool\App
         return null; // Does not matter if we run this as root
     }
 
+    /**
+     * Print help text.
+     *
+     * @return void
+     */
+    public function printHelp()
+    {
+        $plans = array_map(
+            function ($filename) {
+                return basename($filename, '.yaml');
+            },
+            glob(__DIR__ . '/config/*.yaml'),
+        );
+        $plans = implode(', ', $plans);
+        echo <<<HELP
+NAME
+    set-plan.php
+
+SYNOPSIS
+    set-plan.php --plan PLAN
+    set-plan.php --reset
+
+DESCRIPTION
+    Schoolbox instance plan control script.
+
+OPTIONS
+    -h, --help
+        Print this help text and exit.
+
+    --plan PLAN
+        Updates the instance's dataset to reflect the appropriate features available for PLAN.
+        Available plans: $plans.
+
+    --reset
+        Resets the instance's dataset to reflect the default features available for its current plan.
+
+
+HELP
+        ;
+    }
+
+    /**
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit;
+        }
+
+        // Setting the plan for a single instance
         $plan = $this->getOpt(self::OPT_LONG_PLAN);
-
         if ($plan) {
-            // Setting the plan for a single instance
-            $planConfigFile = __DIR__ . '/config/' . $plan . '.yaml';
+            $planConfig = $this->extractPlanConfig((string)$plan);
 
-            if (is_file($planConfigFile) && is_readable($planConfigFile)) {
-                $planConfig = Yaml::parseFile($planConfigFile);
-            } else {
+            // Plan not found? That's an error
+            if (!isset($planConfig)) {
                 $this->getLogger()->error("The plan '$plan' is not an available configuration, check the config exists");
                 exit(1);
             }
 
             $this->getLogger()->info("Setting plan to '$plan'");
-
-            $this->setConfig($planConfig['config']);
-            $this->setTopMenu($planConfig['topMenu']);
-            $this->setComponents($planConfig['components']);
-            $this->rebuildModuleCache();
-        } else {
-            echo
-            <<<HELP
-Updates instance dataset to reflect the appropriate features available for the plan provided
-
-Usage: set-plan.php --plan [portal,portalplus,basic,pro,elite]
-
-HELP
-            ;
+            $this->applyPlan($planConfig);
             exit;
         }
+
+        // Resetting the plan to its defaults
+        $reset = $this->getOpt(self::OPT_LONG_RESET);
+        if ($reset) {
+            $plan = strtolower((string)$this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN));
+
+            // Plan empty or not found?
+            // Exit but not with an error, as this might be a custom plan.
+            if ($plan === '') {
+                $this->getLogger()->warning("This instance has no plan set: assuming it is running a custom plan, and not resetting");
+                exit;
+            }
+            $planConfig = $this->extractPlanConfig($plan);
+            if (!isset($planConfig)) {
+                $this->getLogger()->warning("This instance's current plan '$plan' is not an available configuration: assuming it is running a custom plan, and not resetting");
+                exit;
+            }
+
+            $this->getLogger()->info("Resetting plan to '$plan' defaults");
+            $this->applyPlan($planConfig);
+            exit;
+        }
+
+        // Neither plan nor reset: output an error
+        $this->getLogger()->error("Either the --plan or --reset option must be provided; alternately, use the -h or --help options for help.");
+        exit(1);
+    }
+
+
+    /**
+     * Extracts plan config out of the plan's YAML file.
+     *
+     * @param string $plan
+     * @return array|null The plan's config, or null if it doesn't exist.
+     */
+    private function extractPlanConfig(string $plan): ?array
+    {
+        $planConfigFile = __DIR__ . '/config/' . $plan . '.yaml';
+        if (is_file($planConfigFile) && is_readable($planConfigFile)) {
+            return Yaml::parseFile($planConfigFile);
+        }
+        return null;
+    }
+
+    /**
+     * Applies the plan's config to the instance.
+     *
+     * Once everything's done, rebuilds the module cache.
+     *
+     * @param array $planConfig
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function applyPlan(array $planConfig): void
+    {
+        $this->setConfig($planConfig['config']);
+        $this->setTopMenu($planConfig['topMenu']);
+        $this->setComponents($planConfig['components']);
+        $this->rebuildModuleCache();
     }
 
     /**
@@ -71,29 +176,35 @@ HELP
      */
     private function setConfig(array $configList)
     {
-        $configMapper = ConfigMapper::getInstance();
+        $configExistenceQuery = $this->getDatabaseInternal()->prepareQuery(
+            "SELECT configID FROM config WHERE name = :name"
+        );
+        $configHiddenQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET hidden = :hidden WHERE name = :name"
+        );
+        $configEditableQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET editable = :editable WHERE name = :name"
+        );
+        $configValueQuery = $this->getDatabaseInternal()->prepareQuery(
+            "UPDATE config SET value = :value WHERE name = :name"
+        );
 
         foreach ($configList as $configName => $item) {
             $this->getLogger()->info("Setting config for '$configName'");
-
-            try {
-                $config = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, $configName);
-
-                if (isset($item['hide'])) {
-                    $config->setHidden($item['hide']);
-                }
-
-                if (isset($item['edit'])) {
-                    $config->setEditable($item['edit']);
-                }
-
-                if (isset($item['value'])) {
-                    $config->setValue($item['value']);
-                }
-
-                $configMapper->save($config);
-            } catch (NotFound $e) {
+            $configExistenceQuery->execute(['name' => $configName]);
+            if ($configExistenceQuery->rowCount() === 0) {
                 $this->getLogger()->warning("Setting '$configName' not found");
+                continue;
+            }
+
+            if (isset($item['hide'])) {
+                $configHiddenQuery->execute(['name' => $configName, 'hidden' => $item['hide'] ? 'true' : 'false']);
+            }
+            if (isset($item['edit'])) {
+                $configEditableQuery->execute(['name' => $configName, 'editable' => $item['edit'] ? 'true' : 'false']);
+            }
+            if (isset($item['value'])) {
+                $configValueQuery->execute(['name' => $configName, 'value' => $item['value']]);
             }
         }
     }
