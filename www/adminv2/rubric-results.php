@@ -9,7 +9,7 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-define('RESULTSET_MAXLENGTH', 10);
+define('RESULTSET_MAXLENGTH', 900);
 
 if (!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
