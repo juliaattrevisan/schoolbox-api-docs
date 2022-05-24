@@ -295,12 +295,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Output course modify link if course page
-        if ($isCoursePage) {
+        $this->setVar('course_link_block', '');
+
+        /* Decide if you have WRITE permissions before providing Modify link
+         */
+        if ($isCoursePage && $this->getAccess()->getFolderAccess($this->getUser(), $this->getContext()->getCourseSpecification()->getFolder()->getId()) > UserAccess::ACCESS_READ) {
             $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
             $this->parse('course_link_block', 'course_link');
             $hasClassActions = true;
-        } else {
-            $this->setVar('course_link_block', '');
         }
 
         //analytics space

@@ -940,7 +940,7 @@ class Controller extends Base\Base
             if ($courseSpec instanceof \Schoolbox\Learning\Course\DataModel\Specification\Model) {
                 /* Have at least WRITE access to the folder
                  */
-                if (UserAccess::ACCESS_READ < $this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId())) {
+                if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) > UserAccess::ACCESS_READ) {
                     $folderAccess[$courseSpec->getFolder()->getId()] = true;
                 } else {
                     $folderAccess[$courseSpec->getFolder()->getId()] = false;
