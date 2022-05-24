@@ -91,9 +91,20 @@ export default {
         getCurrentSelection () {
             if (this.isCurrentSelectionValid) { //selection is valid
                 this.currentSelection = this.validatedLookup.find((option) => option.key === this.row[this.field.id]);
-            } else { //otherwise we can't find any matches, so net to null, allowing the user to make a selection or leave it as 'Not Selected'
+            } else if (this.field.mandatory && !this.field.nullable) { //a new row has been added, and it's mandatory, so we should ensure to set its initial state
+                this.row[this.field.id] = this.field.lookup[0].key;
+                this.currentSelection = { 
+                    value: this.field.lookup[0].value, 
+                    key: this.field.lookup[0].key,
+                    deleted: false,
+                };
+            } else { //otherwise we can't find any matches and it's not mandatory, so set to null, allowing the user to make a selection or leave it as 'Not Selected'
                 this.row[this.field.id] = null;
-                this.currentSelection = { value: null, key: null, deleted: false };
+                this.currentSelection = { 
+                    value: null, 
+                    key: null,
+                    deleted: false,
+                };    
             }
         },
 
