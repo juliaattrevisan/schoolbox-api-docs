@@ -93,20 +93,21 @@ class CommandLineTool extends App
         }
         $statement = $this->getDatabaseInternal()->executeQuery($query, Builder::getArrayParameters(self::COURSE_IDS));
 
-        $logger->info(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
+        $logger->notice(sprintf('Found %d folders which have imported the NCCD courses:', $statement->rowCount()));
 
         // Collate assessment and folder files
         $assessmentFiles = [];
         $folderFiles     = [];
         foreach ($statement->getIterator() as $row) {
-            $logger->info(sprintf('... folder #%d (%s)', $row['id'], $row['name']));
 
             // Figure out which student is referenced by the folder:
             // If there is none, skip this folder
             $student = $this->extractStudentFromFolderName($row['name']);
             if (!$student) {
-                $logger->info('    folder does not contain a student ID: skipping');
+                $logger->notice(sprintf('... #%d (%s) does not contain a student ID: skipping', $row['id'], $row['name']));
                 continue;
+            } else {
+                $logger->info(sprintf('... #%d (%s)', $row['id'], $row['name']));
             }
 
             // Collate folder files
@@ -128,7 +129,6 @@ class CommandLineTool extends App
                     $context instanceof UnitImplementation
                     && in_array($context->getCourse()->getSpecification()->getId(), self::COURSE_IDS)
                 ) {
-                    $logger->info(sprintf('  ... assessment #%d (%s)', $assessment->getId(), $assessment->getTitle()));
                     $assessmentFiles[$student->getExternalId()] ??= [
                         'student' => $student,
                         'files'   => [],
@@ -190,19 +190,20 @@ class CommandLineTool extends App
             exit(1);
         }
         foreach ($files as $fileTuple) {
-            $logger->notice($fileTuple['path']);
-
             /** @var IStorage $file */
-            $file        = $fileTuple['file'];
+            $file = $fileTuple['file'];
+            $logger->info(sprintf('Adding file "%s" to "%s"', $file->getBasename(), $fileTuple['path']));
+
+            // Read file content: raise a warning if it couldn't be added.
+            // (If debug is on: give a hint where it might be found on prod)
             $fileContent = $file->read();
             /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
             /** @phpstan-ignore-next-line: read() may return false */
             if ($fileContent === false) {
-                $logger->warning(sprintf('Could not read file "%s": skipping', $file->getFilename()));
-                // Give a hint where it might be found on production?
+                $logger->warning(sprintf('Could not read file "%s": skipping', $file->getBasename()));
                 $logger->debug(
                     sprintf(
-                        'Try downloading from: %s',
+                        '(Try downloading from %s, and uploading to staging)',
                         (new Uri('https://schoolbox.churchie.com.au/'))
                             ->setPath('/storage/fetch.php')
                             ->setQuery(['hash' => $file->getHash()])
@@ -210,7 +211,15 @@ class CommandLineTool extends App
                 );
                 continue;
             }
-            $zip->addFromString($fileTuple['path'], $fileContent);
+
+            // Add file: exit if it couldn't be added
+            if (!$zip->addFromString($fileTuple['path'], $fileContent)) {
+                $logger->error(
+                    sprintf('Could not add file "%s" to ZIP (%s)', $file->getBasename(), $zip->getStatusString()),
+                );
+                $zip->close();
+                exit(1);
+            }
         }
         $zip->close();
     }
@@ -226,26 +235,17 @@ class CommandLineTool extends App
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
-        $logger = $this->getLogger();
-
         // Get each participant who's uploaded something, and return the files
         // from their most recent response.
         $files = [];
         foreach ($assessment->getAllParticipants() as $participant) {
             $response = $participant->findMostRecentResponse();
             if ($response instanceof DueWorkResponse) {
-                // Say something about the participant
-                $teacher = $response->getSubmittedBy();
-                $logger->info(sprintf('    ... teacher #%d (%s)', $teacher->getId(), $teacher->getFullName()));
-
                 // Is there a file here?
                 if ($response->getAllFiles()->count()) {
                     foreach ($response->getAllFiles() as $file) {
-                        $logger->info(sprintf('      ... file %s', $file->getBasename()));
                         $files[$file->getId()] = $file;
                     }
-                } else {
-                    $logger->info('      ... no files!');
                 }
             }
         }
