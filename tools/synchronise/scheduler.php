@@ -46,6 +46,12 @@ $app = new class extends CliTool\App
         ];
     }
 
+    /** @inheritDoc */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
     /**
      * Execute each strat in the composite
      */
