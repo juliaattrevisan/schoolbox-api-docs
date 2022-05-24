@@ -58,7 +58,7 @@ function setRubricResultSets($items)
         }
 
         foreach ($results as $value => $label) {
-            /* Forcibly truncate $label values so they don't exceed Model/LABEL_MAXLENGTH chars
+            /* Forcibly truncate $label values so they don't exceed Model::LABEL_MAXLENGTH chars
              * This is the maximum width allowed in our db schema and will cause sentry errors
              * unless we forcibly ensure that it doesn't exceed the space available
              */
