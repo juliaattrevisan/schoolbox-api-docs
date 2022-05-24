@@ -67,6 +67,14 @@ fi
 aws_iam_key=${13}
 aws_iam_secret=${14}
 
+# Does this environment use the systemd-wrapped taskd service?
+declare taskd_systemd_service_installed
+if [[ $taskd_build_from_local == "0" ]];then
+  taskd_systemd_service_installed="1"
+else
+  taskd_systemd_service_installed="0"
+fi
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Filename: $data_filename";
@@ -260,7 +268,7 @@ declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
-  [FACTER_taskd_build_from_local]="$taskd_build_from_local"
+  [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
   [FACTER_iam_access_key]="$aws_iam_key"
   [FACTER_iam_access_key]="$aws_iam_secret"
 )
@@ -283,7 +291,7 @@ done
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
 FACTER_vagrant_extra_hostname="$extra_hostname" \
     FACTER_primary_php_majver="$phpversion_supported" \
-    Facter_taskd_build_from_local="$taskd_build_from_local" \
+    Facter_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
     FACTER_iam_access_key="$aws_iam_key" \
     FACTER_iam_secret_key="$aws_iam_secret" \
     "$SITE_ROOT"/puppet-apply.sh
@@ -460,26 +468,15 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
 
-# Start and rebuild task daemon
+# Rebuild & restart task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir
-if [ $taskd_build_from_local -gt 0 ]; then
-  if ! "$SITE_ROOT"/tools/taskd/rebuild.sh; then
-    exit 1
-  fi
-else
-  accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
-  if [[ -z $accessToken ]]; then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Cannot start task daemon: not building from local dir, and unable to derive Dockerhub access token from .env environment file";
-  else
-    # Docker login needs the `pass` package to actually accept a password,
-    # otherwise this error gets raised:
-    # "Cannot autolaunch D-Bus without X11 $DISPLAY"
-    apt install -y pass
-    if ! "$SITE_ROOT"/tools/taskd/rebuild.sh --pull-from-dockerhub --dockerhub-access-token=$accessToken; then
-      exit 1
-    fi
-  fi
+declare taskd_args=()
+if [ "$taskd_build_from_local" == 1 ]; then
+  taskd_args+=(--local)
 fi;
+if ! "$SITE_ROOT"/tools/taskd/rebuild.sh "${taskd_args[@]}"; then
+  exit 1
+fi
 
 
 # call custom provisioning

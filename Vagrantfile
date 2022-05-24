@@ -210,7 +210,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     puppet.facter = {
       "suppress_instance_configuration" => true,
       "primary_php_majver" => primary_php_majver,
-      "taskd_build_from_local" => taskd_build_from_local,
+      "taskd_systemd_service_installed" => taskd_build_from_local ? "0" : "1",
       "iam_access_key" => "#{aws_iam_key}",
       "iam_secret_key" => "#{aws_iam_secret}",
     }
