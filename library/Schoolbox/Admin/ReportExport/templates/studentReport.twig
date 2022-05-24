@@ -164,13 +164,18 @@
     }
 
     /* A grade value, suitable for Folder Title
-     * or for an assessment
+     * or for an assessment.
+     *
+     * Allot 8rem for it, and right-align it so it
+     * lines up with the right edge of the page.
      */
     .grade {
         font-size: 1.5rem;
         font-weight: bold;
         padding-left: 2rem;
         padding-right: 0.75rem;
+        min-width: 8rem;
+        text-align: right;
     }
 
     /* For some reason there's a thing called a summary result
