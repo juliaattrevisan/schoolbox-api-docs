@@ -62,7 +62,7 @@ function setRubricResultSets($items)
              * This is the maximum width allowed in our db schema and will cause sentry errors
              * unless we forcibly ensure that it doesn't exceed the space available
              */
-            $truncatedLabel = substr($label, 0, \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH);
+            $truncatedLabel = mb_substr($label, 0, \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH, 'UTF-8');
 
             printf("[%s][%s] = %s\n", $setID, $value, $truncatedLabel);
 
