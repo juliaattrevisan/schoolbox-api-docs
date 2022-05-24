@@ -15,13 +15,23 @@ use Schoolbox\Config\ConfigMapper;
  */
 class Plan extends CliTool\App
 {
-
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP = 'help';
     private const OPT_LONG_PLAN = 'plan:';
+    private const OPT_LONG_RESET = 'reset';
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_PLAN];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_PLAN, self::OPT_LONG_RESET,];
     }
 
     /** @inheritDoc */
@@ -30,8 +40,59 @@ class Plan extends CliTool\App
         return null; // Does not matter if we run this as root
     }
 
+    /**
+     * Print help text.
+     *
+     * @return void
+     */
+    public function printHelp()
+    {
+        $plans = array_map(
+            function ($filename) {
+                return basename($filename, '.yaml');
+            },
+            glob(__DIR__ . '/config/*.yaml'),
+        );
+        $plans = implode(', ', $plans);
+        echo <<<HELP
+NAME
+    set-plan.php
+
+SYNOPSIS
+    set-plan.php --plan PLAN
+    set-plan.php --reset
+
+DESCRIPTION
+    Schoolbox instance plan control script.
+
+OPTIONS
+    -h, --help
+        Print this help text and exit.
+
+    --plan PLAN
+        Updates the instance's dataset to reflect the appropriate features available for PLAN.
+        Available plans: $plans.
+
+    --reset
+        Resets the instance's dataset to its current plan.
+
+
+HELP
+        ;
+    }
+
+    /**
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit;
+        }
+
         $plan = $this->getOpt(self::OPT_LONG_PLAN);
 
         if ($plan) {
@@ -52,14 +113,6 @@ class Plan extends CliTool\App
             $this->setComponents($planConfig['components']);
             $this->rebuildModuleCache();
         } else {
-            echo
-            <<<HELP
-Updates instance dataset to reflect the appropriate features available for the plan provided
-
-Usage: set-plan.php --plan [portal,portalplus,basic,pro,elite]
-
-HELP
-            ;
             exit;
         }
     }
