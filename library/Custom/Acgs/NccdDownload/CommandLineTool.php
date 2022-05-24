@@ -43,7 +43,9 @@ class CommandLineTool extends App
     private const COURSE_IDS = [468];
 
     /**
-     * Pattern for extracting an external ID out of the folder.
+     * Pattern for extracting an external ID out of the folder name.
+     *
+     * A folder name should look something like: "Student Name {$externalId}".
      */
     private const FOLDER_PATTERN = '/\{(?P<externalId>\\d+)\}/';
 
@@ -99,10 +101,9 @@ class CommandLineTool extends App
         foreach ($statement->getIterator() as $row) {
             $logger->info(sprintf('... folder #%d (%s)', $row['id'], $row['name']));
 
-
-            // Get all assessments:
-            // filter out anything not in one of the courses
-            $student     = $this->extractStudentFromFolderName($row['name']);
+            // Figure out which student is referenced by the folder:
+            // If there is none, skip this folder
+            $student = $this->extractStudentFromFolderName($row['name']);
             if (!$student) {
                 $logger->info('    folder does not contain a student ID: skipping');
                 continue;
@@ -118,13 +119,22 @@ class CommandLineTool extends App
                 $folderFiles[$student->getExternalId()]['files'][$file->getId()] = $file;
             }
 
+            // Collate assessment feedback files, but only for assessments which
+            // are within one of the NCCD information courses.
             $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
             foreach ($assessments as $assessment) {
-                $assessmentFiles[$student->getExternalId()] ??= [
-                    'student' => $student,
-                    'files'   => [],
-                ];
-                $assessmentFiles[$student->getExternalId()]['files'] += $this->collectFilesFromAssessment($assessment);
+                $context = $assessment->getContext();
+                if (
+                    $context instanceof UnitImplementation
+                    && in_array($context->getCourse()->getSpecification()->getId(), self::COURSE_IDS)
+                ) {
+                    $logger->info(sprintf('  ... assessment #%d (%s)', $assessment->getId(), $assessment->getTitle()));
+                    $assessmentFiles[$student->getExternalId()] ??= [
+                        'student' => $student,
+                        'files'   => [],
+                    ];
+                    $assessmentFiles[$student->getExternalId()]['files'] += $this->collectFilesFromAssessment($assessment);
+                }
             }
         }
 
@@ -206,24 +216,20 @@ class CommandLineTool extends App
     }
 
     /**
+     * Collect the files which have been uploaded to this assessment as part of
+     * responses by teachers.
+     *
+     * This only fetches the files from the most recent response.
+     *
      * @param IAssessable $assessment
      * @return array<int, IStorage>
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
-        $logger  = $this->getLogger();
-        $context = $assessment->getContext();
-        if (
-            $context instanceof UnitImplementation
-            && in_array($context->getCourse()->getSpecification()->getId(), self::COURSE_IDS)
-        ) {
-            $logger->info(sprintf('  ... assessment #%d (%s)', $assessment->getId(), $assessment->getTitle()));
-        } else {
-            // This assessment isn't part of NCCD: return
-            return [];
-        }
+        $logger = $this->getLogger();
 
-        // Now: get each participant who's uploaded something
+        // Get each participant who's uploaded something, and return the files
+        // from their most recent response.
         $files = [];
         foreach ($assessment->getAllParticipants() as $participant) {
             $response = $participant->findMostRecentResponse();
@@ -247,7 +253,12 @@ class CommandLineTool extends App
     }
 
     /**
-     * Extracts a student record from the folder name.
+     * Extracts a student from the folder name.
+     *
+     * See `self::FOLDER_PATTERN` for the pattern which identifies a student
+     * given a folder name: if the folder name doesn't match the pattern, or
+     * the identifier in the pattern doesn't then resolve to a user, this
+     * returns null.
      *
      * @param string $folderName
      * @return User|null
