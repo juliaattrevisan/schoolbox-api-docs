@@ -3,11 +3,7 @@
         <div class="small-12 island">
             <section class="type-blue content">
                 <strong>{{ headings[classCode].subjectName }}</strong>
-                {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                    {% if loop.first %}
-                        <span class="right">{{ grades[classCode][2][shortCode]['StaffMailName'] ?? '' }}</span>
-                    {% endif %}
-                {% endfor %}
+                <p class="meta"><a href="mailto:{{ headings[classCode].staffEmail }}">{{ headings[classCode].staffName }}</a></p>
             </section>
         </div>
     </div>
@@ -65,7 +61,8 @@
     <div class="row">
         <div class="small-12 island">
             <section class="content">
-                Comment
+                <p class="subheading">Comments</p>
+                <p class="meta"><a href="mailto:{{ subjectData.staffEmail }}">{{ subjectData.staffName }}</a></p>
                 <p>{{ subjectData.comment }}</p>
             </section>
         </div>

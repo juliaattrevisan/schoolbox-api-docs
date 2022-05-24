@@ -48,7 +48,9 @@ class Base extends AchievementReportBase
                 ShortHeading,
                 HdgAbbrev1,
                 ResultNumeric,
-                Comment
+                Comment,
+                StaffMailNamePrimary,
+                StaffEmail
             FROM
                 uvSchoolBoxMYPResults
             WHERE
@@ -66,11 +68,15 @@ class Base extends AchievementReportBase
             $topicHeading = trim($row['TopicHeading']);
             $shortHeading = trim($row['ShortHeading']);
             $shortCode    = trim($row['HdgAbbrev1']);
+            $staffName    = trim($row['StaffMailNamePrimary']);
+            $staffEmail   = trim($row['StaffEmail']);
 
             // HEADINGS
             if (!key_exists($classCode, $headings)) {
                 $headings[$classCode] = [
                     'subjectName'   => $subject,
+                    'staffName'     => $staffName,
+                    'staffEmail'    => $staffEmail,
                     'topicHeadings' => [],
                     'shortHeadings' => [],
                 ];
@@ -85,9 +91,11 @@ class Base extends AchievementReportBase
             // DATA
             if (!key_exists($classCode, $mypData)) {
                 $mypData[$classCode] = [
-                    'topics'   => [],
-                    'overview' => $row['Overview'],
-                    'comment'  => $row['Comment'],
+                    'topics'     => [],
+                    'overview'   => $row['Overview'],
+                    'comment'    => $row['Comment'],
+                    'staffName'  => $staffName,
+                    'staffEmail' => $staffEmail,
                 ];
             }
             if (!key_exists($topicHeading, $mypData[$classCode]['topics'])) {
