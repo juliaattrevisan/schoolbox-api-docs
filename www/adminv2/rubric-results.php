@@ -9,6 +9,8 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
+define('RESULTSET_MAXLENGTH', 10);
+
 if (!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -50,18 +52,16 @@ if (count($sets)) {
                 'RR_LABEL' => $label,
                 'RR_SANE_LABEL' => htmlentities($label),
                 'RR_RESULT_NUMBER' => $resultNumber++,
-                'ON_OFF' => $setID % 2 ? '' : 'dark'
+                'RR_MAXLENGTH' => RESULTSET_MAXLENGTH
             ));
             $this->parse('list_item_block', 'list_item', true);
             $this->setVar('RR_VALUE', ++$value);
         }
         $this->parse('list_block', 'list', true);
-        $this->setVar('ON_OFF', ++$setID % 2 ? '' : 'dark');
     }
 } else {
     $this->setVar(array(
         'list_block' => '',
-        'ON_OFF' => ''
     ));
 }
 // Last set: set set number
