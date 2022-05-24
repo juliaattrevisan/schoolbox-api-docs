@@ -8,6 +8,7 @@ In the latter case, it should take the user to the Course Import page
 
 Usage:
     {% include '@course/courseListResult.twig' with {
+         folderAccess       array                - Access perm indexed by course.folder.id
          courseSpec:        CourseSpecification
          folder.id:         int | null           - optional folder to insert in import links
          linkToUnits:       bool                 - does title link to CourseSpec modify or Import Course page

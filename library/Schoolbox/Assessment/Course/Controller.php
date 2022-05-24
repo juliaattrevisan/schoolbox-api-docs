@@ -932,10 +932,25 @@ class Controller extends Base\Base
          * (Staff members who don't have permissions to edit might still find it useful
          * to see what's in here)
          */
+        $folderAccess = [];
 
+        /* Get a list of (courseSpec, write perm) tuples to use as a hash lookup in twig town
+         */
+        foreach ($data['courses'] as $courseSpec) {
+            if ($courseSpec instanceof \Schoolbox\Learning\Course\DataModel\Specification\Model) {
+                /* Have at least WRITE access to the folder
+                 */
+                if (UserAccess::ACCESS_READ < $this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId())) {
+                    $folderAccess[$courseSpec->getFolder()->getId()] = true;
+                } else {
+                    $folderAccess[$courseSpec->getFolder()->getId()] = false;
+                }
+            }
+        }
 
         if ($this->getRequest()->isXhr()) {
             $options = [
+                'folderAccess'     => $folderAccess,
                 'hasClose'         => true,
                 'hasAdd'           => false,
                 'hasTot'           => false,
@@ -947,6 +962,7 @@ class Controller extends Base\Base
             ];
         } else {
             $options = [
+                'folderAccess'     => $folderAccess,
                 'hasClose'         => false,
                 'hasAdd'           => true,
                 'hasTot'           => true,

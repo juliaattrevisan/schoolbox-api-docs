@@ -1,5 +1,6 @@
 {# Usage:
     {% include '@course/courseListResults.twig' with {
+         folderAccess      array                   - Access perm indexed by course.folder.id
          suggestions:      CourseSpecification[],
          courses:          CourseSpecification[],
          folder.id:        int | null
@@ -22,6 +23,7 @@
 
                 {% for course in suggestions %}
                     {% include '@course/courseListResult.twig' with {
+                        folderAccess:      folderAccess,
                         courseSpec:        course,
                         folder:            folder is defined ? folder : null,
                         linkToUnits:       linkToUnits,
@@ -46,6 +48,7 @@
             <ul class="information-list">
                 {% for course in courses %}
                     {% include '@course/courseListResult.twig' with {
+                        folderAccess:      folderAccess,
                         courseSpec:        course,
                         folder:            folder is defined ? folder : null,
                         linkToUnits:       linkToUnits,
