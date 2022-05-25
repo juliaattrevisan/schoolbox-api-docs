@@ -277,6 +277,8 @@ switch ($_POST['module']) {
                 'ssl' => [
                     'capture_peer_cert' => true,
                     'peer_name'         => $host,
+                    'verify_peer'       => false,  // Required to fetch expired certificates
+                    'allow_self_signed' => true,   // Required to fetch self-signed certificates (used in dev/test)
                 ],
             ]
         );
