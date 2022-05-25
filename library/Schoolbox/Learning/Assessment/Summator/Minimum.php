@@ -22,8 +22,11 @@ use Schoolbox\Collection;
 class Minimum extends AbstractSummator
 {
 
-    /** @var float */
-    protected $min;
+    /**
+     * @var float|null
+     */
+    protected ?float $min = null;
+
 
     /**
      * Weights are not used in this strategy
@@ -36,6 +39,7 @@ class Minimum extends AbstractSummator
         // noop
     }
 
+
     /**
      * @inheritDoc
      */
@@ -45,10 +49,11 @@ class Minimum extends AbstractSummator
          * If you don't do this check for $min == null, summate() will
          * always return null (any actual value is never less than null)
          */
-        if ($val < $this->min || $this->min == null) {
+        if (null === $this->min || $val < $this->min) {
             $this->min = $val;
         }
     }
+
 
     /**
      * @inheritDoc
@@ -58,6 +63,7 @@ class Minimum extends AbstractSummator
         $this->min = null;
     }
 
+
     /**
      * @inheritDoc
      */
@@ -66,6 +72,7 @@ class Minimum extends AbstractSummator
         return isset($this->min) ? floatval($this->min) : null;
     }
 
+
     /**
      * @return string
      */
@@ -73,6 +80,7 @@ class Minimum extends AbstractSummator
     {
         return 'Minimum';
     }
+
 
     /**
      * @inheritdoc
