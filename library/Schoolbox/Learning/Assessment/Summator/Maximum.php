@@ -37,9 +37,9 @@ class Maximum extends AbstractSummator
     protected function aggregate($val, $assessableWeight)
     {
         if (null === $this->max) {
-            $this->max = (float)$val;
+            $this->max = $val;
         } else {
-            $this->max = max($this->max, (float)$val);
+            $this->max = max($this->max,$val);
         }
     }
 
