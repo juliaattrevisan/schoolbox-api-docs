@@ -20,6 +20,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $this->register('GET', '/audit', 'getAudit', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/assessmentAudit', 'assessmentAudit', new Rule\IsSchoolboxAdmin());
     }
 
     /**
