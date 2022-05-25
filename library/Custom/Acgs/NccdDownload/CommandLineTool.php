@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -98,6 +99,7 @@ class CommandLineTool extends App
         // Collate assessment and folder files
         $assessmentFiles = [];
         $folderFiles     = [];
+        $fileMapper      = FileMapper::getInstance();
         foreach ($statement->getIterator() as $row) {
 
             // Figure out which student is referenced by the folder:
@@ -111,13 +113,17 @@ class CommandLineTool extends App
             }
 
             // Collate folder files
-            $files = FileMapper::getInstance()->findByFolderId($row['id']);
+            /** @var FileModel[] $files */
+            $files = $fileMapper->findByFolderId($row['id']);
             foreach ($files as $file) {
                 $folderFiles[$student->getExternalId()] ??= [
                     'student' => $student,
                     'files'   => [],
                 ];
-                $folderFiles[$student->getExternalId()]['files'][$file->getId()] = $file;
+                $folderFiles[$student->getExternalId()]['files'][$file->getId()] = [
+                    'file'     => $file,
+                    'filename' => $file->getTitle(),
+                ];
             }
 
             // Collate assessment feedback files, but only for assessments which
@@ -133,13 +139,16 @@ class CommandLineTool extends App
                         'student' => $student,
                         'files'   => [],
                     ];
-                    $assessmentFiles[$student->getExternalId()]['files'] += $this->collectFilesFromAssessment($assessment);
+                    $assessmentFiles[$student->getExternalId()]['files'] = array_merge(
+                        $assessmentFiles[$student->getExternalId()]['files'],
+                        $this->collectFilesFromAssessment($assessment),
+                    );
                 }
             }
         }
 
         // Collate the assessment files into filenames
-        /** @var array<int, array{file:IStorage, path:string}> $files */
+        /** @var array<int, array{file:IStorage, filename:string, path:string}> $files */
         $files = [];
         foreach ($folderFiles as $folderFilesTuple) {
             /** @var User $student */
@@ -149,14 +158,15 @@ class CommandLineTool extends App
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
                 $files[]    = [
-                    'file' => $file,
-                    'path' => sprintf(
+                    'file'     => $file['file'],
+                    'filename' => $file['filename'] . '.' . $file['file']->getExtension(),
+                    'path'     => sprintf(
                         '%s/%s_%s_%d.%s',
                         $yearLevel,
                         $externalId,
-                        $file->getFilename(),
+                        $file['filename'],
                         $i + 1,
-                        $file->getExtension(),
+                        $file['file']->getExtension(),
                     ),
                 ];
             }
@@ -165,19 +175,20 @@ class CommandLineTool extends App
             /** @var User $student */
             $student = $assessmentFilesTuple['student'];
             ksort($assessmentFilesTuple['files']);
-            foreach (array_values($assessmentFilesTuple['files']) as $i => $file) {
+            foreach (array_values($assessmentFilesTuple['files']) as $j => $file) {
                 /** @var IStorage $file */
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
                 $files[]    = [
-                    'file' => $file,
-                    'path' => sprintf(
+                    'file'     => $file['file'],
+                    'filename' => $file['filename'] . '.' . $file['file']->getExtension(),
+                    'path'     => sprintf(
                         '%s/%s_Evidence_%s_%d.%s',
                         $yearLevel,
                         $externalId,
-                        $file->getFilename(),
-                        $i + 1,
-                        $file->getExtension(),
+                        $file['filename'],
+                        $j + 1,
+                        $file['file']->getExtension(),
                     ),
                 ];
             }
@@ -192,7 +203,7 @@ class CommandLineTool extends App
         foreach ($files as $fileTuple) {
             /** @var IStorage $file */
             $file = $fileTuple['file'];
-            $logger->info(sprintf('Adding file "%s" to "%s"', $file->getBasename(), $fileTuple['path']));
+            $logger->info(sprintf('Adding file "%s" to "%s"', $fileTuple['filename'], $fileTuple['path']));
 
             // Read file content: raise a warning if it couldn't be added.
             // (If debug is on: give a hint where it might be found on prod)
@@ -231,7 +242,7 @@ class CommandLineTool extends App
      * This only fetches the files from the most recent response.
      *
      * @param IAssessable $assessment
-     * @return array<int, IStorage>
+     * @return array<int, array{file: IStorage, filename: string}>
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
@@ -244,7 +255,10 @@ class CommandLineTool extends App
                 // Is there a file here?
                 if ($response->getAllFiles()->count()) {
                     foreach ($response->getAllFiles() as $file) {
-                        $files[$file->getId()] = $file;
+                        $files[$file->getId()] = [
+                            'file'     => $file,
+                            'filename' => $file->getFilename(),
+                        ];
                     }
                 }
             }
