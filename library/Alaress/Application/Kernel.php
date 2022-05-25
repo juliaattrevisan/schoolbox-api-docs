@@ -73,6 +73,7 @@ use Schoolbox\External\Connector\CompositeSync;
 use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
+use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\IConfigLoader;
@@ -1128,10 +1129,12 @@ abstract class Kernel
                         $databaseExternal = $di->get('databaseExternal');
                         $databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
 
-                        $customSync = new CustomSync($config, $databaseExternal);
-
                         $defaultSync = (new ExternalConnectorFactory())->build($config, $databaseExternal, ExternalConnectorFactory::EXTERNAL_SYNC);
+                        if ($defaultSync instanceof OfflineSync) {
+                            return $defaultSync;
+                        }
 
+                        $customSync = new CustomSync($config, $databaseExternal);
                         return (new CompositeSync())
                             ->addSubSync($customSync)
                             ->addSubSync($defaultSync);
