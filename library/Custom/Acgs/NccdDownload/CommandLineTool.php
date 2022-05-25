@@ -121,8 +121,9 @@ class CommandLineTool extends App
                     'files'   => [],
                 ];
                 $folderFiles[$student->getExternalId()]['files'][$file->getId()] = [
-                    'file'     => $file,
-                    'filename' => $file->getTitle(),
+                    'storage'   => $file,
+                    'filename'  => $file->getTitle(),
+                    'filemtime' => $file->getModifiedAt()->getUnixTimeStamp(),
                 ];
             }
 
@@ -148,7 +149,7 @@ class CommandLineTool extends App
         }
 
         // Collate the assessment files into filenames
-        /** @var array<int, array{file:IStorage, filename:string, path:string}> $files */
+        /** @var array<int, array{file:IStorage, filename:string, path:string, filemtime:int}> $files */
         $files = [];
         foreach ($folderFiles as $folderFilesTuple) {
             /** @var User $student */
@@ -158,15 +159,16 @@ class CommandLineTool extends App
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
                 $files[]    = [
-                    'file'     => $file['file'],
-                    'filename' => $file['filename'] . '.' . $file['file']->getExtension(),
-                    'path'     => sprintf(
+                    'file'      => $file['storage'],
+                    'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
+                    'filemtime' => $file['filemtime'],
+                    'path'      => sprintf(
                         '%s/%s_%s_%d.%s',
                         $yearLevel,
                         $externalId,
                         $file['filename'],
                         $i + 1,
-                        $file['file']->getExtension(),
+                        $file['storage']->getExtension(),
                     ),
                 ];
             }
@@ -180,22 +182,23 @@ class CommandLineTool extends App
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
                 $files[]    = [
-                    'file'     => $file['file'],
-                    'filename' => $file['filename'] . '.' . $file['file']->getExtension(),
-                    'path'     => sprintf(
+                    'file'      => $file['storage'],
+                    'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
+                    'filemtime' => $file['filemtime'],
+                    'path'      => sprintf(
                         '%s/%s_Evidence_%s_%d.%s',
                         $yearLevel,
                         $externalId,
                         $file['filename'],
                         $j + 1,
-                        $file['file']->getExtension(),
+                        $file['storage']->getExtension(),
                     ),
                 ];
             }
         }
 
         $zip       = new ZipArchive();
-        $zipStatus = $zip->open($outfile, ZipArchive::CREATE);
+        $zipStatus = $zip->open($outfile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         if ($zipStatus !== true) {
             $logger->error(sprintf('Could not create ZIP file (%s)', $zip->getStatusString()));
             exit(1);
@@ -231,6 +234,7 @@ class CommandLineTool extends App
                 $zip->close();
                 exit(1);
             }
+            $zip->setMtimeName($fileTuple['path'], $fileTuple['filemtime']);
         }
         $zip->close();
     }
@@ -242,7 +246,7 @@ class CommandLineTool extends App
      * This only fetches the files from the most recent response.
      *
      * @param IAssessable $assessment
-     * @return array<int, array{file: IStorage, filename: string}>
+     * @return array<int, array{storage: IStorage, filename: string, filemtime: int}>
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
@@ -256,8 +260,9 @@ class CommandLineTool extends App
                 if ($response->getAllFiles()->count()) {
                     foreach ($response->getAllFiles() as $file) {
                         $files[$file->getId()] = [
-                            'file'     => $file,
-                            'filename' => $file->getFilename(),
+                            'storage'   => $file,
+                            'filename'  => $file->getFilename(),
+                            'filemtime' => $response->getSubmittedAt()->getUnixTimeStamp(),
                         ];
                     }
                 }
