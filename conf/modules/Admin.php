@@ -112,5 +112,8 @@ class Admin extends ModuleLoader
 
         // Usage Graphs
         $this->loadModule($di, \Schoolbox\Admin\Intellischool\Module::class, '/adminv2/intellischool');
+
+        //Health Check
+        $this->loadModule($di, \Schoolbox\Admin\HealthCheck\Module::class, '/adminv2/health-check-export');
     }
 }
