@@ -49,8 +49,8 @@ class Minimum extends AbstractSummator
          * If you don't do this check for $min == null, summate() will
          * always return null (any actual value is never less than null)
          */
-        if (null === $this->min || $val < $this->min) {
-            $this->min = $val;
+        if (null === $this->min || (float)$val < $this->min) {
+            $this->min = (float)$val;
         }
     }
 

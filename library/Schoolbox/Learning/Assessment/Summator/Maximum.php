@@ -17,8 +17,8 @@ use Schoolbox\Collection;
 class Maximum extends AbstractSummator
 {
 
-    /** @var float */
-    protected $max;
+    /** @var float|null */
+    protected ?float $max = null;
 
     /**
      * Weights are not used in this strategy
@@ -36,7 +36,11 @@ class Maximum extends AbstractSummator
      */
     protected function aggregate($val, $assessableWeight)
     {
-        $this->max = max($this->max, $val);
+        if (null === $this->max) {
+            $this->max = (float)$val;
+        } else {
+            $this->max = max($this->max, (float)$val);
+        }
     }
 
     /**
