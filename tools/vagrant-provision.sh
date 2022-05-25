@@ -102,11 +102,11 @@ if [[ -z $s3Referer ]]; then
 fi
 
 # Download some files from S3
-if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
 fi
-if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
