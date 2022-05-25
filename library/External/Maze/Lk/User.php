@@ -94,6 +94,10 @@ class External_Maze_Lk_User extends External_Maze_User
 
         $student = $this->getDb()->getRow($query);
 
+        if (empty($student)) {
+            return [];
+        }
+
         /* Assign birthday
          */
         $birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');

@@ -161,7 +161,8 @@ class External_Maze_Timetable implements External_TimetableInterface
                 $timetableDef['sequence'][] = 1;
             }
         }
-
+        $timetableDef['periodCount'] = count($periods);
+        $timetableDef['dayCount']    = 0;
         return $timetableDef;
     }
 
