@@ -147,7 +147,7 @@
                             <div data-role="existingRubricResult" data-resultNumber="{RR_RESULT_NUMBER}">
                                 <label>
                                     <span data-role="value">{RR_VALUE}</span>
-                                    <input type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" value="{RR_SANE_LABEL}" required />
+                                    <input type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" value="{RR_SANE_LABEL}" maxlength="{RR_MAXLENGTH}" required />
                                 </label>
                                 <!--
                                 <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
@@ -157,7 +157,7 @@
                             <div data-role="newRubricResult">
                                 <label>
                                     <span data-role="value">&nbsp;</span>
-                                    <input class="nullable"  type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" value="" />
+                                    <input class="nullable"  type="text" name="items[{RR_SET_NUMBER}][{RR_RESULT_NUMBER}]" maxlength="{RR_MAXLENGTH}" value="" />
                                 </label>
                             </div>
                         </div>
@@ -170,7 +170,7 @@
                             <div data-role="newRubricResult" data-resultNumber="0">
                                 <label>
                                     <span data-role="value">&nbsp;</span>
-                                    <input class="nullable" type="text" name="items[{RR_SET_NUMBER}][0]" value="" />
+                                    <input class="nullable" type="text" name="items[{RR_SET_NUMBER}][0]" maxlength="{RR_MAXLENGTH}" value="" />
                                 </label>
                             </div>
                         </div>

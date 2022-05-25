@@ -50,18 +50,16 @@ if (count($sets)) {
                 'RR_LABEL' => $label,
                 'RR_SANE_LABEL' => htmlentities($label),
                 'RR_RESULT_NUMBER' => $resultNumber++,
-                'ON_OFF' => $setID % 2 ? '' : 'dark'
+                'RR_MAXLENGTH' => \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH
             ));
             $this->parse('list_item_block', 'list_item', true);
             $this->setVar('RR_VALUE', ++$value);
         }
         $this->parse('list_block', 'list', true);
-        $this->setVar('ON_OFF', ++$setID % 2 ? '' : 'dark');
     }
 } else {
     $this->setVar(array(
         'list_block' => '',
-        'ON_OFF' => ''
     ));
 }
 // Last set: set set number
