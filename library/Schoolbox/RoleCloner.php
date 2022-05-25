@@ -62,6 +62,9 @@ class RoleCloner
         $this->cloneCommsArticleAudiences($source, $destination);
         $this->cloneSchoolCalendarPermissions($source, $destination);
         $this->cloneTours($source, $destination);
+
+        //notification transfer...
+        $this->cloneNotifs($source, $destination);
     }
 
     /**
@@ -314,5 +317,27 @@ class RoleCloner
 
         // insert new perms
         $this->db->query($insertQuery, $args);
+    }
+
+    /**
+     * migrate all notification settings to $destination, and ignore what is already there.
+     * @param Role $source
+     * @param Role $destination
+     * @return void
+     */
+    protected function cloneNotifs(Role $source, Role $destination)
+    {
+        /**
+         * purge /  burn all notification settings from $destination
+         * with those from $source
+         */
+        $this->db->query("
+        REPLACE INTO msg_route_perm ( SELECT rp.msg_source_id as msg_source_id,
+                :newRole as role_id,
+                rp.mask as mask,
+                rp.role_default as role_default
+            FROM msg_route_perm as rp
+            WHERE rp.role_id = :oldRole
+        )", ['newRole' => $destination->getId(), 'oldRole' => $source->getId()]);
     }
 }
