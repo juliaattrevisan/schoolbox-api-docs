@@ -351,12 +351,8 @@
 
 
     @page {
-        counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
         margin: 0.25in;
-        @bottom-right {
-            content: 'Page ' counter(page) ' / ' counter(pages);
-        }
     }
 
     @media print {
