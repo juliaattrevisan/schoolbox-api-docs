@@ -285,6 +285,10 @@ class Controller extends ConfigController
                 ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
                 : null;
 
+            /* This $message instance is the payload that we send to taskd
+             * which it then unpacks, configures its Gotenberg client, and uses
+             * to generate the pdfs. This is the bridge between the systems
+             */
             $message = $messageFactory->build(
                 'download-pages',
                 [
@@ -294,6 +298,9 @@ class Controller extends ConfigController
                     'gotenberg' => [
                         'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'auth' => $gotenbergAuth,
+                        /* TODO Move this to a const once it works
+                         */
+                        'footer' => 'report-export-footer.html'
                     ],
                 ],
                 $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
