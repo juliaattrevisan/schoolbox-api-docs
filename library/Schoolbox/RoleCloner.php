@@ -329,10 +329,15 @@ class RoleCloner
     {
         /**
          * purge /  burn all notification settings from $destination
-         * with those from $source
          */
         $this->db->query("
-        REPLACE INTO msg_route_perm ( SELECT rp.msg_source_id as msg_source_id,
+        DELETE FROM msg_route_perm
+            WHERE msg_route_perm.role_id = :newRole
+        ", ['newRole' => $destination->getId()]);
+
+        //clone all notification settings from $source to $destination
+        $this->db->query("
+        INSERT INTO msg_route_perm ( SELECT rp.msg_source_id as msg_source_id,
                 :newRole as role_id,
                 rp.mask as mask,
                 rp.role_default as role_default
