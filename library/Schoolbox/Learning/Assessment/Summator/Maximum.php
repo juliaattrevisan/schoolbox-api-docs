@@ -39,7 +39,7 @@ class Maximum extends AbstractSummator
         if (null === $this->max) {
             $this->max = $val;
         } else {
-            $this->max = max($this->max,$val);
+            $this->max = max($this->max, $val);
         }
     }
 
