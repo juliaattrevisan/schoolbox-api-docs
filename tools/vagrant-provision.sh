@@ -291,7 +291,7 @@ done
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
 FACTER_vagrant_extra_hostname="$extra_hostname" \
     FACTER_primary_php_majver="$phpversion_supported" \
-    Facter_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
+    FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
     FACTER_iam_access_key="$aws_iam_key" \
     FACTER_iam_secret_key="$aws_iam_secret" \
     "$SITE_ROOT"/puppet-apply.sh
