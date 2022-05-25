@@ -5741,29 +5741,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Summator/Count.php
 
 		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Maximum\\:\\:\\$max \\(float\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Maximum\\:\\:\\$max \\(float\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
-
-		-
 			message: "#^Return type \\(void\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Maximum\\:\\:calculateTotalWeight\\(\\) should be compatible with return type \\(int\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\AbstractSummator\\:\\:calculateTotalWeight\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Summator/Maximum.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Minimum\\:\\:\\$min \\(float\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Minimum.php
-
-		-
-			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Minimum\\:\\:\\$min \\(float\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/Minimum.php
 
 		-
 			message: "#^Return type \\(void\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Minimum\\:\\:calculateTotalWeight\\(\\) should be compatible with return type \\(int\\) of method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\AbstractSummator\\:\\:calculateTotalWeight\\(\\)$#"
