@@ -29,7 +29,7 @@
      * maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
      * so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...
      */
-    let maxCapabilityLength = 900, maxIndicatorLength = 900;
+    let maxCapabilityLength = 900, maxIndicatorLength = 900, maxDescriptorLength = 900;
 
 
         function RubricEditable(element, options) {
@@ -230,6 +230,10 @@
 
             $check.prop('checked', true).trigger('change');
             $textarea.focus().trigger('focus');
+            //limit all descriptors to the max lenght, not just $textbox, as it won't add the attribute to the one directly next to it...
+            $('[data-descriptor-text]').on('change', (event) => {
+                event.target.setAttribute('maxlength', maxDescriptorLength);
+            });
         });
 
         $rb.off('change', 'th [data-level]');
