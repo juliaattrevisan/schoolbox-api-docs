@@ -265,6 +265,12 @@ class Controller extends ConfigController
             $outfile = $escapedTitle !== ''
                 ? ($date . '-' . $escapedTitle)
                 : $date;
+
+            $gotenbergApiKey = $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+            $gotenbergAuth   = $gotenbergApiKey
+                ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
+                : null;
+
             $message = $messageFactory->build(
                 'download-pages',
                 [
@@ -272,8 +278,8 @@ class Controller extends ConfigController
                     'content'   => $reports,
                     'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                     'gotenberg' => [
-                        'url' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                        'key' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        'auth' => $gotenbergAuth,
                     ],
                 ],
                 $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
