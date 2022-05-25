@@ -107,7 +107,7 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getExtTimetableCode()
     {

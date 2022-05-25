@@ -47,15 +47,30 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
 
-
+    /**
+     * Get campus code from campus external timetable code
+     * @param Campus $campus
+     * @return mixed|string
+     */
     private function getCampusCode(Campus $campus)
     {
+        if ($campus->getExtTimetableCode() === null || !strpos($campus->getExtTimetableCode(), '-')) {
+            return '';
+        }
         [$campusCode, $timetableCode] = explode('-', $campus->getExtTimetableCode());
         return $campusCode;
     }
 
+    /**
+     * Get timetable code from campus external timetable code
+     * @param Campus $campus
+     * @return mixed|string
+     */
     private function getTimetableCode(Campus $campus)
     {
+        if ($campus->getExtTimetableCode() === null || !strpos($campus->getExtTimetableCode(), '-')) {
+            return '';
+        }
         [$campusCode, $timetableCode] = explode('-', $campus->getExtTimetableCode());
         return $timetableCode;
     }
