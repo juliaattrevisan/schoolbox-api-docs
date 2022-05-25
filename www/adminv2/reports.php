@@ -14,7 +14,7 @@ $userHandler = new User();
 if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
-
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/reports.html');
 $this->setBlock(TEMPLATE_content, 'search_options', 'search_options_block');
 $this->setBlock(TEMPLATE_content, 'search_results', 'search_results_block');
@@ -39,14 +39,14 @@ $reportVar   = urldecode($this->arg[1] ?? '');
 $exportToCSV = false;
 
 // default sorting
+$orderBy  = '';
+$orderDir = '';
 if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
     $page        = 0; //export, so no pagination
-    $orderBy     = "";
     $exportToCSV = true;
 } elseif (isset($this->arg[2]) && is_numeric($this->arg[2])) {
     // page number
     $page    = $this->arg[2];
-    $orderBy = "";
 } else {
     // sortBy
     $page    = 1;
@@ -61,7 +61,6 @@ if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
             $orderDir = "ASC";
             break;
         default:
-            $orderDir = '';
             break;
     }
 
@@ -111,7 +110,7 @@ if (($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir)
     // handle group export
     if ($exportToCSV) {
         // export to csv
-        $report->export(new Report_Exporter($report->getReportTitle()), 'CSV');
+        $report->export();
     } else {
         // render the page
 
