@@ -3,7 +3,9 @@
         <div class="small-12 island">
             <section class="type-blue content">
                 <strong>{{ headings[classCode].subjectName }}</strong>
-                <p class="meta"><a href="mailto:{{ headings[classCode].staffEmail }}">{{ headings[classCode].staffName }}</a></p>
+                <p class="meta">
+                    <a href="mailto:{{ headings[classCode].staffEmail }}">{{ headings[classCode].staffName }}</a>
+                </p>
             </section>
         </div>
     </div>
@@ -62,8 +64,11 @@
         <div class="small-12 island">
             <section class="content">
                 <p class="subheading">Comments</p>
-                <p class="meta"><a href="mailto:{{ subjectData.staffEmail }}">{{ subjectData.staffName }}</a></p>
-                <p>{{ subjectData.comment }}</p>
+                <p>{{ subjectData.comment }}
+                    {% if subjectData.comment is not empty and subjectData.staffName is not empty %}
+                        &mdash; <a href="mailto:{{ subjectData.staffEmail }}">{{ subjectData.staffName }}</a>
+                    {% endif %}
+                </p>
             </section>
         </div>
     </div>
