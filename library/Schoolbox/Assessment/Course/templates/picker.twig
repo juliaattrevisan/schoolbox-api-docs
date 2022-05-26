@@ -12,7 +12,7 @@
      */
 
     //check if one of the scripts is already loaded so we don't load it again
-    if (Boolean(document.querySelector(`script[src="{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js"]`))) {
+    if (Boolean(document.querySelector(`script[src="{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js?v={{ config.site_version }}"]`))) {
         initResourceTree();
     } else {
         loadScripts();

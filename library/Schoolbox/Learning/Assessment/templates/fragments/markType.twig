@@ -32,7 +32,7 @@
     {% set context = context ~ '-' %}
 {% endif %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.markType-gradingScheme.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.markType-gradingScheme.js?v={{ config.site_version }}"></script>
 <script>
     $(function() {
         $.fn.markTypeGradingScheme({

@@ -11,7 +11,7 @@ $data = [
 
 {% if unitSpec.assessables | length %}
 
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-builder.js"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-builder.js?v={{ config.site_version }}"></script>
     <script type="text/javascript">
         $(function () {
             $('[data-unit-spec={{ unitSpec.id }}]').setupCourseBuilder({toastSelector: '[data-relation="ajax-response-{{ componentInstance.id }}"]'});

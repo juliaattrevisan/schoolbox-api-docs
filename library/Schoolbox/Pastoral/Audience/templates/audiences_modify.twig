@@ -84,9 +84,9 @@
                         <div class="small-12 columns">
                             <label for="template">Available Actions</label>
                             <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
                             <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
                         </div>
                         <script type="text/javascript">

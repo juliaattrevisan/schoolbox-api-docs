@@ -206,7 +206,7 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
-    <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js"></script>
+    <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
     <div id="mass-review" class="reveal-modal" data-reveal data-list-id="mass-review-list" aria-hidden="true" role="dialog">
         <h2>Mark Attempts as Reviewed</h2>
         <p data-mass-unavailable>There aren't any unreviewed attempts for this activity.</p>

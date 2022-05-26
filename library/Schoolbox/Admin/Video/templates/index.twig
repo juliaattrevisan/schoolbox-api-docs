@@ -1,6 +1,6 @@
 {% import '@adminVideo/macros/statusIcon.twig' as statusIcon %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
         $('[data-submit]').click(function (e) {

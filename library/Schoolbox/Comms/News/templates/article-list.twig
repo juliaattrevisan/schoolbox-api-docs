@@ -120,6 +120,6 @@
 <div id="news-component">
     <article-list :data="{{ articleListData | json_encode }}"></article-list>
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/articleList.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/articleList.js?v={{ config.site_version }}"></script>
 
 <div id='toaster' class="toast" data-toast></div>

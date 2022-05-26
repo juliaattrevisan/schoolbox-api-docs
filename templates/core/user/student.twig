@@ -675,7 +675,7 @@
                     ) }}';
                 </script>
             {% endautoescape %}
-            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js"></script>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
             {% if showClasses and showSubjects %}
             <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">

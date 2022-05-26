@@ -96,8 +96,8 @@
 
         {% if year %}
             <section>
-                <script src="{{ CDN_PREFIX }}/js/comms/articletabs.js"></script>
-                <script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js"></script>
+                <script src="{{ CDN_PREFIX }}/js/comms/articletabs.js?v={{ config.site_version }}"></script>
+                <script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js?v={{ config.site_version }}"></script>
                 <script>
                     $(function() {
                         var $newsContainer = $('#news-container');

@@ -11,9 +11,9 @@
  # teams[].team:           the team data for each division team
  # teams[].players[]:      the player data for each division team
  #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.division-lobby.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.division-lobby.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-division-player-list], [data-team-player-list], [data-team-player-list-proxy]').divisionLobby();

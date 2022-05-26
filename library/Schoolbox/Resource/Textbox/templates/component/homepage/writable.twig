@@ -15,7 +15,7 @@
         });
     </script>
     {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
-        <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js" type="text/javascript"></script>
+        <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js?v={{ config.site_version }}" type="text/javascript"></script>
         <script type="text/javascript">
             $(function () {
                 $('#component{{ component.instance.id }} [data-immersive-reader]').immersiveReader({title: '{{ textbox.heading | escape('js') }}'});
@@ -82,7 +82,7 @@
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/textbox/jquery.inlineTextboxEditor.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/textbox/jquery.inlineTextboxEditor.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function() {

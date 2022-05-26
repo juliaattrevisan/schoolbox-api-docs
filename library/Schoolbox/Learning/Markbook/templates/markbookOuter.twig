@@ -6,10 +6,10 @@
         filterPanel   \Schoolbox\Filter\Panel          - which assessments are writable? indexed by assessment.id
 #}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.ajax-form.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.ajax-form.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/dataTables.js?v={{ config.site_version }}"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {# Crumbz: Class > Markbook #}

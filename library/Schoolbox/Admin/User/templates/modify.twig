@@ -775,10 +775,10 @@
     </div>
 {% endif %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         var serviceIdentifierDropdown = $("#serviceIdentifierSelect");

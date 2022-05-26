@@ -26,9 +26,9 @@
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/calendar/jquery.eventModify.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/calendar/jquery.eventModify.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.alaressEditor();
@@ -308,8 +308,8 @@
                             <div class="small-12 columns">
                                 <label>Invite Guests</label>
                                 <input id='add-guests' name="guests" type='text' value='' placeholder="Search for people to invite" />
-                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
                                 <script type="text/javascript">
                                     $(function() {
                                         $('#add-guests').selectizeSelector({

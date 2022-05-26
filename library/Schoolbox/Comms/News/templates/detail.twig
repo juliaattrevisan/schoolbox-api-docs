@@ -90,7 +90,7 @@ Data:
 
     <nav>
         {# Save For Later #}
-        <script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js?v={{ config.site_version }}"></script>
         <script>
             $(function() {
                 $('#saveforlater-container').saveForLater();

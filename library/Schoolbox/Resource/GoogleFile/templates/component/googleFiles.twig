@@ -8,7 +8,7 @@
  # @param bool $hasError        A bool flag indicating something is misconfigured
  # @param Folder\Model $folder  The current homepage instance
 #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
 {% if googleFiles is empty %}
     <div class="empty-state">
         <i class="icon-google-drive"></i>
@@ -134,8 +134,8 @@
     data-folder-id="{{ folder.id }}"
 >
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js?v={{ config.site_version }}"></script>
     <script type="text/javascript">
         $.fn.setupGapi({
             clientId: '{{ config.googleapps_client_id }}',

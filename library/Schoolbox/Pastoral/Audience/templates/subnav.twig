@@ -9,7 +9,7 @@
  # @param array $adminSubnav      A set of tuples for each node in the menu
  # @param string $pageCurrent     A string corresponding to url in a tuple
 #}
-<script src="{{ CDN_PREFIX }}/js/admin/menu.js"></script>
+<script src="{{ CDN_PREFIX }}/js/admin/menu.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $('#admin-nav').adminMenu();

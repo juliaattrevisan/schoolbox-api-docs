@@ -46,7 +46,7 @@
     {% else %}
         <div class="small-12 island">
 
-            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js"></script>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 
             <form method="post"
                   action="{{ routeLookup('learningAssessmentExporter.postExport', {assessmentId: assessmentSpec.id}) }}?{{ returnUrlName|e('html_attr') }}={{ returnUrl|e('html_attr') }}"

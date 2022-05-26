@@ -13,7 +13,7 @@
         </div>
 
         {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
-            <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js" type="text/javascript"></script>
+            <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js?v={{ config.site_version }}" type="text/javascript"></script>
             <script type="text/javascript">
                 $(function () {
                     $('[data-immersive-reader]').immersiveReader({title: '{{ article.title | escape('js') }}' });
@@ -41,7 +41,7 @@
                 </span>
             {% endif %}
 
-            <script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js"></script>
+            <script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js?v={{ config.site_version }}"></script>
             {% autoescape 'js' %}
             <script>
                 /**

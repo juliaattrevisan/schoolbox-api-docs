@@ -35,7 +35,7 @@
                 if (d.getElementById(id)) return t;
                 js = d.createElement(s);
                 js.id = id;
-                js.src = "//platform.twitter.com/widgets.js";
+                js.src = "//platform.twitter.com/widgets.js?v={{ config.site_version }}";
                 fjs.parentNode.insertBefore(js, fjs);
 
                 t._e = [];

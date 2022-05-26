@@ -96,11 +96,11 @@
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 {% if isAutoSavable %}
-    <script src="{{ CDN_PREFIX }}/js/comms/draft.js"></script>
+    <script src="{{ CDN_PREFIX }}/js/comms/draft.js?v={{ config.site_version }}"></script>
 {% endif %}
-<script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js"></script>
-<script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-<script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
 <script>
     'use strict';
@@ -565,7 +565,7 @@
                         :encoded-segments="{{ encodedSegments | json_encode }}"
                     />
                 </fieldset>
-                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceSelect.js"></script>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceSelect.js?v={{ config.site_version }}"></script>
 
                 {# Only news moderator or superuser can change this setting
                  # This prevents teachers getting over eager about their content
@@ -626,7 +626,7 @@
                             locale-news="{{ locale.news }}"
                         />
                     </div>
-                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemFormActions.js"></script>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemFormActions.js?v={{ config.site_version }}"></script>
                 </div>
             </div>
         </form>

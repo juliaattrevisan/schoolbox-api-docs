@@ -144,7 +144,7 @@
 
 {# LTI component JS configuration #}
 {% set providerIdPlaceholder = 'providerIdPlaceholder' %}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/lti/jquery.ltiComponent.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function () {
