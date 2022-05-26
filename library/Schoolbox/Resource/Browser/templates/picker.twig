@@ -3,7 +3,7 @@
 {# Load in required CSS as we are not inside the chrome #}
 {% include 'include/skin.twig' with { config: config } only %}
 
-<link rel="stylesheet" href="{{ CDN_PREFIX }}/js/vendors/jstree/dist/themes/default/style.css" />
+<link rel="stylesheet" href="{{ CDN_PREFIX }}/js/vendors/jstree/dist/themes/default/style.css?v={{ config.site_version }}" />
 
 {% if namespace == 'myFilesBrowser' %}
     {% set fileController   = 'myFile' %}
