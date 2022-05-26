@@ -207,8 +207,13 @@ class Calendar extends DeprecatedModel
             $event = $this->getByID($eventID);
         }
 
-        if (!empty($_SESSION['su'])) {
-            return 3;
+        // TODO remove $_SESSION dependency: or preferably this entire handler
+        $sessionUser = $_SESSION['user'] ?? null;
+        if (!$sessionUser instanceof User) {
+            return UserAccess::ACCESS_DENY;
+        }
+        if ($sessionUser->isSuperuser()) {
+            return UserAccess::ACCESS_FULL;
         }
 
         switch ($event['access']) {
@@ -218,13 +223,15 @@ class Calendar extends DeprecatedModel
              * didn't create.
              */
             case EventModel::ACCESS_PERSONAL:
-                if ($event['author_id'] == $_SESSION['id']) {
-                    return 2;
+                if ($event['author_id'] == $sessionUser->getId()) {
+                    return UserAccess::ACCESS_WRITE;
                 }
-                if ($event['owner'] == $_SESSION['id']) {
-                    return $_SESSION['user']->getRole()->getType() === 'staff' ? 2 : 1;
+                if ($event['owner'] == $sessionUser->getId()) {
+                    return $sessionUser->getRole()->isStaff()
+                        ? UserAccess::ACCESS_WRITE
+                        : UserAccess::ACCESS_READ;
                 }
-                return 0;
+                return UserAccess::ACCESS_DENY;
 
             case EventModel::ACCESS_GROUP:
                 // Need to check all groups, not just one.
@@ -242,7 +249,7 @@ class Calendar extends DeprecatedModel
                 $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
                 if (empty($permissions)) {
-                    $permissions[] = 0;
+                    $permissions[] = UserAccess::ACCESS_DENY;
                 }
                 return min($permissions);
 
@@ -256,7 +263,7 @@ class Calendar extends DeprecatedModel
 
                 /* Find the highest permission level
                  */
-                $output = 0;
+                $output = UserAccess::ACCESS_DENY;
 
                 if (is_array($campusList)) {
                     foreach ($campusList as $campus) {
@@ -270,7 +277,7 @@ class Calendar extends DeprecatedModel
                 return $output;
 
             default:
-                return 0;
+                return UserAccess::ACCESS_DENY;
         }
     }
 
