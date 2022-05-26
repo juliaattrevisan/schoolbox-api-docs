@@ -289,44 +289,6 @@ class Calendar extends DeprecatedModel
 
 
     /**
-     * Used on the Calendar screens to filter events
-     *
-     * @param int $userId
-     *
-     * @return array
-     */
-    public function getFilterCampusList($userId)
-    {
-        $query = "
-			SELECT id, name
-			FROM luCampus
-		";
-
-        if (!$_SESSION['su']) {
-            $query .= "
-				LEFT JOIN userCampus ON userCampus.campus = luCampus.id
-				WHERE userCampus.uid = '$userId' AND luCampus.deleted_at IS NULL
-			";
-        }
-
-
-        $allCampuses = $this->db->getAll($query);
-        $output = [];
-
-        if (is_array($allCampuses) && count($allCampuses)) {
-            foreach ($allCampuses as $currentCampus) {
-                $output[] = [
-                    'CAMPUS_ID'   => $currentCampus['id'],
-                    'CAMPUS_NAME' => $currentCampus['name'],
-                ];
-            }
-        }
-
-        return $output;
-    }
-
-
-    /**
      * Get an event by its id
      *
      * @param int $eventID
