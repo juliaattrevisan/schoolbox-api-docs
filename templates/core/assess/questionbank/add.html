@@ -54,37 +54,19 @@
      * so $('#category-tree').jstree() could be called before jstree.js is loaded
      */
 
-    //check if one of the scripts is already loaded so we don't load it again
+    //check if the script is already loaded so we don't load it again
     if (Boolean(document.querySelector(`script[src="{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}"]`))) {
         initJsTree();
     } else {
-        loadScripts();
+        loadScript();
     }
 
-    function loadScripts () {
-
-        let scriptsLoaded = 0;
-        const jsFiles = ['{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}'];
-
-        function loadScript () {
-            const scriptElement = document.createElement('script');
-            scriptElement.addEventListener('load', onScriptLoaded);
-            scriptElement.src = jsFiles[scriptsLoaded];
-            document.head.appendChild(scriptElement);
-        }
-
-        //keep loading scripts sequentially until all are loaded
-        function onScriptLoaded () {
-            if (scriptsLoaded === (jsFiles.length-1)) {
-                initJsTree();
-            } else {
-                scriptsLoaded++;
-                loadScript();
-            }
-        }
-
-        loadScript();
-
+    //add the JS file <script> tag into the document head and respond to its load
+    function loadScript () {
+        const scriptElement = document.createElement('script');
+        scriptElement.addEventListener('load', initJsTree); //once its loaded, we can trust that jstree() will work
+        scriptElement.src = '{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}';
+        document.head.appendChild(scriptElement);
     }
 
     function initJsTree () {
