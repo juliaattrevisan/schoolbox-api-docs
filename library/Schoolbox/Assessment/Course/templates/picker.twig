@@ -22,10 +22,10 @@
 
         let scriptsLoaded = 0;
         const jsFiles = [
-            '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js',
-            '{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js',
-            '{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js',
-            '{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js'
+            '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js?v={{ config.site_version }}',
+            '{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js?v={{ config.site_version }}',
+            '{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}',
+            '{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js?v={{ config.site_version }}'
         ]
         
         function loadScript () {

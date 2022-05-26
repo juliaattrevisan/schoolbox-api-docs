@@ -53,6 +53,6 @@
                 }
             });
     }
-    script.src = '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js';
+    script.src = '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js?v={{ config.site_version }}';
     document.head.appendChild(script);
 </script>
