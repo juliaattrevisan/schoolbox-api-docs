@@ -121,7 +121,7 @@ class UserBulkMapper extends UserMapper
                 $where        = " u.year_id IN ({$yearBindings->getPlaceholder()})";
                 $params       = array_merge($params, $yearBindings->getParams());
                 if ($addNull) {
-                    $where = " ({$where} OR ' u.year_id IS NULL' ) ";
+                    $where = " ({$where} OR u.year_id IS NULL) ";
                 }
                 $whereList[] = $where;
             } else {
