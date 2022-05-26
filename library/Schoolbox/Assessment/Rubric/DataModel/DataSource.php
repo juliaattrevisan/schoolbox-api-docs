@@ -1791,6 +1791,7 @@ class DataSource
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('a.id', $dueWorks->getPropertyValues('id'))
            ->isNull('a.deleted_at')
+           ->isTrue('sb.use_rubric')
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->notNull('sr.published_at')
            ->isNull('sr.deleted_at');
