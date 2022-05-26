@@ -54,7 +54,7 @@
         {% else %}
             <div class="empty-state">
                 <i class="icon-venue"></i>
-                <p>You currently have no venues, these must exist before you can schedule matches.<br /> Start by <a href="{{ routeLookup('sportsfixturesVenue.getCreateForm', {context: match.id}) }}" title="Add a Venue">adding a venue</a> or you can <a href="{{ routeLookup('sportsfixturesImport.getUpload') }}">bulk upload</a> a list.</p>
+                <p>You currently have no venues, these must exist before you can schedule matches.<br /> Start by <a href="{{ routeLookup('sportsfixturesVenue.getCreateForm') }}" title="Add a Venue">adding a venue</a> or you can <a href="{{ routeLookup('sportsfixturesImport.getUpload') }}">bulk upload</a> a list.</p>
             </div>
         {% endif %}
     </div>
