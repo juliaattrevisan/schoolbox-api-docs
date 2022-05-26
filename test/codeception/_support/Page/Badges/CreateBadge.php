@@ -62,7 +62,7 @@ class CreateBadge
      */
     public function clickBadgeImage(string $image): void
     {
-        $this->tester->click('img[src="https://s3-ap-southeast-2.amazonaws.com/schoolbox-cdn-qa/22.0.alpha1-0/images/badges/' . $image . '.svg"]');
+        $this->tester->click('img[src$="/images/badges/' . $image . '.svg"]');
     }
 
     /**
