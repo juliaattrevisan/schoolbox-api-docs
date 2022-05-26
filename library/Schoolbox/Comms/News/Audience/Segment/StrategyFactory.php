@@ -50,13 +50,18 @@ class StrategyFactory
     /** @var bool */
     private $canTargetTeachersOfUsersInFolder;
 
+    /**
+     * Is the fixtures module enabled?
+     */
+    private bool $isFixturesEnabled;
+
     /** @var External_UserInterface */
     private $externalUser;
 
     /** @var IConnector */
     private $db;
 
-    /** @var array|\mixed[][][] */
+    /** @var array|array[][] */
     private $knownUserSubjects;
 
     /**
@@ -68,22 +73,26 @@ class StrategyFactory
 
 
     /**
+     * Constructor
+     *
      * @param UserAccessMapper       $userAccessMapper
      * @param bool                   $staffCanPost
      * @param bool                   $moderationRequired
      * @param bool                   $canTargetTeachersOfUsersInFolder
+     * @param bool                   $isFixturesEnabled
      * @param Folder\Mapper          $folderMapper
      * @param RoleAccessMapper       $roleAccessMapper
      * @param Access                 $access
      * @param External_UserInterface $externalUser
      * @param IConnector             $db
-     * @param mixed[][][]            $knownUserSubjects
+     * @param array[][]              $knownUserSubjects
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
         bool $staffCanPost,
         bool $moderationRequired,
         bool $canTargetTeachersOfUsersInFolder,
+        bool $isFixturesEnabled,
         Folder\Mapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         Access $access,
@@ -95,6 +104,7 @@ class StrategyFactory
         $this->staffCanPost                     = $staffCanPost;
         $this->moderationRequired               = $moderationRequired;
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
+        $this->isFixturesEnabled                = $isFixturesEnabled;
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;
         $this->access                           = $access;
@@ -272,7 +282,14 @@ class StrategyFactory
                     $this->knownUserSubjects
                 );
             case Strategy\FixturesTeam::getEntityType():
-                return new Strategy\FixturesTeam($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired, $this->db);
+                return new Strategy\FixturesTeam(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                    $this->isFixturesEnabled,
+                    $this->db,
+                );
         }
 
         throw new UnknownEntityTypeException("Unrecognised entity type: '{$entityType}'");
