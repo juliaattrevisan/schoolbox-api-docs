@@ -1157,7 +1157,7 @@ class DataSource
         }
         $dueWorks->indexBy('id');
 
-        [$feedbackIds, $allFeedbackIds] = $this->getFeedbackIds($dueWorks, $student, $includeComparison);
+        [$feedbackIds, $allFeedbackIds] = $this->getFeedbackIdsWithRubric($dueWorks, $student, $includeComparison);
 
         if (empty($feedbackIds)) {
             return [];
@@ -1780,17 +1780,18 @@ class DataSource
     }
 
     /**
-     * Gets feedback ids for the due works
+     * Gets feedback ids for the due works which uses rubric
      * @param GenericCollection $dueWorks
      * @param User              $student
      * @param bool              $includeComparison
      * @return array
      */
-    private function getFeedbackIds(GenericCollection $dueWorks, User $student, bool $includeComparison): array
+    private function getFeedbackIdsWithRubric(GenericCollection $dueWorks, User $student, bool $includeComparison): array
     {
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('a.id', $dueWorks->getPropertyValues('id'))
            ->isNull('a.deleted_at')
+           ->isTrue('sb.use_rubric')
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->notNull('sr.published_at')
            ->isNull('sr.deleted_at');

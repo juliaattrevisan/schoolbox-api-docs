@@ -439,12 +439,12 @@ class Scrub
     /**
      * Supports markdown
      *
-     * @param string $text
+     * @param string|null $text
      * @return string
      */
-    public static function markdown(string $text): string
+    public static function markdown(?string $text): string
     {
-        return self::getMarkdownConverter()->convertToHtml($text)->getContent();
+        return self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
     }
 
 
