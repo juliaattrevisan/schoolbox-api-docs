@@ -706,11 +706,6 @@ parameters:
 			path: library/Calendar.php
 
 		-
-			message: "#^Variable \\$groupChunk might not be defined\\.$#"
-			count: 3
-			path: library/Calendar.php
-
-		-
 			message: "#^Property Calendar_Api_Cache\\:\\:\\$cachedTime \\(null\\) does not accept default value of type int\\.$#"
 			count: 1
 			path: library/Calendar/Api/Cache.php

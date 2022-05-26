@@ -513,11 +513,10 @@ class Calendar extends DeprecatedModel
          * because we don't want to pollute a user's calendar if viewing it as
          * an admin.
          */
+        $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";
         if ($user->getCampusCollection()->count()) {
             if ($this->groupHandler->getPermission($user->getCampusCollection()->first()->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
-            } else {
-                $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";
             }
         }
 
