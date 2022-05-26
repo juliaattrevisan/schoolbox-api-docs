@@ -62,7 +62,7 @@ class CreateBadge
      */
     public function clickBadgeImage(string $image): void
     {
-        $this->tester->click('img[src="/static/images/badges/' . $image . '.svg"]');
+        $this->tester->click('img[src$="/images/badges/' . $image . '.svg"]');
     }
 
     /**
