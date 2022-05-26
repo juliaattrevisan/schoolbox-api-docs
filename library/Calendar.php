@@ -9,6 +9,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
+use Schoolbox\Campus;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -316,9 +317,16 @@ class Calendar extends DeprecatedModel
     {
         $keyword = $this->db->quote($keyword);
 
-        if (is_array($_SESSION['campus'])) {
-            $campusList = $_SESSION['campus'];
+        // TODO remove $_SESSION dependency: or preferably this entire handler
+        $sessionUser = $_SESSION['user'] ?? null;
+        if (!$sessionUser instanceof User) {
+            $count = 0;
+            return [];
+        }
 
+        $sessionUserHasCampus = $sessionUser->getCampusCollection() && count($sessionUser->getCampusCollection());
+        if ($sessionUserHasCampus) {
+            $campusList  = array_map('intval', $sessionUser->getCampusCollection()->getPropertyValues('id'));
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
             $campusQuery = '1 = 1';
@@ -329,7 +337,7 @@ class Calendar extends DeprecatedModel
         $groupQuery = '';
 
         $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
-        $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
+        $tempList = $this->groupHandler->involvedInCategoryList($sessionUser->getId());
 
         if (is_array($tempList)) {
             foreach ($tempList as $temp) {
@@ -350,61 +358,69 @@ class Calendar extends DeprecatedModel
 
         $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
-        //give people with userAccess to moderate Calendar Access to view all Camups Posts
-        if (is_array($_SESSION['campus'])) {
-            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > UserAccess::ACCESS_WRITE) {
+        // give people with userAccess to moderate Calendar Access to view all Campus Posts
+        $groupChunk = "AND event_role.role_id = " . intval($sessionUser->getRole()->getId());
+        /** @var Campus|null $firstCampus */
+        $firstCampus = $sessionUserHasCampus
+            ? $sessionUser->getCampusCollection()->first()
+            : null;
+        if ($firstCampus) {
+            if ($this->groupHandler->getPermission($firstCampus->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
-            } else {
-                $groupChunk = "AND event_role.role_id = {$_SESSION['gid']}";
             }
         }
 
-        $event_query = "SELECT DISTINCT event.id, owner,
-                            GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                            TIME_FORMAT(start_datetime, '" . Config::get('calendar_time_format') . "') as startTime,
-                            TIME_FORMAT(end_datetime, '" . Config::get('calendar_time_format') . "') as endTime,
-                            TIME_TO_SEC(start_datetime) as startTimestamp,
-                            TIME_TO_SEC(end_datetime) as endTimestamp,
-                            start_datetime, end_datetime,
-                            type, event.title, access, location, detail,
-                            user.id as uid, user.title AS userTitle, firstname, lastname,
-                            eventType, eventColour,
-                            MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
-                        FROM event
-                        LEFT JOIN user ON owner = user.id
-                        LEFT JOIN luEventType ON type = eventTypeID
-                        LEFT JOIN event_campus ON event.id = event_campus.event_id
-                        LEFT JOIN event_role ON event.id = event_role.event_id
-                        LEFT JOIN event_folder ON event.id = event_folder.event_id
-                        WHERE
-                             (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
-                                  $groupQuery
-                                  OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
-                                )
-                            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
-                            AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
-                            AND event.deleted_at IS NULL
-                        GROUP BY id
-                        ORDER BY $sort_by $sort_dir
-                        LIMIT $offset, $limit";
+        $timeFormat = $this->db->quote(Config::get('calendar_time_format'));
+        $event_query = "
+            SELECT DISTINCT
+                event.id, owner,
+                GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
+                TIME_FORMAT(start_datetime, '$timeFormat') as startTime,
+                TIME_FORMAT(end_datetime, '$timeFormat') as endTime,
+                TIME_TO_SEC(start_datetime) as startTimestamp,
+                TIME_TO_SEC(end_datetime) as endTimestamp,
+                start_datetime, end_datetime,
+                type, event.title, access, location, detail,
+                user.id as uid, user.title AS userTitle, firstname, lastname,
+                eventType, eventColour,
+                MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
+            FROM event
+                LEFT JOIN user ON owner = user.id
+                LEFT JOIN luEventType ON type = eventTypeID
+                LEFT JOIN event_campus ON event.id = event_campus.event_id
+                LEFT JOIN event_role ON event.id = event_role.event_id
+                LEFT JOIN event_folder ON event.id = event_folder.event_id
+            WHERE (
+                    (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                    $groupQuery
+                    OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+                )
+                AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+                AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
+                AND event.deleted_at IS NULL
+            GROUP BY id
+            ORDER BY $sort_by $sort_dir
+            LIMIT $offset, $limit
+        ";
 
-
-        $count_query = "SELECT COUNT(DISTINCT event.id) AS event_count
-						FROM event
-						LEFT JOIN user ON owner = user.id
-						LEFT JOIN luEventType ON type = eventTypeID
-						LEFT JOIN event_campus ON event.id = event_campus.event_id
-						LEFT JOIN event_role ON event.id = event_role.event_id
-						LEFT JOIN event_folder ON event.id = event_folder.event_id
-						WHERE (
-							(access = '1' AND owner = '" . $_SESSION['id'] . "')
-							$groupQuery
-							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
-						)
-						AND event.deleted_at IS NULL
-						AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
-						AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
-						";
+        $count_query = "
+            SELECT
+                COUNT(DISTINCT event.id) AS event_count
+            FROM event
+                LEFT JOIN user ON owner = user.id
+                LEFT JOIN luEventType ON type = eventTypeID
+                LEFT JOIN event_campus ON event.id = event_campus.event_id
+                LEFT JOIN event_role ON event.id = event_role.event_id
+                LEFT JOIN event_folder ON event.id = event_folder.event_id
+            WHERE (
+                (access = '1' AND owner = '" . intval($sessionUser->getId()) . "')
+                $groupQuery
+                OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . intval($sessionUser->getId()) . "')
+            )
+            AND event.deleted_at IS NULL
+            AND MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword')
+            AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
+        ";
 
         $events = $this->db->getAll($event_query);
         $count  = $this->db->getOne($count_query);
