@@ -51,8 +51,7 @@ class FixturesTeam extends SimpleStrategy
         bool $moderationRequired,
         bool $isFixturesEnabled,
         IConnector $db
-    )
-    {
+    ) {
         parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
         $this->isFixturesEnabled = $isFixturesEnabled;
         $this->db = $db;
