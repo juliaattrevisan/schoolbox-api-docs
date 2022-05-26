@@ -30,6 +30,9 @@ class Assess_Answer_Match extends Evaluation_Answer_Match implements IAutomarkab
         /* Find out how much each correct answer is worth
            */
         for ($i = 0, $numCorrect = 0, $totalMarks = 0; $i < count($answer); $i++) {
+            if (!$response || !isset($response[$i])) {
+                continue;
+            }
             if ($answer[$i]->answerRight == $response[$i]) {
                 $totalMarks += $marksPerAnswer;
                 $numCorrect++;
