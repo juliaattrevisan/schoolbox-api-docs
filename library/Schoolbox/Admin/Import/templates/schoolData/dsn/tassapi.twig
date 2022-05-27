@@ -20,15 +20,15 @@
                 <div class="row">
                     <div class="small-12 medium-3 columns">
                         <label class="required">Company Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][studentdetails][companycode]" value="{{ studentdetails.companycode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][studentdetails][companycode]" value="{{ modules.studentdetails.companycode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-3 columns">
                         <label class="required">App Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][studentdetails][appcode]" value="{{ studentdetails.appcode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][studentdetails][appcode]" value="{{ modules.studentdetails.appcode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required suds-crypto' name="dsn[tassapi][studentdetails][token]" value="{{ studentdetails.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][modules][studentdetails][token]" value="{{ modules.studentdetails.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -39,15 +39,15 @@
                 <div class="row">
                     <div class="small-12 medium-3 columns">
                         <label class="required">Company Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][identitymanagement][companycode]" value="{{ identitymanagement.companycode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][identitymanagement][companycode]" value="{{ modules.identitymanagement.companycode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-3 columns">
                         <label class="required">App Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][identitymanagement][appcode]" value="{{ identitymanagement.appcode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][identitymanagement][appcode]" value="{{ modules.identitymanagement.appcode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required suds-crypto' name="dsn[tassapi][identitymanagement][token]" value="{{ identitymanagement.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][modules][identitymanagement][token]" value="{{ modules.identitymanagement.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -58,15 +58,15 @@
                 <div class="row">
                     <div class="small-12 medium-3 columns">
                         <label class="required">Company Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][lmsintegration][companycode]" value="{{ lmsintegration.companycode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][lmsintegration][companycode]" value="{{ modules.lmsintegration.companycode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-3 columns">
                         <label class="required">App Code</label>
-                        <input type="text" class='required' name="dsn[tassapi][lmsintegration][appcode]" value="{{ lmsintegration.appcode ?? ''}}" />
+                        <input type="text" class='required' name="dsn[tassapi][modules][lmsintegration][appcode]" value="{{ modules.lmsintegration.appcode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="required">Token</label>
-                        <input type="text" class='required suds-crypto' name="dsn[tassapi][lmsintegration][token]" value="{{ lmsintegration.token ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[tassapi][modules][lmsintegration][token]" value="{{ modules.lmsintegration.token ?? ''}}" />
                     </div>
                 </div>
 
@@ -78,15 +78,59 @@
                 <div class="row">
                     <div class="small-12 medium-3 columns">
                         <label>Company Code</label>
-                        <input type="text" name="dsn[tassapi][schoolcalendarandnotices][companycode]" value="{{ schoolcalendarandnotices.companycode ?? ''}}" />
+                        <input type="text" name="dsn[tassapi][modules][schoolcalendarandnotices][companycode]" value="{{ modules.schoolcalendarandnotices.companycode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-3 columns">
                         <label>App Code</label>
-                        <input type="text" name="dsn[tassapi][schoolcalendarandnotices][appcode]" value="{{ schoolcalendarandnotices.appcode ?? ''}}" />
+                        <input type="text" name="dsn[tassapi][modules][schoolcalendarandnotices][appcode]" value="{{ modules.schoolcalendarandnotices.appcode ?? ''}}" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>Token</label>
-                        <input type="text" class='suds-crypto' name="dsn[tassapi][schoolcalendarandnotices][token]" value="{{ schoolcalendarandnotices.token ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[tassapi][modules][schoolcalendarandnotices][token]" value="{{ modules.schoolcalendarandnotices.token ?? ''}}" />
+                    </div>
+                </div>
+
+                <hr />
+
+                <h4 class="no-margin">TASS Academic Periods</h4>
+                <p class="meta">
+                    Put your school's Term Dates in here, according to your TASS timetable setup.
+                    We use this to calculate the Semester value that we send to TASS when fetching timetables.
+                    The dates are <strong>inclusive</strong> when calculated in backend.
+                </p>
+
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 1 Start</label>
+                        <input type="text" name="dsn[tassapi][options][tap1start]" value="{{ options.tap1start ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 1 End</label>
+                        <input type="text" name="dsn[tassapi][options][tap1end]" value="{{ options.tap1end ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 2 Start</label>
+                        <input type="text" name="dsn[tassapi][options][tap2start]" value="{{ options.tap2start ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 2 End</label>
+                        <input type="text" name="dsn[tassapi][options][tap2end]" value="{{ options.tap2end ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 3 Start</label>
+                        <input type="text" name="dsn[tassapi][options][tap3start]" value="{{ options.tap3start ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 3 End</label>
+                        <input type="text" name="dsn[tassapi][options][tap3end]" value="{{ options.tap3end ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 4 Start</label>
+                        <input type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Academic Period 4 End</label>
+                        <input type="text" name="dsn[tassapi][options][tap4end]" value="{{ options.tap4end ?? '' }}" />
                     </div>
                 </div>
             </div>

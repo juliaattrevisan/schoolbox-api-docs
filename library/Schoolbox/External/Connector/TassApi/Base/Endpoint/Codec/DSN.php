@@ -56,6 +56,12 @@ class DSN implements IDSN
 
 
     /**
+     * Optional params we permitted in SUDS Config
+     */
+    private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
+
+
+    /**
      * The expected key-value tuples per module
      * At the moment we expect three keys which should have three values
      */
@@ -71,9 +77,15 @@ class DSN implements IDSN
      */
     public function decode(string $dsn): array
     {
-        $dsnParts = explode(',', $dsn);
+        $bits = explode('?', $dsn);
+        $modules = $bits[0];
+        $options = $bits[1] ?? null;
+
+        $dsnParts = explode(',', $modules);
         $struct = [];
 
+        /* Break apart module config
+         */
         foreach ($dsnParts as $dsnPart) {
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
@@ -105,11 +117,24 @@ class DSN implements IDSN
                 throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
-            $struct[$matches[1]] = [
+            $struct['modules'][$matches[1]] = [
                 'companycode' => $matches[2],
                 'appcode' => $matches[3],
                 'token' => $matches[4]
             ];
+        }
+
+        /* Break apart optional config
+         */
+        if ($options) {
+            $dsnParts = explode(';', $options);
+
+            foreach ($dsnParts as $dsnPart) {
+                $matches = [];
+                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
+
+                $struct['options'][$matches[1]] = $matches[2];
+            }
         }
 
         return $struct;
@@ -128,7 +153,7 @@ class DSN implements IDSN
     {
         $struct = [];
 
-        foreach ($parts as $module => $pairs) {
+        foreach ($parts['modules'] as $module => $pairs) {
             /* Skip encoding of the optional schoolcalendarandnotices
              * if none of its parts were meaningful
              */
@@ -147,6 +172,17 @@ class DSN implements IDSN
             $struct[] = $module . implode(';', $tuples);
         }
 
-        return implode(',', $struct);
+        /* Encode option pieces
+         */
+        $options = [];
+
+        foreach ($parts['options'] as $key => $value) {
+            $options[] = "{$key}={$value}";
+        }
+
+        $moduleEncoding = implode(',', $struct);
+        $optionEncoding = implode(';', $options);
+
+        return "{$moduleEncoding}?{$optionEncoding}";
     }
 }
