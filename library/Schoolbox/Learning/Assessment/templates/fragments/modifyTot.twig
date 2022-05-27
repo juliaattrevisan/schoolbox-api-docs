@@ -46,7 +46,7 @@
                 {% endif %}
             </li>
 
-            <script src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js"></script>
+            <script src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
             <script type="text/javascript">
                 $(function () {
                     $('[data-publish-to-eportfolio]').eportfolioPublish({

@@ -10,8 +10,8 @@ Data:
     referrer            string
  #}
 <div id="toast" class="toast"></div>
-<script src="{{ CDN_PREFIX }}/js/comms/articletabs.js"></script>
-<script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/articletabs.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js?v={{ config.site_version }}"></script>
 <script>
     {% set querystringParams = [
         'c=' ~ compactMode,

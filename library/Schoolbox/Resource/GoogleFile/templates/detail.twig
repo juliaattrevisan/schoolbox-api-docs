@@ -15,8 +15,8 @@
 <div class="small-12 island">
     <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         $.fn.setupGapi({

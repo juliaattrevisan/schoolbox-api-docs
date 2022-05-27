@@ -10,7 +10,7 @@ Usage:
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/checkbox/jquery.select-multi-checkboxes.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/checkbox/jquery.select-multi-checkboxes.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">

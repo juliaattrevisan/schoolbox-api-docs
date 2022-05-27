@@ -11,7 +11,7 @@ Usage:
 ['Learning', routeLookup('learning.getClasses')],
 ['Pending Assessments', routeLookup('learning.getPendingAssessmentsForUser', { viewee: viewee })]
 ) }}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
 <div class="row">
     <div class="small-12 columns"><h1>{% if USER.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending {{ locale.assessment.properPlural }}</h1></div>
 </div>

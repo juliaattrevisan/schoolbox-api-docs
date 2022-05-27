@@ -21,7 +21,7 @@
         <a role="button" data-cancel class="button cancel" href="#" aria-label="Close">Cancel</a>
     </section>
 </div>
-<link rel="stylesheet" href="{{ CDN_PREFIX }}/js/vendors/jstree/dist/themes/default/style.css"/>
+<link rel="stylesheet" href="{{ CDN_PREFIX }}/js/vendors/jstree/dist/themes/default/style.css?v={{ config.site_version }}"/>
 <script>
     var script = document.createElement('script');
     script.onload = () => {
@@ -53,6 +53,6 @@
                 }
             });
     }
-    script.src = '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js';
+    script.src = '{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js?v={{ config.site_version }}';
     document.head.appendChild(script);
 </script>

@@ -10,7 +10,7 @@
  # @param string $pageCurrent     A string corresponding to url in a tuple
  # @param string $titleOverride A string to override the page title
  #}
-<script src="{{ CDN_PREFIX }}/js/admin/menu.js"></script>
+<script src="{{ CDN_PREFIX }}/js/admin/menu.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $('#admin-nav').adminMenu();
@@ -57,7 +57,7 @@
     <div id='admin-settings-search'>
         <admin-settings-search />
     </div>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/adminSettingsSearch.js"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/adminSettingsSearch.js?v={{ config.site_version }}"></script>
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 

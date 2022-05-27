@@ -14,11 +14,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         // Set up comment abilities: post

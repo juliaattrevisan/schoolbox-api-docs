@@ -10,7 +10,7 @@
  #}
 {% if response and response.allFiles.count %}
     {% if kamiEnabled %}
-        <script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js?v={{ config.site_version }}"></script>
         <script>
             $(function() {
                 // Activate export of Kami Documents

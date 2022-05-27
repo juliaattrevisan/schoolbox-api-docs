@@ -1,12 +1,12 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<script src="{{ CDN_PREFIX }}/js/bundle/mage.js"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/validationRules.js" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js"></script>
-<script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-<script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/mage.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/assessment/validationRules.js?v={{ config.site_version }}" data-locale-grading-proper="{{ locale.grading.proper }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script>

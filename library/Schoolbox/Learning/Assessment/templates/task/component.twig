@@ -22,7 +22,7 @@
 
 {% block scripts %}
     {# Mark as complete form #}
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
     <script type="text/javascript">
         $(function() {
             // Save form for task completion

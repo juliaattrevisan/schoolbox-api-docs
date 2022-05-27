@@ -39,9 +39,9 @@
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
 
-        <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jqmath-0.4.0.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jqmath-0.4.0.js?v={{ config.site_version }}"></script>
         <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28" crossorigin></script>
 
         {% autoescape 'js' %}
@@ -365,6 +365,6 @@
     </div>
 </div>
 
-<script src="{{ CDN_PREFIX }}/js/bundle/searchBar.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/searchBar.js?v={{ config.site_version }}"></script>
 </body>
 </html>

@@ -125,7 +125,7 @@
     </table>
 </div>
 {# js specific to the rubric we just injected to...wherever we injected it #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">

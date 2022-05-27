@@ -422,7 +422,7 @@ class Controller extends BaseController
                 'ns'      => $ns,
                 'sources' => $sources,
                 'perms'   => $this->getConfig()->getPermissionList(),
-                'config'  => $this->getConfig()->find($rolec->getColumnValues('id')),
+                'msgConfig'  => $this->getConfig()->find($rolec->getColumnValues('id')),
             ],
         ]);
     }

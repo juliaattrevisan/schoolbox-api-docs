@@ -947,6 +947,7 @@ class Subnav
         return $this->twig->render(
             'subnav.twig',
             [
+                'config'      => $this->configLoader,
                 'adminSubnav' => $adminSub,
                 'pageCurrent' => $pageCurrent,
                 'subpageCurrent' => $subpageCurrent,

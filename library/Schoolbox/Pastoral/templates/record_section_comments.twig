@@ -29,7 +29,7 @@
                 site-version="{{ config.site_version }}"
             />
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPublic.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPublic.js?v={{ config.site_version }}"></script>
         {% elseif (recordType == 'private' and access.private) %}
         <div id="pastoral-record-comments-container-private">
             <pastoral-record-comments
@@ -41,7 +41,7 @@
                 site-version="{{ config.site_version }}"
             />
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPrivate.js"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordCommentsPrivate.js?v={{ config.site_version }}"></script>
         {% endif %}
 
     {% endif %}

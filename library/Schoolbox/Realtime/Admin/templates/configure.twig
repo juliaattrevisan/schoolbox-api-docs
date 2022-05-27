@@ -1,4 +1,4 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/notifications/jquery.msg-config.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/notifications/jquery.msg-config.js?v={{ config.site_version }}"></script>
 <!--suppress NonShortCircuitBooleanExpressionJS -->
 <script type="text/javascript">
 
@@ -247,7 +247,7 @@
 
                 {% if config|length  %}
                 <div id="configurator">
-                    {% for namespace in config %}
+                    {% for namespace in msgConfig %}
                         {% if ns[namespace.id] is defined %}
                         <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                         <section data-namespace="{{ ns[namespace.id].slug }}">

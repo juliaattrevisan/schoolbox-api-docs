@@ -165,7 +165,7 @@
                                  * Highcharts can only load once, but you can't tell which Poll component loads it successfully
                                  * Use the fail case which occurs when error 16 occurs to just go for it
                                  */
-                                $.getScript("{CDN_PREFIX}/js/bundle/highcharts.js", function() {
+                                $.getScript("{CDN_PREFIX}/js/bundle/highcharts.js?v={SITE_VERSION}", function() {
                                     componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});
                                 }).fail(function(jqxhr, settings, exception) {
                                     componentPollGraph('#component-poll{POLL_ID}-graph', {POLL_DATA});

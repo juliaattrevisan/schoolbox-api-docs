@@ -13,8 +13,8 @@ set upsConfig = {
 }
 %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/promise/jquery.retry-promise.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ups/jquery.ups.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/promise/jquery.retry-promise.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ups/jquery.ups.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $('#ruleset').ups();

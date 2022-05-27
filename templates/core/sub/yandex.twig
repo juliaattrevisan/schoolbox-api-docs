@@ -6,7 +6,7 @@
  # Я тебя сломаю
  #}
 {% if config.yandex_enabled and USER.role.parent %}
-<script src="{{ CDN_PREFIX }}/js/yandex/v1/widget.js"></script>
+<script src="{{ CDN_PREFIX }}/js/yandex/v1/widget.js?v={{ config.site_version }}"></script>
 <div class="yandex hide-for-print">
     <div id="ytWidget"></div><script src="https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false" type="text/javascript"></script>
 </div>

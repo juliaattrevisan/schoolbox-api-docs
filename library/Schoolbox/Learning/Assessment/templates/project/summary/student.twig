@@ -22,7 +22,7 @@
 {% set hasActions = statusRoute or modifyRoute %}
 
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">

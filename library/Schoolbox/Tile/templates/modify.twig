@@ -1,7 +1,7 @@
 {# I need some way of adding custom_head #}
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/spectrum/spectrum.css" />
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/spectrum/spectrum.css?v={{ config.site_version }}" />
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
 (function($) {
     $(function() {

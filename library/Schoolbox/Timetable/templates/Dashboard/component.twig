@@ -24,9 +24,9 @@ Data:
 #}
 {% import 'sub/attendanceIcon.twig' as attendanceIcon %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-resize.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-dashboard.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-resize.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-dashboard.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
         $.fn.timetableStart();

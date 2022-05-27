@@ -308,7 +308,7 @@
     {% endautoescape %}
 
     {% if not readonly %}
-        <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js"></script>
+        <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
              role="dialog">
             <h2>Publish Drafts</h2>
