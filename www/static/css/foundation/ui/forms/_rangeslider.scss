@@ -42,6 +42,6 @@ $range-slider-handle-bg-hover-color: $content-ui-foreground;
     top: -0.65rem;
     height: 2.25rem;
     width: 2.25rem;
-    @include border-radius(1.25rem);
+    border-radius: 1.25rem;
   }
 }
