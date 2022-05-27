@@ -5,11 +5,13 @@
 {% block classListSlots %}
     {% verbatim %}
     <template v-slot:student-menu-items="slotProps">
-        <li v-for="(element, index) in slotProps.student.routes" v-if="!index.match(/(dueWork|grades)/)">
-            <a :href="element.href" :class="element.class" :title="element.title">
-                {{ element.label }}
-            </a>
-        </li>
+        <template v-for="(element, index) in slotProps.student.routes">
+            <li v-if="!index.match(/(dueWork|grades)/)">
+                <a :href="element.href" :class="element.class" :title="element.title">
+                    {{ element.label }}
+                </a>
+            </li>
+        </template>
     </template>
     {% endverbatim %}
 {% endblock classListSlots %}
