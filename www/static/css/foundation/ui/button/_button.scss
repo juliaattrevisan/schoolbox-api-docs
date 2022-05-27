@@ -181,7 +181,7 @@ button.submit {
     line-height: 1.5;
     &.buttons {
 		a, button {
-			@include flex;
+			display: flex;
 			@extend .button;
 			justify-content: center;
             margin-bottom: 0;

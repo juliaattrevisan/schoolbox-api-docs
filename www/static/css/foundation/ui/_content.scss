@@ -612,7 +612,7 @@ nav {
 $selector-width: 2.25rem;
 
 %interaction-li {
-    @include flex;
+    display: flex;
     align-items: center;
 }
 %interaction-selector {
@@ -934,7 +934,7 @@ $selector-width: 2.25rem;
 
 // this is like inline list, but it flexes to full width. Basically a more flexible version of the button bar
 .flex-list {
-    @include flex;
+    display: flex;
     list-style: none;
     margin: 0;
 

@@ -211,7 +211,7 @@ td {
 
 // Input & buttons to sit next to each other
 .input-group {
-    @include flex;
+    display: flex;
     align-items: flex-start;
     line-height: 1.5;
 
@@ -598,7 +598,7 @@ input[type="checkbox"].plain {
 }
 
 .toggle-set {
-    @include flex;
+    display: flex;
     justify-content: space-between;
     max-width: 20rem;
 

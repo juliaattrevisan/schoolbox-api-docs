@@ -9,10 +9,6 @@
 	vertical-align: middle;
 }
 
-@mixin flex {
-	display: flex;             // Opera 12.1, Firefox 20+
-}
-
 // Background images - cover
 @mixin cover-image {
 	background-size: cover;
