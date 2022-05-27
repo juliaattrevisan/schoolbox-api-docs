@@ -66,6 +66,8 @@
         <section>
             {% for folder in folders %}
                 <ul class="activity-list group">
+                    {% if markbooks[folder.id] is defined %}
+                        {# weird issue will sometimes occur when there is no markbook for the folder, so dont even try to display the information here #}
                     <li class="subject-group">
                         {% if year is empty %}
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) }}"
@@ -84,6 +86,7 @@
                             </h4>
                         {% endif %}
                     </li>
+                    {% endif %}
                     {% for teacher in folder.teachers %}
                     <li class="actions-small-1">
                         <div class="list-item">
