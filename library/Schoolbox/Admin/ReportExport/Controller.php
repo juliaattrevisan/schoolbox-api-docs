@@ -32,6 +32,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
@@ -77,7 +78,10 @@ class Controller extends ConfigController
 
     private UserBulkMapper $userBulkMapper;
 
+    private RoleMapper $roleMapper;
+
     private Jwt $tokenBuilder;
+
 
     /**
      * Constructor
@@ -92,6 +96,7 @@ class Controller extends ConfigController
      * @param RubricDataSource      $rubricDataSource
      * @param Access                $access
      * @param UserBulkMapper        $userBulkMapper
+     * @param RoleMapper            $roleMapper
      * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
@@ -108,6 +113,7 @@ class Controller extends ConfigController
         RubricDataSource $rubricDataSource,
         Access $access,
         UserBulkMapper $userBulkMapper,
+        RoleMapper $roleMapper,
         Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
@@ -125,6 +131,7 @@ class Controller extends ConfigController
         $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
+        $this->roleMapper            = $roleMapper;
     }
 
     /**
@@ -178,6 +185,7 @@ class Controller extends ConfigController
         $this->response->redirect->afterPost($this->router->generate('adminReportExport.getIndex'));
     }
 
+
     /**
      * Request report generation to taskd
      * @return void
@@ -197,13 +205,19 @@ class Controller extends ConfigController
             // if both campuses and year levels are not provided, generate only for specific students
             $studentIds = [];
         } else {
+            /* Check the config to see what Role Type should have come out in the zip
+             * This lets you prevent staff users from getting a pdf when you only wanted students
+             */
+            $roleIds = $this->roleMapper->findByColumn('group_type', $this->getConfigLoader()->get('report_roletype'))->indexBy('id')->keys();
+
             $students   = $this->userBulkMapper->bulkModifySearch(
                 empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
-                [UserBulkMapper::ANY], // TODO: limit to students?
+                $roleIds,
                 UserBulkMapper::ANY,
                 empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
                 UserBulkMapper::ANY
             );
+
             $studentIds = array_column($students, 'id');
         }
 

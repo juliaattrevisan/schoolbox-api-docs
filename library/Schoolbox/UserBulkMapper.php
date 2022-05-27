@@ -99,7 +99,7 @@ class UserBulkMapper extends UserMapper
         }
 
         if ($searchRoleIds !== [self::ANY]) {
-            $roleBindings = Builder::getBindings($searchRoleIds, 'cm');
+            $roleBindings = Builder::getBindings($searchRoleIds, 'r');
             $whereList[]  = " u.group_id IN ({$roleBindings->getPlaceholder()}) ";
             $params       = array_merge($params, $roleBindings->getParams());
         }
