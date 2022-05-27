@@ -23,7 +23,7 @@ $login-img-max-height: 12rem !default; // 192px
         background-position: $login-background-position;
         background-repeat: no-repeat;
         background-attachment: fixed;
-        @include cover-image;
+        background-size: cover;
 
         #container {
             margin: 0;
