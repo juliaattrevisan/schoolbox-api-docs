@@ -322,7 +322,13 @@ class Controller extends Base
                 'deleteWarning'     => 'WARNING! Deleting users roles can have a serious impact on your system and may prevent access to various users/records throughout the system- please consult Schoolbox helpdesk if you require more information. Are you sure you want to delete this role?',
                 'deleteFailMsg'     => 'You cannot delete a role that still has non-deleted users with that role',
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
+                'showId'            => true,                                    // Set this to true to display the db ID on the front end.
                 'fields'            => [                                        // This is a list of all of the updateable fields
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,                                    // set field to readonly, so the user can not modify the db value...
+                    ],
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
                         'width'     => 2,                                       // Width of the column on anything bigger than 'small'
@@ -339,7 +345,7 @@ class Controller extends Base
                     'permissions' => [
                         'caption'             => 'Permissions',
                         'key'                 => 'permissions',
-                        'width'               => 8,
+                        'width'               => 7,
                         'tooltip'             => 'Permissions can be customised for each staff role. This can limit the visibility and access to parts of the instance.',
                         'mandatory'           => true,
                         'isPopOutList'        => true,
@@ -429,10 +435,16 @@ class Controller extends Base
                 'title'             => 'Houses',
                 'mapper'            => HouseMapper::class,
                 'delete'            => true,
+                'showId'            => true,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'house'         => [
                         'caption'   => 'Name',
-                        'width'     => 12,
+                        'width'     => 11,
                         'maxLength' => 50,
                         'mandatory' => true,
                         'default'   => '',
@@ -443,6 +455,7 @@ class Controller extends Base
                 'title'             => 'Residential Houses',
                 'mapper'            => HouseResidentialMapper::class,
                 'delete'            => true,
+                'showId'            => false,
                 'fields'            => [
                     'house'         => [
                         'caption'   => 'Name',
@@ -457,6 +470,7 @@ class Controller extends Base
                 'title'             => 'Drives',
                 'delete'            => true,
                 'mapper'            => WebDavMapper::class,
+                'showId'            => false,
                 'fields'            => [
                     'uri'           => [
                         'caption'   => 'Base URI',
@@ -525,8 +539,14 @@ class Controller extends Base
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'delete'            => true,
+                'showId'            => true,
                 'deleteFailMsg'     => 'This campus cannot be deleted as it has users assigned to it.',
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'DB ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 5,
@@ -544,7 +564,7 @@ class Controller extends Base
                     ],
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
-                        'width'     => 2,
+                        'width'     => 1,
                         'default'   => null,
                     ]
                 ]
@@ -553,6 +573,7 @@ class Controller extends Base
                 'title'             => 'Event Types',
                 'delete'            => true,
                 'mapper'            => EventTypeMapper::class,
+                'showId'            => false,
                 'fields'            => [
                     'type'          => [
                         'caption'   => 'Event Type',
@@ -573,6 +594,7 @@ class Controller extends Base
                 'title'             => 'News Topics',
                 'delete'            => true,
                 'mapper'            => Topic\Mapper::class,
+                'showId'            => false,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -587,6 +609,7 @@ class Controller extends Base
                 'title'             => 'Work Types',
                 'mapper'            => WorkTypeMapper::class,
                 'delete'            => true,
+                'showId'            => false,
                 'fields'            => [
                     'showOnGradesPage'       => [
                         'caption'   => 'Grades page',
@@ -622,6 +645,7 @@ class Controller extends Base
                 'title'             => 'Submission States',
                 'mapper'            => StateMapper::class,
                 'delete'            => true,
+                'showId'            => false,
                 'fields'            => [
                     'code'          => [
                         'caption'   => 'Code',
@@ -650,6 +674,7 @@ class Controller extends Base
                 'mapper'            => Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
                 'noNewRecords'      => true,
+                'showId'            => false,
                 'fields'            => [
                     'module'        => [
                         'caption'   => 'Module',
@@ -678,6 +703,7 @@ class Controller extends Base
             'timetable-colour'   => [
                 'title'             => 'Timetable Colours',
                 'mapper'            => Timetable_ColourMapper::class,
+                'showId'            => false,
                 'fields'            => [
                     'id'            => [
                         'getter'    => 'getTimetableColourId',
@@ -696,6 +722,7 @@ class Controller extends Base
                 'mapper'            => PastoralTypeMapper::class,
                 'delete'            => true,
                 'deleteFailMsg'     => 'You cannot delete a pastoral type which is still in use in a pastoral record.',
+                'showId'            => false,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -729,6 +756,7 @@ class Controller extends Base
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => PastoralCategoryMapper::class,
                 'delete'            => true,
+                'showId'            => false,
                 'deleteFailMsg'     => 'You cannot delete a pastoral sub-type which is still in use in a pastoral record.',
                 'fields'            => [
                     'pastoralType' => [
@@ -761,6 +789,7 @@ class Controller extends Base
                 'title'             => 'Pastoral SIS Document Classifications',
                 'mapper'            => PastoralDocumentClassificationMapper::class,
                 'delete'            => true,
+                'showId'            => false,
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -800,6 +829,7 @@ class Controller extends Base
                 'title'  => 'Pastoral Record Severity',
                 'mapper' => PastoralSeverityMapper::class,
                 'delete' => true,
+                'showId' => false,
                 'fields' => [
                     'name' => [
                         'caption' => 'Name',
@@ -826,6 +856,7 @@ class Controller extends Base
             'mapper' => Pastoral\Tag\Mapper::class,
             'delete' => true,
             'deleteWarning' => 'Deleting pastoral tags may affect existing reports. Are you sure?',
+            'showId'   => false,
             'fields' => [
                 'name' => [
                     'caption'   => 'Name',
@@ -842,6 +873,7 @@ class Controller extends Base
                 'mapper'        => Pastoral\Action\Mapper::class,
                 'delete'        => true,
                 'deleteWarning' => 'Are you sure?',
+                'showId'        => false,
                 'fields'        => [
                     'name'         => [
                         'caption'   => 'Name',
@@ -875,8 +907,14 @@ class Controller extends Base
         $return['year-levels'] = [
             'title'  => 'Year Levels',
             'delete' => true,
+            'showId' => true,
             'mapper' => YearLevel\Mapper::class,
             'fields' => [
+                'id' => [
+                    'caption'   => 'DB ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
                     'width'     => 1,
@@ -894,7 +932,7 @@ class Controller extends Base
                 'displayOptions' => [
                     'caption'             => 'Display Options',
                     'key'                 => 'displayOptions',
-                    'width'               => 9,
+                    'width'               => 8,
                     'mandatory'           => true,
                     'isPopOutList'        => true,
                 ],
@@ -991,6 +1029,7 @@ class Controller extends Base
             'title'             => 'Learning Moments',
             'mapper'            => LearningMomentEvidenceTag::class,
             'delete'            => true,
+            'showId'            => false,
             'fields'            => [
                 'name'          => [
                     'caption'   => 'Name',
@@ -1006,6 +1045,7 @@ class Controller extends Base
             'title'             => 'Badge Categories',
             'mapper'            => \Schoolbox\Learning\Badge\Category\Mapper::class,
             'delete'            => true,
+            'showId'            => false,
             'fields'            => [
                 'name'          => [
                     'caption'   => 'Name',
@@ -1021,6 +1061,7 @@ class Controller extends Base
             'title'             => 'User Titles',
             'mapper'            => \Schoolbox\User\Title\Mapper::class,
             'delete'            => true,
+            'showId'            => false,
             'fields'            => [
                 'title'         => [
                     'caption'   => 'Name',
@@ -1180,6 +1221,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildJsonOutput(
                     [
+                        'hasDBid'       => $currentTable['showId'] ?? false,
                         'canDelete'     => $currentTable['delete'] ?? false,
                         'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
                         'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
