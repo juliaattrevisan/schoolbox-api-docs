@@ -10,25 +10,17 @@
 }
 
 @mixin flex {
-	// see https://css-tricks.com/using-flexbox/
-	display: -webkit-box;      // iOS 6-, Safari 3.1-6
-	display: -moz-box;         // Firefox 19- (buggy but mostly works)
-	display: -webkit-flex;     // Chrome
 	display: flex;             // Opera 12.1, Firefox 20+
 }
 
 // Background images - cover
 @mixin cover-image {
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
 	background-size: cover;
 }
 
 @mixin vertical-align {
 	position: relative;
 	top: 50%;
-	-webkit-transform: translateY(-50%);
 	transform: translateY(-50%);
 }
 
@@ -39,24 +31,18 @@
 }
 
 @mixin animation ($animation) {
-	-webkit-animation: $animation;
 	animation: $animation;
 }
 
 @mixin border-radius($radius) {
 	border-radius: $radius;
-	-moz-border-radius: $radius;
-	-webkit-border-radius: $radius;
 }
 
 @mixin box-shadow($x-offset, $y-offset, $blur, $color, $inset:"") {
-	-moz-box-shadow: $x-offset $y-offset $blur $color #{$inset};
-	-webkit-box-shadow: $x-offset $y-offset $blur $color #{$inset};
 	box-shadow: $x-offset $y-offset $blur $color #{$inset};
 }
 
 @mixin box-sizing ($box-sizing) {
-	-moz-box-sizing: $box-sizing;
 	box-sizing: $box-sizing;
 }
 
@@ -76,14 +62,10 @@
 }
 
 @mixin transform ($transform) {
-	-webkit-transform: $transform;
 	transform: $transform;
 }
 
 @mixin easy-transition($transition...) {
-	-webkit-transition: $transition;
-	-moz-transition: $transition;
-	-o-transition: $transition;
 	transition: $transition;
 }
 
@@ -94,65 +76,38 @@
 		@include transition-timing-function($easing);
 		@include transition-delay($delay);
 	} @else {
-		-webkit-transition: $properties $duration $easing $delay;
-		-moz-transition: $properties $duration $easing $delay;
-		-o-transition: $properties $duration $easing $delay;
 		transition: $properties $duration $easing $delay;
 	}
 }
 
 @mixin transition-property($transition-property: all) {
-	-webkit-transition-property: $transition-property;
-	-moz-transition-property: $transition-property;
-	-o-transition-property: $transition-property;
 	transition-property: $transition-property;
 }
 
 @mixin transition-duration($transition-duration: 0s) {
-	-webkit-transition-duration: $transition-duration;
-	-moz-transition-duration: $transition-duration;
-	-o-transition-duration: $transition-duration;
 	transition-duration: $transition-duration;
 }
 
 @mixin transition-timing-function($transition-timing-function: ease) {
-	-webkit-transition-timing-function: $transition-timing-function;
-	-moz-transition-timing-function: $transition-timing-function;
-	-o-transition-timing-function: $transition-timing-function;
 	transition-timing-function: $transition-timing-function;
 }
 
 @mixin transition-delay($transition-transition-delay: 500ms) {
-	-webkit-transition-delay: $transition-transition-delay;
-  -moz-transition-delay: $transition-transition-delay;
-  -o-transition-delay: $transition-transition-delay;
   transition-delay: $transition-transition-delay;
 }
 
 @mixin linear-gradient($start-colour, $end-colour) {
 	background-color: $start-colour;
-	background-image: -webkit-gradient(linear, left top, left bottom, from($start-colour), to($end-colour));
-	background-image: -webkit-linear-gradient(top, $start-colour, $end-colour);
-	background-image:    -moz-linear-gradient(top, $start-colour, $end-colour);
-	background-image:      -o-linear-gradient(top, $start-colour, $end-colour);
-	background-image:         linear-gradient(top, $start-colour, $end-colour);
+	background-image: linear-gradient(top, $start-colour, $end-colour);
 }
 
 @mixin placeholder-color($color, $font-weight) {
-	::-webkit-input-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
-	:-ms-input-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
-	:-moz-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
-	::-moz-placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
+	::placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
 }
 
 @mixin placeholder-hover-color($color) {
-	&:focus::-webkit-input-placeholder	{ color: $color; }
-	&:focus:-moz-placeholder			{ color: $color; }
-	&:focus:-ms-input-placeholder		{ color: $color; }
-
-	&:hover::-webkit-input-placeholder	{ color: $color; }
-	&:hover::-moz-placeholder			{ color: $color; }
-	&:hover:-ms-input-placeholder		{ color: $color; }
+	&:focus::placeholder	{ color: $color; }
+	&:hover::placeholder	{ color: $color; }
 }
 
 @mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
