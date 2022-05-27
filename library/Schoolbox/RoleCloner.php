@@ -306,6 +306,33 @@ class RoleCloner
     }
 
     /**
+     * migrate all notification settings to $destination, and ignore what is already there.
+     * @param Role $source
+     * @param Role $destination
+     * @return void
+     */
+    protected function cloneNotifs(Role $source, Role $destination)
+    {
+        /**
+         * purge /  burn all notification settings from $destination
+         */
+        $this->clonePerms("
+            DELETE FROM msg_route_perm
+            WHERE msg_route_perm.role_id = ?
+        ", "
+            INSERT INTO msg_route_perm ( SELECT rp.msg_source_id as msg_source_id,
+                :dest as role_id,
+                rp.mask as mask,
+                rp.role_default as role_default
+            FROM msg_route_perm as rp
+            WHERE rp.role_id = :src
+        )", [
+            'src'  => $source->getId(),
+            'dest' => $destination->getId(),
+        ]);
+    }
+
+    /**
      * @param string $deleteQuery
      * @param string $insertQuery
      * @param array  $args
@@ -317,32 +344,5 @@ class RoleCloner
 
         // insert new perms
         $this->db->query($insertQuery, $args);
-    }
-
-    /**
-     * migrate all notification settings to $destination, and ignore what is already there.
-     * @param Role $source
-     * @param Role $destination
-     * @return void
-     */
-    protected function cloneNotifs(Role $source, Role $destination)
-    {
-        /**
-         * purge /  burn all notification settings from $destination
-         */
-        $this->db->query("
-        DELETE FROM msg_route_perm
-            WHERE msg_route_perm.role_id = :newRole
-        ", ['newRole' => $destination->getId()]);
-
-        //clone all notification settings from $source to $destination
-        $this->db->query("
-        INSERT INTO msg_route_perm ( SELECT rp.msg_source_id as msg_source_id,
-                :newRole as role_id,
-                rp.mask as mask,
-                rp.role_default as role_default
-            FROM msg_route_perm as rp
-            WHERE rp.role_id = :oldRole
-        )", ['newRole' => $destination->getId(), 'oldRole' => $source->getId()]);
     }
 }
