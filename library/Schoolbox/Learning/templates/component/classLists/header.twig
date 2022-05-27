@@ -1,6 +1,6 @@
 <h1>${ subject }</h1>
-<template v-if="showSkeletonLoader" v-for="n in 3">
-    <div class="list-item">
+<template v-if="showSkeletonLoader">
+    <div v-for="n in 3" class="list-item">
         <div class="small-12 card skeleton">
             <div class="img"></div>
             <h3></h3>
