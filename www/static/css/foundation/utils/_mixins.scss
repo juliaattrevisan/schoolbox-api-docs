@@ -17,28 +17,6 @@
 	display: flex;             // Opera 12.1, Firefox 20+
 }
 
-// Link hovers
-@mixin link-bg-transition{
-	-webkit-transition: background-color 0.3s;
-	-moz-transition: background-color 0.3s;
-	-o-transition: background-color 0.3s;
-	transition: background-color 0.3s;
-}
-
-@mixin link-transition{
-	-webkit-transition: color 0.3s;
-	-moz-transition: color 0.3s;
-	-o-transition: color 0.3s;
-	transition: color 0.3s;
-}
-
-@mixin all-transition{
-	-webkit-transition: all 0.5s;
-	-moz-transition: all 0.5s;
-	-o-transition: all 0.5s;
-	transition: all 0.5s;
-}
-
 // Background images - cover
 @mixin cover-image {
 	-webkit-background-size: cover;
@@ -82,12 +60,6 @@
 	box-sizing: $box-sizing;
 }
 
-@mixin columns ($columns: 2 1em) {
-	-webkit-columns: $columns;
-	-moz-columns: $columns;
-	columns: $columns;
-}
-
 @mixin keyframes($name) {
 	@-webkit-keyframes #{$name} {
 		@content;
@@ -106,12 +78,6 @@
 @mixin transform ($transform) {
 	-webkit-transform: $transform;
 	transform: $transform;
-}
-
-@mixin transform-origin ($transform-origin) {
-	-webkit-transform-origin: $transform-origin;
-	-o-transform-origin: $transform-origin;
-	transform-origin: $transform-origin;
 }
 
 @mixin easy-transition($transition...) {
@@ -201,20 +167,6 @@
   @media #{$large-up} {
     #{$property}-left: rem-calc(($multiplier * $base-font-size - $large-adjust)) #{$importance};
     #{$property}-right: rem-calc(($multiplier * $base-font-size - $large-adjust)) #{$importance};
-  }
-}
-
-@mixin with-count($n) {
-  @if $n == 1 {
-    &:first-child:nth-last-child(1) {
-      @content;
-    }
-  }
-  @else {
-    &:first-child:nth-last-child(#{$n}),
-    &:first-child:nth-last-child(#{$n}) ~ a {
-      @content;
-    }
   }
 }
 
