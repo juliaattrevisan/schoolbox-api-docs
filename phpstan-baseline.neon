@@ -3311,11 +3311,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/StrategyFactory.php
 
 		-
-			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\StrategyFactory\\:\\:\\$knownUserSubjects has unknown class mixed as its type\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/StrategyFactory.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Transactor.php
