@@ -106,7 +106,7 @@ button.load-more, .button.load-more {
 /* On.click animation effect on buttons
 */
 .splash.animate {
-	@include animation (ripple 0.3s linear);
+	animation: ripple 0.3s linear;
 }
 	@keyframes ripple {
 		/* Scale 200% to safely cover the entire button and fade it out

@@ -1269,7 +1269,7 @@ $selector-width: 2.25rem;
     margin: 2rem auto;
     width: 3rem;
     height: 3rem;
-    @include animation(sb-loader 1.2s infinite ease-in-out);
+    animation: sb-loader 1.2s infinite ease-in-out;
 }
 // for loaders inside headings, use span.
 span.loader {

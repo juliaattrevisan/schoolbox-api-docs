@@ -880,7 +880,7 @@ ul.az-error-list {
 
 .dz-preview .dz-progress .dz-upload,
 .dropzone-previews .dz-preview .dz-progress .dz-upload {
-  @include animation(loading 0.4s linear infinite);
+  animation: loading 0.4s linear infinite;
   @include easy-transition(width 0.3s $attachzone-overlay-timing);
   -webkit-border-radius: 2px;
   border-radius: 2px;

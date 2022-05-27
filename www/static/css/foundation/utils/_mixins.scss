@@ -21,10 +21,6 @@
 	position: absolute; top: $top; right: $right; bottom: $bottom; left: $left;
 }
 
-@mixin animation ($animation) {
-	animation: $animation;
-}
-
 @mixin border-radius($radius) {
 	border-radius: $radius;
 }
