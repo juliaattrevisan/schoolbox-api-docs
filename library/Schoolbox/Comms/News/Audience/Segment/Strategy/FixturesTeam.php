@@ -27,6 +27,10 @@ use Schoolbox\User;
  */
 class FixturesTeam extends SimpleStrategy
 {
+    /**
+     * Is the fixtures module enabled?
+     */
+    private bool $isFixturesEnabled;
 
     /**
      * @var IConnector
@@ -36,11 +40,19 @@ class FixturesTeam extends SimpleStrategy
 
     /**
      * @inheritdoc
+     * @param bool       $isFixturesEnabled
      * @param IConnector $db
      */
-    public function __construct(UserAccessMapper $userAccessMapper, Access $access, bool $staffCanPost, bool $moderationRequired, IConnector $db)
-    {
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Access $access,
+        bool $staffCanPost,
+        bool $moderationRequired,
+        bool $isFixturesEnabled,
+        IConnector $db
+    ) {
         parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
+        $this->isFixturesEnabled = $isFixturesEnabled;
         $this->db = $db;
     }
 
@@ -51,10 +63,13 @@ class FixturesTeam extends SimpleStrategy
     public function canAudienceToEntityType(User $user): bool
     {
         return
-            $user->isSuperuser() ||
-            $user->getRole()->isStaff() ||
-            $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
-            $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE;
+            $this->isFixturesEnabled &&
+            (
+                $user->isSuperuser() ||
+                $user->getRole()->isStaff() ||
+                $this->hasNewsServicePerm($user, UserAccess::ACCESS_WRITE) ||
+                $this->access->getAccessLevel($user, UserAccess::SERVICE_SPORTS_ADMINISTRATOR) >= UserAccess::ACCESS_WRITE
+            );
     }
 
 

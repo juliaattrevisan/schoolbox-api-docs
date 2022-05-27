@@ -53,6 +53,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             true,
             true,
             true,
+            true,
             Folder\Mapper::getInstance(),
             RoleAccessMapper::getInstance(),
             Access::getInstance(

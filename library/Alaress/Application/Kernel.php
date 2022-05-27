@@ -737,6 +737,7 @@ abstract class Kernel
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
                         $config->get(ConfigMapper::_GLOBAL_MODERATION),
                         $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
+                        $config->get(ConfigMapper::NAME_FIXTURES_ENABLED),
                         $folderMapper,
                         $roleAccessMapper,
                         $access,

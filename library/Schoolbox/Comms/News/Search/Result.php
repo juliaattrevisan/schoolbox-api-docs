@@ -176,6 +176,7 @@ class Result extends Base
             $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
             $config->get(ConfigMapper::_GLOBAL_MODERATION),
             $config->get(ConfigMapper::_AUDIENCE_TO_FOLDER_TEACHERS),
+            $config->get(ConfigMapper::NAME_FIXTURES_ENABLED),
             Folder\Mapper::getInstance(),
             Access\RoleAccessMapper::getInstance(),
             Access\Access::getInstance(),
