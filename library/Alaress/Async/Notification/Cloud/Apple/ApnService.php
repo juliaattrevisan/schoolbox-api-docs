@@ -82,7 +82,11 @@ class ApnService extends AbstractService
     public function __destruct()
     {
         if ($this->protocol) {
-            $this->protocol->closeConnection();
+            try {
+                $this->protocol->closeConnection();
+            } catch (\TypeError $e) {
+                // probably already closed
+            }
         }
     }
 
@@ -124,26 +128,18 @@ class ApnService extends AbstractService
         $notification = new Notification($payload);
 
         // Send the message to everyone
-        $resourceOpen = false;
         foreach ($tokens as $token) {
             $receiver = new Receiver(new DeviceToken($token), $this->getAppIdentifier());
             $prefix   = "$id@$token";
             try {
                 $sender->send($receiver, $notification);
-                $resourceOpen = true;
                 $this->report($prefix, "All ok!", Logger::DEBUG);
             } catch (\Exception $e) {
                 // Exception in doc block is SendNotificationException,
                 // but the actual exception thrown is HttpSenderException...
-                $resourceOpen = false;
                 $this->report($prefix, 'Error: ' . $e->getMessage(), Logger::INFO, '?');
             }
         }
-        // Explicitly close connection on success, as the connection should already be closed when the last one failed
-        if ($resourceOpen) {
-            $this->protocol->closeConnection();
-        }
-        $this->protocol = null;
         return true;
     }
 
