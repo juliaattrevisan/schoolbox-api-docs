@@ -51,6 +51,11 @@ class CommandLineTool extends App
     private const FOLDER_PATTERN = '/\{(?P<externalId>\\d+)\}/';
 
     /**
+     * Columns via which downloaded files are sorted (ascending order).
+     */
+    private const SORT_ORDER = ['filemtime', 'id'];
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -154,7 +159,7 @@ class CommandLineTool extends App
         foreach ($folderFiles as $folderFilesTuple) {
             /** @var User $student */
             $student = $folderFilesTuple['student'];
-            ksort($folderFilesTuple['files']);
+            usort($folderFilesTuple['files'], [$this, 'fileSort']);
             foreach (array_values($folderFilesTuple['files']) as $i => $file) {
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
@@ -170,7 +175,7 @@ class CommandLineTool extends App
         foreach ($assessmentFiles as $assessmentFilesTuple) {
             /** @var User $student */
             $student = $assessmentFilesTuple['student'];
-            ksort($assessmentFilesTuple['files']);
+            usort($assessmentFilesTuple['files'], [$this, 'fileSort']);
             foreach (array_values($assessmentFilesTuple['files']) as $j => $file) {
                 /** @var IStorage $file */
                 $yearLevel  = $student->getYear()->getName();
@@ -280,5 +285,25 @@ class CommandLineTool extends App
             }
         }
         return null;
+    }
+
+    /**
+     * Sort function for a set of files.
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    private function fileSort(array $a, array $b): int
+    {
+        foreach (self::SORT_ORDER as $column) {
+            if (isset($a[$column], $b[$column])) {
+                $cmp = $a[$column] <=> $b[$column];
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+            }
+        }
+        return 0;
     }
 }
