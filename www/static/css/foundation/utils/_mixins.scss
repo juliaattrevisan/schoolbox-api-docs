@@ -17,21 +17,6 @@
 
 // Prefixed properties, in alphabetical order
 
-@mixin keyframes($name) {
-	@-webkit-keyframes #{$name} {
-		@content;
-	}
-	@-moz-keyframes #{$name} {
-		@content;
-	}
-	@-ms-keyframes #{$name} {
-		@content;
-	}
-	@keyframes #{$name} {
-		@content;
-	}
-}
-
 @mixin transition($properties: all, $duration: .3s, $easing: ease-out, $delay: 0s) {
 	@if length($properties) > 1 {
 		@include transition-property($properties);

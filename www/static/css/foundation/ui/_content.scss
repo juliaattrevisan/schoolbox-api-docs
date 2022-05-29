@@ -1279,7 +1279,7 @@ span.loader {
     width: 1rem;
     height: 1rem;
 }
-@include keyframes(sb-loader) {
+@keyframes sb-loader {
     0% {
         transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
     }
