@@ -60,7 +60,8 @@ $login-img-max-height: 12rem !default; // 192px
                 // if they're the same, no need to use complex gradient styles
                 background-color: $login-footer-background-top;
             } @else {
-                @include linear-gradient($login-footer-background-top, $login-footer-background-bottom);
+                background-color: $login-footer-background-top;
+	            background-image: linear-gradient(top, $login-footer-background-top, $login-footer-background-bottom);
             }
 
             margin: 0 0 0 -360px;

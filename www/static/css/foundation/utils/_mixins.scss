@@ -44,11 +44,6 @@
   transition-delay: $transition-transition-delay;
 }
 
-@mixin linear-gradient($start-colour, $end-colour) {
-	background-color: $start-colour;
-	background-image: linear-gradient(top, $start-colour, $end-colour);
-}
-
 @mixin placeholder-color($color, $font-weight) {
 	::placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
 }
