@@ -174,7 +174,8 @@ select {
         color: $aluminum;
         opacity: 1;
         label:hover & {
-            @include placeholder-hover-color($base);
+            &:focus::placeholder { color: $base; }
+	        &:hover::placeholder { color: $base; }
         }
         &:hover {
             background-color: $input-disabled-bg;

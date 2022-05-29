@@ -44,11 +44,6 @@
   transition-delay: $transition-transition-delay;
 }
 
-@mixin placeholder-hover-color($color) {
-	&:focus::placeholder	{ color: $color; }
-	&:hover::placeholder	{ color: $color; }
-}
-
 @mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
   @media #{$small-up} {
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};
