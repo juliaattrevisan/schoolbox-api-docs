@@ -1611,7 +1611,7 @@ $train-line-unvisited-color: $content-ui-background;
                 top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
                 width: 0.5 * $train-line-stop-size;
                 z-index: 1;
-                @include easy-transition(all 200ms ease-out);
+                transition: all 200ms ease-out;
 
                 // You specified an icon for this stop (Knurl)
                 &[class^="icon-"] {

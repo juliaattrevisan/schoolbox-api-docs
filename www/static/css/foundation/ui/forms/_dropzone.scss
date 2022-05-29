@@ -95,7 +95,7 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     opacity: 1;
     z-index: 2;
 
-    @include easy-transition(opacity $attachzone-overlay-duration $attachzone-overlay-timing);
+    transition: opacity $attachzone-overlay-duration $attachzone-overlay-timing;
   }
 }
 
@@ -134,10 +134,8 @@ section > .dropzone-wrap {
     display: block;
     z-index: -1;
 
-    @include easy-transition(
-      opacity $attachzone-overlay-duration $attachzone-overlay-timing,
-      z-index 0s $attachzone-overlay-duration linear
-    );
+    transition: opacity $attachzone-overlay-duration $attachzone-overlay-timing,
+                z-index 0s $attachzone-overlay-duration linear;
   }
 }
 
@@ -198,14 +196,12 @@ ul.az-error-list {
 
   > li {
     clear: none;
-    @include easy-transition(
-      color $attachzone-overlay-duration $attachzone-overlay-timing,
+    transition: color $attachzone-overlay-duration $attachzone-overlay-timing,
       opacity $attachzone-duration-half $attachzone-overlay-timing,
       min-height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
       height $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
       padding $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
-      background-color $attachzone-overlay-duration $attachzone-overlay-timing
-    );
+      background-color $attachzone-overlay-duration $attachzone-overlay-timing;
     &:hover {
       background-color: transparent;
       cursor: default;
@@ -386,7 +382,7 @@ ul.az-error-list {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 1rem 1rem;
-    @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
+    transition: opacity 0.15s $attachzone-overlay-timing;
   }
   ul.az-list > li {
     position: relative;
@@ -465,7 +461,7 @@ ul.az-error-list {
   }
   .filename {
     opacity: 1;
-    @include easy-transition(opacity 0.15s $attachzone-overlay-timing);
+    transition: opacity 0.15s $attachzone-overlay-timing;
   }
 }
 
@@ -484,12 +480,10 @@ ul.az-error-list {
   background-repeat: no-repeat;
   display: table;
   color: $attachzone-resting-color;
-  @include easy-transition(
-    background-color 360ms $attachzone-overlay-timing,
+  transition: background-color 360ms $attachzone-overlay-timing,
     border-color 360ms $attachzone-overlay-timing,
     color 360ms $attachzone-overlay-timing,
-    height 360ms $attachzone-overlay-timing 360ms
-  );
+    height 360ms $attachzone-overlay-timing 360ms;
   &:hover {
     border-color: $attachzone-hover-color;
     background-color: $attachzone-hover-background;
@@ -615,7 +609,7 @@ ul.az-error-list {
     position: absolute;
     top: 0;
     left: 0;
-    @include easy-transition(all 0.15s $attachzone-overlay-timing);
+    transition: all 0.15s $attachzone-overlay-timing;
   }
 
   .dz-success .dz-progress [data-dz-uploadprogress] {
@@ -638,7 +632,7 @@ ul.az-error-list {
   }
 
   .dz-default.dz-message {
-    @include easy-transition(opacity 0.3s $attachzone-overlay-timing);
+    transition: opacity 0.3s $attachzone-overlay-timing;
     opacity: 1;
     -ms-filter: none;
     filter: none;
@@ -698,7 +692,7 @@ ul.az-error-list {
     opacity: 0;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
-    @include easy-transition(opacity 0.4s $attachzone-overlay-timing);
+    transition: opacity 0.4s $attachzone-overlay-timing;
   }
 
   .dz-preview .dz-success-mark,
@@ -859,7 +853,7 @@ ul.az-error-list {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
-  @include easy-transition(opacity 0.4s $attachzone-overlay-timing);
+  transition: opacity 0.4s $attachzone-overlay-timing;
 }
 
 .dz-preview .dz-error-message,
@@ -868,7 +862,7 @@ ul.az-error-list {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
-  @include easy-transition(opacity 0.3s $attachzone-overlay-timing);
+  transition: opacity 0.3s $attachzone-overlay-timing;
 }
 
 .dz-preview:hover.dz-error .dz-error-message,
@@ -881,7 +875,7 @@ ul.az-error-list {
 .dz-preview .dz-progress .dz-upload,
 .dropzone-previews .dz-preview .dz-progress .dz-upload {
   animation: loading 0.4s linear infinite;
-  @include easy-transition(width 0.3s $attachzone-overlay-timing);
+  transition: width 0.3s $attachzone-overlay-timing;
   -webkit-border-radius: 2px;
   border-radius: 2px;
   position: absolute;
