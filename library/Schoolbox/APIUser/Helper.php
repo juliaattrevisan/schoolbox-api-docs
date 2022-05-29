@@ -31,7 +31,7 @@ class Helper
      * @throws \Exception
      */
     public function ajaxSearch(
-        string $keyword,
+        ?string $keyword,
         ?array $filter,
         ?int $limit = null,
         ?int $cursor = null
@@ -66,20 +66,20 @@ class Helper
                 LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id ';
         $where = '
             WHERE user.deleted_at IS NULL
-            AND ';
+            ';
         $params = [];
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $params['externalId'] = $keyword;
-                $where .= "( synergy_id = :externalId  ) ";
+                $where .= "AND ( synergy_id = :externalId  ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
                     $params['lastName']  = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
-                    $where .= "( firstname like :firstName and lastname like :lastName ) ";
+                    $where .= "AND ( firstname like :firstName and lastname like :lastName ) ";
                 } else {
                     $params['username'] = $params['lastName'] = $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
-                    $where .= "( firstname like :firstName or lastname like :lastName or username like :username ) ";
+                    $where .= "AND ( firstname like :firstName or lastname like :lastName or username like :username ) ";
                 }
             }
         }
