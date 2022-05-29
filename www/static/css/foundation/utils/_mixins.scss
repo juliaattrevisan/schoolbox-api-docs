@@ -68,10 +68,6 @@
   }
 }
 
-//@mixin contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
-//	color: contrast-bg($opacity, $background, $saturation, $light, $dark);
-//}
-
 @mixin rotate-color-list($prefix: 'gradient', $count: 10, $start: $alert-color, $end: $success-color, $light: $white, $dark: $black) {
 
 	$iHue: hue($start);
@@ -98,17 +94,6 @@
 			color: $white;
 			fill: $derived;
 		}
-	}
-}
-
-@mixin selection($color: $accent-foreground, $background-color: $accent-background) {
-	::-moz-selection {
-		color: $background-color;
-		background-color: $color;
-	}
-	::selection      {
-		color: $background-color;
-		background-color: $color;
 	}
 }
 
