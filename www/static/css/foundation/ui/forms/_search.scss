@@ -5,7 +5,10 @@
     top: 0;
     width: $tabbar-height;
     z-index: 1000;
-    @include placeholder-color(transparent, $font-weight-normal);
+    ::placeholder { 
+        color: transparent; 
+        font-weight: normal; 
+    }
 
     input[type="text"] {
         border: 0;
@@ -22,7 +25,10 @@
     &.focus {
         width: 100%;
         padding-left: $tabbar-icon-width * 2;
-        @include placeholder-color($black, $font-weight-normal);
+        ::placeholder { 
+            color: $black; 
+            font-weight: normal; 
+        }
     }
 
     /* Search icon in its idle state

@@ -269,7 +269,10 @@ table.rb {
             border-right-width: 1px;
         }
     }
-    @include placeholder-color(gray, normal);
+    ::placeholder { 
+        color: gray; 
+        font-weight: normal; 
+    }
 }
 .rb-criterion {
     margin-bottom: 0;

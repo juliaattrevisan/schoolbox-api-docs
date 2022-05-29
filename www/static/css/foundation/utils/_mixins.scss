@@ -44,10 +44,6 @@
   transition-delay: $transition-transition-delay;
 }
 
-@mixin placeholder-color($color, $font-weight) {
-	::placeholder { color: $color; font-weight: $font-weight; opacity: 1; }
-}
-
 @mixin placeholder-hover-color($color) {
 	&:focus::placeholder	{ color: $color; }
 	&:hover::placeholder	{ color: $color; }

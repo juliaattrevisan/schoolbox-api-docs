@@ -128,7 +128,10 @@ $switch-negative-color: tint($secondary-color, 74%);
 // Custom overrides
 //
 form {
-    @include placeholder-color($aluminum, $font-weight-normal);
+    ::placeholder { 
+        color: $aluminum; 
+        font-weight: normal; 
+    }
     margin: 0 0 $form-spacing / 2 0;
 }
 
