@@ -163,12 +163,11 @@ class CommandLineTool extends App
                     'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
                     'filemtime' => $file['filemtime'],
                     'path'      => sprintf(
-                        '%s/%s_%s_%d.%s',
+                        '%s/%s_%d_%s',
                         $yearLevel,
                         $externalId,
-                        $file['filename'],
                         $i + 1,
-                        $file['storage']->getExtension(),
+                        $file['filename'],
                     ),
                 ];
             }
@@ -186,12 +185,11 @@ class CommandLineTool extends App
                     'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
                     'filemtime' => $file['filemtime'],
                     'path'      => sprintf(
-                        '%s/%s_Evidence_%s_%d.%s',
+                        '%s/%s_Evidence_%d_%s',
                         $yearLevel,
                         $externalId,
-                        $file['filename'],
                         $j + 1,
-                        $file['storage']->getExtension(),
+                        $file['filename'],
                     ),
                 ];
             }
