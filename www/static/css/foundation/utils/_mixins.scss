@@ -17,10 +17,6 @@
 
 // Prefixed properties, in alphabetical order
 
-@mixin box-sizing ($box-sizing) {
-	box-sizing: $box-sizing;
-}
-
 @mixin keyframes($name) {
 	@-webkit-keyframes #{$name} {
 		@content;

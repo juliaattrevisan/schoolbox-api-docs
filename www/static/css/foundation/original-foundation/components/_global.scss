@@ -492,7 +492,7 @@ $cursor-text-value: text !default;
     *,
     *:before,
     *:after {
-      @include box-sizing(border-box);
+        box-sizing: border-box;
     }
 
     html,
