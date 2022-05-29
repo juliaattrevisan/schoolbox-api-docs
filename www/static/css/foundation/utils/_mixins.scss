@@ -17,10 +17,6 @@
 
 // Prefixed properties, in alphabetical order
 
-@mixin absolute ($top: auto, $left: auto, $bottom: auto, $right: auto) {
-	position: absolute; top: $top; right: $right; bottom: $bottom; left: $left;
-}
-
 @mixin box-shadow($x-offset, $y-offset, $blur, $color, $inset:"") {
 	box-shadow: $x-offset $y-offset $blur $color #{$inset};
 }

@@ -28,7 +28,9 @@
     /* Search icon in its idle state
      */
     .icon-search {
-        @include absolute(0, auto, auto, 28px);
+        position: absolute;
+        top: 0;
+        right: 28px;
         @include transition(all, 0.3s, ease-in);
         line-height: inherit;
         margin: 0;
@@ -55,7 +57,9 @@
     [type="text"]:focus + .icon-search,
     [type="text"]:active + .icon-search,
     &:hover .icon-search {
-        @include absolute(0, auto, auto, 16px);
+        position: absolute;
+        top: 0;
+        right: 16px;
 
         /* Search icon when Search feature is activated
         */
