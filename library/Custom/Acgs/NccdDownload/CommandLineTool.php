@@ -158,17 +158,12 @@ class CommandLineTool extends App
             foreach (array_values($folderFilesTuple['files']) as $i => $file) {
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
+                $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
                 $files[]    = [
                     'file'      => $file['storage'],
-                    'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
+                    'filename'  => $filename,
                     'filemtime' => $file['filemtime'],
-                    'path'      => sprintf(
-                        '%s/%s_%d_%s',
-                        $yearLevel,
-                        $externalId,
-                        $i + 1,
-                        $file['filename'],
-                    ),
+                    'path'      => sprintf('%s/%s_%d_%s', $yearLevel, $externalId, $i + 1, $filename),
                 ];
             }
         }
@@ -180,17 +175,12 @@ class CommandLineTool extends App
                 /** @var IStorage $file */
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
+                $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
                 $files[]    = [
                     'file'      => $file['storage'],
-                    'filename'  => $file['filename'] . '.' . $file['storage']->getExtension(),
+                    'filename'  => $filename,
                     'filemtime' => $file['filemtime'],
-                    'path'      => sprintf(
-                        '%s/%s_Evidence_%d_%s',
-                        $yearLevel,
-                        $externalId,
-                        $j + 1,
-                        $file['filename'],
-                    ),
+                    'path'      => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
                 ];
             }
         }
@@ -212,7 +202,7 @@ class CommandLineTool extends App
             /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
             /** @phpstan-ignore-next-line: read() may return false */
             if ($fileContent === false) {
-                $logger->warning(sprintf('Could not read file "%s": skipping', $file->getBasename()));
+                $logger->warning(sprintf('Could not add file "%s" to "%s": skipping', $fileTuple['filename'], $fileTuple['path']));
                 $logger->debug(
                     sprintf(
                         '(Try downloading from %s, and uploading to staging)',
