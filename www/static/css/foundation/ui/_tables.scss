@@ -177,7 +177,7 @@ $rotate-span-width: 11rem;
     letter-spacing: 0.1ex;
 
     > div {
-      @include transform(skew(-#{$rotate-angle}deg, 0deg));
+      transform: skew(-#{$rotate-angle}deg, 0deg);
       overflow: hidden;
       border: 0 solid #eeeeee;
       border-left-width: 1px;
@@ -192,7 +192,7 @@ $rotate-span-width: 11rem;
       > span {
         $rotate-angle-complement: 360 - $rotate-angle;
 
-        @include transform(skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg));
+        transform: skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg);
         filter: none !important;
         position: absolute;
         top: auto;

@@ -131,7 +131,7 @@ $alert-default-background: css-darken($body-bg, 10%);
     transition: opacity 0.3s;
     &.pop {
         right: 1rem;
-        @include transform(translateY(0));
+        transform: translateY(0);
         opacity: 1;
     }
 
