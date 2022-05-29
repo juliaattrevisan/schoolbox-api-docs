@@ -97,20 +97,6 @@
 	}
 }
 
-@mixin button-group-glow($resting-opacity: 0.7, $hover-other-opacity: 0.4, $hover-current-opacity: 1) {
-	&:hover {
-		a {
-			opacity: $hover-other-opacity;
-		}
-	}
-	a {
-		opacity: $resting-opacity;
-		&:hover {
-			opacity: $hover-current-opacity;
-		}
-	}
-}
-
 @mixin wide-switch($width: 4rem) {
 	label {
 		width: $width;
