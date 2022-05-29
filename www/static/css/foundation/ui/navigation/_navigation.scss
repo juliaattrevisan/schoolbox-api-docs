@@ -263,7 +263,7 @@ $allow-sidebar-stash: $large-up;
   }
 
   .account-drop {
-    @include box-shadow(-2px, 2px, 4px, rgba(0, 0, 0, 0.15));
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
     display: none;
     right: $tabbar-icon-width;
     position: absolute;

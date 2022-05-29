@@ -17,10 +17,6 @@
 
 // Prefixed properties, in alphabetical order
 
-@mixin box-shadow($x-offset, $y-offset, $blur, $color, $inset:"") {
-	box-shadow: $x-offset $y-offset $blur $color #{$inset};
-}
-
 @mixin box-sizing ($box-sizing) {
 	box-sizing: $box-sizing;
 }
