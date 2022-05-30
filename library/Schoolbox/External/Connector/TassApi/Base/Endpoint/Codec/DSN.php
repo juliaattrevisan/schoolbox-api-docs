@@ -56,6 +56,24 @@ class DSN implements IDSN
 
 
     /**
+     * This character separates module-related tuples from each other
+     */
+    private const MODULE_SEPARATOR = ',';
+
+
+    /**
+     * This character separates module configuration tuples from each otehr
+     */
+    private const MODULE_TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * This character separates module-related tuples from option tuples
+     */
+    private const OPTION_SEPARATOR = '?';
+
+
+    /**
      * Optional params we permitted in SUDS Config
      */
     private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
@@ -77,12 +95,16 @@ class DSN implements IDSN
      */
     public function decode(string $dsn): array
     {
-        $bits = explode('?', $dsn);
+        $bits = explode(self::OPTION_SEPARATOR, $dsn);
         $modules = $bits[0];
         $options = $bits[1] ?? null;
 
-        $dsnParts = explode(',', $modules);
-        $struct = [];
+        $dsnParts = explode(self::MODULE_SEPARATOR, $modules);
+
+        $struct = [
+            'modules' => [],
+            'options' => []
+        ];
 
         /* Break apart module config
          */
@@ -126,8 +148,15 @@ class DSN implements IDSN
 
         /* Break apart optional config
          */
-        if ($options) {
-            $dsnParts = explode(';', $options);
+        if (null !== $options) {
+            /* No tuples, but you gave an option separator; malformed DSN
+             * Looks like there were supposed to be options, but none exist
+             */
+            if ('' === $options) {
+                throw new DomainException('Detected option separator but no options found');
+            }
+
+            $dsnParts = explode(self::MODULE_TUPLE_SEPARATOR, $options);
 
             foreach ($dsnParts as $dsnPart) {
                 $matches = [];
@@ -169,7 +198,7 @@ class DSN implements IDSN
                 $tuples[] = "{$key}={$value}";
             }
 
-            $struct[] = $module . implode(';', $tuples);
+            $struct[] = $module . implode(self::MODULE_TUPLE_SEPARATOR, $tuples);
         }
 
         /* Encode option pieces
@@ -180,9 +209,18 @@ class DSN implements IDSN
             $options[] = "{$key}={$value}";
         }
 
-        $moduleEncoding = implode(',', $struct);
-        $optionEncoding = implode(';', $options);
+        $moduleEncoding = implode(self::MODULE_SEPARATOR, $struct);
+        $optionEncoding = implode(self::MODULE_TUPLE_SEPARATOR, $options);
 
-        return "{$moduleEncoding}?{$optionEncoding}";
+        if (\count($options)) {
+            return sprintf(
+                '%s%s%s',
+                $moduleEncoding,
+                self::OPTION_SEPARATOR,
+                $optionEncoding
+            );
+        }
+
+        return $moduleEncoding;
     }
 }

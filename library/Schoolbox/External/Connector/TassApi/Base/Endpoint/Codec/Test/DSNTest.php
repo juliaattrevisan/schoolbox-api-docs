@@ -35,46 +35,80 @@ class DSNTest extends TestCase
             'Valid DSN 1 (original order)' => [
                 'studentdetails:companycode=123;appcode=ADweh/189;token=923nAD/j\l35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj7///8fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
                 [
-                    'studentdetails' => [
-                        'companycode' => 123,
-                        'appcode' => 'ADweh/189',
-                        'token' => '923nAD/j\l35h0sd7725=='
-                    ],
+                    'modules' => [
+                        'studentdetails' => [
+                            'companycode' => 123,
+                            'appcode' => 'ADweh/189',
+                            'token' => '923nAD/j\l35h0sd7725=='
+                        ],
 
-                    'identitymanagement' => [
-                        'companycode' => 456,
-                        'appcode' => 'xcjFh28',
-                        'token' => 'ckbj7///8fj1kdhg=',
-                    ],
+                        'identitymanagement' => [
+                            'companycode' => 456,
+                            'appcode' => 'xcjFh28',
+                            'token' => 'ckbj7///8fj1kdhg=',
+                        ],
 
-                    'lmsintegration' => [
-                        'companycode' => 789,
-                        'appcode' => 'Qvmdbn2764',
-                        'token' => 'CVWSEFklrsjdswwwidfnesfd'
-                    ]
+                        'lmsintegration' => [
+                            'companycode' => 789,
+                            'appcode' => 'Qvmdbn2764',
+                            'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                        ]
+                    ],
+                    'options' => []
                 ]
             ],
 
             'Valid DSN 2 (random order of module credentials)' => [
                 'lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==',
                 [
-                    'lmsintegration' => [
-                        'companycode' => 789,
-                        'appcode' => 'Qvmdbn2764',
-                        'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                    'modules' => [
+                        'lmsintegration' => [
+                            'companycode' => 789,
+                            'appcode' => 'Qvmdbn2764',
+                            'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                        ],
+                        'identitymanagement' => [
+                            'companycode' => 456,
+                            'appcode' => 'xcjFh28',
+                            'token' => 'ckbj78fj1kdhg=',
+                        ],
+                        'studentdetails' => [
+                            'companycode' => 123,
+                            'appcode' => 'ADweh189',
+                            'token' => '923nADjl35h0sd7725=='
+                        ],
                     ],
-                    'identitymanagement' => [
-                        'companycode' => 456,
-                        'appcode' => 'xcjFh28',
-                        'token' => 'ckbj78fj1kdhg=',
-                    ],
-                    'studentdetails' => [
-                        'companycode' => 123,
-                        'appcode' => 'ADweh189',
-                        'token' => '923nADjl35h0sd7725=='
-                    ],
+                    'options' => []
                 ]
             ],
+
+            'Valid DSN 3 (has options)' => [
+                'lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==?opt1=val1;opt2=val2;opt3=val3',
+                [
+                    'modules' => [
+                        'lmsintegration' => [
+                            'companycode' => 789,
+                            'appcode' => 'Qvmdbn2764',
+                            'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                        ],
+                        'identitymanagement' => [
+                            'companycode' => 456,
+                            'appcode' => 'xcjFh28',
+                            'token' => 'ckbj78fj1kdhg=',
+                        ],
+                        'studentdetails' => [
+                            'companycode' => 123,
+                            'appcode' => 'ADweh189',
+                            'token' => '923nADjl35h0sd7725=='
+                        ],
+                    ],
+                    'options' => [
+                        'opt1' => 'val1',
+                        'opt2' => 'val2',
+                        'opt3' => 'val3'
+                    ]
+                ]
+            ]
         ];
     }
 
@@ -106,6 +140,11 @@ class DSNTest extends TestCase
             'Valid DSN Re-encode 1' => [
                 'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
                 'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd'
+            ],
+
+            'Valid DSN Re-encode 2 (has option tuples)' => [
+                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?opt1=val1;opt2=val2;opt3=val3;opt4=val4',
+                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?opt1=val1;opt2=val2;opt3=val3;opt4=val4'
             ],
         ];
     }
@@ -211,6 +250,11 @@ class DSNTest extends TestCase
                 'student:details:appcode=ADweh;189;companycode=12;3;token=923nAD,jl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
                 []
             ],
+
+            'Invalid DSN 16 (malformed options)' => [
+                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?',
+                []
+            ]
         ];
     }
 
