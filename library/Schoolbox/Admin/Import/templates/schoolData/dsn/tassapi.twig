@@ -102,35 +102,35 @@
                 <div class="row">
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 1 Start</label>
-                        <input type="text" name="dsn[tassapi][options][tap1start]" value="{{ options.tap1start ?? '' }}" />
+                        <input id='tap1start' type="text" name="dsn[tassapi][options][tap1start]" value="{{ options.tap1start ?? '' }}" data-datepicker data-datesync-enddate="#tap1end" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 1 End</label>
-                        <input type="text" name="dsn[tassapi][options][tap1end]" value="{{ options.tap1end ?? '' }}" />
+                        <input id='tap1end' type="text" name="dsn[tassapi][options][tap1end]" value="{{ options.tap1end ?? '' }}" data-datepicker data-datesync-startdate="#tap1start" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 2 Start</label>
-                        <input type="text" name="dsn[tassapi][options][tap2start]" value="{{ options.tap2start ?? '' }}" />
+                        <input id='tap2start' type="text" name="dsn[tassapi][options][tap2start]" value="{{ options.tap2start ?? '' }}" data-datepicker data-datesync-enddate="#tap2end" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 2 End</label>
-                        <input type="text" name="dsn[tassapi][options][tap2end]" value="{{ options.tap2end ?? '' }}" />
+                        <input id='tap2end' type="text" name="dsn[tassapi][options][tap2end]" value="{{ options.tap2end ?? '' }}" data-datepicker data-datesync-startdate="#tap2start" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 3 Start</label>
-                        <input type="text" name="dsn[tassapi][options][tap3start]" value="{{ options.tap3start ?? '' }}" />
+                        <input id='tap3start' type="text" name="dsn[tassapi][options][tap3start]" value="{{ options.tap3start ?? '' }}" data-datepicker data-datesync-enddate="#tap3end" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 3 End</label>
-                        <input type="text" name="dsn[tassapi][options][tap3end]" value="{{ options.tap3end ?? '' }}" />
+                        <input id='tap3end' type="text" name="dsn[tassapi][options][tap3end]" value="{{ options.tap3end ?? '' }}" data-datepicker data-datesync-startdate="#tap3start" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 4 Start</label>
-                        <input type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" />
+                        <input id='tap4start' type="text" name="dsn[tassapi][options][tap4start]" value="{{ options.tap4start ?? '' }}" data-datepicker data-datesync-enddate="#tap4end" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>TASS Academic Period 4 End</label>
-                        <input type="text" name="dsn[tassapi][options][tap4end]" value="{{ options.tap4end ?? '' }}" />
+                        <input id='tap4end' type="text" name="dsn[tassapi][options][tap4end]" value="{{ options.tap4end ?? '' }}" data-datepicker data-datesync-startdate="#tap4start" />
                     </div>
                 </div>
             </div>
