@@ -37,7 +37,7 @@
         position: absolute;
         top: 0;
         right: 28px;
-        @include transition(all, 0.3s, ease-in);
+        transition: all 0.3s ease-in;
         line-height: inherit;
         margin: 0;
         z-index: 1;

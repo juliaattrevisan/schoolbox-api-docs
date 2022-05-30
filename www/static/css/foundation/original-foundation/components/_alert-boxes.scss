@@ -60,7 +60,7 @@ $alert-transition-ease: ease-out !default;
   margin-bottom: $alert-bottom-margin;
   padding: $alert-padding-top $alert-padding-opposite-direction $alert-padding-bottom $alert-padding-default-float;
   position: relative;
-  @include single-transition(opacity, $alert-transition-speed, $alert-transition-ease)
+  transition: opacity $alert-transition-speed $alert-transition-ease;
 }
 
 // We use this mixin to add alert styles

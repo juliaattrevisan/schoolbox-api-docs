@@ -61,7 +61,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
 
       &:before,
       &:after {
-        @include single-transition(all, 0.15s, linear);
+        transition: all 0.15s linear;
         border-top: $base-font-size solid transparent;
         border-bottom: $base-font-size solid transparent;
         content: " ";

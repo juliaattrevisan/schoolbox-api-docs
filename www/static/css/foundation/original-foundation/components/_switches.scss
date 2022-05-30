@@ -66,7 +66,7 @@ $switch-active-color: $primary-color !default;
     width: $switch-height-med * 2; height: $switch-height-med;
 
     // Transition for the switch label to follow paddle
-    @include single-transition(left, $transition-speed, $transition-ease);
+    transition: left $transition-speed $transition-ease;
   }
 
   // So that we don't need to recreate the form with any JS, we use the

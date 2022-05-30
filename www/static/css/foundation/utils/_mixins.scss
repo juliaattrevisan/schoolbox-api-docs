@@ -15,35 +15,6 @@
 	transform: translateY(-50%);
 }
 
-// Prefixed properties, in alphabetical order
-
-@mixin transition($properties: all, $duration: .3s, $easing: ease-out, $delay: 0s) {
-	@if length($properties) > 1 {
-		@include transition-property($properties);
-		@include transition-duration($duration);
-		@include transition-timing-function($easing);
-		@include transition-delay($delay);
-	} @else {
-		transition: $properties $duration $easing $delay;
-	}
-}
-
-@mixin transition-property($transition-property: all) {
-	transition-property: $transition-property;
-}
-
-@mixin transition-duration($transition-duration: 0s) {
-	transition-duration: $transition-duration;
-}
-
-@mixin transition-timing-function($transition-timing-function: ease) {
-	transition-timing-function: $transition-timing-function;
-}
-
-@mixin transition-delay($transition-transition-delay: 500ms) {
-  transition-delay: $transition-transition-delay;
-}
-
 @mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
   @media #{$small-up} {
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};

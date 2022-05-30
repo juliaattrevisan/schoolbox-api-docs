@@ -58,7 +58,7 @@ $thumb-transition-speed: 200ms !default;
     /* Image Thumbnails */
     .th {
       @include thumb;
-      @include single-transition(all, $thumb-transition-speed, ease-out);
+      transition: all $thumb-transition-speed ease-out;
 
       &.radius { @include radius($thumb-radius); }
     }

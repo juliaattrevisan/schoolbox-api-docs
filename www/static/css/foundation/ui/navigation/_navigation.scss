@@ -212,7 +212,7 @@ $allow-sidebar-stash: $large-up;
         }
 
         &:before {
-          @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+          transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
           text-align: center;
           float: none;
           color: $navigation-foreground;
@@ -220,7 +220,7 @@ $allow-sidebar-stash: $large-up;
       }
 
       span {
-        @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         color: $navigation-foreground;
         font-weight: $font-weight-normal;
         line-height: rem-calc($base-font-size * 1.5);
@@ -327,7 +327,7 @@ $allow-sidebar-stash: $large-up;
   .account-menu-mobile {
     color: $accounts-menu-foreground;
     background-color: transparent;
-    @include single-transition(all, 0.15s, linear);
+    transition: all 0.15s linear;
 
     &:hover {
       background-color: $accounts-menu-hover;
@@ -386,12 +386,12 @@ $allow-sidebar-stash: $large-up;
         max-height: 0;
         visibility: hidden;
         overflow: hidden;
-        @include transition(ease-out, 0.2s, max-height);
+        transition: ease-out 0.2s max-height;
 
         &.active {
           max-height: 3000px;
           visibility: visible;
-          @include transition(ease-in, 0.2s, max-height);
+          transition: ease-in 0.2s max-height;
         }
       }
     }

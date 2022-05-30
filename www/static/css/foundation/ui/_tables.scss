@@ -114,7 +114,7 @@ table.skeleton {
   [class*=" icon-"]:before{
     opacity: 0.5;
     padding: rem-calc(($base-font-size - 2));
-    @include single-transition(all, 0.15s, linear);
+    transition: all 0.15s linear;
   }
 }
 

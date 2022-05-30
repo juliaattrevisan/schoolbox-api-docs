@@ -152,7 +152,7 @@ label {
 input,
 textarea,
 select {
-    @include single-transition(all, 0.15s, linear);
+    transition: all 0.15s linear;
     min-height: $global-button-input-height;
     line-height: inherit;
     font-weight: $font-weight-normal;
@@ -289,7 +289,7 @@ td {
         text-transform: uppercase;
         font-size: rem-calc($base-font-size - 3);
         text-indent: 0;
-        @include single-transition(opacity, $switch-paddle-transition-speed, $switch-paddle-transition-ease);
+        transition: opacity $switch-paddle-transition-speed $switch-paddle-transition-ease;
     }
 }
 %fancy-check {
@@ -348,8 +348,8 @@ td {
         margin: 0 0 $checkbox-margin 0;
         &:before,
         &:after {
-            @include transition(color, 360ms, cubic-bezier(0.2, 1, 0, 1));
-            @include transition(background-color, 360ms, cubic-bezier(0.2, 1, 0, 1));
+            transition: color 360ms cubic-bezier(0.2, 1, 0, 1),
+                        background-color 360ms cubic-bezier(0.2, 1, 0, 1);
         }
 
         &:before {
@@ -452,7 +452,7 @@ td {
     font-weight: $font-weight-normal;
     line-height: 2;
     text-align: left;
-    @include transition(all, 0.1s, ease-in);
+    transition: all 0.1s ease-in;
     i {
         @extend .size-32;
         color: $content-ui-foreground;
@@ -503,7 +503,7 @@ input[type="radio"] {
         height: $toggle-height;
         width: $toggle-width;
         text-align: center;
-        @include single-transition(background-color, 0.15s, linear);
+        transition: background-color 0.15s linear;
 
         // Make sure elements inside the label don't hijack the label click
         * {

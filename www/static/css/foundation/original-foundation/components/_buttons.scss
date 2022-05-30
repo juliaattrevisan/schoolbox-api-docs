@@ -206,7 +206,7 @@ $button-disabled-cursor: $cursor-default-value !default;
   @include button-style($bg, $radius, $disabled, $bg-hover, $border-color);
 
   @if $transition {
-    @include single-transition(background-color);
+    transition: background-color;
   }
 }
 
@@ -220,7 +220,7 @@ $button-disabled-cursor: $cursor-default-value !default;
       @include button-size;
       @include button-style;
 
-      @include single-transition(background-color);
+      transition: background-color;
 
       &.secondary { @include button-style($bg:$secondary-button-bg-color, $bg-hover:$secondary-button-bg-hover, $border-color:$secondary-button-border-color); }
       &.success   { @include button-style($bg:$success-button-bg-color, $bg-hover:$success-button-bg-hover, $border-color:$success-button-border-color); }

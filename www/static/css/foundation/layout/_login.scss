@@ -50,7 +50,7 @@ $login-img-max-height: 12rem !default; // 192px
                 margin: 0;
                 padding: $login-form-padding;
                 background-color: $login-form-background;
-                @include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+                transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
                 position: relative;
             }
         }

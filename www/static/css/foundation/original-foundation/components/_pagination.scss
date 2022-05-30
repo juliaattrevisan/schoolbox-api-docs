@@ -110,7 +110,7 @@ $pagination-link-current-active-bg: $primary-color !default;
 
       a, button {
         @include radius;
-        @include single-transition(background-color);
+        transition: background-color;
         background: none;
         color: $pagination-link-font-color;
         display: block;

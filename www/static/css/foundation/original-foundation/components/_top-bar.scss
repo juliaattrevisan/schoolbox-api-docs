@@ -309,7 +309,7 @@ $topbar-dropdown-arrows: true !default; //Set false to remove the \00bb >> text 
       #{$default-float}: 0;
       position: relative;
       width: auto;
-      @include single-transition($default-float, $topbar-transition-speed);
+      transition: $default-float $topbar-transition-speed;
 
       ul {
         display: block;
@@ -534,7 +534,7 @@ $topbar-dropdown-arrows: true !default; //Set false to remove the \00bb >> text 
       }
 
       .top-bar-section {
-        @include single-transition(none,0,0);
+        transition: none;
         #{$default-float}: 0 !important;
 
         ul {

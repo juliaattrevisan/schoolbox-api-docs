@@ -230,7 +230,7 @@ $button-disabled-cursor: $cursor-default-value !default;
   @include button-style($bg, $radius, $disabled, $bg-hover, $border-color);
 
   @if $transition {
-    @include single-transition(background-color);
+    transition: background-color;
   }
 }
 
@@ -243,7 +243,7 @@ $button-disabled-cursor: $cursor-default-value !default;
       @include button-size;
       @include button-style;
 
-      @include single-transition(background-color);
+      transition: background-color;
 
       &.secondary {
         @include button-style(

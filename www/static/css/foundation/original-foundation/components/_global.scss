@@ -67,16 +67,6 @@ $base-line-height: 1.5 !default;
 
 // @mixins
 //
-// We use this to add transitions to elements
-// $property - Default: all, Options: http://www.w3.org/TR/css3-transitions/#animatable-properties
-// $speed - Default: 300ms
-// $ease - Default: ease-out, Options: http://css-tricks.com/almanac/properties/t/transition-timing-function/
-@mixin single-transition($property:all, $speed:300ms, $ease:ease-out) {
-  @include transition($property, $speed, $ease);
-}
-
-// @mixins
-//
 // We use this to add single or multiple transitions to elements
 // $property - Default: all, Options: http://www.w3.org/TR/css3-transitions/#animatable-properties
 // $speed - Default: 300ms
