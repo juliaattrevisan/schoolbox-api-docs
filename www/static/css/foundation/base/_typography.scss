@@ -3,11 +3,8 @@
 //
 
 // We use these to control header font styles
-// $header-font-family: $body-font-family;
 $header-font-weight: $font-weight-normal;
-// $header-font-style: normal;
 $header-font-color: $jet;
-//$header-line-height: 1.4;
 $header-top-margin: 0;
 $header-bottom-margin: 1rem;
 $header-text-rendering: auto !default;
@@ -30,7 +27,6 @@ $h6-font-reduction: 0;
 
 // These control how subheaders are styled.
 $subheader-line-height: 1.4;
-// DONE figure out what to do instead of this mixin
 $subheader-font-color: $body-foreground;
 $subheader-font-weight: $header-font-weight;
 $subheader-top-margin: 0.625rem;
@@ -38,54 +34,25 @@ $subheader-bottom-margin: 0.5rem;
 
 // A general <small> styling
 $small-font-size: rem-calc(($base-font-size - 4));
-// $small-font-color: scale-color($header-font-color, $lightness: 35%);
 
 // We use these to style paragraphs
-// $paragraph-font-family: inherit;
-// $paragraph-font-weight: $font-weight-normal;
 $paragraph-font-size: rem-calc(($base-font-size - 3));
 $paragraph-line-height: 1.6;
 $paragraph-margin-bottom: rem-calc(($base-font-size - 4));
 $paragraph-aside-font-size: rem-calc(($base-font-size - 4));
-// $paragraph-aside-line-height: 1.35;
-// $paragraph-aside-font-style: italic;
 $paragraph-text-rendering: auto !default;
 
 // We use these to style <code> tags
 $code-color: $accent-foreground;
-// $code-font-family: $font-family-monospace;
-// $code-font-weight: $font-weight-normal;
 $code-background-color: $accent-background;
-// $code-border-size: 1px;
-// $code-border-style: solid;
 $code-border-color: $accent-foreground;
-// $code-padding: rem-calc(2) rem-calc(5) rem-calc(1);
 
 // We use these to style anchors
-// $anchor-text-decoration: none;
-// $anchor-text-decoration-hover: none;
 $anchor-font-color: $content-ui-foreground;
 $anchor-font-color-hover: $content-ui-foreground;
 
 // We use these to style the <hr> element
-// $hr-border-width: 1px;
-// $hr-border-style: solid;
-// $hr-border-color: $gainsboro;
 $hr-margin: rem-calc(16);
-
-// We use these to style lists
-// $list-font-family: $paragraph-font-family;
-// $list-font-size: $paragraph-font-size;
-// $list-line-height: $paragraph-line-height;
-//$list-margin-bottom: $paragraph-margin-bottom;
-// $list-style-position: outside;
-//$list-side-margin: 1.1rem;
-// $list-ordered-side-margin: 1.4rem;
-// $list-side-margin-no-bullet: 0;
-// $list-nested-margin: rem-calc(20);
-// $definition-list-header-weight: $font-weight-bold;
-// $definition-list-header-margin-bottom: .3rem;
-// $definition-list-margin-bottom: rem-calc(12);
 
 // We use these to style blockquotes
 $blockquote-font-color: scale-color($header-font-color, $lightness: 35%);
@@ -95,37 +62,10 @@ $blockquote-cite-font-size: rem-calc(13);
 $blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
 $blockquote-cite-link-color: $blockquote-cite-font-color;
 
-// Acronym styles
-// $acronym-underline: 1px dotted $gainsboro;
-
-// We use these to control padding and margin
-// $microformat-padding: rem-calc(10 12);
-// $microformat-margin: rem-calc(0 0 20 0);
-
-// We use these to control the border styles
-// $microformat-border-width: 1px;
-// $microformat-border-style: solid;
-// $microformat-border-color: $gainsboro;
-
-// We use these to control full name font styles
-// $microformat-fullname-font-weight: $font-weight-bold;
-// $microformat-fullname-font-size: rem-calc(15);
-
-// We use this to control the summary font styles
-// $microformat-summary-font-weight: $font-weight-bold;
-
-// We use this to control abbr padding
-// $microformat-abbr-padding: rem-calc(0 1);
-
-// We use this to control abbr font styles
-// $microformat-abbr-font-weight: $font-weight-bold;
-// $microformat-abbr-font-decoration: none;
-
 @import "../original-foundation/components/type";
 
 // Heading 1
 h1 {
-  // DONE figure out what to do with this mixin
   color: $body-foreground-h1;
 }
 
@@ -163,7 +103,6 @@ a {
 }
 
 .meta {
-  // DONE figure out what to do about this mixin
   color: $body-foreground;
   margin: 0 0 rem-calc(($base-font-size - 10)) 0;
   font-size: $paragraph-font-size;
@@ -238,10 +177,6 @@ blockquote {
 }
 
 .noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently (Jan 17) supported by Chrome and Opera */
 }
