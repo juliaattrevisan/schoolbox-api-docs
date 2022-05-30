@@ -12,7 +12,6 @@ namespace Alaress\Async\Notification\Cloud\Apple;
 use Alaress\Async\Notification\Cloud\AbstractService;
 use Apple\ApnPush\Certificate\Certificate;
 use Apple\ApnPush\Exception\CertificateFileNotFoundException;
-use Apple\ApnPush\Exception\SendNotification\SendNotificationException;
 use Apple\ApnPush\Model\Alert;
 use Apple\ApnPush\Model\Aps;
 use Apple\ApnPush\Model\DeviceToken;
@@ -83,7 +82,11 @@ class ApnService extends AbstractService
     public function __destruct()
     {
         if ($this->protocol) {
-            $this->protocol->closeConnection();
+            try {
+                $this->protocol->closeConnection();
+            } catch (\TypeError $e) {
+                // probably already closed
+            }
         }
     }
 
@@ -131,7 +134,9 @@ class ApnService extends AbstractService
             try {
                 $sender->send($receiver, $notification);
                 $this->report($prefix, "All ok!", Logger::DEBUG);
-            } catch (SendNotificationException $e) {
+            } catch (\Exception $e) {
+                // Exception in doc block is SendNotificationException,
+                // but the actual exception thrown is HttpSenderException...
                 $this->report($prefix, 'Error: ' . $e->getMessage(), Logger::INFO, '?');
             }
         }
