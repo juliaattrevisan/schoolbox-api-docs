@@ -921,36 +921,8 @@ class Controller extends Base\Base
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
         }
 
-        /* For each of the courses found in $data['courses'], decide if it's a courseSpec
-         * (it should already be, but we're specifically editing courseSpecs only
-         * in this usage - if you pollute the data, don't get sick from it)
-         *
-         * Then look at its folder instance and find out if you have WRITE+ access to it
-         * If you have write access to the courseSpec's folder context, you can modify
-         * the course - otherwise, deny the link but show it in the index anyway I guess
-         *
-         * (Staff members who don't have permissions to edit might still find it useful
-         * to see what's in here)
-         */
-        $folderAccess = [];
-
-        /* Get a list of (courseSpec, write perm) tuples to use as a hash lookup in twig town
-         */
-        foreach ($data['courses'] as $courseSpec) {
-            if ($courseSpec instanceof \Schoolbox\Learning\Course\DataModel\Specification\Model) {
-                /* Have at least WRITE access to the folder
-                 */
-                if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) > UserAccess::ACCESS_READ) {
-                    $folderAccess[$courseSpec->getFolder()->getId()] = true;
-                } else {
-                    $folderAccess[$courseSpec->getFolder()->getId()] = false;
-                }
-            }
-        }
-
         if ($this->getRequest()->isXhr()) {
             $options = [
-                'folderAccess'     => $folderAccess,
                 'hasClose'         => true,
                 'hasAdd'           => false,
                 'hasTot'           => false,
@@ -962,7 +934,6 @@ class Controller extends Base\Base
             ];
         } else {
             $options = [
-                'folderAccess'     => $folderAccess,
                 'hasClose'         => false,
                 'hasAdd'           => true,
                 'hasTot'           => true,
@@ -1069,8 +1040,23 @@ class Controller extends Base\Base
                 }
             }
 
-            // confirm you at least have read access...
-            if (!$this->confirmAccess($currentCourse->getFolder()->getId())) {
+            /* For each of the courses found in $data['courses'], decide if it's a courseSpec
+             * (it should already be, but we're specifically editing courseSpecs only
+             * in this usage - if you pollute the data, don't get sick from it)
+             *
+             * Then look at its folder instance and find out if you have WRITE+ access to it
+             * If you have write access to the courseSpec's folder context, you can modify
+             * the course - otherwise, deny the link but show it in the index anyway I guess
+             *
+             * (Staff members who don't have permissions to edit might still find it useful
+             * to see what's in here)
+             */
+            $courseFolderAccess = $this->access->getFolderAccess($this->getUser(), $currentCourse->getFolder()->getId());
+            if ($courseFolderAccess > UserAccess::ACCESS_READ) {
+                $data['folderAccess'][$currentCourse->getFolder()->getId()] = true;
+            } elseif ($courseFolderAccess === UserAccess::ACCESS_READ) {
+                $data['folderAccess'][$currentCourse->getFolder()->getId()] = false;
+            } else {
                 continue;
             }
 

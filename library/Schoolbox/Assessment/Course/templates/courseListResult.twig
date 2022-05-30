@@ -46,8 +46,8 @@ Usage:
 {% endif %}
     <div class="list-item">
         <div class="card small-12">
-            {% if folderAccess[courseSpec.folder.id] ?? false %}
-                {# You have WRITE permission in the Course Folder homepage
+            {% if not hasTot or (folderAccess[courseSpec.folder.id] ?? false) %}
+                {# Importing a course (no Tot) or You have WRITE permission in the Course Folder homepage
                  # Course title links to modify scren; you have a tot option to do the same
                  #}
                 <a href="{{ titleUrl }}" data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
