@@ -234,5 +234,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         + "'#{aws_iam_key}' " \
         + "'#{aws_iam_secret}'"
   end
-  config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}'"
+  config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh", args: "'#{primary_php_majver}' '#{taskd_build_from_local ? 1 : 0}'"
 end
