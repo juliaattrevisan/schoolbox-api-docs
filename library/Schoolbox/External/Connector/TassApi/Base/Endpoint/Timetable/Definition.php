@@ -449,8 +449,8 @@ class Definition implements IStrategy
              */
             [$startKey, $endKey] = $pair;
 
-            $start = trim((string)$options[$startKey]);
-            $end = trim((string)$options[$endKey]);
+            $start = trim((string)($options[$startKey] ?? null));
+            $end = trim((string)($options[$endKey] ?? null));
 
             /* One of the pairs is inconclusive - keep going
              */
