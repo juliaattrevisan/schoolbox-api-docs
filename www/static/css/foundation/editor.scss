@@ -10,6 +10,7 @@ $cdn-prefix: '../../';
 @import "utils/fonts";
 
 @import "base/reset";
+@import "base/global";
 @import "base/typography";
 @import "ui/content";
 @import "ui/iframe";
