@@ -16,26 +16,6 @@
   );
 }
 
-
-/**
- * Adds a percentage of black to a CSS color var.
- *
- * Expects that $colorVar is a `var(--name)` value, and that
- * `var(--name-{r,g,b,a})` variables are defined.
- */
-@function css-shade($colorVar, $percent)
-{
-  $components: color-var-components($colorVar);
-  $offset:     1 - (strip-unit($percent) / 100);
-  @return rgba(
-                  calc(#{map-get($components, 'r')} + (255 - #{map-get($components, 'r')}) * #{$offset}),
-                  calc(#{map-get($components, 'g')} + (255 - #{map-get($components, 'g')}) * #{$offset}),
-                  calc(#{map-get($components, 'b')} + (255 - #{map-get($components, 'b')}) * #{$offset}),
-                  #{map-get($components, 'a')}
-  );
-}
-
-
 /**
  * Lightens a CSS color var.
  *
@@ -252,43 +232,6 @@
 		@return $light; // Darker background, return light color
 	}
 }
-
-//@function calc-button-color($bg, $light: lighten($content-ui-hover, 5%), $dark: darken($content-ui-hover, 5%)) {
-//	@if (perceptive-luminance($bg) < 0.45) {
-//		@return $dark; // Lighter background, return dark color
-//	} @else {
-//		@return $light; // Darker background, return light color
-//	}
-//}
-
-//@function flatten-alpha($color, $background) {
-//	$percent: alpha($color) * 100%;
-//	$opaque: opacify($color, 1);
-//	$solid-color: mix($opaque, $background, $percent);
-//	@return $solid-color;
-//}
-
-//@function contrast-bg($opacity: 0.35, $background: $body-bg, $saturation: 0%, $light: $white, $dark: $black) {
-//
-//	$luminance: perceptive-luminance($background);
-//
-//	$text: $dark;
-//
-//	@if $luminance > 0.5 {
-//		$text: $light;
-//	}
-//
-//	// apply the opacity given
-//	$translucent: rgba($text, $opacity);
-//
-//	// flatten opacity onto the background
-//	$flat: flatten-alpha($translucent, $background);
-//
-//	// boost saturation
-//	$saturated: saturate($flat, $saturation);
-//
-//	@return $saturated;
-//}
 
 // Remove the unit of a length - https://css-tricks.com/snippets/sass/strip-unit-function/
 // @param {Number} $number - Number to remove unit from
