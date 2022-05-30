@@ -39,6 +39,18 @@ class Definition implements IStrategy
     private const CYCLE_END = '2999-01-01 00:00:00';
     private const CYCLE_DEFAULT_DAY_NUMBER = 1;
 
+
+    /**
+     * A set of option related to our ability to detect Current Semester
+     */
+    private const ACADEMIC_PERIOD_KEYS = [
+        ['tap1start', 'tap1end'],
+        ['tap2start', 'tap2end'],
+        ['tap3start', 'tap3end'],
+        ['tap4start', 'tap4end']
+    ];
+
+
     /**
      * @var LoggerInterface
      */
@@ -411,6 +423,41 @@ class Definition implements IStrategy
 
             $this->preloadTimetable((string)$externalId, $person, $data, 'teacher_timetable');
         }
+    }
+
+
+    /**
+     * This bypasses the dependency on tass to fix the way to get Current Semester
+     *
+     * For the given set of TASS Academic Period dates, find out which "semester" we are currently in
+     * A school running 4 term years will have $semester available in tass as 1 through to 4, which
+     * isn't what a semester really is, because tass reasons...
+     *
+     * Check each of the pairs until we find the first match where: Start <= Now <= End
+     *
+     * @param array $options
+     * @return int
+     */
+    private function detectSemester(array $options): int
+    {
+        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $pair) {
+            [$start, $end] = $pair;
+
+            /* If both were defined, check Start <= Now <= End
+             * This returns the first semester that fulfils the date requirements
+             *
+             * If it is, return that $pair's index+1, since:
+             *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
+             *     but it corresponds to "semester 1" in tass.
+             *
+             * Otherwise, continue trying
+             */
+        }
+
+        /* If none of the Academic Periods help us figure out what semester
+         * we're currently in, fall back to the default presumptive behaviour of
+         * guessing that Jan-Jun is Semester 1, and everything else is semester 2
+         */
     }
 
 
