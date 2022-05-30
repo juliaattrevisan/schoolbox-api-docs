@@ -172,13 +172,13 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('result', 'sr2')},
                 {$this->getJoinColumnString('venue', 'sv')}
             FROM sportsfixtures_match sm
-            LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}            
+            LEFT JOIN {$this->getJoinSql('venue', 'sm', 'sv')}
             LEFT JOIN sportsfixtures_team st1 ON sm.home_team_id = st1.id
             LEFT JOIN sportsfixtures_team st2 ON sm.away_team_id = st2.id
             LEFT JOIN sportsfixtures_team_user stu1 ON st1.id = stu1.team_id
             LEFT JOIN sportsfixtures_team_user stu2 ON st2.id = stu2.team_id
-            LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id
-            LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id
+            LEFT JOIN sportsfixtures_result sr1 ON st1.id = sr1.team_id AND sm.id = sr1.match_id
+            LEFT JOIN sportsfixtures_result sr2 ON st2.id = sr2.team_id AND sm.id = sr2.match_id
             WHERE (stu1.user_id = :userId OR stu2.user_id = :userId)
             AND sm.deleted_at IS NULL
             AND st1.deleted_at IS NULL
