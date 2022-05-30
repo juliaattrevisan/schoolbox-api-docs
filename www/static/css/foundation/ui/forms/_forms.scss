@@ -13,18 +13,14 @@ $form-label-font-size: rem-calc(($base-font-size - 2));
 $form-label-font-weight: $font-weight-semibold;
 $form-label-line-height: 1.4rem;
 $form-label-font-color: $black;
-// $form-label-small-transform: capitalize;
 $form-label-bottom-margin: 0;
-// $input-font-family: inherit;
 $input-font-color: $black;
 $input-font-size: $paragraph-font-size;
 $input-height: $global-button-input-height;
 $input-bg-color: $white;
 $input-focus-bg-color: $form-bg-hover-color;
-// DONE use contrasting color
 $input-focus-color: $form-bg-hover-color-contrast;
 $input-border-color: $form-border-color !default;
-// DONE use CSS darken
 $input-focus-border-color: css-darken($form-border-color, 15%);
 $input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
@@ -44,34 +40,16 @@ $fieldset-margin: rem-calc(($base-font-size - 8, 0));
 
 // We use these to style the legends when you use them
 $legend-bg: transparent;
-// $legend-font-weight: $font-weight-bold;
-// $legend-padding: rem-calc(0 3);
-
-// We use these to style the prefix and postfix input elements
-// $input-prefix-bg: scale-color($white, $lightness: -5%);
-// $input-prefix-border-color: scale-color($white, $lightness: -20%);
-// $input-prefix-border-size: 1px;
-// $input-prefix-border-type: solid;
-// $input-prefix-overflow: hidden;
-// $input-prefix-font-color: $oil;
-// $input-prefix-font-color-alt: $white;
-
-// We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
-// $input-number-spinners: true;
 
 // We use these to style the error states for inputs and labels
 $input-error-message-padding: rem-calc(($base-font-size - 8));
 $input-error-message-top: -1px;
 $input-error-message-font-size: rem-calc(($base-font-size - 4));
 $input-error-message-font-weight: $font-weight-normal;
-// $input-error-message-font-style: italic;
-// $input-error-message-font-color: $white;
 $input-error-message-font-color-alt: $alert-color;
 
 // We use this to style the glowing effect of inputs when focused
 $input-include-glowing-effect: false;
-// $glowing-effect-fade-time: 0.45s;
-// $glowing-effect-color: $input-focus-border-color;
 
 // Select variables
 $select-bg-color: $input-bg-color;
@@ -81,40 +59,25 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // SWITCH
 //
 
-// $include-html-form-classes: $include-html-classes;
-
 // Controlling background color for the switch container
 $switch-bg: $content-ui-background;
 
 // Controlling border styles and background colors for the switch container
 $switch-border-color: transparent;
-// $switch-border-style: solid;
 $switch-border-width: 0px;
-// $switch-bg: $white;
 
 // We use these to control the switch heights for our default classes
-// $switch-height-tny: rem-calc(22);
-// $switch-height-sml: rem-calc(28);
 $switch-height-med: rem-calc(32);
-// $switch-height-lrg: rem-calc(44);
 $switch-bottom-margin: 1rem;
 
 // We use these to control default font sizes for our classes.
-// $switch-font-size-tny: 11px;
-// $switch-font-size-sml: 12px;
 $switch-font-size-med: 14px;
-// $switch-font-size-lrg: 17px;
-// $switch-label-side-padding: 6px;
 
 // We use these to style the switch-paddle
 $switch-active-color: $content-ui-foreground;
-// $switch-paddle-bg: $white;
 $switch-paddle-fade-to-color: tint($secondary-color, 74%);
 $switch-paddle-border-color: transparent;
 $switch-paddle-border-width: 0px;
-// $switch-paddle-border-style: solid;
-// $switch-paddle-transition-speed: .1s;
-// $switch-paddle-transition-ease: ease-out;
 $switch-positive-color: tint($success-color, 50%);
 $switch-negative-color: tint($secondary-color, 74%);
 
