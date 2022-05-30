@@ -1,12 +1,14 @@
 #!/bin/bash
 
+# Global constants and functions
+source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
+
 primary_php_majver=$1
 if [[ -z $primary_php_majver ]]; then
   echo "You must declare primary/active PHP major version" >&2
   exit 1
 fi
 taskd_build_from_local="${2}";
-readonly SITE_ROOT=/usr/share/schoolbox # Cannot derive this, because it is copied by vagrant to /tmp in guest
 
 # Override vagrant's network configuration with this host's network config
 /etc/init.d/procps restart
@@ -14,13 +16,13 @@ readonly SITE_ROOT=/usr/share/schoolbox # Cannot derive this, because it is copi
 # wait for /usr/share/schoolbox to mount correctly
 for i in {1..60};
 do
-    if [ -f "/usr/share/schoolbox/tools/notif/syscheck.php" ];
+    if [ -f "$SITE_ROOT/tools/notif/syscheck.php" ];
     then
         break;
     fi
     sleep 1;
 done
-if [ -f "/usr/share/schoolbox/tools/notif/syscheck.php" ];
+if [ -f "$SITE_ROOT/tools/notif/syscheck.php" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Restarting daemons in background";
     sleep 5 && service schoolbox-cloud-socketd@vagrantx restart &
@@ -28,7 +30,7 @@ then
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
 else
-    echo "Unable to locate: /usr/share/schoolbox/tools/notif/syscheck.php";
+    echo "Unable to locate: $SITE_ROOT/tools/notif/syscheck.php";
 fi
 
 

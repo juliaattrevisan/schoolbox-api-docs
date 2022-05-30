@@ -2,7 +2,7 @@
 # Useful constants and functions for vagrant provision scripts
 
 # Global constants
-readonly SITE_ROOT=/usr/share/schoolbox # Cannot derive this, because it is copied by vagrant to /tmp in guest
+readonly SITE_ROOT=/usr/share/schoolbox
 readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_WARN=300;
