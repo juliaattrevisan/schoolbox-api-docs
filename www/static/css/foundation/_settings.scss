@@ -10,10 +10,6 @@
 $base-font-size: 16px;
 $rem-base: $base-font-size;
 
-// Allows the use of rem-calc() or lower-bound() in your settings
-// @import "foundation/functions";
-@import "original-foundation/functions";
-
 // The default font-size is set to 100% of the browser style sheet (usually 16px)
 // for compatibility with browser-based text zoom or user-set defaults.
 
