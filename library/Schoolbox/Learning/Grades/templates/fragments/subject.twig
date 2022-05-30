@@ -10,10 +10,11 @@
         </span>
     </h3>
 </div>
-
+{% if studentGrade is not empty %}
 {% set weightedMean = studentGrade.weightedMean %}
 {% if weightedMean %}
     <div class="grade {{ urgency.marks(studentGrade.meanNormalised) }}-bg no-margin">
         <span>{{ weightedMean }}</span>
     </div>
+{% endif %}
 {% endif %}

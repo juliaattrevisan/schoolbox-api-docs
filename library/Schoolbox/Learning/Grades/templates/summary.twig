@@ -72,14 +72,14 @@
                                class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
                                 {% include '@learningGrades/fragments/subject.twig' with {
                                     folder:              folder,
-                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id],
+                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id] ?? [],
                                 } only %}
                             </a>
                         {% else %}
                             <h4 class="flex-grade">
                                 {% include '@learningGrades/fragments/subject.twig' with {
                                     folder:              folder,
-                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id],
+                                    studentGrade:        markbooks[folder.id].studentStatistics[student.id] ?? [],
                                 } only %}
                             </h4>
                         {% endif %}
