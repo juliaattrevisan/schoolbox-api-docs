@@ -29,7 +29,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecode(): array
+    public function providerValidDSNDecode(): array
     {
         return [
             'Valid DSN 1 (original order)' => [
@@ -116,7 +116,7 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecode
+     * @dataProvider providerValidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
@@ -134,7 +134,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDSNDecodeEncode(): array
+    public function providerValidDSNDecodeEncode(): array
     {
         return [
             'Valid DSN Re-encode 1' => [
@@ -153,7 +153,7 @@ class DSNTest extends TestCase
     /**
      * Test valid DSN strings
      *
-     * @dataProvider provider_validDSNDecodeEncode
+     * @dataProvider providerValidDSNDecodeEncode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
@@ -179,7 +179,7 @@ class DSNTest extends TestCase
      *
      * @return array
      */
-    public function provider_invalidDSNDecode(): array
+    public function providerInvalidDSNDecode(): array
     {
         return [
             'Invalid DSN 1 (empty dsn)' => [
@@ -262,7 +262,7 @@ class DSNTest extends TestCase
     /**
      * Test invalid DSN strings
      *
-     * @dataProvider provider_invalidDSNDecode
+     * @dataProvider providerInvalidDSNDecode
      * @param string $dsn
      * @param array  $expected
      * @throws DomainException
