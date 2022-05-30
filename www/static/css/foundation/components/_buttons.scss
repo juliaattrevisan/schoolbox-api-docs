@@ -24,47 +24,30 @@ $global-button-height: $global-button-input-height;
 $global-button-padding: rem-calc(($base-font-size / 2));
 
 // We use these to build padding for buttons.
-// $button-tny: rem-calc(10);
-// $button-sml: rem-calc(14);
-// $button-med: rem-calc(12);
 $button-med: $global-button-padding;
-// $button-lrg: rem-calc(18);
 
 // We use this to control the display property.
-// $button-display: inline-block;
 $button-margin-bottom: rem-calc(($base-font-size - 12));
 
 // We use these to control button text styles.
-// $button-font-family: $body-font-family;
 $button-font-color: $content-ui-foreground;
 $button-font-color-alt: $content-ui-foreground;
-// $button-font-tny: rem-calc(11);
-// $button-font-sml: rem-calc(13);
 $button-font-med: $base-font-size;
-//$button-font-tny: rem-calc(11);
-//$button-font-sml: rem-calc(13);
-//$button-font-lrg: rem-calc(20);
 
-// $button-font-lrg: rem-calc(20);
 $button-font-weight: $font-weight-normal;
-// $button-font-align: center;
 
 // We use these to control various hover effects.
  $button-function-factor: 11%;
 
 // We use these to control button border and hover styles.
-// $button-border-width: 0px;
-// $button-border-style: solid;
 $button-bg-color: $content-ui-background;
 $button-bg-hover: $content-ui-hover;
 
 $submit-button-color: $content-ui-submit-foreground;
 $submit-button-bg-color: $content-ui-submit-background;
-// DONE modify RBGA instead of tint
 $submit-button-bg-hover: css-tint($content-ui-submit-background, 20%);
 
 $button-border-color: transparent;
-// DONE modify RGBA instead of tint
 $secondary-button-bg-hover: css-tint($submit-button-color, 20%);
 
 $secondary-button-border-color: transparent;
@@ -73,13 +56,8 @@ $success-button-border-color: transparent;
 $alert-button-bg-hover: tint($alert-color, 20%);
 $alert-button-border-color: transparent;
 
-// We use this to set the default radius used throughout the core.
-// $button-radius: $global-radius;
-// $button-round: $global-rounded;
-
 // We use this to set default opacity and cursor for disabled buttons.
 $button-disabled-opacity: 0.5;
-// $button-disabled-cursor: $cursor-default-value;
 
 // Override buttons with icons font-size
 .size-24[class^="icon-"]:before,
