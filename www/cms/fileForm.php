@@ -1,5 +1,6 @@
 <?php
 
+use Aura\Router\Router;
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
@@ -25,6 +26,8 @@ if ($ajax) {
 $page = $kernel->get('sitePage');
 $page->initSession();
 $page->setAjax($ajax);
+/** @var Router $router */
+$router = $page->getDi()->get('router');
 
 $groupHandler = new Group();
 
@@ -41,8 +44,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
             $file = FileMapper::getInstance()->createModel();
         }
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-        exit;
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }
 
     // if file was uploaded from Post File page
@@ -62,15 +64,12 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     $file->setStorage($result->getStorage());
                 }
             } catch (\Schoolbox\Resource\Exception $e) {
-                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-                exit;
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
             } catch (\InvalidArgumentException $e) {
-                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-                exit;
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
             }
         } else {
-            error(ErrorMapper::ERROR_INFORMATION_MISSING);
-            exit;
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 
@@ -111,7 +110,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
         // sooo, this case is much simpler
         if ($modifyExisting) {
             if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE || 0 == $_POST['category']) {
-                error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
 
             $file->setModifiedBy($_SESSION['user']);
@@ -126,7 +125,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
 
             foreach ($destinations as $cat) {
                 if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE || 0 == $cat) {
-                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
 
                 $clone = clone $file;
@@ -205,6 +204,7 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     'formatted' => $file->getModifiedAt()->getShort(),
                 ],
                 'editUrl'               => '/cms/file/' . $affectedIds[0],
+                'visibilityUrl' => $router->generate('resourceBrowser.patchFileInfo', ['fileId' => $affectedIds[0]]),
             ]));
         } else {
             $page->backToTheFuture(2);
@@ -243,12 +243,12 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
         if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-            error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
 
         FileMapper::getInstance()->delete($file);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     if (isset($_REQUEST['ajax'])) {
@@ -271,12 +271,12 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     $file = FileMapper::getInstance()->findById($fileID);
 
                     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                        error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+                        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                     }
 
                     FileMapper::getInstance()->delete($file);
                 } catch (Exception $e) {
-                    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
                 }
             }
         }
@@ -289,11 +289,11 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                 /** @var Link $link */
                 $link = LinkMapper::getInstance()->findById($linkID);
                 if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                    error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
                 }
                 LinkMapper::getInstance()->delete($link);
             } catch (Exception $e) {
-                error(ErrorMapper::ERROR_INFORMATION_MISSING);
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
             }
         }
     }
@@ -301,10 +301,10 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
     $page->backToTheFuture(1);
 } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES)) {
     /* Exceeded PHP max file size */
-    error(ErrorMapper::ERROR_FILE_SIZE);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_SIZE);
 } else {
     /* Unknown action */
-    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 
@@ -331,6 +331,6 @@ function outputException(Exception $e, IFile $file, $ajax = false)
         http_response_code(400);
         die(json_encode(array('code' => $code, 'error' => $msg)));
     } else {
-        error($code, $msg);
+        throw ErrorMapper::getInstance()->generateException($code, null, $msg);
     }
 }

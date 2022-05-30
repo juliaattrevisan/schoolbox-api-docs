@@ -62,12 +62,12 @@ class FilesBuilder
      * We will assume the user has access to this folder
      * and lets build a nice array of the files
      * @param int      $folderId
-     * @param int|null $componentId
      * @param int      $folderAccess
+     * @param int|null $componentId
      * @return array of files
      * @throws RouteNotFound
      */
-    public function getFolderData(int $folderId, ?int $componentId, int $folderAccess = UserAccess::ACCESS_READ): array
+    public function getFolderData(int $folderId, int $folderAccess = UserAccess::ACCESS_READ, ?int $componentId = null): array
     {
         //get the files, for the source folder
         $fileList = $this->fileMapper->findForFolders(
