@@ -222,7 +222,7 @@ readsqlconfig() {
 setsqlconfig() {
   local sql_command;
   for config_name in "${!sql_config[@]}"; do
-    sql_command="UPDATE config SET value='${sql_config[$config_name]}' WHERE name='$config_name'"
+    sql_command="UPDATE config SET value='${sql_config[$config_name]//[\']/\\\'}' WHERE name='$config_name'"
     if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
       echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
     fi
