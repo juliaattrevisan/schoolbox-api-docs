@@ -318,17 +318,6 @@ section {
     }
 }
 
-.accordion {
-    // insane core foundation override
-    .accordion-navigation.active > a {
-        background: $content-ui-selected;
-        color: $accordion-navigation-font-color;
-    }
-    a {
-        transition: all 0.15s linear;
-    }
-}
-
 // Collapsible content
 .collapsible {
     overflow: auto;
