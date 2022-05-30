@@ -18,6 +18,9 @@ class RerouteOverride
     const DEFAULT_FOLLOW   = 1;
     const FORCE_FOLLOW     = 2;
 
+    /** User ID to be set for message disabled folder */
+    public const USER_ID_ALL = 0;
+
 
     /** @var User */
     protected $user;

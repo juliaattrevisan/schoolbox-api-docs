@@ -117,7 +117,7 @@ class RerouteOverrideMapper extends Mapper
      */
     public function getMatchingRoutes($routeKey, $delivery, $userId = null, $userExclusive = false)
     {
-        $userIds = array(0);
+        $userIds = [RerouteOverride::USER_ID_ALL];
         if (isset($userId)) {
             if ($userExclusive) {
                 $userIds = array();

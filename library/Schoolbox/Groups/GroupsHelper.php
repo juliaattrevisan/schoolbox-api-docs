@@ -107,7 +107,7 @@ class GroupsHelper
 
         $muted = [
             'unfollow' => $rerouteOverrides[$user->getId()] ?? [],
-            'disabled' => $rerouteOverrides[0] ?? [],
+            'disabled' => $rerouteOverrides[RerouteOverride::USER_ID_ALL] ?? [],
         ];
 
         $followment = [];
