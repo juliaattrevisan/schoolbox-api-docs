@@ -487,6 +487,13 @@ class Controller extends Web\Controller\Base
             $deansComment[$semester->getOrdinal()] = '';
         }
 
+
+
+        // Extract dean's comment from a due work.
+        // How to find that due work?
+
+
+
         $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
         if (!$pastoralType) {
             // no pastoral type configured
@@ -541,5 +548,11 @@ class Controller extends Web\Controller\Base
             default:
                 return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
         }
+    }
+
+
+    private function getYearGroupFolder(User $user, StudentAttributes $attributes)
+    {
+        $attributes->getYearLevel()
     }
 }

@@ -171,6 +171,12 @@ class FolderFetcher
     }
 
 
+    public function findYearLevelFolder(User $student, StudentAttributes $attributes): ?Folder\Model
+    {
+        //
+    }
+
+
     /**
      * Returns whether a folder should be excluded from reports due to configured class code exclusions
      *
