@@ -398,6 +398,8 @@ class Definition implements IStrategy
         $year = date('Y');
         $semester = (string)$this->getCurrentSemester();
 
+        $options = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions();
+
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
