@@ -460,7 +460,7 @@ class Controller extends Base
                 [
                     'data'  =>  $output,
                     'metadata'  => [
-                        'count' => count($output),
+                        'count' => $userHelper->ajaxSearchCount($search, $filter),
                         'cursor' => end($output)['id'] ?? null
                     ]
                 ]

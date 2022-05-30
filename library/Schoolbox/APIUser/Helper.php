@@ -20,6 +20,25 @@ class Helper
     }
 
     /**
+     * get the count of users from the search query, irrespective fo the limit, or cursor location
+     * @param string|null $keyword
+     * @param array|null  $filter
+     * @return int
+     */
+    public function ajaxSearchCount(
+        ?string $keyword,
+        ?array $filter
+    ) {
+        [$query, $params] = $this->buildSearch($keyword, $filter);
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
+        return $statement->rowCount();
+    }
+
+    /**
      * Find a user based on a keyword, for an AJAX response.
      * stripped and updated from `library/User.php`
      *
@@ -36,6 +55,37 @@ class Helper
         ?int $limit = null,
         ?int $cursor = null
     ) {
+        [$query, $params] = $this->buildSearch($keyword, $filter);
+
+        if (0 !== $cursor) {
+            $query .= " AND user.id > :cursor ";
+        }
+        $query .= "ORDER BY user.id, lyl.sequence, lastname, firstname";
+        if (0 !== $limit) {
+            $query .= " LIMIT :limit";
+        }
+
+        $statement = $this->userMapper->getDatabase()->prepare($query);
+        if (0 !== $limit) {
+            $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if (0 !== $cursor) {
+            $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
+        }
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+        $statement->execute();
+        return $statement->fetchAll();
+    }
+
+    /**
+     * @param string|null $keyword
+     * @param array|null  $filter
+     * @return array [sqlQuery, params]
+     */
+    private function buildSearch(?string $keyword, ?array $filter)
+    {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
         $email      = $filter['email'] ?? '';
@@ -43,7 +93,6 @@ class Helper
         $role       = $filter['role'] ?? '';
         $campus     = $filter['campus'] ?? '';
         $year       = $filter['year'] ?? '';
-        $group      = $filter['group'] ?? null;
 
         //search for a user based on at least one of the above fields
         //assumes at least one contains something
@@ -133,25 +182,7 @@ class Helper
                 $where          .= "AND lyl.id = :year ";
             }
         }
-        if (0 !== $cursor) {
-            $where .= " AND user.id > :cursor ";
-        }
-        $where .= "ORDER BY user.id, lyl.sequence, lastname, firstname";
-        if (0 !== $limit) {
-            $where .= " LIMIT :limit";
-        }
-        $stat = $select . $from . $where;
-        $statement = $this->userMapper->getDatabase()->prepare($stat);
-        if (0 !== $limit) {
-            $lim = $statement->bindValue('limit', $limit, PDO::PARAM_INT);
-        }
-        if (0 !== $cursor) {
-            $cur = $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
-        }
-        foreach ($params as $label => $value) {
-            $statement->bindValue($label, $value);
-        }
-        $statement->execute();
-        return $statement->fetchAll();
+        $query = $select . $from . $where;
+        return [$query, $params];
     }
 }
