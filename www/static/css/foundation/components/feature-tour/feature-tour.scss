@@ -107,33 +107,16 @@ $tooltip-padding: 1rem;
   border-radius: 0;
 }
 
-@-webkit-keyframes pulse {
-  0% {
-    -webkit-box-shadow: 0 0 0 0 rgba($white, .7);
-  }
-
-  70% {
-    -webkit-box-shadow: 0 0 0 1rem rgba($white, 0);
-  }
-
-  100% {
-    -webkit-box-shadow: 0 0 0 0 rgba($white, 0);
-  }
-}
-
 @keyframes pulse {
   0% {
-    -moz-box-shadow: 0 0 0 0 rgba($white, .7);
     box-shadow: 0 0 0 0 rgba($white, .7);
   }
 
   70% {
-    -moz-box-shadow: 0 0 0 1rem rgba($white, 0);
     box-shadow: 0 0 0 1rem rgba($white, 0);
   }
 
   100% {
-    -moz-box-shadow: 0 0 0 0 rgba($white, 0);
     box-shadow: 0 0 0 0 rgba($white, 0);
   }
 }
