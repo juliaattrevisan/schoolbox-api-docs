@@ -410,8 +410,10 @@ class Definition implements IStrategy
         $year = date('Y');
         $semester = (string)$this->getCurrentSemester();
 
-        $options = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions();
 
+        $options = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions();
+        $semester = $this->detectSemester($options);
+        print_r($semester);die();
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
@@ -438,7 +440,7 @@ class Definition implements IStrategy
      * @param array $options
      * @return int
      */
-    private function detectSemester(array $options): int
+    public function detectSemester(array $options): int
     {
         $now = \Alaress_Date_Format::now();
 
@@ -469,7 +471,14 @@ class Definition implements IStrategy
              *     but it corresponds to "semester 1" in tass.
              */
             if ($now->between($startDate, $endDate)) {
-                return $index + 1;
+                $semester = $index + 1;
+
+                $this->log->debug(sprintf(
+                    'Detected TASS Academic Period %s via DSN options; using that as semester value',
+                    $semester
+                ));
+
+                return $semester;
             }
         }
 
@@ -477,7 +486,14 @@ class Definition implements IStrategy
          * we're currently in, fall back to the default presumptive behaviour of
          * guessing that Jan-Jun is Semester 1, and everything else is semester 2
          */
-        return $this->getCurrentSemester();
+        $semester = $this->getCurrentSemester();
+
+        $this->log->debug(sprintf(
+            'Detecting semester %s with classic assumption; using that as semester value',
+            $semester
+        ));
+
+        return $semester;
     }
 
 
