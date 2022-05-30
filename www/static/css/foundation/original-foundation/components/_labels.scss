@@ -8,12 +8,12 @@
 $include-html-label-classes: $include-html-classes !default;
 
 // We use these to style the labels
-$label-padding: rem-calc(4 8 4) !default;
+$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
 $label-radius: $global-radius !default;
 
 // We use these to style the label text
-$label-font-sizing: rem-calc(11) !default;
-$label-font-weight: $font-weight-normal !default;
+$label-font-sizing: rem-calc(($base-font-size - 4));
+$label-font-weight: $font-weight-bold;
 $label-font-color: $oil !default;
 $label-font-color-alt: $white !default;
 $label-font-family: $body-font-family !default;

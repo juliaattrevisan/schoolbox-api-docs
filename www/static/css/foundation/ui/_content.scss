@@ -1,101 +1,4 @@
-//
-// INLINE LISTS
-//
 
-$inline-list-default-float-margin: rem-calc(-$base-font-size);
-$inline-list-default-float-list-margin: rem-calc($base-font-size);
-
-//
-// LABELS
-//
-
-// We use these to style the labels
-$label-padding: rem-calc(($base-font-size - 10)) rem-calc(($base-font-size - 2));
-
-// We use these to style the label text
-$label-font-sizing: rem-calc(($base-font-size - 4));
-$label-font-weight: $font-weight-bold;
-
-//
-// PROGRESS BAR
-//
-
-// We use this to set the progress bar height
-$progress-bar-height: rem-calc(($base-font-size - 2));
-
-/* This is the track colour for the progress bar.
- * The progress bar expands to cover this colour.
- */
-$progress-bar-color: $accent-background;
-
-// We use these to control the border styles
-$progress-bar-border-size: 0px;
-$progress-bar-border-radius: 0px;
-
-// We use these to control the margin & padding
-$progress-bar-pad: rem-calc(0);
-
-/* The actual coloured bar inside that increases
- * as "progress is made"
- */
-$progress-meter-color: $accent-foreground;
-
-//
-// REVEAL
-//
-
-// We use these to control the style of the reveal overlay.
-$reveal-overlay-bg: rgba($black, 0.6);
-
-// We use these to control the style of the modal itself.
-$reveal-modal-padding: rem-calc(($base-font-size - 2));
-
-// We use these to style the reveal close button
-$reveal-close-font-size: 3rem;
-$reveal-close-top: -3rem;
-$reveal-close-right: -2rem;
-$reveal-close-color: $white;
-$reveal-close-weight: $font-weight-normal;
-
-// We use this to set the default radius used throughout the core.
-$reveal-radius: 0;
-
-// We use these to control the modal border
-$reveal-border-width: 9;
-
-//
-// ACCORDION
-//
-
-$accordion-navigation-padding: rem-calc(($base-font-size - 4));
-$accordion-navigation-bg-color: $content-ui-background;
-$accordion-navigation-hover-bg-color: $content-ui-hover;
-$accordion-navigation-active-bg-color: $content-ui-background;
-$accordion-navigation-font-color: $content-ui-foreground;
-$accordion-navigation-font-size: rem-calc(($base-font-size));
-
-$accordion-content-padding: rem-calc(($base-font-size - 4));
-
-//
-// THUMBNAILS
-//
-
-// We use these to control border styles
-$thumb-box-shadow: none;
-$thumb-box-shadow-hover: none;
-
-//
-// TOOLTIPS
-//
-
-$has-tip-font-color: $black;
-$has-tip-border-bottom-hover: dotted 1px $has-tip-font-color;
-$has-tip-font-color-hover: $has-tip-font-color;
-
-$tooltip-padding: rem-calc(($base-font-size - 2));
-$tooltip-bg: $black;
-$tooltip-font-size: rem-calc(($base-font-size - 2));
-$tooltip-font-color: $white;
 
 $container-bg: white !default;
 
@@ -106,10 +9,6 @@ $container-bg: white !default;
 @import "../original-foundation/components/accordion";
 @import "../original-foundation/components/visibility";
 @import "../original-foundation/components/thumbs";
-
-//
-// CUSTOM OVERRIDES
-//
 
 // if an image has no src, hide it.
 img[src=""] {

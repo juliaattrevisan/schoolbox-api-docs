@@ -11,8 +11,8 @@ $include-html-inline-list-classes: $include-html-classes !default;
 $inline-list-top-margin: 0 !default;
 $inline-list-opposite-margin: 0 !default;
 $inline-list-bottom-margin: rem-calc(17) !default;
-$inline-list-default-float-margin: rem-calc(-22) !default;
-$inline-list-default-float-list-margin: rem-calc(22) !default;
+$inline-list-default-float-margin: rem-calc(-$base-font-size);
+$inline-list-default-float-list-margin: rem-calc($base-font-size);
 
 $inline-list-padding: 0 !default;
 
