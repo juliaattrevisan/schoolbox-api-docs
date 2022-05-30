@@ -359,7 +359,7 @@ input.datepicker-input {
             display: flex;
 
             .icon-next {
-                @extend .cursor-pointer;
+                cursor: pointer;
                 line-height: rem-calc(44);
             }
         }
