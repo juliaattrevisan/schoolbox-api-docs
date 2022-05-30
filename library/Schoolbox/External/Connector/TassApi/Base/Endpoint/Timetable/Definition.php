@@ -408,12 +408,9 @@ class Definition implements IStrategy
          * The getTeacherTimetable endpoint is different to students' version
          */
         $year = date('Y');
-        $semester = (string)$this->getCurrentSemester();
 
+        $semester = $this->detectSemester($this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
-        $options = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions();
-        $semester = $this->detectSemester($options);
-        print_r($semester);die();
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
