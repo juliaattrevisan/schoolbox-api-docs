@@ -440,24 +440,44 @@ class Definition implements IStrategy
      */
     private function detectSemester(array $options): int
     {
-        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $pair) {
-            [$start, $end] = $pair;
+        $now = \Alaress_Date_Format::now();
 
+        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $pair) {
             /* If both were defined, check Start <= Now <= End
              * This returns the first semester that fulfils the date requirements
              *
-             * If it is, return that $pair's index+1, since:
-             *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
-             *     but it corresponds to "semester 1" in tass.
-             *
              * Otherwise, continue trying
              */
+            [$startKey, $endKey] = $pair;
+
+            $start = trim((string)$options[$startKey]);
+            $end = trim((string)$options[$endKey]);
+
+            /* One of the pairs is inconclusive - keep going
+             */
+            if ('' === $start || '' === $end) {
+                continue;
+            }
+
+            /* Check Alaress Date Format boundaries
+             */
+            $startDate = \Alaress_Date_Format::newDatabaseDate("{$start} 00:00:00");
+            $endDate = \Alaress_Date_Format::newDatabaseDate("{$end} 23:59:59");
+
+            /* If it is, return that $pair's index+1, since:
+             *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
+             *     but it corresponds to "semester 1" in tass.
+             */
+            if ($now->between($startDate, $endDate)) {
+                return $index + 1;
+            }
         }
 
         /* If none of the Academic Periods help us figure out what semester
          * we're currently in, fall back to the default presumptive behaviour of
          * guessing that Jan-Jun is Semester 1, and everything else is semester 2
          */
+        return $this->getCurrentSemester();
     }
 
 
