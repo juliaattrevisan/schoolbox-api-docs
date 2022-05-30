@@ -436,6 +436,7 @@ class Definition implements IStrategy
      *
      * @param array $options
      * @return int
+     * @throws \InvalidArgumentException
      */
     public function detectSemester(array $options): int
     {
@@ -460,8 +461,8 @@ class Definition implements IStrategy
 
             /* Check Alaress Date Format boundaries
              */
-            $startDate = \Alaress_Date_Format::newDatabaseDate("{$start} 00:00:00");
-            $endDate = \Alaress_Date_Format::newDatabaseDate("{$end} 23:59:59");
+            $startDate = (new \Alaress_Date_Format($start, \Alaress_Date_Format::FORMAT_DATE_PICKER_NO_TIME))->startOfDay();
+            $endDate = (new \Alaress_Date_Format($end, \Alaress_Date_Format::FORMAT_DATE_PICKER_NO_TIME))->endOfDay();
 
             /* If it is, return that $pair's index+1, since:
              *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
