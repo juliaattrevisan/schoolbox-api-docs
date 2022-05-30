@@ -267,12 +267,12 @@ class Controller extends BaseController
             'title'    => 'Message Settings',
             'template' => '@messages/settings.twig',
             'data'     => [
-                'ns'      => $ns,
-                'sources' => $sources,
-                'perms'   => $this->getConfig()->getPermissionList($digest, $mobile),
-                'digest'  => $digest,
-                'mobile'  => $mobile,
-                'config'  => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
+                'ns'        => $ns,
+                'sources'   => $sources,
+                'perms'     => $this->getConfig()->getPermissionList($digest, $mobile),
+                'digest'    => $digest,
+                'mobile'    => $mobile,
+                'msgConfig' => $this->getRoutePermissionMapper()->findAllRoutePermissionsForUser($this->getUser()),
             ],
         ]);
     }

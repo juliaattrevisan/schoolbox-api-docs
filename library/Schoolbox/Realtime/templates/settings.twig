@@ -72,7 +72,7 @@
         </div>
     </div>
     <div class="small-12 island">
-        {% for namespace in config %}
+        {% for namespace in msgConfig %}
             {% if ns[namespace.id] is defined %}
                 <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
                 <section>
