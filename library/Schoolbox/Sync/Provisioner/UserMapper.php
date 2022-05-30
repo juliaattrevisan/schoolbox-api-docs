@@ -18,13 +18,19 @@ use Schoolbox\Permission\Access\UserAccess;
 /** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
 {
+    /**
+     * muted folder id cache
+     * @var array
+     */
+    private array $mutedFolders = [];
+
     protected function mapping()
     {
         parent::mapping();
 
         $this->hasModel(User::class);
 
-        $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback('postSave', [$this, 'postSave']);
 
         /** @var UserAccessMapper $accessMapper */
         $accessMapper = $this->getJoinMapper('userAccess');
@@ -78,30 +84,54 @@ class UserMapper extends SchoolboxMapper
              * Find the final UserAccess instances that a person should have
              * Insert these ones
              */
-            $userAccesses = $userAccessMapper->findByColumnList([
-                'uid' => $user->getId(),
-                'service' => UserAccess::SERVICE_HOMEPAGE
-            ]);
-
-            foreach ($userAccesses as $userAccess) {
-                if ($userAccess->getAccessLevel() !== UserAccess::ACCESS_FULL) {
-                    $userAccessMapper->delete($userAccess);
-                }
-            }
+            $existingAccesses = $userAccessMapper->findByColumnList(
+                [
+                    'uid' => $user->getId(),
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
+                ]
+            )->indexBy('serviceIdentifier');
 
             $finalUserAccess = (new FinalUserAccess(\Schoolbox\Resource\Folder\Mapper::getInstance(), null))
                 ->generate($user->getAccessList(), $user->getUserAccessMutations());
 
-            foreach ($finalUserAccess as $folderId => $accessLevel) {
-                $userAccess = $userAccessMapper->createModel()
-                    ->setUser($user)
-                    ->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setServiceIdentifier($folderId)
-                    ->setAccessLevel($accessLevel);
+            $removedAccess = array_diff($existingAccesses->keys(), array_keys($finalUserAccess));
+            foreach ($existingAccesses as $existingAccess) {
+                if (
+                    in_array($existingAccess->getServiceIdentifier(), $removedAccess)
+                    && $existingAccess->getAccessLevel() !== UserAccess::ACCESS_FULL
+                ) {
+                    $userAccessMapper->delete($existingAccess);
+                }
+            }
 
+            foreach ($finalUserAccess as $folderId => $accessLevel) {
+                if ($existingAccesses->offsetExists($folderId)) {
+                    /** @var UserAccess $userAccess */
+                    $userAccess = $existingAccesses->offsetGet($folderId);
+                    if ($userAccess->getAccessLevel() === UserAccess::ACCESS_FULL) {
+                        continue;
+                    }
+                } else {
+                    $userAccess = $userAccessMapper->createModel()
+                                                   ->setUser($user)
+                                                   ->setService(UserAccess::SERVICE_HOMEPAGE)
+                                                   ->setServiceIdentifier($folderId)
+                                                   ->setFavourite(!in_array($folderId, $this->mutedFolders));
+                }
+
+                $userAccess->setAccessLevel($accessLevel);
                 $userAccessMapper->save($userAccess);
             }
         }
+    }
+
+    /**
+     * @param array $mutedFolders
+     * @return void
+     */
+    public function setMutedFolders(array $mutedFolders)
+    {
+        $this->mutedFolders = $mutedFolders;
     }
 
     /**

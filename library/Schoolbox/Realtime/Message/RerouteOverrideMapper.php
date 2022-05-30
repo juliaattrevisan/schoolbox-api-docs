@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class RerouteOverrideMapper
@@ -116,7 +117,7 @@ class RerouteOverrideMapper extends Mapper
      */
     public function getMatchingRoutes($routeKey, $delivery, $userId = null, $userExclusive = false)
     {
-        $userIds = array(0);
+        $userIds = [RerouteOverride::USER_ID_ALL];
         if (isset($userId)) {
             if ($userExclusive) {
                 $userIds = array();
@@ -175,6 +176,33 @@ class RerouteOverrideMapper extends Mapper
     public function isRouteMuted($routeKey, $userId = null)
     {
         return $this->getMatchingRoutes($routeKey, RoutePermission::MUTE, $userId)->count();
+    }
+
+    /**
+     * Get muted folder ids indexed by userId
+     * @param int|null $userId
+     * @return array
+     */
+    public function getMutedFolders(?int $userId = null): array
+    {
+        $service = UserAccess::SERVICE_HOMEPAGE;
+
+        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
+
+        $routes = $this->getMatchingRoutes("service.$service", RoutePermission::MUTE, $userId);
+        $result = [];
+
+        // routes contain results for user 0 (muted in group level) and user $userId (if provided)
+        foreach ($routes as $route) {
+            preg_match($routeKeyRegex, $route->getRouteKey(), $matches);
+            $folderId = is_array($matches) ? (int)$matches[1] : null;
+            if (!$folderId) {
+                continue;
+            }
+            $result[$route->getUser()->getId()]   ??= [];
+            $result[$route->getUser()->getId()][] = $folderId;
+        };
+        return $result;
     }
 
     /**

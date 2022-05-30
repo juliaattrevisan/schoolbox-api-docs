@@ -23,6 +23,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Message\RerouteOverride;
+use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -252,6 +254,11 @@ class Provisioner
             // Raise exception message, and continue as if nothing was returned
             $this->logger->error("Cannot provision $roleType users: {$e->getMessage()}");
             $externalUsers = [];
+        }
+
+        if ($this->config->get('ups_groups_enabled')) {
+            $mutedFolders = (RerouteOverrideMapper::getInstance())->getMutedFolders();
+            $this->userMapper->setMutedFolders($mutedFolders[RerouteOverride::USER_ID_ALL] ?? []);
         }
 
         foreach ($externalUsers as $externalUser) {

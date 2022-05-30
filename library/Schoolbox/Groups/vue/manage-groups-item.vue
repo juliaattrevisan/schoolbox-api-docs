@@ -46,7 +46,7 @@ export default {
 
         /**
          * To respond to enrolment changes, joining and leaving group
-         * 
+         *
          * @returns { String }
          */
         enrolmentStatus () {
@@ -55,7 +55,7 @@ export default {
 
         /**
          * Shouldn't be able to join/leave a group when an admin
-         * 
+         *
          * @returns { Boolean }
          */
         isAdmin () {
@@ -64,7 +64,7 @@ export default {
 
         /**
          * To show whether the group is a favourite or not
-         * 
+         *
          * @returns { Boolean }
          */
         isFavourite () {
@@ -73,7 +73,7 @@ export default {
 
         /**
          * To show whether notifications is turned or not
-         * 
+         *
          * @returns { Boolean }
          */
         isNotificationsOn () {
@@ -82,7 +82,7 @@ export default {
 
         /**
          * Cant leave private groups, shown so can access other features
-         * 
+         *
          * @returns { Boolean }
          */
         isPrivate () {
@@ -91,17 +91,17 @@ export default {
 
         /**
          * Check if is already a member of a non private group, so can leave if requested
-         * 
+         *
          * @returns { Boolean }
          */
         isEnrolled () {
-            return (this.group.type === groupTypes.FREE || this.group.type === groupTypes.MODERATED) 
+            return (this.group.type === groupTypes.FREE || this.group.type === groupTypes.MODERATED)
                     && this.enrolmentStatus === enrolmentTypes.ENROLLED;
         },
 
         /**
          * Check if membership is already pending
-         * 
+         *
          * @returns { Boolean }
          */
         isMembershipPending () {
@@ -110,7 +110,7 @@ export default {
 
         /**
          * Check if need to request to join
-         * 
+         *
          * @returns { Boolean }
          */
         isRequestToJoin () {
@@ -123,7 +123,7 @@ export default {
 
         /**
          * Get the image style, adding in the cover image only if available
-         * 
+         *
          * @returns { Object }
          */
         getImageStyles () {
@@ -131,7 +131,7 @@ export default {
                 backgroundColor: `#${this.group.colour}`,
             }
             if (this.group.coverImageHash) {
-                imageStyles = { 
+                imageStyles = {
                     ...imageStyles,
                     backgroundImage: `url('/storage/image.php?hash=${this.group.coverImageHash}&size=cardImageLarge')`,
                     backgroundSize: 'cover',
@@ -144,10 +144,10 @@ export default {
 
         /**
          * A simple wrapper to handle the shared post request behaviour
-         * 
+         *
          * @param { String }
          * @param { Object }
-         * 
+         *
          * @returns { Object }
          */
         async getResponseData (endpoint, appendList = {}) {
@@ -185,7 +185,7 @@ export default {
         },
 
         /**
-         * Leave the group 
+         * Leave the group
          */
         async leave () {
             this.isProcessing = true;
@@ -214,7 +214,7 @@ export default {
 
         /**
          * Toggle the group favourite status
-         * 
+         *
          * @param { Event }
          */
         async toggleFavourites (event) {
@@ -245,7 +245,7 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to remove from favourites');
-            } 
+            }
         },
 
         /**
@@ -265,12 +265,12 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to add to favourites');
-            } 
+            }
         },
 
         /**
          * Toggle the group favourite status
-         * 
+         *
          * @param { Event }
          */
         async toggleNotifications (event) {
@@ -300,7 +300,7 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to remove from notifications');
-            } 
+            }
         },
 
         /**
@@ -319,7 +319,7 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.$emit('on-edit-error', 'Unable to add to notifications');
-            } 
+            }
         },
 
     }
@@ -339,7 +339,11 @@ export default {
                     <transition name="slide">
                         <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
                             <button :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']" title="Toggle Favourites" @click="toggleFavourites">Toggle Favourites</button>
-                            <button v-if="!group.isForceFollow" :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"  title="Toggle Notifications" @click="toggleNotifications">Toggle Notifications</button>
+                            <button v-if="!group.isForceFollow && !group.isMsgDisabled"
+                                    :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                    title="Toggle Notifications" @click="toggleNotifications">Toggle Notifications</button>
+                            <button v-if="group.isForceFollow || group.isMsgDisabled"
+                                    :class="['group-action disabled', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"></button>
                         </div>
                     </transition>
                 </div>
@@ -413,6 +417,10 @@ export default {
         color: white;
         opacity: 1;
     }
+}
+
+.disabled {
+    pointer-events: none;
 }
 
 .private, .membership-pending  {

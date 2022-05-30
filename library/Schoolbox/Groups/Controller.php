@@ -221,7 +221,6 @@ class Controller extends BaseController
 
         //update the notification to what the user sets.
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, (bool)$post['isNotificationsOn']);
-        $notificationsList = $this->groupsHelper->getNotifications($user);
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput([

@@ -102,31 +102,13 @@ class GroupsHelper
         $folderIds = $accesses->getPropertyValues('serviceIdentifier');
 
         $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');
-        $service = UserAccess::SERVICE_HOMEPAGE;
+
+        $rerouteOverrides = $this->reRouteOverrideMapper->getMutedFolders($user->getId());
 
         $muted = [
-            'unfollow' => $user->getId(),
-            'disabled' => 0,
+            'unfollow' => $rerouteOverrides[$user->getId()] ?? [],
+            'disabled' => $rerouteOverrides[RerouteOverride::USER_ID_ALL] ?? [],
         ];
-
-        $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
-        /**
-         * loops through all groups the user is part of, and looks to see if they have a mute set in `msg_reroute_override` for that group
-         * then will remember that as a muted group
-         */
-        foreach ($muted as $k => $id) {
-            $muted[$k] = $this->reRouteOverrideMapper
-                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                ->map(
-                    function ($override) use ($routeKeyRegex) {
-                        /** @var RerouteOverride $override */
-                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                        return is_array($matches) ? $matches[1] : null;
-                    },
-                    false
-                )
-                ->getAll();
-        }
 
         $followment = [];
 
@@ -143,12 +125,14 @@ class GroupsHelper
                 $forced = $grp->getForceFollow();
             }
 
-            $follow = !(in_array($folder->getId(), $muted['unfollow']) || in_array($folder->getId(), $muted['disabled']));
+            $disabled = in_array($folder->getId(), $muted['disabled']);
+            $follow   = !in_array($folder->getId(), $muted['unfollow']) && !$disabled;
 
             $followment[$folder->getId()] = [
-                'name'   => $folder->getName(),
-                'follow' => $follow,
-                'force'  => $forced,
+                'name'     => $folder->getName(),
+                'follow'   => $follow,
+                'force'    => $forced,
+                'disabled' => $disabled,
             ];
         }
 
@@ -320,6 +304,7 @@ class GroupsHelper
                 'coverImageHash'    => $imageHash,
                 'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?? false,
                 'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?? false,
+                'isMsgDisabled'     => $notificationsList[$folder->getId()]['disabled'] ?? false,
                 'isFavourite'       => $isFavourite,
                 'type'              => $folder->getGroup()->getTypeString(),
                 'isAccessAdmin'     => $isAdmin,
