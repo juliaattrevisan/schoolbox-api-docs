@@ -25,6 +25,7 @@ $cdn-prefix: "../..";
 
 // General
 @import "ui/content";
+@import "ui/accordion";
 
 // Must import before forms, as forms reimports buttons.scss
 @import "components/buttons";
