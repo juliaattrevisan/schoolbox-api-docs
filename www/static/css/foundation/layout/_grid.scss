@@ -6,23 +6,15 @@ $include-html-grid-classes: $include-html-classes;
 $include-xl-html-grid-classes: true;
 
 $row-width: rem-calc(1000);
-// $total-columns: 12;
-// $column-gutter: rem-calc(30);
 
 //
 // BLOCK GRID
 //
 
-// $include-html-block-grid-classes: $include-html-classes;
-// $include-xl-html-block-grid-classes: false;
-
 // We use this to control the maximum number of block grid elements per row
-// $block-grid-elements: 12;
 $block-grid-default-spacing: rem-calc(16);
 $align-block-grid-to-grid: true;
 
-// Enables media queries for block-grid classes. Set to false if writing semantic HTML.
-// $block-grid-media-queries: true;
 
 @import "../original-foundation/components/grid";
 @import "../original-foundation/components/block-grid";

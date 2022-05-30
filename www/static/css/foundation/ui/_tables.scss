@@ -2,16 +2,12 @@
 // TABLES
 //
 
-// $include-html-table-classes: $include-html-classes;
-
 // These control the background color for the table and even rows
 $table-bg: $white;
 $table-even-row-bg: transparent;
 
 // These control the table cell border style
-// $table-border-style: solid;
 $table-border-size: 0;
-// $table-border-color: $gainsboro;
 
 // These control the table head styles
 $table-head-bg: $table-bg;
@@ -24,11 +20,8 @@ $table-head-padding: rem-calc(($base-font-size - 6));
 $table-row-padding: rem-calc(($base-font-size - 6));
 $table-row-font-size: rem-calc(($base-font-size - 3));
 $table-row-font-color: $black;
-// $table-line-height: rem-calc(18);
 
 // These are for controlling the layout, display and margin of tables
-// $table-layout: auto;
-// $table-display: table-cell;
 $table-margin-bottom: rem-calc(($base-font-size - 2));
 
 @import "../original-foundation/components/tables";

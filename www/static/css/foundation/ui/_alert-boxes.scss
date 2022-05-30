@@ -2,8 +2,6 @@
 // ALERT BOXES
 //
 
-// $include-html-alert-classes: $include-html-classes;
-
 // We use this to control alert padding.
 $alert-padding-top: rem-calc(($base-font-size - 2));
 $alert-padding-default-float: $alert-padding-top;
@@ -22,11 +20,9 @@ $alert-function-factor: 89%;
 // We use these to control border styles.
 $alert-border-style: solid;
 $alert-border-width: 0px;
-//$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
 $alert-bottom-margin: $base-font-size;
 
 // We use these to style the close buttons
-//$alert-close-color: $primary-color;
 $alert-close-top: 0;
 $alert-close-position: 0;
 $alert-close-font-size: rem-calc(($base-font-size + 14));
@@ -41,7 +37,6 @@ $alert-radius: $global-radius;
 $alert-transition-speed: 300ms;
 $alert-transition-ease: ease-out;
 
-//.alert-box { background-color: scale-color($primary-color, $lightness: $alert-function-factor); }
 
 @import "../original-foundation/components/alert-boxes";
 
@@ -56,7 +51,6 @@ $alert-default-background: css-darken($body-bg, 10%);
 
 .alert-box {
     background-color: $alert-default-background;
-    // DONE use contrast color
     color: $body-bg-contrast;
     color-adjust: exact;
     -webkit-print-color-adjust: exact;

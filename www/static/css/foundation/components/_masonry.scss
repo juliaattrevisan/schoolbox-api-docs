@@ -181,9 +181,6 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-comment;
   color: $icon-color-chat;
 }
-// Doesn't yet exist and probably never will
-//.icon-masonry-Component_Homepage_TranslateController:before {
-//}
 .icon-masonry-Component_Homepage_ScrollerController:before {
   @extend .icon-image-slideshow;
   color: $icon-color-image-slideshow;
