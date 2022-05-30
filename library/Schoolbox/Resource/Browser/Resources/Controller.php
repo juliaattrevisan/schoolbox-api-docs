@@ -148,7 +148,7 @@ class Controller extends AbstractController
         }
 
         //grab all files for component folder
-        $files = $filesBuilder->getFolderData($sourceFolder->getId(), $accessHome);
+        $files = $filesBuilder->getFolderData($sourceFolder->getId(), $accessHome, $componentID);
 
         if ($componentID) {
             //lets get the config for the component
