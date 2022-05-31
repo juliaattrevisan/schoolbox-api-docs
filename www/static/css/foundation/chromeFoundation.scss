@@ -141,7 +141,7 @@ $cdn-prefix: "../..";
 
 // Needs to be included outside of container in order to work
 @import "ui/reveal";
-@import "original-foundation/components/tooltips";
+@import "ui/tooltips";
 @import "layout/flex-video";
 @import "ui/button/dropdown-buttons";
 @import "ui/joyride";
