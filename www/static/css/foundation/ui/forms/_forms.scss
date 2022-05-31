@@ -55,34 +55,6 @@ $input-include-glowing-effect: false;
 $select-bg-color: $input-bg-color;
 $select-hover-bg-color: tint($warning-color, 50%);
 
-//
-// SWITCH
-//
-
-// Controlling background color for the switch container
-$switch-bg: $content-ui-background;
-
-// Controlling border styles and background colors for the switch container
-$switch-border-color: transparent;
-$switch-border-width: 0px;
-
-// We use these to control the switch heights for our default classes
-$switch-height-med: rem-calc(32);
-$switch-bottom-margin: 1rem;
-
-// We use these to control default font sizes for our classes.
-$switch-font-size-med: 14px;
-
-// We use these to style the switch-paddle
-$switch-active-color: $content-ui-foreground;
-$switch-paddle-fade-to-color: tint($secondary-color, 74%);
-$switch-paddle-border-color: transparent;
-$switch-paddle-border-width: 0px;
-$switch-positive-color: tint($success-color, 50%);
-$switch-negative-color: tint($secondary-color, 74%);
-
-// Outline Style for tabbing through switches
-// $switch-label-outline: 1px dotted $jumbo;
 
 @import "../../css-only/components/forms";
 @import "switches";
