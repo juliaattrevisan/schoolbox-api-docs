@@ -75,8 +75,6 @@ class ValidActiveTtid
 
         /* Otherwise, there's records we need to examine
          */
-        $hasPastRecord = false;
-
         foreach ($this->ttCalendar as $record) {
             /* If there is a $ttCalendar record equal to $now,
              * then we can exit early - the thing's active and
@@ -85,32 +83,27 @@ class ValidActiveTtid
             if ($record['VALUE'] === $now) {
                 return true;
             }
-
-            /* If $ttCalendar has:
-             *    - at least one record < $now, and
-             *    - at least one record > $now
-             *
-             * ...then we can exit early - the thing's active and we don't need
-             * to go iterate any further. There's nothing we'll see that can
-             * change our minds now
-             *
-             * Cheaply, you can probably presume $ttCalendar is sorted by date,
-             * take the first and last element, compare their values to today
-             * (This makes the assumption that ttCalendar sets are contiguous)
-             *
-             * But, if there's a gap in $ttCalendar, and $now is in that gap,
-             * exit early. I doubt this is going to happen, but I don't trust tass
-             * and their scuffed sis
-             */
-            if ($record['VALUE'] < $now) {
-                $hasPastRecord = true;
-            }
-
-            if ($hasPastRecord && $record['VALUE'] > $now) {
-                return true;
-            }
         }
 
-        return false;
+        /* If $ttCalendar has:
+         *    - at least one record < $now, and
+         *    - at least one record > $now
+         *
+         * ...then we can exit early - the thing's active and we don't need
+         * to go iterate any further. There's nothing we'll see that can
+         * change our minds now
+         *
+         * But, if there's a gap in $ttCalendar, and $now is in that gap,
+         * exit early. I doubt this is going to happen, but I don't trust tass
+         * and their scuffed sis
+         *
+         * Cheaply, you can probably presume $ttCalendar is sorted by date,
+         * take the first and last element, compare their values to today
+         * (This makes the assumption that ttCalendar sets are contiguous)
+         */
+        $firstElement = $this->ttCalendar[0];
+        $lastElement = $this->ttCalendar[\count($this->ttCalendar) - 1];
+
+        return ($firstElement['VALUE'] < $now && $lastElement['VALUE'] > $now);
     }
 }
