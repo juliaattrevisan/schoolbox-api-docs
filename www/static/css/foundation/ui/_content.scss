@@ -3,7 +3,7 @@
 $container-bg: white !default;
 
 @import "inline-lists";
-@import "../original-foundation/components/labels";
+@import "forms/labels";
 @import "../original-foundation/components/progress-bars";
 @import "../original-foundation/components/reveal";
 @import "../original-foundation/components/visibility";
