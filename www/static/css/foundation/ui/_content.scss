@@ -4,7 +4,7 @@ $container-bg: white !default;
 
 @import "inline-lists";
 @import "forms/labels";
-@import "../original-foundation/components/progress-bars";
+@import "progress-bars";
 @import "../original-foundation/components/reveal";
 @import "../original-foundation/components/visibility";
 @import "../original-foundation/components/thumbs";
