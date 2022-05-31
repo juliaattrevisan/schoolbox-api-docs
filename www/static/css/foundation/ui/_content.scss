@@ -6,7 +6,7 @@ $container-bg: white !default;
 @import "forms/labels";
 @import "progress-bars";
 @import "reveal";
-@import "../original-foundation/components/visibility";
+@import "../utils/visibility";
 @import "thumbs";
 
 // if an image has no src, hide it.
