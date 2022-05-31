@@ -47,7 +47,7 @@ $selectize-padding-item-y: 0;
 $selectize-error-text: $white;
 $selectize-error-background: #fa4a47;
 
-@import "../../core/selectize/src/selectize.scss";
+@import "../../vendors/selectize/src/selectize.scss";
 
 /* selectize.scss uses a whole bunch of !important vars
  * so you have to bring a bigger bang to the party
