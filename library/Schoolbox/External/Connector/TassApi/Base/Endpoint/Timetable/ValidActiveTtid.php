@@ -52,38 +52,66 @@ class ValidActiveTtid
      * If you provide a date, you could test a past ttid or a future ttid
      * but $date defaults to today's date which I expect to be the main use case
      *
+     * @param string|null $date
      * @return bool
      */
-    public function isActive(): bool
+    public function isActive(string $date = null): bool
     {
 
         /* Investigate each record in $ttCalendar
+         * for something corresponding to $now
          */
+        if (null === $date) {
+            $now = date('Y-m-d');
+        } else {
+            $now = $date;
+        }
 
         /* If $ttCalendar is empty, there aren't any records to see
          * This timetable doesn't occur, and is meaningless
          * Exit early - it's not active
          */
+        if (!\count($this->ttCalendar)) {
+            return false;
+        }
 
         /* Otherwise, there's records we need to examine
-         *
-         * If there is a $ttCalendar record equal to $now,
-         * then we can exit early - the thing's active and
-         * we're in it
          */
+        $hasPastRecord = false;
 
-        /* If $ttCalendar has:
-         *    - at least one record < $now, and
-         *    - at least one record > $now
-         *
-         * ...then we can exit early - the thing's active and we don't need
-         * to go iterate any further. There's nothing we'll see that can
-         * change our minds now
-         *
-         * Cheaply, you can probably presume $ttCalendar is sorted by date,
-         * take the first and last element, compare their values to today
-         * (This makes the assumption that ttCalendar sets are contiguous)
-         */
+        foreach ($this->ttCalendar as $record) {
+            /* If there is a $ttCalendar record equal to $now,
+             * then we can exit early - the thing's active and
+             * we're in it
+             */
+            if ($record['VALUE'] === $now) {
+                return true;
+            }
+
+            /* If $ttCalendar has:
+             *    - at least one record < $now, and
+             *    - at least one record > $now
+             *
+             * ...then we can exit early - the thing's active and we don't need
+             * to go iterate any further. There's nothing we'll see that can
+             * change our minds now
+             *
+             * Cheaply, you can probably presume $ttCalendar is sorted by date,
+             * take the first and last element, compare their values to today
+             * (This makes the assumption that ttCalendar sets are contiguous)
+             *
+             * But, if there's a gap in $ttCalendar, and $now is in that gap,
+             * exit early. I doubt this is going to happen, but I don't trust tass
+             * and their scuffed sis
+             */
+            if ($record['VALUE'] < $now) {
+                $hasPastRecord = true;
+            }
+
+            if ($hasPastRecord && $record['VALUE'] > $now) {
+                return true;
+            }
+        }
 
         return false;
     }
