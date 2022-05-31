@@ -876,7 +876,6 @@ ul.az-error-list {
 .dropzone-previews .dz-preview .dz-progress .dz-upload {
   animation: loading 0.4s linear infinite;
   transition: width 0.3s $attachzone-overlay-timing;
-  -webkit-border-radius: 2px;
   border-radius: 2px;
   position: absolute;
   top: 0;

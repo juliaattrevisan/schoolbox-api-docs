@@ -73,8 +73,6 @@ $selectize-caret-margin: 0 2px 0 0 !default;
 $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
 
 @mixin selectize-border-radius ($radii) {
-    -webkit-border-radius: $radii;
-    -moz-border-radius: $radii;
     border-radius: $radii;
 }
 
@@ -95,11 +93,7 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
 
 @mixin selectize-vertical-gradient ($color-top, $color-bottom) {
     background-color: mix($color-top, $color-bottom, 60%);
-    background-image: -moz-linear-gradient(top, $color-top, $color-bottom); // FF 3.6+
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from($color-top), to($color-bottom)); // Safari 4+, Chrome 2+
-    background-image: -webkit-linear-gradient(top, $color-top, $color-bottom); // Safari 5.1+, Chrome 10+
-    background-image: -o-linear-gradient(top, $color-top, $color-bottom); // Opera 11.10
-    background-image: linear-gradient(to bottom, $color-top, $color-bottom); // Standard, IE10
+    background-image: linear-gradient(to bottom, $color-top, $color-bottom); 
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(
         startColorstr='#{$color-top}',

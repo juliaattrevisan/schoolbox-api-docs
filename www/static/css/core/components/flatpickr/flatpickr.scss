@@ -5,7 +5,6 @@
   text-align: center;
   visibility: hidden;
   padding: 0;
-  -webkit-animation: none;
   animation: none;
   direction: ltr;
   border: 0;
@@ -31,7 +30,6 @@
   z-index: 99999;
 }
 .flatpickr-calendar.animate.open {
-  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);
   animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 .flatpickr-calendar.inline {

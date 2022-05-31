@@ -128,14 +128,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 .mejs__overlay {
     max-width: 100%;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -ms-flex-align: center;
     align-items: center;
-    display: flex;
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
     justify-content: center;
     left: 0;
     position: absolute;
@@ -167,7 +160,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__overlay-loading-bg-img {
-    -webkit-animation: mejs__loading-spinner 1s linear infinite;
     animation: mejs__loading-spinner 1s linear infinite;
     background: transparent url("#{$cdn-prefix}/images/resources/mejs-controls.svg") -160px -40px no-repeat;
     display: block;
@@ -315,18 +307,7 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__time-buffering {
-    -webkit-animation: buffering-stripes 2s linear infinite;
     animation: buffering-stripes 2s linear infinite;
-    background: -webkit-linear-gradient(
-                    135deg,
-                    rgba(255, 255, 255, 0.4) 25%,
-                    transparent 25%,
-                    transparent 50%,
-                    rgba(255, 255, 255, 0.4) 50%,
-                    rgba(255, 255, 255, 0.4) 75%,
-                    transparent 75%,
-                    transparent
-    );
     background: linear-gradient(
                     -45deg,
                     rgba(255, 255, 255, 0.4) 25%,
