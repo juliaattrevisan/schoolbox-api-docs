@@ -210,3 +210,14 @@ $z-index-base: 1005;
     }
   }
 }
+
+.reveal-modal-tab-content {
+    padding: 1rem 0;
+}
+
+.reveal-modal {
+    .flex-list.buttons li {
+      flex: 1 50%;
+    }
+}
+  
