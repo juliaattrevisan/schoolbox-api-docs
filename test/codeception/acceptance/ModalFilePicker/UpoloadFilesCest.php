@@ -38,7 +38,9 @@ class UpoloadFilesCest
      * on the modal click Resources
      * navigate to Admin > Tiles Icons > Black cursors and pointers icons
      * select clip15.png file
-     * ensure the camp file is presented under the admin folder
+     * navigate to Classes>2019 Classes>Middle School>Year 9>English>9A English (9ENGA)
+     * select Spelling tips file
+     * ensure the files are presented under the admin folder
      */
     public function attachFilesViaResources(AcceptanceTester $i)
     {
@@ -58,7 +60,7 @@ class UpoloadFilesCest
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Resources folder on the modal");
         $resources->clickResources();
-        $i->amGoingTo("navigate to ClassesT2019 Classes>Middle School>Year 9>English>9A English (9ENGA) and select a file");
+        $i->amGoingTo("navigate to Classes>2019 Classes>Middle School>Year 9>English>9A English (9ENGA) and select a file");
         $resources->clickSubFolders("Classes");
         $resources->clickSubFolders("2019 Classes");
         $resources->clickSubFolders("Middle School");
@@ -69,5 +71,30 @@ class UpoloadFilesCest
         $i->amGoingTo("verify the files are presented in the resources page under the Admin folder");
         $i->canSee("clip15");
         $i->canSee("Spelling tips");
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on resources page
+     * click the admin folder
+     * click the attachment zone
+     * on the modal click My Files
+     * select Abby file
+     * ensure the file is presented under the admin folder
+     */
+    public function attachFilesViaMyFiles(AcceptanceTester $i)
+    {
+        $resources = new ResourcesMyFilesPicker($i);
+        $i->amGoingTo("click the Admin folder in the resources page");
+        $resources->clickFolder(57);
+        $i->amGoingTo("click the attach zone tp upload files via modal");
+        $resources->clickAttachmentZone();
+        $i->amGoingTo("click My Files folder on the modal");
+        $resources->clickMyFiles();
+        $i->amGoingTo("click Abby file");
+        $resources->clickFiles("Abby");
+        $i->canSee("Abby");
     }
 }

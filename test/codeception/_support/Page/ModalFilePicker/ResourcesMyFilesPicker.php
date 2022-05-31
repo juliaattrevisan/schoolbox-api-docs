@@ -52,9 +52,18 @@ class ResourcesMyFilesPicker
      * clicks the resources folder
      * @throws Exception
      */
-    public function clickResources()
+    public function clickResources(): void
     {
         $this->tester->click('[href="#filesystem-browse-panel"]');
+    }
+
+    /**
+     * clicks the my files folder
+     * @throws Exception
+     */
+    public function clickMyFiles(): void
+    {
+        $this->tester->click('[href="#filesystem-myfile-panel"]');
     }
 
     /**
