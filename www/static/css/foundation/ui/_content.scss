@@ -7,7 +7,7 @@ $container-bg: white !default;
 @import "progress-bars";
 @import "reveal";
 @import "../original-foundation/components/visibility";
-@import "../original-foundation/components/thumbs";
+@import "thumbs";
 
 // if an image has no src, hide it.
 img[src=""] {
