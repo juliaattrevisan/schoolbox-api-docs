@@ -162,7 +162,7 @@ class Controller extends Web\Controller\Base
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
         $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
-        $deansComments = $this->getDeansComment($user, $attributes);
+        $deansComments = $this->getDeansComment($user, $attributes, $roleTypeOverride);
 
         $data = [
             'user'               => $user,
@@ -476,10 +476,11 @@ class Controller extends Web\Controller\Base
      * Returns general comment of pastoral records of given attributes.
      * @param User              $user
      * @param StudentAttributes $attributes
+     * @param string|null       $roleTypeOverride
      * @return array semester numbers -> comments
      * @throws InvalidColumnException
      */
-    private function getDeansComment(User $user, StudentAttributes $attributes): array
+    private function getDeansComment(User $user, StudentAttributes $attributes, ?string $roleTypeOverride): array
     {
         $semesters = $attributes->getCurriculumSemesters();
 
@@ -512,11 +513,14 @@ class Controller extends Web\Controller\Base
                 $dueWork = $dueWorks->first();
                 if ($dueWork) {
                     $dueWorksFound = true;
-                    $participant   = $dueWork->getParticipantIfExtant($user);
-                    if ($participant) {
-                        $feedback = $participant->getAuthoritativeFeedback(true);
-                        if ($feedback) {
-                            $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+                    $roleType      = $roleTypeOverride ?? $this->getUser()->getRole()->getType();
+                    if ($dueWork->isFeedbackVisibleToRoleType($roleType)) {
+                        $participant = $dueWork->getParticipantIfExtant($user);
+                        if ($participant) {
+                            $feedback = $participant->getAuthoritativeFeedback(true);
+                            if ($feedback) {
+                                $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+                            }
                         }
                     }
                 }
