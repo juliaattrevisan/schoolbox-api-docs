@@ -85,7 +85,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 // $switch-label-outline: 1px dotted $jumbo;
 
 @import "../../css-only/components/forms";
-@import "../../original-foundation/components/switches";
+@import "switches";
 
 //
 // Custom overrides
