@@ -257,6 +257,10 @@ HELP;
             $matchesVersionSingle = '';
             $matches = '';
             preg_match("[DELIVERED (\d+\.\d)]", $forum->getTitle(), $matchesVersionNumber);
+            /**
+             * on odd occasions the form may be title as `[DELIVERED 22]` we need to catch this here
+             * and not pass it onto the next DELIVERED check, if we do, it will incorrectly be moved to the `Delivered v20.0 and before` folder
+             */
             preg_match("[DELIVERED (\d+)]", $forum->getTitle(), $matchesVersionSingle);
             if (!empty($matchesVersionNumber)) {
                 $matches = $matchesVersionNumber;
