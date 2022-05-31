@@ -72,7 +72,7 @@
                 element: element,
 
                 /* The breakpoint threshold between small viewport menu and regular flyout menu
-                 * Consult www/static/css/core/_settings.scss:90 for the var definition
+                 * Consult www/static/css/core/utils/_settings.scss:90 for the var definition
                  * You'll have to keep these in sync manually, sorry
                  */
                 threshold: '951px'
