@@ -14,7 +14,6 @@
   border-radius: 5px;
   position: absolute;
   width: 307.875px;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
@@ -242,7 +241,6 @@
   opacity: 0;
   cursor: pointer;
   border: 1px solid rgba(57,57,57,0.15);
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 .numInputWrapper span:hover {
@@ -373,7 +371,6 @@
   padding: 0 0 0 0.5ch;
   position: relative;
   vertical-align: initial;
-  -webkit-box-sizing: border-box;
   -webkit-appearance: menulist;
   -moz-appearance: menulist;
   width: auto;
@@ -600,14 +597,12 @@ span.flatpickr-weekday {
 .flatpickr-innerContainer {
   display: block;
   display: flex;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   overflow: hidden;
 }
 .flatpickr-rContainer {
   display: inline-block;
   padding: 0;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 .flatpickr-time {
@@ -617,7 +612,6 @@ span.flatpickr-weekday {
   height: 0;
   line-height: 40px;
   max-height: 40px;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
@@ -659,7 +653,6 @@ span.flatpickr-weekday {
   color: #393939;
   font-size: 14px;
   position: relative;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   -webkit-appearance: textfield;
   -moz-appearance: textfield;
