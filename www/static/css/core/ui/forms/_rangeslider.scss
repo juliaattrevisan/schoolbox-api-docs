@@ -53,7 +53,6 @@ $range-slider-disabled-cursor: $cursor-disabled-value !default;
   border: $range-slider-bar-border-width $range-slider-bar-border-style $range-slider-bar-border-color;
   margin: rem-calc(20 0);
   position: relative;
-  -ms-touch-action: none;
   touch-action: none;
   @if $vertical == true {
     display: inline-block;
@@ -97,7 +96,6 @@ $range-slider-disabled-cursor: $cursor-disabled-value !default;
   z-index: 1;
 
   // This removes the 300ms touch delay on Windows 8
-  -ms-touch-action: manipulation;
   touch-action: manipulation;
 }
 

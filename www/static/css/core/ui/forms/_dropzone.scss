@@ -634,7 +634,6 @@ ul.az-error-list {
   .dz-default.dz-message {
     transition: opacity 0.3s $attachzone-overlay-timing;
     opacity: 1;
-    -ms-filter: none;
     filter: none;
     height: 100%;
     width: 100%;
@@ -690,7 +689,6 @@ ul.az-error-list {
   .dropzone-previews .dz-preview .dz-success-mark {
     display: block;
     opacity: 0;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
     filter: alpha(opacity=0);
     transition: opacity 0.4s $attachzone-overlay-timing;
   }
@@ -814,32 +812,27 @@ ul.az-error-list {
 }
 .dropzone.dz-drag-hover .dz-message {
   opacity: 0.15;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
   filter: alpha(opacity=15);
 }
 .dropzone.dz-started .dz-message {
   display: block;
   opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
 }
 .dz-preview.dz-image-preview:hover .dz-details img,
 .dropzone-previews .dz-preview.dz-image-preview:hover .dz-details img {
   display: block;
   opacity: 0.1;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";
   filter: alpha(opacity=10);
 }
 .dz-preview.dz-success .dz-success-mark,
 .dropzone-previews .dz-preview.dz-success .dz-success-mark {
   opacity: 1;
-  -ms-filter: none;
   filter: none;
 }
 .dz-preview.dz-error .dz-error-mark,
 .dropzone-previews .dz-preview.dz-error .dz-error-mark {
   opacity: 1;
-  -ms-filter: none;
   filter: none;
 }
 .dz-preview.dz-error .dz-progress .dz-upload,
@@ -851,7 +844,6 @@ ul.az-error-list {
 .dropzone-previews .dz-preview.dz-success .dz-progress {
   display: block;
   opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
   transition: opacity 0.4s $attachzone-overlay-timing;
 }
@@ -860,7 +852,6 @@ ul.az-error-list {
 .dropzone-previews .dz-preview .dz-error-message {
   display: block;
   opacity: 0;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
   transition: opacity 0.3s $attachzone-overlay-timing;
 }
@@ -868,7 +859,6 @@ ul.az-error-list {
 .dz-preview:hover.dz-error .dz-error-message,
 .dropzone-previews .dz-preview:hover.dz-error .dz-error-message {
   opacity: 1;
-  -ms-filter: none;
   filter: none;
 }
 
