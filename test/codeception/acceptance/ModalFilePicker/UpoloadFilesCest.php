@@ -6,7 +6,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-use AcceptanceTester;
 use Page\ModalFilePicker\ResourcesMyFilesPicker;
 
 class UpoloadFilesCest
@@ -37,15 +36,38 @@ class UpoloadFilesCest
      * click the admin folder
      * click the attachment zone
      * on the modal click Resources
-     * navigate to Admin > Dashboard Components > Middle Student Image Slider
-     * select camp file
+     * navigate to Admin > Tiles Icons > Black cursors and pointers icons
+     * select clip15.png file
      * ensure the camp file is presented under the admin folder
      */
     public function attachFilesViaResources(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $i->amGoingTo("click the Admin folder in the resources page");
         $resources->clickFolder(57);
+        $i->amGoingTo("click the attach zone tp upload files via modal");
         $resources->clickAttachmentZone();
-
+        $i->amGoingTo("click Resources folder on the modal");
+        $resources->clickResources();
+        $i->amGoingTo("navigate to Admin>Tiles Icons>Black cursors and pointers icons and select a file");
+        $resources->clickSubFolders("Admin");
+        $resources->clickSubFolders("Tiles Icons");
+        $resources->clickSubFolders("Black cursors and pointers icons");
+        $resources->clickFiles("clip15.png");
+        $i->amGoingTo("click the attach zone tp upload more files via modal");
+        $resources->clickAttachmentZone();
+        $i->amGoingTo("click Resources folder on the modal");
+        $resources->clickResources();
+        $i->amGoingTo("navigate to ClassesT2019 Classes>Middle School>Year 9>English>9A English (9ENGA) and select a file");
+        $resources->clickSubFolders("Classes");
+        $resources->clickSubFolders("2019 Classes");
+        $resources->clickSubFolders("Middle School");
+        $resources->clickSubFolders("Year 9");
+        $resources->clickSubFolders("English");
+        $resources->clickSubHomeFolders("9A English (9ENGA)");
+        $resources->clickFiles("Spelling tips");
+        $i->amGoingTo("verify the files are presented in the resources page under the Admin folder");
+        $i->canSee("clip15");
+        $i->canSee("Spelling tips");
     }
 }

@@ -37,9 +37,7 @@ class ResourcesMyFilesPicker
      */
     public function clickFolder(int $folderId)
     {
-//        $this->tester->executeJS('$("a#57_anchor").click()');
         $this->tester->executeJS('$("a#' . $folderId . '_anchor").click()');
-        sleep(2);
     }
 
     /**
@@ -48,5 +46,42 @@ class ResourcesMyFilesPicker
     public function clickAttachmentZone(): void
     {
         $this->tester->click('[id="CmsZone"]');
+    }
+
+    /**
+     * clicks the resources folder
+     * @throws Exception
+     */
+    public function clickResources()
+    {
+        $this->tester->click('[href="#filesystem-browse-panel"]');
+    }
+
+    /**
+     * @param string $folderTitle
+     * clicks the attachment zone
+     */
+    public function clickSubFolders(string $folderTitle)
+    {
+        $this->tester->click('a[title="' . $folderTitle . '"][class="icon-folder"]');
+    }
+
+    /**
+     * @param string $homeFolder
+     * clicks the attachment zone
+     */
+    public function clickSubHomeFolders(string $homeFolder)
+    {
+        $this->tester->click('a[title="' . $homeFolder . '"][class="icon-home"]');
+    }
+
+
+    /**
+     * @param string $fileTitle
+     * clicks a file
+     */
+    public function clickFiles(string $folderTitle)
+    {
+        $this->tester->click('a[title="' . $folderTitle . '"]');
     }
 }
