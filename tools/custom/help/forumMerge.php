@@ -289,10 +289,10 @@ HELP;
                 try {
                     $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                    $this->getLogger()->warning("Forum: {$mergeId} has been Deleted");
+                    $this->getLogger()->warning("Folder: {$newFolder} has been Deleted");
                     continue;
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $this->getLogger()->warning("Forum: {$mergeId} does not exist");
+                    $this->getLogger()->warning("Folder: {$newFolder} does not exist");
                     continue;
                 }
                 if ($this->perform()) {
@@ -334,10 +334,10 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     try {
                         $forum->setCategory($folderMapper->findCheaplyById($deliveredFolder));
                     } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                        $this->getLogger()->warning("Forum: {$mergeId} has been Deleted");
+                        $this->getLogger()->warning("Folder: {$deliveredFolder} has been Deleted");
                         continue;
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        $this->getLogger()->warning("Forum: {$mergeId} does not exist");
+                        $this->getLogger()->warning("Folder: {$deliveredFolder} does not exist");
                         continue;
                     }
                     if ($this->perform()) {
@@ -370,10 +370,10 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                 try {
                     $forum->setCategory($folderMapper->findCheaplyById($newFolder));
                 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                    $this->getLogger()->warning("Forum: {$mergeId} has been Deleted");
+                    $this->getLogger()->warning("Folder: {$newFolder} has been Deleted");
                     continue;
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $this->getLogger()->warning("Forum: {$mergeId} does not exist");
+                    $this->getLogger()->warning("Folder: {$newFolder} does not exist");
                     continue;
                 }
                 if ($this->perform()) {
