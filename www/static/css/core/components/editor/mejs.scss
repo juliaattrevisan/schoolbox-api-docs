@@ -181,14 +181,12 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 
 @-webkit-keyframes mejs__loading-spinner {
     100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
 
 @keyframes mejs__loading-spinner {
     100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
@@ -393,20 +391,13 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 .mejs__time-loaded,
 .mejs__time-hovered {
     left: 0;
-    -webkit-transform: scaleX(0);
-    -ms-transform: scaleX(0);
     transform: scaleX(0);
-    -webkit-transform-origin: 0 0;
-    -ms-transform-origin: 0 0;
     transform-origin: 0 0;
-    -webkit-transition: 0.15s ease-in all;
     transition: 0.15s ease-in all;
     width: 100%;
 }
 
 .mejs__time-buffering {
-    -webkit-transform: scaleX(1);
-    -ms-transform: scaleX(1);
     transform: scaleX(1);
 }
 
@@ -416,8 +407,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 }
 
 .mejs__time-hovered.no-hover {
-    -webkit-transform: scaleX(0) !important;
-    -ms-transform: scaleX(0) !important;
     transform: scaleX(0) !important;
 }
 
@@ -427,8 +416,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     cursor: pointer;
     left: 0;
     position: absolute;
-    -webkit-transform: translateX(0);
-    -ms-transform: translateX(0);
     transform: translateX(0);
     z-index: 11;
 }
@@ -439,8 +426,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     height: 10px;
     left: -7px;
     top: -4px;
-    -webkit-transform: scale(0);
-    -ms-transform: scale(0);
     transform: scale(0);
     width: 10px;
 }
@@ -448,8 +433,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
 .mejs__time-rail:hover .mejs__time-handle-content,
 .mejs__time-rail .mejs__time-handle-content:focus,
 .mejs__time-rail .mejs__time-handle-content:active {
-    -webkit-transform: scale(1);
-    -ms-transform: scale(1);
     transform: scale(1);
 }
 
@@ -463,8 +446,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     margin-bottom: 9px;
     position: absolute;
     text-align: center;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 36px;
 }
@@ -487,8 +468,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     line-height: 0;
     position: absolute;
     top: 100%;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 0;
 }
@@ -546,8 +525,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     left: 50%;
     margin: 0;
     position: absolute;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 25px;
     z-index: 1;
@@ -564,8 +541,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     margin: 0;
     position: absolute;
     top: 8px;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 2px;
 }
@@ -585,8 +560,6 @@ Reference: http://blog.rrwd.nl/2015/04/04/the-screen-reader-text-class-why-and-h
     height: 6px;
     left: 50%;
     position: absolute;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 16px;
 }

@@ -81,7 +81,6 @@ $menu-slide: "transform 500ms ease" !default;
 // MIXINS
 // Remove transition flicker on phones
 @mixin kill-flicker {
-  // -webkit-transform: translateZ(0x);
   -webkit-backface-visibility: hidden;
 }
 
@@ -92,10 +91,6 @@ $menu-slide: "transform 500ms ease" !default;
 }
 
 @mixin translate3d($tx, $ty, $tz) {
-  -webkit-transform: translate3d($tx, $ty, $tz);
-  -moz-transform: translate3d($tx, $ty, $tz);
-  -ms-transform: translate($tx, $ty);
-  -o-transform: translate3d($tx, $ty, $tz);
   transform: translate3d($tx, $ty, $tz);
 }
 
@@ -538,10 +533,6 @@ $menu-slide: "transform 500ms ease" !default;
       .right-off-canvas-menu,
       .top-off-canvas-menu,
       .bottom-off-canvas-menu {
-        -ms-transform: none;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -o-transform: none;
         transform: none;
         z-index: 1003;
       }
@@ -551,10 +542,6 @@ $menu-slide: "transform 500ms ease" !default;
     }
     .offcanvas-overlap-left {
       .right-off-canvas-menu {
-        -ms-transform: none;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -o-transform: none;
         transform: none;
         z-index: 1003;
       }
@@ -564,10 +551,6 @@ $menu-slide: "transform 500ms ease" !default;
     }
     .offcanvas-overlap-right {
       .left-off-canvas-menu {
-        -ms-transform: none;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -o-transform: none;
         transform: none;
         z-index: 1003;
       }
@@ -577,10 +560,6 @@ $menu-slide: "transform 500ms ease" !default;
     }
     .offcanvas-overlap-top {
       .bottom-off-canvas-menu {
-        -ms-transform: none;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -o-transform: none;
         transform: none;
         z-index: 1003;
       }
@@ -590,10 +569,6 @@ $menu-slide: "transform 500ms ease" !default;
     }
     .offcanvas-overlap-bottom {
       .top-off-canvas-menu {
-        -ms-transform: none;
-        -webkit-transform: none;
-        -moz-transform: none;
-        -o-transform: none;
         transform: none;
         z-index: 1003;
       }
