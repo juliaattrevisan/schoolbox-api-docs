@@ -60,11 +60,6 @@ class ValidActiveTtid
     public function isActive(string $date = null): bool
     {
 
-        /* Investigate each record in $ttCalendar
-         * for something corresponding to $now
-         */
-        $now = $date ?? date('Y-m-d');
-
         /* If $ttCalendar is empty, there aren't any records to see
          * This timetable doesn't occur, and is meaningless
          * Exit early - it's not active
@@ -72,6 +67,11 @@ class ValidActiveTtid
         if (!\count($this->ttCalendar)) {
             return false;
         }
+
+        /* Investigate each record in $ttCalendar
+         * for something corresponding to $now
+         */
+        $now = $date ?? date('Y-m-d');
 
         /* Otherwise, there's records we need to examine
          */
