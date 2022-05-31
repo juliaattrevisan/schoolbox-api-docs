@@ -185,8 +185,8 @@ export default {
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/foundation/utils/_colors.scss';
-@import 'www/static/css/foundation/utils/_variables.scss';
+@import 'www/static/css/core/utils/_colors.scss';
+@import 'www/static/css/core/utils/_variables.scss';
 
 .add-commment-input {
     margin-bottom: 1rem;
