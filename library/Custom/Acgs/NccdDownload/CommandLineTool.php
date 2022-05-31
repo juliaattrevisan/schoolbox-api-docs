@@ -47,7 +47,7 @@ class CommandLineTool extends App
     /**
      * The ID(s) of the NCCD information courses.
      */
-    private const COURSE_IDS = [468];
+    private const COURSE_IDS = [468, 509];
 
     /**
      * Pattern for extracting an external ID out of the folder name.
