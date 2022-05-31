@@ -253,12 +253,22 @@ HELP;
              * Now match forums with the title like [DELIVERED xx.x] where x are numbers, we are looking specifically for version numbers.
              */
             //clear $matches
+            $matchesVersionNumber = '';
+            $matchesVersionSingle = '';
             $matches = '';
-            preg_match("[DELIVERED (\d+\.\d)]", $forum->getTitle(), $matches);
+            preg_match("[DELIVERED (\d+\.\d)]", $forum->getTitle(), $matchesVersionNumber);
+            preg_match("[DELIVERED (\d+)]", $forum->getTitle(), $matchesVersionSingle);
+            if (!empty($matchesVersionNumber)) {
+                $matches = $matchesVersionNumber;
+                $format = "[DELIVERED \d+\.\d]";
+            } elseif (!empty($matchesVersionSingle)) {
+                $matches = $matchesVersionSingle;
+                $format = "[DELIVERED (\d+)]";
+            }
             //if matched here merge the forum into the new folder
             if (!empty($matches) && false ===  $actioned) {
                 $actioned = true;
-                $this->getLogger()->info("Merge Forums based on [DELIVERED \d+\.\d]");
+                $this->getLogger()->info("Merge Forums based on {$format}");
                 $mergeId = $matches[1];
                 if (!isset($deliveredFolders[$mergeId])) {
                     $this->getLogger()->warning("Folder 'Delivered $mergeId' was not found to merge forum into.");
