@@ -256,6 +256,7 @@ HELP;
             $matchesVersionNumber = '';
             $matchesVersionSingle = '';
             $matches = '';
+            $format = 'no match';
             preg_match("[DELIVERED (\d+\.\d)]", $forum->getTitle(), $matchesVersionNumber);
             /**
              * on odd occasions the form may be title as `[DELIVERED 22]` we need to catch this here
