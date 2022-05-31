@@ -140,7 +140,7 @@ $cdn-prefix: "../..";
 @import "components/alaress-datetime-picker/alaress-datetime-picker";
 
 // Needs to be included outside of container in order to work
-@import "original-foundation/components/reveal";
+@import "ui/reveal";
 @import "original-foundation/components/tooltips";
 @import "layout/flex-video";
 @import "ui/button/dropdown-buttons";
