@@ -29,6 +29,13 @@ use function count;
  */
 class FolderFetcher
 {
+    /**
+     * Year level group folders always have a class code with this suffix: it is
+     * prefixed with their year level, e.g. "10YG_1".
+     *
+     * TODO make this configurable
+     */
+    private const YEAR_LEVEL_GROUP_FOLDER_CODE_SUFFIX = 'YG_1';
 
     /** @var Folder\Mapper */
     private $folderMapper;
@@ -171,9 +178,46 @@ class FolderFetcher
     }
 
 
-    public function findYearLevelFolder(User $student, StudentAttributes $attributes): ?Folder\Model
+    /**
+     * Search for the student's year group folder (if there is one in which they
+     * have participated within the attributes' semester).
+     *
+     * @param User              $student
+     * @param StudentAttributes $attributes
+     * @return Folder\Model|null
+     */
+    public function findYearGroupFolder(User $student, StudentAttributes $attributes): ?Folder\Model
     {
-        //
+        // Always fetch folders with interactions
+        $term = (new Term\Model())
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
+
+        /* This actually returns folders with Participations, findFoldersWithInteractionsForStudent()
+         * is probably not the best function name for what it does.
+         */
+        $folders = $this->folderMapper
+            ->findFoldersWithInteractionsForStudent($student, $term)
+            ->filter(static function (Folder\Model $folder) {
+                return $folder->isClass() || $folder->wasClass();
+            });
+
+        // Only retain folders that are either current or rolled-over classes
+        $yearGroupCode = sprintf('%d%s', $attributes->getYearLevel(), self::YEAR_LEVEL_GROUP_FOLDER_CODE_SUFFIX);
+        foreach ($folders as $folder) {
+            foreach ($folder->getCodes() as $code) {
+                if (!$code->isDeleted() && $code->getCode() === $yearGroupCode) {
+                    return $folder;
+                }
+            }
+            foreach ($folder->getRolledOverCodes() as $code) {
+                if ($code === $yearGroupCode) {
+                    return $folder;
+                }
+            }
+        }
+        return null;
     }
 
 

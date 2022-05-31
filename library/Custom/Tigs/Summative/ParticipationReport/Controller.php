@@ -19,7 +19,9 @@ use DomainException;
 use External_ClassInterface;
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
@@ -488,12 +490,45 @@ class Controller extends Web\Controller\Base
         }
 
 
-
         // Extract dean's comment from a due work.
-        // How to find that due work?
+        $fetcher         = new FolderFetcher($this->folderMapper, $this->externalUser);
+        $yearGroupFolder = $fetcher->findYearGroupFolder($user, $attributes);
+        if ($yearGroupFolder) {
+            // Find the due work within this place
+            $dueWorksFound = false;
+            foreach ($semesters as $semester) {
+                $dueWorks = $this->assessmentMapperProxy->findAllByFolderIdForReview(
+                    $yearGroupFolder->getId(),
+                    $user,
+                    [
+                        // TODO replace with config
+                        'work_type' => 24,
+                        'term'      => (new TermModel())
+                            ->setStart($semester->getStart())
+                            ->setActualFinish($semester->getFinish())
+                    ]
+                );
+                /** @var IAssessable|null $dueWork */
+                $dueWork = $dueWorks->first();
+                if ($dueWork) {
+                    $dueWorksFound = true;
+                    $participant   = $dueWork->getParticipantIfExtant($user);
+                    if ($participant) {
+                        $feedback = $participant->getAuthoritativeFeedback(true);
+                        if ($feedback) {
+                            $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+                        }
+                    }
+                }
+            }
+            if ($dueWorksFound) {
+                return $deansComment;
+            }
+        }
 
 
-
+        // No due works were found for this semester and student.
+        // Fall back to the pastoral-based comments.
         $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
         if (!$pastoralType) {
             // no pastoral type configured
@@ -548,11 +583,5 @@ class Controller extends Web\Controller\Base
             default:
                 return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
         }
-    }
-
-
-    private function getYearGroupFolder(User $user, StudentAttributes $attributes)
-    {
-        $attributes->getYearLevel()
     }
 }
