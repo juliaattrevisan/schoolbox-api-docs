@@ -32,6 +32,8 @@ class ValidActiveTtid
 
 
     /**
+     * Constructor
+     *
      * @param array $ttCalendar
      */
     public function __construct(array $ttCalendar)
@@ -61,11 +63,7 @@ class ValidActiveTtid
         /* Investigate each record in $ttCalendar
          * for something corresponding to $now
          */
-        if (null === $date) {
-            $now = date('Y-m-d');
-        } else {
-            $now = $date;
-        }
+        $now = $date ?? date('Y-m-d');
 
         /* If $ttCalendar is empty, there aren't any records to see
          * This timetable doesn't occur, and is meaningless
