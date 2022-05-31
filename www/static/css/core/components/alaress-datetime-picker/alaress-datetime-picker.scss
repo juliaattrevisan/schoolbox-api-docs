@@ -88,7 +88,6 @@ input.datepicker-input {
  */
 .adtp {
 
-    -webkit-transition: width 0.3s; /* Safari */
     transition: width 0.3s;
 
     .flatpickr-months {
@@ -337,7 +336,7 @@ input.datepicker-input {
     }
 
     span.displayDate {
-        color: #oil;
+        color: $oil;
     }
 
     .adtp-tt-week-bold {

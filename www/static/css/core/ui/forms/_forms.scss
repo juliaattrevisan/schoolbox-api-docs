@@ -477,14 +477,6 @@ $select-hover-bg-color: tint($warning-color, 50%);
       border-radius: 0;
       @include form-element;
       @if $input-include-glowing-effect == false {
-        -webkit-transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
-          background $input-transition-fade-time $input-transition-fade-timing-function;
-        -moz-transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
-          background $input-transition-fade-time $input-transition-fade-timing-function;
-        -ms-transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
-          background $input-transition-fade-time $input-transition-fade-timing-function;
-        -o-transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
-          background $input-transition-fade-time $input-transition-fade-timing-function;
         transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
           background $input-transition-fade-time $input-transition-fade-timing-function;
       }

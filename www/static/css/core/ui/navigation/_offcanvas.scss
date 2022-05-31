@@ -158,10 +158,6 @@ $menu-slide: "transform 500ms ease" !default;
   // removed for now till chrome fixes backface issue
   @include wrap-base;
   @include clearfix;
-  -webkit-transition: -webkit-#{$menu-slide};
-  -moz-transition: -moz-#{$menu-slide};
-  -ms-transition: -ms-#{$menu-slide};
-  -o-transition: -o-#{$menu-slide};
   transition: #{$menu-slide};
 }
 
@@ -348,10 +344,6 @@ $menu-slide: "transform 500ms ease" !default;
     bottom: 0;
     width: 100%;
   }
-  -webkit-transition: -webkit-#{$menu-slide};
-  -moz-transition: -moz-#{$menu-slide};
-  -ms-transition: -ms-#{$menu-slide};
-  -o-transition: -o-#{$menu-slide};
   transition: #{$menu-slide};
 
   //back button style like label
