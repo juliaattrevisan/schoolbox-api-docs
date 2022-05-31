@@ -97,4 +97,37 @@ class UpoloadFilesCest
         $resources->clickFiles("Abby");
         $i->canSee("Abby");
     }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on resources page
+     * click the admin folder
+     * click the attachment zone
+     * on the modal click Recording
+     * click Audio
+     * ensure the file is presented under the admin folder
+     */
+    public function attachFilesByRecordingAudio(AcceptanceTester $i)
+    {
+        $resources = new ResourcesMyFilesPicker($i);
+        $i->amGoingTo("click the Admin folder in the resources page");
+        $resources->clickFolder(57);
+        $i->amGoingTo("click the attach zone tp upload files via modal");
+        $resources->clickAttachmentZone();
+        $i->amGoingTo("click Recording on the modal and then click Audio button");
+        $resources->clickRecording();
+        $resources->clickAudio();
+        $i->amGoingTo("click the button to start recording and wait 10 seconds to record the audio");
+        $resources->clickStartAudioVideoButton();
+        $i->wait(10);
+        $i->amGoingTo("click the button to stop recording");
+        $resources->clickStopAudioVideoButton();
+        $i->amGoingTo("click the Upload button, type a file name and submit it");
+        $resources->clickUploadButton();
+        $resources->typeName('testAudioAutomation');
+        $resources->clickSubmitButton();
+        $i->waitForText('testAudioAutomation2', 3);
+    }
 }

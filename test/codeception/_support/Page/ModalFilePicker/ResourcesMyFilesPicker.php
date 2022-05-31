@@ -67,6 +67,15 @@ class ResourcesMyFilesPicker
     }
 
     /**
+     * clicks Recording
+     * @throws Exception
+     */
+    public function clickRecording(): void
+    {
+        $this->tester->click('[href="#filesystem-usermedia-panel"]');
+    }
+
+    /**
      * @param string $folderTitle
      * clicks the attachment zone
      */
@@ -92,5 +101,94 @@ class ResourcesMyFilesPicker
     public function clickFiles(string $folderTitle)
     {
         $this->tester->click('a[title="' . $folderTitle . '"]');
+    }
+
+    /**
+     * clicks audio
+     * @throws Exception
+     */
+    public function clickAudio(): void
+    {
+        $this->tester->waitForElementVisible('div[class="icon-mic"]', 5);
+        $this->tester->click('div[class="icon-mic"]');
+    }
+
+    /**
+     * clicks photo
+     * @throws Exception
+     */
+    public function clickPhoto(): void
+    {
+        $this->tester->waitForElementVisible('div[class="icon-photo"]', 5);
+        $this->tester->click('div[class="icon-photo"]');
+    }
+
+    /**
+     * clicks video
+     * @throws Exception
+     */
+    public function clickVideo(): void
+    {
+        $this->tester->waitForElementVisible('div[class="icon-video"]', 5);
+        $this->tester->click('div[class="icon-video"]');
+    }
+
+    /**
+     * clicks screen
+     * @throws Exception
+     */
+    public function clickScreen(): void
+    {
+        $this->tester->waitForElementVisible('div[class="icon-screen-capture"]', 5);
+        $this->tester->click('div[class="icon-screen-capture"]');
+    }
+
+    /**
+     * clicks start button
+     * @throws Exception
+     */
+    public function clickStartAudioVideoButton(): void
+    {
+        $this->tester->waitForElementVisible('button.vjs-record-button.vjs-control.vjs-button.vjs-icon-record-start', 5);
+        $this->tester->click('button.vjs-record-button.vjs-control.vjs-button.vjs-icon-record-start');
+    }
+
+    /**
+     * clicks stop button
+     * @throws Exception
+     */
+    public function clickStopAudioVideoButton(): void
+    {
+        $this->tester->waitForElementVisible('button.vjs-record-button.vjs-control.vjs-button.vjs-icon-record-stop', 5);
+        $this->tester->click('button.vjs-record-button.vjs-control.vjs-button.vjs-icon-record-stop');
+    }
+
+    /**
+     * @param string $fileName
+     * type a file name
+     */
+    public function typeName(string $fileName): void
+    {
+        $this->tester->fillField(['id' => 'filename'], $fileName);
+    }
+
+    /**
+     * clicks stop button
+     * @throws Exception
+     */
+    public function clickUploadButton(): void
+    {
+        $this->tester->waitForElementVisible('a[title="Upload"]', 5);
+        $this->tester->click('a[title="Upload"]');
+    }
+
+    /**
+     * clicks stop button
+     * @throws Exception
+     */
+    public function clickSubmitButton(): void
+    {
+        $this->tester->waitForElementVisible('button.submit', 5);
+        $this->tester->click('button.submit');
     }
 }
