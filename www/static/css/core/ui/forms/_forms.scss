@@ -559,21 +559,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
     }
 
     // style placeholder text cross browser
-    ::-webkit-input-placeholder {
-      color: $input-placeholder-font-color;
-    }
-
-    :-moz-placeholder {
-      /* Firefox 18- */
-      color: $input-placeholder-font-color;
-    }
-
-    ::-moz-placeholder {
-      /* Firefox 19+ */
-      color: $input-placeholder-font-color;
-    }
-
-    :-ms-input-placeholder {
+    ::placeholder {
       color: $input-placeholder-font-color;
     }
 

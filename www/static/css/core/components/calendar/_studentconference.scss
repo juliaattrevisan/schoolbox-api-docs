@@ -14,10 +14,7 @@
  * https://codepen.io/sagalbot/pen/oZmLVN
  */
 .schoolbox-vue-selectize {
-  ::-webkit-input-placeholder { color: $aluminum !important }
-  :-ms-input-placeholder { color: $aluminum !important }
-  :-moz-placeholder { color: $aluminum !important }
-  ::-moz-placeholder { color: $aluminum !important }
+  ::placeholder { color: $aluminum !important }
 
   /* Same bottom margin as other generic input elements
    * This is rendered as a div in vue
@@ -133,10 +130,7 @@
  * somewhat unique compared to the default schoolbox vue-select
  */
 #createAttendanceForm {
-  ::-webkit-input-placeholder { color: $aluminum !important }
-  :-ms-input-placeholder { color: $aluminum !important }
-  :-moz-placeholder { color: $aluminum !important }
-  ::-moz-placeholder { color: $aluminum !important }
+  ::placeholder { color: $aluminum !important }
 
   .vs__dropdown-toggle {
     border: 0;
