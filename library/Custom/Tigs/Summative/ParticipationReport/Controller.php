@@ -486,10 +486,7 @@ class Controller extends Web\Controller\Base
         $semesters = $attributes->getCurriculumSemesters();
 
         // initialise
-        $deansComment = [];
-        foreach ($semesters as $semester) {
-            $deansComment[$semester->getOrdinal()] = '';
-        }
+        $deansComment = $this->buildDefaultDeansComment($attributes);
 
 
         // Extract dean's comment from a due work.
@@ -534,38 +531,7 @@ class Controller extends Web\Controller\Base
             }
         }
 
-
-        // No due works were found for this semester and student.
-        // Fall back to the pastoral-based comments.
-        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
-        if (!$pastoralType) {
-            // no pastoral type configured
-            return $deansComment;
-        }
-
-        // get records in the curriculum year
-        $pb = $this->pastoralMapper->getPredicateBuilder()
-            ->equals('student_id', $user->getId())
-            ->equals('type_id', $pastoralType)
-            ->greaterThanOrEqualTo('created_at', $attributes->getCurriculumYearStart()->getDatabase())
-            ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
-        $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
-
-        // get latest record in each semester
-        foreach ($semesters as $semester) {
-            $start = $semester->getStart();
-            $finish = $semester->getFinish();
-
-            $firstRecord = $records->filter(
-                function (Pastoral $record) use ($start, $finish) {
-                    return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
-                }
-            )->first();
-            if ($firstRecord) {
-                $deansComment[$semester->getOrdinal()] = $firstRecord->getBodyPublic();
-            }
-        }
-        return $deansComment;
+        return $this->extractDeansCommentFromPastoral($user, $attributes);
     }
 
 
@@ -591,5 +557,70 @@ class Controller extends Web\Controller\Base
             default:
                 return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
         }
+    }
+
+
+    /**
+     * Extract the dean's comment from pastoral.
+     *
+     * If the comment can't be extracted from a due work, it is extracted from
+     * pastoral.
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @return array<int, string> dean's comment, keyed by semester.
+     */
+    private function extractDeansCommentFromPastoral(User $user, StudentAttributes $attributes): array
+    {
+        $semesters    = $attributes->getCurriculumSemesters();
+        $deansComment = $this->buildDefaultDeansComment($attributes);
+
+        // No due works were found for this semester and student.
+        // Fall back to the pastoral-based comments.
+        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
+        if (!$pastoralType) {
+            // no pastoral type configured
+            return $deansComment;
+        }
+
+        // get records in the curriculum year
+        $pb = $this->pastoralMapper->getPredicateBuilder()
+            ->equals('student_id', $user->getId())
+            ->equals('type_id', $pastoralType)
+            ->greaterThanOrEqualTo('created_at', $attributes->getCurriculumYearStart()->getDatabase())
+            ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
+        $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
+
+        // get latest record in each semester
+        foreach ($semesters as $semester) {
+            $start  = $semester->getStart();
+            $finish = $semester->getFinish();
+
+            $firstRecord = $records->filter(
+                function (Pastoral $record) use ($start, $finish) {
+                    return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
+                }
+            )->first();
+            if ($firstRecord) {
+                $deansComment[$semester->getOrdinal()] = $firstRecord->getBodyPublic();
+            }
+        }
+        return $deansComment;
+    }
+
+
+    /**
+     * Builds a default dean's comment array.
+     *
+     * @param StudentAttributes $attributes
+     * @return array<int, string> dean's comment, keyed by semester.
+     */
+    private function buildDefaultDeansComment(StudentAttributes $attributes): array
+    {
+        $deansComment = [];
+        foreach ($attributes->getCurriculumSemesters() as $semester) {
+            $deansComment[$semester->getOrdinal()] = '';
+        }
+        return $deansComment;
     }
 }
