@@ -39,7 +39,7 @@ class Module extends BaseModule
         $permission = new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             function (array $params = []) {
-                return $params['folderId'];
+                return $params['folderId'] ?? null;
             },
             Access::getInstance()
         );
