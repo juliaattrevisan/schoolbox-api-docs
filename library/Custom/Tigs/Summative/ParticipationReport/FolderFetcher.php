@@ -29,14 +29,6 @@ use function count;
  */
 class FolderFetcher
 {
-    /**
-     * Year level group folders always have a class code with this suffix: it is
-     * prefixed with their year level, e.g. "10YG_1".
-     *
-     * TODO make this configurable
-     */
-    private const YEAR_LEVEL_GROUP_FOLDER_CODE_SUFFIX = 'YG_1';
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
@@ -184,22 +176,31 @@ class FolderFetcher
      *
      * @param User              $student
      * @param StudentAttributes $attributes
+     * @param string            $yearGroupClassCodeSuffix
      * @return Folder\Model|null
      */
-    public function findYearGroupFolder(User $student, StudentAttributes $attributes): ?Folder\Model
-    {
+    public function findYearGroupFolder(
+        User $student,
+        StudentAttributes $attributes,
+        string $yearGroupClassCodeSuffix
+    ): ?Folder\Model {
         $folders = $this->fetchFoldersWithInteractionsForStudent($student, $attributes);
 
-        // Only retain folders that are either current or rolled-over classes
-        $yearGroupCode = sprintf('%d%s', $attributes->getYearLevel(), self::YEAR_LEVEL_GROUP_FOLDER_CODE_SUFFIX);
+        // Only retain folders that are either current or rolled-over classes,
+        // and whose folder code matches the year group class code.
+        $yearGroupClassCode = sprintf('%d%s', $attributes->getYearLevel(), $yearGroupClassCodeSuffix);
+
+        // Try with current class codes, then with rolled-over codes
         foreach ($folders as $folder) {
             foreach ($folder->getCodes() as $code) {
-                if (!$code->isDeleted() && $code->getCode() === $yearGroupCode) {
+                if (!$code->isDeleted() && $code->getCode() === $yearGroupClassCode) {
                     return $folder;
                 }
             }
+        }
+        foreach ($folders as $folder) {
             foreach ($folder->getRolledOverCodes() as $code) {
-                if ($code === $yearGroupCode) {
+                if ($code === $yearGroupClassCode) {
                     return $folder;
                 }
             }

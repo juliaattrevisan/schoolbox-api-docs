@@ -21,6 +21,7 @@ use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -492,41 +493,44 @@ class Controller extends Web\Controller\Base
 
 
         // Extract dean's comment from a due work.
-        $fetcher         = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $yearGroupFolder = $fetcher->findYearGroupFolder($user, $attributes);
-        if ($yearGroupFolder) {
-            // Find the due work within this place
-            $dueWorksFound = false;
-            foreach ($semesters as $semester) {
-                $dueWorks = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                    $yearGroupFolder->getId(),
-                    $user,
-                    [
-                        // TODO replace with config
-                        'work_type' => 24,
-                        'term'      => (new TermModel())
-                            ->setStart($semester->getStart())
-                            ->setActualFinish($semester->getFinish())
-                    ]
-                );
-                /** @var IAssessable|null $dueWork */
-                $dueWork = $dueWorks->first();
-                if ($dueWork) {
-                    $dueWorksFound = true;
-                    $roleType      = $roleTypeOverride ?? $this->getUser()->getRole()->getType();
-                    if ($dueWork->isFeedbackVisibleToRoleType($roleType)) {
-                        $participant = $dueWork->getParticipantIfExtant($user);
-                        if ($participant) {
-                            $feedback = $participant->getAuthoritativeFeedback(true);
-                            if ($feedback) {
-                                $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+        $fetcher                  = new FolderFetcher($this->folderMapper, $this->externalUser);
+        $yearGroupClassCodeSuffix = $this->getConfigLoader()->get(Config::_TIGS_YEAR_GROUP_CLASS_CODE_SUFFIX);
+        if ($yearGroupClassCodeSuffix) {
+            $yearGroupFolder = $fetcher->findYearGroupFolder($user, $attributes, $yearGroupClassCodeSuffix);
+            if ($yearGroupFolder) {
+                // Find the due work within this place
+                $dueWorksFound = false;
+                foreach ($semesters as $semester) {
+                    $dueWorks = $this->assessmentMapperProxy->findAllByFolderIdForReview(
+                        $yearGroupFolder->getId(),
+                        $user,
+                        [
+                            'type'      => AssessmentType::TYPE_DUE_WORK,
+                            'work_type' => $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DEANS_COMMENT),
+                            'term'      => (new TermModel())
+                                ->setStart($semester->getStart())
+                                ->setActualFinish($semester->getFinish())
+                        ]
+                    );
+                    /** @var IAssessable|null $dueWork */
+                    $dueWork = $dueWorks->first();
+                    if ($dueWork) {
+                        $dueWorksFound = true;
+                        $roleType      = $roleTypeOverride ?? $this->getUser()->getRole()->getType();
+                        if ($dueWork->isFeedbackVisibleToRoleType($roleType)) {
+                            $participant = $dueWork->getParticipantIfExtant($user);
+                            if ($participant) {
+                                $feedback = $participant->getAuthoritativeFeedback(true);
+                                if ($feedback) {
+                                    $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+                                }
                             }
                         }
                     }
                 }
-            }
-            if ($dueWorksFound) {
-                return $deansComment;
+                if ($dueWorksFound) {
+                    return $deansComment;
+                }
             }
         }
 
