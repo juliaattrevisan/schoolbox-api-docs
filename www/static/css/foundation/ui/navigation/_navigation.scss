@@ -81,7 +81,7 @@ $off-canvas-overlay-background-hover: transparent;
 // Transition Variables
 $menu-slide: transform 100ms ease;
 
-@import "../../original-foundation/components/magellan";
+@import "magellan";
 @import "../../css-only/components/offcanvas";
 
 // Highlight color: is white if tab background is dark, contrasting if light
