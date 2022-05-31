@@ -196,6 +196,7 @@ class Gateway
                 AND el.lev_code = se.act_level
             LEFT JOIN ecudtable eu
                 ON eu.ud_code = se.ecud2_code
+                AND ea.act_type = eu.act_type
                 AND eu.cmpy_code = se.cmpy_code
                 AND eu.ref_code = '2'
         ";
