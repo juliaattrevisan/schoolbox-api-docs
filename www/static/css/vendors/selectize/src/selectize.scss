@@ -86,7 +86,6 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
 }
 
 @mixin selectize-box-shadow ($shadow) {
-    -webkit-box-shadow: $shadow;
     box-shadow: $shadow;
 }
 
