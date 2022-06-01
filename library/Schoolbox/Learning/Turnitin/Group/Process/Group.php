@@ -22,13 +22,13 @@ use Schoolbox\Learning\Turnitin\LogTrait;
  * just like we do for File.php; since transmission can break at any step
  * we need a way to just force it in
  *
- * This happens by finding the Submissino Box and getting its list of files
+ * This happens by finding the Submission Box and getting its list of files
  * at runtime, then micromanaging the diff with turnitin. It does this specifically
  * to avoid bottlenecking course imports and due work modifies, which would
- * result in hammering the turnitin api and maybe desyncing files due to failures
+ * result in hammering the Turnitin api and maybe desyncing files due to failures
  * with no recourse.
  *
- * Here, it follows the same flavour as turnitin files, giving you a chance
+ * Here, it follows the same flavour as Turnitin files, giving you a chance
  * to debug and reprocess them independently of their due works etc.
  */
 class Group
