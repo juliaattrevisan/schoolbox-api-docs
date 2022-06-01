@@ -58,6 +58,16 @@ class Controller extends ConfigController
      */
     private const FILENAME_MAX_LENGTH = 250;
 
+
+    /**
+     * This file contains an html fragment that represents the footer
+     * for all the generated summative reports. Schools wanting a custom
+     * theme or layout for their reports will require customisation of almost
+     * everything inside the templates folder
+     */
+    private const FOOTER_HTML = '/templates/footer.html';
+
+
     private UserMapper $userMapper;
 
     private TermMapper $termMapper;
@@ -285,6 +295,10 @@ class Controller extends ConfigController
                 ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
                 : null;
 
+            /* This $message instance is the payload that we send to taskd
+             * which it then unpacks, configures its Gotenberg client, and uses
+             * to generate the pdfs. This is the bridge between the systems
+             */
             $message = $messageFactory->build(
                 'download-pages',
                 [
@@ -294,6 +308,7 @@ class Controller extends ConfigController
                     'gotenberg' => [
                         'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         'auth' => $gotenbergAuth,
+                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
                     ],
                 ],
                 $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
@@ -306,7 +321,6 @@ class Controller extends ConfigController
                 ],
                 $this->getUser(),
             );
-
             $producer->send($message);
         }
         $this->getResponse()->content->set(

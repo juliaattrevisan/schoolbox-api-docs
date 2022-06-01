@@ -349,14 +349,12 @@
         white-space: pre-wrap;
     }
 
-
+    /* Apply measured margins to report. You can adjust those to suit
+     * tested printouts to ensure you don't print over edges and stuff
+     */
     @page {
-        counter-increment: page;
         size: A4 portrait; /* try and enforce portrait orientation */
-        margin: 0.25in;
-        @bottom-right {
-            content: 'Page ' counter(page) ' / ' counter(pages);
-        }
+        margin: 0.25in 0.25in 0.75in 0.25in;
     }
 
     @media print {
