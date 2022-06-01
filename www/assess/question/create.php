@@ -27,7 +27,7 @@ $groupHandler = new Group();
  */
 /** @var SitePage $this */
 if (!empty($_POST)) {
-    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
+    $returnUrl = ($_POST[Redirect::RETURN_URL] ?? '') !== '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);

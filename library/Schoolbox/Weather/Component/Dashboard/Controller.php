@@ -60,7 +60,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         /* If the api couldn't understand your location, set the component name to some default
          * otherwise it says "Weather In" and that's it
          */
-        $componentName = $this->weatherPayload['weatherLocation'] ?: 'Unknown Location';
+        $componentName = $this->weatherPayload['weatherLocation'] ?? 'Unknown Location';
 
         $this->setComponentName("Weather in {$componentName}");
 

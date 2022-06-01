@@ -2426,11 +2426,6 @@ parameters:
 			path: library/External/Tass/Helper.php
 
 		-
-			message: "#^Variable \\$longestDay might not be defined\\.$#"
-			count: 1
-			path: library/External/Tass/Timetable.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/External/Tass/User.php

@@ -49,15 +49,15 @@ class External_Schoolpro_User implements External_UserInterface
         if ($currentParent) {
             return [
                 'ContactID'            => $currentParent['ID'],
-                'ContactPreferred'     => $currentParent['FirstName'],
-                'ContactSurname'       => $currentParent['Surname'],
-                'ContactEmail'         => $currentParent['Email'],
-                'ContactMobile'        => $currentParent['Mobile'],
+                'ContactPreferred'     => $currentParent['FirstName'] ?? '',
+                'ContactSurname'       => $currentParent['Surname'] ?? '',
+                'ContactEmail'         => $currentParent['Email'] ?? '',
+                'ContactMobile'        => $currentParent['Mobile'] ?? '',
                 'SpouseID'             => $currentParent['SpouseID'],
-                'SpousePreferred'      => $currentParent['SpouseFirstName'],
-                'SpouseSurname'        => $currentParent['SpouseSurname'],
-                'SpouseEmail'          => $currentParent['SpouseEmail'],
-                'SpouseMobile'         => $currentParent['SpouseMobile'],
+                'SpousePreferred'      => $currentParent['SpouseFirstName'] ?? '',
+                'SpouseSurname'        => $currentParent['SpouseSurname'] ?? '',
+                'SpouseEmail'          => $currentParent['SpouseEmail'] ?? '',
+                'SpouseMobile'         => $currentParent['SpouseMobile'] ?? '',
                 'DirectoryIncludeFlag' => 1
             ];
         }
@@ -109,7 +109,7 @@ class External_Schoolpro_User implements External_UserInterface
                      * but the Contact doesn't have the Spouse's email ><
                      */
                     if ($currentStudentSpouse) {
-                        $emails[] = $currentStudentSpouse['email'];
+                        $emails[] = $currentStudentSpouse['email'] ?? '';
                     }
                 }
             }

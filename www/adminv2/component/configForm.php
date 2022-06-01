@@ -65,7 +65,7 @@ if (($_POST['type'] ?? '') == 'components') {
 
     // Was any one component requested?
     // If so render it only so it can be re-rendered
-    if ($_POST['movedComponentId']) {
+    if ($_POST['movedComponentId'] ?? false) {
         $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
         if (is_object($instance) === false) {
             exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
@@ -128,7 +128,7 @@ if (($_POST['type'] ?? '') == 'components') {
     // GET config options from homepage
     $config = $_GET;
 
-    /** @var Component_Instance $instance */
+    /** @var Component_Instance|null $instance */
     $instance = $componentInstanceMapper->findByInstanceId($config['component']);
 
     if (is_object($instance)) {

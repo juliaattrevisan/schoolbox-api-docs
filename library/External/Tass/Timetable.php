@@ -88,16 +88,25 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         /* Fetch the longest day to use as our day template...  */
         if ($day == 0) {
-            $query      = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
-            $longestDay = $this->getConnector()->executeQuery($query)->fetch();
+            $query  = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = :timetableCode AND cmpy_code = :campusCode ORDER BY prd_num DESC";
+            $params = [
+                'timetableCode' => $timetableCode,
+                'campusCode'    => $campusCode,
+            ];
+            $longestDay = $this->getConnector()->executeQuery($query, $params)->fetch();
             $day        = $longestDay['day_code'];
         }
 
         $query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
-                WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' AND day_code='$day'
+                WHERE tt_id = :timetableCode AND cmpy_code = :campusCode AND day_code= :day
                 ORDER BY prd_code";
+        $params = [
+            'timetableCode' => $timetableCode,
+            'campusCode'    => $campusCode,
+            'day'           => $day,
+        ];
 
-        $statement = $this->getConnector()->executeQuery($query);
+        $statement = $this->getConnector()->executeQuery($query, $params);
         $periodCount = 0;
         while ($period = $statement->fetch()) {
             $timetableDef['desc'][]   = $period['prd_desc'];
@@ -107,7 +116,7 @@ class External_Tass_Timetable implements External_TimetableInterface
             $periodCount++;
         }
 
-        $timetableDef['periodCount'] = $longestDay['prd_num'];
+        $timetableDef['periodCount'] = $longestDay['prd_num'] ?? $periodCount;
         $timetableDef['dayCount']    = $this->getDays($campus);
         return $timetableDef;
     }

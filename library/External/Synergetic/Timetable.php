@@ -457,7 +457,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
 
-        if (!is_array($timetableDef['desc'])) {
+        if (!is_array($timetableDef['desc'] ?? false)) {
             return [];
         }
 
@@ -695,7 +695,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         }
         $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
 
-        if (!is_array($timetableDef['desc'])) {
+        if (!is_array($timetableDef['desc'] ?? false)) {
             return [];
         }
 
