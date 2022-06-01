@@ -405,7 +405,7 @@ class Controller extends Base
 
     /**
      * Searches for a user based on a filter list
-     * param: {search: search basic term} {filter: extra parameters for determining how to filter the search results}
+     * param: {search: search basic term (optional)} {filter: extra parameters for determining how to filter the search results}
      *
      * @api /api/user
      * @link http://api.schoolbox.com.au/#operation/userSearch
@@ -415,22 +415,6 @@ class Controller extends Base
         $search = $this->request->query->get('search', '');
         $cursor = (int)$this->request->query->get('cursor', null);
         $limit = (int)$this->request->query->get('limit', 5);
-        if ('' === $search) {
-            $problem = (new ApiProblem('Search must not be blank'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early there is a malformed keyword for search
-        }
-        if (strlen($search) <= 2) {
-            $problem = (new ApiProblem('Search term must be longer than 2 characters'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early there is a malformed keyword for search
-        }
         /**
          * check if filter is an array or string and use it like that
          */
