@@ -175,9 +175,13 @@ class Group
                 Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
             );
 
+            $box = $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId());
+
             $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
-                'name' => $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId())->getName(),
-                'type' => self::GROUP_TYPE
+                'name' => $box->getName(),
+                'type' => self::GROUP_TYPE,
+                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $box->getDueDate()->getUnixTimeStamp()),
+                'report_generation' => Turnitin\File\Process\Transmit::REPORT_GENERATION_COLLUSION,
             ]);
 
             $turnitinGroup->setGroupId($group['id']);

@@ -50,7 +50,7 @@ class Transmit
      *
      * https://developers.turnitin.com/docs/tca#groups
      */
-    private const REPORT_GENERATION_COLLUSION = 'IMMEDIATELY_AND_DUE_DATE';
+    public const REPORT_GENERATION_COLLUSION = 'IMMEDIATELY_AND_DUE_DATE';
 
 
     /**
