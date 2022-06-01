@@ -23,7 +23,7 @@ class Helper
      * Find a user based on a keyword, for an AJAX response.
      * stripped and updated from `library/User.php`
      *
-     * @param string     $keyword
+     * @param string|null $keyword
      * @param array|null $filter
      * @param int|null   $limit
      * @param int|null   $cursor
