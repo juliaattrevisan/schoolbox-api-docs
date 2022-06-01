@@ -157,7 +157,7 @@
                     status = "Expires in " + data.expiry + " days";
                     light = "warning";
                     if (data.isCustomCert) {
-                        status = "Unmanaged" + status;
+                        status = "Unmanaged. " + status;
                     }
                     if (data.expiry < 7) {
                         light = "alert";
