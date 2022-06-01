@@ -286,7 +286,15 @@ HELP;
                     continue;
                 }
                 $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$newFolder}");
-                $forum->setCategory($folderMapper->findCheaplyById($newFolder));
+                try {
+                    $forum->setCategory($folderMapper->findCheaplyById($newFolder));
+                } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                    $this->getLogger()->warning("Folder: {$newFolder} has been Deleted");
+                    continue;
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $this->getLogger()->warning("Folder: {$newFolder} does not exist");
+                    continue;
+                }
                 if ($this->perform()) {
                     $this->getLogger()->notice("Moved Forum '{$title}' into folder {$newFolder}");
                     $threadMapper->save($forum);
@@ -323,7 +331,15 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                         continue;
                     }
                     $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$deliveredFolder}");
-                    $forum->setCategory($folderMapper->findCheaplyById($deliveredFolder));
+                    try {
+                        $forum->setCategory($folderMapper->findCheaplyById($deliveredFolder));
+                    } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                        $this->getLogger()->warning("Folder: {$deliveredFolder} has been Deleted");
+                        continue;
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $this->getLogger()->warning("Folder: {$deliveredFolder} does not exist");
+                        continue;
+                    }
                     if ($this->perform()) {
                         $this->getLogger()->notice("Moved Forum '{$title}' into folder {$deliveredFolder}");
                         $threadMapper->save($forum);
@@ -351,7 +367,15 @@ or to the correct Question Folder. For Forum: {$forum->getID()} then run this ag
                     continue;
                 }
                 $this->getLogger()->notice("Found Forum '{$title}' to move into folder {$newFolder}");
-                $forum->setCategory($folderMapper->findCheaplyById($newFolder));
+                try {
+                    $forum->setCategory($folderMapper->findCheaplyById($newFolder));
+                } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                    $this->getLogger()->warning("Folder: {$newFolder} has been Deleted");
+                    continue;
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $this->getLogger()->warning("Folder: {$newFolder} does not exist");
+                    continue;
+                }
                 if ($this->perform()) {
                     $this->getLogger()->notice("Moved Forum '{$title}' into folder {$newFolder}");
                     $threadMapper->save($forum);
