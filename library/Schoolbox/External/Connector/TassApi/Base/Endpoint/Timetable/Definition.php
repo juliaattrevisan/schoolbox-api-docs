@@ -162,7 +162,7 @@ class Definition implements IStrategy
             $cycleLength = $cycle['cycleLength'];
             $dayLength = $cycle['dayLength'];
             $cycleStart = $cycleConfiguration[$ttid]['cycleStart'] ?? \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
-            $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
+            $cycleEnd = $cycleConfiguration[$ttid]['cycleEnd'] ?? \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
             $dayStart = $cycleConfiguration[$ttid]['dayStart'] ?? self::CYCLE_DEFAULT_DAY_NUMBER;
 
             /* Unique constraint on sis_timetable_period
@@ -189,11 +189,12 @@ class Definition implements IStrategy
                 ->setStartDay($dayStart);
 
             $this->log->info(sprintf(
-                'Creating timetable cycle %s (%s) with day length %s, starting on %s with day number %s',
+                'Creating timetable cycle %s (%s) with day length %s, spanning [%s, %s] and starting with day number %s',
                 $timetableCycle->getId(),
                 $timetableCycle->getTitle(),
                 $timetableCycle->getDayLength(),
                 $cycleStart,
+                $cycleEnd,
                 $dayStart
             ));
 
@@ -299,6 +300,12 @@ class Definition implements IStrategy
                 continue;
             }
 
+            /* Remember the date furthest in the future, among all the records
+             * in the tt_calendar set. This should correspond to a cycle's actual
+             * end date since no more occurrences of $ttid occurs beyond that date.
+             */
+            $furthestDate = null;
+
             /*
              * Index the $timetableCalendar data by (ttid, value)
              * ensuring we only remember meaningful records:
@@ -321,6 +328,17 @@ class Definition implements IStrategy
                 if ($closestPast['VALUE'] < $current['VALUE'] && $current['VALUE'] <= $today) {
                     $closestPast = $current;
                 }
+
+                /* Remember the date furthest in the future, among all the records
+                 * in the tt_calendar set. This should correspond to a cycle's actual
+                 * end date since no more occurrences of $ttid occurs beyond that date.
+                 */
+                if (null === $furthestDate || $current['VALUE'] >= $furthestDate) {
+                    /* First record in the set
+                     * Or, we found a date even further in the future than we've ever seen
+                     */
+                    $furthestDate = $current['VALUE'];
+                }
             }
 
             if ('' !== $closestFuture['VALUE'] || '' !== $closestPast['VALUE']) {
@@ -332,6 +350,10 @@ class Definition implements IStrategy
                     /* Cycle start date
                      */
                     'cycleStart' => $record['VALUE'],
+
+                    /* Cycle end date
+                     */
+                    'cycleEnd' => $furthestDate,
 
                     /* Starting Day number
                      */
@@ -499,12 +521,6 @@ class Definition implements IStrategy
             /* Period scheme that we assume can apply universally
              */
             'periods' => $timetable['STRDAYS'],
-
-            /* There doesn't appear to be any info about cycles starting/ending at a particular
-             * datetime, so just presume the hardcoded defaults for now
-             */
-            'start' => self::CYCLE_START,
-            'finish' => self::CYCLE_END
         ]);
 
         $this->log->debug(sprintf(
