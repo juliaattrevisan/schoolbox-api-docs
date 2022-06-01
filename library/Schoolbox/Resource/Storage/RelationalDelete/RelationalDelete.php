@@ -281,8 +281,7 @@ class RelationalDelete implements IRelationalDelete
             // EOTC Meta data
             new \EOTC\RelationalDelete(
                 \EOTC\EventMetadataMapper::getInstance(),
-                $this->logger,
-                ''
+                $this->logger
             ),
         ];
     }
