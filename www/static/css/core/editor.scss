@@ -1,6 +1,7 @@
 $cdn-prefix: '../../';
 
 //@import "utils/skin";
+@import "utils/reset";
 @import "utils/colors";
 @import "utils/variables";
 @import "utils/mixins";
@@ -9,7 +10,6 @@ $cdn-prefix: '../../';
 @import "utils/settings";
 @import "utils/icons";
 
-@import "base/reset";
 @import "base/global";
 @import "base/typography";
 @import "ui/content";

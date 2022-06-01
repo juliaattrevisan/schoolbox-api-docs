@@ -7,6 +7,7 @@
 $cdn-prefix: "../..";
 
 // Utils
+@import "utils/reset";
 @import "utils/colors";
 @import "utils/font-faces";
 @import "utils/variables";
@@ -17,7 +18,6 @@ $cdn-prefix: "../..";
 @import "utils/skeleton";
 
 // Base
-@import "base/reset";
 @import "base/global";
 @import "base/typography";
 
