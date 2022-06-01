@@ -58,6 +58,11 @@ class ExpiryTool extends CliTool\App
         ];
     }
 
+    /** @inheritDoc */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
 
     /**
      * Run the cli tool
@@ -114,10 +119,10 @@ HELP;
 
         /* Otherwise, start doing the stuff
          */
+        $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
         if ($this->perform()) {
             /* In Perform mode, blow them away
              */
-            $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
 
             foreach ($items as $item) {
                 $lock->refresh();
@@ -129,6 +134,7 @@ HELP;
              */
             foreach ($items as $item) {
                 $lock->refresh();
+                $relationalDelete->remove($item->getHash(), true);
 
                 $this->getLogger()->debug(sprintf(
                     '%s: %s -  expired on %s',
