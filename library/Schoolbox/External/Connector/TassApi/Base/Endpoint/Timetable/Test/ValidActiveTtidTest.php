@@ -118,6 +118,73 @@ class ValidActiveTtidTest extends TestCase
 
 
     /**
+     * Sampled from an actual school
+     */
+    private const TTCALENDAR_GAP = [
+        [
+            'CAT_NUM' => '',
+            'CMPY_CODE' => '01',
+            'TTDATE' => '2022-05-26 00:00:00.0',
+            'RECORD_ID' => '47050',
+            'LABEL' => 'Thu 26/05/2022',
+            'ID' => '39-2022-05-26',
+            'TABLE_ID' => 'ttcalendar',
+            'VALUE' => '2022-05-26',
+            'TT_ID' => '39',
+            'DAY_CODE' => '9',
+        ],
+        [
+            'CAT_NUM' => '',
+            'CMPY_CODE' => '01',
+            'TTDATE' => '2022-05-27 00:00:00.0',
+            'RECORD_ID' => '47051',
+            'LABEL' => 'Fri 27/05/2022',
+            'ID' => '39-2022-05-27',
+            'TABLE_ID' => 'ttcalendar',
+            'VALUE' => '2022-05-27',
+            'TT_ID' => '39',
+            'DAY_CODE' => '10',
+        ],
+        [
+            'CAT_NUM' => '',
+            'CMPY_CODE' => '01',
+            'TTDATE' => '2022-05-30 00:00:00.0',
+            'RECORD_ID' => '47054',
+            'LABEL' => 'Mon 30/05/2022',
+            'ID' => '39-2022-05-30',
+            'TABLE_ID' => 'ttcalendar',
+            'VALUE' => '2022-05-30',
+            'TT_ID' => '39',
+            'DAY_CODE' => '1',
+        ],
+        [
+            'CAT_NUM' => '',
+            'CMPY_CODE' => '01',
+            'TTDATE' => '2022-05-31 00:00:00.0',
+            'RECORD_ID' => '47055',
+            'LABEL' => 'Tue 31/05/2022',
+            'ID' => '39-2022-05-31',
+            'TABLE_ID' => 'ttcalendar',
+            'VALUE' => '2022-05-31',
+            'TT_ID' => '39',
+            'DAY_CODE' => '2',
+        ],
+        [
+            'CAT_NUM' => '',
+            'CMPY_CODE' => '01',
+            'TTDATE' => '2022-06-01 00:00:00.0',
+            'RECORD_ID' => '47056',
+            'LABEL' => 'Wed 01/06/2022',
+            'ID' => '39-2022-06-01',
+            'TABLE_ID' => 'ttcalendar',
+            'VALUE' => '2022-06-01',
+            'TT_ID' => '39',
+            'DAY_CODE' => '3',
+        ],
+    ];
+
+
+    /**
      * @dataProvider providerValidActiveTtid
      * @param array  $ttCalendar
      * @param string $date
@@ -160,6 +227,12 @@ class ValidActiveTtidTest extends TestCase
                 true,
             ],
 
+            'Active Example 4 (discontiguous ttCalendar set)' => [
+                self::TTCALENDAR_GAP,
+                '2022-05-28',
+                true,
+            ],
+
             /* These configurations indicate $ttid is inactive
              */
             'Inactive Example 1 ($now is outside of ttCalendar set)' => [
@@ -189,6 +262,12 @@ class ValidActiveTtidTest extends TestCase
             'Inactive Example 5 (ttCalendar set is empty)' => [
                 [],
                 '2022-12-01',
+                false,
+            ],
+
+            'Inactive Example 6 (discontiguous ttCalendar set)' => [
+                self::TTCALENDAR_GAP,
+                '2022-07-20',
                 false,
             ],
         ];
