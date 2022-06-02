@@ -4,10 +4,11 @@
 
     We had previously used normalize (github.com/necolas/normalize.css) 
     But it hasn't been updated in over five years and browsers have moved
-    on quite a bit since then. 
+    on quite a bit since then. Addtionally, Foundation itself pretty
+    aggresively sets evertything to how it sees fit. 
 
-    
-
+    In addition to the styles within here, _global.scss also adds some
+    additional base resets linked mainly to $property values. 
 */
 
 /*
@@ -35,7 +36,7 @@ html, body {
 */
 body {
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;/*  */
+    -webkit-font-smoothing: antialiased;
 }
 /*
   6. Improve media defaults
