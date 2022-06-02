@@ -190,13 +190,20 @@ class CommandLineTool extends App
             $student = $assessmentFilesTuple['student'];
             usort($assessmentFilesTuple['files'], [$this, 'fileSort']);
             foreach (array_values($assessmentFilesTuple['files']) as $j => $file) {
-                /** @var IStorage $file */
-                $yearLevel  = $student->getYear()->getName();
-                $externalId = $student->getExternalId();
-                $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
+                /** @var IStorage $storage */
+                $storage     = $file['storage'];
+                $fileContent = null;
+                $yearLevel   = $student->getYear()->getName();
+                $externalId  = $student->getExternalId();
+                $filename    = $file['filename'] . '.' . $file['storage']->getExtension();
+                if ($storage->getMime() === 'text/html') {
+                    $filename    = $file['filename'] . '.pdf';
+                    $fileContent = $this->convertToPdf($filename, $storage->read());
+                    $storage     = null;
+                }
                 $files[]    = [
-                    'file'        => $file['storage'],
-                    'fileContent' => null,
+                    'file'        => $storage,
+                    'fileContent' => $fileContent,
                     'filename'    => $filename,
                     'filemtime'   => $file['filemtime'],
                     'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
@@ -266,7 +273,7 @@ class CommandLineTool extends App
      * This only fetches the files from the most recent response.
      *
      * @param IAssessable $assessment
-     * @return array<int, array{storage: IStorage, filename: string, filemtime: int}>
+     * @return array<int, array{storage: IStorage, filename: string, filemtime: int, comment:string|null}>
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
@@ -350,7 +357,7 @@ class CommandLineTool extends App
      */
     private function convertToPdf(string $filename, string $input): string
     {
-        $this->getLogger()->info(sprintf('Converting file "%filename" to PDF', $filename));
+        $this->getLogger()->info(sprintf('Converting file "%s" to PDF', $filename));
         $document = DocumentFactory::makeFromString($filename, $input);
         $request  = new HTMLRequest($document);
         $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
