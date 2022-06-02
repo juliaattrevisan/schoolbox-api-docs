@@ -167,6 +167,13 @@ class RelationalDelete implements IRelationalDelete
                 $this->logger
             ),
 
+            // Task
+            new Deletable(
+                \Schoolbox\Assessment\Course\Task\File\Mapper::getInstance(),
+                $this->logger,
+                'storage_id'
+            ),
+
             // Video Queue
             new Deletable(
                 \Schoolbox\Video\QueueMapper::getInstance(),
@@ -177,6 +184,13 @@ class RelationalDelete implements IRelationalDelete
             new Deletable(
                 \Schoolbox\Resource\File\Mapper::getInstance(),
                 $this->logger
+            ),
+
+            // News
+            new Deletable(
+                \Schoolbox\Comms\News\File\Mapper::getInstance(),
+                $this->logger,
+                'storage_id'
             ),
         ];
     }
@@ -246,6 +260,28 @@ class RelationalDelete implements IRelationalDelete
                 $this->logger,
                 ['portrait'],
                 'portrait_hash'
+            ),
+
+            // Badge
+            new Nullable(
+                \Schoolbox\Learning\Badge\Mapper::getInstance(),
+                $this->logger,
+                ['image'],
+                'image_hash'
+            ),
+
+            // Evidence
+            new Nullable(
+                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
+                $this->logger,
+                ['storage'],
+                'hash'
+            ),
+
+            // EOTC Meta data
+            new \EOTC\RelationalDelete(
+                \EOTC\EventMetadataMapper::getInstance(),
+                $this->logger
             ),
         ];
     }
