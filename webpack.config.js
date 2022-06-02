@@ -199,6 +199,7 @@ module.exports = {
         userBulkModify:  './library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js',
         adminList: './library/Schoolbox/Admin/Lists/templates/vue/adminList.js',
         saveAdminSettings: './library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js',
+        shapsList: './library/Schoolbox/Admin/SHAPS/vue/shapsList.js',
         usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
         usageSpecific: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js',
 

@@ -224,6 +224,43 @@ class HelpRequest
         return $this->authParams->getServerUrl();
     }
 
+    public function provisionUserParticipation($userIds, $courseIds)
+    {
+        $users       = $this->userMapper->findByColumn('id', $userIds);
+        $userPayload = array_combine($users->getPropertyValues('email'), array_fill(0, $users->count(), true));
+        $coursePayload = array_combine($courseIds,array_fill(0, count($courseIds), $userPayload));
+        $data    = [];
+
+        try {
+            $this->execute('post', 'cources', ['course' => $coursePayload], ['byUsername' => '1']);
+            $code    = 200;
+            $message = 'OK';
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (ClientException|Exception\UnexpectedResponseException|ConnectException|TooManyRedirectsException $e) {
+            // 400: empty payload (should never get this) or some users failed
+            $code    = 400;
+            $message = 'Bad Request';
+            if ($e->getResponse()) {
+                try {
+                    $data = json_decode($e->getResponse()->getBody()->getContents());
+                } catch (\RuntimeException $e) {
+                    // Not much we can do here.
+                }
+            }
+        } catch (GuzzleException $e) {
+            // any other exception
+            $code    = 500;
+            $message = 'Internal Server Error';
+        }
+        // Build response
+        return [
+            'data'   => $data,
+            'status' => [
+                'code'    => $code,
+                'message' => $message,
+            ],
+        ];
+    }
 
     /**
      * Provision users

@@ -14,8 +14,12 @@ use Alaress\Web\Controller\Base;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Campus;
+use Schoolbox\CampusMapper;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Collection;
 use Custom\Help\CourseParticipation;
 use InvalidArgumentException;
 
@@ -24,7 +28,12 @@ class Controller extends Base
     /**
      * @var UserMapper
      */
-    private $userMapper;
+    private UserMapper $userMapper;
+
+    private CampusMapper $campusMapper;
+
+    private RoleMapper $roleMapper;
+
 
     /**
      * A telephone to help.schoolbox.com.au so we can ask it things
@@ -40,9 +49,16 @@ class Controller extends Base
      * @param UserMapper      $userMapper
      * @param Auth\Parameters $authParams
      */
-    public function __construct(UserMapper $userMapper, Auth\Parameters $authParams)
+    public function __construct(
+        UserMapper $userMapper,
+        CampusMapper $campusMapper,
+        RoleMapper $roleMapper,
+        Auth\Parameters $authParams
+    )
     {
         $this->userMapper  = $userMapper;
+        $this->campusMapper = $campusMapper;
+        $this->roleMapper = $roleMapper;
         $this->helpRequest = new HelpRequest($authParams, $this->userMapper);
     }
 
@@ -51,15 +67,50 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getAllStaff(): Collection
+    public function getAllStaff()
     {
+        try {
+            $provisionedUsers = $this->helpRequest->users();
+            $enrolements = $this->helpRequest->findEnrolments();
+        } catch (GuzzleException $e) {
+            $provisionedUsers = [];
+            $enrolements = [];
+
+        }
         // All the staff in our Schoolbox instance
-        return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
+        $users = $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
             'order' => [
                 'lastname' => 'asc',
                 'firstname' => 'asc'
             ]
         ]);
+        $campusList = $this->campusMapper->findAll()->indexBy('id');
+        $userList = [];
+        foreach ($users as $user) {
+            $campuses = $user->getCampusCollection()->map(
+                function (Campus $campus) use ($campusList) {
+                    return $campusList->offsetGet($campus->getId())->getName();
+                }
+            )->getAll();
+            $courses = [];
+            foreach ($enrolements as $enrolement) {
+                if (in_array($user->getId(), $enrolement['participants'])) {
+                    $courses[$enrolement['folderId']] = $enrolement['folderName'];
+                }
+            }
+            $userList[] = [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstname(),
+                'lastname'  => $user->getLastname(),
+                'external_id' => $user->getExternalId(),
+                'campuses' => array_values($campuses),
+                'role'     => $user->getRole()->getName(),
+                'courses'  => $courses,
+                'provisioned' => (int)array_key_exists($user->getId(), $provisionedUsers)
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($userList));
     }
 
     /**
@@ -102,35 +153,62 @@ class Controller extends Base
     {
         $title = 'Schoolbox Help Staff Provisioning';
 
-        try {
-            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
-        } catch (GuzzleException $e) {
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@shaps/provisioning/index.twig', [
-                    'pageCurrent' => $this->router->generate('shaps.getAll'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
-                    'errorMessage' => $this->getReasonPhrase($e)
-                ])->setTitle($title)
-            );
-            return;
+//        try {
+//            $provisionedUsers = $this->helpRequest->findProvisionedUsers();
+//        } catch (GuzzleException $e) {
+//            $this->getResponse()->content->set(
+//                $this->buildHtmlOutput('@shaps/provisioning/index.twig', [
+//                    'pageCurrent' => $this->router->generate('shaps.getAll'),
+//                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
+//                    'errorMessage' => $this->getReasonPhrase($e)
+//                ])->setTitle($title)
+//            );
+//            return;
+//        }
+//
+//        $errors = [];
+//        $allStaff = $this->getAllStaff();
+//        foreach ($allStaff as $user) {
+//            $errors[$user->getId()] = $this->getInvalidities($user);
+//        }
+        $campusList = $this->campusMapper->findAll()->sortBy('sequence', 'ASC');
+        $campuses   = [];
+        foreach ($campusList as $campus) {
+            $campuses[] = [
+                'id'   => $campus->getId(),
+                'name' => $campus->getName(),
+            ];
+        }
+        $roleList = $this->roleMapper->findByColumn('group_type', Role::STAFF)->sortBy('sequence', 'ASC');
+        $roles    = [];
+        foreach ($roleList as $role) {
+            $roles[] = [
+                'id'   => $role->getId(),
+                'name' => $role->getName(),
+            ];
         }
 
-        $errors = [];
-        $allStaff = $this->getAllStaff();
-        foreach ($allStaff as $user) {
-            $errors[$user->getId()] = $this->getInvalidities($user);
+        $courses = [];
+        try {
+            $courseList = $this->helpRequest->courses();
+            foreach ($courseList as $course) {
+                $courses[] = [
+                    'id' => $course['folderId'],
+                    'name' => $course['folderName'],
+                ];
+            }
+        } catch (GuzzleException $e) {
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioning/index.twig',
+                '@shaps/index.twig',
                 [
                 'pageCurrent' => $this->router->generate('shaps.getAll'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
-                'allUsers' => $allStaff,
-                'provisionedUsers' => $provisionedUsers,
-                'errors' => $errors,
-                'errorMessage' => null,
+                'campuses'       => $campuses,
+                'roles'          => $roles,
+                'courses'        => $courses,
                 ]
             )->setTitle($title)
         );
@@ -165,7 +243,7 @@ class Controller extends Base
             return;
         }
 
-        $allStaff = $this->getAllStaff();
+        $allStaff = [];
         $errors = [];
         foreach ($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
@@ -212,7 +290,7 @@ class Controller extends Base
             return;
         }
 
-        $allStaff = $this->getAllStaff();
+        $allStaff = []; //$this->getAllStaff();
         $errors = [];
         foreach ($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
@@ -426,7 +504,17 @@ class Controller extends Base
      */
     public function postProvision(): void
     {
-        $response = $this->helpRequest->provisionUsers($this->request->post->get('userId'));
+        $userIds = $this->request->post->get('users');
+        $courseIds = $this->request->post->get('courseIds');
+        $provision = $this->request->post->get('provisioned');
+
+
+
+        $response = $this->helpRequest->provisionUsers($userIds);
+
+        if (!empty($courseIds)) {
+            $response2 = $this->helpRequest->provisionUserParticipation($userIds, $courseIds);
+        }
 
         // Build response
         $this->response->status->set($response['status']['code']);
