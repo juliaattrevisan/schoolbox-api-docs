@@ -164,6 +164,16 @@ class ResourcesMyFilesPicker
     }
 
     /**
+     * clicks to take a picture
+     * @throws Exception
+     */
+    public function clickCameraPhotoButton(): void
+    {
+        $this->tester->waitForElementVisible('button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera', 5);
+        $this->tester->click('button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera');
+    }
+
+    /**
      * @param string $fileName
      * type a file name
      */

@@ -6,7 +6,10 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Page\ModalFilePicker\ResourcesMyFilesPicker;
+namespace Page\ModalFilePicker;
+
+use AcceptanceTester;
+use Exception;
 
 class UpoloadFilesCest
 {
@@ -47,7 +50,7 @@ class UpoloadFilesCest
         $resources = new ResourcesMyFilesPicker($i);
         $i->amGoingTo("click the Admin folder in the resources page");
         $resources->clickFolder(57);
-        $i->amGoingTo("click the attach zone tp upload files via modal");
+        $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Resources folder on the modal");
         $resources->clickResources();
@@ -89,7 +92,7 @@ class UpoloadFilesCest
         $resources = new ResourcesMyFilesPicker($i);
         $i->amGoingTo("click the Admin folder in the resources page");
         $resources->clickFolder(57);
-        $i->amGoingTo("click the attach zone tp upload files via modal");
+        $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click My Files folder on the modal");
         $resources->clickMyFiles();
@@ -114,7 +117,7 @@ class UpoloadFilesCest
         $resources = new ResourcesMyFilesPicker($i);
         $i->amGoingTo("click the Admin folder in the resources page");
         $resources->clickFolder(57);
-        $i->amGoingTo("click the attach zone tp upload files via modal");
+        $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Recording on the modal and then click Audio button");
         $resources->clickRecording();
@@ -128,6 +131,70 @@ class UpoloadFilesCest
         $resources->clickUploadButton();
         $resources->typeName('testAudioAutomation');
         $resources->clickSubmitButton();
-        $i->waitForText('testAudioAutomation2', 3);
+        $i->waitForText('testAudioAutomation', 3);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on resources page
+     * click the admin folder
+     * click the attachment zone
+     * on the modal click Recording
+     * click video
+     * ensure the file is presented under the admin folder
+     */
+    public function attachFilesByRecordingAVideo(AcceptanceTester $i)
+    {
+        $resources = new ResourcesMyFilesPicker($i);
+        $i->amGoingTo("click the Admin folder in the resources page");
+        $resources->clickFolder(57);
+        $i->amGoingTo("click the attach zone to upload files via modal");
+        $resources->clickAttachmentZone();
+        $i->amGoingTo("click Recording on the modal and then click Video button");
+        $resources->clickRecording();
+        $resources->clickVideo();
+        $i->amGoingTo("click the button to start recording and wait 10 seconds to record the video");
+        $resources->clickStartAudioVideoButton();
+        $i->wait(10);
+        $i->amGoingTo("click the button to stop recording");
+        $resources->clickStopAudioVideoButton();
+        $i->amGoingTo("click the Upload button, type a file name and submit it");
+        $resources->clickUploadButton();
+        $resources->typeName('testVideoAutomation');
+        $resources->clickSubmitButton();
+        $i->waitForText('testVideoAutomation', 3);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on resources page
+     * click the admin folder
+     * click the attachment zone
+     * on the modal click Recording
+     * click Photo
+     * ensure the file is presented under the admin folder
+     */
+    public function attachFilesByTakingPhoto(AcceptanceTester $i)
+    {
+        $resources = new ResourcesMyFilesPicker($i);
+        $i->amGoingTo("click the Admin folder in the resources page");
+        $resources->clickFolder(57);
+        $i->amGoingTo("click the attach zone to upload files via modal");
+        $resources->clickAttachmentZone();
+        $i->amGoingTo("click Recording on the modal and then click Photo button");
+        $resources->clickRecording();
+        $resources->clickPhoto();
+        $i->amGoingTo("click the button to take a picture");
+        $resources->clickCameraPhotoButton();
+        $i->wait(2);
+        $i->amGoingTo("click the Upload button, type a file name and submit it");
+        $resources->clickUploadButton();
+        $resources->typeName('testPhotoAutomation');
+        $resources->clickSubmitButton();
+        $i->waitForText('testPhotoAutomation', 3);
     }
 }
