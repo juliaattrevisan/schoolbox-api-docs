@@ -79,15 +79,22 @@ class Group
 
 
     /**
+     * @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy
+     */
+    private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy;
+
+
+    /**
      * Constructor.
      *
-     * @param string                           $instanceIdentifier
-     * @param Turnitin\Api                     $api
-     * @param Turnitin\Group\Mapper            $turnitinGroupMapper
-     * @param Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper
-     * @param SubmissionBoxMapper              $submissionBoxMapper
-     * @param SubmissionBox\SingleFile\Mapper  $submissionBoxFileMapper
-     * @param LoggerInterface|null             $log
+     * @param string                                               $instanceIdentifier
+     * @param Turnitin\Api                                         $api
+     * @param Turnitin\Group\Mapper                                $turnitinGroupMapper
+     * @param Turnitin\Group\Attachment\Mapper                     $turnitinGroupAttachmentMapper
+     * @param SubmissionBoxMapper                                  $submissionBoxMapper
+     * @param SubmissionBox\SingleFile\Mapper                      $submissionBoxFileMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy
+     * @param LoggerInterface|null                                 $log
      */
     public function __construct(
         string $instanceIdentifier,
@@ -96,6 +103,7 @@ class Group
         Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper,
+        \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         ?LoggerInterface $log = null
     ) {
         $this->instanceIdentifier = $instanceIdentifier;
@@ -104,6 +112,7 @@ class Group
         $this->turnitinGroupAttachmentMapper = $turnitinGroupAttachmentMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionBoxFileMapper = $submissionBoxFileMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->log = $log;
     }
 
@@ -177,10 +186,14 @@ class Group
 
             $box = $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId());
 
+            /* Fish out due dates from the official Assessment table
+             */
+            $assessment = $this->assessmentMapperProxy->findById($box->getAssessmentId());
+
             $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
                 'type' => self::GROUP_TYPE,
-                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $box->getDueDate()->getUnixTimeStamp()),
+                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $assessment->getDueAt()->getUnixTimeStamp()),
                 'report_generation' => Turnitin\File\Process\Transmit::REPORT_GENERATION_COLLUSION,
             ]);
 
