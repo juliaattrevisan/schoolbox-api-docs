@@ -129,10 +129,11 @@ class CommandLineTool extends App
                     'storage'   => $file,
                     'filename'  => $file->getTitle(),
                     'filemtime' => $file->getModifiedAt()->getUnixTimeStamp(),
+                    'comment'   => null,
                 ];
             }
 
-            // Collate assessment feedback files, but only for assessments which
+            // Collate assessment response files, but only for assessments which
             // are within one of the NCCD information courses.
             $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
             foreach ($assessments as $assessment) {
@@ -251,12 +252,18 @@ class CommandLineTool extends App
             if ($response instanceof DueWorkResponse) {
                 // Is there a file here?
                 if ($response->getAllFiles()->count()) {
+                    $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                     foreach ($response->getAllFiles() as $file) {
                         $files[$file->getId()] = [
                             'storage'   => $file,
                             'filename'  => $file->getFilename(),
                             'filemtime' => $response->getSubmittedAt()->getUnixTimeStamp(),
+                            'comment'   => $feedback
+                                ? $feedback->getComment()
+                                : null,
                         ];
+                        // Only attach comment to the first file in the response
+                        $feedback = null;
                     }
                 }
             }
