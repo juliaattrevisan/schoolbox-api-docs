@@ -421,3 +421,18 @@ $visibility-breakpoint-queries:
   }
   }
 }
+
+// Hide/Show things
+.show {
+    display: block;
+}
+
+// Hide visually and from screen readers
+.hide {
+    display: none !important;
+}
+
+// Hide visually and from screen readers, but maintain layout
+.invisible {
+    visibility: hidden;
+}

@@ -9,10 +9,6 @@ $container-bg: white !default;
 @import "../utils/visibility";
 @import "thumbs";
 
-// if an image has no src, hide it.
-img[src=""] {
-    display: none;
-}
 
 .align-middle {
     vertical-align: middle;
@@ -119,16 +115,6 @@ img[src=""] {
         padding: rem-calc(($base-font-size - 2));
         transition: max-height 0.3s ease-in;
     }
-}
-
-// Hide/Show things
-.show {
-    display: block;
-}
-.hide {
-    // Restore !important from Foundation 5.5.0.
-    // We've come too far with it to manage without it!
-    display: none !important;
 }
 
 // Disabled elements
