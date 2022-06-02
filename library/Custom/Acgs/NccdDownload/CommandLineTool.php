@@ -172,6 +172,7 @@ class CommandLineTool extends App
          * @var array<int, array{
          *     file:IStorage|null,
          *     fileContent:string|null,
+         *     mimetype:string,
          *     filename:string,
          *     path:string,
          *     filemtime:int
@@ -183,12 +184,15 @@ class CommandLineTool extends App
             $student = $folderFilesTuple['student'];
             usort($folderFilesTuple['files'], [$this, 'fileSort']);
             foreach (array_values($folderFilesTuple['files']) as $i => $file) {
+                /** @var IStorage $storage */
+                $storage    = $file['storage'];
                 $yearLevel  = $student->getYear()->getName();
                 $externalId = $student->getExternalId();
-                $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
+                $filename   = $file['filename'] . '.' . $storage->getExtension();
                 $files[]    = [
-                    'file'        => $file['storage'],
+                    'file'        => $storage,
                     'fileContent' => null,
+                    'mimetype'    => $storage->getMime(),
                     'filename'    => $filename,
                     'filemtime'   => $file['filemtime'],
                     'path'        => sprintf('%s/%s_%d_%s', $yearLevel, $externalId, $i + 1, $filename),
@@ -201,31 +205,25 @@ class CommandLineTool extends App
             usort($assessmentFilesTuple['files'], [$this, 'fileSort']);
             foreach (array_values($assessmentFilesTuple['files']) as $j => $file) {
                 /** @var IStorage $storage */
-                $storage     = $file['storage'];
-                $fileContent = null;
-                $yearLevel   = $student->getYear()->getName();
-                $externalId  = $student->getExternalId();
-                $filename    = $file['filename'] . '.' . $file['storage']->getExtension();
-                if ($storage->getMime() === 'text/html') {
-                    $filename    = $file['filename'] . '.pdf';
-                    $fileContent = $this->convertToPdf($filename, $storage->read());
-                    $storage     = null;
-                }
+                $storage    = $file['storage'];
+                $yearLevel  = $student->getYear()->getName();
+                $externalId = $student->getExternalId();
+                $filename   = $file['filename'] . '.' . $storage->getExtension();
                 $files[]    = [
                     'file'        => $storage,
-                    'fileContent' => $fileContent,
+                    'fileContent' => null,
+                    'mimetype'    => $storage->getMime(),
                     'filename'    => $filename,
                     'filemtime'   => $file['filemtime'],
                     'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
                 ];
                 $comment = $file['comment'] ?? '';
                 if ($comment !== '') {
-                    // Comments are text: convert them to PDF
-                    $filename    = $file['filename'] . '_comment.pdf';
-                    $fileContent = $this->convertToPdf($filename, nl2br($comment));
-                    $files[]     = [
+                    $filename = $file['filename'] . '_comment.html';
+                    $files[]  = [
                         'file'        => null,
-                        'fileContent' => $fileContent,
+                        'fileContent' => nl2br($comment),
+                        'mimetype'    => 'text/html',
                         'filename'    => $filename,
                         'filemtime'   => $file['filemtime'],
                         'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
@@ -241,7 +239,8 @@ class CommandLineTool extends App
             exit(1);
         }
         foreach ($files as $fileTuple) {
-            $logger->info(sprintf('Adding file "%s" to "%s"', $fileTuple['filename'], $fileTuple['path']));
+            $path = $fileTuple['path'];
+            $logger->info(sprintf('Adding file "%s" to "%s"', $fileTuple['filename'], $path));
 
             // Read file content: raise a warning if it couldn't be added.
             // (If debug is on: give a hint where it might be found on prod)
@@ -249,7 +248,7 @@ class CommandLineTool extends App
             $file        = $fileTuple['file'];
             $fileContent = $file ? $file->read() : ($fileTuple['fileContent'] ?? false);
             if ($fileContent === false) {
-                $logger->warning(sprintf('Could not add file "%s" to "%s": skipping', $fileTuple['filename'], $fileTuple['path']));
+                $logger->warning(sprintf('Could not add file "%s" to "%s": skipping', $fileTuple['filename'], $path));
                 if ($file) {
                     $logger->debug(
                         sprintf(
@@ -263,17 +262,27 @@ class CommandLineTool extends App
                 continue;
             }
 
-            // TODO move PDF conversion here
+            // Convert this to PDF if it's HTML
+            if ($fileTuple['mimetype'] === 'text/html') {
+                $this->getLogger()->info(sprintf('Converting file "%s" to PDF', $path));
+                // Convert extension
+                $path        = sprintf(
+                    '%s/%s.pdf',
+                    pathinfo($path, PATHINFO_DIRNAME),
+                    pathinfo($path, PATHINFO_FILENAME),
+                );
+                $fileContent = $this->convertToPdf($path, $fileContent);
+            }
 
             // Add file: exit if it couldn't be added
-            if (!$zip->addFromString($fileTuple['path'], $fileContent)) {
+            if (!$zip->addFromString($path, $fileContent)) {
                 $logger->error(
                     sprintf('Could not add file "%s" to ZIP (%s)', $fileTuple['filename'], $zip->getStatusString()),
                 );
                 $zip->close();
                 exit(1);
             }
-            $zip->setMtimeName($fileTuple['path'], $fileTuple['filemtime']);
+            $zip->setMtimeName($path, $fileTuple['filemtime']);
         }
         $zip->close();
     }
@@ -369,7 +378,6 @@ class CommandLineTool extends App
      */
     private function convertToPdf(string $filename, string $input): string
     {
-        $this->getLogger()->info(sprintf('Converting file "%s" to PDF', $filename));
         $document = DocumentFactory::makeFromString($filename, Scrub::htmlAbsoluteUri($input, $this->baseUri));
         $request  = new HTMLRequest($document);
         $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
