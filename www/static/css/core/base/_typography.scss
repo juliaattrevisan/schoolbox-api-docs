@@ -514,13 +514,22 @@ $align-class-breakpoints:
 
         h2,
         h3 { page-break-after: avoid; }
+
+        /* Remove display of links to places, when printing
+           */
+        a[href*="/"]:after,
+        a[href*="/"]:visited:after {
+            content: normal;
+        }
       }
     }
 
   }
 }
 
-//CUSTOM OVERRIDES
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
 
 // Heading 1
 h1 {
@@ -623,15 +632,6 @@ blockquote {
 // .info.card is not the same thing as .info
 .info:not(.card) {
   color: $info-color;
-}
-
-@media print {
-  /* Remove display of links to places, when printing
-   */
-  a[href*="/"]:after,
-  a[href*="/"]:visited:after {
-    content: normal;
-  }
 }
 
 .noselect {
