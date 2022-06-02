@@ -20,8 +20,10 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Scrub;
 use TheCodingMachine\Gotenberg\DocumentFactory;
 use TheCodingMachine\Gotenberg\GotenbergClientInterface;
 use TheCodingMachine\Gotenberg\HTMLRequest;
@@ -60,6 +62,13 @@ class CommandLineTool extends App
     private const SORT_ORDER = ['filemtime', 'id'];
 
     /**
+     * Base URI, for use when generating PDFs: HTML uploads may contain
+     * relative URIs, we need to provide a base URI so that they may be made
+     * absolute.
+     */
+    private string $baseUri;
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -79,8 +88,7 @@ class CommandLineTool extends App
             exit(1);
         }
 
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $this->baseUri = (new UrlFactory($this->getConfig()))->buildFullyQualified()->toString();
 
         // Find every folder which imports the NCCD Information course
         $params = Builder::getArrayPlaceholders(self::COURSE_IDS);
@@ -138,7 +146,9 @@ class CommandLineTool extends App
 
             // Collate assessment response files, but only for assessments which
             // are within one of the NCCD information courses.
-            $assessments = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
+            /** @var MapperProxy $assessmentDataSource */
+            $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+            $assessments          = $assessmentDataSource->findAllByFolderIdForReview($row['id']);
             foreach ($assessments as $assessment) {
                 $context = $assessment->getContext();
                 if (
@@ -253,6 +263,9 @@ class CommandLineTool extends App
                 continue;
             }
 
+            // TODO move PDF conversion here
+            // TODO figure out how to resolve relative URLs
+
             // Add file: exit if it couldn't be added
             if (!$zip->addFromString($fileTuple['path'], $fileContent)) {
                 $logger->error(
@@ -358,7 +371,7 @@ class CommandLineTool extends App
     private function convertToPdf(string $filename, string $input): string
     {
         $this->getLogger()->info(sprintf('Converting file "%s" to PDF', $filename));
-        $document = DocumentFactory::makeFromString($filename, $input);
+        $document = DocumentFactory::makeFromString($filename, Scrub::htmlAbsoluteUri($input, $this->baseUri));
         $request  = new HTMLRequest($document);
         $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
         $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
