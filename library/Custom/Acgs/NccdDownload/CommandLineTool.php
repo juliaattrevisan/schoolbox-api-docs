@@ -264,7 +264,6 @@ class CommandLineTool extends App
             }
 
             // TODO move PDF conversion here
-            // TODO figure out how to resolve relative URLs
 
             // Add file: exit if it couldn't be added
             if (!$zip->addFromString($fileTuple['path'], $fileContent)) {
