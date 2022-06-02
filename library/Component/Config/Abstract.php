@@ -11,6 +11,10 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
+
+    public const KEY_SHOW_COMPONENT_TITLE = 'showComponentTitle';
+    public const KEY_COLLAPSE = 'collapse';
+
     /**
      * Where this Config's Component resides
      *

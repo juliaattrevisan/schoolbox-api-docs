@@ -11,9 +11,6 @@
 class Component_ConfigDefinition
 {
 
-    public const KEY_COLLAPSE             = 'collapse';
-    public const KEY_SHOW_COMPONENT_TITLE = 'showComponentTitle';
-
     /**
      * @var int
      */
