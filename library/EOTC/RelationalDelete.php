@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace EOTC;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\IDatabase;
+use PDO;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
@@ -17,9 +19,9 @@ use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
 class RelationalDelete extends Deletable
 {
     /**
-     * @var \Database
+     * @var IDatabase
      */
-    private $database;
+    private IDatabase $database;
 
     /**
      * RelationalDelete constructor.
@@ -31,7 +33,7 @@ class RelationalDelete extends Deletable
     {
         parent::__construct($mapper, $logger);
 
-        $this->database = \Database::getInstance();
+        $this->database = $this->mapper->getDatabase();
     }
 
     /**
@@ -50,7 +52,7 @@ class RelationalDelete extends Deletable
         if ($statement->rowCount() === 0) {
             return;
         }
-        $storageIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $storageIds = $statement->fetchAll(PDO::FETCH_COLUMN);
 
         if (!$storageIds) {
             return;
@@ -61,14 +63,11 @@ class RelationalDelete extends Deletable
         if ($performDryRun) {
             $this->logger->notice("Will delete {$storageIdCount} eotc metadata file(s) from eotc_metadata_file", ['char' => '-']);
         } else {
-            try {
-                $bindings  = Builder::getBindings($storageIds, 'st');
-                $query     = "DELETE FROM `eotc_metadata_file` WHERE `storage_id` IN ({$bindings->getPlaceholder()})";
-                $statement = $this->database->prepare($query);
-                $statement->execute($bindings->getParams());
-                $this->logger->notice("Deleted {$storageIdCount} eotc metadata files from eotc_metadata_file", ['char' => '-']);
-            } catch (Mapper\Exception $e) {
-            }
+            $bindings  = Builder::getBindings($storageIds, 'st');
+            $query     = "DELETE FROM `eotc_metadata_file` WHERE `storage_id` IN ({$bindings->getPlaceholder()})";
+            $statement = $this->database->prepare($query);
+            $statement->execute($bindings->getParams());
+            $this->logger->notice("Deleted {$storageIdCount} eotc metadata files from eotc_metadata_file", ['char' => '-']);
         }
     }
 }
