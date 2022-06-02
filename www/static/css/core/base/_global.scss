@@ -58,6 +58,11 @@
         font-family: #{$namespace};
     }
 
+    //to allow smooth browswer scrolling when animating to an anchor tag
+    html {
+        scroll-behavior: smooth;
+    }
+
     html,
     body { 
         font-size: $base-font-size; 

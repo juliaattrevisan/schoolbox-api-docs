@@ -681,9 +681,9 @@ $select-hover-bg-color: tint($warning-color, 50%);
 
 @import "switches";
 
-//
-// Custom overrides
-//
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
 
 $input-height: $global-button-input-height;
 $input-focus-color: $form-bg-hover-color-contrast;

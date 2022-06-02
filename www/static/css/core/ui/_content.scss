@@ -1414,3 +1414,9 @@ li article ol {
 .border-none {
     border: none !important;
 }
+
+//this higlights the selected config option when an option has been selected
+//in the admin search panel
+.highlight-admin-search-selection {
+    background-color: #ffa;
+}

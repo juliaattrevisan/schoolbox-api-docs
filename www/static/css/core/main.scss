@@ -158,14 +158,3 @@ $cdn-prefix: "../..";
 // jQuery UI
 @import "/node_modules/jquery-ui/themes/base/draggable";
 @import "/node_modules/jquery-ui/themes/base/sortable";
-
-// client custom CSS overrides:
-// no longer required, as they're included by www/css/core/skin.css.php
-//@import 'utils/custom';
-
-html {
-  scroll-behavior: smooth;
-}
-.highlight-admin-search-selection {
-  background-color: #ffa;
-}

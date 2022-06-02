@@ -1,8 +1,7 @@
-$charset: "utf-8";
-// =============================================================================
-// Default Schoolbox variables
-// These will be overridden by skin values
-// =============================================================================
+/*
+    Default Schoolbox variables
+    These will be overridden by skin values
+*/
 
 /*****************************
  Refined Colour Application
@@ -15,9 +14,6 @@ $navigation-hover:                 var(--navigation-hover) !default;
 $off-canvas-foreground:            var(--off-canvas-foreground) !default;
 $off-canvas-background:            var(--off-canvas-background) !default;
 $off-canvas-hover:                 var(--off-canvas-hover) !default;
-
-// This has never been a var that is able to be overridden?
-//$off-canvas:                       rgb(255, 255, 255) !default;
 
 $content-ui-foreground:            var(--content-ui-foreground) !default;
 $content-ui-background:            var(--content-ui-background) !default;
@@ -85,7 +81,6 @@ $accounts-menu-hover-contrast:              var(--accounts-menu-hover-contrast) 
 /*****************************
  Colors derived from configured skin colors, and their contrasts
  ****************************/
-
 $body-foreground:                           var(--body-foreground) !default;
 $body-foreground-contrast:                  var(--body-foreground-contrast) !default;
 $body-foreground-h1:                        var(--body-foreground-h1) !default;
@@ -97,11 +92,6 @@ $navigation-foreground-highlight-contrast:  var(--navigation-foreground-highligh
 /*****************************
  Constants
  ****************************/
-
-/*
- * Islands are also always white
- * Content text is always black
- */
 
 /* A specific var for input element borders
  * By default this is connected to the skin builder var
@@ -115,7 +105,6 @@ $input-border-color-contrast: $form-border-color-contrast;
  * Hover colour for action-list rows
  * Hover colour for the action button in the action-list row
  */
-// DONE modify RGBA instead of tint
 $row-hover-background:             css-tint($content-ui-hover, 87%);
 
 $row-action-hover-background:      $content-ui-hover;
