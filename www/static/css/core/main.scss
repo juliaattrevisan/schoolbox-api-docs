@@ -14,14 +14,14 @@ $cdn-prefix: "../..";
 @import "utils/mixins";
 @import "utils/functions";
 @import "utils/settings";
-@import "utils/icons";
-@import "utils/skeleton";
 
 // Base
 @import "base/global";
 @import "base/typography";
 
 // General
+@import "ui/icons";
+@import "ui/skeleton";
 @import "ui/content";
 @import "ui/accordion";
 
