@@ -3,6 +3,7 @@
 namespace Page\Folder;
 
 use AcceptanceTester;
+use Exception;
 
 class CreateFolder
 {
@@ -11,6 +12,7 @@ class CreateFolder
     public const FOLDER_NAME = 'name';
     public const HOMEPAGE_TEMPLATE = 'template';
     public const CREATE_GROUP = 'label[for=groupcheck]';
+    public const SCHOOL_CODE = 'input[name=code]';
     public const CREATE_FOLDER_BUTTON = 'input[type=submit]';
 
     private AcceptanceTester $tester;
@@ -26,6 +28,7 @@ class CreateFolder
     }
 
     /**
+     * @throws Exception
      * wait Create Folder Title to be presented
      */
     public function waitCreateFolderTitleToBePresented(): void
@@ -63,6 +66,14 @@ class CreateFolder
     public function clickCreateGroupToggle(): void
     {
         $this->tester->click(self::CREATE_GROUP);
+    }
+
+    /**
+     * type a folder name
+     */
+    public function typeSchoolCode($folderName): void
+    {
+        $this->tester->fillField(self::SCHOOL_CODE, $folderName);
     }
 
     /**

@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Page;
 
+use AcceptanceTester;
+
 /**
  * Represents the course modify page
  */
@@ -23,7 +25,17 @@ class CourseModify
     public const SELECTOR_USE_FOLDER = '[data-selection] [data-select]';
     public const SELECTOR_SAVE_COURSE = '#update-course-form [type=submit][value="Save Course"]';
 
+    private AcceptanceTester $tester;
 
+    /**
+     * Constructor
+     *
+     * @param AcceptanceTester $i
+     */
+    public function __construct(AcceptanceTester $i)
+    {
+        $this->tester = $i;
+    }
     /**
      *
      * @param int $courseId
@@ -32,5 +44,21 @@ class CourseModify
     public static function getUrl(int $courseId): string
     {
         return str_replace(self::URL_ID_FRAGMENT, (string)$courseId, self::URL);
+    }
+
+    /**
+     * click unit arrow
+     */
+    public function clickUnitArrow($unitNumber): void
+    {
+        $this->tester->click(['css' => 'a[class=icon-down-arrow][data-collapser=unit-' . $unitNumber . ']']);
+    }
+
+    /**
+     * click export icon
+     */
+    public function clickExportIcon($assessmentNumber): void
+    {
+        $this->tester->click(['css' => 'a[href="/learning/export/assessment/' . $assessmentNumber . '?returnUrl=L2NvdXJzZS9tb2RpZnkvNiMxNQ%3D%3D"]']);
     }
 }
