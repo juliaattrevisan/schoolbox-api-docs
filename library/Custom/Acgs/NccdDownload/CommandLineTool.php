@@ -79,9 +79,6 @@ class CommandLineTool extends App
             exit(1);
         }
 
-        /** @var GotenbergClientInterface $gotenberg */
-        $gotenberg = $this->getDi()->get('pdfGenerator');
-
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
@@ -206,21 +203,16 @@ class CommandLineTool extends App
                 ];
                 $comment = $file['comment'] ?? '';
                 if ($comment !== '') {
-                    // This is a text file: convert it to a PDF
-                    $filename = $file['filename'] . '_comment.pdf';
-                    $document = DocumentFactory::makeFromString($filename, $comment);
-                    $request  = new HTMLRequest($document);
-                    $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
-                    $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
-                    $gotenberg->store($request, $tmpfile);
-                    $files[] = [
+                    // Comments are text: convert them to PDF
+                    $filename    = $file['filename'] . '_comment.pdf';
+                    $fileContent = $this->convertToPdf($filename, nl2br($comment));
+                    $files[]     = [
                         'file'        => null,
-                        'fileContent' => file_get_contents($tmpfile),
+                        'fileContent' => $fileContent,
                         'filename'    => $filename,
                         'filemtime'   => $file['filemtime'],
                         'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
                     ];
-                    unlink($tmpfile);
                 }
             }
         }
@@ -344,5 +336,31 @@ class CommandLineTool extends App
             }
         }
         return 0;
+    }
+
+    /**
+     * Converts HTML or text input to PDF.
+     *
+     * @param string $filename
+     * @param string $input
+     * @return string
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \TheCodingMachine\Gotenberg\FilesystemException
+     */
+    private function convertToPdf(string $filename, string $input): string
+    {
+        $this->getLogger()->info(sprintf('Converting file "%filename" to PDF', $filename));
+        $document = DocumentFactory::makeFromString($filename, $input);
+        $request  = new HTMLRequest($document);
+        $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
+        $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+
+        /** @var GotenbergClientInterface $gotenberg */
+        $gotenberg = $this->getDi()->get('pdfGenerator');
+        $gotenberg->store($request, $tmpfile);
+        $result = file_get_contents($tmpfile);
+        unlink($tmpfile);
+        return $result;
     }
 }
