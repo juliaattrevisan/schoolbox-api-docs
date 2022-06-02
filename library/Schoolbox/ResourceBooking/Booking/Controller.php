@@ -347,7 +347,12 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if (
+                if ($booking->getResource()->canUserModerateThisItem($this->getUser())) {
+                    /* If you're a Moderator and can moderate this request,
+                     * set it to Approved - otherwise you'll end up approving your own request anyway
+                     */
+                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                } elseif (
                     ($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
                     $statusId == Status\Model::STATUS_APPROVED &&
                     $isTimeChanged
@@ -599,6 +604,11 @@ class Controller extends Base
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+            $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+        } elseif ($resource->canUserModerateThisItem($this->getUser())) {
+            /* If you're a Moderator and can moderate this request,
+             * set it to Approved - otherwise you'll end up approving your own request anyway
+             */
             $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
         }
 
