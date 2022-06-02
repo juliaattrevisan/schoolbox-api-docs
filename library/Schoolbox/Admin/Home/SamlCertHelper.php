@@ -50,15 +50,22 @@ class SamlCertHelper
 
             // if cache exists, update $setting info from cache
             if (!empty($idpMetadataCache->getStreamContents()) && file_exists($idpMetadataCache->getCachedFile())) {
-                $samlCert = "-----BEGIN CERTIFICATE-----\n";
-
+                $idpMetadata = [];
                 try {
-                    $samlCert .= IdPMetadataParser::parseXML($idpMetadataCache->getStreamContents())['idp']['x509cert'];
+                    $idpMetadata = IdPMetadataParser::parseXML($idpMetadataCache->getStreamContents());
                 } catch (\Exception $e) {
                     $cache->invalidateCache();
                 }
 
-                $samlCert .= "\n-----END CERTIFICATE-----";
+                //find the value in the array that is valid for the XML doc structure
+                $samlCert = $idpMetadata['idp']['x509cert'] ?? '';
+
+                if ($samlCert === '') {
+                    //special case found via LGS
+                    $samlCert = $idpMetadata['idp']['x509certMulti']['signing'][1] ?? '';
+                }
+
+                $samlCert = "-----BEGIN CERTIFICATE-----\n" . $samlCert . "\n-----END CERTIFICATE-----";
             }
         } catch (\Exception $e) {
             //noop, metadata url invalid
