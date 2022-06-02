@@ -11,6 +11,7 @@ namespace Custom\Acgs\NccdDownload;
 use Alaress\Database\Predicate\Builder;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -21,6 +22,9 @@ use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use TheCodingMachine\Gotenberg\DocumentFactory;
+use TheCodingMachine\Gotenberg\GotenbergClientInterface;
+use TheCodingMachine\Gotenberg\HTMLRequest;
 use ZipArchive;
 
 /**
@@ -74,6 +78,9 @@ class CommandLineTool extends App
             $logger->error('An outfile (--outfile) must be supplied.');
             exit(1);
         }
+
+        /** @var GotenbergClientInterface $gotenberg */
+        $gotenberg = $this->getDi()->get('pdfGenerator');
 
         /** @var MapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
@@ -199,14 +206,21 @@ class CommandLineTool extends App
                 ];
                 $comment = $file['comment'] ?? '';
                 if ($comment !== '') {
-                    $filename   = $file['filename'] . '_comment.txt';
-                    $files[]    = [
+                    // This is a text file: convert it to a PDF
+                    $filename = $file['filename'] . '_comment.pdf';
+                    $document = DocumentFactory::makeFromString($filename, $comment);
+                    $request  = new HTMLRequest($document);
+                    $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
+                    $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+                    $gotenberg->store($request, $tmpfile);
+                    $files[] = [
                         'file'        => null,
-                        'fileContent' => $comment,
+                        'fileContent' => file_get_contents($tmpfile),
                         'filename'    => $filename,
                         'filemtime'   => $file['filemtime'],
                         'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
                     ];
+                    unlink($tmpfile);
                 }
             }
         }
