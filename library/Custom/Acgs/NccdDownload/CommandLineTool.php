@@ -129,7 +129,6 @@ class CommandLineTool extends App
                     'storage'   => $file,
                     'filename'  => $file->getTitle(),
                     'filemtime' => $file->getModifiedAt()->getUnixTimeStamp(),
-                    'comment'   => null,
                 ];
             }
 
@@ -155,7 +154,15 @@ class CommandLineTool extends App
         }
 
         // Collate the assessment files into filenames
-        /** @var array<int, array{file:IStorage, filename:string, path:string, filemtime:int}> $files */
+        /**
+         * @var array<int, array{
+         *     file:IStorage|null,
+         *     fileContent:string|null,
+         *     filename:string,
+         *     path:string,
+         *     filemtime:int
+         * }> $files
+         */
         $files = [];
         foreach ($folderFiles as $folderFilesTuple) {
             /** @var User $student */
@@ -166,10 +173,11 @@ class CommandLineTool extends App
                 $externalId = $student->getExternalId();
                 $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
                 $files[]    = [
-                    'file'      => $file['storage'],
-                    'filename'  => $filename,
-                    'filemtime' => $file['filemtime'],
-                    'path'      => sprintf('%s/%s_%d_%s', $yearLevel, $externalId, $i + 1, $filename),
+                    'file'        => $file['storage'],
+                    'fileContent' => null,
+                    'filename'    => $filename,
+                    'filemtime'   => $file['filemtime'],
+                    'path'        => sprintf('%s/%s_%d_%s', $yearLevel, $externalId, $i + 1, $filename),
                 ];
             }
         }
@@ -183,11 +191,23 @@ class CommandLineTool extends App
                 $externalId = $student->getExternalId();
                 $filename   = $file['filename'] . '.' . $file['storage']->getExtension();
                 $files[]    = [
-                    'file'      => $file['storage'],
-                    'filename'  => $filename,
-                    'filemtime' => $file['filemtime'],
-                    'path'      => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
+                    'file'        => $file['storage'],
+                    'fileContent' => null,
+                    'filename'    => $filename,
+                    'filemtime'   => $file['filemtime'],
+                    'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
                 ];
+                $comment = $file['comment'] ?? '';
+                if ($comment !== '') {
+                    $filename   = $file['filename'] . '_comment.txt';
+                    $files[]    = [
+                        'file'        => null,
+                        'fileContent' => $comment,
+                        'filename'    => $filename,
+                        'filemtime'   => $file['filemtime'],
+                        'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
+                    ];
+                }
             }
         }
 
@@ -198,32 +218,32 @@ class CommandLineTool extends App
             exit(1);
         }
         foreach ($files as $fileTuple) {
-            /** @var IStorage $file */
-            $file = $fileTuple['file'];
             $logger->info(sprintf('Adding file "%s" to "%s"', $fileTuple['filename'], $fileTuple['path']));
 
             // Read file content: raise a warning if it couldn't be added.
             // (If debug is on: give a hint where it might be found on prod)
-            $fileContent = $file->read();
-            /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
-            /** @phpstan-ignore-next-line: read() may return false */
+            /** @var IStorage|null $file */
+            $file        = $fileTuple['file'];
+            $fileContent = $file ? $file->read() : ($fileTuple['fileContent'] ?? false);
             if ($fileContent === false) {
                 $logger->warning(sprintf('Could not add file "%s" to "%s": skipping', $fileTuple['filename'], $fileTuple['path']));
-                $logger->debug(
-                    sprintf(
-                        '(Try downloading from %s, and uploading to staging)',
-                        (new Uri('https://schoolbox.churchie.com.au/'))
-                            ->setPath('/storage/fetch.php')
-                            ->setQuery(['hash' => $file->getHash()])
-                    )
-                );
+                if ($file) {
+                    $logger->debug(
+                        sprintf(
+                            '(Try downloading from %s, and uploading to staging)',
+                            (new Uri('https://schoolbox.churchie.com.au/'))
+                                ->setPath('/storage/fetch.php')
+                                ->setQuery(['hash' => $file->getHash()])
+                        )
+                    );
+                }
                 continue;
             }
 
             // Add file: exit if it couldn't be added
             if (!$zip->addFromString($fileTuple['path'], $fileContent)) {
                 $logger->error(
-                    sprintf('Could not add file "%s" to ZIP (%s)', $file->getBasename(), $zip->getStatusString()),
+                    sprintf('Could not add file "%s" to ZIP (%s)', $fileTuple['filename'], $zip->getStatusString()),
                 );
                 $zip->close();
                 exit(1);
@@ -258,9 +278,7 @@ class CommandLineTool extends App
                             'storage'   => $file,
                             'filename'  => $file->getFilename(),
                             'filemtime' => $response->getSubmittedAt()->getUnixTimeStamp(),
-                            'comment'   => $feedback
-                                ? $feedback->getComment()
-                                : null,
+                            'comment'   => $feedback ? $feedback->getComment() : null,
                         ];
                         // Only attach comment to the first file in the response
                         $feedback = null;
