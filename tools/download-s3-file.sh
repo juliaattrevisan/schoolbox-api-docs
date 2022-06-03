@@ -28,12 +28,15 @@ readonly ARG_CACHE_DIR='cache-dir'
 readonly ARG_S3_REFERER='s3-referer'
 readonly ARG_IAM_ACCESS_KEY='iam-access-key'
 readonly ARG_IAM_SECRET_KEY='iam-secret-key'
+readonly ARG_HELP_SHORT='h'
+readonly ARG_HELP='help'
+readonly CACHE_DIR_DEFAULT="/tmp"
 
 # Global vars
 declare file_name;                              # The name in the S3 bucket,     eg 'prefix/sales.tar.gz?versionId=abc'
 declare file_name_short;                        # The name we use on local disk, eg 'prefix/sales.tar.gz'
 declare file_basename                           # Prefix and version stripped,   eg 'sales.tar.gz'
-declare cache_dir='/tmp'
+declare cache_dir="$CACHE_DIR_DEFAULT"
 declare s3_referer;
 declare iam_access_key
 declare iam_secret_key
@@ -59,10 +62,29 @@ function error(){
   fi
 }
 
+function print_help(){
+  echo "SYNOPSIS"
+  echo "  Download a file from S3 to local cache dir. Checks file doesn't already exist in cache."
+  echo "USAGE"
+  echo "  $0 [OPTIONS] --$ARG_DATA_SOURCE <data-source> --$ARG_FILE_NAME <file-name>"
+  echo "OPTIONS"
+  echo "  -$ARG_HELP_SHORT,--$ARG_HELP                         Optional. Show this help message and exit"
+  echo "  --$ARG_DATA_SOURCE <data-source>       Required. Where to download file from. Either S3 or Camberwell office caching proxy."
+  echo "  --$ARG_CACHE_DIR <cache-dir>           Optional. Defaults to '$CACHE_DIR_DEFAULT'. Where to download file to."
+  echo "  --$ARG_S3_REFERER <s3-referer>         Optional. Authentication token."
+  echo "  --$ARG_IAM_ACCESS_KEY <iam-access-key> Required to download from S3 data sources"
+  echo "  --$ARG_IAM_SECRET_KEY <iam-secret-key> Required to download from S3 data sources"
+}
+
+
 function parse_args(){
   local errors='0'
   while [[ $# -gt 0 ]]; do
     case $1 in
+        -"$ARG_HELP_SHORT"|--"$ARG_HELP")
+        print_help;
+        exit
+        ;;
         --"$ARG_DATA_SOURCE")
         data_source="$2"; shift; shift;
         ;;
@@ -98,6 +120,7 @@ function parse_args(){
   fi
   if [ $errors == '1' ]; then
     error "Errors detected, exiting";
+    print_help
     exit 1
   fi
 }
@@ -138,6 +161,7 @@ function validate_args(){
   fi
   if [[ $errors == '1' ]]; then
     error "Errors detected, exiting";
+    print_help
     exit 1
   fi
 }
