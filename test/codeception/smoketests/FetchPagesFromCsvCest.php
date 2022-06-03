@@ -24,13 +24,6 @@ class FetchPagesFromCsvCest
 
     protected $users = [];
 
-    /**
-     * @param IntegrationTester $i
-     */
-    public function _before(IntegrationTester $i)
-    {
-        $i->updateInDatabase('config', array('value' => '1'), array('name' => 'summative_report_enabled'));
-    }
 
     /**
      * Fail test to ensure we can get a 404 response from schoolbox.
