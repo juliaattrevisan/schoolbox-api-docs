@@ -16,6 +16,7 @@
  */
 class Component_Config_ShowComponentTitle extends Component_Config_Abstract
 {
+    public const KEY = 'showComponentTitle';
 
     /**
      * @param SitePage                          $page

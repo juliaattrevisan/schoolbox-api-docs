@@ -10,7 +10,8 @@
 
 namespace Schoolbox\Resource\Textbox\Search;
 
-use Component_Config_Abstract;
+use Component_Config_Collapse;
+use Component_Config_ShowComponentTitle;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
@@ -175,8 +176,8 @@ class Result extends Base
                 [
                     'componentClass'     => $mapper::HOMEPAGE_COMPONENT_CONTROLLER,
                     'componentKey'       => $mapper::HOMEPAGE_COMPONENT_KEY,
-                    'collapse'           => Component_Config_Abstract::KEY_COLLAPSE,
-                    'showComponentTitle' => Component_Config_Abstract::KEY_SHOW_COMPONENT_TITLE,
+                    'collapse'           => Component_Config_Collapse::KEY,
+                    'showComponentTitle' => Component_Config_ShowComponentTitle::KEY,
                 ]
             );
             $configs = $configQuery->fetchAll(\PDO::FETCH_ASSOC);
@@ -205,8 +206,8 @@ class Result extends Base
             $params          = [
                 'componentDefinitionId' => $this->componentDefinitionId,
                 'componentTextBoxId'    => $this->componentConfigDefinitionId[$mapper::HOMEPAGE_COMPONENT_KEY],
-                'collapse'              => $this->componentConfigDefinitionId[Component_Config_Abstract::KEY_COLLAPSE],
-                'showComponentTitle'    => $this->componentConfigDefinitionId[Component_Config_Abstract::KEY_SHOW_COMPONENT_TITLE],
+                'collapse'              => $this->componentConfigDefinitionId[Component_Config_Collapse::KEY],
+                'showComponentTitle'    => $this->componentConfigDefinitionId[Component_Config_ShowComponentTitle::KEY],
 
             ];
             $componentColumn = ', cci.value as component_value, cci2.value as collapse, cci3.value as show_title';
