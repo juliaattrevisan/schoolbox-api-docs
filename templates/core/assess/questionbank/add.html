@@ -45,10 +45,32 @@
     </div>
 </form>
 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-<script type="text/javascript" src="{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}"></script>
-<script type="text/javascript">
+<script>
 
-    $(function () {
+    /**
+     * As this file is loaded dynamically within a modal, we need to ensure 
+     * its script files are fully loaded on the CDN before we call any methods contained within
+     * the files. This is because these script files will not be loaded with render blocking, 
+     * so $('#category-tree').jstree() could be called before jstree.js is loaded
+     */
+
+    //check if the script is already loaded so we don't load it again
+    if (Boolean(document.querySelector(`script[src="{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}"]`))) {
+        initJsTree();
+    } else {
+        loadScript();
+    }
+
+    //add the JS file <script> tag into the document head and respond to its load
+    function loadScript () {
+        const scriptElement = document.createElement('script');
+        scriptElement.addEventListener('load', initJsTree); //once its loaded, we can trust that jstree() will work
+        scriptElement.src = '{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}';
+        document.head.appendChild(scriptElement);
+    }
+
+    function initJsTree () {
+
         var form = $('#question-bank').children('form'),
             qid  = form.children('input[name=question_id]'),
             cid  = form.children('input[name=question_category]');
@@ -100,6 +122,7 @@
                 $('#bank-success').foundation('reveal').foundation('reveal', 'open', href);
             });
         });
-    });
+
+    }
 
 </script>
