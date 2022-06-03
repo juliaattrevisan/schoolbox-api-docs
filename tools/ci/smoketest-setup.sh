@@ -115,7 +115,6 @@ mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = '
 
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
-tools/ci/smoketest-setup.sh
 
 ## Finish where we started.
 cd "$initialdir"
