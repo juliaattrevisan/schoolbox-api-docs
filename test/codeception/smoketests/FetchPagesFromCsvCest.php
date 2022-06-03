@@ -29,8 +29,7 @@ class FetchPagesFromCsvCest
      */
     public function _before(IntegrationTester $i)
     {
-        #Might not need this login any more as I think this runs each test, so the login differs each test now.
-        #$i->loginAdmin(); #we logged in as alaress
+        $i->updateInDatabase('config', array('value' => '1'), array('name' => 'summative_report_enabled'));
     }
 
     /**
