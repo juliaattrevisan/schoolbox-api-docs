@@ -230,8 +230,8 @@ module.exports = {
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
         //Sass
-        chromeFoundation: './www/static/css/foundation/chromeFoundation.scss',
-        editor: './www/static/css/foundation/editor.scss',
+        main: './www/static/css/core/main.scss',
+        editor: './www/static/css/core/editor.scss',
 
     },
     output: {
@@ -352,7 +352,7 @@ module.exports = {
                                 options: {
                                     sassOptions: {
                                         indentWidth: 4,
-                                        includePaths: ['../../css/foundation/'],
+                                        includePaths: ['../../css/core/'],
                                     },
                                 },
                             }

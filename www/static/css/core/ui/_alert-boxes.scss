@@ -1,0 +1,249 @@
+// Foundation by ZURB
+// foundation.zurb.com
+// Licensed under MIT Open Source
+
+//
+// Alert Box Variables
+//
+$include-html-alert-classes: $include-html-classes !default;
+
+// We use this to control alert padding.
+$alert-padding-top: rem-calc(($base-font-size - 2));
+$alert-padding-default-float: $alert-padding-top;
+$alert-padding-opposite-direction: $alert-padding-top + rem-calc(10);
+$alert-padding-bottom: $alert-padding-top;
+
+// We use these to control text style.
+$alert-font-weight: $font-weight-normal;
+$alert-font-size: rem-calc(($base-font-size - 2));
+$alert-font-color: $white;
+$alert-font-color-alt: scale-color($secondary-color, $lightness: -66%);
+
+// We use this for close hover effect.
+$alert-function-factor: 89%;
+
+// We use these to control border styles.
+$alert-border-style: solid;
+$alert-border-width: 0px;
+$alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor) !default;
+$alert-bottom-margin: $base-font-size;
+
+// We use these to style the close buttons
+$alert-close-color: $oil !default;
+$alert-close-top: 0;
+$alert-close-position: 0;
+$alert-close-font-size: rem-calc(($base-font-size + 14));
+$alert-close-opacity: 1;
+$alert-close-opacity-hover: 1;
+$alert-close-padding: rem-calc(($base-font-size - 5));
+$alert-close-background: inherit !default;
+
+// We use this to control border radius
+$alert-radius: $global-radius;
+
+$alert-transition-speed: 300ms;
+$alert-transition-ease: ease-out;
+
+//
+// Alert Mixins
+//
+
+// We use this mixin to create a default alert base.
+@mixin alert-base {
+  border-style: $alert-border-style;
+  border-width: $alert-border-width;
+  display: block;
+  font-size: $alert-font-size;
+  font-weight: $alert-font-weight;
+  margin-bottom: $alert-bottom-margin;
+  padding: $alert-padding-top $alert-padding-opposite-direction $alert-padding-bottom $alert-padding-default-float;
+  position: relative;
+  transition: opacity $alert-transition-speed $alert-transition-ease;
+}
+
+// We use this mixin to add alert styles
+//
+// $bg - The background of the alert. Default: $primary-color.
+@mixin alert-style($bg:$primary-color) {
+
+  // This finds the lightness percentage of the background color.
+  $bg-lightness: lightness($bg);
+
+  // We control which background color and border come through.
+  background-color: $bg;
+  border-color: scale-color($bg, $lightness: $alert-function-factor);
+
+  // We control the text color for you based on the background color.
+  @if $bg-lightness > 70% { color: $alert-font-color-alt; }
+  @else                   { color: $alert-font-color; }
+
+}
+
+// We use this to create the close button.
+@mixin alert-close {
+  #{$opposite-direction}: $alert-close-position;
+  background: $alert-close-background;
+  color: $alert-close-color;
+  font-size: $alert-close-font-size;
+  line-height: .9;
+  margin-top: -($alert-close-font-size / 2);
+  opacity: $alert-close-opacity;
+  padding: $alert-close-padding;
+  position: absolute;
+  top: $alert-close-top;
+  &:hover,
+  &:focus { opacity: $alert-close-opacity-hover; }
+}
+
+// We use this to quickly create alerts with a single mixin.
+//
+// $bg - Background of alert. Default: $primary-color.
+// $radius - Radius of alert box. Default: false.
+@mixin alert($bg:$primary-color, $radius:false) {
+  @include alert-base;
+  @include alert-style($bg);
+  @include radius($radius);
+}
+
+@include exports("alert-box") {
+  @if $include-html-alert-classes {
+    .alert-box {
+      @include alert;
+
+      .close      { @include alert-close; }
+
+      &.radius    { @include radius($alert-radius); }
+      &.round     { @include radius($global-rounded); }
+
+      &.success   { @include alert-style($success-color); }
+      &.alert     { @include alert-style($alert-color); }
+      &.secondary { @include alert-style($secondary-color); }
+      &.warning { @include alert-style($warning-color); }
+      &.info { @include alert-style($info-color); }
+      &.alert-close { opacity: 0}
+    }
+  }
+}
+
+
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
+
+$alert-tint-amount: 90%;
+
+// DONE use CSS darken
+$alert-default-background: css-darken($body-bg, 10%);
+
+.alert-box {
+    background-color: $alert-default-background;
+    color: $body-bg-contrast;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    .close {
+        &:hover {
+            text-decoration: none;
+        }
+        color: inherit;
+        margin: 0;
+        line-height: 0.8;
+    }
+
+    &.highlight {
+        background-color: $accent-background;
+        color: $accent-foreground;
+    }
+    &.success {
+        background-color: $success-color;
+        color: $white;
+    }
+    &.warning {
+        background-color: $warning-color;
+        color: $white;
+    }
+    &.alert {
+        background-color: $alert-color;
+        color: $white;
+    }
+}
+
+.alert-box:empty {
+    display: none;
+}
+
+.alert-box-icon {
+    @extend .alert-box;
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+
+    [class^="icon-"],
+    [class*=" icon-"] {
+        &:before {
+            color: $white;
+            padding-right: 0;
+        }
+    }
+    &.highlight {
+        [class^="icon-"],
+        [class*=" icon-"] {
+            &:before {
+                color: $accent-foreground;
+            }
+        }
+    }
+}
+
+// Toast pop-up alert...
+// A less obnoxious pop-up alert
+.toast {
+    background-color: $tuatara;
+    bottom: 1rem;
+    color: $white;
+    display: block;
+    font-size: $base-font-size - 2;
+    opacity: 0;
+    padding: 0.875rem 1.25rem;
+    position: fixed;
+    right: -999px; //ensure doesn't interfere while inactive
+    text-align: center;
+    z-index: 2000;
+    transition: opacity 0.3s;
+    &.pop {
+        right: 1rem;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    &::before {
+        background-color: $white;
+        border-radius: 0.75rem;
+        content: "";
+        display: inline-block;
+        height: 0.75rem;
+        margin-right: 0.5rem;
+        width: 0.75rem;
+        animation: pulse 1.5s infinite;
+    }
+
+    &.success::before {
+        background-color: $success-color;
+        animation: none;
+    }
+    &.warning::before {
+        background-color: $warning-color;
+        animation: none;
+    }
+    &.alert::before {
+        background-color: $alert-color;
+        animation: none;
+    }
+}
+
+// Accommodate for when the notifications are open
+.move-left,
+.right-open {
+    .toast {
+        right: 17.25rem;
+    }
+}

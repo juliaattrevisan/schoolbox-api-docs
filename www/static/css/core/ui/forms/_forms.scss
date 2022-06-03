@@ -1,0 +1,1577 @@
+
+// Foundation by ZURB
+// foundation.zurb.com
+// Licensed under MIT Open Source
+
+@import "buttons";
+
+//
+// @variables
+//
+$include-html-form-classes: $include-html-classes !default;
+
+// We use this to set the base for lots of form spacing and positioning styles
+$form-spacing: rem-calc(($base-font-size));
+
+// We use these to style the labels in different ways
+$form-label-pointer: $cursor-default-value;
+$form-label-font-size: rem-calc(($base-font-size - 2));
+$form-label-font-weight: $font-weight-semibold;
+$form-label-line-height: 1.4rem;
+$form-label-font-color: $black;
+$form-label-small-transform: capitalize !default;
+$form-label-bottom-margin: 0;
+$input-font-family: inherit !default;
+$input-font-color: $black;
+$input-placeholder-font-color: $steel !default;
+$input-font-size: $paragraph-font-size;
+$input-bg-color: $white;
+$input-focus-bg-color: $form-bg-hover-color;
+$input-border-color: $form-border-color !default;
+$input-focus-border-color: css-darken($form-border-color, 15%);
+$input-border-style: solid;
+$input-border-width: 0.0625rem;
+$input-border-radius: $global-radius;
+$input-disabled-bg: $vapor;
+$input-disabled-cursor: $cursor-default-value;
+$input-box-shadow: none;
+$input-include-glowing-effect: false;
+
+// We use these to style the fieldset border and spacing.
+$fieldset-border-style: solid;
+$fieldset-border-width: 2px;
+$fieldset-border-color: $body-bg;
+$fieldset-padding: rem-calc(($base-font-size - 8));
+$fieldset-margin: rem-calc(($base-font-size - 8, 0));
+
+// We use these to style the legends when you use them
+$legend-font-weight: $font-weight-bold !default;
+$legend-padding: rem-calc(0 3) !default;
+
+// We use these to style the prefix and postfix input elements
+$input-prefix-bg: scale-color($white, $lightness: -5%) !default;
+$input-prefix-border-color: scale-color($white, $lightness: -20%) !default;
+$input-prefix-border-size: 1px !default;
+$input-prefix-border-type: solid !default;
+$input-prefix-overflow: visible !default;
+$input-prefix-font-color: $oil !default;
+$input-prefix-font-color-alt: $white !default;
+
+// We use this setting to turn on/off HTML5 number spinners (the up/down arrows)
+$input-number-spinners: true !default;
+
+// We use these to style the error states for inputs and labels
+$input-error-message-padding: rem-calc(($base-font-size - 8));
+$input-error-message-top: -1px;
+$input-error-message-font-size: rem-calc(($base-font-size - 4));
+$input-error-message-font-weight: $font-weight-normal;
+$input-error-message-font-style: italic !default;
+$input-error-message-font-color: $white !default;
+$input-error-message-bg-color: $alert-color !default;
+$input-error-message-font-color-alt: $alert-color;
+
+// We use this to style the glowing effect of inputs when focused
+$glowing-effect-fade-time: 0.45s !default;
+$glowing-effect-color: $input-focus-border-color !default;
+
+// We use this to style the transition when inputs are focused and when the glowing effect is disabled.
+$input-transition-fade-time: 0.15s !default;
+$input-transition-fade-timing-function: linear !default;
+
+// Select variables
+$select-bg-color: $input-bg-color;
+$select-hover-bg-color: tint($warning-color, 50%);
+
+//
+// @MIXINS
+//
+
+// We use this mixin to give us form styles for rows inside of forms
+@mixin form-row-base {
+  .row {
+    margin: 0 ((-$form-spacing) / 2);
+
+    .column,
+    .columns {
+      padding: 0 ($form-spacing / 2);
+    }
+
+    // Use this to collapse the margins of a form row
+    &.collapse {
+      margin: 0;
+
+      .column,
+      .columns {
+        padding: 0;
+      }
+      input {
+        @include side-radius($opposite-direction, 0);
+      }
+    }
+  }
+  input.column,
+  input.columns,
+  textarea.column,
+  textarea.columns {
+    padding-#{$default-float}: ($form-spacing / 2);
+  }
+}
+
+// @MIXIN
+//
+// We use this mixin to give all basic form elements their style
+@mixin form-element {
+  background-color: $input-bg-color;
+  border: {
+    style: $input-border-style;
+    width: $input-border-width;
+    color: $input-border-color;
+  }
+  box-shadow: $input-box-shadow;
+  color: $input-font-color;
+  display: block;
+  font-family: $input-font-family;
+  font-size: $input-font-size;
+  height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+  margin: 0 0 $form-spacing 0;
+  padding: $form-spacing / 2;
+  width: 100%;
+  box-sizing: border-box;
+  @if $input-include-glowing-effect {
+    @include block-glowing-effect(focus, $glowing-effect-fade-time, $glowing-effect-color);
+  }
+  // Basic focus styles
+  &:focus {
+    background: $input-focus-bg-color;
+    border-color: $input-focus-border-color;
+    outline: none;
+  }
+  // Disabled Styles
+  &:disabled {
+    background-color: $input-disabled-bg;
+    cursor: $input-disabled-cursor;
+  }
+
+  // Disabled background input background color
+  &[disabled],
+  &[readonly],
+  fieldset[disabled] & {
+    background-color: $input-disabled-bg;
+    cursor: $input-disabled-cursor;
+  }
+}
+
+// @MIXIN
+//
+// We use this mixin to create form labels
+//
+// $alignment - Alignment options. Default: false. Options: [right, inline, false]
+// $base-style - Control whether or not the base styles come through. Default: true.
+@mixin form-label($alignment: false, $base-style: true) {
+  // Control whether or not the base styles come through.
+  @if $base-style {
+    color: $form-label-font-color;
+    cursor: $form-label-pointer;
+    display: block;
+    font-size: $form-label-font-size;
+    font-weight: $form-label-font-weight;
+    line-height: $form-label-line-height;
+    margin-bottom: $form-label-bottom-margin;
+  }
+
+  // Alignment options
+  @if $alignment == right {
+    float: none !important;
+    text-align: right;
+  } @else if $alignment == inline {
+    margin: 0 0 $form-spacing 0;
+    padding: $form-spacing / 2 + rem-calc($input-border-width) 0;
+  }
+}
+
+// We use this mixin to create postfix/prefix form Labels
+@mixin prefix-postfix-base {
+  border-style: $input-prefix-border-type;
+  border-width: $input-prefix-border-size;
+  display: block;
+  font-size: $form-label-font-size;
+  height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+  line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+  overflow: $input-prefix-overflow;
+  padding-bottom: 0;
+  padding-top: 0;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 2;
+}
+
+// @MIXIN
+//
+// We use this mixin to create prefix label styles
+// $bg - Default:$input-prefix-bg || scale-color($white, $lightness: -5%) !default;
+// $is-button - Toggle position settings if prefix is a button. Default:false
+//
+@mixin prefix($bg: $input-prefix-bg, $border: $input-prefix-border-color, $is-button: false) {
+  @if $bg {
+    $bg-lightness: lightness($bg);
+    background: $bg;
+    border-#{$opposite-direction}: none;
+
+    // Control the font color based on background brightness
+    @if $bg-lightness > 70% or $bg == yellow {
+      color: $input-prefix-font-color;
+    } @else {
+      color: $input-prefix-font-color-alt;
+    }
+  }
+
+  @if $border {
+    border-color: $border;
+  }
+
+  @if $is-button {
+    border: none;
+    padding-#{$default-float}: 0;
+    padding-#{$opposite-direction}: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+    text-align: center;
+  }
+}
+
+// @MIXIN
+//
+// We use this mixin to create postfix label styles
+// $bg - Default:$input-prefix-bg || scale-color($white, $lightness: -5%) !default;
+// $is-button - Toggle position settings if prefix is a button. Default: false
+@mixin postfix(
+  $bg: $input-prefix-bg,
+  $border-left-hidden: true,
+  $border: $input-prefix-border-color,
+  $is-button: false
+) {
+  @if $bg {
+    $bg-lightness: lightness($bg);
+    background: $bg;
+    @if $border-left-hidden {
+      border-#{$default-float}: none;
+    }
+
+    // Control the font color based on background brightness
+    @if $bg-lightness > 70% or $bg == yellow {
+      color: $input-prefix-font-color;
+    } @else {
+      color: $input-prefix-font-color-alt;
+    }
+  }
+
+  @if $border {
+    border-color: $border;
+  }
+
+  @if $is-button {
+    border: none;
+    padding-#{$default-float}: 0;
+    padding-#{$opposite-direction}: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+    text-align: center;
+  }
+}
+
+// We use this mixin to style fieldsets
+@mixin fieldset {
+  border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
+  margin: $fieldset-margin;
+  padding: $fieldset-padding;
+
+  // and legend styles
+  legend {
+    font-weight: $legend-font-weight;
+    margin: 0;
+    margin-#{$default-float}: rem-calc(-3);
+    padding: $legend-padding;
+  }
+}
+
+// @MIXIN
+//
+// We use this mixin to control border and background color of error inputs
+// $color - Default: $alert-color (found in settings file)
+@mixin form-error-color($color: $alert-color) {
+  background-color: rgba($color, 0.1);
+  border-color: $color;
+
+  // Go back to normal on focus
+  &:focus {
+    background: $input-focus-bg-color;
+    border-color: $input-focus-border-color;
+  }
+}
+
+// @MIXIN
+//
+// We use this simple mixin to style labels for error inputs
+// $color - Default:$alert-color. Found in settings file
+@mixin form-label-error-color($color: $alert-color) {
+  color: $color;
+}
+
+// @MIXIN
+//
+// We use this mixin to create error message styles
+// $bg - Default: $alert-color (Found in settings file)
+@mixin form-error-message($bg: $input-error-message-bg-color) {
+  display: block;
+  font-size: $input-error-message-font-size;
+  font-style: $input-error-message-font-style;
+  font-weight: $input-error-message-font-weight;
+  margin-bottom: $form-spacing;
+  margin-top: $input-error-message-top;
+  padding: $input-error-message-padding;
+
+  // We can control the text color based on the brightness of the background.
+  $bg-lightness: lightness($bg);
+  background: $bg;
+  @if $bg-lightness < 70% or $bg == yellow {
+    color: $input-error-message-font-color;
+  } @else {
+    color: $input-error-message-font-color-alt;
+  }
+}
+
+// We use this mixin to style select elements
+@mixin form-select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-color: $select-bg-color;
+  border-radius: 0;
+
+  // Hide the dropdown arrow shown in newer IE versions
+  &::-ms-expand {
+    display: none;
+  }
+
+  // The custom arrow has some fake horizontal padding so we can align it
+  // from the right side of the element without relying on CSS3
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgeD0iMTJweCIgeT0iMHB4IiB3aWR0aD0iMjRweCIgaGVpZ2h0PSIzcHgiIHZpZXdCb3g9IjAgMCA2IDMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDYgMyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBvbHlnb24gcG9pbnRzPSI1Ljk5MiwwIDIuOTkyLDMgLTAuMDA4LDAgIi8+PC9zdmc+");
+
+  // We can safely use leftmost and rightmost now
+  background-position: if($text-direction == "rtl", 0%, 100%) center;
+
+  background-repeat: no-repeat;
+  border: {
+    style: $input-border-style;
+    width: $input-border-width;
+    color: $input-border-color;
+  }
+  color: $input-font-color;
+  font-family: $input-font-family;
+  font-size: $input-font-size;
+  line-height: normal;
+  padding: ($form-spacing / 2);
+  @include radius(0);
+  &.radius {
+    @include radius($global-radius);
+  }
+  &:focus {
+    background-color: $select-hover-bg-color;
+    border-color: $input-focus-border-color;
+  }
+  // Disabled Styles
+  &:disabled {
+    background-color: $input-disabled-bg;
+    cursor: $input-disabled-cursor;
+  }
+}
+
+// We use this mixin to turn on/off HTML5 number spinners
+@mixin html5number($browser, $on: true) {
+  @if $on == false {
+    @if $browser == webkit {
+      -webkit-appearance: none;
+      margin: 0;
+    } @else if $browser == moz {
+      -moz-appearance: textfield;
+    }
+  }
+}
+
+@include exports("form") {
+  @if $include-html-form-classes {
+    /* Standard Forms */
+    form {
+      margin: 0 0 $form-spacing;
+    }
+
+    /* Using forms within rows, we need to set some defaults */
+    form .row {
+      @include form-row-base;
+    }
+
+    /* Label Styles */
+    label {
+      @include form-label;
+      &.right {
+        @include form-label(right, false);
+      }
+      &.inline {
+        @include form-label(inline, false);
+      }
+      /* Styles for required inputs */
+      small {
+        text-transform: $form-label-small-transform;
+        color: scale-color($form-label-font-color, $lightness: 15%);
+      }
+    }
+
+    /* Attach elements to the beginning or end of an input */
+    .prefix,
+    .postfix {
+      @include prefix-postfix-base;
+    }
+
+    /* Adjust padding, alignment and radius if pre/post element is a button */
+    .postfix.button {
+      @include button-size(false, false);
+      @include postfix(false, false, false, true);
+    }
+    .prefix.button {
+      @include button-size(false, false);
+      @include prefix(false, false, true);
+    }
+
+    .prefix.button.radius {
+      @include radius(0);
+      @include side-radius($default-float, $button-radius);
+    }
+    .postfix.button.radius {
+      @include radius(0);
+      @include side-radius($opposite-direction, $button-radius);
+    }
+    .prefix.button.round {
+      @include radius(0);
+      @include side-radius($default-float, $button-round);
+    }
+    .postfix.button.round {
+      @include radius(0);
+      @include side-radius($opposite-direction, $button-round);
+    }
+
+    /* Separate prefix and postfix styles when on span or label so buttons keep their own */
+    span.prefix,
+    label.prefix {
+      @include prefix();
+    }
+    span.postfix,
+    label.postfix {
+      @include postfix();
+    }
+
+    /* We use this to get basic styling on all basic form elements */
+    input:not([type]),
+    #{text-inputs(all, 'input')} {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border-radius: 0;
+      @include form-element;
+      @if $input-include-glowing-effect == false {
+        transition: border-color $input-transition-fade-time $input-transition-fade-timing-function,
+          background $input-transition-fade-time $input-transition-fade-timing-function;
+      }
+      &.radius {
+        @include radius($input-border-radius);
+      }
+    }
+
+    form {
+      .row {
+        .prefix-radius.row.collapse {
+          input,
+          textarea,
+          select,
+          button {
+            @include radius(0);
+            @include side-radius($opposite-direction, $button-radius);
+          }
+          .prefix {
+            @include radius(0);
+            @include side-radius($default-float, $button-radius);
+          }
+        }
+        .postfix-radius.row.collapse {
+          input,
+          textarea,
+          select,
+          button {
+            @include radius(0);
+            @include side-radius($default-float, $button-radius);
+          }
+          .postfix {
+            @include radius(0);
+            @include side-radius($opposite-direction, $button-radius);
+          }
+        }
+        .prefix-round.row.collapse {
+          input,
+          textarea,
+          select,
+          button {
+            @include radius(0);
+            @include side-radius($opposite-direction, $button-round);
+          }
+          .prefix {
+            @include radius(0);
+            @include side-radius($default-float, $button-round);
+          }
+        }
+        .postfix-round.row.collapse {
+          input,
+          textarea,
+          select,
+          button {
+            @include radius(0);
+            @include side-radius($default-float, $button-round);
+          }
+          .postfix {
+            @include radius(0);
+            @include side-radius($opposite-direction, $button-round);
+          }
+        }
+      }
+    }
+
+    input[type="submit"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      border-radius: 0;
+    }
+
+    /* Respect enforced amount of rows for textarea */
+    textarea[rows] {
+      height: auto;
+    }
+
+    /* Not allow resize out of parent */
+    textarea {
+      max-width: 100%;
+    }
+
+    // style placeholder text cross browser
+    ::placeholder {
+      color: $input-placeholder-font-color;
+    }
+
+    /* Add height value for select elements to match text input height */
+    select {
+      @include form-select;
+      height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+      &[multiple] {
+        height: auto;
+      }
+    }
+
+    /* Adjust margin for form elements below */
+    input[type="file"],
+    input[type="checkbox"],
+    input[type="radio"],
+    select {
+      margin: 0 0 $form-spacing 0;
+    }
+
+    input[type="checkbox"] + label,
+    input[type="radio"] + label {
+      display: inline-block;
+      margin-#{$default-float}: $form-spacing * 0.5;
+      margin-#{$opposite-direction}: $form-spacing;
+      margin-bottom: 0;
+      vertical-align: baseline;
+    }
+
+    /* Normalize file input width */
+    input[type="file"] {
+      width: 100%;
+    }
+
+    /* HTML5 Number spinners settings */
+    input[type="number"] {
+      @include html5number(moz, $input-number-spinners);
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      @include html5number(webkit, $input-number-spinners);
+    }
+
+    /* We add basic fieldset styling */
+    fieldset {
+      @include fieldset;
+    }
+
+    /* Error Handling */
+
+    #{data('abide')} {
+      .error small.error,
+      .error span.error,
+      span.error,
+      small.error {
+        @include form-error-message;
+      }
+      span.error,
+      small.error {
+        display: none;
+      }
+    }
+
+    span.error,
+    small.error {
+      @include form-error-message;
+    }
+
+    .error {
+      input,
+      textarea,
+      select {
+        margin-bottom: 0;
+      }
+
+      input[type="checkbox"],
+      input[type="radio"] {
+        margin-bottom: $form-spacing;
+      }
+
+      label,
+      label.error {
+        @include form-label-error-color;
+      }
+
+      small.error {
+        @include form-error-message;
+      }
+
+      > label {
+        > small {
+          background: transparent;
+          color: scale-color($form-label-font-color, $lightness: 15%);
+          display: inline;
+          font-size: 60%;
+          font-style: normal;
+          margin: 0;
+          padding: 0;
+          text-transform: $form-label-small-transform;
+        }
+      }
+
+      span.error-message {
+        display: block;
+      }
+    }
+
+    input.error,
+    textarea.error,
+    select.error {
+      margin-bottom: 0;
+    }
+    label.error {
+      @include form-label-error-color;
+    }
+  }
+}
+
+
+@import "switches";
+
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
+
+$input-height: $global-button-input-height;
+$input-focus-color: $form-bg-hover-color-contrast;
+$input-hover-bg-color: $form-bg-hover-color;
+$input-hover-color: $black;
+$legend-bg: transparent;
+
+form {
+    ::placeholder { 
+        color: $aluminum; 
+        font-weight: normal; 
+    }
+    margin: 0 0 $form-spacing / 2 0;
+}
+
+label {
+    display: block;
+    &.required:after,
+    span.required-with-tip:after {
+        content: " *";
+        color: $alert-color;
+    }
+    &.error {
+        display: block;
+        font-style: italic;
+        width: 100%;
+    }
+}
+
+input,
+textarea,
+select {
+    transition: all 0.15s linear;
+    min-height: $global-button-input-height;
+    line-height: inherit;
+    font-weight: $font-weight-normal;
+    &:hover {
+        background-color: $input-hover-bg-color;
+        color: $input-hover-color;
+        border-color: $input-border-color;
+    }
+    &:focus {
+        color: $input-focus-color;
+        background-color: $input-focus-bg-color;
+        border-color: $input-focus-border-color;
+        outline: none;
+    }
+    &:disabled,
+    &[disabled],
+    &[readonly] {
+        background-color: $input-disabled-bg;
+        color: $aluminum;
+        opacity: 1;
+        label:hover & {
+            &:focus::placeholder { color: $base; }
+	        &:hover::placeholder { color: $base; }
+        }
+        &:hover {
+            background-color: $input-disabled-bg;
+            border-color: $form-border-color;
+            color: $aluminum;
+        }
+    }
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    min-height: 1.5rem;
+}
+
+input[type="number"] {
+    padding: 0 0 0 $form-spacing / 2;
+}
+
+select {
+    padding-right: 1.3rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-family: $font-family-icon, $font-family-sans-serif;
+}
+
+// remove margins on forms inside tables
+th,
+td {
+    input[type],
+    textarea,
+    select,
+    input[type="radio"]:not(.plain) + label.checkbox-label,
+    input[type="checkbox"]:not(.plain) + label.checkbox-label {
+        margin: 0;
+    }
+}
+
+// Input & buttons to sit next to each other
+.input-group {
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.5;
+
+    input,
+    select,
+    .selectize-control,
+    .attachzone {
+        flex: 1 1 auto;
+
+        & + .button {
+            flex: 0 0 auto;
+        }
+    }
+    input[type="submit"] {
+        line-height: initial;
+        width: auto;
+    }
+    .adtp-btn {
+        line-height: 1.5;
+    }
+    .no-text {
+        min-width: 2.5rem;
+    }
+    .selectized.error ~ .selectize-control {
+        margin-bottom: 0;
+    }
+    @media #{$small-only} {
+        flex-wrap: wrap;
+
+        input,
+        select,
+        .selectize-control,
+        .attachzone {
+            margin: 0;
+
+            & + .button {
+                flex: 1 0 auto;
+            }
+        }
+    }
+}
+
+.switch {
+    &.long {
+        @include wide-switch(8rem);
+        @include switch-label;
+    }
+
+    &.medium {
+        @include wide-switch(6rem);
+        @include switch-label;
+    }
+
+    &.inline {
+        display: inline-block;
+        margin-bottom: 0;
+    }
+
+    @include switch-label(0.4rem);
+    vertical-align: middle;
+
+    label {
+        cursor: $cursor-default-value;
+    }
+
+    span {
+        position: absolute;
+        top: 0.2rem;
+        line-height: 1.625rem;
+        font-weight: 100;
+        text-transform: uppercase;
+        font-size: rem-calc($base-font-size - 3);
+        text-indent: 0;
+        transition: opacity $switch-paddle-transition-speed $switch-paddle-transition-ease;
+    }
+}
+%fancy-check {
+    position: absolute;
+    width: 0;
+    height: 0;
+    min-height: 0;
+    opacity: 0;
+}
+%fancy-check-selector {
+    position: relative;
+    display: inline-block;
+}
+%fancy-check-before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    display: block;
+    content: "";
+}
+%fancy-check-after {
+    font-family: $font-family-icon;
+    position: absolute;
+    display: block;
+    content: "\e604";
+    color: rgba($white, 0);
+    margin: 0;
+    text-align: center;
+}
+@mixin fancy-check(
+    $label-class: false,
+    $checkbox-size: 1.5rem,
+    $checkbox-margin: 0.5rem,
+    $icon-size: 1rem,
+    $hover-color: $input-border-color,
+    $active-color: $content-ui-foreground
+) {
+    $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
+    $label-selector: "label";
+
+    @extend %fancy-check;
+    // overwrite to append class if required
+    @if ($label-class) {
+        $label-selector: "label.#{$label-class}";
+    }
+
+    + #{$label-selector} {
+        // this is where the magic happens
+        @extend %fancy-check-selector;
+        cursor: $cursor-default-value;
+        min-height: $checkbox-size;
+        line-height: $checkbox-size;
+        padding: 0 0 0 ($checkbox-size + $checkbox-margin);
+        font-weight: $font-weight-normal;
+        margin: 0 0 $checkbox-margin 0;
+        &:before,
+        &:after {
+            transition: color 360ms cubic-bezier(0.2, 1, 0, 1),
+                        background-color 360ms cubic-bezier(0.2, 1, 0, 1);
+        }
+
+        &:before {
+            @extend %fancy-check-before;
+            width: $checkbox-size;
+            height: $checkbox-size;
+            background-color: $hover-color;
+        }
+
+        &:after {
+            @extend %fancy-check-after;
+            width: $checkbox-inner-size;
+            height: $checkbox-inner-size;
+            top: $input-border-width;
+            left: $input-border-width;
+            background-color: $input-bg-color;
+            line-height: $checkbox-size - $input-border-width;
+            font-size: $icon-size;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &:checked {
+        + #{$label-selector} {
+            &:before,
+            &:after {
+                color: $content-ui-foreground !important;
+                background-color: $content-ui-background;
+            }
+        }
+    }
+
+    &.indeterminate {
+        + #{$label-selector} {
+            &:before,
+            &:after {
+                color: $content-ui-foreground !important;
+                background-color: $content-ui-background;
+            }
+            &:after {
+                content: "\e60f";
+            }
+        }
+    }
+
+    &:not(:disabled) {
+        + #{$label-selector} {
+            &:hover {
+                &:before,
+                &:after {
+                    background-color: $hover-color;
+                }
+
+                &:after {
+                    color: $white;
+                }
+            }
+        }
+        &:focus {
+            + #{$label-selector} {
+                &:before {
+                    background-color: $input-focus-border-color;
+                }
+            }
+        }
+    }
+
+    &:disabled {
+        + #{$label-selector} {
+            &:after {
+                color: $white !important;
+            }
+        }
+    }
+}
+
+//to ensure the foundation checkboxes/radio boxes are displayed block
+.option-list {
+    margin: 0 0 1rem 0;
+    list-style-type: none;
+    li:hover {
+        cursor: default;
+        background-color: transparent !important;
+    }
+}
+
+// Radio button blocks
+.button-block {
+    display: block;
+    background-color: $white;
+    border: $input-border-width solid $content-ui-background;
+    color: $content-ui-foreground;
+    margin: 0 0 1rem 0;
+    padding: ($base-font-size - 4);
+    width: 100%;
+    font-size: $base-font-size;
+    font-weight: $font-weight-normal;
+    line-height: 2;
+    text-align: left;
+    transition: all 0.1s ease-in;
+    i {
+        @extend .size-32;
+        color: $content-ui-foreground;
+        padding-right: 0.35rem;
+        float: left;
+        line-height: 1;
+    }
+    &:hover {
+        background-color: $content-ui-background;
+        color: $content-ui-foreground;
+        cursor: pointer;
+    }
+}
+input[type="radio"] {
+    + .block {
+        @extend .button-block;
+    }
+    &:checked + .block {
+        background-color: $content-ui-foreground;
+        border: $input-border-width solid $content-ui-foreground;
+        color: $content-ui-selected;
+        i {
+            color: $content-ui-selected;
+        }
+    }
+}
+
+// Toggle Checkbox (VAPORWAVE)
+@mixin vaporwave(
+    $label-class: false,
+    $toggle-height: $input-height,
+    $toggle-width: $input-height,
+    $hover-background-color: $button-bg-hover,
+    $active-color: $content-ui-foreground,
+    $active-text-color: $content-ui-foreground-contrast
+) {
+    $label-selector: "label";
+
+    // overwrite to append class if required
+    @if ($label-class) {
+        $label-selector: "label.#{$label-class}";
+    }
+
+    + #{$label-selector} {
+        font-weight: $font-weight-normal;
+        margin: 0;
+        line-height: $toggle-height;
+        height: $toggle-height;
+        width: $toggle-width;
+        text-align: center;
+        transition: background-color 0.15s linear;
+
+        // Make sure elements inside the label don't hijack the label click
+        * {
+            pointer-events: none;
+        }
+
+        &:hover:enabled {
+            background-color: $hover-background-color;
+        }
+
+        [class^="icon-"]:before {
+            padding-right: 0;
+        }
+    }
+
+    &:checked {
+        + #{$label-selector} {
+            background-color: $active-color;
+            color: $active-text-color;
+            [class^="icon-"] {
+                color: $active-text-color;
+            }
+        }
+    }
+}
+
+// Beautifully styled checkboxes - just use the "plain" class
+input[type="radio"].plain,
+input[type="checkbox"].plain {
+    margin: 0;
+    min-height: inherit;
+}
+
+.checklist,
+.radiolist {
+    input[type="radio"]:not(.plain),
+    input[type="checkbox"]:not(.plain) {
+        @include fancy-check();
+    }
+}
+
+.checklist .checklist {
+    margin-left: 2rem;
+}
+
+// Checklist Container
+.checklist.checklist-container {
+    padding: 0;
+    max-height: 13rem;
+    border: $fieldset-border-width $fieldset-border-style $input-border-color;
+
+    input[type="checkbox"]:not(.plain):not(:disabled) {
+        border: none;
+
+        &:checked + label {
+            background: $content-ui-background;
+            &:hover {
+                background: css-lighten($content-ui-background, 3%);
+            }
+        }
+
+        + label {
+            border-bottom: 1px solid $input-border-color;
+            margin: 0;
+            padding: 0.5rem 0 0.5rem 2rem;
+            width: 100%;
+
+            &:after,
+            &:before {
+                padding: 0.5rem 0 0.5rem 0.5rem;
+                background-color: transparent;
+            }
+
+            &:hover {
+                cursor: pointer;
+                background: $content-ui-background;
+
+                &:after,
+                &:before {
+                    background-color: transparent;
+                }
+            }
+        }
+
+        &:focus {
+            &:after,
+            &:before {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .checklist-wrapper {
+        position: relative;
+    }
+}
+
+.toggle-set {
+    display: flex;
+    justify-content: space-between;
+    max-width: 20rem;
+
+    input[type="radio"]:not(.plain),
+    input[type="checkbox"]:not(.plain) {
+        @include vaporwave();
+    }
+}
+
+input[type="radio"]:not(.plain) {
+    @include fancy-check("radio-label");
+    @include vaporwave("input-toggle");
+}
+
+input[type="checkbox"]:not(.plain) {
+    @include fancy-check("checkbox-label");
+    @include vaporwave("input-toggle");
+}
+
+ul.filters {
+    align-items: center;
+    &:before {
+        display: inline-block;
+        content: "Showing:";
+        margin-right: 8px;
+    }
+    input[type="checkbox"] {
+        @include vaporwave($toggle-width: auto);
+    }
+    li {
+        display: inline-block;
+        margin-bottom: 3px;
+    }
+    label {
+        padding: 0 12px 0 8px;
+    }
+}
+
+.filter-interaction {
+    border-bottom: 1px solid #ededed;
+}
+
+// flex version of columns for filter results
+#applied_filters {
+    display: flex;
+    flex-flow: row wrap;
+    width: 100%;
+
+    .applied-filter-tab {
+        flex: 0 0 50%;
+        float: none;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        width: auto;
+        margin-top: 0.5rem;
+
+        @media #{$medium-up} {
+            flex: 1 1 0;
+        }
+
+        .filter {
+            margin: 0 0 1px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .selected-list {
+            margin: 0 0 1px;
+        }
+
+        .selected-item,
+        .more-count {
+            background-color: $accent-background;
+            display: block;
+            font-size: ($base-font-size - 4);
+            font-style: italic;
+            line-height: 1;
+            margin-bottom: 1px;
+            padding: 0.375rem 0.875rem;
+        }
+    }
+}
+
+.filter-dropdown {
+    .filter-component {
+        border-bottom: 1px solid #ededed;
+        border-right: 1px solid #ededed;
+        margin: 0;
+
+        @media #{$medium-down} {
+            border-right: 0;
+            flex: 0 0 100% !important;
+        }
+
+        &.btn {
+            border: 0;
+            flex: 2 auto;
+            max-width: rem-calc(300);
+
+            @media #{$medium-down} {
+                flex: 0 0 100%;
+                max-width: none;
+            }
+        }
+
+        > span {
+            display: block;
+            padding: 0.6rem 2.5rem 0.6rem 1.5rem;
+            position: relative;
+            text-align: center;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &.open {
+                background: $ghost;
+            }
+
+            &.no-option {
+                opacity: 0.5;
+
+                &:hover {
+                    cursor: not-allowed;
+                }
+            }
+
+            &::after {
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid $black;
+                content: "";
+                height: 0;
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+            }
+        }
+    }
+
+    .course-title {
+        font-weight: $font-weight-semibold;
+        margin-top: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .meta {
+        margin: 0;
+        text-align: center;
+    }
+
+    a,
+    input:not([type="text"]) {
+        font-size: 1rem;
+        line-height: inherit;
+        margin: 0;
+        width: 100%;
+    }
+
+    .f-dropdown {
+        &.content {
+            background: $ghost;
+            box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+            max-height: 268px;
+            outline: none;
+            overflow-x: hidden;
+            overflow-y: scroll;
+
+            @media #{$medium-down} {
+                max-width: 100%;
+                left: 0 !important;
+                width: 100% !important;
+            }
+        }
+    }
+}
+
+@media print {
+    ul.filters,
+    #applied_filters,
+    .filter-component {
+        display: none;
+    }
+}
+
+input[type="radio"]:not(.plain) + label {
+    &:before,
+    &:after {
+        border-radius: 1rem;
+    }
+}
+
+// Disabled
+input[type="checkbox"]:not(.plain):disabled,
+input[type="radio"]:not(.plain):disabled,
+input[type="checkbox"][readonly]:not(.plain),
+input[type="radio"][readonly]:not(.plain)  {
+    & + label {
+        cursor: $cursor-default-value;
+        opacity: 0.5;
+
+        &:after {
+            opacity: 0.5;
+        }
+    }
+}
+
+select.visibility {
+    &.show-icon-only {
+        width: 3rem !important;
+        padding: 0.5rem 1rem 0.5rem 0.3rem;
+    }
+}
+
+// Component Forms
+.editPanel {
+    // Socialstreams-specific colouring
+    &.socialstream-new-post {
+        background-color: $asgard;
+        display: block;
+    }
+    background-color: $gainsboro;
+    display: none;
+    padding: rem-calc(($base-font-size));
+
+    // Ensure that the source form input type is spaced like the others
+    .source {
+        margin: 0 0 $form-spacing 0;
+        span {
+            margin: 0 0 0 $form-spacing;
+        }
+    }
+}
+
+//  Show/Hide Advanced form fields
+.form-advanced {
+    display: none;
+    &.show {
+        display: block;
+    }
+}
+
+.context-switch {
+    margin-bottom: 1rem;
+
+    nav {
+        float: left;
+
+        /* Force these particular buttons to be square
+         */
+        a {
+            @extend .button;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: $global-button-height;
+        }
+
+        &:first-of-type {
+            a {
+                @extend .icon-previous;
+            }
+        }
+
+        &:last-of-type {
+            a {
+                @extend .icon-next;
+            }
+        }
+    }
+
+    /* Nav button widths = 2 buttons
+     * Previous enforcement of square buttons makes this easy
+     */
+    .semester,
+    .subject {
+        width: calc(100% - #{($global-button-height * 2)});
+        float: left;
+
+        select {
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    .subject {
+        margin-left: $global-button-height;
+    }
+}
+
+section > fieldset {
+    transition: opacity 360ms cubic-bezier(0.2, 1, 0, 1);
+    @include grid-row(nest-collapse);
+    border: none;
+
+    &[disabled] {
+        opacity: 0.8;
+    }
+
+    fieldset {
+        width: 100%;
+        border: none;
+        padding: 1rem 0;
+        margin: 0 0 0.5rem;
+    }
+
+    // second sibling onwards
+    ~ fieldset {
+        border-top: solid $fieldset-border-width $body-bg;
+    }
+
+    > legend {
+        @extend .column;
+        margin: 0.2rem 0 0.5rem;
+    }
+}
+
+fieldset.collapsible {
+    legend,
+    legend[class^="icon-"],
+    legend[class*=" icon-"],
+    legend[data-collapser] {
+        color: $anchor-font-color;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.mage > section > fieldset fieldset {
+    // second sibling onwards
+    ~ fieldset,
+    ~ fieldset fieldset {
+        border-top: solid $fieldset-border-width $body-bg;
+    }
+}
+
+.content > fieldset {
+    @media #{$small-only} {
+        padding: 0;
+    }
+}
+
+form .information-list .sp-replacer {
+    margin-bottom: 1rem;
+}
+
+/* Allow rubrics to display levels exceeding the container element SA-2730
+ * This is, apparently, some obnoxious webkit/failfox bug
+ *
+ * https://stackoverflow.com/questions/17408815/fieldset-resizes-wrong-appears-to-have-unremovable-min-width-min-content
+ * https://bugzilla.mozilla.org/show_bug.cgi?id=504622#c5
+ */
+fieldset {
+    min-width: 0;
+}
+
+.class-list {
+    section {
+        margin-bottom: 2px;
+    }
+}
+.class-list-form {
+    margin-bottom: 0;
+
+    .button {
+        margin-bottom: 0;
+    }
+}
+
+input.invalid-data,
+input.invalid-data:focus {
+    background-color: $hot-color;
+    border-color: $alert-color;
+}
+
+@import "dropzone";
+@import "tinymce";
+@import "rangeslider";
+
+// A table-like layout of input fields
+// Remove excess padding on everything
+// Reset padding to something sane on top and bottom
+
+.gridded-inputs {
+    .column,
+    .columns {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+
+        input,
+        select,
+        .switch {
+            margin: 0;
+        }
+    }
+}
+
+/**
+ * when you have an action bar that includes state tracking, this is
+ * the correct way to indicate a failure.
+ */
+#assessment-status .component-action .saving-error {
+    background-color: $alert-color;
+    color: #fff;
+    opacity: 1;
+}

@@ -148,7 +148,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/foundation/utils/_variables.scss';
+@import 'www/static/css/core/utils/_variables.scss';
 
 .field {
     @media screen and (max-width: 1500px) {

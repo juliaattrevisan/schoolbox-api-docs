@@ -1,0 +1,137 @@
+
+@include exports("global") {
+
+    // Meta styles are a dependancy of the Javascript.
+    // Used to provide media query values for javascript components.
+    // Forward slash placed around everything to convince PhantomJS to read the value.
+
+    meta.foundation-version {
+        font-family: "/5.5.3/";
+    }
+
+    meta.foundation-mq-small {
+        font-family: "/" + unquote($small-up) + "/";
+        width: lower-bound($small-range);
+    }
+
+    meta.foundation-mq-small-only {
+        font-family: "/" + unquote($small-only) + "/";
+        width: lower-bound($small-range);
+    }
+
+    meta.foundation-mq-medium {
+        font-family: "/" + unquote($medium-up) + "/";
+        width: lower-bound($medium-range);
+    }
+
+    meta.foundation-mq-medium-only {
+        font-family: "/" + unquote($medium-only) + "/";
+        width: lower-bound($medium-range);
+    }
+
+    meta.foundation-mq-large {
+        font-family: "/" + unquote($large-up) + "/";
+        width: lower-bound($large-range);
+    }
+
+    meta.foundation-mq-large-only {
+        font-family: "/" + unquote($large-only) + "/";
+        width: lower-bound($large-range);
+    }
+
+    meta.foundation-mq-xlarge {
+        font-family: "/" + unquote($xlarge-up) + "/";
+        width: lower-bound($xlarge-range);
+    }
+
+    meta.foundation-mq-xlarge-only {
+        font-family: "/" + unquote($xlarge-only) + "/";
+        width: lower-bound($xlarge-range);
+    }
+
+    meta.foundation-mq-xxlarge {
+        font-family: "/" + unquote($xxlarge-up) + "/";
+        width: lower-bound($xxlarge-range);
+    }
+
+    meta.foundation-data-attribute-namespace {
+        font-family: #{$namespace};
+    }
+
+    //to allow smooth browswer scrolling when animating to an anchor tag
+    html {
+        scroll-behavior: smooth;
+    }
+
+    html,
+    body { 
+        font-size: $base-font-size; 
+    }
+
+    // Default body styles
+    body {
+      background: $body-bg;
+      color: $body-font-color;
+      cursor: $cursor-auto-value;
+      font-family: $body-font-family;
+      font-style: $body-font-style;
+      font-weight: $body-font-weight;
+      line-height: $base-line-height; // Set to $base-line-height to take on browser default of 150%
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    a:hover { 
+        cursor: $cursor-pointer-value; 
+    }
+
+    // Grid Defaults to get images and embeds to work properly
+    // Get rid of gap under images by making them display: inline-block; by default
+    img { 
+        display: inline-block;
+        max-width: 100%; 
+        height: auto; 
+        vertical-align: middle;
+    }
+
+    // if an image has no src, hide it.
+    img[src=""] {
+        display: none;
+    }
+
+    //don't allow max-width when using map_canvas, I assume because
+    //setting it prevents it from displaying completely
+    #map_canvas,
+    .map_canvas,
+    .mqa-display {
+        img,
+        embed,
+        object { 
+            max-width: none !important;
+        }
+    }
+
+    // Miscellaneous useful HTML classes
+    .left { 
+        float: left !important; 
+    }
+    .right { 
+        float: right !important; 
+    }
+    .clearfix { 
+        @include clearfix;
+    }
+
+    // Make sure textarea takes on height automatically
+    textarea { 
+        height: auto; 
+        min-height: 50px; 
+    }
+
+    // Make select elements 100% width by default
+    select { 
+        width: 100%; 
+    }
+
+}

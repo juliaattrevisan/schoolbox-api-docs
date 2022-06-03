@@ -1,4 +1,4 @@
-import '!style-loader!css-loader!sass-loader!../www/static/css/foundation/chromeFoundation.scss'; //add in the base styles
+import '!style-loader!css-loader!sass-loader!../www/static/css/core/main.scss'; //add in the base styles
 import '../stories/assets/skin.css';
 import { initialize, mswDecorator } from 'msw-storybook-addon';
 

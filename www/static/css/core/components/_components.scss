@@ -1,0 +1,473 @@
+/*********************************************************
+ * Component styles for Dashboard, Homepage, Eportfolio
+ *********************************************************/
+
+// Color variables for component layouts
+
+/** Make these styles more specific than topbar styles  **/
+#component-layout .column-top .component-titlebar {
+  background-color: var(--top-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+#component-layout .column-top .component-titlebar h2,
+#component-layout .column-top .component-titlebar a {
+  color: var(--top-head-font);
+}
+
+#component-layout .column-top .island section {
+  color: var(--top-font-primary);
+  background-color: var(--top-bg-primary);
+}
+
+#component-layout .column-left .component-titlebar {
+  background-color: var(--left-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+#component-layout .column-left .component-titlebar h2,
+#component-layout .column-left .component-titlebar a {
+  color: var(--left-head-font);
+}
+
+#component-layout .column-left .island section {
+  color: var(--left-font-primary);
+  background-color: var(--left-bg-primary);
+}
+
+#component-layout .column-right .component-titlebar {
+  background-color: var(--right-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+#component-layout .column-right .component-titlebar h2,
+#component-layout .column-right .component-titlebar a {
+  color: var(--right-head-font);
+}
+
+#component-layout .column-right .island section {
+  color: var(--right-font-primary);
+  background-color: var(--right-bg-primary);
+}
+
+/** Special Effects for Action Buttons **/
+#component-layout .column-top .component-titlebar nav a,
+#component-layout .column-left .component-titlebar nav a,
+#component-layout .column-right .component-titlebar nav a {
+  opacity: 0.5;
+}
+
+#component-layout .column-top .component-titlebar nav a:hover,
+#component-layout .column-left .component-titlebar nav a:hover,
+#component-layout .column-right .component-titlebar nav a:hover {
+  opacity: 1;
+  background-color: transparent;
+}
+
+/* This is used in Masonry, in admin, to configure where your
+ * components are on Dashboard/Homepage/ePortfolio
+ */
+.component-configurator {
+
+    /* Apply margin between components
+     * Don't colour the margin
+     */
+    .component {
+        margin-bottom: rem-calc(($base-font-size));
+
+        /* Absorb from Skin Builder colour set
+         *
+         * wow nested identical css names - that's a really bad
+         * outcome. I shall rename .component.information-list
+         * into component-titlebar
+         */
+        .component-titlebar {
+            background-color: $content-ui-background;
+            margin-bottom: 0px;
+        }
+    }
+}
+
+/* Component Title Bar
+ */
+.component-titlebar {
+    .list-item {
+        padding: .475rem 1rem;
+    }
+    h2 {
+        margin-bottom: 0;
+    }
+}
+
+.ui-sortable-handle:hover {
+    cursor: move;
+}
+
+.component-action{
+  @extend .hide-for-print;
+
+  section {
+        display: flex;
+        justify-content: flex-end;
+        background-color: $ghost;
+        border-top: 1px solid $body-bg;
+        border-bottom: 3px solid $body-bg;
+        margin: 0;
+        min-height: 2.5rem;
+    }
+    form{
+        display: inline-block;
+        margin: 0;
+    }
+    .button, button, input{
+        background-color: transparent;
+        margin: 0;
+        font-weight: $font-weight-semibold;
+        font-size: rem-calc(($base-font-size - 2));
+        line-height: 1.5rem;
+        height: auto;
+        text-transform: uppercase;
+        width: auto;
+
+        &:hover{
+            background-color: $content-ui-hover;
+        }
+        &:disabled, &.disabled {
+            &:hover {
+                // don't show a hover if it's disabled
+                background-color: transparent;
+            }
+        }
+    }
+    input, [type="submit"] {
+        color: $content-ui-foreground;
+        display: inline-block;
+
+        &:hover {
+            color: $content-ui-foreground;
+        }
+    }
+    p{
+        display: inline-block;
+        margin: 0;
+        padding: 0.5rem 1rem;
+    }
+    .component-action-info {
+        @extend .meta;
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.5rem 0;
+    }
+    .spacer {
+        flex-grow: 1;
+    }
+}
+
+@media #{$medium-up} {
+    .component-action .component-action-info  {
+        position: absolute;
+        left: 0.75rem;
+        top: 0.75rem;
+        padding: 0;
+    }
+}
+
+.component-titlebar.meta {
+    @extend .no-margin;
+    font-style: normal;
+    padding: 0.125rem 1rem 0.5rem;
+}
+
+// Component specific margin
+.component-container {
+    margin-bottom: rem-calc(($base-font-size * 2));
+
+    section {
+        margin: 0;
+    }
+}
+
+/* Dashboard, Homepage: Calendar Events
+ */
+.translucent {
+    opacity: 0.3;
+}
+
+/* Adding Components to homepages
+ */
+#tabs-homepage .component-tabs{
+    display: block;
+    max-height: 0;
+    visibility: hidden;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.2s ease-out, opacity 0.2s ease-out;
+
+    &.active{
+        display: block;
+        max-height: 1000px;
+        visibility: visible;
+        opacity: 1;
+        transition: max-height 0.2s ease-in, opacity 0.2s ease-in;
+    }
+}
+
+.component-palette [data-component-palette] {
+    transition: all 0.2s;
+}
+
+[data-component-palette]{
+    background-color: $white;
+    position: relative;
+    overflow: hidden;
+    &:hover{
+        transform: translate(0.2rem, -0.2rem);
+        box-shadow: -10px 10px 0 rgba(0, 0, 0, 0.1);
+        z-index: 99;
+    }
+}
+
+.ui-draggable-dragging{
+    box-shadow: -10px 10px 0 rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-width: calc(100% - 2rem);
+}
+
+/* Dashboard, Homepage: Styles for Tyles
+ */
+$tiles-add-background:       #8fd16b;
+$tiles-add-background-hover: #aeff83;
+ul.tileList {
+    // Get rid of spacing between tiles
+    word-spacing: 0;
+    line-height: 0;
+
+    // TODO: remove margin padding 0 when Foundation is moved out of container
+    margin: 0;
+    padding: 0;
+
+    &.ui-sortable li {
+        // Get rid of border and background on sortable tiles
+        background-image: none;
+        border: none;
+    }
+
+    // Styles for individual tiles
+    li.tile {
+        // TODO: uncomment padding 0 when Foundation is moved out of container
+        //padding: 0;
+        position: relative;
+        display: inline-block;
+        height: auto;
+        // Styles for the tile's background image (if provided)
+        background-repeat: no-repeat;
+        // This tends to get clobbered by more specific styles which set a
+        // background as a color and nothing else.
+        background-size: cover;
+        background-position: center;
+        transition: background-color 0.1s;
+        color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        &.contained {
+            background-size: contain;
+        }
+        &.background-top {
+            background-position-y: top;
+        }
+        &.background-middle {
+            background-position-y: center;
+        }
+        &.background-bottom {
+            background-position-y: bottom;
+        }
+        &.background-left {
+            background-position-x: left;
+        }
+        &.background-center {
+            background-position-x: center;
+        }
+        &.background-right {
+            background-position-x: right;
+        }
+        &.marked-for-delete {
+            // Fade out tiles marked for delete
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+        &.add {
+            // Add new tile link looks like a tile
+              background-color: $tiles-add-background;
+            &:hover {
+                background-color: $tiles-add-background-hover;
+            }
+            .title {
+                // its title is just a link in the middle of it
+                text-align: center;
+                vertical-align: middle;
+            }
+        }
+        .btn {
+            margin: 8px 8px 0 0;
+        }
+        .title {
+            // Title: revert spacing back to normal
+            position: absolute;
+            width: 100%;
+            word-spacing: normal;
+            line-height: normal;
+            // Font size: I assume some will want to change this and the font family
+            font-size: 2em;
+            padding: 1em;
+            &.text-top {
+                top: 0;
+            }
+            &.text-middle {
+                transform: translateY(-50%);
+                top: 50%;
+            }
+            &.text-bottom {
+                bottom: 0;
+            }
+            &.text-left {
+                text-align: left;
+            }
+            &.text-center {
+                text-align: center;
+            }
+            &.text-right {
+                text-align: right;
+            }
+        }
+        .tile-link, .edit {
+            // The tile's link and edit partition overlap the entire tile
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            transition: background-color 0.1s;
+        }
+    }
+
+    .button {
+        width: $global-button-height;
+        line-height: 1.5;
+        &:before {
+            float: none;
+            padding-right: 0;
+        }
+    }
+}
+
+/* Dashboard: Recent Submissions
+ */
+.counter {
+    font-size: rem-calc(($base-font-size + 8));
+    line-height: 1.8rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* Homepage: Course Outline
+ */
+.ui-sortable-helper {
+    cursor: move;
+}
+
+/* Homepage Statistics
+ */
+.tally {
+    float: right;
+    margin-top: -0.5rem;
+}
+
+/* Homepage Countdown
+ */
+.countdown-timer{
+    text-align: center;
+    color: $accent-foreground;
+    li{
+        padding-right: 2px !important;
+    }
+    span{
+        display: block;
+        padding: 0.2rem;
+        font-weight: 500;
+        background-color: $accent-background;
+    }
+    .count{
+        font-size: $h2-font-size;
+    }
+    .labels{
+        font-size: $paragraph-font-size;
+        text-transform: uppercase;
+        @media #{$small-only} {
+            font-size: 0.625rem;
+        }
+    }
+}
+
+/* Eportfolio
+ */
+.eportfolio {
+    position: relative;
+    .cover-photo {
+        background-image: url("#{$cdn-prefix}/images/core/eportfolio/coverphotoPlaceholder.jpg");
+        background-size: cover;
+        background-position: center;
+        height: 28rem;
+
+        ~ nav {
+            position: absolute;
+            top: 1rem;
+            @media #{$small-only}  { right: 1rem; }
+            @media #{$medium-only} { right: 2.5rem; }
+            @media #{$large-up}    { right: 2rem; }
+
+            .dzone:before {
+                padding: 0;
+                top: 6px;
+                left: 6px;
+            }
+        }
+    }
+    .card {
+        position: absolute;
+        bottom: 0;
+        margin: 0rem 1rem 0 0rem;
+        .wrap{
+            background-color: rgba(0, 0, 0, 0);
+	        background-image: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.46));
+            float: left;
+            width: 100%;
+            height: 8rem;
+            padding: 0 0 1rem 1rem;
+        }
+        img{
+            border: 2px solid $white;
+            width: 8rem;
+            margin: -1rem 1rem 0rem 0;
+        }
+        h1, p{
+            color: $white;
+            @include vertical-align;
+            // This usually exists in cards but not H1, this is a once off.
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    }
+}
+
+/**
+ * Hide empty state message configs on components, these are only for use in templates
+ */
+.component-container .emptystatemessage {
+    display: none;
+}
+
+// Kill flex-video margin-bottom when it's inside a component
+.component-container .flex-video {
+    margin-bottom: 0;
+}

@@ -1,0 +1,406 @@
+// Foundation by ZURB
+// foundation.zurb.com
+// Licensed under MIT Open Source
+
+//
+// @name _tables.scss
+// @dependencies _global.scss
+//
+
+//
+// @variables
+//
+
+$include-html-table-classes: $include-html-classes !default;
+
+// These control the background color for the table and even rows
+$table-bg: $white;
+$table-even-row-bg: transparent;
+
+// These control the table cell border style
+$table-border-style: solid !default;
+$table-border-size: 0;
+$table-border-color: $gainsboro !default;
+
+// These control the table head styles
+$table-head-bg: $table-bg;
+$table-head-font-size: rem-calc(($base-font-size - 3));
+$table-head-font-color: $black;
+$table-head-font-weight: $font-weight-semibold;
+$table-head-padding: rem-calc(($base-font-size - 6));
+
+// These control the table foot styles
+$table-foot-bg: $table-head-bg !default;
+$table-foot-font-size: $table-head-font-size !default;
+$table-foot-font-color: $table-head-font-color !default;
+$table-foot-font-weight: $table-head-font-weight !default;
+$table-foot-padding: $table-head-padding !default;
+
+// These control the caption
+$table-caption-bg: transparent !default;
+$table-caption-font-color: $table-head-font-color !default;
+$table-caption-font-size: rem-calc(16) !default;
+$table-caption-font-weight: bold !default;
+
+// These control the row padding and font styles
+$table-row-padding: rem-calc(($base-font-size - 6));
+$table-row-font-size: rem-calc(($base-font-size - 3));
+$table-row-font-color: $black;
+$table-line-height: rem-calc(18) !default;
+
+// These are for controlling the layout, display and margin of tables
+$table-layout: auto !default;
+$table-display: table-cell !default;
+$table-margin-bottom: rem-calc(($base-font-size - 2));
+
+
+//
+// @mixins
+//
+
+@mixin table {
+  background: $table-bg;
+  border: $table-border-style $table-border-size $table-border-color;
+  margin-bottom: $table-margin-bottom;
+  table-layout: $table-layout;
+
+  caption {
+    background: $table-caption-bg;
+    color: $table-caption-font-color;
+    font: {
+      size: $table-caption-font-size;
+      weight: $table-caption-font-weight;
+    }
+  }
+
+  thead {
+    background: $table-head-bg;
+
+    tr {
+      th,
+      td {
+        color: $table-head-font-color;
+        font-size: $table-head-font-size;
+        font-weight: $table-head-font-weight;
+        padding: $table-head-padding;
+      }
+    }
+  }
+
+  tfoot {
+    background: $table-foot-bg;
+
+    tr {
+      th,
+      td {
+        color: $table-foot-font-color;
+        font-size: $table-foot-font-size;
+        font-weight: $table-foot-font-weight;
+        padding: $table-foot-padding;
+      }
+    }
+  }
+
+  tr {
+    th,
+    td {
+      color: $table-row-font-color;
+      font-size: $table-row-font-size;
+      padding: $table-row-padding;
+      text-align: $default-float;
+    }
+
+    &.even,
+    &.alt,
+    &:nth-of-type(even) { background: $table-even-row-bg; }
+  }
+
+  thead tr th,
+  tfoot tr th,
+  tfoot tr td,
+  tbody tr th,
+  tbody tr td,
+  tr td { display: $table-display; line-height: $table-line-height; }
+}
+
+
+@include exports("table") {
+  @if $include-html-table-classes {
+    table {
+      @include table;
+    }
+  }
+}
+
+
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  line-height: 1.4;
+  .card {
+    padding: 0;
+    img {
+      margin: -0.625rem 1rem 0 -0.6rem;
+    }
+  }
+  .profile-cell {
+    min-width: 160px;
+    padding: 0;
+
+    .card img {
+      margin: 0 0.5rem 0 0;
+    }
+  }
+  tr.alert {
+    background-color: tint($alert-color, 74%);
+  }
+}
+
+table td,
+table th {
+  position: relative; // This is to stop the user's viewport from jumping when there's a checkbox inside of a cell
+}
+
+td,
+th {
+  vertical-align: top;
+  border-bottom: 1px solid $body-bg;
+  input[type="radio"] + label.radio-label,
+  input[type="checkbox"] + label.checkbox-label {
+    margin: 0 rem-calc(($base-font-size)) 0 0;
+  }
+}
+
+tr.sub-row {
+  th,
+  td {
+    background-color: $gainsboro;
+  }
+}
+
+// Table Skeleton
+table.skeleton {
+  tr {
+    height: 2rem;
+  }
+}
+
+.row-header,
+.island table.dataTable thead th {
+  border-bottom: 2px solid $body-bg;
+  font-weight: $font-weight-semibold;
+}
+
+// Override calendar default colour with accent colours
+.fc .fc-today {
+  background: $accent-background !important;
+  color: $accent-foreground !important;
+}
+
+/* .row-header is designed to have the same style as th elements
+ * but the padding is completely different when used on a list-item
+ */
+.action-list,
+.information-list {
+  li.row-header {
+    padding-top: 0.5rem;
+    border-bottom: 2px solid $body-bg;
+  }
+}
+
+// Table Actions
+.table-actions {
+  [class^="icon-"]:before,
+  [class*=" icon-"]:before{
+    opacity: 0.5;
+    padding: rem-calc(($base-font-size - 2));
+    transition: all 0.15s linear;
+  }
+}
+
+tr:hover {
+  .table-actions{
+    [class^="icon-"]:before,
+    [class*=" icon-"]:before{
+      opacity: 1;
+    }
+  }
+}
+
+/* Don't use row hovers on Timetable Grid screens anymore
+ * They don't do much now due to fully-expanding coloured blocks
+ */
+table:not(.no-hover) tbody tr:hover {
+  nav a {
+    opacity: 1;
+    &:hover {
+      background-color: $row-action-hover-background;
+    }
+  }
+}
+
+$square-grid-td-size: 4rem;
+$rotate-width: 4.5rem;
+$rotate-angle: 45;
+$rotate-th-width: $square-grid-td-size;
+$rotate-span-width: 11rem;
+
+.square-grid {
+  td,
+  thead th {
+    width: $square-grid-td-size;
+    white-space: nowrap;
+  }
+}
+
+.rotate-headers {
+  background-color: $body-bg;
+
+  th {
+    &:empty {
+      &:first-child {
+        width: 50%;
+      }
+      &:last-child {
+        width: 100%;
+      }
+    }
+
+    font-size: $paragraph-font-size;
+    border-color: $vapor;
+    height: $rotate-width * 2 + 1;
+    min-width: $rotate-th-width;
+    max-width: $rotate-th-width;
+    position: relative;
+    vertical-align: bottom;
+    padding: 0 !important;
+    letter-spacing: 0.1ex;
+
+    > div {
+      transform: skew(-#{$rotate-angle}deg, 0deg);
+      overflow: hidden;
+      border: 0 solid #eeeeee;
+      border-left-width: 1px;
+      z-index: 1;
+      position: relative;
+      height: 100%;
+      top: 0;
+      left: $rotate-width + 0.5;
+      filter: none !important;
+      background-color: $white;
+
+      > span {
+        $rotate-angle-complement: 360 - $rotate-angle;
+
+        transform: skew(#{$rotate-angle}deg, 0deg) rotate(#{$rotate-angle-complement}deg);
+        filter: none !important;
+        position: absolute;
+        top: auto;
+        bottom: 3.75rem;
+        left: -3.75rem;
+        display: inline-block;
+        width: $rotate-span-width;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-weight: normal;
+      }
+    }
+
+    .meta {
+      font-style: normal;
+    }
+  }
+}
+
+// stackable tables
+@mixin table-stack($size, $h-pad: 0.875rem) {
+  table.stack-for-#{$size}-down {
+    thead {
+      display: none;
+    }
+    tr,
+    th,
+    td {
+      display: block;
+    }
+    th,
+    td {
+      padding: 0.875rem $h-pad;
+    }
+    td {
+      &:before {
+        content: attr(title);
+        float: left;
+        margin: 0 1.125rem;
+      }
+    }
+  }
+}
+
+@media #{$small-only} {
+  @include table-stack($size: small, $h-pad: 2rem);
+}
+@media #{$medium-down} {
+  @include table-stack($size: medium);
+}
+@media #{$large-down} {
+  @include table-stack($size: large);
+}
+
+@if $include-xl-html-grid-classes {
+  @media #{$xlarge-down} {
+    @include table-stack($size: xlarge);
+  }
+}
+
+#marksheet-styles tr td {
+  vertical-align: middle;
+}
+
+#marksheet-styles select {
+  max-width: 3rem;
+}
+
+//prevent grades from wrapping over two lines
+.marksheet .student-grade-cell {
+    white-space: nowrap;
+}
+
+// dataTables
+.island {
+  table.dataTable.no-footer {
+    border-bottom: none;
+  }
+  .dataTables_wrapper {
+    .dataTables_info {
+      @extend .meta;
+      font-size: $paragraph-font-size;
+      text-align: left;
+
+      margin-bottom: 1.5rem;
+      margin-left: 1rem;
+      margin-top: 1rem;
+
+      @media #{$small-only} {
+        margin-left: 2rem;
+      }
+    }
+
+    // Remove scrollbar from fixed column, is a bug that needs a workaround
+    // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
+    .DTFC_LeftBodyLiner {
+      overflow-x: hidden;
+    }
+  }
+}
+
+// Tables in homepage components
+.component-container table {
+  background: transparent;
+}

@@ -19,7 +19,7 @@ $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
     <meta http-equiv="Content-Language" content="en-au" />
     <link rel="stylesheet"
           type="text/css"
-          href="<?php echo Scrub::text($cdnPrefixGenerator->generate());?>/css/core/chromeFoundation.css?v=<?php echo Scrub::text($config->get('site_version'));?>" />
+          href="<?php echo Scrub::text($cdnPrefixGenerator->generate());?>/css/core/main.css?v=<?php echo Scrub::text($config->get('site_version'));?>" />
 </head>
 <body>
     <div class="row island">

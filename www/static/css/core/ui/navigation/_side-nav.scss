@@ -1,0 +1,261 @@
+
+
+// Foundation by ZURB
+// foundation.zurb.com
+// Licensed under MIT Open Source
+
+//
+// @variables
+//
+
+$include-html-nav-classes: $include-html-classes !default;
+
+// We use this to control padding.
+$side-nav-padding: 0;
+
+// We use these to control list styles.
+$side-nav-list-type: none;
+$side-nav-list-position: inside;
+$side-nav-list-margin: 0;
+
+// We use these to control link styles.
+$side-nav-link-color: $anchor-font-color;
+$side-nav-link-color-active: $side-nav-link-color;
+$side-nav-link-color-hover: $body-font-color;
+$side-nav-link-bg-hover: hsla(0, 0%, 0%, 0.025) !default;
+$side-nav-link-margin: 0 !default;
+$side-nav-link-padding: rem-calc(7 14) !default;
+$side-nav-font-size: rem-calc(13);
+$side-nav-font-weight: normal;
+$side-nav-font-weight-active: $font-weight-bold;
+$side-nav-font-family: $body-font-family;
+$side-nav-font-family-active: $side-nav-font-family;
+
+// We use these to control heading styles.
+$side-nav-heading-color: $side-nav-link-color !default;
+$side-nav-heading-font-size: $side-nav-font-size !default;
+$side-nav-heading-font-weight: bold !default;
+$side-nav-heading-text-transform: uppercase !default;
+
+// We use these to control border styles
+$side-nav-divider-size: 1px;
+$side-nav-divider-style: solid !default;
+$side-nav-divider-color: scale-color(#fff, $lightness: 10%);
+
+//
+// @mixins
+//
+
+// We use this to style the side-nav
+//
+// $divider-color - Border color of divider. Default: $side-nav-divider-color.
+// $font-size - Font size of nav items. Default: $side-nav-font-size.
+// $link-color - Color of navigation links. Default: $side-nav-link-color.
+// $link-color-hover - Color of navigation links when hovered. Default: $side-nav-link-color-hover.
+@mixin side-nav(
+  $divider-color: $side-nav-divider-color,
+  $font-size: $side-nav-font-size,
+  $link-color: $side-nav-link-color,
+  $link-color-active: $side-nav-link-color-active,
+  $link-color-hover: $side-nav-link-color-hover,
+  $link-bg-hover: $side-nav-link-bg-hover
+) {
+  display: block;
+  font-family: $side-nav-font-family;
+  list-style-position: $side-nav-list-position;
+  list-style-type: $side-nav-list-type;
+  margin: 0;
+  padding: $side-nav-padding;
+
+  li {
+    font-size: $font-size;
+    font-weight: $side-nav-font-weight;
+    margin: $side-nav-list-margin;
+
+    a:not(.button) {
+      color: $link-color;
+      display: block;
+      margin: $side-nav-link-margin;
+      padding: $side-nav-link-padding;
+      @media #{$mediumwide-up} {
+        //ensure isn't applied on mobile
+        &:hover,
+        &:focus {
+          background: $link-bg-hover;
+          color: $link-color-hover;
+        }
+        &:active {
+          color: $link-color-active;
+        }
+      }
+    }
+
+    &.active > a:first-child:not(.button) {
+      color: $side-nav-link-color-active;
+      font-family: $side-nav-font-family-active;
+      font-weight: $side-nav-font-weight-active;
+    }
+
+    &.divider {
+      border-top: $side-nav-divider-size $side-nav-divider-style;
+      height: 0;
+      list-style: none;
+      padding: 0;
+      border-top-color: $divider-color;
+    }
+
+    &.heading {
+      color: $side-nav-heading-color;
+      font: {
+        size: $side-nav-heading-font-size;
+        weight: $side-nav-heading-font-weight;
+      }
+      text-transform: $side-nav-heading-text-transform;
+    }
+  }
+}
+
+@include exports("side-nav") {
+  @if $include-html-nav-classes {
+    .side-nav {
+      @include side-nav;
+    }
+  }
+}
+
+/*-------------------------------------------------------------------------------------
+    CUSTOM OVERRIDES
+-------------------------------------------------------------------------------------*/
+
+$border-bottom-width: 2px;
+
+.side-nav {
+  background-color: $white;
+  li {
+    a {
+      padding: 0.5rem 0.75rem;
+      display: block;
+      border-left: $border-bottom-width solid transparent;
+      @media #{$mediumwide-up} {
+        //ensure isn't applied on mobile
+        &:hover {
+          border-left: $border-bottom-width solid $content-ui-hover;
+          color: $side-nav-link-color-hover;
+        }
+      }
+    }
+
+    &.active {
+      > a {
+        font-weight: $side-nav-font-weight-active;
+        border-left: $border-bottom-width solid $accent-foreground;
+      }
+    }
+
+    ul {
+      margin: 0;
+      list-style: none;
+
+      li a {
+        padding-left: 1.5rem;
+
+        .label {
+          font-size: 10px;
+        }
+      }
+      &.flyout {
+        display: none;
+        background-color: $white;
+        width: 100%;
+        z-index: 2;
+
+        @media #{$mediumwide-up} {
+          box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.3);
+          position: absolute;
+          margin-top: -35px;
+          right: -100%;
+        }
+        @media #{$medium-down} {
+          background-color: $side-nav-link-bg-hover;
+        }
+      }
+    }
+    @media #{$mediumwide-up} {
+      //ensure isn't applied on mobile
+      &:hover > ul.flyout {
+        display: block;
+      }
+    }
+    &.parent-item > a:after {
+      font-family: $font-family-icon;
+      content: "\e64b"; // right caret
+      float: right;
+
+      @media #{$medium-down} {
+        transform: rotate(90deg);
+      }
+    }
+  }
+}
+
+#admin-nav {
+  .side-nav {
+    position: relative;
+    width: 100%;
+
+    // 'Lists'
+    .flyout {
+      max-height: 450px;
+      overflow: auto;
+    }
+  }
+  .dropdown-btn {
+    width: 100%;
+    background-color: $white;
+    padding: 0.75rem;
+    display: none;
+
+    &:after {
+      font-family: $font-family-icon;
+      content: "\e621";
+      float: right;
+    }
+  }
+  @media #{$medium-down} {
+    .dropdown-btn {
+      display: block;
+    }
+    .admin {
+      border-top: 1px solid $accent-foreground;
+      display: none;
+    }
+  }
+}
+
+.side-nav.news-archive-filter {
+  // Need to keep the active class to determine whether to show its children (months),
+  // but hide the border on the year if a month is selected
+  li.active.has-month-selected > a {
+    border-left: none;
+  }
+  .months {
+    display: none;
+  }
+  li.active .months {
+    display: block;
+  }
+}
+
+.news-nav section {
+  min-width: 210px;
+}
+
+.news-nav .side-nav li a {
+  padding-right: 0 !important;
+}
+
+@media #{$medium-only} {
+  .news-nav {
+    padding-left: 0;
+  }
+}

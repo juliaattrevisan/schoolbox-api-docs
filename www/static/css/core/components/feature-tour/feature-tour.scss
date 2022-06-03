@@ -1,0 +1,268 @@
+$modal-width: 30rem;
+$tooltip-padding: 1rem;
+
+// ----------------------------------------------------------------
+// Tooltip
+// ----------------------------------------------------------------
+.introjs-tooltip {
+  border-radius: 0;
+  box-sizing: border-box;
+  min-width: 350px;
+  padding: $tooltip-padding;
+}
+
+.introjs-arrow {
+  border: 8px solid $white;
+
+  &.top {
+    border-color: transparent transparent $white;
+    top: -1rem;
+  }
+
+  &.top-right {
+    border-color: transparent transparent $white;
+    right: 1rem;
+    top: -1rem;
+  }
+
+  &.top-middle {
+    border-color: transparent transparent $white;
+    left: 50%;
+    margin-left: -5px;
+    top: -1rem;
+  }
+
+  &.right {
+    border-color: transparent transparent transparent $white;
+    right: -1rem;
+    top: 1rem;
+  }
+
+  &.right-bottom {
+    border-color: transparent transparent transparent $white;
+    bottom: 1rem;
+    right: -1rem;
+  }
+
+  &.bottom {
+    border-color: $white transparent transparent;
+    bottom: -1rem;
+  }
+
+  &.left {
+    border-color: transparent $white transparent transparent;
+    left: -1rem;
+    top: 1rem;
+  }
+
+  &.left-bottom {
+    border-color: transparent $white transparent transparent;
+    bottom: 1rem;
+    left: -1rem;
+  }
+
+  &.bottom-middle {
+    border-color: $white transparent transparent transparent;
+    left: 50%;
+    margin-left: -5px;
+    bottom: -1rem;
+  }
+}
+
+.introjs-tooltiptext {
+  font-size: $paragraph-font-size;
+  padding-right: 2rem;
+
+  [class^="icon-"]:before {
+    padding-right: 0;
+  }
+}
+
+
+// ----------------------------------------------------------------
+// Modal
+// ----------------------------------------------------------------
+.introjs-intromodal {
+  padding-bottom: 3rem; // This is to allow space for the absolute positioned 'no thanks' button
+  min-width: $modal-width;
+}
+
+.introjs-newsmodal {
+  min-width: 40rem;
+  .introjs-tooltiptext {
+    padding-right: 0;
+  }
+}
+
+// ----------------------------------------------------------------
+// Highlighted area
+// ----------------------------------------------------------------
+.introjs-overlay {
+  background: $reveal-overlay-bg;
+}
+
+.introjs-helperLayer {
+  animation: pulse 1.5s infinite;
+  border: 1px solid rgba($white, .6);
+  border-radius: 0;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($white, .7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 1rem rgba($white, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba($white, 0);
+  }
+}
+
+.introjs-tooltipReferenceLayer {
+  box-sizing: border-box;
+}
+
+
+// ----------------------------------------------------------------
+// Buttons
+// ----------------------------------------------------------------
+.introjs-tooltipbuttons {
+  display: flex;
+}
+
+.introjs-button {
+  background-color: $content-ui-background;
+  background-image: none;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: $content-ui-foreground;
+  font: rem-calc(($base-font-size - 2)) / normal $font-family-sans-serif;
+  line-height: 1.375rem;
+  text-align: center;
+  text-shadow: none;
+  @include button-dimensions();
+  margin: 1rem 0 0;
+
+  &:hover {
+    background-color: $content-ui-hover;
+    border-color: transparent;
+    box-shadow: none;
+    color: $content-ui-foreground;
+  }
+
+  &:focus,
+  &:active {
+    background-image: none;
+  }
+}
+
+.introjs-nextbutton,
+.introjs-prevbutton {
+  flex: 1 auto;
+}
+
+.introjs-skipbutton,
+.introjs-prevbutton {
+  margin-right: 1px;
+}
+
+.introjs-donebutton {
+  width: 100%;
+  margin-right: 0;
+
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover,
+  &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
+  }
+
+  // Hide the previous and next buttons on the last step, leaving just the 'done' button
+  &+ .introjs-nextbutton,
+  &+ .introjs-prevbutton {
+    display: none;
+  }
+}
+
+.introjs-nextbutton.introjs-fullbutton {
+    border-radius: 0;
+}
+
+.introjs-startbutton,
+.introjs-donebutton {
+  font-weight: $font-weight-semibold;
+  color: $submit-button-color;
+  background-color: $submit-button-bg-color;
+  &:hover,
+  &:focus {
+    color: $submit-button-color;
+    background-color: $submit-button-bg-hover;
+  }
+}
+
+.introjs-nothanksbutton {
+  background: transparent;
+  position: absolute;
+  right: $tooltip-padding;
+  bottom: $tooltip-padding;
+  margin: 0;
+  padding-bottom: 0;
+  color: $monsoon;
+  min-height: auto;
+  width: $modal-width - ($tooltip-padding*2);
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+
+// ----------------------------------------------------------------
+// Restyling the skip button to an X top right
+// ----------------------------------------------------------------
+.closeable-tooltip {
+  .introjs-skipbutton:not(.introjs-donebutton) {
+    background: transparent;
+    color: $oil;
+    font-size: 2rem;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 6px;
+    top: 3px;
+    text-shadow: none;
+
+    &:hover {
+      color: $accent-foreground;
+    }
+  }
+}
+
+
+// ----------------------------------------------------------------
+// Bullets
+// ----------------------------------------------------------------
+.introjs-bullets ul {
+  margin: 1.5rem auto;
+
+  li {
+    display: inline-block;
+    margin: 0 6px;
+
+    a {
+      background: $iron;
+      height: .75rem;
+      width: .75rem;
+
+      &:hover,
+      &.active {
+        background: $accent-foreground;
+      }
+    }
+  }
+}

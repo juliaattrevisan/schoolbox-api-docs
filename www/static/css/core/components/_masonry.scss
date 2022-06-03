@@ -1,0 +1,427 @@
+$masonry-background-color: $accent-background;
+$masonry-color: $accent-foreground;
+$masonry-drop-background: $input-focus-bg-color;
+
+// Hide the placeholders for non-empty columns
+.masonry-placeholder, .marker {
+  display: none;
+  border: 2px dashed $masonry-color;
+  background-color: $masonry-background-color;
+  color: $masonry-color;
+  padding: rem-calc(14);
+  margin-bottom: rem-calc(($base-font-size));
+  font-size: rem-calc(13);
+  text-align: center;
+}
+
+.show-empty .empty-column .masonry-placeholder {
+    display: inherit;
+}
+
+//Used when hovering a component over column
+.marker{
+  display: inherit;
+  color: $masonry-color;
+  background-color: $masonry-drop-background;
+}
+
+
+/* The drag/drop in Component tab
+ */
+.component-palette {
+    border-top: 1px solid $body-bg;
+
+    /* To overcome the !important from .grid, which overcomes
+     * the too-powerful Foundation defaults
+     */
+    margin: 0 !important;
+
+    .disabled {
+        opacity: 0.7;
+        pointer-events: none;
+        cursor: not-allowed;
+        a {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    }
+
+    /* The Component avatar representations you can drag/drop into
+     * component-based pages like Dashboard, Homepage and ePortfolio
+     *
+     * For compatibility in block grid
+     */
+    .card {
+        .icon-masonry {
+            padding: 0.75rem 0 0.5rem 0.75rem;
+        }
+    }
+}
+
+// Padding when dropping a component onto the page before it is ajaxed in
+#component-layout {
+  .pending {
+      margin-bottom: 2rem;
+  }
+  .column-right {
+    float: right;
+  }
+}
+
+
+// Disabled components in the palette
+
+// Homepage masonry icons
+.icon-masonry:before {
+    // default icon
+    @extend .icon-add;
+}
+
+.icon-masonry-Component_Homepage_BreadcrumbController:before {
+  @extend .icon-breadcrumbs;
+  color: $icon-color-breadcrumbs;
+}
+.icon-masonry-Schoolbox_Comms_News_Component_Homepage_Controller:before {
+  @extend .icon-news;
+  color: $icon-color-news;
+}
+.icon-masonry-Component_Homepage_LinkListController:before {
+  @extend .icon-link;
+  color: $icon-color-links;
+}
+.icon-masonry-Component_Homepage_FileListController:before {
+  @extend .icon-files;
+  color: $icon-color-files;
+}
+.icon-masonry-Component_Homepage_MembersController:before {
+  @extend .icon-group;
+  color: $icon-color-group-members;
+}
+.icon-masonry-Component_Homepage_ForumListController:before {
+  @extend .icon-forum;
+  color: $icon-color-forum;
+}
+.icon-masonry-Component_Homepage_ManageClassController:before {
+  @extend .icon-class-list;
+  color: $icon-color-class-list;
+}
+.icon-masonry-Component_Homepage_ManageFolderController:before {
+  @extend .icon-folder;
+  color: $icon-color-folders;
+}
+.icon-masonry-Component_Homepage_ManagersController:before {
+  @extend .icon-group-managers;
+  color: $icon-color-group-members;
+}
+.icon-masonry-Component_Homepage_ImageController:before {
+  @extend .icon-image;
+  color: $icon-color-image;
+}
+.icon-masonry-Component_Homepage_FolderListController:before {
+  @extend .icon-folder;
+  color: $icon-color-folders;
+}
+.icon-masonry-Schoolbox_Calendar_Component_Homepage_Controller:before {
+  @extend .icon-calendar;
+  color: $icon-color-calendar;
+}
+.icon-masonry-Component_Homepage_ClickviewController:before {
+  @extend .icon-click-view;
+  color: $icon-color-clickView;
+}
+.icon-masonry-Component_Homepage_ImageGalleryController:before {
+  @extend .icon-image-gallery;
+  color: $icon-color-image-gallery;
+}
+.icon-masonry-Component_Homepage_RandImageController:before {
+  @extend .icon-random-image;
+  color: $icon-color-random-image;
+}
+.icon-masonry-Component_Homepage_DropBoxController:before {
+  @extend .icon-drop-box;
+  color: $icon-color-file-drop-box;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller:before {
+  @extend .icon-due-work;
+  color: $icon-color-due-work;
+}
+.icon-masonry-Component_Homepage_RSSController:before {
+  @extend .icon-rss;
+  color: $icon-color-rss-feed;
+}
+.icon-masonry-Component_Homepage_TeachersController:before {
+  @extend .icon-teacher;
+  color: $icon-color-class-teachers;
+}
+.icon-masonry-Component_Homepage_PollController:before {
+  @extend .icon-poll;
+  color: $icon-color-poll;
+}
+.icon-masonry-Component_Homepage_WikiController:before {
+  @extend .icon-wiki;
+  color: $icon-color-wiki;
+}
+.icon-masonry-Component_Homepage_FeedController:before {
+  @extend .icon-homepagefeed;
+  color: $icon-color-homepage-feed;
+}
+.icon-masonry-Schoolbox_Resource_Textbox_Component_Homepage_Controller:before {
+  @extend .icon-textbox;
+  color: $icon-color-text-box;
+}
+.icon-masonry-Component_Homepage_AudioController:before {
+  @extend .icon-audio;
+  color: $icon-color-audio;
+}
+.icon-masonry-Component_Homepage_PodcastController:before {
+  @extend .icon-podcast;
+  color: $icon-color-podcast;
+}
+.icon-masonry-Schoolbox_Blog_Homepage_Component_Controller:before {
+  @extend .icon-comment;
+  color: $icon-color-chat;
+}
+.icon-masonry-Component_Homepage_ScrollerController:before {
+  @extend .icon-image-slideshow;
+  color: $icon-color-image-slideshow;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller:before {
+  @extend .icon-quiz;
+  color: $icon-color-quizzes;
+}
+.icon-masonry-Component_Homepage_CountdownController:before {
+  @extend .icon-countdown;
+  color: $icon-color-countdown;
+}
+.icon-masonry-Component_Homepage_ChatController:before {
+  @extend .icon-chat;
+  color: $icon-color-chat;
+}
+.icon-masonry-Component_Homepage_SurveyController:before {
+  @extend .icon-surveys;
+  color: $icon-color-surveys;
+}
+.icon-masonry-Schoolbox_Twitter_Component_Homepage_Controller:before {
+  @extend .icon-twitter;
+  color: $icon-color-twitter;
+}
+.icon-masonry-Component_Homepage_ClassListController:before {
+  @extend .icon-class-list;
+  color: $icon-color-class-list;
+}
+.icon-masonry-Component_Homepage_VideoController:before {
+  @extend .icon-video;
+  color: $icon-color-video-player;
+}
+.icon-masonry-Component_Homepage_WolframController:before {
+  @extend .icon-wolfram-alpha;
+  color: $icon-color-wolfram-alpha;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_Component_Homepage_Outline_Controller:before {
+  @extend .icon-course-outline;
+  color: $icon-color-course-outline;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller:before {
+  @extend .icon-course-builder;
+  color: $icon-color-course-builder;
+}
+.icon-masonry-Component_Homepage_RubricController:before {
+  @extend .icon-criteria;
+  color: $icon-color-course-criteria;
+}
+.icon-masonry-Component_Homepage_SocialStreamController:before {
+  @extend .icon-social-stream;
+  color: $icon-color-social-stream;
+}
+.icon-masonry-Component_Homepage_EtherpadController:before {
+  @extend .icon-collab-docs;
+  color: $icon-color-collab-doc;
+}
+.icon-masonry-Component_Homepage_PinterestController:before {
+  @extend .icon-pinterest;
+  color: $icon-color-pinterest;
+}
+.icon-masonry-Schoolbox_Tile_Component_HomepageTileController:before {
+  @extend .icon-tiles;
+  color: $icon-color-tiles;
+}
+.icon-masonry-Schoolbox_Curriculum_Component_CurriculumDetailsController:before {
+  @extend .icon-curriculum-details;
+  color: $icon-color-curriculum-details;
+}
+.icon-masonry-Schoolbox_Curriculum_Component_CurriculumOverviewController:before {
+  @extend .icon-curriculum;
+  color: $icon-color-curriculum-overview;
+}
+.icon-masonry-Schoolbox_LTI_Component_Homepage_Controller:before {
+  @extend .icon-lti;
+  color: $icon-color-lti;
+}
+
+// Eportfolio masonry icons
+.icon-masonry-Component_Eportfolio_AdvancedListController:before {
+  @extend .icon-advanced-list;
+  color: $icon-color-advanced-list;
+}
+.icon-masonry-Component_Eportfolio_BasicListController:before {
+  @extend .icon-list;
+  color: $icon-color-basic-list;
+}
+.icon-masonry-Schoolbox_Blog_Eportfolio_Component_Controller:before {
+  @extend .icon-blog;
+  color: $icon-color-blog;
+}
+.icon-masonry-Component_Eportfolio_FileListController:before {
+  @extend .icon-files;
+  color: $icon-color-files;
+}
+.icon-masonry-Component_Eportfolio_ImageController:before {
+  @extend .icon-image;
+  color: $icon-color-image;
+}
+.icon-masonry-Component_Eportfolio_ImageListController:before {
+  @extend .icon-image-gallery;
+  color: $icon-color-image-gallery;
+}
+.icon-masonry-Component_Eportfolio_LinkListController:before {
+  @extend .icon-link;
+  color: $icon-color-links;
+}
+.icon-masonry-Component_Eportfolio_TextboxController:before {
+  @extend .icon-textbox;
+  color: $icon-color-text-box;
+}
+.icon-masonry-Component_Eportfolio_VideoController:before {
+  @extend .icon-video;
+  color: $icon-color-video-player;
+}
+
+// Dashboard masonry icons
+.icon-masonry-Component_Dashboard_ActivityController:before {
+  @extend .icon-info;
+  color: $icon-color-homepage-activity;
+}
+.icon-masonry-Component_Dashboard_HomepageNewsController:before {
+  @extend .icon-report;
+  color: $icon-color-homepage-news;
+}
+.icon-masonry-Schoolbox_Calendar_Component_Dashboard_Controller:before {
+  @extend .icon-calendar;
+  color: $icon-color-calendar;
+}
+.icon-masonry-Component_Dashboard_ChildSubjectController:before {
+  @extend .icon-group;
+  color: $icon-color-child-subject;
+}
+.icon-masonry-Component_Dashboard_GreetingController:before {
+  @extend .icon-chat;
+  color: $icon-color-greeting;
+}
+.icon-masonry-Schoolbox_Comms_News_Component_Dashboard_Controller:before {
+  @extend .icon-news;
+  color: $icon-color-news;
+}
+.icon-masonry-Component_Dashboard_ImageGalleryController:before {
+  @extend .icon-image-gallery;
+  color: $icon-color-image-gallery;
+}
+.icon-masonry-Component_Dashboard_ImageSliderController:before {
+  @extend .icon-image-slideshow;
+  color: $icon-color-image-slideshow;
+}
+.icon-masonry-Component_Dashboard_NewsController:before {
+  @extend .icon-news;
+  color: $icon-color-news;
+}
+.icon-masonry-Component_Dashboard_RecentSubmissionsController:before {
+  @extend .icon-due-work;
+  color: $icon-color-due-work;
+}
+.icon-masonry-Component_Dashboard_RssController:before {
+  @extend .icon-rss;
+  color: $icon-color-rss-feed;
+}
+.icon-masonry-Component_Dashboard_ScrollerController:before {
+  @extend .icon-image-slideshow;
+  color: $icon-color-image-slideshow;
+}
+.icon-masonry-Component_Dashboard_SubjectController:before {
+  @extend .icon-class-list;
+  color: $icon-color-subject-list;
+}
+.icon-masonry-Component_Dashboard_TextboxController:before {
+  @extend .icon-textbox;
+  color: $icon-color-text-box;
+}
+.icon-masonry-Component_Dashboard_TimetableController:before {
+  @extend .icon-timetable;
+  color: $icon-color-timetable;
+}
+.icon-masonry-Schoolbox_Twitter_Component_Dashboard_Controller:before {
+  @extend .icon-twitter;
+  color: $icon-color-twitter;
+}
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_UpcomingWorkController:before {
+  @extend .icon-due-work;
+  color: $icon-color-due-work;
+}
+.icon-masonry-Component_Dashboard_VideoController:before {
+  @extend .icon-video;
+  color: $icon-color-video-player;
+}
+.icon-masonry-Schoolbox_Weather_Component_Dashboard_Controller:before {
+  @extend .icon-weather;
+  color: $icon-color-weather;
+}
+.icon-masonry-Schoolbox_ResourceBooking_Booking_Component_ResourceManagement:before {
+  @extend .icon-resource-booking;
+  color: $icon-color-resource-management;
+}
+.icon-masonry-Schoolbox_Tile_Component_DashboardTileController:before {
+  @extend .icon-tiles;
+  color: $icon-color-tiles;
+}
+.icon-masonry-Schoolbox_Fixtures_Component_Dashboard_Controller:before {
+   @extend .icon-sport;
+   color: $icon-color-sport;
+}
+.icon-masonry-Schoolbox_Fixtures_Component_Homepage_Controller:before {
+  @extend .icon-sport;
+  color: $icon-color-sport;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_Task_Component_Homepage_Controller:before {
+  @extend .icon-task;
+  color: $icon-color-task;
+}
+.icon-masonry-Schoolbox_Learning_Component_Dashboard_ClassController:before {
+  @extend .icon-teacher;
+  color: $icon-color-class-teachers;
+}
+.icon-masonry-Schoolbox_Resource_Folder_Component_Dashboard_GroupController:before {
+  @extend .icon-group;
+  color: $icon-color-group;
+}
+.icon-masonry-Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller:before {
+  @extend .icon-favourite;
+  color: $icon-color-student-toolkit;
+}
+.icon-masonry-Schoolbox_Geosnapshot_Component_Dashboard_Controller:before {
+  @extend .icon-geosnapshot;
+  color: $icon-color-geosnapshot;
+}
+.icon-masonry-Schoolbox_Geosnapshot_Component_Homepage_Controller:before {
+  @extend .icon-geosnapshot;
+  color: $icon-color-geosnapshot;
+}
+.icon-masonry-Schoolbox_Resource_GoogleFile_Component_Homepage_Controller:before {
+  @extend .icon-google-drive;
+  color: $icon-color-google;
+}
+.icon-masonry-Schoolbox_Learning_Assessment_Lti_Component_Homepage_Controller:before {
+    @extend .icon-lti;
+    color: $icon-color-lti;
+}
+.icon-masonry-Schoolbox_Intellischool_Component_Dashboard_Controller:before {
+    @extend .icon-intellischool;
+    color: $icon-color-intellischool;
+}

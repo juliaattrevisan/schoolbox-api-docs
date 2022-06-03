@@ -1,0 +1,195 @@
+@charset "UTF-8";
+
+$selectize-font-size: rem-calc(($base-font-size - 3));
+$selectize-line-height: 18px !default;
+
+$selectize-color-text: $body-font-color;
+$selectize-color-border: $input-border-color;
+$selectize-color-highlight: $highlight-color;
+$selectize-color-input: $white !default;
+$selectize-color-input-full: $selectize-color-input !default;
+$selectize-color-disabled: $content-ui-hover;
+
+// When you add an element from the dropdown
+$selectize-color-item: $content-ui-hover;
+$selectize-color-item-text: $selectize-color-text !default;
+$selectize-color-item-border: transparent;
+
+// Occurs when you click and hold over a selectized element
+$selectize-color-item-active: $content-ui-hover;
+$selectize-color-item-active-text: $selectize-color-text !default;
+$selectize-color-item-active-border: $selectize-color-border;
+
+// Suggestions for what you just typed in
+$selectize-color-dropdown: $white;
+$selectize-color-dropdown-border: $selectize-color-border !default;
+$selectize-color-dropdown-border-top: $selectize-color-border;
+$selectize-color-dropdown-item-active: tint($tertiary, 87%);
+$selectize-color-dropdown-item-active-text: $selectize-color-text;
+$selectize-color-dropdown-item-create-text: rgba(red($selectize-color-text), green($selectize-color-text), blue($selectize-color-text), .5) !default;
+$selectize-color-dropdown-item-create-active-text: $selectize-color-dropdown-item-active-text !default;
+$selectize-color-optgroup: $selectize-color-dropdown !default;
+$selectize-color-optgroup-text: $selectize-color-text !default;
+
+$selectize-shadow-input: none;
+$selectize-shadow-input-focus: none;
+$selectize-border: $input-border-width solid $selectize-color-border;
+$selectize-border-radius: 0px;
+
+$selectize-width-item-border: 1px !default;
+$selectize-max-height-dropdown: 200px !default;
+
+$selectize-padding-x: 0;
+$selectize-padding-y: 0;
+$selectize-padding-item-x: 0;
+$selectize-padding-item-y: 0;
+
+$selectize-error-text: $white;
+$selectize-error-background: #fa4a47;
+
+@import "../../vendors/selectize/src/selectize.scss";
+
+/* selectize.scss uses a whole bunch of !important vars
+ * so you have to bring a bigger bang to the party
+ */
+
+// when you're disabled, you are disabled
+fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > a.remove {
+	width: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.selectize-control {
+	margin: 0 0 $form-spacing 0;
+	width: 100%;
+
+	&.single, &.multi {
+		.selectize-input > div {
+			background: $content-ui-background;
+			padding: 0 0.5rem 0 0.5rem;
+			font-size: $selectize-font-size;
+			font-weight: $font-weight-normal;
+			border-radius: 3px;
+			a {
+				padding: 0.5rem !important;
+				width: 1.5rem !important;
+				color: $content-ui-foreground;
+			}
+		}
+        .selectize-input.input-active {
+            background-color: $form-bg-hover-color;
+            color: $form-bg-hover-color-contrast;
+            input {
+                color: $form-bg-hover-color-contrast;
+            }
+        }
+	}
+
+	&.single {
+		.selectize-input > div {
+			margin-left: $selectize-margin-item-x;
+		}
+	}
+
+	&.multi .selectize-input.has-items {
+		padding: $selectize-margin-item-x $selectize-margin-item-y 0;
+	}
+
+	.selectize-input {
+		.item.error {
+			background-color: $selectize-error-background !important;
+			color: $selectize-error-text !important;
+
+			> a.remove {
+				color: $selectize-error-text !important;
+				&:hover {
+					color: #000;
+					background: none !important;
+				}
+			}
+		}
+
+		> div {
+			a.remove {
+				padding: 0 0 0 0.25rem !important;
+				width: 1rem !important;
+				margin: 0 0 0 0.5rem !important;
+				display: inline-block;
+				line-height: 1rem;
+				height: 1rem;
+				overflow: hidden;
+				position: relative;
+				top: 0.1875rem;
+				&:hover {
+					text-decoration: none;
+					background: $content-ui-submit-foreground;
+					border-radius: 1rem;
+                    // DONE use contrasting color
+                    color: $content-ui-submit-foreground-contrast;
+				}
+			}
+		}
+		> input[type=text] {
+			margin-left: 0.5rem !important;
+		}
+	}
+
+	.row {
+		width: 100%;
+	}
+
+	.progress-tick {
+		margin-top: 1rem;
+
+        @media #{$small-only} {
+            margin-top: .5rem;
+        }
+	}
+}
+
+.selectize-input {
+    line-height: 1.875rem;
+	margin-bottom: 0;
+	padding: $selectize-margin-item-y 0;
+	vertical-align: middle;
+	min-height: 2.5rem;
+    input {
+        height: 1.9375rem;
+		font-size: $selectize-font-size;
+
+        .remove {
+            color: $content-ui-foreground;
+        }
+
+        /* !important because of chrome.css
+         */
+        &[placeholder] {
+            margin-left: 0.5rem !important;
+			font-size: $selectize-font-size;
+        }
+    }
+	&.dropdown-active:before {
+		display: none;
+	}
+    &:hover, &:focus, &.input-active {
+        background-color: $form-bg-hover-color;
+        color: $form-bg-hover-color-contrast;
+        input {
+            color: $form-bg-hover-color-contrast;
+        }
+    }
+}
+
+.selectize-dropdown {
+    // ¯\_(ツ)_/¯
+    // (just has to be > .reveal-modal-bg z-index value)
+    z-index: 9000;
+
+    .row[data-selectable] {
+        padding: 0;
+    }
+    .active {
+        background-color: $content-ui-hover;
+    }
+}

@@ -1,0 +1,128 @@
+table.dataTable {
+  clear: both;
+  margin: 0 !important;
+  max-width: none !important;
+  width: 100%;
+}
+table.dataTable td,
+table.dataTable th {
+  box-sizing: content-box;
+}
+table.dataTable.nowrap th, table.dataTable.nowrap td {
+  white-space: nowrap;
+}
+
+div.dataTables_wrapper div.dataTables_length label {
+  float: left;
+  text-align: left;
+  margin-bottom: 0;
+}
+div.dataTables_wrapper div.dataTables_length select {
+  width: 75px;
+  margin-bottom: 0;
+}
+div.dataTables_wrapper div.dataTables_filter label {
+  float: right;
+  margin-bottom: 0;
+}
+div.dataTables_wrapper div.dataTables_filter input {
+  display: inline-block !important;
+  width: auto !important;
+  margin-bottom: 0;
+  margin-left: 0.5em;
+}
+div.dataTables_wrapper div.dataTables_info {
+  padding-top: 2px;
+}
+div.dataTables_wrapper div.dataTables_paginate {
+  float: right;
+  margin: 0;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+  padding-right: 1.5rem;
+}
+
+table.dataTable thead th:active,
+table.dataTable thead td:active {
+  outline: none;
+}
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+  cursor: pointer;
+}
+
+div.dataTables_scrollHead table {
+  margin-bottom: 0 !important;
+}
+
+div.dataTables_scrollBody table {
+  border-top: none;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+div.dataTables_scrollBody table tbody tr:first-child th,
+div.dataTables_scrollBody table tbody tr:first-child td {
+  border-top: none;
+}
+
+div.dataTables_scrollFoot table {
+  margin-top: 0 !important;
+  border-top: none;
+}
+
+/* Use glyphs instead of sprites
+ * These are using temporary block triangles for now
+ * until the font gets updated
+ */
+table.dataTable thead {
+    th {
+        position: relative;
+
+        /* Don't need to reserve space when sorting is disabled
+         * Noticable on center-aligned table headings
+         */
+        &.sorting_disabled {
+            padding-right: 0.5rem;
+        }
+    }
+
+    th.sorting:hover, th.sorting_asc:hover, th.sorting_desc:hover {
+        background-color: $content-ui-hover;
+    }
+
+    .sorting:after {   }
+
+    .sorting_asc:after {
+        content: '\25b2';
+        position: absolute;
+        right: 0.2rem;
+        color: $content-ui-foreground;
+    }
+
+    .sorting_desc:after {
+        content: '\25bc';
+        position: absolute;
+        right: 0.2rem;
+        color: $content-ui-foreground;
+    }
+
+    .sorting_asc_disabled:after {
+        content: '\25b2';
+        opacity: 0.25;
+        position: absolute;
+        right: 0.2rem;
+        color: $content-ui-foreground;
+    }
+
+    .sorting_desc_disabled:after {
+        content: '\25bc';
+        opacity: 0.25;
+        position: absolute;
+        right: 0.2rem;
+        color: $content-ui-foreground;
+    }
+}

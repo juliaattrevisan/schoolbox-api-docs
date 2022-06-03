@@ -27,7 +27,7 @@
 
     {% block mainHeader %}
         {% include 'include/skin.twig' with { config: config } only %}
-        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/fullcalendar/datepicker.css?v={{ config.site_version }}" />
+        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
         {% if tour.data is defined and not user.impersonated %}
         {% autoescape 'js' %}

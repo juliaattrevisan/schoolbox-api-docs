@@ -1,0 +1,1422 @@
+
+
+$container-bg: white !default;
+
+@import "inline-lists";
+@import "forms/labels";
+@import "progress-bars";
+@import "reveal";
+@import "../utils/visibility";
+@import "thumbs";
+
+
+.align-middle {
+    vertical-align: middle;
+}
+
+.align-bottom {
+    vertical-align: bottom;
+}
+
+.inline-list > li {
+    margin-left: 0;
+    margin-right: $inline-list-default-float-list-margin;
+    margin-bottom: $inline-list-default-float-list-margin;
+}
+
+// Empty States
+.empty-state {
+    background-color: $gainsboro;
+    color: $aluminum;
+    padding: 1rem;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 1rem;
+    width: 100%;
+
+    [class^="icon-"],
+    [class*=" icon-"] {
+        @extend .size-48;
+        color: $aluminum;
+        margin-bottom: 0.5rem;
+        display: block;
+
+        &:before {
+            padding: 0;
+        }
+    }
+    img {
+        margin-bottom: 1rem;
+    }
+    h1 {
+        // default override
+        color: $aluminum;
+    }
+    p,
+    a {
+        font-size: 0.875rem;
+        font-weight: 400;
+        margin-bottom: 0;
+    }
+}
+
+.error-state section {
+    background-color: transparent;
+    color: $jet;
+    padding: 2rem;
+
+    h1,
+    h2 {
+        color: $jet;
+    }
+    .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        div {
+            max-width: rem-calc(600);
+            padding-right: 2rem;
+        }
+    }
+    @media #{$small-only} {
+        img {
+            display: none;
+        }
+    }
+}
+
+// component-container already has it's own margin-bottom,
+// empty states in information lists shouldn't have padding or margin
+.component-container .empty-state,
+.information-list .empty-state {
+    margin-bottom: 0;
+}
+
+.trace {
+    pre {
+        display: inline;
+        &:before {
+            content: "";
+            display: block;
+        }
+    }
+}
+
+// Deleting Components
+.delete-it {
+    background-color: tint($warning-color, 74%);
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    &.show {
+        max-height: 700px;
+        padding: rem-calc(($base-font-size - 2));
+        transition: max-height 0.3s ease-in;
+    }
+}
+
+// Disabled elements
+:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+section {
+    label {
+        font-size: $paragraph-font-size;
+    }
+}
+
+// Make a list vertically scrollable if too much content
+.information-list.scrollable-list {
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+.scrollable {
+    overflow: auto;
+
+    table {
+        margin-bottom: 0;
+    }
+}
+
+%container {
+    background-color: $container-bg;
+    margin-bottom: $base-font-size;
+}
+
+%content {
+    padding: rem-calc(($base-font-size - 4));
+
+    .subheader {
+        margin-top: 0;
+    }
+    p:last-child {
+        margin: 0;
+    }
+}
+
+// White Islands - Custom 'Island' Columns
+.island {
+    @include grid-column();
+    @include responsive-sides(1, padding);
+    position: relative;
+    // Only sections inside islands have these styles
+    section {
+        @extend %container;
+        @extend .clearfix;
+    }
+    .content {
+        @extend %content;
+    }
+    fieldset.content {
+        padding: 1rem 0;
+        @media #{$small-only} {
+            padding: 0.5rem 0;
+        }
+        @media #{$medium-only} {
+            padding: 0.25rem 0;
+        }
+    }
+
+    label.error {
+        margin-bottom: 1rem;
+    }
+}
+
+// Labels
+.label {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    text-transform: uppercase;
+    margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
+
+    /* A generic label used to indicate something is taking place
+     * Used mainly in label-timeout indicators
+     */
+    &.highlight {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
+    &.filter {
+        @extend .highlight;
+        padding-right: 2rem;
+        .close {
+            font-size: 1.5rem;
+            font-weight: normal;
+            position: absolute;
+            right: 10px;
+            top: -2px;
+            &:hover {
+                color: $alert-color;
+            }
+        }
+    }
+
+    // Label colors
+    &.reviewed {
+        @include label($bg: tint($success-color, 74%));
+        color: $success-color;
+    }
+    &.submitted {
+        @include label($bg: tint($warning-color, 74%));
+        color: $warning-color;
+    }
+    &.submitted-late {
+        @include label($bg: tint($alert-color, 74%));
+        color: $alert-color;
+    }
+    &.unsubmitted {
+        @include label($bg: $gainsboro);
+        color: darken($gainsboro, 50%);
+    }
+    &.warning {
+        @include label($bg: tint($warning-color, 74%));
+        color: $warning-color;
+    }
+    &.neutral {
+        @include label($bg: $neutral-color);
+        color: darken($neutral-color, 50%);
+    }
+}
+
+.individualisation {
+    background-color: #9a9a9a;
+    display: inline-block;
+    width: rem-calc($base-font-size - 2);
+    height: rem-calc($base-font-size - 2);
+    line-height: 1;
+    font-family: serif;
+    font-style: italic;
+    text-align: center;
+
+    &.has-tip {
+        border-bottom: 0;
+        color: $white;
+        font-weight: 400;
+
+        &:hover {
+            color: $white;
+        }
+    }
+}
+
+.marksheet .individualisation {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    line-height: 1.2;
+}
+
+.card .individualisation {
+    margin-left: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+}
+
+// Hints
+.hint {
+    color: $content-ui-foreground !important;
+    top: -1px;
+    margin-left: 4px;
+    width: 1rem;
+    height: 1rem;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1rem;
+    white-space: nowrap;
+    display: inline-block;
+    position: relative;
+    margin-bottom: auto;
+    font-size: $small-font-size;
+    background-color: $content-ui-background;
+    border-radius: 0.5rem;
+
+    &.icon-help:before {
+        color: $monsoon;
+    }
+    &.has-tip:hover {
+        border-bottom: none;
+    }
+}
+
+// Collapsible content
+.collapsible {
+    overflow: auto;
+    .information-list {
+        clear: both;
+    }
+}
+
+.expander {
+    color: $content-ui-foreground;
+    line-height: 1;
+    font-size: 1rem;
+    text-decoration: none;
+
+    &:before {
+        @extend .icon-down-arrow;
+        display: inline-block;
+        transition-duration: 0.2s;
+    }
+    &.icon-up-arrow:before {
+        @extend .icon-up-arrow;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+    &.expanded:before {
+        transform: rotate(180deg);
+    }
+}
+
+.filter-interaction {
+    .filter-summary {
+        line-height: 2rem;
+    }
+    input[type="submit"] {
+        margin-bottom: 0;
+    }
+}
+
+nav {
+    @extend .hide-for-print;
+}
+
+/*
+ * Uses .expander, .selector or .grip
+ * Use %placeholders to prevent the same CSS getting spat out over and over again.
+ */
+$selector-width: 2.25rem;
+
+%interaction-li {
+    display: flex;
+    align-items: center;
+}
+%interaction-selector {
+    padding: 0 0.75rem;
+    flex: 1 $selector-width;
+    &:before {
+        padding: 0;
+    }
+}
+@mixin list-interaction($selector, $cursor, $icon: "", $color: $content-ui-foreground) {
+    > li {
+        > div:first-of-type {
+            @extend %interaction-li;
+        }
+
+        ul.information-list {
+            flex: 1 100%;
+        }
+        .#{$selector} {
+            @if str-length($icon) > 0 {
+                @extend .icon-#{$icon};
+            }
+            @extend %interaction-selector;
+            cursor: $cursor;
+            &:before {
+                color: $color;
+            }
+        }
+    }
+}
+
+%information-list {
+    @include responsive-sides(1, padding);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
+%information-li {
+    @include grid-row(
+        $behavior: nest
+    ); // there is no scenario in which .information-list > li will operate as anything other than a row
+    @include responsive-sides(-1, margin);
+    border-bottom: 1px solid $body-bg;
+    position: relative;
+    overflow: visible;
+    list-style: none;
+    transition: background-color 0.3s ease-in;
+}
+%card-article {
+    padding: 1rem;
+    clear: both;
+    word-wrap: break-word;
+}
+%ui-sortable-helper {
+    border-bottom: none;
+    background-color: $row-action-hover-background;
+}
+@mixin information-list() {
+    @extend %information-list;
+
+    &.expandable,
+    &.expandable-card {
+        @include list-interaction(expander, pointer);
+        ul {
+            list-style: none;
+            margin: 0;
+        }
+        li .expander {
+            flex: 1 2.5rem;
+        }
+    }
+    &.card-selectable {
+        @include list-interaction(selector, pointer);
+        li .selector {
+            flex: 1 3rem;
+            label {
+                padding: 0 !important;
+            }
+        }
+    }
+    &.sortable,
+    &.sortable-card {
+        @include list-interaction(grip, move, grip);
+        .grip:before {
+            font-size: 1rem; // enforce grips being full size
+        }
+        .ui-sortable-helper {
+            @extend %ui-sortable-helper;
+        }
+    }
+    &.sortable,
+    &.sortable-card,
+    &.unsortable {
+        .columns,
+        .column {
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+
+            @media #{$medium-only} {
+                padding-bottom: 0.75rem;
+                padding-top: 0.75rem;
+            }
+            @media #{$small-only} {
+                padding-bottom: 0.5rem;
+                padding-top: 0.5rem;
+            }
+        }
+        input,
+        select {
+            margin-bottom: 0;
+        }
+    }
+    &.group {
+        border-bottom: 0.5rem solid $body-bg;
+        &:last-of-type {
+            border-bottom: 0;
+        }
+        > li:nth-child(n + 2) {
+            padding: 0.25rem;
+        }
+    }
+    > li {
+        @extend %information-li;
+        > &:first-child {
+            padding-top: 0;
+        }
+        &:last-child {
+            border-bottom: 0;
+        }
+        input[type="radio"]:not(.plain) + label.checkbox-label,
+        input[type="checkbox"]:not(.plain) + label.checkbox-label {
+            margin-top: 0.5rem;
+        }
+    }
+    form {
+        margin: 0;
+    }
+    nav a:hover {
+        background-color: $row-action-hover-background;
+    }
+    .card {
+        flex: 1 100%;
+    }
+    /* <article> immediately follows <nav> has a special
+     * layout rule to display content
+     */
+    .list-item ~ article,
+    .card ~ article {
+        @extend %card-article;
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Zero padding article, if it is empty
+         * Whitespaces and empty elements inside <article> don't count
+         */
+        &:empty {
+            padding: 0;
+        }
+    }
+}
+
+// The original list
+// All other lists include (@extend) these styles
+.information-list {
+    @include information-list;
+}
+
+// Activity list
+.activity-list {
+    @include information-list;
+    li {
+        .grade {
+            text-align: center;
+            font-weight: $font-weight-bold;
+            font-size: rem-calc(($base-font-size + 2));
+            min-width: 6rem;
+        }
+    }
+    // Specific to Grade page
+    &.group {
+        li {
+            padding: 0 !important;
+
+            &.subject-group {
+                border-bottom: 0;
+            }
+        }
+        li ul li {
+            border-top: 0;
+        }
+    }
+    // Grades expandable layout
+    .unit {
+        border-top: 2px solid $body-bg;
+
+        .card {
+            padding: 0.5rem 0 0.5rem 0;
+        }
+    }
+    .unit ~ [data-collapsable] ul li:first-child {
+        border-top: 0;
+    }
+    .assessment {
+        border-top: 1px solid $body-bg;
+
+        .progress-tick.tiny {
+            margin-left: 0;
+        }
+
+        @media #{$medium-up} {
+            .content {
+                padding-left: 3rem;
+            }
+        }
+    }
+    .project .assessment {
+        background-color: $vapor;
+        border-top: 1px solid $body-bg;
+        border-left: 3rem solid $white;
+
+        @media #{$small-only} {
+            border-left: 1rem solid $white;
+        }
+    }
+}
+
+// Subject list
+.subject-list {
+    @include information-list;
+    .subject-group {
+        border-bottom: 0;
+    }
+    li {
+        .grade {
+            text-align: center;
+            font-weight: $font-weight-bold;
+            font-size: rem-calc(($base-font-size + 2));
+            min-width: 6rem;
+        }
+        a:hover {
+            background-color: $row-hover-background;
+        }
+        ul {
+            clear: both;
+            margin: 0;
+            li:last-child {
+                padding-bottom: 0;
+            }
+        }
+    }
+}
+
+.news-list {
+    @include information-list;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    @include responsive-sides($importance: !important);
+}
+
+.permission-list {
+    @include information-list;
+
+    [class*="icon-"]:before {
+        padding: 0;
+    }
+
+    span:not([data-perm-container]) > [class*="icon-"]:before {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+
+    a {
+        // Button splash & .actions-small-# a[class*="icon-"] specificity causes this
+        overflow: inherit !important;
+        opacity: 1 !important;
+    }
+
+    input:checked + label {
+        background-color: $content-ui-submit-background;
+        a {
+            color: $content-ui-submit-foreground;
+        }
+    }
+}
+
+@mixin hide-n($size, $media-down, $media-up, $count: $total-columns) {
+    @for $i from 1 through $count {
+        &.#{$size}-#{$i} {
+            > li {
+                @media #{$media-down} {
+                    // Any button after $i not an overflow gets hidden
+                    // Say i=4: any button in position 5+ gets hidden
+                    &:nth-child(n + #{$i + 1}):not(.overflow) {
+                        @content;
+                    }
+                    // Any overflow after $i gets hidden
+                    // Say i=4: any overflow in position 5- gets hidden
+                    &:nth-child(-n + #{$i + 1}).overflow {
+                        @content;
+                    }
+                }
+
+                @media #{$media-up} {
+                    // In the overflow: any button before $i gets hidden
+                    // Say i=4: any button in position 4- gets hidden
+                    &.overflow > ul.f-dropdown {
+                        li:nth-child(-n + #{$i}) {
+                            @content;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// this is like inline list, but it flexes to full width. Basically a more flexible version of the button bar
+.flex-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+
+    li {
+        flex: 1 auto;
+        margin: 1px 1px 0 0;
+    }
+
+    a {
+        flex: 1 auto;
+        &:empty:before {
+            float: none !important; // grrrr :(
+        }
+        &.overflow {
+            width: 3rem;
+        }
+    }
+}
+
+.grade {
+    font-size: rem-calc(($base-font-size - 4));
+    padding: 0.285rem 1rem;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    &.gradient-none-bg {
+        background-color: $aluminum;
+    }
+    span {
+        display: block;
+        white-space: nowrap;
+        font-size: 1rem;
+        line-height: 2rem;
+    }
+    a:hover {
+        background-color: transparent;
+    }
+    .meta {
+        text-transform: lowercase;
+        font-variant: small-caps;
+    }
+}
+
+// For meta text that's inline with other text, remove bottom margin and add left margin
+.meta.inline {
+    margin: 0 0 0 0.375rem;
+}
+
+// Grades that sit along side of other elements
+.flex-grade {
+    display: flex;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    .sibling {
+        flex: 1;
+    }
+    .txt {
+        flex: 0 auto;
+        padding: 0 1rem;
+
+        p {
+            margin-bottom: 0;
+        }
+    }
+    .assess-status {
+        flex: 1 0 auto;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .gradient-none-bg {
+        background-color: $aluminum;
+    }
+
+    .grade {
+        align-items: center;
+        display: flex;
+        flex: 0 0 auto;
+        justify-content: center;
+        margin-left: 0.75rem;
+
+        span {
+            color: $white;
+            line-height: inherit;
+        }
+        &.review {
+            background-color: $warning-color;
+        }
+        &.in-progress {
+            background-color: $base;
+        }
+    }
+    @media not print {
+        @media #{$medium-down} {
+            flex-wrap: wrap;
+            justify-content: center;
+
+            .txt p {
+                margin-bottom: 0.5rem;
+            }
+            .grade {
+                flex: 1 100%;
+                margin-left: 0;
+            }
+        }
+        ~ blockquote {
+            margin-bottom: 0;
+        }
+    }
+    @media print {
+        .grade {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+        }
+    }
+}
+
+// Show & Hide Task List
+.task-list {
+    clear: both;
+    transition: max-height 0.3s ease-out;
+}
+
+// Lists with action buttons
+.action-list {
+    @include information-list;
+    clear: both;
+    > li {
+        &:hover {
+            background-color: $row-hover-background;
+        }
+    }
+    .expanded .task-list {
+        max-height: 100%;
+        transition: max-height 0.3s ease-in;
+    }
+}
+
+/* Resource List in File Picker Accordion
+ * You can get to this list via a File Picker Accordion, by clicking
+ * on any dropzone. This is a differently-styled list than the one in
+ * Resource Browser from the Main Navigation (that's a jstree)
+ */
+.resource-list {
+    @extend .action-list;
+    .card {
+        a {
+            color: $content-ui-foreground;
+        }
+        .size-32 {
+            color: $content-ui-foreground;
+            padding-top: 1rem;
+        }
+    }
+    > .resource {
+        vertical-align: middle;
+        a {
+            display: block;
+            padding: 0.5rem 0 0.5rem 0;
+            &[class^="icon-"]:before,
+            &[class*=" icon-"]:before {
+                vertical-align: middle;
+            }
+            img[class^="mime-"],
+            img[class*=" mime-"] {
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+.tree-list {
+    li a {
+        display: block;
+        height: 2.5rem;
+        line-height: 2.5rem;
+
+        &:before {
+            @extend .icon-folder;
+            font-size: 1rem;
+            padding: 0 0.5rem;
+        }
+        &:hover {
+            background-color: $accent-background;
+        }
+    }
+}
+
+// Block Grid
+.grid {
+    > li {  
+        padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
+        //shadow trick to have a 1px 'border' around child items without them becoming 
+        //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938 
+        box-shadow: 
+            1px 0 0 0 $body-bg, 
+            0 1px 0 0 $body-bg, 
+            1px 1px 0 0 $body-bg,
+            1px 0 0 0 $body-bg inset, 
+            0 1px 0 0 $body-bg inset; 
+    }
+}
+
+// Reveal
+.reveal-modal {
+    min-height: auto;
+
+    &:focus {
+        outline: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        // rem-calc must be quoted as otherwise it won't be parsed
+        // (it's in a CSS native function)
+        max-width: calc(100% - #{rem-calc(($base-font-size * 2.5))});
+    }
+
+    .component-action {
+        margin: 0 -0.875rem -0.875rem;
+        section {
+            border-bottom-width: 0;
+            margin-top: 2rem;
+            &:empty {
+                display: none;
+            }
+        }
+    }
+
+    .checklist {
+        overflow-y: auto;
+    }
+
+    #filesystem-browse,
+    #filesystem-myfile {
+        max-height: rem-calc(420);
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .close-reveal-modal {
+        right: $reveal-close-right;
+
+        @media #{$small-only} {
+            right: 0.5rem;
+        }
+    }
+
+    form {
+        margin: 0;
+    }
+
+    // Fix spacing for forms inside modals that have columns
+    form.has-columns {
+        margin-left: -0.875rem;
+        margin-right: -0.875rem;
+
+        fieldset {
+            padding: 0;
+        }
+    }
+    .tabs-content {
+        margin: 0;
+        padding-top: 1rem;
+    }
+}
+
+// Fix stupid foundation bug
+.reveal-modal-bg {
+    position: fixed;
+}
+
+.reveal-action {
+    section {
+        margin: 0;
+        text-align: right;
+    }
+
+    .button,
+    button,
+    input {
+        background-color: transparent;
+        margin: 0;
+        text-transform: uppercase;
+        font-size: rem-calc($base-font-size - 2);
+        vertical-align: top;
+        font-weight: $font-weight-semibold;
+        color: $body-font-color;
+        padding: 0.5rem 0.75rem;
+
+        &:hover {
+            background-color: transparent;
+        }
+
+        &.submit {
+            background-color: transparent;
+            color: $content-ui-submit-background;
+            width: auto;
+        }
+    }
+
+    .close-reveal-modal {
+        top: auto;
+        right: auto;
+        position: relative;
+        line-height: 1.375rem;
+        font-weight: $font-weight-semibold;
+        color: $body-font-color;
+    }
+}
+
+.reveal-modal.no-pad .reveal-action section {
+    padding: 0.75rem 1.25rem;
+}
+
+// generic counter
+[data-show-count]:before {
+    content: attr(data-show-count);
+}
+[data-show-count="0"]:before {
+    content: "none";
+}
+
+// Schoolbox Loader
+.loader {
+    background-color: $accent-foreground;
+    border-radius: 0.5rem;
+    margin: 2rem auto;
+    width: 3rem;
+    height: 3rem;
+    animation: sb-loader 1.2s infinite ease-in-out;
+}
+// for loaders inside headings, use span.
+span.loader {
+    border-radius: 0.2rem;
+    display: inline-block;
+    margin: 0 0.5rem;
+    width: 1rem;
+    height: 1rem;
+}
+@keyframes sb-loader {
+    0% {
+        transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
+    }
+    50% {
+        transform: perspective(7.5rem) rotateX(-180.1deg) rotateY(0deg);
+    }
+    100% {
+        transform: perspective(7.5rem) rotateX(-180deg) rotateY(-179.9deg);
+    }
+}
+
+.minw-1 {
+    min-width: 1rem;
+}
+.minw-15 {
+    min-width: 1.5rem;
+}
+.minw-2 {
+    min-width: 2rem;
+}
+.minw-3 {
+    min-width: 3rem;
+}
+.minw-4 {
+    min-width: 4rem;
+}
+
+.three-panels {
+    .property-panel {
+        .information-list > li {
+            @extend %content;
+        }
+    }
+}
+
+.progress-tick-form {
+    transition: all 240ms cubic-bezier(0.15, 1.4, 0.7, 1.35);
+    &[disabled] {
+        transform: scale(0.75);
+        opacity: 0.75;
+    }
+    margin: -0.5rem;
+}
+
+$progress-tick-size-regular: rem-calc($base-font-size * 2);
+$progress-tick-size-small: rem-calc($base-font-size * 1.25);
+$progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
+
+@mixin progress-tick($progress-tick-size) {
+    width: $progress-tick-size;
+    height: $progress-tick-size;
+    min-width: $progress-tick-size;
+    min-height: $progress-tick-size;
+    &:before {
+        line-height: $progress-tick-size;
+    }
+    &.pending {
+        border-radius: $progress-tick-size / 4;
+    }
+}
+
+.progress-tick,
+.action-list nav a.progress-tick {
+    @include progress-tick($progress-tick-size-regular);
+    display: block;
+    background-color: $base;
+    margin: 0.25rem;
+    transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+    @extend .no-text;
+    @extend .icon-approve;
+
+    &:before {
+        color: $white;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        visibility: hidden;
+    }
+
+    &:not(.readonly):hover {
+        &:before {
+            visibility: visible;
+        }
+    }
+
+    &.small {
+        @include progress-tick($progress-tick-size-small);
+    }
+
+    &.tiny {
+        @include progress-tick($progress-tick-size-tiny);
+        display: inline-block;
+        margin: 0.5rem 0.25rem -1px 0.25rem;
+        &:before {
+            content: none;
+            display: none;
+        }
+    }
+
+    &.pending {
+        @extend .icon-approve;
+        background-color: $warning-color;
+        transform: rotate(135deg);
+        &:before {
+            visibility: visible;
+            // counter-rotation
+            transform: rotate(-135deg);
+        }
+    }
+
+    &.reviewed {
+        @extend .icon-approve;
+        background-color: $success-color;
+        border-radius: $progress-tick-size-regular;
+        transform: rotate(360deg);
+        &:before {
+            visibility: visible;
+        }
+    }
+
+    &.failed {
+        background-color: $alert-color;
+
+        &:before {
+            visibility: visible;
+            content: "\0021";
+            font-weight: $font-weight-bold;
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+        &.small:before {
+            font-size: 1.25rem;
+            line-height: 0.85;
+        }
+    }
+}
+
+.countdown {
+    font-weight: 100;
+    font-size: $h1-font-size;
+}
+
+time {
+    white-space: nowrap;
+}
+
+ul.meta {
+    list-style: none;
+    line-height: 1.5rem;
+    margin-bottom: 0.5rem;
+    > li {
+        $meta-icon-margin: 1rem;
+        $meta-indent: 1rem + $meta-icon-margin;
+
+        text-indent: -1 * $meta-indent;
+        padding-left: $meta-indent;
+
+        &[class^="icon-"]:before {
+            padding-right: $meta-icon-margin;
+        }
+    }
+}
+
+dl {
+    &.inline-dl {
+        @include grid-row($behavior: nest);
+        margin-bottom: 1rem;
+
+        dt,
+        dd {
+            @include grid-column($columns: false, $position: true);
+            margin-bottom: 0;
+        }
+
+        dt {
+            clear: left;
+        }
+
+        dd {
+            clear: right;
+        }
+    }
+}
+
+// Profiles
+.profile {
+    .alert-box, .pastoral-flags {
+        margin: 0 0 0.75rem 0.75rem;
+        @media #{$small-only} {
+            margin: 0 0 0.5rem 0.5rem;
+            padding: 0.5rem 1.5rem 0.5rem 0.875rem;
+        }
+    }
+    dl {
+        @extend .inline-dl;
+        margin: 0 0 0.75rem 0;
+        @media #{$small-only} {
+            margin: 0 0 0.5rem 0.5rem;
+            dt, 
+            dd {
+                padding: 0 0.25rem 0 0;
+            }
+        }
+    }
+    @media #{$small-only} {
+        .medium-2 {
+            width: 20%;
+        }
+        .medium-10 {
+            width: 80%;
+        }
+    }
+}
+
+// Alert anchors/links
+.alert-box {
+    a {
+        &:not(.close) {
+            color: inherit;
+            text-decoration: underline;
+        }
+    }
+}
+
+// gradient 1-10
+@include rotate-color-list;
+
+.progress {
+    transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+    position: relative;
+    span {
+        transition: inherit;
+    }
+    .meter {
+        &.slow {
+            transition: width 1s;
+        }
+    }
+    .pipe-meter {
+        width: 0.5rem;
+        height: 2rem;
+        // DONE use CSS darken
+        background-color: css-darken($accent-foreground, 5%);
+        position: absolute;
+        top: -9px;
+        &.slow {
+            transition: left 1s;
+        }
+    }
+}
+
+$train-line-segment-maxlength: 15rem;
+$train-line-stop-size: 2rem;
+$train-line-segment-width: 0.25rem;
+$train-line-visited-color: $content-ui-foreground;
+$train-line-visited-glow-blur: 0.5rem;
+$train-line-unvisited-color: $content-ui-background;
+
+.train-line {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+    list-style: none;
+    padding: 0;
+    margin: $train-line-stop-size 0 0;
+    li {
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        position: relative;
+        text-align: center;
+        max-width: $train-line-segment-maxlength;
+        min-width: 3 * $train-line-stop-size;
+        &:before,
+        &:after {
+            content: "";
+            display: block;
+            height: $train-line-segment-width;
+            flex: 1;
+            width: 50%;
+            position: absolute;
+            top: 0;
+            background: $content-ui-foreground;
+        }
+        &:before {
+            left: 0;
+        }
+        &:after {
+            right: 0;
+        }
+        &:first-child:before,
+        &:last-child:after {
+            content: none;
+        }
+        &.current-stop {
+            &:after {
+                background: $content-ui-background;
+            }
+            ~ li {
+                &:before,
+                &:after {
+                    background: $content-ui-background;
+                }
+                a span {
+                    background: $content-ui-background;
+                }
+            }
+            a span {
+                box-shadow: 0 0 $train-line-visited-glow-blur $content-ui-foreground;
+            }
+        }
+        a {
+            display: block;
+            margin: $train-line-stop-size 0.5rem;
+
+            // Smaller stops that have no icons (Nub)
+            // The 0.4 multiplier and offset is empirical - I don't know what the math is
+            // to derive it from the stop size or segment width
+            span {
+                background: $content-ui-foreground;
+                border-radius: $train-line-stop-size / 2;
+                // DONE use contrasting color
+                color: $content-ui-foreground-contrast;
+                height: 0.5 * $train-line-stop-size;
+                left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
+                padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
+                    (($train-line-stop-size - rem-calc($base-font-size)) / 2);
+                position: absolute;
+                top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                width: 0.5 * $train-line-stop-size;
+                z-index: 1;
+                transition: all 200ms ease-out;
+
+                // You specified an icon for this stop (Knurl)
+                &[class^="icon-"] {
+                    height: $train-line-stop-size;
+                    left: calc(50% - (#{$train-line-stop-size / 2}));
+                    top: -1 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                    width: $train-line-stop-size;
+                }
+            }
+        }
+    }
+}
+
+article {
+    @extend .clearfix;
+    font-size: rem-calc(($base-font-size - 3));
+    // Scroll WYSIWYG content areas when wide tables exist.
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    // Enforce right text alignment for right-aligned blocks within user-generated
+    // content.
+    // Otherwise: most do, but some don't (notably: discussion threads)
+    [dir="rtl"] {
+        text-align: right;
+    }
+}
+
+/**
+ * Foundation kills margins on lists inside lists (ul li ul)
+ * We have cases where an article lives in a <li>, which then has ul's (e.g. forum)
+ * Remove the foundation margin kills in that situation
+ */
+li article ul,
+li article ol {
+    margin-#{$default-float}: $list-side-margin;
+    margin-bottom: $list-margin-bottom;
+}
+
+.wait-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.6);
+    > * {
+        display: table;
+        width: 100%;
+        height: 100%;
+        > * {
+            text-align: center;
+            vertical-align: middle;
+            display: table-cell;
+        }
+    }
+}
+
+.border-none {
+    border: none !important;
+}
+
+//this higlights the selected config option when an option has been selected
+//in the admin search panel
+.highlight-admin-search-selection {
+    background-color: #ffa;
+}

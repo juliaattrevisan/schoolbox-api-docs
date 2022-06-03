@@ -1,0 +1,316 @@
+$alert-button-bg-color: $alert-color;
+$alert-button-bg-hover: scale-color($alert-color, $lightness: $button-function-factor);
+$alert-button-border-color: $alert-button-bg-hover;
+$dropdown-button-pip-color: $content-ui-foreground;
+$dropdown-button-padding-med: 2.5rem;
+$dropdown-button-pip-opposite-med: 1rem;
+$alert-close-font-size: rem-calc(($base-font-size + 14));
+
+a[disabled], a.disabled {
+    // Make disabled links not clickable
+    pointer-events: none;
+    cursor: default;
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+// rather than use the global (which would affect sidebar, topbar, etc.) limit anchor decoration to explicitly content
+#container a[class^="icon-"]:hover,
+#container a[class*=" icon-"]:hover {
+	text-decoration: none;
+	&:before{
+		text-decoration: none;
+	}
+}
+
+/* All generic buttons
+ */
+.button {
+    @include button-dimensions();
+	@extend .hide-for-print;
+    color: $content-ui-foreground;
+    background-color: $content-ui-background;
+
+	&:hover {
+	    color: $content-ui-foreground;
+	    background-color: $content-ui-hover;
+		text-decoration: none !important; // forgive me, for I have sinned.
+    }
+
+	&.alert{
+        color: $white;
+		&:hover {
+			color: $white;
+		}
+	}
+
+	&.warning{
+		background-color: $warning-color;
+		&:hover {
+			background-color: tint($warning-color, 20%);
+		}
+	}
+
+	&.icon {
+		@extend .no-text;
+		max-width: $global-button-height;
+	}
+
+    &[class^="icon-"]:before,
+    &[class*=" icon-"]:before {
+        line-height: normal;
+    }
+
+	&:empty {
+		@extend .no-text;
+		&:after {
+			// Use dark magic to ensure empty buttons have line-height of button's non-Schoolbox font.
+			content: ".";
+			visibility: hidden;
+			display: inline-block;
+			width: 0;
+		}
+	}
+}
+
+// style for 'Load more' buttons
+button.load-more, .button.load-more {
+  background-color: transparent;
+  border: 1px solid $content-ui-foreground;
+  display: block;
+  margin: 0 auto;
+  max-width: 250px;
+
+  &:hover {
+    background-color: $content-ui-background;
+  }
+}
+
+// flex buttons that wrap
+.flex-wrap{
+	flex-wrap: wrap;
+}
+
+/* Splash effect when clicking buttons
+*/
+.splash {
+	display: block;
+	position: absolute;
+	background-color: $content-ui-foreground;
+	border-radius: 100%;
+	opacity: 0.5;
+    transform: scale(0);
+}
+
+/* On.click animation effect on buttons
+*/
+.splash.animate {
+	animation: ripple 0.3s linear;
+}
+	@keyframes ripple {
+		/* Scale 200% to safely cover the entire button and fade it out
+		 */
+		100% { opacity: 0; transform: scale(2); }
+}
+
+/* Arbitrary <button> element
+ */
+button {
+    @extend .button;
+    /* Remove mysterious highlight effect when you click
+     */
+    outline: 0;
+}
+
+/* Special button in audio/video player
+ */
+.mejs-controls {
+    button {
+        min-height: initial;
+    }
+}
+
+/* Form submits have a unique styling
+ */
+[type="submit"]{
+	@extend .button;
+	@extend .expand;
+	color: $submit-button-color;
+	background-color: $submit-button-bg-color;
+    font-weight: $font-weight-semibold;
+
+	&:hover, &:focus {
+		color: $submit-button-color;
+		background-color: $submit-button-bg-hover;
+	}
+	&:disabled {
+		opacity: $button-disabled-opacity;
+		color: $submit-button-color;
+		background-color: $submit-button-bg-color;
+	}
+	&[readonly] {
+		background-color: css-change-color(
+            $submit-button-bg-color,
+            $alpha: $button-disabled-opacity
+        );
+		background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
+		background-repeat: no-repeat;
+		background-size: 1rem;
+		background-position: 0.75rem 50%;
+	}
+}
+
+/* Fake submit button
+ */
+a.submit,
+button.submit {
+	@extend [type="submit"];
+
+	.splash {
+		background-color: $submit-button-color;
+	}
+}
+
+/* Flex List Action Buttons
+ * This can be found in the meta-panel of Resource Browser
+ * I don't think this should be such a strange number; maybe
+ * the actual flex-list button dimensions aren't right.
+ */
+.flex-list {
+    line-height: 1.5;
+    &.buttons {
+		a, button {
+			display: flex;
+			@extend .button;
+			justify-content: center;
+            margin-bottom: 0;
+
+            &[class^="icon-"]:before,
+            &[class*=" icon-"]:before {
+              line-height: inherit;
+            }
+
+			&.submit {
+              @extend [type="submit"];
+			}
+		}
+    }
+	li:last-child a{
+		margin-right: 0;
+	}
+    button {
+        width: 100%;
+    }
+}
+
+// button action that displays inline with a heading
+.button-action {
+  display: flex;
+  align-items: flex-start;
+
+  h1 {
+    flex: 1 1 auto;
+  }
+  .button {
+    flex: 0 auto;
+  }
+}
+
+.profile-learning-actions {
+  > div {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 45rem;
+    margin: 0 auto;
+  }
+
+  a {
+    color: $anchor-font-color;
+    padding: .75rem 1rem;
+    text-align: center;
+    flex-basis: 0;
+    flex-grow: 1;
+    line-height: 1.4;
+
+    &:before {
+      font-size: 2rem;
+      float: none;
+      padding: 0;
+    }
+
+    span {
+      display: block;
+    }
+
+    @media #{$small-only} {
+      flex-basis: auto;
+    }
+  }
+
+  .learning {
+    &:before {
+      color: $electric;
+    }
+    &:hover {
+      background-color: $electric;
+      color: $white;
+
+      &:before {
+        color: $white;
+      }
+    }
+  }
+  .goals {
+    &:before {
+      color: $cheddar;
+    }
+    &:hover {
+      background-color: $cheddar;
+      color: $white;
+
+      &:before {
+        color: $white;
+      }
+    }
+  }
+  .achievement {
+    &:before {
+      color: $success-color;
+    }
+    &:hover {
+      background-color: $success-color;
+      color: $white;
+
+      &:before {
+        color: $white;
+      }
+    }
+  }
+}
+
+.close,
+.close-button {
+  background-color: transparent;
+  color: inherit;
+  font-size: $alert-close-font-size;
+
+    &:hover {
+      background-color: transparent;
+      color: inherit;
+    }
+}
+
+// Used in dropzone when an error has occurred on upload
+.close {
+  right: 0.5rem;
+  top: 1rem;
+}
+
+// Used in file components when an error has occurred during upload
+.close-button {
+  right: 0;
+  top: 0;
+  padding-top: 0;
+}

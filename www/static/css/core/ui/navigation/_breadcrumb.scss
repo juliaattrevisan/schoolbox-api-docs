@@ -1,0 +1,260 @@
+// Foundation by ZURB
+// foundation.zurb.com
+// Licensed under MIT Open Source
+
+//
+// Breadcrumb Variables
+//
+$include-html-nav-classes: $include-html-classes !default;
+
+// We use this to set the background color for the breadcrumb container.
+$crumb-bg: scale-color($secondary-color, $lightness: 55%) !default;
+
+// We use these to set the padding around the breadcrumbs.
+$crumb-padding: rem-calc(9 14 9) !default;
+$crumb-side-padding: rem-calc(12) !default;
+
+// We use these to control border styles.
+$crumb-function-factor: -10% !default;
+$crumb-border-size: 0;
+$crumb-border-style: solid !default;
+$crumb-border-color: scale-color($crumb-bg, $lightness: $crumb-function-factor) !default;
+$crumb-radius: $global-radius !default;
+
+// We use these to set various text styles for breadcrumbs.
+$crumb-font-size: rem-calc(11) !default;
+$crumb-font-color: $primary-color !default;
+$crumb-font-color-current: $oil !default;
+$crumb-font-color-unavailable: $aluminum !default;
+$crumb-font-transform: uppercase !default;
+$crumb-link-decor: underline !default;
+
+// We use these to control the slash between breadcrumbs
+$crumb-slash-color: $base !default;
+$crumb-slash: "";
+$crumb-slash-position: 1px !default;
+
+//
+// Breadcrumb Mixins
+//
+
+// We use this mixin to create a container around our breadcrumbs
+@mixin crumb-container {
+  border-style: $crumb-border-style;
+  border-width: $crumb-border-size;
+  display: block;
+  list-style: none;
+  margin-#{$default-float}: 0;
+  overflow: hidden;
+  padding: $crumb-padding;
+
+  // We control which background color and border come through.
+  background-color: $crumb-bg;
+  border-color: $crumb-border-color;
+}
+
+// We use this mixin to create breadcrumb styles from list items.
+@mixin crumbs {
+
+  // A normal state will make the links look and act like clickable breadcrumbs.
+  color: $crumb-font-color;
+  float: $default-float;
+  font-size: $crumb-font-size;
+  line-height: $crumb-font-size;
+  margin: 0;
+  text-transform: $crumb-font-transform;
+
+  &:hover a, &:focus a { text-decoration: $crumb-link-decor; }
+
+  a {
+    color: $crumb-font-color;
+  }
+
+  // Current is for the link of the current page
+  &.current {
+    color: $crumb-font-color-current;
+    cursor: $cursor-default-value;
+    a {
+      color: $crumb-font-color-current;
+      cursor: $cursor-default-value;
+    }
+
+    &:hover, &:hover a,
+    &:focus, &:focus a { text-decoration: none; }
+  }
+
+  // Unavailable removed color and link styles so it looks inactive.
+  &.unavailable {
+    color: $crumb-font-color-unavailable;
+    a { color: $crumb-font-color-unavailable; }
+
+    &:hover,
+    &:hover a,
+    &:focus,
+    a:focus {
+      color: $crumb-font-color-unavailable;
+      cursor: $cursor-disabled-value;
+      text-decoration: none;
+    }
+  }
+
+  &:before {
+    color: $crumb-slash-color;
+    content: "#{$crumb-slash}";
+    margin: 0 $crumb-side-padding;
+    position: relative;
+    top: $crumb-slash-position;
+  }
+
+  &:first-child:before {
+    content: " ";
+    margin: 0;
+  }
+}
+
+@include exports("breadcrumbs") {
+  @if $include-html-nav-classes {
+    .breadcrumbs {
+      @include crumb-container;
+      @include radius($crumb-radius);
+
+      > * {
+        @include crumbs;
+      }
+    }
+    /* Accessibility - hides the forward slash */
+    [aria-label="breadcrumbs"] [aria-hidden="true"]:after {
+      content: "/";
+    }
+  }
+}
+
+
+$breadcrumb-color: $content-ui-foreground;
+$breadcrumb-noclick-color: $oil;
+$breadcrumb-bg-color: $content-ui-background;
+$breadcrumb-hover-bg-color: $content-ui-hover;
+$breadcrumb-active-bg-color: $content-ui-selected;
+
+// DONE scale-color (in this case lightness:40%) is possible but cumbersome
+$breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 40%);
+
+
+/* Breadcrumbs
+*  These sit at the top of the page
+*/
+.breadcrumb {
+  margin: 0 0 1rem;
+  list-style: none;
+  overflow: hidden;
+  li {
+    a, 
+    span {
+      // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
+      background-color: $breadcrumb-bg-color;
+      color: $breadcrumb-noclick-color;
+      cursor: text;
+      line-height: $base-font-size;
+      padding: 0.5rem 0.5rem 0.5rem 1rem;
+      position: relative;
+      display: block;
+      float: left;
+      margin-right: 0;
+      white-space: nowrap;
+
+      &:before,
+      &:after {
+        transition: all 0.15s linear;
+        border-top: $base-font-size solid transparent;
+        border-bottom: $base-font-size solid transparent;
+        content: " ";
+        display: block;
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 50%;
+        margin-top: rem-calc($base-font-size) * -1;
+        left: 100%;
+        z-index: 2;
+      }
+
+      &:before {
+        margin-left: 1px;
+        border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-active-bg-color;
+      }
+
+      &:after {
+        border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-bg-color;
+      }
+
+      // Styles when it actually contains a link
+      &[href] {
+        color: $breadcrumb-color;
+        background-color: $breadcrumb-bg-color;
+        cursor: pointer;
+
+        &:after {
+          border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-bg-color;
+        }
+
+        &:hover {
+          background-color: $breadcrumb-hover-bg-color;
+
+          &:after {
+            border-left-color: $breadcrumb-hover-bg-color;
+          }
+        }
+      }
+    }
+
+    // Active styles
+    &.active span {
+      &:before {
+        margin-left: 0;
+      }
+
+      &[href]:hover:before,
+      &[href]:hover:after {
+        border-left-color: $breadcrumb-hover-bg-color;
+      }
+
+      &:not([href]) {
+        color: $breadcrumb-noclick-color;
+      }
+    }
+
+    &.active span,
+    &.active span:after {
+      background-color: $breadcrumb-active-bg-color;
+      border-left: 0 solid $breadcrumb-active-bg-color;
+    }
+  }
+}
+
+#content > .breadcrumb {
+  @media #{$small-only} {
+    margin: 0 0 1rem 0;
+    li {
+      display: none;
+
+      &:nth-last-child(-n + 2) {
+        display: list-item;
+      }
+    }
+  }
+  @media #{$large-up} {
+    margin: 0 0 1rem -1rem;
+  }
+}
+
+/* Basic Breadcrumbs
+*  Meta style breadcrumbs with &rsaquo; instead of styles
+*/
+.breadcrumb-basic {
+  list-style: none;
+  margin-left: 0;
+  li {
+    display: inline-block;
+    margin: 0 0.375rem 0 0;
+  }
+}

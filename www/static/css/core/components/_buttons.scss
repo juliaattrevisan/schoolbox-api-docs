@@ -1,0 +1,86 @@
+/* Because forms.scss reimports this file
+ */
+$include-html-button-classes: $include-html-classes;
+
+//
+// BUTTONS
+//
+
+/* Button/input dimensions
+ *
+ * text + padding-top + padding-bottom = global-button-height
+ * = 1rem + 1rem + 1rem (since padding-top == padding-bottom)
+ * = 3rem
+ *
+ * Converse also holds true if you adjust the height and need to
+ * decide the padding (this is used to vertically-center text):
+ * global-button-height = 1rem + padding-top + padding-bottom
+ * global-button-height - 1rem = padding * 2
+
+ */
+$button-input-scale: 250 !default;
+$global-button-input-height: rem-calc(($base-font-size  * ($button-input-scale / 100))) !default;
+$global-button-height: $global-button-input-height;
+$global-button-padding: rem-calc(($base-font-size / 2));
+
+// We use these to build padding for buttons.
+$button-med: $global-button-padding;
+
+// We use this to control the display property.
+$button-margin-bottom: rem-calc(($base-font-size - 12));
+
+// We use these to control button text styles.
+$button-font-color: $content-ui-foreground;
+$button-font-color-alt: $content-ui-foreground;
+$button-font-med: $base-font-size;
+
+$button-font-weight: $font-weight-normal;
+
+// We use these to control various hover effects.
+ $button-function-factor: 11%;
+
+// We use these to control button border and hover styles.
+$button-bg-color: $content-ui-background;
+$button-bg-hover: $content-ui-hover;
+
+$submit-button-color: $content-ui-submit-foreground;
+$submit-button-bg-color: $content-ui-submit-background;
+$submit-button-bg-hover: css-tint($content-ui-submit-background, 20%);
+
+$button-border-color: transparent;
+$secondary-button-bg-hover: css-tint($submit-button-color, 20%);
+
+$secondary-button-border-color: transparent;
+$success-button-bg-hover: tint($success-color, 20%);
+$success-button-border-color: transparent;
+$alert-button-bg-hover: tint($alert-color, 20%);
+$alert-button-border-color: transparent;
+
+// We use this to set default opacity and cursor for disabled buttons.
+$button-disabled-opacity: 0.5;
+
+// Override buttons with icons font-size
+.size-24[class^="icon-"]:before,
+.size-24[class*=" icon-"]:before{
+	font-size: 1.5rem;
+}
+
+.size-32[class^="icon-"]:before,
+.size-32[class*=" icon-"]:before{
+	font-size: 2rem;
+}
+
+.size-48[class^="icon-"]:before,
+.size-48[class*=" icon-"]:before{
+	font-size: 3rem;
+}
+
+.size-64[class^="icon-"]:before,
+.size-64[class*=" icon-"]:before{
+	font-size: 4rem;
+}
+
+// MS Immersive reader button
+.immersive-reader-button {
+  float: right;
+}

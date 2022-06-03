@@ -1,0 +1,510 @@
+.rubric-wrap {
+    border-top: solid 0.5rem $body-bg;
+}
+.threaded .rubric-wrap {
+    border-top-color: $snow;
+}
+table.rb {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    .markdown {
+        li {
+            white-space: pre-wrap;
+        }
+        p {
+            white-space: pre-wrap;
+            font-weight: inherit;
+        }
+    }
+
+    [colspan] {
+        border-right-width: 0 !important;
+    }
+    &.markable {
+        td {
+            padding: 0;
+            position: relative;
+        }
+
+        .rb-group-summary {
+            color: inherit;
+            label {
+                display: block;
+                &.error {
+                    width: 100%;
+                    margin-bottom: 0; // Don't need you
+                }
+            }
+            .groupMark {
+                min-width: 8rem;
+                display: inline-block;
+            }
+            select.groupMark {
+                width: initial;
+            }
+
+            .meta {
+                color: darken($aluminum, 15%);
+            }
+        }
+
+        // Styling for the selected descriptor on the rubric marked grid
+        input[type=checkbox], input[type=radio] {
+            &:checked {
+                + label {
+                    background-color: $content-ui-selected;
+                    // DONE use contrasting color
+                    color: $content-ui-selected-contrast;
+                }
+            }
+            + label {
+                margin: 0;
+
+                // Prevent iPad breakage
+                * {
+                    pointer-events: none;
+                }
+
+                &:hover {
+                    // DONE use CSS lighten
+                    background-color: css-lighten($content-ui-selected, 3%);
+                    cursor: pointer;
+                }
+            }
+        }
+
+        input[type='tel'] {
+            border-color: $input-border-color;
+            background-color: $container-bg;
+        }
+
+    }
+
+    label {
+        box-sizing: content-box;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        span {
+            margin: $table-row-padding;
+        }
+
+        &.error {
+            margin-bottom: 0;
+        }
+    }
+
+    // Self Reflection
+    .rb-self-reflection-choice {
+        border-radius: 50%;
+        float: right;
+        &.blind-mode { //can't show the students image, so just show a circle in place
+            width: 2rem;
+            height: 2rem;
+            background: $content-ui-submit-background;
+            text-indent: 100%; //to hide the text within the element
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
+
+    a {
+        white-space: nowrap;
+        line-height: 2.75rem;
+    }
+    input[type=text], input[type=tel] {
+        + label.rb-readonly {
+            padding-left: 2.6125rem;
+        }
+    }
+
+    tbody th:first-of-type {
+        border-right: solid 1px $body-bg;
+        border-left: 0;
+    }
+    tbody th:last-of-type,
+    thead th:first-of-type {
+        border-right: solid 2px $body-bg;
+        border-left: 0;
+    }
+    td, th {
+        border-left: 1px solid $body-bg;
+        transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+        &:hover {
+            input[type=text], input[type=tel], textarea {
+                border-color: $input-border-color;
+                background-color: $container-bg;
+            }
+        }
+        .fieldAssign {
+            font-weight: normal;
+            padding-left: 1rem;
+        }
+        // Print font size for the rubric grid: ~10px
+        @media print {
+           font-size: rem-calc(($base-font-size * 0.625));
+        }
+    }
+
+    td {
+        overflow: hidden;
+
+        /* So that in readonly view, absolute elements end up in the correct location
+         * such as the student's avatar in Self Reflection
+         */
+    }
+  div {
+    position: relative;
+    line-height: $form-label-line-height;
+    span{
+      margin: $table-row-padding;
+    }
+  }
+    textarea {
+        font-size: 0.625rem;
+        resize: none;
+        overflow-y: auto;
+        height: 100px; /* yes, I used pixels. wanna fight about it? */
+        min-width: 5rem;
+        &:focus {
+            color: calc-text-color($container-bg);
+            background-color: $container-bg;
+        }
+    }
+    textarea, input[type=text], input[type=tel] {
+        border-color: transparent;
+        background-color: transparent;
+        &:focus {
+            border-color: $input-focus-border-color !important;
+            color: calc-text-color($container-bg);
+            background-color: $container-bg;
+        }
+    }
+
+    .rb-group-summary {
+        // DONE use CSS lighten
+        //background-color: $form-bg-hover-color !important;
+        // DONE use contrasting color
+        color: $form-bg-hover-color-contrast;
+
+        label {
+            //color: $form-bg-hover-color-contrast;
+            font-weight: bold!important;
+            display: block;
+        }
+
+        input[type=tel] {
+            border-color: $input-border-color;
+            color: calc-text-color($container-bg);
+            background-color: $container-bg;
+            width: 5rem;
+            display: inline-block;
+        }
+    }
+
+    tr {
+        label {
+            transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
+            font-weight: normal;
+        }
+        &.rb-group-header label {
+            font-weight: bold;
+        }
+        // Fix textarea width getting pushed over cells by checkbox
+        .rb-criterion {
+            width: calc(100% - 2rem);
+        }
+    }
+    .hide-h {
+        padding-left: 0;
+        padding-right: 0;
+        width: 0;
+        input[type=text], input[type=tel], textarea {
+            opacity: 0;
+            /* far out! */
+            width: 0 !important;
+            border-left-width: 0 !important;
+            border-right-width: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            overflow: hidden !important;
+        }
+    }
+    .hide-v {
+        background-color: #f9f9f9 !important;
+        &:not(:last-child):hover:before {
+            content: 'Click to add descriptor';
+            font-size: $small-font-size;
+            opacity: 0.5;
+            font-style: italic;
+        }
+        &:hover {
+            cursor: pointer;
+        }
+        input[type=text], input[type=tel], textarea {
+            opacity: 0;
+            /* far out! */
+            height: 0 !important;
+            border-top-width: 0 !important;
+            border-bottom-width: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
+        }
+    }
+    tr.rb-group-header {
+        border-top: solid 1px $body-bg;
+    }
+    .rb-group-header {
+        + tr {
+            border-top: solid 1px $body-bg;
+        }
+        th {
+            border-right-width: 1px;
+        }
+    }
+    ::placeholder { 
+        color: gray; 
+        font-weight: normal; 
+    }
+}
+.rb-criterion {
+    margin-bottom: 0;
+}
+.rb-editable {
+    &:before {
+        top: 14px !important;
+    }
+    &:after {
+        top: 15px !important;
+    }
+}
+.rb-no-cell {
+    background-color: $body-bg;
+    // DONE figure out what to do about this mixin
+    color: $body-foreground;
+    line-height: 2.875rem;
+}
+.rb-selected {
+    background-color: $content-ui-selected !important;
+    // DONE use contrasting color
+    color: $content-ui-selected-contrast;
+
+    .range-selection-value {
+        font-weight: bold;
+    }
+
+    .range.selected {
+        &:before {
+            content: "(";
+        }
+        &:after {
+            content: ")";
+        }
+    }
+}
+.rb-blank {
+    background-color: #FFEFEB !important;
+    color: calc-text-color(#FFEFEB);
+}
+.rb-final-summary {
+    background-color: $input-border-color !important;
+    // DONE use contrasting color
+    color: $input-border-color-contrast;
+}
+
+.rb-description, .rb-value {
+    display: block;
+    &.error {
+        border-color: $alert-color !important;
+    }
+}
+.rb-value {
+    font-family: monospace !important;
+    margin-top: 0.5rem !important;
+}
+.sequencer {
+    color: #9a9a9a;
+    display: block;
+    text-align: right;
+    [class*="icon-"] {
+        &:before {
+            padding-right: 0;
+            color: inherit;
+        }
+        &:hover:before {
+            color: $input-focus-border-color;
+        }
+    }
+    a {
+        &[disabled] {
+            opacity: 0.3;
+            &:hover {
+                color: inherit;
+            }
+        }
+        &:hover {
+            text-decoration: none;
+        }
+    }
+    .icon-up-arrow,
+    .icon-down-arrow {
+        display: inline-block;
+        width: 2rem;
+        height: 1rem;
+        line-height: 1rem;
+        text-align: center;
+    }
+    .icon-previous,
+    .icon-next {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        text-align: center;
+    }
+}
+
+.descriptor-sum {
+    font-weight: bold;
+}
+
+select.letter-grade-select {
+    margin-bottom: 0;
+}
+
+@media not print {
+  @media #{$medium-down} {
+    table.rb.markable {
+      thead {
+        position: absolute;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+      }
+
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        white-space: normal;
+      }
+
+      tr td,
+      tr th {
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        white-space: normal;
+      }
+
+      .capability {
+        background-color: $snow;
+      }
+
+      th[scope="row"] {
+        display: block;
+        font-size: rem-calc(($base-font-size - 2));
+        text-align: center;
+        width: 100%;
+      }
+    }
+    table.rb {
+      tbody th {
+        &:last-of-type {
+          border-right-width: 0;
+        }
+
+        &:first-of-type {
+          border-right-width: 0;
+          border-bottom-width: 1px;
+        }
+      }
+
+      .rb-group-name,
+      .rb-group-header label {
+        font-size: $base-font-size;
+      }
+
+      .hide-v,
+      .rb-blank,
+      th:empty {
+        display: none;
+      }
+
+      thead {
+        display: block;
+      }
+
+      tr {
+        .rb-group-header {
+          label {
+            font-weight: bold;
+          }
+        }
+      }
+
+      .rb-criterion-name {
+        padding-left: 1.25rem;
+      }
+
+      .rb-group-summary {
+        padding-left: 1.5rem;
+      }
+
+      label span {
+        margin-left: 1.25rem;
+      }
+
+      .rb-description,
+      .rb-value {
+        margin-left: 1.5rem;
+      }
+
+      select {
+        padding: 0 1.5rem;
+      }
+
+      textarea {
+        min-height: 1rem;
+      }
+
+      .rb-no-cell {
+        display: none;
+      }
+
+      .sequencer {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  // Rubric progression graph
+  th.rubric-progression-capability, th.rubric-progression-indicator {
+    width: 15%;
+  }
+  td.rubric-progression-graph {
+    padding: 0;
+  }
+}
+
+@media print {
+    .rb-selected p,
+    .rb-selected aside{
+        font-size: 1rem;
+        font-weight: bold;
+        font-style: italic;
+    }
+}
+
+

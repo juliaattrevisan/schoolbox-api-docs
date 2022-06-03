@@ -1,0 +1,118 @@
+/*
+    Default Schoolbox variables
+    These will be overridden by skin values
+*/
+
+/*****************************
+ Refined Colour Application
+ (these are Skin Builder vars)
+ ****************************/
+$navigation-foreground:            var(--navigation-foreground) !default;
+$navigation-background:            var(--navigation-background) !default;
+$navigation-hover:                 var(--navigation-hover) !default;
+
+$off-canvas-foreground:            var(--off-canvas-foreground) !default;
+$off-canvas-background:            var(--off-canvas-background) !default;
+$off-canvas-hover:                 var(--off-canvas-hover) !default;
+
+$content-ui-foreground:            var(--content-ui-foreground) !default;
+$content-ui-background:            var(--content-ui-background) !default;
+$content-ui-hover:                 var(--content-ui-hover) !default;
+$content-ui-selected:              var(--content-ui-selected) !default;
+
+$content-ui-submit-foreground:     var(--content-ui-submit-foreground) !default;
+$content-ui-submit-background:     var(--content-ui-submit-background) !default;
+
+$form-border-color:                var(--form-border-color) !default;
+$form-bg-hover-color:              var(--form-bg-hover-color) !default;
+
+$accent-foreground:                var(--accent-foreground) !default;
+$accent-background:                var(--accent-background) !default;
+$accent-hover:                     var(--accent-hover) !default;
+
+$logo-background:                  var(--logo-background) !default;
+
+$body-bg:                          var(--body-background) !default;
+
+$login-form-background:            var(--login-form-background) !default;
+
+$accounts-menu-foreground:         var(--accounts-menu-foreground) !default;
+$accounts-menu-background:         var(--accounts-menu-background) !default;
+$accounts-menu-hover:              var(--accounts-menu-hover) !default;
+
+/*****************************
+ Contrasts to skin color vars above
+ (this replaces usages of calc-text-color function, which works only with colors
+  known at SASS compilation time)
+ ****************************/
+$navigation-foreground-contrast:            var(--navigation-foreground-contrast) !default;
+$navigation-background-contrast:            var(--navigation-background-contrast) !default;
+$navigation-hover-contrast:                 var(--navigation-hover-contrast) !default;
+
+$off-canvas-foreground-contrast:            var(--off-canvas-foreground-contrast) !default;
+$off-canvas-background-contrast:            var(--off-canvas-background-contrast) !default;
+$off-canvas-hover-contrast:                 var(--off-canvas-hover-contrast) !default;
+
+$content-ui-foreground-contrast:            var(--content-ui-foreground-contrast) !default;
+$content-ui-background-contrast:            var(--content-ui-background-contrast) !default;
+$content-ui-hover-contrast:                 var(--content-ui-hover-contrast) !default;
+$content-ui-selected-contrast:              var(--content-ui-selected-contrast) !default;
+
+$content-ui-submit-foreground-contrast:     var(--content-ui-submit-foreground-contrast) !default;
+$content-ui-submit-background-contrast:     var(--content-ui-submit-background-contrast) !default;
+
+$form-border-color-contrast:                var(--form-border-color-contrast) !default;
+$form-bg-hover-color-contrast:              var(--form-bg-hover-color-contrast) !default;
+
+$accent-foreground-contrast:                var(--accent-foreground-contrast) !default;
+$accent-background-contrast:                var(--accent-background-contrast) !default;
+$accent-hover-contrast:                     var(--accent-hover-contrast) !default;
+
+$logo-background-contrast:                  var(--logo-background-contrast) !default;
+
+$body-bg-contrast:                          var(--body-background-contrast) !default;
+
+$login-form-background-contrast:            var(--login-form-background-contrast) !default;
+
+$accounts-menu-foreground-contrast:         var(--accounts-menu-foreground-contrast) !default;
+$accounts-menu-background-contrast:         var(--accounts-menu-background-contrast) !default;
+$accounts-menu-hover-contrast:              var(--accounts-menu-hover-contrast) !default;
+
+/*****************************
+ Colors derived from configured skin colors, and their contrasts
+ ****************************/
+$body-foreground:                           var(--body-foreground) !default;
+$body-foreground-contrast:                  var(--body-foreground-contrast) !default;
+$body-foreground-h1:                        var(--body-foreground-h1) !default;
+$body-foreground-h1-contrast:               var(--body-foreground-h1-contrast) !default;
+$navigation-foreground-highlight:           var(--navigation-foreground-highlight) !default;
+$navigation-foreground-highlight-contrast:  var(--navigation-foreground-highlight-contrast) !default;
+
+
+/*****************************
+ Constants
+ ****************************/
+
+/* A specific var for input element borders
+ * By default this is connected to the skin builder var
+ * but if for some reason you need different border colours
+ * you can choose that here
+ */
+$input-border-color:          $form-border-color;
+$input-border-color-contrast: $form-border-color-contrast;
+
+/* Action-list specific colouring:
+ * Hover colour for action-list rows
+ * Hover colour for the action button in the action-list row
+ */
+$row-hover-background:             css-tint($content-ui-hover, 87%);
+
+$row-action-hover-background:      $content-ui-hover;
+
+// Colours
+$primary-color:					#f0f !default;
+$secondary-color:				#ff0 !default;
+$tertiary-color:				#0ff !default;
+
+// for BC
+$tertiary:						$tertiary-color;
