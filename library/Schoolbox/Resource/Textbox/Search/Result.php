@@ -193,12 +193,14 @@ class Result extends Base
         if ($this->componentConfigDefinitionId) {
             $componentJoin   = "
                 LEFT JOIN component_instance ci
+                -- (
                           JOIN component_config_instance cci ON ci.id = cci.component_instance_id
                                                              AND cci.component_config_definition_id = :componentTextBoxId
                           LEFT JOIN component_config_instance cci2 ON cci.component_instance_id = cci2.component_instance_id
                                                                    AND cci2.component_config_definition_id = :collapse
-                          LEFT  JOIN component_config_instance cci3 ON cci.component_instance_id = cci3.component_instance_id
+                          LEFT JOIN component_config_instance cci3 ON cci.component_instance_id = cci3.component_instance_id
                                                                     AND cci3.component_config_definition_id = :showComponentTitle
+                -- )
                 ON c.id = ci.identifier
                 AND ci.component_definition_id = :componentDefinitionId
                 AND ci.module = 'homepage'
