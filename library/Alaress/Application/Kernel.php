@@ -460,7 +460,8 @@ abstract class Kernel
                 $conf->get('site_domain'),
                 $conf->get('site_version'),
                 $conf->get('site_type'),
-                $conf->get('site_school_code')
+                $conf->get('site_school_code'),
+                $conf->get('site_environment'),
             );
         }));
 

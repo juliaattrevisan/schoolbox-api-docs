@@ -61,7 +61,9 @@ class Factory
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
                 $scope->setTags([
+                    'instance_id'      => $instance->getId(),
                     'php_version'      => PHP_VERSION,
+                    'site_environment' => $instance->getSiteEnvironment(),
                     'site_version'     => $instance->getVersion(),
                     'site_school_code' => $instance->getSchoolCode(),
                 ]);
