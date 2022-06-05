@@ -10,6 +10,7 @@
 
 class Component_Config_Collapse extends Component_Config_Abstract
 {
+    public const KEY = 'collapse';
 
     /**
      * Parse out config options
