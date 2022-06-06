@@ -318,259 +318,261 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <!-- Upgrade Reminder -->
-        {% if showUpgradeReminder %}
-            {% include '@adminHome/upgrade-reminder.twig' %}
-        {% endif %}
+        <div class="small-12 columns">
+            <!-- Upgrade Reminder -->
+            {% if showUpgradeReminder %}
+                {% include '@adminHome/upgrade-reminder.twig' %}
+            {% endif %}
 
-        <div class="row">
-            <div class="small-12 large-5 island">
+            <div class="row">
+                <div class="small-12 large-5 island">
 
-                <!-- Usage Graphs -->
+                    <!-- Usage Graphs -->
 
-                <h2 class="subheader">Server Usage</h2>
-                {% if usageInGraph %}
-                    <section>
-                        <div data-graph="usage"></div>
-                    </section>
-                {% else %}
-                    <table>
-                        <tbody>
-                        <tr><th>Storage</th><td>{{ disk_used }}</td></tr>
-                        <tr><th>Memory</th><td>{{ memory_used }} / {{ memory_total }}</td></tr>
-                        </tbody>
-                    </table>
-                {% endif %}
-
-                <!-- Service Statuses -->
-
-                <h2 class="subheader">Status of Services</h2>
-                <section>
-                    <ul class="information-list">
-                        {% if external_db and external_db != 'Schoolbox' %}
-                        <li>
-                            <div class="small-5 columns content">
-                                <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}</a>
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="external_db">Testing...</span>
-                            </div>
-                        </li>
-                        {% endif %}
-                        <li>
-                            <div class="small-5 columns content">
-                                Email
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="email_status">Testing...</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="small-5 columns content">
-                                Notifications
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="rabbitmq">Testing...</span>
-                            </div>
-                        </li>
-                        {% if ldap_enabled %}
-                        <li>
-                            <div class="small-5 columns content">
-                                LDAP Primary
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="ldap_status">Testing...</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="small-5 columns content">
-                                LDAP Secondary
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="ldap_alt_status">Testing...</span>
-                            </div>
-                        </li>
-                        {% endif %}
-                        <li>
-                            <div class="small-5 columns content">
-                                WWW
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="www">Testing...</span>
-                            </div>
-                        </li>
-                        {% if collabDocsEnabled %}
-                        <li>
-                            <div class="small-5 columns content">
-                                Collab Docs
-                            </div>
-                            <div class="small-7 columns content">
-                                <span class="full-width neutral label" data-light="etherpad">Testing...</span>
-                            </div>
-                        </li>
-                        {% endif %}
-                            <li>
-                                <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="kami">Testing...</span>
-                                </div>
-                            </li>
-                        {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
-                        {% if drRoute %}
-                            <li>
-                                <div class="small-5 columns content">
-                                    <a href="{{ drRoute }}">Disaster Recovery</a>
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width {% if backupsEnabled %}success{% else%}highlight{% endif %} label">{% if backupsEnabled %}Enabled{% else%}Disabled{% endif %}</span>
-                                </div>
-                            </li>
-                        {% endif %}
-
-                        {# Optionally show turnitin status #}
-                            <li id="turnitin-block" hidden>
-                                <div class="small-5 columns content">
-                                    <a id="turnitin-url" href="" target="_blank"></a>
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width success neutral label" data-light="turnitin">Testing...</span>
-                                </div>
-                            </li>
-                        {# Show ssh + SSL cert status if not cloud hosted #}
-                        {% if not is_cloud %}
-                            <li>
-                                <div class="small-5 columns content">
-                                    Support Available
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="small-5 columns content">
-                                    SSL Certificate
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="cert_status">Testing...</span>
-                                </div>
-                            </li>
-                            {% if show_port_80_availability_check %}
-                            <li>
-                                <div class="small-5 columns content">
-                                    SSL Renewal
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="port_80">Testing...</span>
-                                </div>
-                            </li>
-                            {% endif %}
-
-
-                            {% if suds_import_data_enabled %}
-                                {% for importLog in suds_import_logs %}
-                                    <li>
-                                        <div class="small-5 columns content">
-                                            {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
-                                            <a href="{{ route }}#previous">{{ importLog.script }}</a>
-                                        </div>
-                                        <div class="small-7 columns content">
-                                            {% if importLog.isComplete %}
-                                                <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
-                                            {% elseif importLog.isRunning %}
-                                                <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
-                                            {% elseif importLog.isError %}
-                                                <span class="full-width alert label">Error</span>
-                                            {% endif %}
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            {% endif %}
-                            <li>
-                                <div class="small-5 columns content">
-                                    NTP Drift
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="ntp">Testing...</span>
-                                </div>
-                            </li>
-                            {% if saml_enabled %}
-                            <li>
-                                <div class="small-5 columns content">
-                                    SAML Certificate
-                                </div>
-                                <div class="small-7 columns content">
-                                    <span class="full-width neutral label" data-light="saml_cert">testing...</span>
-                                </div>
-                            </li>
-                            {% endif %}
-                        {% endif %}
-                    </ul>
-                </section>
-
-                <!-- Role Statistics -->
-
-                <h2 class="subheader">Role Statistics</h2>
-                <section>
-                    <div class="loading"></div>
-                    <div class="scrollable">
-                        <table id="group-summary">
-                            <colgroup>
-                                <col width="50%" />
-                                <col width="20%" />
-                                <col width="30%" />
-                            </colgroup>
-                            <thead>
-                            <tr>
-                                <th>Role</th>
-                                <th>Total</th>
-                                <th>Logged In</th>
-                            </tr>
-                            </thead>
+                    <h2 class="subheader">Server Usage</h2>
+                    {% if usageInGraph %}
+                        <section>
+                            <div data-graph="usage"></div>
+                        </section>
+                    {% else %}
+                        <table>
                             <tbody>
+                            <tr><th>Storage</th><td>{{ disk_used }}</td></tr>
+                            <tr><th>Memory</th><td>{{ memory_used }} / {{ memory_total }}</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                </section>
-            </div>
+                    {% endif %}
 
-            <!-- Recent Log Entries -->
+                    <!-- Service Statuses -->
 
-            <div class="small-12 large-7 island">
-                <div class="rss-feed">
-                    <h2 class="subheader">Recent Updates</h2>
-                    <div class="empty-state">
-                        <i class="icon-rss"></i>
-                        <p>Loading...</p>
-                    </div>
+                    <h2 class="subheader">Status of Services</h2>
+                    <section>
+                        <ul class="information-list">
+                            {% if external_db and external_db != 'Schoolbox' %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}</a>
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="external_db">Testing...</span>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    Email
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="email_status">Testing...</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="small-5 columns content">
+                                    Notifications
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="rabbitmq">Testing...</span>
+                                </div>
+                            </li>
+                            {% if ldap_enabled %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    LDAP Primary
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="ldap_status">Testing...</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="small-5 columns content">
+                                    LDAP Secondary
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="ldap_alt_status">Testing...</span>
+                                </div>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    WWW
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="www">Testing...</span>
+                                </div>
+                            </li>
+                            {% if collabDocsEnabled %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    Collab Docs
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="etherpad">Testing...</span>
+                                </div>
+                            </li>
+                            {% endif %}
+                                <li>
+                                    <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width neutral label" data-light="kami">Testing...</span>
+                                    </div>
+                                </li>
+                            {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
+                            {% if drRoute %}
+                                <li>
+                                    <div class="small-5 columns content">
+                                        <a href="{{ drRoute }}">Disaster Recovery</a>
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width {% if backupsEnabled %}success{% else%}highlight{% endif %} label">{% if backupsEnabled %}Enabled{% else%}Disabled{% endif %}</span>
+                                    </div>
+                                </li>
+                            {% endif %}
+
+                            {# Optionally show turnitin status #}
+                                <li id="turnitin-block" hidden>
+                                    <div class="small-5 columns content">
+                                        <a id="turnitin-url" href="" target="_blank"></a>
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width success neutral label" data-light="turnitin">Testing...</span>
+                                    </div>
+                                </li>
+                            {# Show ssh + SSL cert status if not cloud hosted #}
+                            {% if not is_cloud %}
+                                <li>
+                                    <div class="small-5 columns content">
+                                        Support Available
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="small-5 columns content">
+                                        SSL Certificate
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width neutral label" data-light="cert_status">Testing...</span>
+                                    </div>
+                                </li>
+                                {% if show_port_80_availability_check %}
+                                <li>
+                                    <div class="small-5 columns content">
+                                        SSL Renewal
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width neutral label" data-light="port_80">Testing...</span>
+                                    </div>
+                                </li>
+                                {% endif %}
+
+
+                                {% if suds_import_data_enabled %}
+                                    {% for importLog in suds_import_logs %}
+                                        <li>
+                                            <div class="small-5 columns content">
+                                                {% set route = routeLookup('adminImportIndex.getSchoolDataIndex') %}
+                                                <a href="{{ route }}#previous">{{ importLog.script }}</a>
+                                            </div>
+                                            <div class="small-7 columns content">
+                                                {% if importLog.isComplete %}
+                                                    <span class="full-width success label" title="{{ importLog.finishAt.local }}">Complete</span>
+                                                {% elseif importLog.isRunning %}
+                                                    <span class="full-width warning label" title="Started at {{ importLog.startAt.local }}">In Progress</span>
+                                                {% elseif importLog.isError %}
+                                                    <span class="full-width alert label">Error</span>
+                                                {% endif %}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                {% endif %}
+                                <li>
+                                    <div class="small-5 columns content">
+                                        NTP Drift
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width neutral label" data-light="ntp">Testing...</span>
+                                    </div>
+                                </li>
+                                {% if saml_enabled %}
+                                <li>
+                                    <div class="small-5 columns content">
+                                        SAML Certificate
+                                    </div>
+                                    <div class="small-7 columns content">
+                                        <span class="full-width neutral label" data-light="saml_cert">testing...</span>
+                                    </div>
+                                </li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                    </section>
+
+                    <!-- Role Statistics -->
+
+                    <h2 class="subheader">Role Statistics</h2>
+                    <section>
+                        <div class="loading"></div>
+                        <div class="scrollable">
+                            <table id="group-summary">
+                                <colgroup>
+                                    <col width="50%" />
+                                    <col width="20%" />
+                                    <col width="30%" />
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Total</th>
+                                    <th>Logged In</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
                 </div>
-                <div class="actions-small-2 row">
-                    <div class="list-item">
-                        <div class="small-12 columns">
-                            <h2 class="subheader">Recent Activity</h2>
+
+                <!-- Recent Log Entries -->
+
+                <div class="small-12 large-7 island">
+                    <div class="rss-feed">
+                        <h2 class="subheader">Recent Updates</h2>
+                        <div class="empty-state">
+                            <i class="icon-rss"></i>
+                            <p>Loading...</p>
                         </div>
                     </div>
-                    <nav>
-                        <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
-                        <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
-                    </nav>
+                    <div class="actions-small-2 row">
+                        <div class="list-item">
+                            <div class="small-12 columns">
+                                <h2 class="subheader">Recent Activity</h2>
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
+                            <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
+                        </nav>
+                    </div>
+                    <section>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>User</th>
+                            </tr>
+                            </thead>
+                            <tbody class="logs">
+                            </tbody>
+                        </table>
+                    </section>
                 </div>
-                <section>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Action</th>
-                            <th>User</th>
-                        </tr>
-                        </thead>
-                        <tbody class="logs">
-                        </tbody>
-                    </table>
-                </section>
-            </div>
 
-        </div>
-    </div>
+            </div><!-- row -->
+        </div><!-- small-12 columns -->
+    </div><!-- admin-content -->
 </div>
 
 
