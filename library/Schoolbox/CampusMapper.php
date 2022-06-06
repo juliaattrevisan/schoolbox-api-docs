@@ -9,6 +9,7 @@
 namespace Schoolbox;
 
 use PDO;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
 
@@ -45,6 +46,7 @@ class CampusMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'campusHasUsers']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeDeletedCampusFromUPSRules']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     /**
@@ -232,5 +234,36 @@ class CampusMapper extends Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Campus $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Campus $model): bool
+    {
+        if (trim($model->getName() ?? '') === '') {
+            throw new CallbackException("Campus name cannot be empty");
+        }
+        $query  = 'SELECT id, name FROM luCampus WHERE deleted_at IS NULL AND name = :name';
+        $params = ['name' => $model->getName()];
+        if ($model->getId()) {
+            $query        .= " AND id != :id";
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+            throw new CallbackException("Campus name must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
     }
 }
