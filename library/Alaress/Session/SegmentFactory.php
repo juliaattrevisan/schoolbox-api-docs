@@ -26,7 +26,7 @@ class SegmentFactory extends BaseSegmentFactory
      * @param BaseSession $manager
      * @param string      $name
      *
-     * @return Segment
+     * @return BaseSegment
      */
     public function newInstance(BaseSession $manager, $name)
     {
