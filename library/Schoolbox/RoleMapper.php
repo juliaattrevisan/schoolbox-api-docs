@@ -11,6 +11,7 @@
 namespace Schoolbox;
 
 use InvalidArgumentException;
+use PDO;
 use Schoolbox\Mapper\Exception\CallbackException;
 
 /**
