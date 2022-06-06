@@ -203,69 +203,71 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="row">
-            <div class="small-12 columns">
-                <h2 class="subheader">Global Notification Settings</h2>
-            </div>
-            <div class="small-12 island">
-                <section class="content">
-                    <p>Use this page to configure the notifications the system will send to users.</p>
-                    <ul>
-                        <li>
-                            <em>Selected options</em> are the way this notification should be received by default (remembering users can personalise their settings).
-                        </li>
-                        <li>
-                            <em>Disabled options</em> will not be selectable by users of the given role
-                        </li>
-                        <li>
-                            You can customise and restrict users' delivery options by using the modify button
-                        </li>
-                        <li>
-                            To hide a notification source from members of a role, lock that source to Muted
-                        </li>
-                    </ul>
-                </section>
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Global Notification Settings</h2>
+                </div>
+                <div class="small-12 island">
+                    <section class="content">
+                        <p>Use this page to configure the notifications the system will send to users.</p>
+                        <ul>
+                            <li>
+                                <em>Selected options</em> are the way this notification should be received by default (remembering users can personalise their settings).
+                            </li>
+                            <li>
+                                <em>Disabled options</em> will not be selectable by users of the given role
+                            </li>
+                            <li>
+                                You can customise and restrict users' delivery options by using the modify button
+                            </li>
+                            <li>
+                                To hide a notification source from members of a role, lock that source to Muted
+                            </li>
+                        </ul>
+                    </section>
 
-                <div class="actions-small-1 row">
-                    <div class="list-item">
-                        <div class="small-12 columns">
-                            <h2 class="subheader" id="filter">Configure Settings</h2>
+                    <div class="actions-small-1 row">
+                        <div class="list-item">
+                            <div class="small-12 columns">
+                                <h2 class="subheader" id="filter">Configure Settings</h2>
+                            </div>
                         </div>
+                        <nav>
+                            <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+                        </nav>
                     </div>
-                    <nav>
-                        <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
-                    </nav>
-                </div>
 
-                <ul class="sub-nav">
-                    {% for i, filter in filters.options %}
-                        <li class="{% if filters.selected == i %}active{% endif %}">
-                            <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
+                    <ul class="sub-nav">
+                        {% for i, filter in filters.options %}
+                            <li class="{% if filters.selected == i %}active{% endif %}">
+                                <a href="/adminv2/messages/configure{{ filter == 'all' ? '' : ('/' ~ filter) }}">{{ filter | capitalize }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
 
-                {% if config|length  %}
-                <div id="configurator">
-                    {% for namespace in msgConfig %}
-                        {% if ns[namespace.id] is defined %}
-                        <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
-                        <section data-namespace="{{ ns[namespace.id].slug }}">
-                            {% for source in namespace.sources %}
-                                {% include '@messages/source.twig' with { source: source } %}
-                            {% endfor %}
-                        </section>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <p>No roles exist with this role type</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+                    {% if config|length  %}
+                    <div id="configurator">
+                        {% for namespace in msgConfig %}
+                            {% if ns[namespace.id] is defined %}
+                            <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                            <section data-namespace="{{ ns[namespace.id].slug }}">
+                                {% for source in namespace.sources %}
+                                    {% include '@messages/source.twig' with { source: source } %}
+                                {% endfor %}
+                            </section>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No roles exist with this role type</p>
+                    </div>
+                    {% endif %}
+                </div><!-- small-12 island -->
+            </div><!-- row -->
+        </div><!-- small-12 columns -->
+    </div><!-- admin-content -->
 </div>
 <div id="slider-modal" class="reveal-modal" data-reveal></div>
 
