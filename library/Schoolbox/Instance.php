@@ -46,6 +46,9 @@ class Instance
      */
     private string $schoolCode;
 
+    /** @var string */
+    private string $siteEnvironment;
+
 
     /**
      * @param string $id         the 8 character instance ID (same as INSTANCE_ID const)
@@ -54,6 +57,7 @@ class Instance
      * @param string $version    version of Schoolbox currently installed
      * @param string $type       whether this system is production or development etc.
      * @param string $schoolCode Alaress' unique identifier for the School this instance runs for
+     * @param string $siteEnvironment whether on-prem or cloud
      */
     public function __construct(
         string $id,
@@ -61,7 +65,8 @@ class Instance
         string $domain,
         string $version,
         string $type,
-        string $schoolCode
+        string $schoolCode,
+        string $siteEnvironment,
     ) {
         $this->id = $id;
         $this->hostname = $hostname;
@@ -69,6 +74,7 @@ class Instance
         $this->version = $version;
         $this->type = $type;
         $this->schoolCode = $schoolCode;
+        $this->siteEnvironment = $siteEnvironment;
     }
 
 
@@ -159,5 +165,13 @@ class Instance
     public function isDevelopment(): bool
     {
         return strpos($this->getType(), self::SITE_TYPE_DEVELOPMENT) !== false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSiteEnvironment(): string
+    {
+        return $this->siteEnvironment;
     }
 }
