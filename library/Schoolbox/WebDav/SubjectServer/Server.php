@@ -44,32 +44,24 @@ class Server extends DAV\Collection
 
     /**
      * @var AssessmentDataSource
-     *
-     * @phpstan-ignore-next-line - this IS read and written
      */
     private $assessmentDataSource;
 
 
     /**
      * @var StorageDataSource
-     *
-     * @phpstan-ignore-next-line - this IS read and written
      */
     private $storageDataSource;
 
 
     /**
      * @var DueWorkResponseDataSource
-     *
-     * @phpstan-ignore-next-line - this IS read and written
      */
     private $dueWorkResponseDataSource;
 
 
     /**
      * @var ErrorMapper
-     *
-     * @phpstan-ignore-next-line - this IS read and written
      */
     private $errorMapper;
 
@@ -86,8 +78,6 @@ class Server extends DAV\Collection
      * A name generator, for sanitising and deduping names.
      *
      * @var NameGenerator
-     *
-     * @phpstan-ignore-next-line - this IS read and written
      */
     private $nameGenerator;
 
