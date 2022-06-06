@@ -3,3 +3,7 @@ INSERT INTO component_definition (name, class, description, module, component_ca
 VALUES ('Intellischool Launcher', 'Schoolbox\\Intellischool\\Component\\Homepage\\Controller',
         'Displays the Intellischools dashbaord on homepages', 'homepage', null, 1, 'true', 'true', null, null, null);
 
+#all homepage components require at least 1 config value to function...
+INSERT INTO component_config_definition (component_definition_id, `key`, default_value, label, description)
+VALUES ( (SELECT id from component_definition where class = 'Schoolbox\\Intellischool\\Component\\Homepage\\Controller')
+        , 'componentname', 'Intellischool Launcher', 'Heading', null);
