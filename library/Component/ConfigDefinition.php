@@ -39,7 +39,7 @@ class Component_ConfigDefinition
     /**
      * Current value of this config setting.
      *
-     * @var string
+     * @var string|null If not set, fall back to `$this->defaultValue`.
      */
     protected $value;
 
@@ -139,7 +139,7 @@ class Component_ConfigDefinition
     }
 
     /**
-     * @param  string $value
+     * @param  string|null $value
      *
      * @return $this
      */
@@ -150,7 +150,7 @@ class Component_ConfigDefinition
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getValue()
     {
