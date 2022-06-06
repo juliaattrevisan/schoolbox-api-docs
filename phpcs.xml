@@ -7,7 +7,6 @@
     <!-- <exclude-pattern>*/migrations/*</exclude-pattern> -->
     <exclude-pattern>*\.(twig|scss|css|js)$</exclude-pattern>
 
-    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
     <config name="testVersion" value="8.0-"/>
 
     <!-- ignore warnings and display ERRORS only -->
