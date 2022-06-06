@@ -325,7 +325,7 @@ class Controller extends Base
                 'showId'            => true,                                    // Set this to true to display the db ID on the front end.
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,                                    // set field to readonly, so the user can not modify the db value...
                     ],
@@ -438,7 +438,7 @@ class Controller extends Base
                 'showId'            => true,
                 'fields'            => [
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,
                     ],
@@ -543,7 +543,7 @@ class Controller extends Base
                 'deleteFailMsg'     => 'This campus cannot be deleted as it has users assigned to it.',
                 'fields'            => [
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,
                     ],
@@ -911,7 +911,7 @@ class Controller extends Base
             'mapper' => YearLevel\Mapper::class,
             'fields' => [
                 'id' => [
-                    'caption'   => 'DB ID',
+                    'caption'   => 'ID',
                     'width'     => 1,
                     'readonly'  => true,
                 ],
