@@ -19,12 +19,6 @@ class External_Tass_Timetable implements External_TimetableInterface
 
 
     /**
-     * Keeps track of calendar day events
-     */
-    private $tassDay;
-
-
-    /**
      * @var Group
      */
     private $groupHandler;
@@ -184,11 +178,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                     AND tt_id = '" . $this->getTimetableCode($campus) . "'
                     ORDER BY ttdate DESC";
 
-        $result               = $this->getConnector()->executeQuery($query)->fetch();
-        $time                 = strtotime($result['ttdate']);
-        $this->tassDay[$time] = $result['day_code'];
-
-        return $time;
+        $result = $this->getConnector()->executeQuery($query)->fetch();
+        return strtotime($result['ttdate']);
     }
 
 
