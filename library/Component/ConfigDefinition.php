@@ -10,7 +10,6 @@
 
 class Component_ConfigDefinition
 {
-
     /**
      * @var int
      */

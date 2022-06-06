@@ -20,7 +20,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTriggerBundle;
 
 class TriggerFactory
 {
-
     /** @var ModuleNotifierInterface */
     protected $notifier;
 

@@ -7,7 +7,6 @@ use Schoolbox\Database\Factory;
 
 class External_Tass_Helper
 {
-
     /**
      * Default spouse prefix
      *

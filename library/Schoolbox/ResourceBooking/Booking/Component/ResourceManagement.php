@@ -21,7 +21,6 @@ use Calendar_Api_Config_Mapper;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var Booking\Mapper
      */

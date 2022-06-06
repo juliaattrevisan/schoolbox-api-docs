@@ -14,7 +14,6 @@ use Schoolbox\Realtime\Schedule\Event\Event;
 
 interface TriggerBundleInterface
 {
-
     /**
      * @param string $label
      * @param int $timestamp

@@ -38,15 +38,14 @@ use Schoolbox\User;
 
 class FactoryTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_task_markTypeInvalid
+     * @dataProvider providerTaskMarkTypeInvalid
      * @param Task $task
      *
      * @throws InvalidArgumentException If assessment class not registered
      * @throws DomainException
      */
-    public function test_task_markTypeInvalid(Task $task)
+    public function testTaskMarkTypeInvalid(Task $task)
     {
         $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
@@ -55,14 +54,14 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_task_markTypeValid
+     * @dataProvider providerTaskMarkTypeValid
      * @param Task   $task
      * @param string $expectedMarkScheme
      * @throws \PHPUnit\Framework\Exception
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
-    public function test_task_markTypeValid(Task $task, $expectedMarkScheme)
+    public function testTaskMarkTypeValid(Task $task, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($task);
@@ -71,13 +70,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_quiz_markTypeInvalid
+     * @dataProvider providerQuizMarkTypeInvalid
      * @param Quiz $quiz
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
-    public function test_quiz_markTypeInvalid(Quiz $quiz)
+    public function testQuizMarkTypeInvalid(Quiz $quiz)
     {
         $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
@@ -86,14 +85,14 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_quiz_markTypeValid
+     * @dataProvider providerQuizMarkTypeValid
      * @param Quiz   $quiz
      * @param string $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
-    public function test_quiz_markTypeValid(Quiz $quiz, $expectedMarkScheme)
+    public function testQuizMarkTypeValid(Quiz $quiz, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($quiz);
@@ -102,13 +101,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_dueWOrk_markTypeInvalid
+     * @dataProvider providerDueWOrkMarkTypeInvalid
      * @param DueWork $dueWork
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
-    public function test_dueWork_markTypeInvalid(DueWork $dueWork)
+    public function testDueWorkMarkTypeInvalid(DueWork $dueWork)
     {
         $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
@@ -117,14 +116,14 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_dueWork_markTypeValid
+     * @dataProvider providerDueWorkMarkTypeValid
      * @param DueWork $dueWork
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
-    public function test_dueWork_markTypeValid(DueWork $dueWork, $expectedMarkScheme)
+    public function testDueWorkMarkTypeValid(DueWork $dueWork, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($dueWork);
@@ -133,13 +132,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_project_markTypeInvalid
+     * @dataProvider providerProjectMarkTypeInvalid
      * @param Project $project
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
-    public function test_project_markTypeInvalid($project)
+    public function testProjectMarkTypeInvalid($project)
     {
         $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
@@ -148,14 +147,14 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider provider_project_markTypeValid
+     * @dataProvider providerProjectMarkTypeValid
      * @param Project $project
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
-    public function test_project_markTypeValid($project, $expectedMarkScheme)
+    public function testProjectMarkTypeValid($project, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($project);
@@ -169,7 +168,7 @@ class FactoryTest extends TestCase
      * @return Task[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_task_markTypeInvalid(): array
+    public function providerTaskMarkTypeInvalid(): array
     {
         return [
             [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
@@ -186,7 +185,7 @@ class FactoryTest extends TestCase
      * @return array<array{0: Task, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_task_markTypeValid(): array
+    public function providerTaskMarkTypeValid(): array
     {
         return [
             [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION)), Completion::class],
@@ -198,7 +197,7 @@ class FactoryTest extends TestCase
      * @return Quiz[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_quiz_markTypeInvalid(): array
+    public function providerQuizMarkTypeInvalid(): array
     {
         return [
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
@@ -215,7 +214,7 @@ class FactoryTest extends TestCase
      * @return array<array{0: Quiz, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_quiz_markTypeValid(): array
+    public function providerQuizMarkTypeValid(): array
     {
         return [
             [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
@@ -227,7 +226,7 @@ class FactoryTest extends TestCase
      * @return DueWork[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_dueWork_markTypeInvalid(): array
+    public function providerDueWorkMarkTypeInvalid(): array
     {
         return [
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
@@ -241,7 +240,7 @@ class FactoryTest extends TestCase
      * @return array<array{0: DueWork, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_dueWork_markTypeValid(): array
+    public function providerDueWorkMarkTypeValid(): array
     {
         return [
             [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
@@ -260,7 +259,7 @@ class FactoryTest extends TestCase
      * @return Project[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_project_markTypeInvalid(): array
+    public function providerProjectMarkTypeInvalid(): array
     {
         $projects = [];
         foreach ($this->getSummators() as $summator) {
@@ -279,7 +278,7 @@ class FactoryTest extends TestCase
      * @var IMarkScheme $projects [][1]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function provider_project_markTypeValid(): array
+    public function providerProjectMarkTypeValid(): array
     {
         $projects = [];
         foreach ($this->getSummators() as $summator) {

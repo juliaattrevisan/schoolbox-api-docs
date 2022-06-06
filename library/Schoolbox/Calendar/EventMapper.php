@@ -44,7 +44,6 @@ use UnexpectedValueException;
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
-
     /**
      * @return void
      * @throws Schoolbox\Mapper\DefinitionException

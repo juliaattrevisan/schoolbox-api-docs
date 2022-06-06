@@ -29,7 +29,6 @@ use Alaress_Date_Format;
 
 class EventMetadataNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_SUBMITTED     = 'submitted';
     const TRIGGER_UPDATED       = 'updated';
     const TRIGGER_STATUSCHANGED = 'statuschanged';

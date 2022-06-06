@@ -15,7 +15,6 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 
 class StubTriggerBundle implements TriggerBundleInterface
 {
-
     /** @var Event */
     protected $event;
 

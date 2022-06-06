@@ -22,7 +22,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase
 {
-
     /* Contextual: The owner of the submission box
       */
     protected $authorId   = -1;
