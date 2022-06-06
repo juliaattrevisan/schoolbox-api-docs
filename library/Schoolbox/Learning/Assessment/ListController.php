@@ -51,7 +51,6 @@ use Alaress_Date_Format;
  */
 class ListController extends Web\Controller\Base
 {
-
     /**
      * @var UserMapper
      */
