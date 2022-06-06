@@ -105,7 +105,7 @@
         "oat-sa/lib-lti1p3-nrps": "^7.0",
         "intelliscl/sdk": "0.2.0.4-beta",
         "apple/apn-push": "^3.1",
-        "symfony/mime": "^5.4",
+        "symfony/mime": "^6.0.9",
         "symfony/mailer": "^v6.0.8",
         "phpxmlrpc/phpxmlrpc": "^4.6",
         "psr/container": "^1.1.0",
