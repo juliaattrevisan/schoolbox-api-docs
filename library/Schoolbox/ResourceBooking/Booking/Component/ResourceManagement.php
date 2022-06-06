@@ -33,7 +33,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     protected $templateEngine;
 
     /**
-     * @var array[Collection|Booking\Model[]]
+     * @var array
      */
     protected $bookings;
 
