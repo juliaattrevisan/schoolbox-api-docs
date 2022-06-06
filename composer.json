@@ -31,7 +31,7 @@
         }
     },
     "require": {
-        "php": "7.4.* || 8.0.*",
+        "php": "8.0.*",
         "symfony/http-foundation": "~5.2",
         "league/oauth2-client": "^2.4",
         "sabre/dav": "^4.2.1",
