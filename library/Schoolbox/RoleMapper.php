@@ -11,6 +11,7 @@
 namespace Schoolbox;
 
 use InvalidArgumentException;
+use Schoolbox\Mapper\Exception\CallbackException;
 
 /**
  * @method Role createModel($idValue = null)
@@ -57,6 +58,7 @@ class RoleMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
 
@@ -117,5 +119,36 @@ class RoleMapper extends Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Role $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Role $model): bool
+    {
+        if (trim($model->getName() ?? '') === '') {
+            throw new CallbackException("Role name cannot be empty");
+        }
+        $query  = 'SELECT id, name FROM `groups` WHERE deleted_at IS NULL AND name = :name';
+        $params = ['name' => $model->getName()];
+        if ($model->getId()) {
+            $query        .= " AND id != :id";
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+            throw new CallbackException("Role name must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
     }
 }
