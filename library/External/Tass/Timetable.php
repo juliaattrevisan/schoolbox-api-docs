@@ -268,7 +268,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(
@@ -362,7 +361,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['day'][$desc['day_code']][$code])
                     ) {
                         $timetable[$x]['day'][$desc['day_code']][$code] = array(
