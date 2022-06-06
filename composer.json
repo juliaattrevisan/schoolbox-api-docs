@@ -51,7 +51,6 @@
         "aura/router": "~2.3.0",
         "aura/web": "~2.1.0",
         "aura/session": "~2.1.0",
-        "aura/sqlquery": "~2.7.1",
         "0x46616c6b/etherpad-lite-client": "~0.6",
         "easyrdf/easyrdf": "~1.1.1",
         "caxy/php-htmldiff": "~0.1.3",
