@@ -1,0 +1,36 @@
+                <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="intellischoolIframe">
+                    <input type="hidden" name="id_token" value="{{ jwt }}">
+                </form>
+                <iframe style="min-height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
+                </iframe>
+                <script type="text/javascript">
+                    window.addEventListener("message", event => {
+                        // Check that the event is from a trusted source
+                        if (![
+                            "https://analytics.intellischool.cloud",
+                            "https://analytics.intellischool.xyz",
+                            "https://analytics.intellischool.dev"
+                        ].includes(event.origin)
+                        )
+                            return;
+                        // Act on the event
+                        if (event.data && event.data.intellischool && typeof(event.data.intellischool) === "object")  {
+                            switch (event.data.intellischool.action)
+                            {
+                                case "resize":
+                                    if (event.data.intellischool.height) {
+                                        document.getElementById('intellischoolIframe').height = Math.ceil(event.data.intellischool.height);
+                                    }
+                                    return;
+
+                                default:
+                                    // Unknown event, do nothing
+                                    return;
+                            }
+                        }
+                    }, false);
+                    document.addEventListener("DOMContentLoaded", function() {
+                        document.getElementById('iframeForm').submit();
+                    });
+                </script>
+            
