@@ -62,9 +62,9 @@ class Database implements IDatabase, Serializable
     /**
      * The database connection, and instance of PDO
      *
-     * @var PDO
+     * @var PDO|null
      */
-    private $connection;
+    private $connection = null;
 
     /**
      * The transaction handler
