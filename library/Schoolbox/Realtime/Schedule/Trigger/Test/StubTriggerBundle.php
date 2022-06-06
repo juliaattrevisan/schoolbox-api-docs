@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Test;
 
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 
@@ -83,5 +84,14 @@ class StubTriggerBundle implements TriggerBundleInterface
     public function getEvent()
     {
         return $this->event;
+    }
+
+    /**
+     * @return TriggerInterface[]
+     */
+    public function getTriggers()
+    {
+        // noop
+        return [];
     }
 }

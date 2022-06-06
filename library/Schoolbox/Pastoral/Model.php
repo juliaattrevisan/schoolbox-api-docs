@@ -92,7 +92,7 @@ class Model implements ISoftDeletable, IModel
     /** @var null|User Null if imported from SIS */
     private $modifiedBy;
 
-    /** @var GenericCollection<Access\Model> */
+    /** @var GenericCollection<Access\Model>|null */
     private $access;
 
     /** @var Collection|Comment\Model[] */
@@ -143,7 +143,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return GenericCollection<Access\Model>
+     * @return GenericCollection<Access\Model>|null
      */
     public function getAccess()
     {

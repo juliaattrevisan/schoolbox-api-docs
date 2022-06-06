@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger;
 
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Realtime\Schedule\Event\Event;
 
 interface TriggerBundleInterface
@@ -48,4 +49,9 @@ interface TriggerBundleInterface
      * @return Event
      */
     public function getEvent();
+
+    /**
+     * @return TriggerInterface[]
+     */
+    public function getTriggers();
 }

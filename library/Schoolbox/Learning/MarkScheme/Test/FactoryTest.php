@@ -183,7 +183,7 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @return array<array<Task, class-string>>
+     * @return array<array{0: Task, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
     public function provider_task_markTypeValid(): array
@@ -212,7 +212,7 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @return array<array<Quiz, class-string>>
+     * @return array<array{0: Quiz, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
     public function provider_quiz_markTypeValid(): array
@@ -238,7 +238,7 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @return array<array<DueWork, class-string>>
+     * @return array<array{0: DueWork, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
     public function provider_dueWork_markTypeValid(): array
@@ -274,7 +274,7 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @return array<array<Project, class-string>>
+     * @return array<array{0: Project, 1: class-string}>
      * @var Project     $projects [][0]
      * @var IMarkScheme $projects [][1]
      * @throws InvalidArgumentException If $slug is not recognised

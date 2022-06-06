@@ -416,7 +416,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * The column that is used for storing if this field has been soft deleted.
      *
-     * @var string
+     * @var string|null
      */
     protected $soft_delete_column = null;
 
