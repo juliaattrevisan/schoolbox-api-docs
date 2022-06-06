@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Mapper\Exception\CallbackException;
+
 /**
  * @method House createModel($idValue = null)
  */
@@ -29,6 +31,8 @@ class HouseMapper extends Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     /**
@@ -48,5 +52,36 @@ class HouseMapper extends Schoolbox\Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param House $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(House $model): bool
+    {
+        if (trim($model->getName() ?? '') === '') {
+            throw new CallbackException("House name cannot be empty");
+        }
+        $query  = 'SELECT id, house FROM house WHERE deleted_at IS NULL AND house = :name';
+        $params = ['house' => $model->getHouse()];
+        if ($model->getId()) {
+            $query        .= " AND id != :id";
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+            throw new CallbackException("House name must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
     }
 }
