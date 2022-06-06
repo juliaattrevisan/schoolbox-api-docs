@@ -20,6 +20,7 @@ declare(strict_types=1);
 use Alaress\Module\Cache\Rebuilder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -35,7 +36,7 @@ $kernel = new CliTool\Kernel(
             $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
             $cacheBuilder
                 ->setLogger($this->getLogger())
-                ->rebuild($this->getConfig()->get('site_school_code'));
+                ->rebuild($this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
         }
     },
     [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],

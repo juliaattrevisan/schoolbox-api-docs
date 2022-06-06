@@ -1884,7 +1884,9 @@ abstract class Kernel
         } catch (ModuleCache\FetchException $e) {
             /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
             $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
-            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            /** @var IConfigLoader $config */
+            $config = $this->di->get('config');
+            $moduleCacheRebuilder->rebuild($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
             $routes = $moduleCache->fetchRouteTable();
         }
 
@@ -1908,7 +1910,9 @@ abstract class Kernel
         } catch (ModuleCache\FetchException $e) {
             /** @var ModuleCache\Rebuilder $moduleCacheRebuilder */
             $moduleCacheRebuilder = $this->di->get('moduleCache.rebuilder');
-            $moduleCacheRebuilder->rebuild(INSTANCE_ID);
+            /** @var IConfigLoader $config */
+            $config = $this->di->get('config');
+            $moduleCacheRebuilder->rebuild($config->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
             $modules = $moduleCache->fetchModuleRegistrations();
         }
         Registry::setRegistrations($modules);
