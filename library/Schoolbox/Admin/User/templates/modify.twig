@@ -7,364 +7,364 @@
     {{ renderAdminNavigation(pageCurrent, method == 'Create' ? 'Create User' : 'Modify User') }}
 
     <div class="admin-content">
+        <div class="small-12 columns">
+            {% if method=='Update' %}
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <h2 class="subheader">{{ user.fullName }}</h2>
+                </div>
+                <nav>
+                    <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                </nav>
+                <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                    <li>
+                        {% if user.enabled %}
+                            <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
+                        {% else %}
+                            <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
+                        {% endif %}
+                    </li>
+                    <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
+                    <li>
+                        {% if isSchoolboxAdmin %}
+                            <a class="icon-delete menu_disabled"
+                            title="This user may not be deleted">Delete User</a>
+                        {% else %}
+                            <a class="icon-delete"
+                            title="Delete User"
+                            data-delete
+                            data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div><!-- actions-small-1 -->
+            {% endif %}
 
-        {% if method=='Update' %}
-        <div class="actions-small-1">
-            <div class="list-item">
-                <h2 class="subheader">{{ user.fullName }}</h2>
-            </div>
-            <nav>
-                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-            </nav>
-            <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                <li>
-                    {% if user.enabled %}
-                        <a href="{{ routeLookup('user.impersonate', {userId: user.id}) }}" class="icon-staff-students" title="Login as user">Impersonate</a>
-                    {% else %}
-                        <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
-                    {% endif %}
-                </li>
-                <li><a href="/search/user/{{ user.id }}" class="icon-eye">View Profile</a></li>
-                <li>
-                    {% if isSchoolboxAdmin %}
-                        <a class="icon-delete menu_disabled"
-                           title="This user may not be deleted">Delete User</a>
-                    {% else %}
-                        <a class="icon-delete"
-                           title="Delete User"
-                           data-delete
-                           data-action="{{ routeLookup('adminUser.postDeleteUser', {userId: user.id}) }}">Delete User</a>
-                    {% endif %}
-                </li>
-            </ul>
-        </div>
-        {% endif %}
+            <div class="row">
+                <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
+                    <div class="small-12 island">
+                        <section>
+                            <fieldset>
+                                <div class="row content">
+                                    <input type="hidden" name="type" value="modify"/>
+                                    <input type="hidden" name="userID" value="{{ user.id }}"/>
 
-        <div class="row">
-            <form method="POST" action="{{ routeLookup('adminUser.postDetails', {userId: user.id}) }}" data-validatable-as="userDetails" data-modify-user-form>
-                <div class="small-12 island">
-                    <section>
-                        <fieldset>
-                            <div class="row content">
-                                <input type="hidden" name="type" value="modify"/>
-                                <input type="hidden" name="userID" value="{{ user.id }}"/>
+                                    <div class="small-12 medium-4 island">
+                                        <label>Portrait Image</label>
 
-                                <div class="small-12 medium-4 island">
-                                    <label>Portrait Image</label>
+                                        {# If the user has a picture, show it
+                                        #}
+                                        {% if user.portrait %}
+                                            <div id="portraitImage">
+                                                {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
+                                            </div>
+                                        {% endif %}
 
-                                    {# If the user has a picture, show it
-                                     #}
-                                    {% if user.portrait %}
-                                        <div id="portraitImage">
-                                            {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
-                                        </div>
-                                    {% endif %}
+                                        {# If you can change the picture manually, show attachzone
+                                        # This depends on the config setting "Load From SIS"
+                                        # If it's on, you -cannot- change pictures manually
+                                        #}
+                                        {% if portraitZone %}
+                                            {% include 'sub/attachzone.twig' with {
+                                                attachzone: portraitZone,
+                                                onDetach: "function() {
+                                                    $('#portraitImage').fadeOut();
+                                                }"
+                                            } %}
 
-                                    {# If you can change the picture manually, show attachzone
-                                     # This depends on the config setting "Load From SIS"
-                                     # If it's on, you -cannot- change pictures manually
-                                     #}
-                                    {% if portraitZone %}
-                                        {% include 'sub/attachzone.twig' with {
-                                            attachzone: portraitZone,
-                                            onDetach: "function() {
-                                                $('#portraitImage').fadeOut();
-                                            }"
-                                        } %}
+                                            {# Cachebuster
+                                            # Get the latest version for instant gratification while on this screen
+                                            #}
+                                            <script>
+                                                $(function() {
+                                                    var img = $('#profile-drop').find('img');
 
-                                        {# Cachebuster
-                                         # Get the latest version for instant gratification while on this screen
-                                         #}
-                                        <script>
-                                            $(function() {
-                                                var img = $('#profile-drop').find('img');
+                                                    img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
+                                                });
+                                            </script>
+                                        {% endif %}
 
-                                                img.attr('src', img.attr('src') + '&cb={{ date().timestamp }}');
-                                            });
-                                        </script>
-                                    {% endif %}
-
-                                    {# If user never had a picture and you can't add one manually because of config setting
-                                     # then display a generic empty state thing explaining what's going on
-                                     #}
-                                    {% if not user.portrait and not portraitZone %}
-                                        <div class="empty-state">
-                                            {% include 'include/portrait.twig' with {user: user, render: 'large'} only %}
-                                            <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
-                                            <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                <div class="small-12 medium-4 island">
-                                    <div>
-                                        <label for="title">Title</label>
-                                        <select id="title" name="title">
-                                            <option value="" {% if user.title == "" %}selected{% endif %}></option>
-                                            {% for title in titles %}
-                                                {% if title.title %}
-                                                    <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </select>
+                                        {# If user never had a picture and you can't add one manually because of config setting
+                                        # then display a generic empty state thing explaining what's going on
+                                        #}
+                                        {% if not user.portrait and not portraitZone %}
+                                            <div class="empty-state">
+                                                {% include 'include/portrait.twig' with {user: user, render: 'large'} only %}
+                                                <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
+                                                <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
+                                            </div>
+                                        {% endif %}
                                     </div>
 
-                                    <div>
-                                        <label for="firstname" class="required">First Name</label>
-                                        <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
-                                    </div>
-                                    <div>
-                                        <label for="lastname">Surname</label>
-                                        <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
-                                    </div>
-                                    <div>
-                                        <label for="position_title">Position Title</label>
-                                        <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
-                                    </div>
-
-                                    {% if user %}
+                                    <div class="small-12 medium-4 island">
                                         <div>
-                                            {# Can't display a schoolbox user ID on insert screen #}
-                                            <label for="userId">Schoolbox User ID</label>
-                                            <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                                            <label for="title">Title</label>
+                                            <select id="title" name="title">
+                                                <option value="" {% if user.title == "" %}selected{% endif %}></option>
+                                                {% for title in titles %}
+                                                    {% if title.title %}
+                                                        <option value="{{ title.title }}" {% if user.title == title.title %}selected{% endif %}>{{ title.title }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
                                         </div>
-                                    {% endif %}
 
-                                    <div>
-                                        <label for="database">{{ externalDatabase }} ID</label>
-                                        <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                                        <div>
+                                            <label for="firstname" class="required">First Name</label>
+                                            <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                                        </div>
+                                        <div>
+                                            <label for="lastname">Surname</label>
+                                            <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                                        </div>
+                                        <div>
+                                            <label for="position_title">Position Title</label>
+                                            <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                                        </div>
+
+                                        {% if user %}
+                                            <div>
+                                                {# Can't display a schoolbox user ID on insert screen #}
+                                                <label for="userId">Schoolbox User ID</label>
+                                                <input id="userId" type="text" disabled value="{{ user.id }}"/>
+                                            </div>
+                                        {% endif %}
+
+                                        <div>
+                                            <label for="database">{{ externalDatabase }} ID</label>
+                                            <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="small-12 medium-4 island">
+                                        <div>
+                                            <label for="username" class="required">Username</label>
+                                            <input id="username"
+                                                type="text"
+                                                class="required"
+                                                name="modusername"
+                                                maxlength="255"
+                                                {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
+                                                value="{{ user.username }}" />
+                                        </div>
+
+                                        <div>
+                                            <label for="password">Password</label>
+                                            <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
+                                        </div>
+
+                                        <div>
+                                            <label for="group">Role</label>
+                                            <select id="group" name="group">
+                                                {% for role in roles %}
+                                                    <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="alt_email">Alternate Email</label>
+                                            <input id="alt_email" type="email" name="alt_email" maxlength="255" value="{{ user.altEmail }}"/>
+                                        </div>
+
+                                        <div>
+                                            <label for="year">Year</label>
+                                            <select name="year_id">
+                                                <option value="" selected="selected">Not Set</option>
+                                                {% for yearLevel in yearLevels %}
+                                                    {% set selected = '' %}
+
+                                                    {% if user.year is not null and yearLevel.id == user.year.id %}
+                                                        {% set selected = 'selected="selected"' %}
+                                                    {% endif %}
+
+                                                    <option value="{{ yearLevel.id }}" {{ selected }}>{{ yearLevel.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="house">House</label>
+                                            <select id="house" name="house">
+                                                <option value="">Not Set</option>
+                                                {% for house in houses %}
+                                                    <option value="{{ house.id }}" {% if user.schoolHouse.id ?? 0 == house.id %}selected{% endif %}>{{ house.house }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label for="residential_house">Residential House</label>
+                                            <select id="residential_house" name="residential_house">
+                                                <option value="">Not Set</option>
+                                                {% for residentialHouse in residentialHouses %}
+                                                    <option value="{{ residentialHouse.id }}"
+                                                            {% if user.residentialHouse.id ?? 0 == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
+                            </fieldset>
 
-                                <div class="small-12 medium-4 island">
-                                    <div>
-                                        <label for="username" class="required">Username</label>
-                                        <input id="username"
-                                               type="text"
-                                               class="required"
-                                               name="modusername"
-                                               maxlength="255"
-                                               {% if isSchoolboxAdmin %}readonly title="This user's username may not be changed"{% endif %}
-                                               value="{{ user.username }}" />
-                                    </div>
+                            {# Render roughly-equal column lengths #}
+                            <fieldset>
+                                <label class="content required">Campus Involvement</label>
 
-                                    <div>
-                                        <label for="password">Password</label>
-                                        <input id="password" type="password" name="modpassword" class="password" value="donotchange"/>
-                                    </div>
+                                <div class="row content">
+                                    {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
 
-                                    <div>
-                                        <label for="group">Role</label>
-                                        <select id="group" name="group">
-                                            {% for role in roles %}
-                                                <option value="{{ role.id }}" {% if user.role.id == role.id %}selected{% endif %}>{{ role.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                                    {# Work out if the user is in this campus- really need to write a collection.contains() method #}
+                                    {% for campus in campuses %}
+                                        {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
+                                            <div class="small-12 medium-4 columns">
+                                        {% endif %}
 
-                                    <div>
-                                        <label for="alt_email">Alternate Email</label>
-                                        <input id="alt_email" type="email" name="alt_email" maxlength="255" value="{{ user.altEmail }}"/>
-                                    </div>
+                                        {% set campusChecked = false %}
+                                        {% for userCampus in user.campusCollection %}
+                                            {% if userCampus.id == campus.id %}
+                                                {% set campusChecked = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                                        <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
 
-                                    <div>
-                                        <label for="year">Year</label>
-                                        <select name="year_id">
-                                            <option value="" selected="selected">Not Set</option>
-                                            {% for yearLevel in yearLevels %}
-                                                {% set selected = '' %}
-
-                                                {% if user.year is not null and yearLevel.id == user.year.id %}
-                                                    {% set selected = 'selected="selected"' %}
-                                                {% endif %}
-
-                                                <option value="{{ yearLevel.id }}" {{ selected }}>{{ yearLevel.name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="house">House</label>
-                                        <select id="house" name="house">
-                                            <option value="">Not Set</option>
-                                            {% for house in houses %}
-                                                <option value="{{ house.id }}" {% if user.schoolHouse.id ?? 0 == house.id %}selected{% endif %}>{{ house.house }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label for="residential_house">Residential House</label>
-                                        <select id="residential_house" name="residential_house">
-                                            <option value="">Not Set</option>
-                                            {% for residentialHouse in residentialHouses %}
-                                                <option value="{{ residentialHouse.id }}"
-                                                        {% if user.residentialHouse.id ?? 0 == residentialHouse.id %}selected{% endif %}>{{ residentialHouse.house }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-
-                        {# Render roughly-equal column lengths #}
-                        <fieldset>
-                            <label class="content required">Campus Involvement</label>
-
-                            <div class="row content">
-                                {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
-
-                                {# Work out if the user is in this campus- really need to write a collection.contains() method #}
-                                {% for campus in campuses %}
-                                    {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
-                                        <div class="small-12 medium-4 columns">
-                                    {% endif %}
-
-                                    {% set campusChecked = false %}
-                                    {% for userCampus in user.campusCollection %}
-                                        {% if userCampus.id == campus.id %}
-                                            {% set campusChecked = true %}
+                                        {% if loop.last or loop.index % numPerColumn == 0 %}
+                                            </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                                    <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
 
-                                    {% if loop.last or loop.index % numPerColumn == 0 %}
-                                        </div>
+                                    {# Special case for two campuses
+                                    # Render an empty nbsp; div otherwise it looks like a 2-column layout
+                                    #}
+                                    {% if campuses|length == 2 %}
+                                        <div class="small-12 medium-4 columns">&nbsp;</div>
                                     {% endif %}
-                                {% endfor %}
-
-                                {# Special case for two campuses
-                     # Render an empty nbsp; div otherwise it looks like a 2-column layout
-                                #}
-                                {% if campuses|length == 2 %}
-                                    <div class="small-12 medium-4 columns">&nbsp;</div>
-                                {% endif %}
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <label class="content">Options</label>
-                            <div class="row content">
-                                <div class="small-12 medium-4 columns">
-                                    <ul class="option-list">
-                                        <li>
-                                            <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
-                                            <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
-                                        </li>
-                                        <li>
-                                            <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
-                                            <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
-                                        </li>
-                                        <li>
-                                            <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
-                                            <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
-                                        </li>
-                                    </ul>
                                 </div>
-                                <div class="small-12 medium-4 columns">
-                                    <ul class="option-list">
-                                        <li>
-                                            <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
-                                            <label for="local_email" class="checkbox-label">Email Address from Username</label>
-                                        </li>
-                                        <li>
-                                            <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
-                                            <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
-                                        </li>
-                                        <li>
-                                            <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
-                                            <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                <div class="small-12 medium-4 columns">
-                                    <ul class="option-list">
-                                        <li>
-                                            <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
-                                            <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
-                                        </li>
-
-                                        {% if isSchoolboxAdmin %}
-                                            {% if user.isSuperuser %}
-                                                <input type="hidden" name="superuser" value="1" />
-                                            {% endif %}
+                            </fieldset>
+                            <fieldset>
+                                <label class="content">Options</label>
+                                <div class="row content">
+                                    <div class="small-12 medium-4 columns">
+                                        <ul class="option-list">
                                             <li>
-                                                <input id="superuser"
-                                                       type="checkbox"
-                                                       name="superuser"
-                                                       value="1"
-                                                       disabled
-                                                       {% if user.isSuperuser %}checked{% endif %}
-                                                />
-                                                <label for="superuser"
-                                                       class="checkbox-label"
-                                                       title="This user's superuser status may not be changed"
-                                                >Superuser</label>
+                                                <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
+                                                <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
                                             </li>
-                                        {% else %}
                                             <li>
-                                                <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
-                                                <label for="superuser" class="checkbox-label">Superuser</label>
+                                                <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
+                                                <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
                                             </li>
-                                        {% endif %}
+                                            <li>
+                                                <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
+                                                <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="small-12 medium-4 columns">
+                                        <ul class="option-list">
+                                            <li>
+                                                <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
+                                                <label for="local_email" class="checkbox-label">Email Address from Username</label>
+                                            </li>
+                                            <li>
+                                                <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
+                                                <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+                                            </li>
+                                            <li>
+                                                <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
+                                                <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                                        {% if method=='Update' %}
-                                            {# Only modify user screen has the enabled checkbox #}
+                                    <div class="small-12 medium-4 columns">
+                                        <ul class="option-list">
+                                            <li>
+                                                <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
+                                                <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
+                                            </li>
+
                                             {% if isSchoolboxAdmin %}
-                                                {% if user.enabled %}
-                                                    <input type="hidden" name="account_enabled" value="1" />
+                                                {% if user.isSuperuser %}
+                                                    <input type="hidden" name="superuser" value="1" />
                                                 {% endif %}
                                                 <li>
-                                                    <input id="account_enabled"
-                                                           type="checkbox"
-                                                           name="account_enabled"
-                                                           value="1"
-                                                           disabled
-                                                           {% if user.enabled %}checked{% endif %} />
-                                                    <label for="account_enabled"
-                                                           class="checkbox-label"
-                                                           title="This user's account must always be enabled"
-                                                    >Account Enabled</label>
+                                                    <input id="superuser"
+                                                        type="checkbox"
+                                                        name="superuser"
+                                                        value="1"
+                                                        disabled
+                                                        {% if user.isSuperuser %}checked{% endif %}
+                                                    />
+                                                    <label for="superuser"
+                                                        class="checkbox-label"
+                                                        title="This user's superuser status may not be changed"
+                                                    >Superuser</label>
                                                 </li>
                                             {% else %}
                                                 <li>
-                                                    <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
-                                                           {% if user.enabled %}checked{% endif %} />
-                                                    <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                                                    <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
+                                                    <label for="superuser" class="checkbox-label">Superuser</label>
                                                 </li>
                                             {% endif %}
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </section>
-                </div>
-                <div class="small-12 columns">
-                    <input type="submit" value="{{ method }} User"/>
-                </div>
-            </form>
-        </div>
 
-        {# User detail section #}
-        {% if method=='Update' %}
+                                            {% if method=='Update' %}
+                                                {# Only modify user screen has the enabled checkbox #}
+                                                {% if isSchoolboxAdmin %}
+                                                    {% if user.enabled %}
+                                                        <input type="hidden" name="account_enabled" value="1" />
+                                                    {% endif %}
+                                                    <li>
+                                                        <input id="account_enabled"
+                                                            type="checkbox"
+                                                            name="account_enabled"
+                                                            value="1"
+                                                            disabled
+                                                            {% if user.enabled %}checked{% endif %} />
+                                                        <label for="account_enabled"
+                                                            class="checkbox-label"
+                                                            title="This user's account must always be enabled"
+                                                        >Account Enabled</label>
+                                                    </li>
+                                                {% else %}
+                                                    <li>
+                                                        <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
+                                                            {% if user.enabled %}checked{% endif %} />
+                                                        <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                                                    </li>
+                                                {% endif %}
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </section>
+                    </div>
+                    <div class="small-12 columns">
+                        <input type="submit" value="{{ method }} User"/>
+                    </div>
+                </form>
+            </div><!-- row -->
+
+            {# User detail section #}
+            {% if method=='Update' %}
 
             {# Synergetic file year and semester #}
             {% if (externalDatabase | lower) == 'synergetic' %}
-                <div class="row">
-                    <div class="small-12 island">
-                        <h3 class="subheader">Synergetic Info</h3>
-                        <section class="profile content">
-                            <dl>
-                                <dt class="small-12 medium-3 no-pad">Year:</dt>
-                                <dd class="small-12 medium-9 no-pad">{{ fileYear }}</dd>
-                                <dt class="small-12 medium-3 no-pad">Semester:</dt>
-                                <dd class="small-12 medium-9 no-pad">{{ fileSemester }}</dd>
-                            </dl>
-                        </section>
-                    </div>
+            <div class="row">
+                <div class="small-12 island">
+                    <h3 class="subheader">Synergetic Info</h3>
+                    <section class="profile content">
+                        <dl>
+                            <dt class="small-12 medium-3 no-pad">Year:</dt>
+                            <dd class="small-12 medium-9 no-pad">{{ fileYear }}</dd>
+                            <dt class="small-12 medium-3 no-pad">Semester:</dt>
+                            <dd class="small-12 medium-9 no-pad">{{ fileSemester }}</dd>
+                        </dl>
+                    </section>
                 </div>
+            </div><!-- row -->
             {% endif %}
 
             {# Group Access #}
@@ -431,7 +431,7 @@
                         </ul>
                     </section>
                 </div>
-            </div>
+            </div><!-- row -->
 
             {# Service permissions #}
 
@@ -494,7 +494,7 @@
 
                             <li class="actions-small-1">
                                 <form id="serviceCloneForm" action="{{ routeLookup('adminUser.postInsertPermission', {userId: user.id}) }}" method="post" data-validatable-as="addService"
-                                      data-action="addService" class="list-item">
+                                    data-action="addService" class="list-item">
                                     <div class="small-4 card">
                                         <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
                                             <option value="" data-identifier="{{ identifiers.none }}" disabled selected>Select Service</option>
@@ -536,7 +536,7 @@
                         </ul>
                     </section>
                 </div>
-            </div>
+            </div><!-- row -->
 
             {# Linked user accounts #}
 
@@ -577,7 +577,7 @@
                         </ul>
                     </section>
                 </div>
-            </div>
+            </div><!-- row -->
 
             {# Token #}
 
@@ -622,7 +622,7 @@
                         </div>
                     </section>
                 </div>
-            </div>
+            </div><!-- row -->
 
             {# Recent activity log #}
 
@@ -671,7 +671,7 @@
                             <p class="content">No recorded logins</p>
                         {% endif %}
                     </section>
-                </div>
+                </div><!-- small-12 medium-6 island -->
 
                 <div class="small-12 medium-6 island">
                     <section>
@@ -721,8 +721,8 @@
                             <p class="content">No recent activity</p>
                         {% endif %}
                     </section>
-                </div>
-            </div>
+                </div><!-- small-12 medium-6 island -->
+            </div><!-- row -->
 
             <div class="row">
                 <div class="small-12 island">
@@ -750,9 +750,10 @@
                         </div>
                     </form>
                 </div>
-            </div>
-        {% endif %}
-    </div>
+            </div><!-- row -->
+            {% endif %}
+        </div><!-- small-12 columns -->
+    </div><!-- admin-content -->
 </div>
 
 <div id="saveLabel" class="toast"></div>
