@@ -167,22 +167,6 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
 
-    public function getLastDay($date, Campus $campus)
-    {
-
-        $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
-
-        $query = "SELECT ttdate, day_code FROM ttcalendar
-                    WHERE ttdate <= '$nowmssqldate'
-                    AND cmpy_code = '" . $this->getCampusCode($campus) . "'
-                    AND tt_id = '" . $this->getTimetableCode($campus) . "'
-                    ORDER BY ttdate DESC";
-
-        $result = $this->getConnector()->executeQuery($query)->fetch();
-        return strtotime($result['ttdate']);
-    }
-
-
     /**
      * @inheritDoc
      */
