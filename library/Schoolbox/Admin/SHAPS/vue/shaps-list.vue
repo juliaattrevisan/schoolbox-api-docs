@@ -46,6 +46,9 @@ export default {
         provisioned: {
             type: Boolean
         },
+        deleted: {
+            type: Boolean
+        },
     },
 
     data () {
@@ -54,7 +57,7 @@ export default {
             hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            tableColumns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'courses', 'provisioned'],
+            tableColumns: ['firstname', 'lastname', 'email', 'campuses', 'role', 'courses', 'provisioned'],
             tableOptions: {
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -73,7 +76,7 @@ export default {
                         name: FilterEvents.COURSE,
                         callback: (row, query) => {
                             if (query === 'null') {
-                                query = null; //cast to proper null here to match
+                                return row.courses.length === 0;
                             }
                             return row.courses.join().includes(query);
                         }
@@ -81,11 +84,7 @@ export default {
                     {
                         name: FilterEvents.PROVISIONED,
                         callback: (row, query) => {
-                            if (query == 1) {
-                            return row.provisioned === 'Provisioned';
-                            } else if (query == 0) {
-                                return row.provisioned === '';
-                            }
+                            return row.provisioned === parseInt(query);
                         }
                     },
                 ],
@@ -93,7 +92,7 @@ export default {
                 headings: {
                     firstname: 'First Name',
                     lastname: 'Surname',
-                    external_id: 'External ID',
+                    email: 'Email',
                     campuses: 'Campuses',
                     role: 'Role',
                     courses: 'Courses',
@@ -107,7 +106,11 @@ export default {
                 perPageValues: [25, 50, 100, 150, 200],
                 resizableColumns: false,
                 selectable: {
-                    mode: 'multiple' //to enable multi-select
+                    mode: 'multiple', //to enable multi-select
+                    only: (row) => {
+                        return row.email != null && row.email.length > 0
+                            && row.lastname != null && row.lastname.length > 0;
+                    },
                 },
                 sortIcon: {
                     is: 'glyphicon-sort',
@@ -119,9 +122,6 @@ export default {
                 templates: {
                     campuses: (h, row, index) => {
                         return row.campuses.join(', ');
-                    },
-                    courses: (h, row, index) => {
-                        return row.courses.join(', ');
                     },
                     provisioned: (h, row, index) => {
                         return row.provisioned == 1 ? 'Provisioned' : '';
@@ -179,7 +179,7 @@ export default {
     methods: {
 
         /**
-         * To hide a UI note informing of shift-selection once pressed once
+         * To hide a UI note informing of shift-selection once pressed
          */
         initShiftKeyDetection () {
             document.addEventListener('keydown', (event) => {
@@ -218,7 +218,7 @@ export default {
          * @retrun { Object}
          */
         getRowsBody () {
-            return  {
+            return {
                 campusId: -1,
                 roleId: -1,
                 courses: -1,
@@ -304,6 +304,27 @@ export default {
                     :provisioned="provisioned"
                 />
             </template>
+            <template #firstname="props">
+                <div v-if="props.row.deleted">
+                    {{ props.row.firstname }} (deleted)
+                </div>
+                <div v-else>
+                    <span
+                        v-if="props.row.email === null || props.row.email.length === 0 || props.row.lastname === null || props.row.lastname.length === 0"
+                        data-tooltip class="hint has-tip tip-top"
+                        title="Please make sure that email and surname are both set to provision this user.">?</span>
+                    <a :href="'/search/user/'+props.row.id">
+                        {{ props.row.firstname }}
+                    </a>
+                </div>
+            </template>
+            <template #courses="props">
+                <div>
+                    <ul>
+                        <li v-for="course in props.row.courses">{{ course }}</li>
+                    </ul>
+                </div>
+            </template>
             <template #afterTable>
                 <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
@@ -335,7 +356,6 @@ export default {
             ref="newValues"
             :src-user-modify="srcUserModify"
             :courses="courses"
-            :provisioned="provisioned"
             :selected-rows="selectedRows"
             :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
             @updated="onUpdated"

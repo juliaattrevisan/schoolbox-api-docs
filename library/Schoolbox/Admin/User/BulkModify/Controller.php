@@ -195,7 +195,7 @@ class Controller extends Base
         $this->cache->cacheUsers(INSTANCE_ID, $userIds);
 
         $jsonPayload = [
-            nl2br(\Scrub::text($this->userBulkMapper->getOutputMessage())),
+            \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));

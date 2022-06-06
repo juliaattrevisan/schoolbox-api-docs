@@ -277,7 +277,7 @@ class Handler
             // update user object
             $user
                 ->setUsername($userData['email']) // yes, email -> username is on purpose
-                ->setTitle($userData['title'])
+                ->setTitle($userData['title'] ?? '')
                 ->setFirstname($userData['firstname'])
                 ->setLastname($userData['lastname'])
                 ->setAltEmail($userData['email'])

@@ -3,18 +3,28 @@
 
 <div class="admin-container row">
     {{ renderAdminNavigation(pageCurrent) }}
-    <div class="admin-content">
-        <div class="small-12 columns">
-            <div id='shaps-list-container'>
-                <shaps-list
-                        src-user-list="{{ routeLookupIfAuthorized('shaps.getAllStaff') }}"
-                        src-user-modify="{{ routeLookupIfAuthorized('shaps.postProvision') }}"
-                        :campuses="{{ campuses | json_encode }}"
-                        :roles="{{ roles | json_encode }}"
-                        :courses="{{ courses | json_encode }}"
-                />
+    {% if errors is not empty %}
+        <div class="admin-content">
+            <div class="small-12 columns">
+                {% for error in errors %}
+                    {{ error }}
+                {% endfor %}
             </div>
-            <script src="{{ CDN_PREFIX }}/js/bundle/shapsList.js?v={{ config.site_version }}"></script>
         </div>
-    </div>
+    {% else %}
+        <div class="admin-content">
+            <div class="small-12 columns">
+                <div id='shaps-list-container'>
+                    <shaps-list
+                            src-user-list="{{ routeLookupIfAuthorized('shaps.getAllStaff') }}"
+                            src-user-modify="{{ routeLookupIfAuthorized('shaps.postProvision') }}"
+                            :campuses="{{ campuses | json_encode }}"
+                            :roles="{{ roles | json_encode }}"
+                            :courses="{{ courses | json_encode }}"
+                    />
+                </div>
+                <script src="{{ CDN_PREFIX }}/js/bundle/shapsList.js?v={{ config.site_version }}"></script>
+            </div>
+        </div>
+    {% endif %}
 </div>

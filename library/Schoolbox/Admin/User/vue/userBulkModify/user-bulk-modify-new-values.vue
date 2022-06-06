@@ -1,7 +1,7 @@
 <script>
 
 /**
- * Provides the available options that can be bulk modified 
+ * Provides the available options that can be bulk modified
  * for the currently selected users
  */
 
@@ -80,17 +80,8 @@ export default {
     computed: {
 
         /**
-         * To strip the <br> from the log data
-         * 
-         * @return { String }
-         */
-        updatedLogData () {
-            return this.logData[0].replace(/<br\s*\/?>/gi, '');
-        },
-
-        /**
          * To change when processing
-         * 
+         *
          * @return { String }
          */
         updateButtonText () {
@@ -136,7 +127,7 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
                 this.updateFields = Object.assign({}, this.updateFieldsOriginal); //reset to original values
-                this.$emit('updated'); 
+                this.$emit('updated');
             }
         },
 
@@ -159,7 +150,7 @@ export default {
 
         /**
          * Check for any issues in the returned update
-         * 
+         *
          * @param { Object }
          * @param { Object }
          */
@@ -167,11 +158,11 @@ export default {
             if (response.ok) { //successful response
                 this.hasDataError = false;
                 this.logData = responseData;
-            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error 
-                this.hasDataError = true; 
+            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
+                this.hasDataError = true;
                 this.logData = [responseData.title]; //which comes in with an error message
-            } else { 
-                this.hasDataError = true; 
+            } else {
+                this.hasDataError = true;
                 this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
             }
         },
@@ -194,7 +185,7 @@ export default {
             <div v-if="hasUpdated" class="new-values">
                 <div class="new-values__full-width">
                     <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
-                    <textarea v-html="updatedLogData"></textarea>
+                    <textarea v-html="logData"></textarea>
                 </div>
                 <div class="new-values__full-width">
                     <button @click.prevent="onCloseSelected" class="button submit">Close</button>
@@ -334,7 +325,7 @@ $toOneColumn: 600px;
     grid-template-columns: repeat(4, 1fr); //four equal columns
     padding: 0.5rem;
     @media (max-width: $toTwoColumns) {
-        grid-template-columns: repeat(2, 1fr); 
+        grid-template-columns: repeat(2, 1fr);
     }
     @media (max-width: $toOneColumn) {
         display: block;
@@ -344,7 +335,7 @@ $toOneColumn: 600px;
     .new-values__full-width {
         grid-column: 1 / span 4; //extend full grid width
         @media (max-width: $toTwoColumns) {
-            grid-column: 1 / span 2; 
+            grid-column: 1 / span 2;
         }
     }
 
