@@ -58,6 +58,11 @@ into their skin config textarea
             background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/blog.png");
         }
 
+        &.badge {
+            background-size: 80%;
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/badge.png");
+        }
+
         /* Specify the color to override icon- global style
          * until Profile Buttons supports enabling/disabling of icons in some manner
          */
