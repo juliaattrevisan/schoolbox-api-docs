@@ -116,7 +116,7 @@
     "require-dev": {
         "lox/xhprof": "dev-master",
         "codeception/codeception": "^4.1",
-        "phpunit/phpunit": "~9.0",
+        "phpunit/phpunit": "^9.5.20",
         "phpstan/phpstan": "^1.2.0",
         "roave/security-advisories": "dev-latest",
         "brianium/paratest": "^6.0",
