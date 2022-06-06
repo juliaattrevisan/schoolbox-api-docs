@@ -434,6 +434,10 @@ $selector-width: 2.25rem;
                 padding: 0 !important;
             }
         }
+        .package-title {
+            overflow: visible;
+            white-space: normal;
+        }
     }
     &.sortable,
     &.sortable-card {
