@@ -68,14 +68,8 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion_current=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion_current, supported: $phpversion_supported";
-#if [ "$phpversion_current" != "7.4" ];
-#then
-#    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
-#fi
-
-# Schoolbox <= 20.1 requires PHP 7.1: >= 20.2 requires PHP 7.4
 if [ "$phpversion_current" != "$phpversion_supported" ]; then
-  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php74.vagrant.yaml' in puppet repo";
+  error " Current and supported PHP versions do not match. Check 'ubuntu-1804-php${phpversion_supported/./}.vagrant.yaml' in puppet repo";
   exit 1
 fi
 

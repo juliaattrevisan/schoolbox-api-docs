@@ -295,6 +295,6 @@ HELP
         $this->getLogger()->info("Rebuilding route and module cache");
         /** @var Rebuilder $cacheBuilder */
         $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
-        $cacheBuilder->rebuild($this->getConfig()->get('site_school_code'));
+        $cacheBuilder->rebuild($this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
     }
 }

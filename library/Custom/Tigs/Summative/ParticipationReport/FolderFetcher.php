@@ -29,7 +29,6 @@ use function count;
  */
 class FolderFetcher
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
@@ -47,6 +46,19 @@ class FolderFetcher
      * @var FoldersWithCourses
      */
     private FoldersWithCourses $foldersWithCourses;
+
+
+    /**
+     * Cache for the folders fetched for a student and semester.
+     *
+     * This is cached because:
+     * * `$this->folderMapper->findFoldersWithInteractionsForStudent` must
+     *   search all participation records
+     * * the same query is done in `findForStudent` and `findYearGroupFolder`
+     *
+     * @var array<int, array<string, GenericCollection<Folder\Model>>
+     */
+    private array $folderCache = [];
 
 
     /**
@@ -88,21 +100,7 @@ class FolderFetcher
      */
     public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes, ?User $viewer, ?string $roleTypeOverride): GenericCollection
     {
-        // Always fetch folders with interactions
-        $term = (new Term\Model())
-            ->setStart($attributes->getCurriculumSemesterStart())
-            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-            ->setActualFinish($attributes->getCurriculumSemesterFinish());
-
-        /* This actually returns folders with Participations, findFoldersWithInteractionsForStudent()
-         * is probably not the best function name for what it does.
-         */
-        $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($student, $term);
-
-        // Only retain folders that are either current or rolled-over classes
-        $folders = $folders->filter(static function (Folder\Model $folder) {
-            return $folder->isClass() || $folder->wasClass();
-        });
+        $folders = $this->fetchFoldersWithInteractionsForStudent($student, $attributes);
 
         /* For SA-10636 we need to filter this set of $folders even further; classes to show
          * are a function of their submissions/feedbacks and feedbacks' visibilities
@@ -110,15 +108,16 @@ class FolderFetcher
         $currentClasses = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
         $preservedClassIds = $this->previousClassIdCache->find($student, $folders, $currentClasses, $viewer, $roleTypeOverride);
 
-        /* Iterate through folders, unsetting everything outside of $preservedClassIds
+        /* Iterate through folders, filtering out everything outside of $preservedClassIds
+         * (Filter instead of unset, because unsetting mutates the original object)
          */
         $classIds = array_merge($preservedClassIds, $currentClasses->getPropertyValues('id'));
 
-        foreach ($folders as $idx => $folder) {
-            if (!\in_array($folder->getId(), $classIds, false)) {
-                $folders->offsetUnset($idx);
+        $folders = $folders->filter(
+            function (Folder\Model $folder) use ($classIds) {
+                return in_array($folder->getId(), $classIds, false);
             }
-        }
+        );
 
         /* Then slap it together with the current student's classes, if reportDate not set
          *
@@ -172,6 +171,45 @@ class FolderFetcher
 
 
     /**
+     * Search for the student's year group folder (if there is one in which they
+     * have participated within the attributes' semester).
+     *
+     * @param User              $student
+     * @param StudentAttributes $attributes
+     * @param string            $yearGroupClassCodeSuffix
+     * @return Folder\Model|null
+     */
+    public function findYearGroupFolder(
+        User $student,
+        StudentAttributes $attributes,
+        string $yearGroupClassCodeSuffix
+    ): ?Folder\Model {
+        $folders = $this->fetchFoldersWithInteractionsForStudent($student, $attributes);
+
+        // Only retain folders that are either current or rolled-over classes,
+        // and whose folder code matches the year group class code.
+        $yearGroupClassCode = sprintf('%d%s', $attributes->getYearLevel(), $yearGroupClassCodeSuffix);
+
+        // Try with current class codes, then with rolled-over codes
+        foreach ($folders as $folder) {
+            foreach ($folder->getCodes() as $code) {
+                if (!$code->isDeleted() && $code->getCode() === $yearGroupClassCode) {
+                    return $folder;
+                }
+            }
+        }
+        foreach ($folders as $folder) {
+            foreach ($folder->getRolledOverCodes() as $code) {
+                if ($code === $yearGroupClassCode) {
+                    return $folder;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * Returns whether a folder should be excluded from reports due to configured class code exclusions
      *
      * Excludes a folder if either a current or archived class code matches one of the exclusions.
@@ -214,5 +252,48 @@ class FolderFetcher
     public function getPreviousClassIds(): array
     {
         return $this->previousClassIdCache->getIds();
+    }
+
+
+    /**
+     * Fetches folders which a student has interacted with in the attributes'
+     * semester.
+     *
+     * Subsequent requests for the same student and semester will return a
+     * cached result.
+     *
+     * @param User              $student
+     * @param StudentAttributes $attributes
+     * @return GenericCollection
+     */
+    private function fetchFoldersWithInteractionsForStudent(
+        User $student,
+        StudentAttributes $attributes
+    ): GenericCollection {
+        // Always fetch folders with interactions
+        $term = (new Term\Model())
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
+        $termKey = sprintf(
+            '%d-%d',
+            $term->getStart()->getUnixTimeStamp(),
+            $term->getActualFinish()->getUnixTimeStamp(),
+        );
+        $studentId = $student->getId();
+        if (isset($this->folderCache[$studentId][$termKey])) {
+            return $this->folderCache[$studentId][$termKey];
+        }
+
+        /* This actually returns folders with Participations, findFoldersWithInteractionsForStudent()
+         * is probably not the best function name for what it does.
+         */
+        $folders = $this->folderMapper
+            ->findFoldersWithInteractionsForStudent($student, $term)
+            ->filter(static function (Folder\Model $folder) {
+                return $folder->isClass() || $folder->wasClass();
+            });
+        $this->folderCache[$studentId][$termKey] = $folders;
+        return $folders;
     }
 }

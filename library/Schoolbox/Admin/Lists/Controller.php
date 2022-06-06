@@ -325,7 +325,7 @@ class Controller extends Base
                 'showId'            => true,                                    // Set this to true to display the db ID on the front end.
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,                                    // set field to readonly, so the user can not modify the db value...
                     ],
@@ -438,7 +438,7 @@ class Controller extends Base
                 'showId'            => true,
                 'fields'            => [
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,
                     ],
@@ -457,9 +457,14 @@ class Controller extends Base
                 'delete'            => true,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'house'         => [
                         'caption'   => 'Name',
-                        'width'     => 12,
+                        'width'     => 11,
                         'maxLength' => 255,
                         'mandatory' => true,
                         'default'   => '',
@@ -472,9 +477,14 @@ class Controller extends Base
                 'mapper'            => WebDavMapper::class,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'uri'           => [
                         'caption'   => 'Base URI',
-                        'width'     => 3,
+                        'width'     => 2,
                         'mandatory' => true,
                         'default'   => '',
                     ],
@@ -543,7 +553,7 @@ class Controller extends Base
                 'deleteFailMsg'     => 'This campus cannot be deleted as it has users assigned to it.',
                 'fields'            => [
                     'id' => [
-                        'caption'   => 'DB ID',
+                        'caption'   => 'ID',
                         'width'     => 1,
                         'readonly'  => true,
                     ],
@@ -575,6 +585,11 @@ class Controller extends Base
                 'mapper'            => EventTypeMapper::class,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'type'          => [
                         'caption'   => 'Event Type',
                         'width'     => 10,
@@ -585,7 +600,7 @@ class Controller extends Base
                     'color'         => [
                         'caption'   => 'Event Colour',
                         'colour'    => true,
-                        'width'     => 2,
+                        'width'     => 1,
                         'default'   => '',
                     ]
                 ]
@@ -596,9 +611,14 @@ class Controller extends Base
                 'mapper'            => Topic\Mapper::class,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 12,
+                        'width'     => 11,
                         'maxLength' => 150,
                         'mandatory' => true,
                         'default'   => '',
@@ -611,6 +631,11 @@ class Controller extends Base
                 'delete'            => true,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'showOnGradesPage'       => [
                         'caption'   => 'Grades page',
                         'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
@@ -636,7 +661,7 @@ class Controller extends Base
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
-                        'width'     => 3,
+                        'width'     => 2,
                         'default'   => '',
                     ]
                 ]
@@ -647,6 +672,11 @@ class Controller extends Base
                 'delete'            => true,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'code'          => [
                         'caption'   => 'Code',
                         'width'     => 2,
@@ -655,7 +685,7 @@ class Controller extends Base
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
-                        'width'     => 8,
+                        'width'     => 7,
                         'maxLength' => 16,
                         'mandatory' => true,
                         'default'   => '',
@@ -676,6 +706,11 @@ class Controller extends Base
                 'noNewRecords'      => true,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'module'        => [
                         'caption'   => 'Module',
                         'readonly'  => true,
@@ -693,7 +728,7 @@ class Controller extends Base
                     ],
                     'visible'       => [
                         'caption'   => 'Visible',
-                        'width'     => 2,
+                        'width'     => 1,
                         'checkbox'  => true,
                         'mandatory' => true,
                         'default'   => false,
@@ -705,14 +740,16 @@ class Controller extends Base
                 'mapper'            => Timetable_ColourMapper::class,
                 'showId'            => false,
                 'fields'            => [
-                    'id'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
                         'getter'    => 'getTimetableColourId',
-                        'hidden'    => true,
                     ],
                     'hexColour'    => [
                         'caption'   => 'Event Colours',
                         'colour'    => true,
-                        'width'     => 12,
+                        'width'     => 11,
                         'default'   => '',
                     ],
                 ]
@@ -724,6 +761,11 @@ class Controller extends Base
                 'deleteFailMsg'     => 'You cannot delete a pastoral type which is still in use in a pastoral record.',
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 6,
@@ -747,7 +789,7 @@ class Controller extends Base
                         'nullable'  => true,
                         'mandatory' => false,
                         'nullable_label' => 'N/A',
-                        'width'     => 3,
+                        'width'     => 2,
                         'tooltip'   => 'This is used when exporting pastoral care records to your SIS pastoral care module. This should be the matching code in your SIS lookup table for this pastoral record type (e.g. luPastoralCareType). If you are not using (or do not want to export back to) your external SIS pastoral care module this can be left blank.',
                     ],
                 ]
@@ -759,6 +801,11 @@ class Controller extends Base
                 'showId'            => false,
                 'deleteFailMsg'     => 'You cannot delete a pastoral sub-type which is still in use in a pastoral record.',
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'pastoralType' => [
                         'getter'    => 'getPastoralType',
                         'caption'   => 'Pastoral Type',
@@ -770,7 +817,7 @@ class Controller extends Base
                     'name'          => [
                         'caption'   => 'Name',
                         'mandatory' => true,
-                        'width'     => 8,
+                        'width'     => 7,
                         'maxLength' => 100,
                         'default'   => '',
                     ],
@@ -791,9 +838,14 @@ class Controller extends Base
                 'delete'            => true,
                 'showId'            => false,
                 'fields'            => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 10,
+                        'width'     => 9,
                         'maxLength' => 100,
                         'mandatory' => true,
                         'default'   => '',
@@ -831,6 +883,11 @@ class Controller extends Base
                 'delete' => true,
                 'showId' => false,
                 'fields' => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name' => [
                         'caption' => 'Name',
                         'width' => 8,
@@ -840,7 +897,7 @@ class Controller extends Base
                     ],
                     'dashboard' => [
                         'caption'   => 'Show On Pastoral Dashboard',
-                        'width'     => 4,
+                        'width'     => 3,
                         'mandatory' => true,
                         'checkbox'  => true,
                         'default'   => false,
@@ -858,9 +915,14 @@ class Controller extends Base
             'deleteWarning' => 'Deleting pastoral tags may affect existing reports. Are you sure?',
             'showId'   => false,
             'fields' => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 'name' => [
                     'caption'   => 'Name',
-                    'width'     => 12,
+                    'width'     => 11,
                     'maxLength' => 100,
                     'mandatory' => true,
                     'default'   => '',
@@ -875,6 +937,11 @@ class Controller extends Base
                 'deleteWarning' => 'Are you sure?',
                 'showId'        => false,
                 'fields'        => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
                     'name'         => [
                         'caption'   => 'Name',
                         'width'     => 9,
@@ -884,7 +951,7 @@ class Controller extends Base
                     ],
                     'externalCode' => [
                         'caption'        => 'SIS Code',
-                        'width'          => 3,
+                        'width'          => 2,
                         'lookup'         => $this->getConfigLoader()->get('external_pastoral') ? $pastoralExternal->getActionList() : [],
                         'nullable'       => true,
                         'mandatory'      => false,
@@ -911,7 +978,7 @@ class Controller extends Base
             'mapper' => YearLevel\Mapper::class,
             'fields' => [
                 'id' => [
-                    'caption'   => 'DB ID',
+                    'caption'   => 'ID',
                     'width'     => 1,
                     'readonly'  => true,
                 ],
@@ -1031,9 +1098,14 @@ class Controller extends Base
             'delete'            => true,
             'showId'            => false,
             'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 'name'          => [
                     'caption'   => 'Name',
-                    'width'     => 12,
+                    'width'     => 11,
                     'maxLength' => 60,
                     'mandatory' => true,
                     'default'   => '',
@@ -1047,9 +1119,14 @@ class Controller extends Base
             'delete'            => true,
             'showId'            => false,
             'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 'name'          => [
                     'caption'   => 'Name',
-                    'width'     => 12,
+                    'width'     => 11,
                     'maxLength' => 60,
                     'mandatory' => true,
                     'default'   => '',
@@ -1063,9 +1140,14 @@ class Controller extends Base
             'delete'            => true,
             'showId'            => false,
             'fields'            => [
+                'id' => [
+                    'caption'   => 'ID',
+                    'width'     => 1,
+                    'readonly'  => true,
+                ],
                 'title'         => [
                     'caption'   => 'Name',
-                    'width'     => 12,
+                    'width'     => 11,
                     'maxLength' => 20,
                     'mandatory' => true,
                     'default'   => '',
