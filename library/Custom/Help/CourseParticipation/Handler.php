@@ -26,7 +26,6 @@ use UnexpectedValueException;
 
 class Handler
 {
-
     public const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
     public const DEFAULT_PARTICIPANT_ROLE_NAME = 'School Staff';
 

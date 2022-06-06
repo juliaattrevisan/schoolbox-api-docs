@@ -28,7 +28,6 @@ use Schoolbox\YearLevel;
  */
 class Controller extends Base
 {
-
     /** @var WritableCache */
     protected WritableCache $cache;
 

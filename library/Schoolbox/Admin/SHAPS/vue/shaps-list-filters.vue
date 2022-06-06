@@ -63,7 +63,6 @@ export default {
          * @param { Event }
          */
         onProvisionedChange (event) {
-            console.log(event.target.value);
             EventBus.emit(`vue-tables.filter::${FilterEvents.PROVISIONED}`, event.target.value); //picked up by shaps-list.vue
         },
     }
