@@ -51,11 +51,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
 
 		-
-			message: "#^Array \\(array\\<Psr\\\\Http\\\\Message\\\\ResponseInterface\\>\\) does not accept array\\<int, array\\|Psr\\\\Http\\\\Message\\\\ResponseInterface\\>\\.$#"
-			count: 1
-			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
-
-		-
 			message: "#^Call to function is_int\\(\\) with array\\<string\\> will always evaluate to false\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
@@ -2231,16 +2226,6 @@ parameters:
 			path: library/External/Maze/Class.php
 
 		-
-			message: "#^Method External_Maze_Helper\\:\\:setBetweenSemesters\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Maze/Helper.php
-
-		-
-			message: "#^Method External_Maze_Helper\\:\\:setDb\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Maze/Helper.php
-
-		-
 			message: "#^Method External_Maze_Timetable\\:\\:getHelper\\(\\) should return External_Maze_Helper but returns null\\.$#"
 			count: 1
 			path: library/External/Maze/Timetable.php
@@ -2266,11 +2251,6 @@ parameters:
 			path: library/External/Maze/User.php
 
 		-
-			message: "#^Method External_Pcschools_Class\\:\\:setDatabase\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Pcschools/Class.php
-
-		-
 			message: "#^Binary operation \"\\-\\=\" between string and 12 results in an error\\.$#"
 			count: 2
 			path: library/External/Pcschools/Timetable.php
@@ -2279,11 +2259,6 @@ parameters:
 			message: "#^Method External_Pcschools_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Pcschools/Timetable.php
-
-		-
-			message: "#^Method External_Pcschools_User\\:\\:setDatabase\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Pcschools/User.php
 
 		-
 			message: "#^Property External_Pcschools_User\\:\\:\\$userMapper is never read, only written\\.$#"
@@ -5971,17 +5946,7 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\FactoryTest\\:\\:provider_dueWork_markTypeValid\\(\\) should return array\\<array\\<Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model\\>\\> but returns array\\<int, array\\<int, class\\-string\\|Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\FactoryTest\\:\\:provider_quiz_markTypeValid\\(\\) should return array\\<array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Model\\>\\> but returns array\\<int, array\\<int, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\FactoryTest\\:\\:provider_task_markTypeValid\\(\\) should return array\\<array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Task\\\\Model\\>\\> but returns array\\<int, array\\<int, class\\-string\\|Schoolbox\\\\Learning\\\\Assessment\\\\Task\\\\Model\\>\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
 
@@ -6137,11 +6102,6 @@ parameters:
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Mapper\\:\\:getSoftDeleteSql\\(\\) should return string but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -6636,11 +6596,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Pipe/Pipe.php
 
 		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe\\:\\:\\$commandLock is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
-
-		-
 			message: "#^Method Schoolbox\\\\Realtime\\\\Pipe\\\\PipeCollection\\:\\:getPipeBySocketKey\\(\\) should return Schoolbox\\\\Realtime\\\\Pipe\\\\Pipe but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Pipe/PipeCollection.php
@@ -6729,11 +6684,6 @@ parameters:
 			message: "#^Dead catch \\- BadMethodCallException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Schedule/Trigger/Timetable/TimetableTrigger.php
-
-		-
-			message: "#^Array \\(array\\<Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundle\\>\\) does not accept Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundleInterface\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Schedule/Trigger/TriggerFactory.php
 
 		-
 			message: "#^Method Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerFactory\\:\\:getBundle\\(\\) should return Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundle but returns Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\TriggerBundleInterface\\.$#"
@@ -7867,11 +7817,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:setDeletedAt\\(\\)\\.$#"
-			count: 1
-			path: tools/pastoral/generateTestData.php
-
-		-
-			message: "#^Constant class@anonymous/tools/pastoral/generateTestData\\.php\\:23\\:\\:NUM_RECORDS is unused\\.$#"
 			count: 1
 			path: tools/pastoral/generateTestData.php
 
