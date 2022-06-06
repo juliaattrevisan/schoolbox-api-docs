@@ -108,7 +108,6 @@
         "symfony/mime": "^5.4",
         "symfony/mailer": "^5.4",
         "phpxmlrpc/phpxmlrpc": "^4.6",
-        "symfony/service-contracts": "^2.5",
         "psr/container": "^1.1.0",
         "enqueue/enqueue": "^0.10.15",
         "enqueue/redis": "^0.10.9"
