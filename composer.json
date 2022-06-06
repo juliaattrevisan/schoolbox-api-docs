@@ -82,7 +82,7 @@
         "ext-imagick": "*",
         "ext-json": "*",
         "ssnepenthe/color-utils": "^0.4.2",
-        "symfony/lock": "^5.2.3",
+        "symfony/lock": "^6.0.7",
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
         "enshrined/svg-sanitize": "~0.15.0",
