@@ -63,7 +63,7 @@ class HouseMapper extends Schoolbox\Mapper
      */
     protected function validateName(House $model): bool
     {
-        if (trim($model->getName() ?? '') === '') {
+        if (trim($model->getHouse() ?? '') === '') {
             throw new CallbackException("House name cannot be empty");
         }
         $query  = 'SELECT id, house FROM house WHERE deleted_at IS NULL AND house = :name';
