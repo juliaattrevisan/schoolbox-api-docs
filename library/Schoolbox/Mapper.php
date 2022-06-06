@@ -3568,7 +3568,7 @@ abstract class Mapper implements IMapper, Serializable
             }
             return "$column = " . $this->database->quote($value);
         }
-        return null;
+        return '';
     }
 
     /**

@@ -27,7 +27,7 @@ class TriggerFactory
     /** @var Event */
     protected $event;
 
-    /** @var TriggerBundle[] */
+    /** @var TriggerBundleInterface[] */
     protected $bundles;
 
     /** @var int */
@@ -49,7 +49,7 @@ class TriggerFactory
 
     /**
      * @param string $method
-     * @return TriggerBundle
+     * @return TriggerBundleInterface
      */
     public function buildTriggers($method)
     {
@@ -102,7 +102,7 @@ class TriggerFactory
 
     /**
      * @param string $method
-     * @return TriggerBundle
+     * @return TriggerBundleInterface
      */
     public function getBundle($method)
     {
