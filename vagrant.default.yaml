@@ -37,8 +37,8 @@ extra_hostname:
 aws_iam_key: ''
 aws_iam_secret: ''
 
-# Which PHP major version should be enabled? Supported options: ['7.4','8.0']
-primary_php_majver: '7.4'
+# Which PHP major version should be enabled? Supported options: ['8.0']
+primary_php_majver: '8.0'
 
 
 # Task daemon repo settings: analogous to the Puppet repo settings.
