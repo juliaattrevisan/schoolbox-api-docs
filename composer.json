@@ -32,7 +32,7 @@
     },
     "require": {
         "php": "8.0.*",
-        "symfony/http-foundation": "~5.2",
+        "symfony/http-foundation": "^6.0.9",
         "league/oauth2-client": "^2.4",
         "sabre/dav": "^4.2.1",
         "sabre/vobject" : "^4.4.0",
