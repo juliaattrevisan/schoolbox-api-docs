@@ -5,93 +5,95 @@
     {ADMIN_NAV}
 
     <div class="admin-content">
-        <div class="row">
-            <div class="small-12 island">
-                <!-- BEGIN filter -->
-                <form action="/adminv2/reportsForm.php" method="POST">
-                    <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="small-12 island">
+                    <!-- BEGIN filter -->
+                    <form action="/adminv2/reportsForm.php" method="POST">
+                        <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
 
-                    <section>
-                        <fieldset class="content">
-                            <legend>Filter</legend>
+                        <section>
+                            <fieldset class="content">
+                                <legend>Filter</legend>
+                                <div class="small-12 columns">
+                                    <dl class="row">
+                                        <!-- BEGIN search_options -->
+                                        <dd class="small-12 medium-4 columns end">
+                                            <label for="{FILTER_ID}">
+                                                {FILTER_NAME}
+                                                <input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" />
+                                            </label>
+                                        </dd>
+                                        <!-- END search_options -->
+                                    </dl>
+                                </div>
+                            </fieldset>
+                        </section>
+                        <div class="row">
                             <div class="small-12 columns">
-                                <dl class="row">
-                                    <!-- BEGIN search_options -->
-                                    <dd class="small-12 medium-4 columns end">
-                                        <label for="{FILTER_ID}">
-                                            {FILTER_NAME}
-                                            <input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" placeholder="{FILTER_PLACEHOLDER}" />
-                                        </label>
-                                    </dd>
-                                    <!-- END search_options -->
-                                </dl>
+                                <input id="filtersubmit" type="submit" value="Filter" />
                             </div>
-                        </fieldset>
-                    </section>
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <input id="filtersubmit" type="submit" value="Filter" />
                         </div>
-                    </div>
-                </form>
-                <!-- END filter -->
-            </div>
-        </div>
-
-        <!-- BEGIN result_table -->
-        <div class="row actions-small-1">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
+                    </form>
+                    <!-- END filter -->
                 </div>
             </div>
-            <!-- BEGIN download_report -->
-            <nav>
-                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="icon-download" title="Download Report"></a>
-            </nav>
-            <!-- END download_report -->
-        </div>
-        <div class="row">
-            <div class="small-12 columns">
-                <!-- BEGIN result -->
-                {RESULT}
-                <!-- END result -->
 
-                <ul class="pagination">
-                    <!-- BEGIN previous_button -->
-                    <li class="arrow">
-                        <a href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo;</a>
-                    </li>
-                    <!-- END previous_button -->
-
-                    <!-- BEGIN first_page -->
-                    <li>
-                        <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                    </li>
-                    <li class="unavailable"><a>&hellip;</a></li>
-                    <!-- END first_page -->
-
-                    <!-- BEGIN page_number -->
-                    <li class="{CURRENT}">
-                        <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                    </li>
-                    <!-- END page_number -->
-
-                    <!-- BEGIN last_page -->
-                    <li class="unavailable"><a>&hellip;</a></li>
-                    <li>
-                        <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
-                    </li>
-                    <!-- END last_page -->
-
-                    <!-- BEGIN next_button -->
-                    <li class="arrow">
-                        <a href="/adminv2/reports/{NEXT_PAGE}">&rsaquo;</a>
-                    </li>
-                    <!-- END next_button -->
-                </ul>
+            <!-- BEGIN result_table -->
+            <div class="row actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h2>
+                    </div>
+                </div>
+                <!-- BEGIN download_report -->
+                <nav>
+                    <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="icon-download" title="Download Report"></a>
+                </nav>
+                <!-- END download_report -->
             </div>
-        </div>
-        <!-- END result_table -->
-    </div>
+            <div class="row">
+                <div class="small-12 columns">
+                    <!-- BEGIN result -->
+                    {RESULT}
+                    <!-- END result -->
+
+                    <ul class="pagination">
+                        <!-- BEGIN previous_button -->
+                        <li class="arrow">
+                            <a href="/adminv2/reports/{PREVIOUS_PAGE}">&lsaquo;</a>
+                        </li>
+                        <!-- END previous_button -->
+
+                        <!-- BEGIN first_page -->
+                        <li>
+                            <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                        </li>
+                        <li class="unavailable"><a>&hellip;</a></li>
+                        <!-- END first_page -->
+
+                        <!-- BEGIN page_number -->
+                        <li class="{CURRENT}">
+                            <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                        </li>
+                        <!-- END page_number -->
+
+                        <!-- BEGIN last_page -->
+                        <li class="unavailable"><a>&hellip;</a></li>
+                        <li>
+                            <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+                        </li>
+                        <!-- END last_page -->
+
+                        <!-- BEGIN next_button -->
+                        <li class="arrow">
+                            <a href="/adminv2/reports/{NEXT_PAGE}">&rsaquo;</a>
+                        </li>
+                        <!-- END next_button -->
+                    </ul>
+                </div>
+            </div>
+            <!-- END result_table -->
+        </div><!-- small-12 columns -->
+    </div><!-- admin-content -->
 </div>
