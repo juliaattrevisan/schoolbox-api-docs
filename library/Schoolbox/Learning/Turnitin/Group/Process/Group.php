@@ -193,7 +193,7 @@ class Group
             $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
                 'type' => self::GROUP_TYPE,
-                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $assessment->getDueAt()->getUnixTimeStamp()),
+                'due_date' => $assessment->getDueAt()->getZuluTime(),
                 'report_generation' => Turnitin\File\Process\Transmit::REPORT_GENERATION_COLLUSION,
             ]);
 

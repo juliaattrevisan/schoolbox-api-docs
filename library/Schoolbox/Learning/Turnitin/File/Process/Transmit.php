@@ -417,7 +417,7 @@ class Transmit
             $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
                 'type' => Turnitin\Group\Process\Group::GROUP_TYPE,
-                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $assessment->getDueAt()->getUnixTimeStamp()),
+                'due_date' => $assessment->getDueAt()->getZuluTime(),
                 'report_generation' => self::REPORT_GENERATION_COLLUSION,
             ]);
 
@@ -533,7 +533,7 @@ class Transmit
          */
         $eulaResult = $this->api->retrieve('POST', '/api/v1/eula/v1beta/accept', [
             'user_id' => $owner->getId(),
-            'accepted_timestamp' => gmdate("Y-m-d\TH:i:s\Z"),
+            'accepted_timestamp' => \Alaress_Date_Format::now()->getZuluTime(),
             'language' => self::EULA_LANGUAGE
         ]);
 

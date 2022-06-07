@@ -69,6 +69,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const FRIDAY = 5;
     const SATURDAY = 6;
 
+
     /**
      * Returns an instance of static at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
@@ -1738,6 +1739,24 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         return $this->getUsingFormat('Hi') == '2359';
     }
+
+
+    /**
+     * Takes the input date, converts it to UTC first,
+     * then outputs the Zulu time (a subvariant of ISO 8601)
+     *
+     * Returns a cloned instance because of the requirement
+     * to process the timezone conversion
+     *
+     * @return string
+     */
+    public function getZuluTime(): string
+    {
+        $clone = clone $this;
+
+        return $clone->setTimezone('UTC')->getUsingFormat('Y-m-d\TH:i:sp');
+    }
+
 
     /** DIFF */
 
