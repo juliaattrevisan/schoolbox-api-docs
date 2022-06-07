@@ -19,7 +19,7 @@
         padding: $base-font-size;
         margin: 0;
         opacity: 0;
-        line-height: $tabbar-height / 2;
+        line-height: calc($tabbar-height / 2);
     }
     &:hover,
     &.focus {

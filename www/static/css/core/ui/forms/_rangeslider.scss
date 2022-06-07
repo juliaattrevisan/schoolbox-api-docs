@@ -131,7 +131,7 @@ $range-slider-disabled-cursor: $cursor-disabled-value !default;
         @include range-slider-bar-base($vertical: true);
         .range-slider-handle {
           bottom: -($range-slider-vertical-bar-height - $range-slider-handle-width);
-          margin-#{$default-float}: -($range-slider-handle-width / 4);
+          margin-#{$default-float}: -(calc($range-slider-handle-width / 4));
           margin-top: 0;
           position: absolute;
         }

@@ -1082,7 +1082,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
         line-height: $progress-tick-size;
     }
     &.pending {
-        border-radius: $progress-tick-size / 4;
+        border-radius: calc($progress-tick-size / 4);
     }
 }
 
@@ -1345,15 +1345,15 @@ $train-line-unvisited-color: $content-ui-background;
             // to derive it from the stop size or segment width
             span {
                 background: $content-ui-foreground;
-                border-radius: $train-line-stop-size / 2;
+                border-radius: calc($train-line-stop-size / 2);
                 // DONE use contrasting color
                 color: $content-ui-foreground-contrast;
                 height: 0.5 * $train-line-stop-size;
-                left: calc(50% - (#{$train-line-stop-size / 2}) + 0.4rem);
-                padding: (($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
-                    (($train-line-stop-size - rem-calc($base-font-size)) / 2);
+                left: calc(50% - (#{calc($train-line-stop-size / 2)}) + 0.4rem);
+                padding: calc(($train-line-stop-size - (rem-calc($base-font-size) * 1.5)) / 2)
+                    calc(($train-line-stop-size - rem-calc($base-font-size)) / 2);
                 position: absolute;
-                top: -0.4 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                top: -0.4 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
                 width: 0.5 * $train-line-stop-size;
                 z-index: 1;
                 transition: all 200ms ease-out;
@@ -1361,8 +1361,8 @@ $train-line-unvisited-color: $content-ui-background;
                 // You specified an icon for this stop (Knurl)
                 &[class^="icon-"] {
                     height: $train-line-stop-size;
-                    left: calc(50% - (#{$train-line-stop-size / 2}));
-                    top: -1 * (($train-line-stop-size - $train-line-segment-width) / 2);
+                    left: calc(50% - (#{calc($train-line-stop-size / 2)}));
+                    top: -1 * (calc(($train-line-stop-size - $train-line-segment-width) / 2));
                     width: $train-line-stop-size;
                 }
             }

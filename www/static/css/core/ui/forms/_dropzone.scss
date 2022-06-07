@@ -190,9 +190,9 @@ ul.az-error-list {
   @extend .action-list;
 
   // some helpful vars
-  $attachzone-duration-quarter: $attachzone-overlay-duration / 4;
-  $attachzone-duration-half: $attachzone-overlay-duration / 2;
-  $attachzone-duration-3quarter: $attachzone-overlay-duration * 3 / 4;
+  $attachzone-duration-quarter: calc($attachzone-overlay-duration / 4);
+  $attachzone-duration-half: calc($attachzone-overlay-duration / 2);
+  $attachzone-duration-3quarter: calc($attachzone-overlay-duration * 3 / 4);
 
   > li {
     clear: none;

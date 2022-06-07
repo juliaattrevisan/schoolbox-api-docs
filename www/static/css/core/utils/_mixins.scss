@@ -55,9 +55,9 @@ $modules: () !default;
 	$iSat: saturation($start);
 	$iLight: lightness($start);
 
-	$dHue: (hue($end) - $iHue) / ($count - 1);
-	$dSat: (saturation($end) - $iSat) / ($count - 1);
-	$dLight: (lightness($end) - $iLight) / ($count - 1);
+	$dHue: calc((hue($end) - $iHue) / ($count - 1));
+	$dSat: calc((saturation($end) - $iSat) / ($count - 1));
+	$dLight: calc((lightness($end) - $iLight) / ($count - 1));
 
 	@for $i from 0 through $count {
 
@@ -199,17 +199,17 @@ $modules: () !default;
         }
         @else {
             top: 50%;
-            margin-top: (-$width/2);
+            margin-top: calc(($width * -1) / 2);
         }
         @if $left {
             left: $left;
         }
         @else {
-            left: ($tabbar-menu-icon-width - $width)/2;
+            left: calc(($tabbar-menu-icon-width - $width) / 2);
         }
         }
         @else {
-        margin-top: -($width/2);
+        margin-top: calc(($width * -1) / 2);
         top: 50%;
         #{$opposite-direction}: $topbar-link-padding;
         }

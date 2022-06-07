@@ -7,7 +7,7 @@
 	// We shoudln't use more than 5 action buttons in a row
 	@for $i from 1 through 5 {
 		.actions-#{$size}-#{$i},
-		.island .row.actions-#{$size}-#{$i}{
+		.island .row.actions-#{$size}-#{$i} {
 			position: relative;
 			min-width: $button-size * $i;
 			min-height: $button-size;
@@ -94,9 +94,10 @@
 		.row.actions-#{$size}-#{$i} {
 			 nav {
 				 right: 1rem;
-				 @media #{$small-only} {
-					 right: 0;
-				 }
+				//  @media #{$small-only} { //currently creating a Sass compile error
+                //  @media screen and (max-width: 640px) {
+				// 	 right: 0;
+				//  }
 			 }
 		 }
         // A unique situation where h2 actions need to exist inside a form
@@ -105,12 +106,13 @@
             right: 0;
           }
 
-          @media #{$small-only} {
-            .column, .columns {
-              padding-left: 0;
-              padding-right: 0;
-            }
-          }
+        //   @media #{$small-only} { //currently creating a Sass compile error
+        //     @media screen and (max-width: 640px) {
+        //     .column, .columns {
+        //       padding-left: 0;
+        //       padding-right: 0;
+        //     }
+        //   }
         }
 	}
 }

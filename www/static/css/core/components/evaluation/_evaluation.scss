@@ -101,7 +101,7 @@
         @include label(
             $text-size: inherit,
             $bg: tint($success-color, 74%),
-            $padding: rem-calc($base-font-size / 2)
+            $padding: rem-calc(calc($base-font-size / 2))
         );
         color: $success-color;
     }
@@ -109,7 +109,7 @@
         @include label(
             $text-size: inherit,
             $bg: tint($alert-color, 74%),
-            $padding: rem-calc($base-font-size / 2)
+            $padding: rem-calc(calc($base-font-size / 2))
         );
         color: $alert-color;
     }

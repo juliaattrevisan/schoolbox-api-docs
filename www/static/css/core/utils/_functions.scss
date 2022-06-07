@@ -2,6 +2,8 @@
     Various handy functions that are referenced throughout the rest of the styles
 */
 
+@use 'sass:math'; //to use math.div()
+
 /**
  * Adds a percentage of white to a CSS color var.
  *
@@ -10,7 +12,7 @@
  */
 @function css-tint($colorVar, $percent) {
   $components: color-var-components($colorVar);
-  $offset:     strip-unit($percent) / 100;
+  $offset:     calc(strip-unit($percent) / 100);
   @return rgba(
                   calc(#{map-get($components, 'r')} + (255 - #{map-get($components, 'r')}) * #{$offset}),
                   calc(#{map-get($components, 'g')} + (255 - #{map-get($components, 'g')}) * #{$offset}),
@@ -154,7 +156,7 @@
  * Helper function for scaling the value of a channel var.
  */
 @function scale-channel($channelVar, $percent) {
-  $offset: strip-unit($percent) / 100;
+  $offset: calc(strip-unit($percent) / 100);
   @if ($percent > 0%) {
     @return "calc(#{$channelVar} + (100% - #{$channelVar}) * #{$offset})"
   } @else if($percent < 0%) {
@@ -216,7 +218,7 @@
 	$green: green($bg) * $green-magic;
 	$blue:  blue($bg) * $blue-magic;
 
-	$perceptive-luminance: 1 - ($red + $green + $blue) / 255;
+	$perceptive-luminance: 1 - calc(($red + $green + $blue) / 255);
 
 	@return $perceptive-luminance;
 }
@@ -259,7 +261,7 @@
 // STRIP UNIT
 // It strips the unit of measure and returns it
 @function strip-unit($num) {
-    @return $num / ($num * 0 + 1);
+    @return math.div($num, ($num * 0 + 1));
 }
   
 // TEXT INPUT TYPES
@@ -308,7 +310,7 @@ $rem-base: 16px !default;
 
 // CONVERT TO REM
 @function convert-to-rem($value, $base-value: $rem-base) {
-    $value: strip-unit($value) / strip-unit($base-value) * 1rem;
+    $value: calc(strip-unit($value) / strip-unit($base-value)) * 1rem;
     @if ($value == 0rem) { $value: 0; } // Turn 0rem into 0
     @return $value;
 }
