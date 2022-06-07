@@ -6091,11 +6091,6 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: "#^Variable \\$filterSoftDeleteSql in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Variable \\$property_map in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
