@@ -91,57 +91,57 @@
         * or information-list construct (e.g. h2 actions).
         */
     .row.actions-small-#{$i} {
-            nav {
-                right: 1rem;
-                @media #{$small-only} { //currently creating a Sass compile error
-            	 right: 0;
-                }
+        nav {
+            right: 1rem;
+            @media #{$small-only} { //currently creating a Sass compile error
+                right: 0;
             }
         }
+    }
     // A unique situation where h2 actions need to exist inside a form
     form.row .row.actions-small-#{$i} {
         nav {
             right: 0;
         }
 
-      @media #{$small-only} { //currently creating a Sass compile error
-        .column, .columns {
-          padding-left: 0;
-          padding-right: 0;
+        @media #{$small-only} { //currently creating a Sass compile error
+            .column, .columns {
+                padding-left: 0;
+                padding-right: 0;
+            }
         }
-      }
     }
 }
 
 .list-item {
-	width: 100%;
+    width: 100%;
 }
 
 // headers for lists
 .list-header {
-	@extend .show-for-medium-up;
-	font-weight: $font-weight-bold;
-	font-size: $paragraph-font-size;
+    @extend .show-for-medium-up;
+    font-weight: $font-weight-bold;
+    font-size: $paragraph-font-size;
     padding-top: .5rem;
 }
 
 .sortable, .sortable-card {
-	.list-header {
-		padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
-	}
+    .list-header {
+        padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
+    }
 }
 
 // small behaves a little differently to the other viewports
 @media #{$small-only} {
-	form .list-item {
-		// restore guttering
-		padding-right: 0.5rem;
-		padding-left: 0.5rem;
-	}
-	.sortable, .sortable-card {
-		.list-item {
-			// remove guttering if there's a grip handle
-			padding-left: 0;
-		}
-	}
+    form .list-item {
+        // restore guttering
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    .sortable, .sortable-card {
+        .list-item {
+            // remove guttering if there's a grip handle
+            padding-left: 0;
+        }
+    }
 }

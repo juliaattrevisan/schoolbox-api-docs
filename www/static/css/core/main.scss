@@ -146,8 +146,8 @@ $cdn-prefix: "../..";
 @import "ui/selectize.customisation";
 
 //Magnific Popup
-// @import "/node_modules/magnific-popup/src/css/main";
-// @import "components/magnific/settings";
+@import "/node_modules/magnific-popup/src/css/main";
+@import "components/magnific/settings";
 
 // combobox relies on selectize styles
 @import "ui/combobox";
