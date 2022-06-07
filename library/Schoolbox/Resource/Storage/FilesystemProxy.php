@@ -22,7 +22,8 @@ use League\Flysystem\NotSupportedException;
  * v1 Flysystem object. Where the two interfaces differ, v3 will be used.
  *
  * Directory-specific methods are not proxied, because directories are not
- * relevant for `IStorage` objects.
+ * relevant for `IStorage` objects. All of these methods raise a
+ * `NotSupportedException`.
  */
 class FilesystemProxy
 {
@@ -39,18 +40,37 @@ class FilesystemProxy
     }
 
     /**
-     * Proxy for `FilesystemInterface::has`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::has` (with file name)
+     * * v3 `FilesystemAdapter::fileExists`
      *
      * @param IStorage $storage
      * @return bool
      */
-    public function has(IStorage $storage): bool
+    public function fileExists(IStorage $storage): bool
     {
         return $this->filesystem->has(self::getPathFromHash($storage->getHash()));
     }
 
     /**
-     * Proxy for `FilesystemInterface::read`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::has` (with folder name)
+     * * v3 `FilesystemAdapter::directoryExists`
+     *
+     * @param IStorage $storage
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function directoryExists(IStorage $storage): void
+    {
+        throw self::generateDirectorySpecificMethodException();
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::read`
+     * * v3 `FilesystemAdapter::read`
      *
      * @param IStorage $storage
      * @return string
@@ -62,7 +82,9 @@ class FilesystemProxy
     }
 
     /**
-     * Proxy for `FilesystemInterface::readStream`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::readStream`
+     * * v3 `FilesystemAdapter::readStream`
      *
      * @param IStorage $storage
      * @return resource
@@ -71,6 +93,51 @@ class FilesystemProxy
     public function readStream(IStorage $storage)
     {
         return $this->filesystem->readStream(self::getPathFromHash($storage->getHash()));
+    }
+
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::delete` (with file name)
+     * * v3 `FilesystemAdapter::delete`
+     *
+     * @param IStorage $storage
+     * @throws FileNotFoundException
+     */
+    public function delete(IStorage $storage): void
+    {
+        $this->filesystem->delete(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::delete` (with folder name)
+     * * v3 `FilesystemAdapter::deleteDirectory`
+     *
+     * @param IStorage $storage
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function deleteDirectory(IStorage $storage): void
+    {
+        throw self::generateDirectorySpecificMethodException();
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::createDir` (with folder name)
+     * * v3 `FilesystemAdapter::createDirectory`
+     *
+     * @param IStorage $storage
+     * @param array    $config
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function createDirectory(IStorage $storage, array $config = []): void
+    {
+        throw self::generateDirectorySpecificMethodException();
     }
 
     /**
@@ -186,6 +253,8 @@ class FilesystemProxy
         // TODO is this resource rewound?
         $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
     }
+
+
 
     /**
      * Returns a relative path for the specified hash
