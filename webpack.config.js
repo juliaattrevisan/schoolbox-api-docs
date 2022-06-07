@@ -329,7 +329,7 @@ module.exports = {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    url: false,
+                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
                                 }
                             },
                             { loader: 'sass-loader' },
@@ -338,7 +338,7 @@ module.exports = {
                     {
                         use: [
                             {
-                                loader: 'file-loader',
+                                loader: 'file-loader', //to emit the css `main` and `editor` into the /core directory
                                 options: {
                                     name: '[name].css',
                                     outputPath: '../../css/core/'
@@ -348,8 +348,8 @@ module.exports = {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    url: false,
-                                    modules: false
+                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
+                                    modules: false //disable css modules for all files: https://github.com/css-modules/css-modules
                                 }
                             },
                             {
@@ -357,9 +357,8 @@ module.exports = {
                                 options: {
                                     sassOptions: {
                                         indentWidth: 4,
-                                        includePaths: ['../../css/core/'],
+                                        includePaths: ['../../css/core/'], //where our base css file is loaded
                                     },
-                                    sourceMap: true,
                                 },
                             }
                         ]
