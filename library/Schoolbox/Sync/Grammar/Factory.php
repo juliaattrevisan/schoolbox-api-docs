@@ -241,8 +241,8 @@ class Factory
 
         $actualCount = count($arguments);
 
-        // Be a little more lenient with parameter counts; only error if there's
-        // too few parameters provided;
+        // Be a little more lenient with parameter counts;
+        // only error if there's too few parameters provided.
         if ($expectedCount > $actualCount) {
             throw new OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
         }
