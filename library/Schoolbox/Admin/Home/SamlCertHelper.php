@@ -5,6 +5,7 @@ namespace Schoolbox\Admin\Home;
 use OneLogin\Saml2\IdPMetadataParser;
 
 use function PHPUnit\Framework\arrayHasKey;
+use function Sabre\Uri\build;
 
 /**
  * Functions for processing SAML certificate
@@ -34,13 +35,14 @@ class SamlCertHelper
     }
 
     /**
-     * Get SAML cert for an instance
+     * Get SAML cert/s from metadata url
      *
-     * @return string|null  SAML certificate
+     * @param string $url
+     * @return array SAML certificates found
      */
-    public static function getSamlCertFromMetadataUrl($url): ?string
+    public static function getSamlCertsFromMetadataUrl(string $url): ?array
     {
-        $samlCert = '';
+        $certsOut = null;
         try {
             $url = new \Laminas\Uri\Uri($url);
             $idpMetadataUrl = $url->toString();
@@ -57,19 +59,49 @@ class SamlCertHelper
                     $cache->invalidateCache();
                 }
 
-                //find the value in the array that is valid for the XML doc structure
-                $samlCert = $idpMetadata['idp']['x509cert'] ?? '';
-
-                if ($samlCert === '') {
-                    //special case found via LGS
-                    $samlCert = $idpMetadata['idp']['x509certMulti']['signing'][1] ?? '';
+                if (array_key_exists('x509cert', $idpMetadata['idp'])) {
+                    $certsOut = array(self::buildCertString($idpMetadata['idp']['x509cert']));
+                } elseif (array_key_exists('x509certMulti', $idpMetadata['idp'])) {
+                    $certsOut = [];
+                    foreach ($idpMetadata['idp']['x509certMulti']['signing'] as $index => $certInner) {
+                        $certsOut[] = self::buildCertString($certInner);
+                    }
                 }
-
-                $samlCert = "-----BEGIN CERTIFICATE-----\n" . $samlCert . "\n-----END CERTIFICATE-----";
             }
         } catch (\Exception $e) {
             //noop, metadata url invalid
         }
-        return $samlCert;
+        return $certsOut;
+    }
+
+    /**
+     * Find the cert in an array that contains has the most days before expiry
+     *
+     * @param array $certs array of certs to be checked
+     * @return string|null  SAML certificate
+     */
+    public static function getCertWithLongestDatedExpiryFromX509CertMulti(array $certs): ?string
+    {
+        $bestCertIndex = -1;
+        $bestCertExpiry = -1;
+        foreach ($certs as $index => $cert) {
+            $currentCertExpiry = self::getDaysBeforeExpiry($cert);
+            if ($currentCertExpiry > $bestCertExpiry) {
+                $bestCertIndex = $index;
+                $bestCertExpiry = $currentCertExpiry;
+            }
+        }
+        return $certs[$bestCertIndex] ?? null;
+    }
+
+    /**
+     * Add 'begin cert' and 'end cert' onto the provided string
+     *
+     * @param string $certInner
+     * @return string  SAML certificate
+     */
+    private static function buildCertString(string $certInner): string
+    {
+        return "-----BEGIN CERTIFICATE-----\n" . $certInner . "\n-----END CERTIFICATE-----";
     }
 }
