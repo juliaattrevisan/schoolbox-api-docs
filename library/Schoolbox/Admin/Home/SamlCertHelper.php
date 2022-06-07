@@ -4,9 +4,6 @@ namespace Schoolbox\Admin\Home;
 
 use OneLogin\Saml2\IdPMetadataParser;
 
-use function PHPUnit\Framework\arrayHasKey;
-use function Sabre\Uri\build;
-
 /**
  * Functions for processing SAML certificate
  */
@@ -63,7 +60,7 @@ class SamlCertHelper
                     $certsOut = array(self::buildCertString($idpMetadata['idp']['x509cert']));
                 } elseif (array_key_exists('x509certMulti', $idpMetadata['idp'])) {
                     $certsOut = [];
-                    foreach ($idpMetadata['idp']['x509certMulti']['signing'] as $index => $certInner) {
+                    foreach ($idpMetadata['idp']['x509certMulti']['signing'] as $certInner) {
                         $certsOut[] = self::buildCertString($certInner);
                     }
                 }
