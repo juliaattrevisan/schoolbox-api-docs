@@ -300,4 +300,24 @@ class Manager
     {
         return $this->mountManager->getFilesystem($prefix);
     }
+
+    /**
+     * Convenience method for fetching storage filesystem.
+     *
+     * @return FilesystemInterface
+     */
+    public function getStorageFilesystem(): FilesystemInterface
+    {
+        return $this->getFilesystem(self::FS_STORAGE);
+    }
+
+    /**
+     * Convenience method for fetching temp filesystem.
+     *
+     * @return FilesystemInterface
+     */
+    public function getTempFilesystem(): FilesystemInterface
+    {
+        return $this->getFilesystem(self::FS_TEMP);
+    }
 }
