@@ -24,6 +24,10 @@ use League\Flysystem\NotSupportedException;
  * Directory-specific methods are not proxied, because directories are not
  * relevant for `IStorage` objects. All of these methods raise a
  * `NotSupportedException`.
+ *
+ * Location-specific methods are not proxied, because an `IStorage` object's
+ * location is determined by its hash. All of these methods raise a
+ * `NotSupportedException`.
  */
 class FilesystemProxy
 {
@@ -69,6 +73,49 @@ class FilesystemProxy
 
     /**
      * Proxy for:
+     * * v1 `FilesystemInterface::write`
+     * * v3 `FilesystemAdapter::write`
+     *
+     * @param IStorage $storage
+     * @param string   $contents
+     * @param array    $config
+     * @return void
+     * @throws FileExistsException if somehow the file exists
+     */
+    public function write(IStorage $storage, string $contents, array $config = [])
+    {
+        $fp = fopen('php://temp', 'r+');
+        fwrite($fp, $contents);
+        rewind($fp);
+        $this->writeStream($storage, $fp, $config);
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::writeStream`
+     * * v3 `FilesystemAdapter::writeStream`
+     *
+     * @param IStorage $storage
+     * @param resource $resource
+     * @param array    $config
+     * @return void
+     * @throws FileExistsException if somehow the file exists
+     */
+    public function writeStream(IStorage $storage, $resource, array $config = [])
+    {
+        $hash = $this->hashGenerator->generateHash($resource);
+        // Put it in the filesystem, and also the storage
+        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
+        if ($storage instanceof Model) {
+            $storage->setHash($hash);
+        }
+
+        // TODO is this resource rewound?
+        $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+    }
+
+    /**
+     * Proxy for:
      * * v1 `FilesystemInterface::read`
      * * v3 `FilesystemAdapter::read`
      *
@@ -107,6 +154,8 @@ class FilesystemProxy
     public function delete(IStorage $storage): void
     {
         $this->filesystem->delete(self::getPathFromHash($storage->getHash()));
+
+        // TODO consider whether to delete the storage record too?
     }
 
     /**
@@ -141,7 +190,79 @@ class FilesystemProxy
     }
 
     /**
-     * Proxy for `FilesystemInterface::listContents`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::setVisibility`
+     * * v3 `FilesystemAdapter::setVisibility`
+     *
+     * @param IStorage $storage
+     * @param string   $visibility
+     * @throws FileNotFoundException
+     */
+    public function setVisibility(IStorage $storage, string $visibility): void
+    {
+        $this->filesystem->setVisibility(self::getPathFromHash($storage->getHash()), $visibility);
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::setVisibility`
+     * * v3 `FilesystemAdapter::visibility`
+     *
+     * @param IStorage $storage
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function visibility(IStorage $storage): string
+    {
+        return $this->filesystem->getVisibility(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::getMimetype`
+     * * v3 `FilesystemAdapter::mimeType`
+     *
+     * @param IStorage $storage
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function mimeType(IStorage $storage): string
+    {
+        return $this->filesystem->getMimetype(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::getTimestamp`
+     * * v3 `FilesystemAdapter::lastModified`
+     *
+     * @param IStorage $storage
+     * @return int
+     * @throws FileNotFoundException
+     */
+    public function lastModified(IStorage $storage): int
+    {
+        return $this->filesystem->getTimestamp(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::getSize`
+     * * v3 `FilesystemAdapter::fileSize`
+     *
+     * @param IStorage $storage
+     * @return int
+     * @throws FileNotFoundException
+     */
+    public function fileSize(IStorage $storage): int
+    {
+        return $this->filesystem->getSize(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for:
+     * * v1 `FilesystemInterface::listContents`.
+     * * v3 `FilesystemAdapter::listContents`
      *
      * @param IStorage $storage
      * @param bool     $recursive
@@ -154,110 +275,41 @@ class FilesystemProxy
         throw self::generateDirectorySpecificMethodException();
     }
 
+
     /**
-     * Proxy for `FilesystemInterface::getMetadata`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::rename`
+     * * v3 `FilesystemAdapter::move`
      *
-     * @param IStorage $storage
+     * @param IStorage $source
+     * @param IStorage $destination
      * @return never-return
      * @throws NotSupportedException
      * @noinspection PhpUnusedParameterInspection
      */
-    public function getMetadata(IStorage $storage)
+    public function move(IStorage $source, IStorage $destination): void
     {
-        throw new NotSupportedException(sprintf('%s does not support %s', __CLASS__, __METHOD__));
+        throw self::generateLocationSpecificMethodException();
     }
 
     /**
-     * Proxy for `FilesystemInterface::getSize`.
+     * Proxy for:
+     * * v1 `FilesystemInterface::copy`
+     * * v3 `FilesystemAdapter::copy`
      *
-     * @param IStorage $storage
-     * @return int
-     * @throws FileNotFoundException
+     * @param IStorage $source
+     * @param IStorage $destination
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function getSize(IStorage $storage): int
+    public function copy(IStorage $source, IStorage $destination): void
     {
-        return $this->filesystem->getSize(self::getPathFromHash($storage->getHash()));
+        throw self::generateLocationSpecificMethodException();
     }
 
     /**
-     * Proxy for `FilesystemInterface::getMimetype`.
-     *
-     * @param IStorage $storage
-     * @return string
-     * @throws FileNotFoundException
-     */
-    public function getMimetype(IStorage $storage): string
-    {
-        return $this->filesystem->getMimetype(self::getPathFromHash($storage->getHash()));
-    }
-
-    /**
-     * Proxy for `FilesystemInterface::getTimestamp`.
-     *
-     * @param IStorage $storage
-     * @return int
-     * @throws FileNotFoundException
-     */
-    public function getTimestamp(IStorage $storage): int
-    {
-        return $this->filesystem->getTimestamp(self::getPathFromHash($storage->getHash()));
-    }
-
-    /**
-     * Proxy for `FilesystemInterface::getVisibility`.
-     *
-     * @param IStorage $storage
-     * @return string
-     * @throws FileNotFoundException
-     */
-    public function getVisibility(IStorage $storage): string
-    {
-        return $this->filesystem->getVisibility(self::getPathFromHash($storage->getHash()));
-    }
-
-    /**
-     * Proxy for `FilesystemInterface::write`.
-     *
-     * @param IStorage $storage
-     * @param string   $contents
-     * @param array    $config
-     * @return void
-     * @throws FileExistsException if somehow the file exists
-     */
-    public function write(IStorage $storage, string $contents, array $config = [])
-    {
-        $fp = fopen('php://temp', 'r+');
-        fwrite($fp, $contents);
-        rewind($fp);
-        $this->writeStream($storage, $fp, $config);
-    }
-
-    /**
-     * Proxy for `FilesystemInterface::writeStream`.
-     *
-     * @param IStorage $storage
-     * @param resource $resource
-     * @param array    $config
-     * @return void
-     * @throws FileExistsException if somehow the file exists
-     */
-    public function writeStream(IStorage $storage, $resource, array $config = [])
-    {
-        $hash = $this->hashGenerator->generateHash($resource);
-        // Put it in the filesystem, and also the storage
-        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
-        if ($storage instanceof Model) {
-            $storage->setHash($hash);
-        }
-
-        // TODO is this resource rewound?
-        $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
-    }
-
-
-
-    /**
-     * Returns a relative path for the specified hash
+     * Returns a filesystem path for the specified hash.
      *
      * @param string $hash
      * @return string
@@ -268,13 +320,24 @@ class FilesystemProxy
     }
 
     /**
-     * Generate generic exception for non-supported directory-specific
-     * exceptions.
+     * Generate generic exception for non-supported directory operations
+     * (e.g. `createDirectory`, `directoryExists`).
      *
      * @return NotSupportedException
      */
     private static function generateDirectorySpecificMethodException(): NotSupportedException
     {
-        throw new NotSupportedException(sprintf('%s does not support directory-specific methods', __CLASS__));
+        throw new NotSupportedException(sprintf('%s does not support directory methods', __CLASS__));
+    }
+
+    /**
+     * Generate generic exception for non-supported location operations
+     * (e.g. `copy`, `move`).
+     *
+     * @return NotSupportedException
+     */
+    private static function generateLocationSpecificMethodException(): NotSupportedException
+    {
+        throw new NotSupportedException(sprintf('%s does not support location methods', __CLASS__));
     }
 }
