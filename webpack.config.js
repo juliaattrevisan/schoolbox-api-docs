@@ -149,7 +149,7 @@ module.exports = {
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
-        /*
+        
         // Libraries
         clipboard: './www/static/js/clipboard/clipboard.js',
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
@@ -228,7 +228,7 @@ module.exports = {
 
         //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
-        */
+        
         //Sass
         main: './www/static/css/core/main.scss',
         editor: './www/static/css/core/editor.scss',
@@ -325,9 +325,14 @@ module.exports = {
                     {
                         resourceQuery: /^\?vue/,
                         use: [
-                            'vue-style-loader',
-                            'css-loader',
-                            'sass-loader'
+                            { loader: 'vue-style-loader' },
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    url: false,
+                                }
+                            },
+                            { loader: 'sass-loader' },
                         ]
                     },
                     {
@@ -354,6 +359,7 @@ module.exports = {
                                         indentWidth: 4,
                                         includePaths: ['../../css/core/'],
                                     },
+                                    sourceMap: true,
                                 },
                             }
                         ]
