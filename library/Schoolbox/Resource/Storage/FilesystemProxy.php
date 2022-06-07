@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Storage;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\NotSupportedException;
 
 /**
  * A proxy class for providing a `FilesystemInterface`-like facade when dealing
@@ -62,6 +63,7 @@ class FilesystemProxy
 
     /**
      * Proxy for `FilesystemInterface::readStream`.
+     *
      * @param IStorage $storage
      * @return resource
      * @throws FileNotFoundException
@@ -69,6 +71,81 @@ class FilesystemProxy
     public function readStream(IStorage $storage)
     {
         return $this->filesystem->readStream(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::listContents`.
+     *
+     * @param IStorage $storage
+     * @param bool     $recursive
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function listContents(IStorage $storage, bool $recursive = false)
+    {
+        throw self::generateDirectorySpecificMethodException();
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::getMetadata`.
+     *
+     * @param IStorage $storage
+     * @return never-return
+     * @throws NotSupportedException
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function getMetadata(IStorage $storage)
+    {
+        throw new NotSupportedException(sprintf('%s does not support %s', __CLASS__, __METHOD__));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::getSize`.
+     *
+     * @param IStorage $storage
+     * @return int
+     * @throws FileNotFoundException
+     */
+    public function getSize(IStorage $storage): int
+    {
+        return $this->filesystem->getSize(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::getMimetype`.
+     *
+     * @param IStorage $storage
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function getMimetype(IStorage $storage): string
+    {
+        return $this->filesystem->getMimetype(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::getTimestamp`.
+     *
+     * @param IStorage $storage
+     * @return int
+     * @throws FileNotFoundException
+     */
+    public function getTimestamp(IStorage $storage): int
+    {
+        return $this->filesystem->getTimestamp(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::getVisibility`.
+     *
+     * @param IStorage $storage
+     * @return string
+     * @throws FileNotFoundException
+     */
+    public function getVisibility(IStorage $storage): string
+    {
+        return $this->filesystem->getVisibility(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -119,5 +196,16 @@ class FilesystemProxy
     private static function getPathFromHash(string $hash): string
     {
         return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
+    }
+
+    /**
+     * Generate generic exception for non-supported directory-specific
+     * exceptions.
+     *
+     * @return NotSupportedException
+     */
+    private static function generateDirectorySpecificMethodException(): NotSupportedException
+    {
+        throw new NotSupportedException(sprintf('%s does not support directory-specific methods', __CLASS__));
     }
 }
