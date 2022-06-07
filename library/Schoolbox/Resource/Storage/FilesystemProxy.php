@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Resource\Storage;
+
+use League\Flysystem\FileExistsException;
+use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
+
+/**
+ * A proxy class for providing a `FilesystemInterface`-like facade when dealing
+ * with `IStorage` objects, instead of paths.
+ *
+ * This provides a Flysystem v3-like proxy, even though currently it wraps a
+ * v1 Flysystem object. Where the two interfaces differ, v3 will be used.
+ *
+ * Directory-specific methods are not proxied, because directories are not
+ * relevant for `IStorage` objects.
+ */
+class FilesystemProxy
+{
+    /**
+     * Constructor
+     *
+     * @param FilesystemInterface $filesystem    base filesystem this class proxies
+     * @param HashGenerator       $hashGenerator method for generating hashes for storage files
+     */
+    public function __construct(
+        private FilesystemInterface $filesystem,
+        private HashGenerator $hashGenerator,
+    ) {
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::has`.
+     *
+     * @param IStorage $storage
+     * @return bool
+     */
+    public function has(IStorage $storage): bool
+    {
+        return $this->filesystem->has(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::read`.
+     *
+     * @param IStorage $storage
+     * @return string
+     * @throws FileNotFoundException if the file wasn't found
+     */
+    public function read(IStorage $storage): string
+    {
+        return $this->filesystem->read(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::readStream`.
+     * @param IStorage $storage
+     * @return resource
+     * @throws FileNotFoundException
+     */
+    public function readStream(IStorage $storage)
+    {
+        return $this->filesystem->readStream(self::getPathFromHash($storage->getHash()));
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::write`.
+     *
+     * @param IStorage $storage
+     * @param string   $contents
+     * @param array    $config
+     * @return void
+     * @throws FileExistsException if somehow the file exists
+     */
+    public function write(IStorage $storage, string $contents, array $config = [])
+    {
+        $fp = fopen('php://temp', 'r+');
+        fwrite($fp, $contents);
+        rewind($fp);
+        $this->writeStream($storage, $fp, $config);
+    }
+
+    /**
+     * Proxy for `FilesystemInterface::writeStream`.
+     *
+     * @param IStorage $storage
+     * @param resource $resource
+     * @param array    $config
+     * @return void
+     * @throws FileExistsException if somehow the file exists
+     */
+    public function writeStream(IStorage $storage, $resource, array $config = [])
+    {
+        $hash = $this->hashGenerator->generateHash($resource);
+        // Put it in the filesystem, and also the storage
+        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
+        if ($storage instanceof Model) {
+            $storage->setHash($hash);
+        }
+
+        // TODO is this resource rewound?
+        $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+    }
+
+    /**
+     * Returns a relative path for the specified hash
+     *
+     * @param string $hash
+     * @return string
+     */
+    private static function getPathFromHash(string $hash): string
+    {
+        return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
+    }
+}
