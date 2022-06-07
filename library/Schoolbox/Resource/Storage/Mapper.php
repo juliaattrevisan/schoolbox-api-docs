@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Storage;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Byte_Format;
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
 use PDO;
 use PDOStatement;
 use Schoolbox;
@@ -152,33 +151,21 @@ class Mapper extends BaseMapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
-        // Is this file already in the storage table and (config flag OFF or (previous exists and size appears correct))?
+        // Don't re-copy this file if it's already in storage, and either:
+        // * config flag OFF, or:
+        // * previous exists and size hasn't changed?
+        $filesystemProxy = new FilesystemProxy($this->getManager()->getStorageFilesystem(), new HashGenerator());
         if ($previous) {
             if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE)) {
                 return true;
             }
-
-            $manager      = $this->getManager();
-            $filesystem   = $manager->getStorageFilesystem();
-            $previousPath = $manager->calcPath($previous);
-            $currentPath  = $manager->calcPath($storage);
             if (
-                $filesystem->has($previousPath)
-                && $filesystem->getSize($currentPath) === $filesystem->getSize($previousPath)
+                $filesystemProxy->fileExists($previous)
+                && $filesystemProxy->fileSize($storage) === $filesystemProxy->fileSize($previous)
             ) {
                 return true;
             }
         }
-//        if (
-//            $previous &&
-//            (
-//                !$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE) ||
-//                ($previous->exists() && $storage->getSize() === $previous->getFilesystem()->getSize($previous->getPath()))
-//            )
-//        ) {
-//            // no copying to take place
-//            return true;
-//        }
 
         // Ram media files into Video Queue table for transcoding
 
