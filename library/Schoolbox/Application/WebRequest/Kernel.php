@@ -55,7 +55,6 @@ use Schoolbox\IConfigLoader;
  */
 class Kernel extends WebKernelAbstract
 {
-
     /** @var bool */
     protected $debugMode;
 
