@@ -20,6 +20,8 @@ enable_xdebug="true";
 force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
 declare phpversion_supported                                # Must be specified via script arg
+declare aws_iam_key
+declare aws_iam_secret
 
 function log(){
   $LOG $L_INFO "$1"
@@ -31,8 +33,8 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-if [[ $# -ne 12 ]]; then
-  error "Script requires 12 params, found $#"
+if [[ $# -ne 14 ]]; then
+  error "Script requires 14 params, found $#"
   exit 1
 fi
 
@@ -58,6 +60,8 @@ if [[ -z $phpversion_supported ]]; then
   exit 1
 fi
 taskd_build_from_local="${12}";
+aws_iam_key=${13}
+aws_iam_secret=${14}
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -92,11 +96,11 @@ if [[ -z $s3Referer ]]; then
 fi
 
 # Download some files from S3
-if ! schoolbox-download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
 fi
-if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
@@ -211,6 +215,8 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --s3-referer "$s3Referer" \
+--iam-access-key "$aws_iam_key" \
+--iam-secret-key "$aws_iam_secret" \
 --skip-bucket-copy \
 --sql-host 'localhost' \
 --sql-schema 'schoolbox' \
@@ -251,6 +257,8 @@ declare -A env_vars=(
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
   [FACTER_taskd_build_from_local]="$taskd_build_from_local"
+  [FACTER_iam_access_key]="$aws_iam_key"
+  [FACTER_iam_access_key]="$aws_iam_secret"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
@@ -269,7 +277,12 @@ done
 
 # Set up the host for the newly-installed instance
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
-FACTER_vagrant_extra_hostname="$extra_hostname" FACTER_primary_php_majver="$phpversion_supported" Facter_taskd_build_from_local="$taskd_build_from_local" "$SITE_ROOT"/puppet-apply.sh
+FACTER_vagrant_extra_hostname="$extra_hostname" \
+    FACTER_primary_php_majver="$phpversion_supported" \
+    Facter_taskd_build_from_local="$taskd_build_from_local" \
+    FACTER_iam_access_key="$aws_iam_key" \
+    FACTER_iam_secret_key="$aws_iam_secret" \
+    "$SITE_ROOT"/puppet-apply.sh
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";

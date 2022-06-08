@@ -217,17 +217,17 @@ upload_tarball(){
   if [ -z "$upload" ]; then
     return;
   fi
-  echo -e "AWS S3 Key: \c" && read -r S3KEY;
+  S3KEY=$(grep -E '^aws_iam_key:' /usr/share/schoolbox/vagrant.yaml | sed -E "s/(aws_iam_key:|[ \"'])//g")
   if [ -z "$S3KEY" ]; then
     error "Error: an AWS S3 Key must be supplied";
     restart_services;
     exit 1;
   fi
-  echo -e "AWS S3 Secret: \c" && read -r S3SECRET;
+  S3SECRET=$(grep -E '^aws_iam_secret:' /usr/share/schoolbox/vagrant.yaml | sed -E "s/(aws_iam_secret:|[ \"'])//g")
   if [ -z "$S3SECRET" ]; then
     error "Error: an AWS S3 Secret must be supplied";
     restart_services;
-  exit 1;
+    exit 1;
   fi
   # below is based on: https://gist.github.com/chrismdp/6c6b6c825b07f680e710
   path=$CACHE_DIR;
