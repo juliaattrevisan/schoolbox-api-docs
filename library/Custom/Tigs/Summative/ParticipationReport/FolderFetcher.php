@@ -56,7 +56,7 @@ class FolderFetcher
      *   search all participation records
      * * the same query is done in `findForStudent` and `findYearGroupFolder`
      *
-     * @var array<int, array<string, GenericCollection<Folder\Model>>
+     * @var array<int, array<string, GenericCollection<Folder\Model>>>
      */
     private array $folderCache = [];
 
