@@ -29,9 +29,11 @@ class Module extends BaseModule
         $this->register('GET', '/audit/listOfRoles', 'listOfRoles', $isAlaress);
         $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
         $this->register('GET', '/audit/listOfYearLevels', 'listOfYearLevels', $isAlaress);
-        $this->register('GET', '/audit/listOfHouses', 'listOfYearLevels', $isAlaress);
-        $this->register('GET', '/audit/servicePermissions', 'listOfYearLevels', $isAlaress);
-        $this->register('GET', '/audit/listOfSuperusers', 'listOfYearLevels', $isAlaress);
+        $this->register('GET', '/audit/listOfHouses', 'listOfHouses', $isAlaress);
+        $this->register('GET', '/audit/servicePermissions', 'servicePermissions', $isAlaress);
+        $this->register('GET', '/audit/listOfSuperusers', 'listOfSuperusers', $isAlaress);
+        // LMS Fundamental Audits
+        $this->register('GET', '/audit/gradeGroups', 'gradeGroups', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);

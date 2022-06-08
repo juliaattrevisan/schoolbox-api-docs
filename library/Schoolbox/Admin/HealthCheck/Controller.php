@@ -438,4 +438,33 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfSuperusers.csv');
     }
+
+    public function lms()
+    {
+        $this->taskDHelper->addSource('user', 'gradeGroups');
+
+    }
+
+    /**
+     * USER
+     * gradeGroups.csv
+     */
+    public function gradeGroups()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            sgg.name as 'Grade Group',
+            sg.lower_bound as 'Lower Bound',
+            sg.raw_grade as 'Normalised Result',
+            sg.caption as 'Caption'
+        FROM
+            submission_grade sg
+        LEFT JOIN
+            submission_grade_group sgg ON sg.submission_grade_group_id = sgg.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'gradeGroups.csv');
+    }
 }
