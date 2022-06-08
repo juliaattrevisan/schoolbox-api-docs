@@ -7,7 +7,6 @@ use Aura\Router\Router;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\AssessmentAudit;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
@@ -16,10 +15,15 @@ class Controller extends Base
 {
     private TaskD $taskDHelper;
     private Jwt $tokenBuilder;
+
     /**
      * Constructor
      *
-     * @param Jwt $tokenBuilder
+     * @param Jwt            $tokenBuilder
+     * @param IConfigLoader  $config
+     * @param Router         $router
+     * @param MessageFactory $messageFactory
+     * @param Producer       $producer
      */
     public function __construct(
         Jwt $tokenBuilder,
@@ -118,16 +122,15 @@ class Controller extends Base
      */
     public function uxui()
     {
-        $this->taskDHelper->addSource('uxui', 'TopMenuReport');
-        $this->taskDHelper->addSource('uxui', 'SideMenuReport');
-
+        $this->taskDHelper->addSource('uxui', 'topMenuReport');
+        $this->taskDHelper->addSource('uxui', 'sideMenuReport');
     }
 
     /**
      * UXUI
      * Top Menu Report.csv
      */
-    public function TopMenuReport()
+    public function topMenuReport()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("SELECT
@@ -162,7 +165,7 @@ class Controller extends Base
      * UXUI
      * Side Menu Report .csv
      */
-    public function SideMenuReport()
+    public function sideMenuReport()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
