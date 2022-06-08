@@ -34,6 +34,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/listOfSuperusers', 'listOfSuperusers', $isAlaress);
         // LMS Fundamental Audits
         $this->register('GET', '/audit/gradeGroups', 'gradeGroups', $isAlaress);
+        $this->register('GET', '/audit/academicPeriods', 'academicPeriods', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);

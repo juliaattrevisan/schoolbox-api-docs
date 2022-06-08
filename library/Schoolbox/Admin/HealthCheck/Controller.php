@@ -442,11 +442,12 @@ class Controller extends Base
     public function lms()
     {
         $this->taskDHelper->addSource('user', 'gradeGroups');
+        $this->taskDHelper->addSource('user', 'academicPeriods');
 
     }
 
     /**
-     * USER
+     * LMS
      * gradeGroups.csv
      */
     public function gradeGroups()
@@ -466,5 +467,26 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'gradeGroups.csv');
+    }
+
+    /**
+     * LMS
+     * academicPeriods.csv
+     */
+    public function academicPeriods()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            title as 'Academic Period Name',
+            start as 'Start Date',
+            display_finish 'End Date',
+            IF(archived, 'Yes', 'No') as 'Archived?'
+        FROM
+            term;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'academicPeriods.csv');
     }
 }
