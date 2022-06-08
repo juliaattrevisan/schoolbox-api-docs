@@ -12,6 +12,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Zip\Folder;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -35,11 +36,14 @@ if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::
     error(ErrorMapper::ERROR_CATEGORY_DELETED);
 }
 
-$zip = new Folder(
+/** @var FilesystemProxy $filesystemProxy */
+$filesystemProxy = $kernel->get('filesystem.storageProxy');
+$zip             = new Folder(
     $folder,
     $_SESSION['user'],
     $access,
     FolderMapper::getInstance(),
     FileMapper::getInstance(),
+    $filesystemProxy,
 );
 $zip->sendZip();
