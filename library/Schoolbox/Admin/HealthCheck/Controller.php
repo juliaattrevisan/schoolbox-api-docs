@@ -15,8 +15,8 @@ class Controller extends Base
      */
     private const FILENAME_MAX_LENGTH = 250;
 
-    private Helper $helper;
-    private Jwt $tokenBuilder;
+    private TaskD $helper;
+    private Jwt   $tokenBuilder;
     /**
      * Constructor
      *
@@ -42,7 +42,7 @@ class Controller extends Base
      */
     public function getAudit()
     {
-        $this->helper = new Helper(
+        $this->helper = new TaskD(
             $this->tokenBuilder,
             $this->getConfigLoader(),
             $this->getRouter(),

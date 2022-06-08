@@ -14,7 +14,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Scrub;
 
-class Helper
+class TaskD
 {
     /**
      * Max length for filenames: anything longer causes issues on upload.
