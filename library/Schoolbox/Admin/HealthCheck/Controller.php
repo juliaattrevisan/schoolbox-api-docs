@@ -77,7 +77,6 @@ class Controller extends Base
 
             //the report name looks to be valid, lets add it to the list
             $this->$report();
-
         }
 
         //after looping through all reports, send them all to here...
@@ -132,28 +131,28 @@ class Controller extends Base
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("SELECT
-    mt.text as 'Icon Name',
-    mt.title as 'Tooltip',
-    mt.url as 'Destination URL',
-    lc.name as 'Campus',
-    (SELECT
-        group_concat(g.name)
-    FROM `groups` g
-    LEFT JOIN
-        menu_top_role mtr ON mtr.menu_top_id = mt.id
-    WHERE
-        mtr.role_id = g.id
-    AND
-        g.deleted_at IS NULL
-    ) as 'Role'
-FROM
-    menu_top mt
-LEFT JOIN
-    menu_top_campus mtc on mtc.menu_top_id = mt.id
-LEFT JOIN
-    luCampus lc on mtc.campus_id = lc.id
-ORDER BY
-    sort_order asc; ");
+            mt.text as 'Icon Name',
+            mt.title as 'Tooltip',
+            mt.url as 'Destination URL',
+            lc.name as 'Campus',
+            (SELECT
+                group_concat(g.name)
+            FROM `groups` g
+            LEFT JOIN
+                menu_top_role mtr ON mtr.menu_top_id = mt.id
+            WHERE
+                mtr.role_id = g.id
+            AND
+                g.deleted_at IS NULL
+            ) as 'Role'
+        FROM
+            menu_top mt
+        LEFT JOIN
+            menu_top_campus mtc on mtc.menu_top_id = mt.id
+        LEFT JOIN
+            luCampus lc on mtc.campus_id = lc.id
+        ORDER BY
+            sort_order asc; ");
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'TopMenuReport.csv');
