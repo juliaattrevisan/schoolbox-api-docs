@@ -258,6 +258,7 @@ class Controller extends Base
     public function user()
     {
         $this->taskDHelper->addSource('user', 'listOfRoles');
+        $this->taskDHelper->addSource('user', 'listOfCampuses');
     }
 
     /**
@@ -285,5 +286,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfRoles.csv');
+    }
+    /**
+     * USER
+     * listOfCampuses.csv
+     */
+    public function listOfCampuses()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            c.NAME   AS 'Campus Name',
+            Count(*) AS 'User Count'
+        FROM
+            luCampus c
+        JOIN
+            userCampus uc ON c.id = uc.campus
+        JOIN
+            user u ON uc.uid = u.id
+        WHERE
+            u.deleted_at IS NULL
+        GROUP BY
+            c.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'listOfCampuses.csv');
     }
 }

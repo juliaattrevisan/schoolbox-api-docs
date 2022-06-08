@@ -27,6 +27,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', new Rule\IsSchoolboxAdmin());
         // User Management Audits
         $this->register('GET', '/audit/listOfRoles', 'listOfRoles', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', new Rule\IsSchoolboxAdmin());
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', new Rule\IsSchoolboxAdmin());
     }
