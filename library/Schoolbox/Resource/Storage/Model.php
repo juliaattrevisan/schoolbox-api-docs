@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
+use BadMethodCallException;
 use Config;
 use League\Flysystem\File;
 use League\Flysystem\FileNotFoundException;
@@ -70,7 +71,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function exists()
     {
-        return parent::exists();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**

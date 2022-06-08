@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\File;
 
+use BadMethodCallException;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\File\Mimetype;
@@ -181,7 +182,7 @@ trait StorableTrait
      */
     public function exists()
     {
-        return $this->storage->exists();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
