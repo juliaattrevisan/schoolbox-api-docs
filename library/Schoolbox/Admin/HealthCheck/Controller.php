@@ -120,6 +120,7 @@ class Controller extends Base
     public function uxui()
     {
         $this->taskDHelper->addSource('uxui', 'TopMenuReport');
+        $this->taskDHelper->addSource('uxui', 'SideMenuReport');
 
     }
 
@@ -156,5 +157,44 @@ ORDER BY
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'TopMenuReport.csv');
+    }
+
+    /**
+     * UXUI
+     * Side Menu Report .csv
+     */
+    public function SideMenuReport()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ms.title as 'Side Menu Item',
+            ms.url as 'URL',
+            lc.name as 'Campus',
+            (SELECT
+                group_concat(g.name)
+            FROM
+                `groups` g
+            LEFT JOIN
+                menu_side_role msr on msr.menu_side_id = ms.id
+            WHERE
+                msr.role_id = g.id
+            AND
+                g.deleted_at IS NULL
+            ) AS 'Role'
+        FROM
+            menu_side ms
+        LEFT JOIN
+            menu_side_campus msc on msc.menu_side_id = ms.id
+        LEFT JOIN
+            luCampus lc on msc.campus_id = lc.id
+        GROUP BY
+            ms.title, ms.url
+        ORDER BY
+            ms.title, lc.name;
+            ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'SideMenuReport.csv');
     }
 }
