@@ -19,17 +19,18 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $this->register('GET', '/audit', 'getAudit', new Rule\IsSchoolboxAdmin());
-        $this->register('GET', '/audit/assessmentAudit', 'assessmentAudit', new Rule\IsSchoolboxAdmin());
+        $isAlaress = new Rule\IsSchoolboxAdmin();
+        $this->register('GET', '/audit', 'getAudit', $isAlaress);
+        $this->register('GET', '/audit/assessmentAudit', 'assessmentAudit', $isAlaress);
         // UXUI Audits
-        $this->register('GET', '/audit/topMenuReport', 'topMenuReport', new Rule\IsSchoolboxAdmin());
-        $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', new Rule\IsSchoolboxAdmin());
-        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/topMenuReport', 'topMenuReport', $isAlaress);
+        $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', $isAlaress);
+        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
         // User Management Audits
-        $this->register('GET', '/audit/listOfRoles', 'listOfRoles', new Rule\IsSchoolboxAdmin());
-        $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/listOfRoles', 'listOfRoles', $isAlaress);
+        $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
         // Common Audits
-        $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
     }
 
     /**
