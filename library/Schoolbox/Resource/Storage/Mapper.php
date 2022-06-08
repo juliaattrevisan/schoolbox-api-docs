@@ -423,17 +423,8 @@ class Mapper extends BaseMapper implements Receiver
     public function getManager()
     {
         if ($this->manager === null) {
-            $factory = new FilesystemFactory();
-
-            /** @var Sanitizer\ISanitizer $sanitizer  */
-            $sanitizer     = self::getDi()->get('storage.sanitizer');
-            $this->manager = new Manager(
-                $factory->build($this->config_loader->get('storage_dir')),
-                new Alaress_Byte_Format(),
-                $sanitizer
-            );
+            $this->manager = self::getDi()->get('filesystem.mountManager');
         }
-
         return $this->manager;
     }
 
