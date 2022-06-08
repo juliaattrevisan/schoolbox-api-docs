@@ -517,6 +517,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      *
      * @see Mapper::getManager(), Manager::getFilesystem()
      *
+     * @deprecated remove once this no longer inherits File
+     *
      * @return array
      */
     public function __sleep()
@@ -529,6 +531,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
 
     /**
      * On wakeup, resurrect the filesystem that was not serialized in `__sleep`.
+     *
+     * @deprecated remove once this no longer inherits File
      */
     public function __wakeup()
     {
