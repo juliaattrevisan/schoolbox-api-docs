@@ -27,6 +27,7 @@ use Schoolbox\Instance;
 use Schoolbox\Mapper as SchoolboxMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use SplFileInfo;
 use Throwable;
 
@@ -249,7 +250,7 @@ class Worker extends CliTool\App
         bool $retryFailed,
     ): void {
         $hash      = $hashObject->getHash();
-        $processor = new Image\Processor($hashObject, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
+        $processor = new Image\Processor($hashObject, $this->filesystemProxy, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
 
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.

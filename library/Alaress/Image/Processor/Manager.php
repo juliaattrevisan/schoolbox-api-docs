@@ -26,6 +26,7 @@ use RuntimeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External as SchoolboxExternal;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -177,6 +178,9 @@ class Manager
     private array $requiresMutexCache = [];
 
     /**
+     * Constructor
+     *
+     * @param FilesystemProxy $filesystemProxy
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
      * @param int             $workerCount     Max number of concurrent workers
@@ -187,6 +191,7 @@ class Manager
      * @param ClientInterface $redis
      */
     public function __construct(
+        private readonly FilesystemProxy $filesystemProxy,
         int $timeInterval,
         int $imageCountLimit,
         int $workerCount,
