@@ -175,7 +175,8 @@ trait StorableTrait
     /**
      * Check whether the file exists.
      *
-     * @inherited from Flysystem\File
+     * @deprecated replace usages with `FilesystemProxy::fileExists`
+     *
      * @return bool
      */
     public function exists()
@@ -186,7 +187,8 @@ trait StorableTrait
     /**
      * Read the file.
      *
-     * @inherited from Flysystem\File
+     * @deprecated replace usages with `FilesystemProxy::read`
+     *
      * @return string file contents
      */
     public function read()
@@ -197,7 +199,8 @@ trait StorableTrait
     /**
      * Read the file as a stream.
      *
-     * @inherited from Flysystem\File
+     * @deprecated replace usages with `FilesystemProxy::readStream`
+     *
      * @return resource file stream
      */
     public function readStream()
@@ -208,7 +211,8 @@ trait StorableTrait
     /**
      * Get this file's filesystem.
      *
-     * @inherited from Flysystem\File
+     * @deprecated remove usages, use filesystem proxy instead
+     *
      * @return FilesystemInterface
      */
     public function getFilesystem()
@@ -219,7 +223,8 @@ trait StorableTrait
     /**
      * Get the path to the file on its filesystem.
      *
-     * @inherited from Flysystem\File
+     * @deprecated remove usages
+     *
      * @return string
      */
     public function getPath()
