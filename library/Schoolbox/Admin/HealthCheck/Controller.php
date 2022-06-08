@@ -51,7 +51,7 @@ class Controller extends Base
         );
 
         //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessmentAudit'];
+        $validReports = ['assessmentAudit', 'homepageTemplates'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
@@ -101,5 +101,22 @@ class Controller extends Base
         $assessmentAudit = new AssessmentAudit($folderMapper, $this->getDi()->get('databaseInternal'), $this->getConfigLoader()->get('site_school_code'));
         $assessmentAudit->getAssessmentAudit($folderMapper->findById(0));
         exit(1);
+    }
+
+    /**
+     * URL for getting the list of homepage templates, and returns a csv object
+     */
+    public function homepageTemplates()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("SELECT
+                name AS 'Homepage Templates'
+            FROM
+                homepageTemplate
+            ORDER BY
+                name ASC; ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'HomepageTempates.csv');
     }
 }

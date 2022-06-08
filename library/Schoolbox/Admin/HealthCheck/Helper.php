@@ -2,16 +2,16 @@
 
 namespace Schoolbox\Admin\HealthCheck;
 
-use Alaress\Database\Statement\Query\IQuery;
+use PDOStatement;
 
 class Helper
 {
     /**
      * converts a db query to an associated array object
-     * @param IQuery $query
+     * @param PDOStatement $query
      * @return array
      */
-    public function queryToArray(IQuery $query)
+    public function queryToArray(PDOStatement $query)
     {
         $outputArray = [];
         while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
@@ -35,11 +35,11 @@ class Helper
     /**
      * converts a db query to a csv return
      * will build the csv headers
-     * @param IQuery $query
+     * @param PDOStatement $query
      * @param string $filename
      * @return void
      */
-    public function queryToCSV(IQuery $query, string $filename)
+    public function queryToCSV(PDOStatement $query, string $filename)
     {
         header('Content-type: text/csv; charset=utf-8');
         header("Content-Disposition: attachment; filename=\"$filename\"");
