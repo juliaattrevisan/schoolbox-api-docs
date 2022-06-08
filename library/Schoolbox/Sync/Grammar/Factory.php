@@ -156,7 +156,10 @@ class Factory
      *               * conditions: a list of conditions
      *               * effects:    a list of effects
      *               * negate:     whether the condition is to be negated
-     *
+     * @throws OutOfBoundsException if a condition's type couldn't be found
+     * @throws OutOfRangeException  if an effect or condition couldn't be built
+     * @noinspection PhpDocMissingThrowsInspection this should only throw the
+     *               above two exception types
      */
     protected function translateRuleModelToAddableRule(Rule $rule)
     {
@@ -166,18 +169,61 @@ class Factory
             'negate' => false
         ];
 
+        $i              = 1;
+        $firstException = null;
         foreach ($rule->getConditions() as $condition) {
-            $result['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
+            try {
+                $result['conditions'][] = $this->buildCondition(
+                    $condition->getConditionType()->getName(),
+                    $condition->getArguments(),
+                );
+            } catch (OutOfBoundsException | OutOfRangeException $e) {
+                // Log that this condition is broken,
+                // and provide information on how to fix it before rethrowing
+                $this->log->error(
+                    sprintf(
+                        'Condition %d in rule "%s" is invalid: consider removing the condition',
+                        $i,
+                        $rule->getName() ?: ('Rule ' . $rule->getId()),
+                    ),
+                );
+                $firstException ??= $e;
+            } finally {
+                $i++;
+            }
         }
 
         foreach ($rule->getEffects() as $effect) {
-            $result['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
+            try {
+                $result['effects'][$effect->getUserProperty()] = $this->buildEffect(
+                    $effect->getEffectType()->getName(),
+                    $effect->getArguments()
+                );
+            } catch (OutOfBoundsException | OutOfRangeException $e) {
+                // Log that this effect is broken,
+                // and provide information on how to fix it before rethrowing
+                $this->log->error(
+                    sprintf(
+                        'Effect on "%s" in rule "%s" is invalid: consider removing the rule',
+                        $effect->getUserProperty(),
+                        $rule->getName() ?: ('Rule ' . $rule->getId()),
+                    ),
+                );
+                $firstException ??= $e;
+            }
         }
 
         /* You can negate entire rules but we don't do it in UPS
          */
 //        $result['negate'] = isset($rule['negate']) && $rule['negate'];
 
+        // Was an exception raised? throw if so
+        if ($firstException) {
+            // Logically this cannot be anything other than
+            // OutOfBoundsException or OutOfRangeException
+            /** @noinspection PhpUnhandledExceptionInspection */
+            throw $firstException;
+        }
         return $result;
     }
 
