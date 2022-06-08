@@ -21,7 +21,7 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 $config = ConfigLoader::getInstance();
 /** @var \Schoolbox\User $currentUser */
-$user = $_SESSION['user'];
+$currentUser = $_SESSION['user'];
 
 $groupHandler = new Group();
 $externalHandler = new External_User();
@@ -29,7 +29,7 @@ $userMapper = UserMapper::getInstance();
 
 if ($config->get('mail_enable') == 1) {
     //check if the user actually has an email
-    if ('' === trim((string)$user->getEmail())) {
+    if ('' === trim((string)$currentUser->getEmail())) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EMAIL_NOT_FOUND);
     }
     // Parse out list of emails passed
@@ -62,9 +62,9 @@ if ($config->get('mail_enable') == 1) {
             $addressLists['bcc'] = array_merge($addressLists['bcc'], $externalHandler->getParentEmails($studentExternalIds));
         }
         if (in_array('students', $selectedGroups)) {
-            $users = $userMapper->findByColumn('synergy_id', $studentExternalIds);
-            foreach ($users as $user) {
-                $addressLists['bcc'][] = $user->getFormattedEmailDisplay();
+            $students = $userMapper->findByColumn('synergy_id', $studentExternalIds);
+            foreach ($students as $student) {
+                $addressLists['bcc'][] = $student->getFormattedEmailDisplay();
             }
         }
         if (in_array('housemasters', $selectedGroups)) {
@@ -111,10 +111,10 @@ if ($config->get('mail_enable') == 1) {
              * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
              * by the system rather than the human
              */
-            if (!in_array($_SESSION['user']->getEmail(), $replyToEmailAddresses, true)) {
+            if (!in_array($currentUser->getEmail(), $replyToEmailAddresses, true)) {
                 $addressLists[$type][] = Mailer::buildAddress(
-                    $_SESSION['user']->getEmail(),
-                    $_SESSION['user']->getFullName()
+                    $currentUser->getEmail(),
+                    $currentUser->getFullName()
                 );
             }
         }
@@ -129,20 +129,22 @@ if ($config->get('mail_enable') == 1) {
     $emailBody = '';
     $signature = $config->get('email_signature');
     $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
+    $emailParts = explode('@', $currentUser->getEmail(), 2);
     if (
-        $config->get('mail_address') === explode('@', $user->getEmail())[1] &&
+        count($emailParts) === 2 &&
+        $config->get('mail_address') === $emailParts[1] &&
         '' !== trim($signature)
     ) {
         //build signature, and replace requested tokens
         $emailBody = "<p>&nbsp;</p><p>---</p>" . $tokenReplacer->replace(
             $signature,
             [
-                '[title]'     => $user->getTitle(),
-                '[firstname]' => $user->getFirstname(),
-                '[surname]'   => $user->getLastname(), //surname as that is the language we are using in admin user modify
-                '[fullname]'  => $user->getFullName(),
-                '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $user->getEmail(), $user->getEmail()),
-                '[position]'  => $user->getPositionTitle(),
+                '[title]'     => $currentUser->getTitle(),
+                '[firstname]' => $currentUser->getFirstname(),
+                '[surname]'   => $currentUser->getLastname(), //surname as that is the language we are using in admin user modify
+                '[fullname]'  => $currentUser->getFullName(),
+                '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $currentUser->getEmail(), $currentUser->getEmail()),
+                '[position]'  => $currentUser->getPositionTitle(),
             ]
         );
     }
