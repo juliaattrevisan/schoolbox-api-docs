@@ -87,13 +87,15 @@ class Processor
     /**
      * Constructor
      *
-     * @param Storage\Model $file
-     * @param string        $cacheKey
-     * @param ITransform    $transform
-     * @param int           $imageMagickTimeout
+     * @param Storage\Model           $file
+     * @param Storage\FilesystemProxy $filesystemProxy
+     * @param string                  $cacheKey
+     * @param ITransform              $transform
+     * @param int                     $imageMagickTimeout
      */
     public function __construct(
         Storage\Model $file,
+        private readonly Storage\FilesystemProxy $filesystemProxy,
         string $cacheKey,
         ITransform $transform,
         int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT

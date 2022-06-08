@@ -16,6 +16,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -129,8 +130,11 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $imageProcessor = new Image\Processor(
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    $imageProcessor  = new Image\Processor(
         Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
+        $filesystemProxy,
         $cache_key,
         $transform
     );

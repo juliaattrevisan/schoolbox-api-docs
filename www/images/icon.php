@@ -14,6 +14,7 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -36,10 +37,17 @@ $size = (int)str_replace('square', '', $size);
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $iconTransform  = new Image\Transformation\Icon();
-    $transform      = $iconTransform->retrieve($icon, $size);
-    $cache_key      = $iconTransform->getCacheKey($icon, $size);
-    $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
+    $iconTransform   = new Image\Transformation\Icon();
+    $transform       = $iconTransform->retrieve($icon, $size);
+    $cache_key       = $iconTransform->getCacheKey($icon, $size);
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    $imageProcessor  = new Image\Processor(
+        LocalFS::getStorageModel(WEB_root, $path),
+        $filesystemProxy,
+        $cache_key,
+        $transform,
+    );
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();

@@ -19,6 +19,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -80,8 +81,10 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $transform      = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
-    $imageProcessor = new Processor($resource, $cacheKey, $transform);
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    $transform       = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $imageProcessor  = new Processor($resource, $filesystemProxy, $cacheKey, $transform);
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();

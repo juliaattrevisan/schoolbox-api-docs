@@ -20,6 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -103,7 +104,14 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    $processor       = new Image\Processor(
+        $storage,
+        $filesystemProxy,
+        $transforms->getCacheKey($size),
+        $transforms->retrieve($size),
+    );
     $processor->load()->stream();
 } catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();

@@ -18,6 +18,7 @@ use League\Flysystem\Filesystem;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -92,7 +93,14 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve($_GET['size'] ?? ''));
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    $image           = new Image\Processor(
+        $storageModel,
+        $filesystemProxy,
+        $cacheKey,
+        $portrait->retrieve($_GET['size'] ?? ''),
+    );
     $image->load()->stream();
 } catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
     // This transformation is already being processed.

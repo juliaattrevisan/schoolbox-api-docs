@@ -12,6 +12,7 @@ use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -76,7 +77,9 @@ if (isset($_GET['key'])) {
 
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
-$processor    = new Image\Processor($storageModel, $cacheKey, $transform);
+/** @var FilesystemProxy $filesystemProxy */
+$filesystemProxy = $kernel->get('filesystem.storageProxy');
+$processor       = new Image\Processor($storageModel, $filesystemProxy, $cacheKey, $transform);
 try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
