@@ -21,10 +21,14 @@ class Module extends BaseModule
     {
         $this->register('GET', '/audit', 'getAudit', new Rule\IsSchoolboxAdmin());
         $this->register('GET', '/audit/assessmentAudit', 'assessmentAudit', new Rule\IsSchoolboxAdmin());
-        $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', new Rule\IsSchoolboxAdmin());
+        // UXUI Audits
         $this->register('GET', '/audit/topMenuReport', 'topMenuReport', new Rule\IsSchoolboxAdmin());
         $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', new Rule\IsSchoolboxAdmin());
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', new Rule\IsSchoolboxAdmin());
+        // User Management Audits
+        $this->register('GET', '/audit/listOfRoles', 'listOfRoles', new Rule\IsSchoolboxAdmin());
+        // Common Audits
+        $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', new Rule\IsSchoolboxAdmin());
     }
 
     /**

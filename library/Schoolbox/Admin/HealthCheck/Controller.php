@@ -58,7 +58,7 @@ class Controller extends Base
     public function getAudit()
     {
         //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessmentAudit', 'uxui'];
+        $validReports = ['assessmentAudit', 'uxui', 'user', 'lms', 'community'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
@@ -250,5 +250,40 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'ResourceBrowser.csv');
+    }
+
+    /**
+     * return list of reports for user management audit
+     */
+    public function user()
+    {
+        $this->taskDHelper->addSource('user', 'listOfRoles');
+    }
+
+    /**
+     * USER
+     * listOfRoles.csv
+     */
+    public function listOfRoles()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.NAME   AS 'Role Name',
+            Count(*) AS 'User Count'
+        FROM
+            groups g
+        JOIN
+            user u ON g.id = u.group_id
+        WHERE
+            u.deleted_at IS NULL
+        AND
+            g.deleted_at IS NULL
+        GROUP BY
+            g.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'listOfRoles.csv');
     }
 }
