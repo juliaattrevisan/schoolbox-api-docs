@@ -199,4 +199,54 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'SideMenuReport.csv');
     }
+
+    /**
+     * UXUI
+     * resourceBrowser .csv
+     */
+    public function resourceBrowser()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            f.name AS 'Folder/Page Name',
+            f.id AS  'Folder/Page ID',
+            IF(hc.template, 'homepage', 'folder') AS 'Page Status',
+            (SELECT
+                  IF(group_concat(g.name) IS NULL, '', group_concat(g.name))
+              FROM
+                 `groups` g
+                     join
+                 perms p on g.id = p.gid
+              WHERE
+                     p.type = 1
+               AND
+                 g.deleted_at is null
+               AND f.id = p.cid
+            ) as 'Read',
+            (SELECT
+                 IF(group_concat(g.name) IS NULL, '', group_concat(g.name))
+              FROM
+                 `groups` g
+              JOIN
+                 perms p on g.id = p.gid
+              WHERE
+                     p.type = 2
+              AND
+                 g.deleted_at is null
+              AND f.id = p.cid
+            ) AS 'Write'
+        FROM
+            folder f
+        LEFT JOIN
+            homepage_config hc ON f.id = hc.cid
+        WHERE
+                f.parent = 0
+          AND
+            f.deleted_at IS NULL;
+            ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'ResourceBrowser.csv');
+    }
 }

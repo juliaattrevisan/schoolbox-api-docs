@@ -24,6 +24,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', new Rule\IsSchoolboxAdmin());
         $this->register('GET', '/audit/topMenuReport', 'topMenuReport', new Rule\IsSchoolboxAdmin());
         $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', new Rule\IsSchoolboxAdmin());
+        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', new Rule\IsSchoolboxAdmin());
     }
 
     /**
