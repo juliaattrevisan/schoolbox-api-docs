@@ -17,6 +17,8 @@ $app = new class extends CliTool\App {
         /** @var Storage\Mapper $storageMapper */
         $storageMapper = $this->getDi()->get('mapperFactory')->get(Storage\Mapper::class);
 
+        /** @var Storage\FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
         $okCount = 0;
         $errorCount = 0;
 
@@ -24,7 +26,7 @@ $app = new class extends CliTool\App {
         $files    = $storageMapper->findAll();
         $countAll = $files->count();
         foreach ($files as $file) {
-            if ($file->exists()) {
+            if ($filesystemProxy->fileExists($file)) {
                 if ($file->getFilesystem()->getSize($file->getPath()) === $file->getSize()) {
                     $okCount++;
                     $this->getLogger()->info("File OK $okCount/$errorCount/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
