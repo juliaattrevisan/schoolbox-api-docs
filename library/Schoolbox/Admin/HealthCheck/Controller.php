@@ -260,6 +260,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'listOfRoles');
         $this->taskDHelper->addSource('user', 'listOfCampuses');
         $this->taskDHelper->addSource('user', 'listOfYearLevels');
+        $this->taskDHelper->addSource('user', 'listOfYearHouses');
     }
 
     /**
@@ -288,6 +289,7 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfRoles.csv');
     }
+
     /**
      * USER
      * listOfCampuses.csv
@@ -314,6 +316,7 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfCampuses.csv');
     }
+
     /**
      * USER
      * listOfYearLevels.csv
@@ -339,5 +342,32 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfYearLevels.csv');
+    }
+
+    /**
+     * USER
+     * listOfHouses.csv
+     */
+    public function listOfHouses()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            h.house AS 'House Level',
+            Count(*) AS 'User Count'
+        FROM
+            house h
+        JOIN
+            user u ON h.id = u.house
+        WHERE
+            h.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            h.house;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'listOfHouses.csv');
     }
 }
