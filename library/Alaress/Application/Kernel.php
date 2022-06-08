@@ -46,6 +46,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
+use League\Flysystem\FilesystemInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -142,7 +143,11 @@ use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\HashGenerator;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
@@ -1807,6 +1812,54 @@ abstract class Kernel
                 );
             })
         );
+
+
+        // Filesystems
+        $di->set(
+            'filesystem.mountManager',
+            $di->lazy(
+                function () use ($di, $config) {
+                    /** @var Sanitizer\ISanitizer $sanitizer  */
+                    $sanitizer = $di->get('storage.sanitizer');
+                    return new Manager(
+                        (new FilesystemFactory())->build($config->get('storage_dir')),
+                        new \Alaress_Byte_Format(),
+                        $sanitizer
+                    );
+                }
+            )
+        );
+        $di->set(
+            'filesystem.storage',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Manager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getStorageFilesystem();
+                }
+            )
+        );
+        $di->set(
+            'filesystem.storageProxy',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var FilesystemInterface $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new FilesystemProxy($storage, new HashGenerator());
+                }
+            )
+        );
+        $di->set(
+            'filesystem.temp',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Manager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getTempFilesystem();
+                }
+            )
+        );
+
 
         return $di;
     }
