@@ -156,7 +156,10 @@ class Factory
      *               * conditions: a list of conditions
      *               * effects:    a list of effects
      *               * negate:     whether the condition is to be negated
-     *
+     * @throws OutOfBoundsException if a condition's type couldn't be found
+     * @throws OutOfRangeException  if an effect or condition couldn't be built
+     * @noinspection PhpDocMissingThrowsInspection this should only throw the
+     *               above two exception types
      */
     protected function translateRuleModelToAddableRule(Rule $rule)
     {
@@ -166,7 +169,8 @@ class Factory
             'negate' => false
         ];
 
-        $i = 1;
+        $i              = 1;
+        $firstException = null;
         foreach ($rule->getConditions() as $condition) {
             try {
                 $result['conditions'][] = $this->buildCondition(
@@ -183,7 +187,7 @@ class Factory
                         $rule->getName() ?: ('Rule ' . $rule->getId()),
                     ),
                 );
-                throw $e;
+                $firstException ??= $e;
             } finally {
                 $i++;
             }
@@ -205,7 +209,7 @@ class Factory
                         $rule->getName() ?: ('Rule ' . $rule->getId()),
                     ),
                 );
-                throw $e;
+                $firstException ??= $e;
             }
         }
 
@@ -213,6 +217,13 @@ class Factory
          */
 //        $result['negate'] = isset($rule['negate']) && $rule['negate'];
 
+        // Was an exception raised? throw if so
+        if ($firstException) {
+            // Logically this cannot be anything other than
+            // OutOfBoundsException or OutOfRangeException
+            /** @noinspection PhpUnhandledExceptionInspection */
+            throw $firstException;
+        }
         return $result;
     }
 
