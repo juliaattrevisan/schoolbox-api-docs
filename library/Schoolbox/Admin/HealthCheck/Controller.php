@@ -124,6 +124,8 @@ class Controller extends Base
     {
         $this->taskDHelper->addSource('uxui', 'topMenuReport');
         $this->taskDHelper->addSource('uxui', 'sideMenuReport');
+        $this->taskDHelper->addSource('uxui', 'resourceBrowser');
+        $this->taskDHelper->addSource('uxui', 'homepageTemplates');
     }
 
     /**
