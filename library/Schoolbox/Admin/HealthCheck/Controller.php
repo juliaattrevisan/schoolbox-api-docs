@@ -262,6 +262,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'listOfYearLevels');
         $this->taskDHelper->addSource('user', 'listOfYearHouses');
         $this->taskDHelper->addSource('user', 'servicePermissions');
+        $this->taskDHelper->addSource('user', 'listOfSuperusers');
     }
 
     /**
@@ -413,5 +414,27 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'servicePermissions.csv');
+    }
+
+    /**
+     * USER
+     * listOfSuperusers.csv
+     */
+    public function listOfSuperusers()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat(u.firstname,' ',u.lastname,' (',u.id,')') AS 'Superuser'
+        FROM
+            superusers s
+        JOIN
+            user u ON s.id = u.id
+        WHERE
+            u.deleted_at IS NULL;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'listOfSuperusers.csv');
     }
 }
