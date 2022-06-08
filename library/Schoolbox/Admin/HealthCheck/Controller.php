@@ -261,6 +261,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'listOfCampuses');
         $this->taskDHelper->addSource('user', 'listOfYearLevels');
         $this->taskDHelper->addSource('user', 'listOfYearHouses');
+        $this->taskDHelper->addSource('user', 'servicePermissions');
     }
 
     /**
@@ -369,5 +370,48 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfHouses.csv');
+    }
+
+    /**
+     * USER
+     * servicePermissions.csv
+     */
+    public function servicePermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ls.NAME AS 'Service Type',
+            CASE
+                WHEN ua.service = '2' THEN lc.NAME
+                WHEN ua.service = '6' THEN h.NAME
+                ELSE 'N/A'
+            END AS 'Service',
+            CASE type
+                WHEN '3' THEN 'Moderator'
+                WHEN '2' THEN 'Write'
+                WHEN '1' THEN 'Read'
+            END AS 'Permission',
+            Concat(u.firstname,' ',u.lastname,' (',u.id,')') AS 'User'
+        FROM
+            userAccess ua
+        LEFT JOIN
+            lu_service ls ON ua.service = ls.id
+        LEFT JOIN
+            user u ON ua.uid = u.id
+        LEFT JOIN
+            luCampus lc ON ua.sid = lc.id
+        LEFT JOIN
+            luResidentialHouse h ON ua.sid = h.id
+        WHERE
+            NOT service = '1'
+        AND
+            u.deleted_at IS NULL
+        ORDER BY
+            ua.service,ua.type,ua.sid,u.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'servicePermissions.csv');
     }
 }

@@ -31,6 +31,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
         $this->register('GET', '/audit/listOfYearLevels', 'listOfYearLevels', $isAlaress);
         $this->register('GET', '/audit/listOfHouses', 'listOfYearLevels', $isAlaress);
+        $this->register('GET', '/audit/servicePermissions', 'listOfYearLevels', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
     }
