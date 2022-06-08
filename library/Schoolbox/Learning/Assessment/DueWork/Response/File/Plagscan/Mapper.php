@@ -142,7 +142,7 @@ class Mapper extends \Schoolbox\Mapper
          */
         if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
             try {
-                $this->connector = new Connector($plagscanClientId, $plagscanApiKey);
+                $this->connector = new Connector($plagscanClientId, $plagscanApiKey, self::getDi()->get('filesystem.storageProxy'));
             } catch (\DomainException $e) {
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
