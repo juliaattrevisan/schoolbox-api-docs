@@ -3,29 +3,40 @@
 namespace Schoolbox\Admin\HealthCheck;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Router;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\AssessmentAudit;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 
 class Controller extends Base
 {
-    /**
-     * Max length for filenames: anything longer causes issues on upload.
-     */
-    private const FILENAME_MAX_LENGTH = 250;
-
-    private TaskD $helper;
-    private Jwt   $tokenBuilder;
+    private TaskD $taskDHelper;
+    private Jwt $tokenBuilder;
     /**
      * Constructor
      *
      * @param Jwt $tokenBuilder
      */
     public function __construct(
-        Jwt $tokenBuilder
+        Jwt $tokenBuilder,
+        IConfigLoader $config,
+        Router $router,
+        MessageFactory $messageFactory,
+        Producer $producer
     ) {
         $this->tokenBuilder = $tokenBuilder;
+
+        $this->taskDHelper = new TaskD(
+            $this->tokenBuilder,
+            $config,
+            $router,
+            $messageFactory,
+            $producer
+        );
     }
 
     /**
@@ -42,23 +53,14 @@ class Controller extends Base
      */
     public function getAudit()
     {
-        $this->helper = new TaskD(
-            $this->tokenBuilder,
-            $this->getConfigLoader(),
-            $this->getRouter(),
-            $this->getDi()->get('taskd.messageFactory'),
-            $this->getDi()->get('taskd.messageProducer')
-        );
-
         //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessmentAudit', 'homepageTemplates'];
+        $validReports = ['assessmentAudit', 'uxui'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
             $query = 'all';
         }
-        //helper URL object
-        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
         //array of reports to be run
         $reports = explode(',', $query);
         //if query is 'all' lets add all options in
@@ -74,19 +76,12 @@ class Controller extends Base
             }
 
             //the report name looks to be valid, lets add it to the list
+            $this->$report();
 
-            $sources[] = [
-                'filename' => sprintf(
-                    "%s/%s.csv",
-                    $report,
-                    mb_substr($report, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
-                ),
-                'source'     => $urlBase->setPath($this->router->generate('adminHealthCheckExport.' . $report))->toString(),
-            ];
         }
 
         //after looping through all reports, send them all to here...
-        $this->helper->sendToTaskD('HealthCheck', $sources, $this->getUser());
+        $this->taskDHelper->sendToTaskD('HealthCheck', $this->getUser());
 
         //redirect home
         $this->getResponse()->redirect->found('/');
@@ -97,10 +92,9 @@ class Controller extends Base
      */
     public function assessmentAudit()
     {
-        $folderMapper = FolderMapper::getInstance();
-        $assessmentAudit = new AssessmentAudit($folderMapper, $this->getDi()->get('databaseInternal'), $this->getConfigLoader()->get('site_school_code'));
-        $assessmentAudit->getAssessmentAudit($folderMapper->findById(0));
-        exit(1);
+        //helper URL object
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+        $this->taskDHelper->addSource('assessmentAudit', 'assessmentAudit', $urlBase->setPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0]))->toString());
     }
 
     /**
@@ -118,5 +112,14 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'HomepageTempates.csv');
+    }
+
+    /**
+     * return list of reports for uxui
+     */
+    public function uxui()
+    {
+        $this->taskDHelper->addSource('uxui', 'homepageTemplates');
+
     }
 }

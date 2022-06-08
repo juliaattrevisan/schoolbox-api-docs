@@ -27,6 +27,8 @@ class TaskD
     private MessageFactory $messageFactory;
     private Producer $producer;
 
+    private array $sources;
+
     /**
      * Constructor
      *
@@ -47,9 +49,22 @@ class TaskD
         $this->producer = $producer;
     }
 
-
-    public function sendToTaskD(string $filename, array $files, User $user)
+    /**
+     * @param string     $filename
+     * @param User       $user
+     * @param array      $sources
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     */
+    public function sendToTaskD(string $filename, User $user, array $sources = [])
     {
+        //if passed sources is empty, grab class saved
+        if (empty($sources)) {
+            $sources = $this->sources;
+        }
         $escapedTitle = Scrub::filename(trim($filename));
         // Get the taskd context, and send
 
@@ -63,7 +78,7 @@ class TaskD
             'download-pages',
             [
                 'token'     => $this->tokenBuilder->generate($user),
-                'content'   => $files,
+                'content'   => $sources,
                 'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                 'gotenberg' => [
                     'url' => $this->config->get(ConfigMapper::NAME_GOTENBERG_HOST),
@@ -82,5 +97,24 @@ class TaskD
         );
 
         $this->producer->send($message);
+    }
+
+    public function addSource(string $folder, string $report, ?string $url = null)
+    {
+        //helper URL object
+        $urlBase = (new \Schoolbox\Url\Factory($this->config))->buildFullyQualified();
+
+        //if passed url is null, generate a local url
+        if (null === $url) {
+            $url = $urlBase->setPath($this->router->generate('adminHealthCheckExport.' . $report))->toString();
+        }
+        $this->sources[] = [
+            'filename' => sprintf(
+                "%s/%s.csv",
+                $folder,
+                mb_substr($report, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
+            ),
+            'source'     => $url,
+        ];
     }
 }
