@@ -191,7 +191,7 @@ class Manager
      * @param ClientInterface $redis
      */
     public function __construct(
-        private readonly FilesystemProxy $filesystemProxy,
+        private FilesystemProxy $filesystemProxy,
         int $timeInterval,
         int $imageCountLimit,
         int $workerCount,

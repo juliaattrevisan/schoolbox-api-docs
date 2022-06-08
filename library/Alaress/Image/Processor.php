@@ -95,7 +95,7 @@ class Processor
      */
     public function __construct(
         Storage\Model $file,
-        private readonly Storage\FilesystemProxy $filesystemProxy,
+        private Storage\FilesystemProxy $filesystemProxy,
         string $cacheKey,
         ITransform $transform,
         int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
