@@ -241,10 +241,16 @@ class Factory
 
         $actualCount = count($arguments);
 
-        if ($expectedCount != $actualCount) {
+        // Be a little more lenient with parameter counts;
+        // only error if there's too few parameters provided.
+        if ($expectedCount > $actualCount) {
             throw new OutOfRangeException("$classname expects $expectedCount arguments, got $actualCount");
         }
 
+        // If there's too many parameters, just ignore the excess.
+        // (Somehow, skip rules are getting created with a parameter which they
+        // should not have.)
+        $arguments = array_slice($arguments, 0, $expectedCount);
         try {
             return $rc->newInstanceArgs($arguments);
         } catch (TypeError $e) {
