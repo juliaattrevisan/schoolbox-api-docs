@@ -301,10 +301,6 @@ class Kernel extends WebKernelAbstract
             }
         }
 
-        // Has session expired? Assume no user here then, but that should probably
-        // be handled in authenticator.
-        $params = [];
-
         // The preloader may throw an exception.
         // It should be ignored if the user is not authorized,
         // because we always want a login screen.
@@ -312,8 +308,10 @@ class Kernel extends WebKernelAbstract
         $preloader          = $this->di->get('preloader');
         $preloaderException = null;
 
+        // Augment route params with preloader params, if possible
+        $params = $route->params;
         try {
-            $params = $preloader->check($route->name, $route->params);
+            $params = $preloader->check($route->name, $params);
         } catch (\Exception $preloaderException) {
             // Store the preloader exception for later
         }
