@@ -295,7 +295,7 @@ class Processor
         // will generate a Warning that will be handled by the kernel's registered Error handler, which will throw an
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
-        if (!$this->file->exists()) {
+        if (!$this->filesystemProxy->fileExists($this->file)) {
             throw new FileNotFoundException("File not found");
         }
 
