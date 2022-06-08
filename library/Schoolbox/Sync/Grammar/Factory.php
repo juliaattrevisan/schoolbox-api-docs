@@ -166,12 +166,47 @@ class Factory
             'negate' => false
         ];
 
+        $i = 1;
         foreach ($rule->getConditions() as $condition) {
-            $result['conditions'][] = $this->buildCondition($condition->getConditionType()->getName(), $condition->getArguments());
+            try {
+                $result['conditions'][] = $this->buildCondition(
+                    $condition->getConditionType()->getName(),
+                    $condition->getArguments(),
+                );
+            } catch (OutOfBoundsException | OutOfRangeException $e) {
+                // Log that this condition is broken,
+                // and provide information on how to fix it before rethrowing
+                $this->log->error(
+                    sprintf(
+                        'Condition %d in rule "%s" is invalid: consider removing the condition',
+                        $i,
+                        $rule->getName() ?: ('Rule ' . $rule->getId()),
+                    ),
+                );
+                throw $e;
+            } finally {
+                $i++;
+            }
         }
 
         foreach ($rule->getEffects() as $effect) {
-            $result['effects'][$effect->getUserProperty()] = $this->buildEffect($effect->getEffectType()->getName(), $effect->getArguments());
+            try {
+                $result['effects'][$effect->getUserProperty()] = $this->buildEffect(
+                    $effect->getEffectType()->getName(),
+                    $effect->getArguments()
+                );
+            } catch (OutOfBoundsException | OutOfRangeException $e) {
+                // Log that this effect is broken,
+                // and provide information on how to fix it before rethrowing
+                $this->log->error(
+                    sprintf(
+                        'Effect on "%s" in rule "%s" is invalid: consider removing the rule',
+                        $effect->getUserProperty(),
+                        $rule->getName() ?: ('Rule ' . $rule->getId()),
+                    ),
+                );
+                throw $e;
+            }
         }
 
         /* You can negate entire rules but we don't do it in UPS
