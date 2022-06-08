@@ -29,6 +29,7 @@ class Module extends BaseModule
         // User Management Audits
         $this->register('GET', '/audit/listOfRoles', 'listOfRoles', $isAlaress);
         $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
+        $this->register('GET', '/audit/listOfYearLevels', 'listOfYearLevels', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
     }

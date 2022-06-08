@@ -259,6 +259,7 @@ class Controller extends Base
     {
         $this->taskDHelper->addSource('user', 'listOfRoles');
         $this->taskDHelper->addSource('user', 'listOfCampuses');
+        $this->taskDHelper->addSource('user', 'listOfYearLevels');
     }
 
     /**
@@ -312,5 +313,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfCampuses.csv');
+    }
+    /**
+     * USER
+     * listOfYearLevels.csv
+     */
+    public function listOfYearLevels()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            lyl.NAME AS 'Year Level',
+            Count(*) AS 'User Count'
+        FROM
+            lu_year_level lyl
+        JOIN
+            user u ON lyl.id = u.year_id
+        WHERE
+            lyl.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            lyl.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'listOfYearLevels.csv');
     }
 }
