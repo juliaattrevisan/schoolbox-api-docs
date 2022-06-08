@@ -25,7 +25,6 @@ class Module extends BaseModule
         // UXUI Audits
         $this->register('GET', '/audit/topMenuReport', 'topMenuReport', $isAlaress);
         $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', $isAlaress);
-        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
         // User Management Audits
         $this->register('GET', '/audit/listOfRoles', 'listOfRoles', $isAlaress);
         $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
@@ -35,6 +34,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/listOfSuperusers', 'listOfYearLevels', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
+        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
     }
 
     /**

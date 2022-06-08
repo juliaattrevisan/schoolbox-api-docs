@@ -263,6 +263,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'listOfYearHouses');
         $this->taskDHelper->addSource('user', 'servicePermissions');
         $this->taskDHelper->addSource('user', 'listOfSuperusers');
+        $this->taskDHelper->addSource('user', 'resourceBrowser');
     }
 
     /**
