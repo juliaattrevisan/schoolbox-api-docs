@@ -149,7 +149,7 @@ class Connector
         $postData = [
             [
                 'name'     => 'fileUpload',
-                'contents' => $submissionFile->getStorage()->read(),
+                'contents' => $this->filesystemProxy->read($submissionFile),
                 'filename' => $filename,
             ],
         ];

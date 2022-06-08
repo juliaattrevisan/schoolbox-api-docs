@@ -316,7 +316,7 @@ class Processor
             },
             E_WARNING
         );
-        $imageSize = getimagesizefromstring($this->file->read());
+        $imageSize = getimagesizefromstring($this->filesystemProxy->read($this->file));
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
         if ($imageSize === false) {
