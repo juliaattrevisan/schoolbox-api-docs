@@ -3,10 +3,10 @@ config:
   site_plan : { value : PortalPlus }
 
   #Modules
-  boarder_leave_enabled: {value: false, edit: false}
+  boarder_leave_enabled: {edit: true}
   teams_enabled: {edit: true,}
   curriculum_tagging_enabled: {value: false, edit: false}
-  eotc_enabled: {value: false, edit: false}
+  eotc_enabled: {edit: true}
   learning_moments_enabled : {edit: true}
   badges_enabled : {value: false, edit: false}
   fixtures_enabled: {edit: true}
@@ -37,16 +37,16 @@ config:
   pastoral_action_enable: {hide: true}
 
   #Boarder Leave
-  debug_email_address: {hide: true}
-  boarder_leave_parent_notification_enabled: {hide: true}
-  terms_and_conditions: {hide: true}
-  boarder_breakfast_start: {hide: true}
-  boarder_breakfast_end: {hide: true}
-  boarder_lunch_start: {hide: true}
-  boarder_lunch_end: {hide: true}
-  boarder_dinner_start: {hide: true}
-  boarder_dinner_end: {hide: true}
-  boarder_leave_creation_threshold: {hide: true}
+  debug_email_address: {hide: false}
+  boarder_leave_parent_notification_enabled: {hide: false}
+  terms_and_conditions: {hide: false}
+  boarder_breakfast_start: {hide: false}
+  boarder_breakfast_end: {hide: false}
+  boarder_lunch_start: {hide: false}
+  boarder_lunch_end: {hide: false}
+  boarder_dinner_start: {hide: false}
+  boarder_dinner_end: {hide: false}
+  boarder_leave_creation_threshold: {hide: false}
 
   #Learning Moments
   evidence_parent_create: {hide: false}
