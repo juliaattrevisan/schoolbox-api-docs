@@ -443,6 +443,7 @@ class Controller extends Base
     {
         $this->taskDHelper->addSource('user', 'gradeGroups');
         $this->taskDHelper->addSource('user', 'academicPeriods');
+        $this->taskDHelper->addSource('user', 'workTypes');
 
     }
 
@@ -488,5 +489,29 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'academicPeriods.csv');
+    }
+
+    /**
+     * LMS
+     * workTypes.csv
+     */
+    public function workTypes()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            NAME as 'Work Type',
+            IF(show_on_grades_page, 'Yes', 'No') as 'Display on Grades Page',
+            IF(staff_or_instructor_visible_only, 'Yes', 'No') as 'Visible to Staff only'
+        FROM
+            lu_work_type
+        WHERE
+            deleted_at IS NULL
+        ORDER BY
+            sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'workTypes.csv');
     }
 }
