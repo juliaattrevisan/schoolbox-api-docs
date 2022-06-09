@@ -161,6 +161,16 @@
         flex-grow: 2;
     }
 
+    /* These appear the name of the assessment and the comment
+     * as little subtitle sort of things
+     */
+    .worktype {
+        color: grey;
+        font-size: 0.75rem;
+        font-style: italic;
+        margin-top: 0.25rem;
+    }
+
     /* A grade value, suitable for Folder Title
      * or for an assessment.
      *
@@ -174,6 +184,44 @@
         padding-right: 0.75rem;
         min-width: 8rem;
         text-align: right;
+    }
+
+    /* Comments, if provided, are generally plaintext but could be ckeditor stuff
+     * Wrap it in a div anyway. If the comment is very long, padding-right stops
+     * it from being directly adjacent to the grade if it exists
+     */
+    .comment {
+        margin: 1rem 0;
+        padding-right: 2rem;
+    }
+
+    /* This .feedback-assessment-container element typically has a bottom border for a
+     * separator and a page break in the media query
+     */
+    .feedback-assessment-container {
+        border-bottom: 1px solid #ccc;
+    }
+
+    /* The width of the Assessment and Grade columns
+     * Using small-* names is going to be misleading - specify them explicitly
+     */
+    .feedback-assessment {
+        display: flex;
+        padding: 0.75rem;
+    }
+
+    /* Assessment name lives here
+     */
+    .feedback-assessment .left {
+        flex-grow: 2;
+    }
+
+    /* The grade already has a right-margin from container element .feedback-assessment
+     * and also doesn't have a border or anything - resetting padding here mostly centers
+     * the content int his little flexbox place
+     */
+    .feedback-assessment .grade {
+        padding-right: 0;
     }
 
     /* The summary section is anticipated to be a less-detailed overview of what
@@ -220,53 +268,6 @@
         font-size: 1rem;
     }
 
-    /* This .feedback-assessment-container element typically has a bottom border for a
-     * separator and a page break in the media query
-     */
-    .feedback-assessment-container {
-        border-bottom: 1px solid #ccc;
-    }
-
-    /* The width of the Assessment and Grade columns
-     * Using small-* names is going to be misleading - specify them explicitly
-     */
-    .feedback-assessment {
-        display: flex;
-        padding: 0.75rem;
-    }
-
-    /* Assessment name lives here
-     */
-    .feedback-assessment .left {
-        flex-grow: 2;
-    }
-
-    /* The grade already has a right-margin from container element .feedback-assessment
-     * and also doesn't have a border or anything - resetting padding here mostly centers
-     * the content int his little flexbox place
-     */
-    .feedback-assessment .grade {
-        padding-right: 0;
-    }
-
-    /* These appear the name of the assessment and the comment
-     * as little subtitle sort of things
-     */
-    .worktype {
-        color: grey;
-        font-size: 0.75rem;
-        font-style: italic;
-        margin-top: 0.25rem;
-    }
-
-    /* Comments, if provided, are generally plaintext but could be ckeditor stuff
-     * Wrap it in a div anyway. If the comment is very long, padding-right stops
-     * it from being directly adjacent to the grade if it exists
-     */
-    .comment {
-        margin: 1rem 0;
-        padding-right: 2rem;
-    }
 
     /* Push the rubric grid down a little bit, if it exists
      */
