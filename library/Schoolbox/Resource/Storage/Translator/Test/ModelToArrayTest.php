@@ -9,15 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Translator\Test;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use Proxy\Test\ProxyServerTestConfigLoader;
-use RuntimeException;
-use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\TestLoader;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Translator\ModelToArray;
@@ -34,17 +27,8 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        // Mock filesystem: throws an exception on asking for file's size
-        // This will be caught and cause getSize to return null
-        /** @var Filesystem|MockObject $filesystem */
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem
-             ->method('getSize')
-             ->willThrowException(new RuntimeException());
-
         yield 'empty fields' => [
-            (new Model())
-                ->setFilesystem($filesystem),
+            new Model(),
             [
                 'hash'   => null,
                 'mime'   => '',
