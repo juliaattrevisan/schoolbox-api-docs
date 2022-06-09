@@ -64,6 +64,15 @@ class Definition implements IStrategy
 
 
     /**
+     * This is the config setting for date_local
+     * It's used by the Nat Picker in the optional TASS Academic Periods area
+     *
+     * @var string
+     */
+    private string $dateLocalFormat;
+    
+
+    /**
      * The "perform" flag from the cli tool
      *
      * @var bool
@@ -107,6 +116,7 @@ class Definition implements IStrategy
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Api[]                 $api
+     * @param string                $dateLocalFormat
      * @param Lookup                $lookup
      * @param Registry              $timetableRegistry
      * @param Registry              $cycleRegistry
@@ -117,6 +127,7 @@ class Definition implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        string $dateLocalFormat,
         Lookup $lookup,
         Registry $timetableRegistry,
         Registry $cycleRegistry,
@@ -126,6 +137,7 @@ class Definition implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->dateLocalFormat = $dateLocalFormat;
         $this->lookup = $lookup;
 
         /* Store timetableCache and cycleCache in a registry object that its output
@@ -461,8 +473,8 @@ class Definition implements IStrategy
 
             /* Check Alaress Date Format boundaries
              */
-            $startDate = (new \Alaress_Date_Format($start, \Alaress_Date_Format::FORMAT_DATE_PICKER_NO_TIME))->startOfDay();
-            $endDate = (new \Alaress_Date_Format($end, \Alaress_Date_Format::FORMAT_DATE_PICKER_NO_TIME))->endOfDay();
+            $startDate = (new \Alaress_Date_Format($start, $this->dateLocalFormat))->startOfDay();
+            $endDate = (new \Alaress_Date_Format($end, $this->dateLocalFormat))->endOfDay();
 
             /* If it is, return that $pair's index+1, since:
              *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
