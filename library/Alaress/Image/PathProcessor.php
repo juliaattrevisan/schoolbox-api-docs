@@ -442,6 +442,9 @@ class PathProcessor
      * This method will re-raise the exception that would've been raised if that
      * config was off.
      *
+     * TODO remove once Flysystem3 migration is done?
+     *      I don't think it returns false on file not found.
+     *
      * @param string $path
      * @return resource
      * @throws Flysystem\FileNotFoundException if the stream was not found
