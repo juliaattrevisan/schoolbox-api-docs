@@ -176,11 +176,25 @@
         text-align: right;
     }
 
-    /* For some reason there's a thing called a summary result
-     * and another thing called a subject result, but the demo
-     * data makes them all seem the same data? Unsure of the
-     * functional difference between the two
+    /* The summary section is anticipated to be a less-detailed overview of what
+     * a student accomplished for this reporting period. Functionally identical to the
+     * Class Pages section, but their intents are different. The styling is specifically
+     * so that content flows contiguously; no page breaks, no obtrusive folder highlighting,
+     * and indenting to show the hierarchy of assessments. The rubric grid, while
+     * optional, probably shouldn't be activated for this section. We don't stop people
+     * from doing that though.
      */
+    .summary .folder-title {
+        border-bottom: 1px solid #ccc;
+        margin-top: 2rem;
+        margin-left: 2rem;
+        padding-left: 0;
+    }
+
+    .summary .feedback-assessment-container {
+        border: 0;
+        margin-left: 4rem;
+    }
 
     /* A folder title in the class summary section
      */
