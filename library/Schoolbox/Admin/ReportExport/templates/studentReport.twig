@@ -268,7 +268,6 @@
         font-size: 1rem;
     }
 
-
     /* Push the rubric grid down a little bit, if it exists
      */
     .rubric-wrap {
@@ -378,14 +377,15 @@
         }
 
         /* Folder titles in the Class Pages section always get a page break
-         * They always start on a new page. In the Summary section, they just
-         * render one underneath the other, contiguously
+         * They always start on a new page.
          */
-        .folder-title.class-page {
+        .class-page {
             page-break-before: always; /* ensure each individual subject goes on new page */
         }
 
         /* Summary always starts on a separate page
+         * Folders In the Summary section will just
+         * render one underneath the other, contiguously
          */
         .summary {
             page-break-before: always;
