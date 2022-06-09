@@ -271,22 +271,23 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     }
 
     /**
+     * TODO check usages to verify this is not being called to generate the hash
+     *
      * @return string
      */
     public function getHash()
     {
-        // Calculate hash if not known
-
-        if (!$this->hash) {
-            // Don't calc it if no path
-
-            if (!$this->path) {
-                return null;
-            }
-
-            // TODO hash generator should be injected
-            $this->setHash((new HashGenerator())->generateHash($this->readStream()));
-        }
+//        // Calculate hash if not known
+//
+//        if (!$this->hash) {
+//            // Don't calc it if no path
+//
+//            if (!$this->path) {
+//                return null;
+//            }
+//
+//            $this->setHash((new HashGenerator())->generateHash($this->readStream()));
+//        }
 
         return $this->hash;
     }
