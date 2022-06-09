@@ -276,6 +276,7 @@ class Module extends BaseModule
                 $this->injector->get('user'),
                 new ScrubAdapter(),
             ),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 

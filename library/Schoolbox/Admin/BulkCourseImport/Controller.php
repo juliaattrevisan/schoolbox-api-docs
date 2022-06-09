@@ -23,6 +23,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -61,7 +62,8 @@ class Controller extends Base
         UnitSpecification\Mapper $unitSpecificationMapper,
         ImportFactory $importFactory,
         MapperProxy $assessmentMapperProxy,
-        ErrorMapper $errorMapper
+        ErrorMapper $errorMapper,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->folderMapper               = $folderMapper;
         $this->userMapper                 = $userMapper;
@@ -129,7 +131,7 @@ class Controller extends Base
             $this->unitSpecificationMapper,
             $this->importFactory,
             $this->assessmentMapperProxy,
-        ))->import($csvFile->readStream(), $defaultDueTime, $performMode);
+        ))->import($this->filesystemProxy->readStream($csvFile), $defaultDueTime, $performMode);
 
         // Render this thing out
         $this->getResponse()->content->set(

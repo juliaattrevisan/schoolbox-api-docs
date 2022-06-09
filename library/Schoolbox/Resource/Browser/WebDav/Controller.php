@@ -43,7 +43,7 @@ class Controller extends FullAccessController
                 $baseFile,
                 [
                     'name'     => $file->getBasename(),
-                    'resource' => $file->readStream(),
+                    'resource' => $this->filesystemProxy->readStream($file),
                 ]
             );
         }

@@ -65,16 +65,18 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param RoleMapper             $roleMapper
-     * @param ErrorMapper            $errorMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param IConfigLoader          $configLoader
+     * @param RoleMapper                       $roleMapper
+     * @param ErrorMapper                      $errorMapper
+     * @param HomepageTemplateMapper           $homepageTemplateMapper
+     * @param IConfigLoader                    $configLoader
+     * @param Resource\Storage\FilesystemProxy $filesystemProxy
      */
     public function __construct(
         RoleMapper $roleMapper,
         ErrorMapper $errorMapper,
         HomepageTemplateMapper $homepageTemplateMapper,
-        IConfigLoader $configLoader
+        IConfigLoader $configLoader,
+        private Resource\Storage\FilesystemProxy $filesystemProxy,
     ) {
         $this->roleMapper             = $roleMapper;
         $this->errorMapper            = $errorMapper;
@@ -141,7 +143,7 @@ class Controller extends Base
         $csvFile = $factory->build($post->get('attachment'))->getFirst();
 
         $bulkHandler = new Bulk_Folder(
-            $csvFile->readStream(),
+            $this->filesystemProxy->readStream($csvFile),
             (int)$post->get('template'),
             $post->get('groupPerm'),
             (bool)$post->get('inherit')

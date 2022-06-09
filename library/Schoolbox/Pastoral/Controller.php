@@ -57,6 +57,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Search\Results;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -175,6 +176,7 @@ class Controller extends Base
      * @param Audience\Mapper                 $audienceMapper
      * @param TermMapper                      $termMapper
      * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
+     * @param FilesystemProxy                 $filesystemProxy
      */
     public function __construct(
         IConfigLoader $config,
@@ -201,7 +203,8 @@ class Controller extends Base
         PastoralReportMapper $pastoralReportMapper,
         Audience\Mapper $audienceMapper,
         TermMapper $termMapper,
-        Comment\Translator\ModelToArray $pastoralCommentTranslator
+        Comment\Translator\ModelToArray $pastoralCommentTranslator,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->config                     = $config;
         $this->errorMapper                = $errorMapper;
@@ -1359,7 +1362,7 @@ class Controller extends Base
         header("Content-Ranges: none");
         header("Content-Disposition: $attach filename=\"$basename\"");
         header("Content-Length: " . $attachment->getStorage()->getSize());
-        fpassthru($attachment->getStorage()->readStream());
+        fpassthru($this->filesystemProxy->readStream($attachment->getStorage()));
 
         exit;
     }

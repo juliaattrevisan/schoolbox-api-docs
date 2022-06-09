@@ -58,6 +58,7 @@ class Module extends BaseModule
         return new Controller(
             new ImporterFactory(),
             $this->getConfig(),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 

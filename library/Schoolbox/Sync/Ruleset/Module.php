@@ -88,6 +88,9 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(MimetypeMapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(MimetypeMapper::class),
+            $this->injector->get('filesystem.storageProxy'),
+        );
     }
 }

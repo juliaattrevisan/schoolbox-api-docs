@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Browser;
 use Alaress\Web\Controller\Base as BaseController;
 use InvalidArgumentException;
 use Schoolbox\Collection;
-use Schoolbox\Config;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
@@ -31,7 +30,6 @@ use Schoolbox\UserMapper;
  */
 abstract class AbstractController extends BaseController
 {
-
     /**
      * @var AbstractTreeBuilder
      */
@@ -71,6 +69,11 @@ abstract class AbstractController extends BaseController
      * @var string
      */
     protected $nodeType;
+
+    /**
+     * File system proxy, for loading file contents.
+     */
+    protected Resource\Storage\FilesystemProxy $filesystemProxy;
 
     /**
      * Which tab gets highlighted?
@@ -615,6 +618,16 @@ abstract class AbstractController extends BaseController
     public function setNodeType($nodeType)
     {
         $this->nodeType = $nodeType;
+        return $this;
+    }
+
+    /**
+     * @param Resource\Storage\FilesystemProxy $filesystemProxy
+     * @return self
+     */
+    public function setFilesystemProxy(Resource\Storage\FilesystemProxy $filesystemProxy): self
+    {
+        $this->filesystemProxy = $filesystemProxy;
         return $this;
     }
 }
