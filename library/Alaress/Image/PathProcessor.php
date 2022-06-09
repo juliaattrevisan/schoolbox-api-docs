@@ -169,7 +169,7 @@ class PathProcessor
                     true,
                     $mimetype,
                     $transformModel->getSize(),
-                    self::readStream($this->storageFilesystem, $transformPath),
+                    $this->readStream($transformPath),
                 );
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
@@ -198,7 +198,7 @@ class PathProcessor
                 true,
                 $mimetype,
                 $transformSize,
-                self::readStream($this->storageFilesystem, $transformPath),
+                $this->readStream($transformPath),
             );
         }
 
@@ -266,7 +266,7 @@ class PathProcessor
             false,
             $mimetype,
             $transformModel->getSize(),
-            self::readStream($this->storageFilesystem, $transformPath)
+            $this->readStream($transformPath),
         );
     }
 
@@ -442,14 +442,13 @@ class PathProcessor
      * This method will re-raise the exception that would've been raised if that
      * config was off.
      *
-     * @param Flysystem\FilesystemInterface $fileSystem
-     * @param string                        $path
+     * @param string $path
      * @return resource
      * @throws Flysystem\FileNotFoundException if the stream was not found
      */
-    private static function readStream(Flysystem\FilesystemInterface $fileSystem, string $path)
+    private function readStream(string $path)
     {
-        $stream = $fileSystem->readStream($path);
+        $stream = $this->storageFilesystem->readStream($path);
         if (!is_resource($stream)) {
             throw new Flysystem\FileNotFoundException($path);
         }
