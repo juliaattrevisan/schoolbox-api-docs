@@ -1,9 +1,8 @@
 <?php
 
 /**
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Alaress\Image;
@@ -37,8 +36,13 @@ use UnexpectedValueException;
 
 /**
  * Transforms images and persists to database + disk.
+ *
+ * This is a direct copy of `\Alaress\Image\Processor`: however, it accepts a
+ * path and filesystem in its constructor, instead of a storage model and
+ * filesystem proxy. This is because objects other than storage objects may be
+ * processed.
  */
-class Processor
+class PathProcessor
 {
     /**
      * Number of seconds that ImageMagick should timeout after by default.
@@ -87,13 +91,6 @@ class Processor
     /**
      * Constructor
      *
-     * TODO this should take a path and a standard filesystem, rather than a
-     *      storage and a filesystem proxy.
-     *
-     * This is because it could work with either:
-     * * a file on disk
-     * * a file in storage
-     *
      * @param Storage\Model           $file
      * @param Storage\FilesystemProxy $filesystemProxy
      * @param string                  $cacheKey
@@ -121,7 +118,7 @@ class Processor
      *
      * @param int      $maxAttempts
      * @param null|int $retryAfter If non-null, retry any incomplete transformations older than this value (in seconds)
-     * @param bool     $permFail should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
+     * @param bool     $permFail   should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
      * @return StreamableFile
      * @throws DomainException
      * @throws Flysystem\FileNotFoundException
@@ -154,9 +151,9 @@ class Processor
         }
 
         // TODO SA-8354 inject dependencies
-        $mountManager   = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
-        $fileSystem     = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $transformPath  = Storage\Manager::getTransformPath($this->file->getHash(), $this->cacheKey);
+        $mountManager  = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
+        $fileSystem    = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
+        $transformPath = Storage\Manager::getTransformPath($this->file->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
@@ -217,13 +214,13 @@ class Processor
         try {
             $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
         } catch (
-            FileNotFoundException |
-            FileExistsException |
-            ImagineException\OutOfBoundsException |
-            ImagineException\RuntimeException |
-            OverflowException |
-            LayeredNonGifException |
-            CorruptImageException $e
+        FileNotFoundException|
+        FileExistsException|
+        ImagineException\OutOfBoundsException|
+        ImagineException\RuntimeException|
+        OverflowException|
+        LayeredNonGifException|
+        CorruptImageException $e
         ) {
             if ($permFail) {
                 /**
@@ -328,7 +325,7 @@ class Processor
             },
             E_WARNING
         );
-        $imageSize = getimagesizefromstring($this->filesystemProxy->read($this->file));
+        $imageSize       = getimagesizefromstring($this->filesystemProxy->read($this->file));
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
         if ($imageSize === false) {
