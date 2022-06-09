@@ -87,7 +87,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function readStream()
     {
-        return parent::readStream();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
