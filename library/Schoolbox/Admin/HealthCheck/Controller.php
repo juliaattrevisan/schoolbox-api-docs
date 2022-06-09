@@ -446,6 +446,8 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'workTypes');
         $this->taskDHelper->addSource('user', 'submissionStates');
         $this->taskDHelper->addSource('user', 'lmsSettings');
+        $this->taskDHelper->addSource('user', 'yearLevelPermissions');
+        $this->taskDHelper->addSource('user', 'homepageTemplates');
     }
 
     /**
@@ -515,7 +517,7 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'workTypes.csv');
     }
-    
+
     /**
      * LMS
      * submissionStates.csv
@@ -619,5 +621,42 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'lmsSettings.csv');
+    }
+
+    /**
+     * LMS
+     * yearLevelPermissions.csv
+     */
+    public function yearLevelPermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+               name                                       AS 'Name',
+                CASE overall_grade
+                    WHEN '1' THEN 'Standard'
+                    WHEN '-1' THEN 'None'
+                    WHEN '-2' THEN 'Percentage'
+                ELSE 'Not Selected'
+               END                                        AS 'Overall Grade',
+               if(show_overall_grade, 'Yes', 'No')        AS 'Show Overall Grade',
+               if(display_grade_page, 'Yes', 'No')        AS 'Display Grade Page',
+               if(display_assessment_grade, 'Yes', 'No')  AS 'Display Assessment Grade',
+               if(display_rubric_grade, 'Yes', 'No')      AS 'Display Rubric Grade',
+               if(display_capability_grade, 'Yes', 'No')  AS 'Display Capability Grade',
+               if(display_progression_grade, 'Yes', 'No') AS 'Display Progression Grade',
+               if(show_rubric_points, 'Yes', 'No')        AS 'Show Rubric Points',
+               if(lms_cohort_comparison, 'Yes', 'No')     AS 'Display Cohort Comparison',
+               if(learning_moments_enabled, 'Yes', 'No')  AS 'Learning Moments Enabled'
+        FROM
+            lu_year_level
+        WHERE
+            deleted_at IS NULL
+        ORDER
+            BY sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'yearLevelPermissions.csv');
     }
 }
