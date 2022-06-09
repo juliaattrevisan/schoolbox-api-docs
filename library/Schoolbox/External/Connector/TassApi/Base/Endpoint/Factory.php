@@ -62,6 +62,15 @@ class Factory
 
 
     /**
+     * This is the config setting for date_local
+     * It's used by the Nat Picker in the optional TASS Academic Periods area
+     *
+     * @var string
+     */
+    private string $dateLocalFormat;
+
+
+    /**
      * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
      * because tass doesn't treat parents independently of families.
      *
@@ -171,15 +180,18 @@ class Factory
      */
     private ClassPeriodMapper $classPeriodMapper;
 
+
     /**
      * @var bool
      */
     private bool $includePhoto;
 
+
     /**
      * @var StorageMapper
      */
     private StorageMapper $storageMapper;
+
 
     /**
      * Factory constructor.
@@ -188,6 +200,7 @@ class Factory
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $key
+     * @param string                          $dateLocalFormat
      * @param bool                            $includePhoto
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
@@ -212,6 +225,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        string $dateLocalFormat,
         bool $includePhoto,
         string $spousePrefix,
         int $addnumFather,
@@ -237,6 +251,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->dateLocalFormat = $dateLocalFormat;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
@@ -357,6 +372,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->dateLocalFormat,
                 $lookup,
                 $timetableRegistry,
                 $cycleRegistry,
