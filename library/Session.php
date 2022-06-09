@@ -293,15 +293,17 @@ class Session
         if ($host) {
             if ($ldapCaCertHash) {
                 // Copy this file to local cache somewhere (stream_dir I guess)
-                $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
-                $ldapCaCertPath = sprintf(
+                $storageMapper   = StorageMapper::getInstance();
+                $ldapCaCert      = $storageMapper->findByHash($ldapCaCertHash);
+                $filesystemProxy = $storageMapper->getStorageFilesystemProxy();
+                $ldapCaCertPath  = sprintf(
                     '%s/ldap-ca-cert-%s-%s',
                     Config::get('stream_dir'),
                     INSTANCE_ID,
                     $ldapCaCert->getHash()
                 );
                 if (!file_exists($ldapCaCertPath)) {
-                    file_put_contents($ldapCaCertPath, $ldapCaCert->read());
+                    file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
                 }
                 ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
                 ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);

@@ -418,6 +418,9 @@ class Mapper extends BaseMapper implements Receiver
     // TODO: This does not belong here, but where does it go
 
     /**
+     * @deprecated The mount manager from DI (filesystem.mountManager) should be
+     *             used instead, and injected where necessary.
+     *
      * @return Manager
      */
     public function getManager()
@@ -440,16 +443,24 @@ class Mapper extends BaseMapper implements Receiver
         return $this;
     }
 
-//    /**
-//     * Simplified method for retrieving the storage mapper's filesystem.
-//     *
-//     * This shouldn't be required long-term: the storage mapper shouldn't
-//     * necessarily need to know how files are stored.
-//     *
-//     * @return FilesystemInterface
-//     */
-//    public function getStorageFilesystem()
-//    {
-//        return $this->getManager()->getFilesystem(Manager::FS_STORAGE);
-//    }
+    /**
+     * Simplified method for retrieving a proxy for the mapper's filesystem.
+     *
+     * This shouldn't be required long-term: the storage mapper shouldn't
+     * necessarily need to know how files are stored. This is only a convenience
+     * for classes which can't easily have the filesystem proxy from the DI
+     * container injected.
+     *
+     * (Look, it's not wonderful but it IS better than having the filesystem in
+     * the model!)
+     *
+     * @deprecated The proxy filesystem from DI (filesystem.mountManager) should
+     *             be used instead, and injected where necessary.
+     *
+     * @return FilesystemProxy
+     */
+    public function getStorageFilesystemProxy()
+    {
+        return self::getDi()->get('filesystem.storageProxy');
+    }
 }
