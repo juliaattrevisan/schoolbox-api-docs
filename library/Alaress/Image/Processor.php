@@ -138,7 +138,12 @@ class Processor
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
             // Assume the stream to the base SVG exists
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $this->file->getSize(), $this->file->readStream());
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $this->file->getSize(),
+                $this->filesystemProxy->readStream($this->file),
+            );
         }
 
         // TODO SA-8354 inject dependencies
@@ -351,7 +356,7 @@ class Processor
         while (!$image) {
             try {
                 $attempts++;
-                $image = $imagine->read($this->file->readStream());
+                $image = $imagine->read($this->filesystemProxy->readStream($this->file));
             } catch (ImagineException\RuntimeException $e) {
                 if ($attempts > $maxAttempts) {
                     throw $e;
