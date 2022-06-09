@@ -37,7 +37,8 @@ $publicdir     = (new WebDavFolder(
         $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
         $kernel->get('submissionDataSource'),
         $mapperFactory->get(ErrorMapper::class),
-        new WebDavNameGenerator()
+        new WebDavNameGenerator(),
+        $kernel->get('filesystem.storageProxy'),
     )
 );
 

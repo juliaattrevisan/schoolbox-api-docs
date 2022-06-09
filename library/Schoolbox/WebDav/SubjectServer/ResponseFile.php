@@ -10,6 +10,7 @@ namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * A DAV collection representing a single file within a submission.
@@ -29,11 +30,15 @@ class ResponseFile extends DAV\File
     /**
      * Constructor
      *
-     * @param string              $name         Usually the file's name, but can be changed to be made unique
+     * @param string              $name Usually the file's name, but can be changed to be made unique
      * @param DueWorkResponseFile $responseFile
+     * @param FilesystemProxy     $filesystemProxy
      */
-    public function __construct($name, DueWorkResponseFile $responseFile)
-    {
+    public function __construct(
+        $name,
+        DueWorkResponseFile $responseFile,
+        private FilesystemProxy $filesystemProxy,
+    ) {
         $this->name         = $name;
         $this->responseFile = $responseFile;
     }
@@ -43,7 +48,7 @@ class ResponseFile extends DAV\File
      */
     public function get()
     {
-        return $this->responseFile->readStream();
+        return $this->filesystemProxy->readStream($this->responseFile);
     }
 
     /**
