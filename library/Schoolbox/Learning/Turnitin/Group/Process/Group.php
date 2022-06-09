@@ -22,13 +22,13 @@ use Schoolbox\Learning\Turnitin\LogTrait;
  * just like we do for File.php; since transmission can break at any step
  * we need a way to just force it in
  *
- * This happens by finding the Submissino Box and getting its list of files
+ * This happens by finding the Submission Box and getting its list of files
  * at runtime, then micromanaging the diff with turnitin. It does this specifically
  * to avoid bottlenecking course imports and due work modifies, which would
- * result in hammering the turnitin api and maybe desyncing files due to failures
+ * result in hammering the Turnitin api and maybe desyncing files due to failures
  * with no recourse.
  *
- * Here, it follows the same flavour as turnitin files, giving you a chance
+ * Here, it follows the same flavour as Turnitin files, giving you a chance
  * to debug and reprocess them independently of their due works etc.
  */
 class Group
@@ -79,15 +79,22 @@ class Group
 
 
     /**
+     * @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy
+     */
+    private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy;
+
+
+    /**
      * Constructor.
      *
-     * @param string                           $instanceIdentifier
-     * @param Turnitin\Api                     $api
-     * @param Turnitin\Group\Mapper            $turnitinGroupMapper
-     * @param Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper
-     * @param SubmissionBoxMapper              $submissionBoxMapper
-     * @param SubmissionBox\SingleFile\Mapper  $submissionBoxFileMapper
-     * @param LoggerInterface|null             $log
+     * @param string                                               $instanceIdentifier
+     * @param Turnitin\Api                                         $api
+     * @param Turnitin\Group\Mapper                                $turnitinGroupMapper
+     * @param Turnitin\Group\Attachment\Mapper                     $turnitinGroupAttachmentMapper
+     * @param SubmissionBoxMapper                                  $submissionBoxMapper
+     * @param SubmissionBox\SingleFile\Mapper                      $submissionBoxFileMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy
+     * @param LoggerInterface|null                                 $log
      */
     public function __construct(
         string $instanceIdentifier,
@@ -96,6 +103,7 @@ class Group
         Turnitin\Group\Attachment\Mapper $turnitinGroupAttachmentMapper,
         SubmissionBoxMapper $submissionBoxMapper,
         SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper,
+        \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         ?LoggerInterface $log = null
     ) {
         $this->instanceIdentifier = $instanceIdentifier;
@@ -104,6 +112,7 @@ class Group
         $this->turnitinGroupAttachmentMapper = $turnitinGroupAttachmentMapper;
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionBoxFileMapper = $submissionBoxFileMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->log = $log;
     }
 
@@ -175,9 +184,17 @@ class Group
                 Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
             );
 
+            $box = $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId());
+
+            /* Fish out due dates from the official Assessment table
+             */
+            $assessment = $this->assessmentMapperProxy->findById($box->getAssessmentId());
+
             $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
-                'name' => $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId())->getName(),
-                'type' => self::GROUP_TYPE
+                'name' => $box->getName(),
+                'type' => self::GROUP_TYPE,
+                'due_date' => $assessment->getDueAt()->getZuluTime(),
+                'report_generation' => Turnitin\File\Process\Transmit::REPORT_GENERATION_COLLUSION,
             ]);
 
             $turnitinGroup->setGroupId($group['id']);

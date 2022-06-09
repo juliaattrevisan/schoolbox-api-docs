@@ -1246,7 +1246,10 @@ class Controller extends Assessment\Controller
                  */
                 $instanceIdentifier = $this->getConfigLoader()->get('site_type');
 
-                $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
+                /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+                $detachedFunction = static function () use ($api, $models, $instanceIdentifier, $assessmentMapperProxy) {
                     /* Set up a record processor
                      */
                     $processor = (new Turnitin\File\Process\Transmit(
@@ -1256,7 +1259,8 @@ class Controller extends Assessment\Controller
                         Turnitin\Group\Mapper::getInstance(),
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
-                        SingleFile\Mapper::getInstance()
+                        SingleFile\Mapper::getInstance(),
+                        $assessmentMapperProxy,
                     ));
 
                     /* Shank them all up

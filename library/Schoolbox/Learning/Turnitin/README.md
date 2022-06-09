@@ -282,6 +282,16 @@ For historical additions, `turnitin_report`records experiences these five status
 
 > Historical additions takes the students' the most recent non-deleted submission in a submission box. If you made fifty submissions, Historical will only add the most recent non-deleted submission. This includes submissions with multiple files.
 
+### 4.5 Group Lister CLI Tool
+
+I made this because we were missing some fields in Turnitin. We weren't supplying them. This tool lets you see what Turnitin knows about its Groups, exposing to you the `due_date` and `report_generation` field values. It does not mutate data and therefore does not have a locking or `perform` mechanism(s). It just interrogates the third party for info.
+
+```
+vagrant ssh;
+cd /usr/share/schoolbox/tools/turnitin;
+php grouplist.php
+```
+
 ## 5 CLI Tools Appendix
 
 Here are some general statements about the cli tools. I couldn't think of a nice way to fit it all in earlier, so I'll collate them here.
