@@ -42,6 +42,7 @@ class Module extends BaseModule
         // Community Engagement Audits
         $this->register('GET', '/audit/newsTopics', 'newsTopics', $isAlaress);
         $this->register('GET', '/audit/newsServicePermissions', 'newsServicePermissions', $isAlaress);
+        $this->register('GET', '/audit/newsSettings', 'newsSettings', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);

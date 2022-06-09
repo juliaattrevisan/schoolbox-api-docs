@@ -670,6 +670,7 @@ class Controller extends Base
     {
         $this->taskDHelper->addSource('user', 'newsTopic');
         $this->taskDHelper->addSource('user', 'newsServicePermissions');
+        $this->taskDHelper->addSource('user', 'newsSettings');
     }
 
     /**
@@ -721,5 +722,34 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'newsServicePermissions.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * newsSettings.csv
+     */
+    public function newsSettings()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            title AS 'Option',
+            IF(value = 'list', 'List-Left', IF(value = 'list-reversed', 'List-Right',
+                                              IF(value = 1, 'Enabled',
+                                                IF(value = 0, 'Disabled', value
+                                                  )
+                                                )
+                                              )
+              ) AS 'Choice'
+        FROM
+            config
+        WHERE
+            configid IN ( 412, 100, 426, 101, 414, 415, 513, 514 )
+        ORDER BY
+          sequence;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'newsSettings.csv');
     }
 }
