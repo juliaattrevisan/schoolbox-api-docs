@@ -12,6 +12,7 @@ namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
 /**
@@ -31,9 +32,10 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
+     * @param ErrorMapper     $errorMapper
+     * @param FilesystemProxy $filesystemProxy
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct(ErrorMapper $errorMapper, private FilesystemProxy $filesystemProxy)
     {
         $this->errorMapper = $errorMapper;
     }
@@ -60,7 +62,7 @@ class Controller extends Base
         try {
             $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-            $response = $api->retrieveStudentPhotos($viewee);
+            $response = $api->retrieveStudentPhotos($viewee, $this->filesystemProxy);
         } catch (\RuntimeException | \DomainException $e) {
             /* RuntimeException is thrown when student doesn't have a profile pic
              * DomainException is thrown when json can't be decoded

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot\Payload;
 
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 
 /**
@@ -23,6 +25,14 @@ use Schoolbox\User;
  */
 class StudentPhoto
 {
+    /**
+     * Constructor
+     *
+     * @param FilesystemProxy $filesystemProxy
+     */
+    public function __construct(private FilesystemProxy $filesystemProxy)
+    {
+    }
 
     /**
      * Builds a payload for getting pictures with $viewee's face in them
@@ -41,7 +51,7 @@ class StudentPhoto
         }
 
         return [
-            'face_image' => base64_encode($viewee->getPortrait()->read())
+            'face_image' => base64_encode($this->filesystemProxy->read($viewee->getPortrait()))
         ];
     }
 }
