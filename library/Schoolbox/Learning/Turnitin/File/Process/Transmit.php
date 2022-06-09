@@ -21,6 +21,7 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -620,9 +621,10 @@ class Transmit
             Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING
         );
 
+        // TODO inject filesystem proxy
         $payload = [
             'filename' => $ssf->getBasename(),
-            'contents' => $ssf->read()
+            'contents' => StorageMapper::getInstance()->getStorageFilesystemProxy()->read($ssf)
         ];
 
         return $this->api->retrieve('UPLOAD', "/api/v1/submissions/{$submission['id']}/original", $payload);
