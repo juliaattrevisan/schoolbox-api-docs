@@ -105,6 +105,8 @@ HELP;
                     'Submission box %s has not been processed by Turnitin yet; it does not have a Turnitin Group identifier',
                     $group->getSubmissionBoxId()
                 ));
+
+                continue;
             }
 
             /* Pump to cli for visual inspection
