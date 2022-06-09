@@ -103,36 +103,32 @@ class Component_Instance
      */
     public function getConfigArray($compat = true)
     {
-        if (isset($this->config)) {
-            // Dead index, this is actually not a config
-            $dumb_index = $this->config->getOffset('');
+        // Dead index, this is actually not a config
+        $dumb_index = $this->config->getOffset('');
 
-            if (count($this->config) == 1 && isset($dumb_index)) {
-                return [];
-            }
-
-            $output = [];
-
-            /** @var Component_ConfigDefinition $opt */
-            foreach ($this->config as $opt) {
-                $key = $compat ? $this->compatMap($opt->getKey()) : $opt->getKey();
-                $val = $opt->getValue();
-
-                if (!isset($val)) {
-                    $val = $opt->getDefaultValue();
-                }
-
-                $output[$key] = [
-                    'label' => $opt->getLabel(),
-                    'value' => $val,
-                    'defaultValue' => $opt->getDefaultValue(),
-                ];
-            }
-
-            return $output;
+        if (count($this->config) == 1 && isset($dumb_index)) {
+            return [];
         }
 
-        return [];
+        $output = [];
+
+        /** @var Component_ConfigDefinition $opt */
+        foreach ($this->config as $opt) {
+            $key = $compat ? $this->compatMap($opt->getKey()) : $opt->getKey();
+            $val = $opt->getValue();
+
+            if (!isset($val)) {
+                $val = $opt->getDefaultValue();
+            }
+
+            $output[$key] = [
+                'label' => $opt->getLabel(),
+                'value' => $val,
+                'defaultValue' => $opt->getDefaultValue(),
+            ];
+        }
+
+        return $output;
     }
 
     /**

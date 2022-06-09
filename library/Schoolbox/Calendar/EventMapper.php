@@ -44,7 +44,6 @@ use UnexpectedValueException;
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {
-
     /**
      * @return void
      * @throws Schoolbox\Mapper\DefinitionException
@@ -524,7 +523,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      */
     private function createSource($event)
     {
-        if ($event->getSource() != null && $event->getSource() != "") {
+        if ($event->getSource() !== null && $event->getSource() !== "") {
             $sourceMapper = EventSourceMapper::getInstance();
 
             $source = $sourceMapper->createModel();

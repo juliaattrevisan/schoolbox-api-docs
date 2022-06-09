@@ -92,7 +92,7 @@ class Model implements ISoftDeletable, IModel
     /** @var null|User Null if imported from SIS */
     private $modifiedBy;
 
-    /** @var Collection|Access\Model[] */
+    /** @var GenericCollection<Access\Model>|null */
     private $access;
 
     /** @var Collection|Comment\Model[] */
@@ -120,7 +120,7 @@ class Model implements ISoftDeletable, IModel
     public function __construct()
     {
         // TODO tighten collection types
-        $this->access                = new Collection();
+        $this->access                = new GenericCollection(Access\Model::class);
         $this->comments              = new Collection();
         $this->attachments           = new Collection();
         $this->tags                  = new Collection();
@@ -131,7 +131,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param Collection|Access\Model[] $access
+     * @param GenericCollection<Access\Model> $access
      *
      * @return self
      */
@@ -143,7 +143,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return null|GenericCollection|Access\Model[]
+     * @return GenericCollection<Access\Model>|null
      */
     public function getAccess()
     {

@@ -7,7 +7,6 @@ use Schoolbox\Database\Factory;
 
 class External_Tass_Helper
 {
-
     /**
      * Default spouse prefix
      *
@@ -78,7 +77,10 @@ class External_Tass_Helper
         $addnum_array = array_unique(explode(',', trim(Config::get('external_tass_addnum'))));
 
         foreach ($addnum_array as $value) {
-            $addnum = $addnum . ',' . $this->getDatabase()->legacyQuote(trim($value));
+            $trimValue = trim($value);
+            if ($trimValue !== '') {
+                $addnum = $addnum . ',' . $this->getDatabase()->legacyQuote($trimValue);
+            }
         }
         if (strlen($addnum) > 0) {
             $addnum = substr($addnum, 1);
@@ -134,7 +136,10 @@ class External_Tass_Helper
         $typecode_array = array_unique(explode(',', trim(Config::get('external_tass_commrules_typecode'))));
 
         foreach ($typecode_array as $value) {
-            $typecode = $typecode . ',' . $this->getDatabase()->legacyQuote(trim($value));
+            $trimValue = trim($value);
+            if ($trimValue !== '') {
+                $typecode = $typecode . ',' . $this->getDatabase()->legacyQuote($trimValue);
+            }
         }
         if (strlen($typecode) > 0) {
             $typecode = substr($typecode, 1);

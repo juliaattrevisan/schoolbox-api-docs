@@ -69,7 +69,7 @@ class Server extends DAV\Collection
     /**
      * A list of child nodes, cached whenever getChildren() is called.
      *
-     * @var DAV\INode[]
+     * @var DAV\INode[]|null
      */
     private $childNodeCache = null;
 

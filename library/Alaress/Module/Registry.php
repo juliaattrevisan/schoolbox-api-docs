@@ -48,8 +48,8 @@ class Registry
         $moduleClass = get_class($module);
         $basename    = $module->getBasename();
         if (isset(self::$registrations[$basename])) {
-            $otherModuleClass = self::$registrations[$basename]['class'] ?? null;
-            if ($moduleClass !== ($otherModuleClass)) {
+            $otherModuleClass = self::$registrations[$basename]['class'];
+            if ($moduleClass !== $otherModuleClass) {
                 throw new LogicException(
                     sprintf(
                         'Module "%s" is already registered as instanceof "%s" - won\'t redefine as instanceof "%s"',

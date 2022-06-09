@@ -10,7 +10,6 @@
 
 namespace Assess;
 
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 /**
@@ -20,11 +19,10 @@ use Schoolbox\Learning\Assessment\IAssessable;
  */
 class Visibility
 {
-
     /**
      * Identifier
      *
-     * @var null
+     * @var int|null
      */
     private $id = null;
 
@@ -82,7 +80,7 @@ class Visibility
      */
     public function isStaff()
     {
-        if ($this->getId() == IAssessable::MARK_VISIBILITY_PRIVATE) {
+        if ($this->id == IAssessable::MARK_VISIBILITY_PRIVATE) {
             return true;
         }
 
@@ -96,7 +94,7 @@ class Visibility
      */
     public function isStaffStudent()
     {
-        if ($this->getId() == IAssessable::MARK_VISIBILITY_STUDENT) {
+        if ($this->id == IAssessable::MARK_VISIBILITY_STUDENT) {
             return true;
         }
 
@@ -110,7 +108,7 @@ class Visibility
      */
     public function isStaffStudentParent()
     {
-        if ($this->getId() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
+        if ($this->id == IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
             return true;
         }
 
@@ -123,7 +121,7 @@ class Visibility
     /**
      * Set id
      *
-     * @param null $id
+     * @param int|null $id
      */
     public function setId($id)
     {
@@ -133,7 +131,7 @@ class Visibility
     /**
      * Get id
      *
-     * @return null
+     * @return int|null
      */
     public function getId()
     {

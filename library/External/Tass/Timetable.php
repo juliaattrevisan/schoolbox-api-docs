@@ -19,12 +19,6 @@ class External_Tass_Timetable implements External_TimetableInterface
 
 
     /**
-     * Keeps track of calendar day events
-     */
-    private $tassDay;
-
-
-    /**
      * @var Group
      */
     private $groupHandler;
@@ -173,25 +167,6 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
 
-    public function getLastDay($date, Campus $campus)
-    {
-
-        $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
-
-        $query = "SELECT ttdate, day_code FROM ttcalendar
-                    WHERE ttdate <= '$nowmssqldate'
-                    AND cmpy_code = '" . $this->getCampusCode($campus) . "'
-                    AND tt_id = '" . $this->getTimetableCode($campus) . "'
-                    ORDER BY ttdate DESC";
-
-        $result               = $this->getConnector()->executeQuery($query)->fetch();
-        $time                 = strtotime($result['ttdate']);
-        $this->tassDay[$time] = $result['day_code'];
-
-        return $time;
-    }
-
-
     /**
      * @inheritDoc
      */
@@ -268,7 +243,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(
@@ -362,7 +336,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['day'][$desc['day_code']][$code])
                     ) {
                         $timetable[$x]['day'][$desc['day_code']][$code] = array(

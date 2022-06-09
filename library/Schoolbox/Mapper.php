@@ -416,7 +416,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * The column that is used for storing if this field has been soft deleted.
      *
-     * @var string
+     * @var string|null
      */
     protected $soft_delete_column = null;
 
@@ -3301,7 +3301,7 @@ abstract class Mapper implements IMapper, Serializable
         if (isset($join['multi'])) {
             // LEFT JOIN ...
             $join_sql                 = '`:via_table`   AS `:via_alias`   ON `:this_alias`.`:this_key`   = `:via_alias`.`:via_this_key`
-			LEFT JOIN    `:other_table` AS `:other_alias` ON `:other_alias`.`:other_key` = `:via_alias`.`:via_other_key`';
+            LEFT JOIN    `:other_table` AS `:other_alias` ON `:other_alias`.`:other_key` = `:via_alias`.`:via_other_key`';
             $params[':via_table']     = $join['multi']['via_table'];
             $params[':via_this_key']  = $join['multi']['this_key'];
             $params[':via_other_key'] = $join['multi']['other_key'];
@@ -3311,7 +3311,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         if (!$joinDeleted) {
             $filterSoftDeleteSql = $other_mapper->getSoftDeleteFilterSql($other_alias);
-            if (isset($filterSoftDeleteSql)) {
+            if ($filterSoftDeleteSql !== '') {
                 $join_sql .= ' AND ' . $filterSoftDeleteSql;
             }
         }
@@ -3568,7 +3568,7 @@ abstract class Mapper implements IMapper, Serializable
             }
             return "$column = " . $this->database->quote($value);
         }
-        return null;
+        return '';
     }
 
     /**
