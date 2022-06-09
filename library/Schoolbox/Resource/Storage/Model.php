@@ -95,7 +95,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function write($content)
     {
-        return parent::write($content);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -103,7 +103,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function writeStream($resource)
     {
-        return parent::writeStream($resource);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -111,7 +111,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function update($content)
     {
-        return parent::update($content);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -119,7 +119,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function updateStream($resource)
     {
-        return parent::updateStream($resource);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -127,7 +127,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function put($content)
     {
-        return parent::put($content);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -135,7 +135,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function putStream($resource)
     {
-        return parent::putStream($resource);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -143,7 +143,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function rename($newpath)
     {
-        return parent::rename($newpath);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -151,7 +151,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function copy($newpath)
     {
-        return parent::copy($newpath);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -159,7 +159,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function getTimestamp()
     {
-        return parent::getTimestamp();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -167,7 +167,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function getVisibility()
     {
-        return parent::getVisibility();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -175,7 +175,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function getMetadata()
     {
-        return parent::getMetadata();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
@@ -183,7 +183,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function delete()
     {
-        return parent::delete();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
 
