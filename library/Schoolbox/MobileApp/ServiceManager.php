@@ -74,17 +74,19 @@ class ServiceManager implements IServiceManager
     /**
      * Constructor
      *
-     * @param LoggerInterface    $log
-     * @param RegistryMapper     $registryMapper
-     * @param Schoolbox\Instance $serverInstance
-     * @param string             $appTitle
-     * @param int                $serviceType
+     * @param LoggerInterface         $log
+     * @param RegistryMapper          $registryMapper
+     * @param Schoolbox\Instance      $serverInstance
+     * @param string                  $appTitle
+     * @param Storage\FilesystemProxy $filesystemProxy
+     * @param int                     $serviceType
      */
     public function __construct(
         LoggerInterface $log,
         RegistryMapper $registryMapper,
         Schoolbox\Instance $serverInstance,
         string $appTitle,
+        private Storage\FilesystemProxy $filesystemProxy,
         int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
     ) {
         $this->registryMapper = $registryMapper;
@@ -265,7 +267,8 @@ class ServiceManager implements IServiceManager
         if ($this->apnsCertRequiresUpdate($hash)) {
             // copy the cert from storage
             $fp = fopen($this->getTempCertFilename($hash), 'wb');
-            $storage->pipe($fp);
+            // TODO consider a filesystem proxy method for copying to temp
+            stream_copy_to_stream($this->filesystemProxy->readStream($storage), $fp);
             fclose($fp);
         }
 

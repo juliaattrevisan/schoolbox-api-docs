@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends BaseController
 {
-
     /** @var RoleMapper */
     protected $roleMapper;
 
@@ -51,6 +50,14 @@ class Controller extends BaseController
     /** @var Config */
     protected $config;
 
+    /**
+     * Constructor
+     *
+     * @param Resource\Storage\FilesystemProxy $filesystemProxy
+     */
+    public function __construct(private Resource\Storage\FilesystemProxy $filesystemProxy)
+    {
+    }
 
     /**
      * @return NSMapper
@@ -540,6 +547,7 @@ class Controller extends BaseController
             MobileApp\RegistryMapper::getInstance(),
             $this->getDi()->get('instance'),
             $this->getConfigLoader()->get('title'),
+            $this->filesystemProxy,
             $liveMessage
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,

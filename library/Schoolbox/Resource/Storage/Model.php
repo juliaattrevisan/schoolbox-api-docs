@@ -476,15 +476,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function pipe($to)
     {
-        $from = $this->readStream();
-
-        $size = 0;
-
-        while (!feof($from)) {
-            $size += fwrite($to, fread($from, 8192));
-        }
-
-        return $size;
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
 
