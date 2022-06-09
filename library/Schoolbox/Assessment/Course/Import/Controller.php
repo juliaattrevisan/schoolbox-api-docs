@@ -35,7 +35,6 @@ use Schoolbox\Resource\Folder;
 
 class Controller extends Base\Base
 {
-
     const IMPORT_STAGE_COURSE_AND_CLASSES = 1;
     const IMPORT_STAGE_UNITS = 2;
     const IMPORT_STAGE_ASSESSMENTS = 3;
