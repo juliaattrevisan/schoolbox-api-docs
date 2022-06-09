@@ -93,7 +93,7 @@ HELP;
                 AND {$eventSourceMapper->getTable()}.`deleted_at` IS NULL
                 SET {$eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
                 {$eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$eventSourceMapper->getTable()}.`source_name` = :sourceName
+                WHERE {$eventSourceMapper->getTable()}.`source_name` IN (:sourceName, 'ParentCalendar', 'ParentNotices', 'StudentCalendar', 'StudentNotices', 'TeacherCalendar', 'TeacherNotices')
             ";
 
         $statement = $eventSourceMapper->getDatabase()->prepare($query);
