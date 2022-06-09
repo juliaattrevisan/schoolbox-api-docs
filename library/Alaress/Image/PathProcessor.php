@@ -90,15 +90,18 @@ class PathProcessor
      * Constructor
      *
      * @param string                $path
-     * @param FilesystemInterface   $filesystem
-     * @param Storage\HashGenerator $hashGenerator
+     * @param FilesystemInterface   $pathFilesystem    The filesystem on which `$path` is stored
+     * @param FilesystemInterface   $storageFilesystem The filesystem on which storage transforms are stored.
+     *                                                 This may be a different filesystem to `$pathFilesystem`.
+     * @param Storage\HashGenerator $hashGenerator     Helper for generating a storage hash out of `$path`
      * @param string                $cacheKey
      * @param ITransform            $transform
      * @param int                   $imageMagickTimeout
      */
     public function __construct(
         string $path,
-        private FilesystemInterface $filesystem,
+        private FilesystemInterface $pathFilesystem,
+        private FilesystemInterface $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
         string $cacheKey,
         ITransform $transform,
@@ -137,7 +140,7 @@ class PathProcessor
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
-        $mimetype   = $this->filesystem->getMimetype($this->path);
+        $mimetype   = $this->pathFilesystem->getMimetype($this->path);
         $fileFormat = $this->getFormatFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
@@ -146,16 +149,13 @@ class PathProcessor
             return new StreamableFile(
                 true,
                 $mimetype,
-                $this->filesystem->getSize($this->path),
-                $this->filesystem->readStream($this->path),
+                $this->pathFilesystem->getSize($this->path),
+                $this->pathFilesystem->readStream($this->path),
             );
         }
 
-        // TODO SA-8354 inject dependencies
-        $mountManager      = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
-        $storageFilesystem = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $hash              = $this->hashGenerator->generateHash($this->filesystem->readStream($this->path));
-        $transformPath     = Storage\Manager::getTransformPath($hash, $this->cacheKey);
+        $hash          = $this->hashGenerator->generateHash($this->pathFilesystem->readStream($this->path));
+        $transformPath = Storage\Manager::getTransformPath($hash, $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
@@ -169,12 +169,12 @@ class PathProcessor
                     true,
                     $mimetype,
                     $transformModel->getSize(),
-                    self::readStream($storageFilesystem, $transformPath),
+                    self::readStream($this->storageFilesystem, $transformPath),
                 );
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
                 $basePath = Storage\Manager::getPathFromHash($hash);
-                $state    = $storageFilesystem->has($basePath)
+                $state    = $this->storageFilesystem->has($basePath)
                     ? Storage\Transform\Model::STATE_PROCESSING
                     : Storage\Transform\Model::STATE_FAILED;
                 $transformMapper->save($transformModel->setSize(null)->setState($state));
@@ -187,14 +187,19 @@ class PathProcessor
 
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
-        if ($storageFilesystem->has($transformPath)) {
-            $transformSize = $storageFilesystem->getSize($transformPath);
+        if ($this->storageFilesystem->has($transformPath)) {
+            $transformSize = $this->storageFilesystem->getSize($transformPath);
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
                 $transformMapper->createRecord($hash, $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
             }
-            return new StreamableFile(true, $mimetype, $transformSize, self::readStream($storageFilesystem, $transformPath));
+            return new StreamableFile(
+                true,
+                $mimetype,
+                $transformSize,
+                self::readStream($this->storageFilesystem, $transformPath),
+            );
         }
 
         // Transform does not exist on disk. Has the transformation been attempted before?
@@ -225,7 +230,12 @@ class PathProcessor
         // are then base64 encoded. This will not throw an exception. We could catch it in a custom shutdown handler, but it's fine to leave in the
         // 'processing' state so this is not required
         try {
-            $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $storageFilesystem, $transformPath);
+            $transformSize = $this->generateTransformation(
+                $maxAttempts,
+                $fileFormat,
+                $this->storageFilesystem,
+                $transformPath,
+            );
         } catch (
             FileNotFoundException
             | FileExistsException
@@ -256,7 +266,7 @@ class PathProcessor
             false,
             $mimetype,
             $transformModel->getSize(),
-            self::readStream($storageFilesystem, $transformPath)
+            self::readStream($this->storageFilesystem, $transformPath)
         );
     }
 
@@ -317,7 +327,7 @@ class PathProcessor
         // will generate a Warning that will be handled by the kernel's registered Error handler, which will throw an
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
-        if (!$this->filesystem->has($this->path)) {
+        if (!$this->pathFilesystem->has($this->path)) {
             throw new FileNotFoundException("File not found");
         }
 
@@ -338,7 +348,7 @@ class PathProcessor
             },
             E_WARNING
         );
-        $imageSize       = getimagesizefromstring($this->filesystem->read($this->path));
+        $imageSize       = getimagesizefromstring($this->pathFilesystem->read($this->path));
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
         if ($imageSize === false) {
@@ -373,7 +383,7 @@ class PathProcessor
         while (!$image) {
             try {
                 $attempts++;
-                $image = $imagine->read($this->filesystem->readStream($this->path));
+                $image = $imagine->read($this->pathFilesystem->readStream($this->path));
             } catch (ImagineException\RuntimeException $e) {
                 if ($attempts > $maxAttempts) {
                     throw $e;
