@@ -215,7 +215,7 @@ class Controller extends Base
      */
     protected function buildReader(Storage\IStorage $upload): Reader
     {
-        return $this->importerFactory->buildReader($this->basename, $upload);
+        return $this->importerFactory->buildReader($this->basename, $this->filesystemProxy->readStream($upload));
     }
 
 

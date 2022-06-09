@@ -63,14 +63,14 @@ class ImporterFactory
     /**
      * Builds a CSV reader out of the uploaded file.
      *
-     * @param string            $basename
-     * @param  Storage\IStorage $upload
+     * @param string          $basename
+     * @param string|resource $upload
      * @return Reader
      * @throws \RuntimeException
      */
-    public function buildReader(string $basename, Storage\IStorage $upload): \Alaress\Csv\Reader
+    public function buildReader(string $basename, $upload): \Alaress\Csv\Reader
     {
-        $reader = new Reader($upload->readStream());
+        $reader = new Reader($upload);
         $reader->setLoadFromFirst(true);
 
         // User import does not fill down - the others do

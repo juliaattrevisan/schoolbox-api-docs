@@ -200,7 +200,7 @@ class Importer
 
             $n = $this->processOne(
                 new Reader(
-                    $this->file->readStream(),
+                    $this->filesystemProxy->readStream($this->file),
                     true
                 )
             );
