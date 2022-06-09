@@ -33,6 +33,7 @@ $app = new class extends CliTool\App
      */
     private const OPT_LONG_HELP = 'help';
 
+
     /**
      * An arbitrarily-chosen string to denote where these events came from
      */
@@ -78,6 +79,19 @@ Usage: php 00-purge-old-compass.php --perform
 
 HELP;
             exit;
+        }
+
+        /* Check if you're running SUDS Compass first
+         *
+         * If you are, continue deleting the event records associated with a suds_compass import
+         * (these should be loaded into SUDS Timetable instead of schoolbox.events, separately)
+         *
+         * Otherwise, don't do anything and just exit politely
+         * This script had the potential to cross-over into tass calendar which also uses the same
+         * concept of setting potentially-deleteable events' updated_at to 0000-00-00
+         */
+        if (\Schoolbox\External\Importer\Endpoint\Factory::COMPASS !== $this->getConfig()->get('schooldata_import_data_source')) {
+            $this->getLogger()->info('Compass purge did not run: this schoolbox instance did not use SUDS Compass. No changes required; exiting');
         }
 
         $this->eventSourceMapper = \Event\Source\Mapper::getInstance();

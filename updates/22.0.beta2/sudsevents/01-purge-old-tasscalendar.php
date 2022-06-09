@@ -69,6 +69,19 @@ HELP;
             exit;
         }
 
+        /* Check if you're running SUDS TASS first
+         *
+         * If you are, continue deleting the event records associated with a suds_tass import
+         * (these should be loaded into SUDS Events instead of schoolbox.events, separately)
+         *
+         * Otherwise, don't do anything and just exit politely
+         * This script had the potential to cross-over into compass calendar which also uses the same
+         * concept of setting potentially-deleteable events' updated_at to 0000-00-00
+         */
+        if (\Schoolbox\External\Importer\Endpoint\Factory::TASS_API !== $this->getConfig()->get('schooldata_import_data_source')) {
+            $this->getLogger()->info('TASS Calendar purge did not run: this schoolbox instance did not use SUDS TASS. No changes required; exiting');
+        }
+
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
         $eventSourceMapper = \Event\Source\Mapper::getInstance();
         $source = \Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Factory::SOURCE_NAME;
