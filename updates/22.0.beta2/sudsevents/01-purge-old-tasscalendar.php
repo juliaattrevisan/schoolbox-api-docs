@@ -82,6 +82,7 @@ HELP;
          */
         if (\Schoolbox\External\Importer\Endpoint\Factory::TASS_API !== $this->getConfig()->get('schooldata_import_data_source')) {
             $this->getLogger()->info('TASS Calendar purge did not run: this schoolbox instance did not use SUDS TASS. No changes required; exiting');
+            exit;
         }
 
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();

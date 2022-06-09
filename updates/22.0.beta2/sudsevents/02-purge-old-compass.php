@@ -67,7 +67,7 @@ $app = new class extends CliTool\App
 
 Once-off correctional tool
 
-This ALWAYS EXECUTES a hard-delete of compass calendar events.
+This ALWAYS EXECUTES a hard-delete of compass calendar events
 
 This removes the old Compass Events implementation which put timetable events into
 the schoolbox.event table, and all its relational pieces. This has since moved to
@@ -94,6 +94,7 @@ HELP;
          */
         if (\Schoolbox\External\Importer\Endpoint\Factory::COMPASS !== $this->getConfig()->get('schooldata_import_data_source')) {
             $this->getLogger()->info('Compass purge did not run: this schoolbox instance did not use SUDS Compass. No changes required; exiting');
+            exit;
         }
 
         $this->eventSourceMapper = \Event\Source\Mapper::getInstance();
