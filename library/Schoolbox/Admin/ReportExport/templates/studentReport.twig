@@ -437,7 +437,7 @@
     {# Summary #}
     {% if showSummary %}
     <div class="summary">
-        <h3>Summary</h3>
+        <h3>{{ summaryHeading }}</h3>
         {% for folder in folders %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
