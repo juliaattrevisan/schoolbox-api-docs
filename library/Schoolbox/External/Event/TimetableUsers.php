@@ -294,7 +294,7 @@ class TimetableUsers
     {
         $query = "
             SELECT se.id
-            FROM {$this->eventMapper->getTable()} se 
+            FROM {$this->eventMapper->getTable()} se
             INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
@@ -368,9 +368,11 @@ class TimetableUsers
 
         $query = "
             SELECT DISTINCT u.id, u.synergy_id, u.title, u.firstname, u.lastname
-            FROM {$this->userMapper->getTable()} u 
+            FROM {$this->userMapper->getTable()} u
             INNER JOIN `groups` g on u.group_id = g.id
             WHERE g.group_type = :groupType
+            AND g.deleted_at IS NULL
+            AND u.deleted_at IS NULL
             AND {$where}
         ";
 
