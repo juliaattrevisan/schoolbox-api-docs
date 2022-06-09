@@ -153,8 +153,6 @@
      */
     .folder-title {
         align-items: center;
-        background: lightgrey;
-        border: 1px solid black;
         display: flex;
         padding: 0.75rem;
     }
@@ -186,14 +184,16 @@
 
     /* A folder title in the class summary section
      */
-    .class-summary {
+    .class-page {
+        background: lightgrey;
+        border: 1px solid black;
         padding: 0.75rem;
     }
 
     /* Teachers in the Class Summary section have a more space-efficient style
      * and layout, but we don't need its excess padding
      */
-    .class-summary .card.compact {
+    .class-page .card.compact {
         display: flex;
         align-items: center;
         margin: 0.75rem 0 0 0;
@@ -202,7 +202,7 @@
 
     /* Special cosmetic representation of semantic h5
      */
-    .class-summary h5 {
+    .class-page h5 {
         font-size: 1rem;
     }
 
@@ -362,8 +362,18 @@
             padding: 0; /* to get more of the page real estate */
         }
 
-        .folder-title {
+        /* Folder titles in the Class Pages section always get a page break
+         * They always start on a new page. In the Summary section, they just
+         * render one underneath the other, contiguously
+         */
+        .folder-title.class-page {
             page-break-before: always; /* ensure each individual subject goes on new page */
+        }
+
+        /* Summary always starts on a separate page
+         */
+        .summary {
+            page-break-before: always;
         }
 
         /* This is so so so extremely wasteful if grids are very short
@@ -411,6 +421,8 @@
 
     {# Summary #}
     {% if showSummary %}
+    <div class="summary">
+        <h3>Summary</h3>
         {% for folder in folders %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
@@ -440,6 +452,7 @@
                 {% endfor %}
             {% endif %}
         {% endfor %}
+    </div>
     {% endif %}
 
     {# Class #}
@@ -447,7 +460,7 @@
         {% for folder in folders %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-            <div class="folder-title class-summary">
+            <div class="folder-title class-page">
                 <div class="left">
                     <h4>{{ folder.title }}</h4>
                     {% for teacher in folder.teachers %}
