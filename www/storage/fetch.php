@@ -14,6 +14,7 @@ use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -75,13 +76,16 @@ try {
             }
         }
 
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
+
         //send headers
         header("Content-Type: $contentType");
         header("Cache-control: private");
         header("Content-Ranges: none");
         header("Content-Disposition: $disposition; filename=\"$basename\"");
         header("Content-Length: " . $resource->getSize());
-        fpassthru($resource->readStream());
+        fpassthru($filesystemProxy->readStream($resource));
         exit;
     }
 } catch (Exception $ex) {

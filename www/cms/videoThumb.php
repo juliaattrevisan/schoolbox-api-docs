@@ -124,10 +124,9 @@ if (isset($type, $id)) {
 
             if ($filesystem->has($imageFilename)) {
                 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-                $image = $filesystem->get($imageFilename);
                 header("Content-Type: $mimeType");
-                header("Content-Length: {$image->getSize()}");
-                fpassthru($image->readStream());
+                header("Content-Length: {$filesystem->getSize($imageFilename)}");
+                fpassthru($filesystem->readStream($imageFilename));
                 exit;
             }
 

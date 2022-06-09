@@ -11,6 +11,8 @@
  */
 
 //includes
+use Schoolbox\Resource\Storage\FilesystemProxy;
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
@@ -68,6 +70,9 @@ if (is_numeric($_GET['id'])) {
         $attach = "";
     }
 
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+
     //send headers
     header("Content-Type: {$file->getMime()}");
     header("Pragma: ");
@@ -75,7 +80,7 @@ if (is_numeric($_GET['id'])) {
     header("Content-Ranges: none");
     header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
     header("Content-Length: {$file->getSize()}");
-    fpassthru($file->readStream());
+    fpassthru($filesystemProxy->readStream($file));
     exit;
 } else {
     error(2);

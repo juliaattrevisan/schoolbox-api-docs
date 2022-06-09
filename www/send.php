@@ -20,6 +20,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
@@ -106,6 +107,8 @@ if (is_numeric($_GET['id'])) {
         }
     }
 
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
 
     //send headers
     header("Content-Type: $contentType");
@@ -114,7 +117,7 @@ if (is_numeric($_GET['id'])) {
     header("Content-Ranges: none");
     header("Content-Disposition: $disposition; filename=\"$basename\"");
     header("Content-Length: {$file->getSize()}");
-    fpassthru($file->readStream());
+    fpassthru($filesystemProxy->readStream($file));
     exit;
 }
 

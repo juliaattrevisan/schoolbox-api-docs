@@ -12,6 +12,7 @@ use League\Flysystem\FileNotFoundException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mime\Address;
@@ -24,8 +25,15 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoader $config)
-{
+function sendMail(
+    $to,
+    $cc,
+    $bcc,
+    $subject,
+    $message,
+    $attachments,
+    FilesystemProxy $filesystemProxy
+) {
     $mail = new MimeEmail();
 
     //get users email address to use in from field
@@ -116,7 +124,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
         $files = $factory->build($attachments)->getAll();
 
         foreach ($files as $storage) {
-            $mail->attach($storage->readStream(), $storage->getBasename(), $storage->getMime());
+            $mail->attach($filesystemProxy->readStream($storage), $storage->getBasename(), $storage->getMime());
         }
     } catch (\Schoolbox\Mapper\Exception | FileNotFoundException $e) {
         error(41);
@@ -142,7 +150,15 @@ $hasRecipient = (isset($_POST['to']) && $_POST['to']) || (isset($_POST['bcc']) &
 if ($hasRecipient && Config::get('mail_enable')) {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
-    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments, $kernel->get('config'));
+    sendMail(
+        $_POST['to'],
+        $_POST['cc'],
+        $_POST['bcc'],
+        $_POST['subject'],
+        $_POST['message'],
+        $attachments,
+        $kernel->get('filesystem.storageProxy'),
+    );
 
     $page->backToTheFuture(3);
 } else {
