@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Profile;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 
@@ -139,6 +140,7 @@ class Importer
      * @param Profile\Staff\Mapper        $staffProfileMapper
      * @param Profile\Relationship\Mapper $relationshipMapper
      * @param LoggerInterface|null        $logger
+     * @param FilesystemProxy             $filesystemProxy
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -150,7 +152,8 @@ class Importer
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
         Profile\Relationship\Mapper $relationshipMapper,
-        ?LoggerInterface $logger
+        ?LoggerInterface $logger,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->mapping = new Mapping($type);
 

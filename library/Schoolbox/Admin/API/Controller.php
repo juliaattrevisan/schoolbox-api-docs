@@ -97,6 +97,7 @@ class Controller extends Web\Controller\Base
      * @param External\Profile\Student\Mapper      $studentMapper
      * @param External\Profile\Staff\Mapper        $staffMapper
      * @param External\Profile\Relationship\Mapper $relationshipMapper
+     * @param Storage\FilesystemProxy              $filesystemProxy
      */
     public function __construct(
         Storage\Mapper $storageMapper,
@@ -105,7 +106,8 @@ class Controller extends Web\Controller\Base
         External\Profile\Parent\Mapper $parentMapper,
         External\Profile\Student\Mapper $studentMapper,
         External\Profile\Staff\Mapper $staffMapper,
-        External\Profile\Relationship\Mapper $relationshipMapper
+        External\Profile\Relationship\Mapper $relationshipMapper,
+        private Storage\FilesystemProxy $filesystemProxy,
     ) {
         $this->storageMapper = $storageMapper;
         $this->importerFactory = $importerFactory;
@@ -239,7 +241,12 @@ class Controller extends Web\Controller\Base
                     foreach ($files as $keyspace => $file) {
                         if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS)) {
                             // this is where the action happens
-                            $this->importerFactory->buildImporter($keyspace, $this->importerFactory->buildReader($keyspace, $file), $log, true)->save();
+                            $this->importerFactory->buildImporter(
+                                $keyspace,
+                                $this->importerFactory->buildReader($keyspace, $this->filesystemProxy->readStream($file)),
+                                $log,
+                                true
+                            )->save();
                         } else {
                             (new Importer(
                                 $keyspace,
@@ -251,6 +258,7 @@ class Controller extends Web\Controller\Base
                                 $this->staffProfileMapper,
                                 $this->relationshipMapper,
                                 $log,
+                                $this->filesystemProxy,
                             ))->setPerform(true)->process();
                         }
                     }
