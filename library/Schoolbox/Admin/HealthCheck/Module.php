@@ -46,6 +46,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/eventTypes', 'eventTypes', $isAlaress);
         $this->register('GET', '/audit/calendarServicePermissions', 'calendarServicePermissions', $isAlaress);
         $this->register('GET', '/audit/parentNewsNotifications', 'parentNewsNotifications', $isAlaress);
+        $this->register('GET', '/audit/parentNotifOverride', 'parentNotifOverride', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);

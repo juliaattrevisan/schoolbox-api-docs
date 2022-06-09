@@ -674,6 +674,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'eventTypes');
         $this->taskDHelper->addSource('user', 'calendarServicePermissions');
         $this->taskDHelper->addSource('user', 'parentNewsNotifications');
+        $this->taskDHelper->addSource('user', 'parentNotifOverride');
     }
 
     /**
@@ -844,5 +845,37 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'parentNewsNotifications.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * parentNotifOverride.csv
+     */
+    public function parentNotifOverride()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat(u.firstname,' ', u.lastname, ' (', u.id, ')') AS 'User',
+            ms.description as 'Notification',
+            mr.delivery 'Delivery'
+        FROM
+            msg_reroute mr
+        LEFT JOIN
+            user u on mr.user_id = u.id
+        LEFT JOIN
+            groups g on u.group_id = g.id
+        LEFT JOIN
+            msg_source ms on mr.msg_source_id = ms.id
+        WHERE
+            g.group_type = 'parent'
+        AND
+            g.deleted_at is NULL
+        AND
+            u.deleted_at is NULL;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'parentNotifOverride.csv');
     }
 }
