@@ -673,6 +673,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'newsSettings');
         $this->taskDHelper->addSource('user', 'eventTypes');
         $this->taskDHelper->addSource('user', 'calendarServicePermissions');
+        $this->taskDHelper->addSource('user', 'parentNewsNotifications');
     }
 
     /**
@@ -812,5 +813,36 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'calendarServicePermissions.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * parentNewsNotifications.csv
+     */
+    public function parentNewsNotifications()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Parent Role',
+            ms.description as 'Notification',
+            mrp.mask as 'Allowed',
+            mrp.role_default as 'Defaults'
+        FROM
+            msg_route_perm mrp
+        LEFT JOIN
+            groups g on g.id = mrp.role_id
+        JOIN
+            msg_source ms on ms.id = mrp.msg_source_id
+        WHERE
+            g.deleted_at is NULL
+        AND
+            g.group_type = 'parent'
+        ORDER BY
+            g.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'parentNewsNotifications.csv');
     }
 }
