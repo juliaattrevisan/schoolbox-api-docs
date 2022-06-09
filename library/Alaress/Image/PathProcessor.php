@@ -53,11 +53,9 @@ class PathProcessor
     private const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
 
     /**
-     * Original un-transformed file. Contents may be local or remote.
-     *
-     * @var Storage\Model
+     * Path to the file in the filesystem.
      */
-    private $file;
+    private $path;
 
     /**
      * The $key is a way to uniquely associate a cached image with a particular
@@ -91,21 +89,21 @@ class PathProcessor
     /**
      * Constructor
      *
-     * @param Storage\Model           $file
-     * @param Storage\FilesystemProxy $filesystemProxy
-     * @param string                  $cacheKey
-     * @param ITransform              $transform
-     * @param int                     $imageMagickTimeout
+     * @param string              $path
+     * @param FilesystemInterface $filesystem
+     * @param string              $cacheKey
+     * @param ITransform          $transform
+     * @param int                 $imageMagickTimeout
      */
     public function __construct(
-        Storage\Model $file,
-        private Storage\FilesystemProxy $filesystemProxy,
+        string $path,
+        private FilesystemInterface $filesystem,
         string $cacheKey,
         ITransform $transform,
         int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
     ) {
-        $this->file               = $file;
-        $this->cacheKey           = $cacheKey;
+        $this->path     = $path;
+        $this->cacheKey = $cacheKey;
         $this->transform          = $transform;
         $this->imageMagickTimeout = $imageMagickTimeout;
     }
@@ -137,36 +135,37 @@ class PathProcessor
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
-        $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
+        $mimetype   = $this->filesystem->getMimetype($this->path);
+        $fileFormat = $this->getFormatFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
             // Assume the stream to the base SVG exists
             return new StreamableFile(
                 true,
-                (string)$this->file->getMimetype(),
-                $this->file->getSize(),
-                $this->filesystemProxy->readStream($this->file),
+                $mimetype,
+                $this->filesystem->getSize($this->path),
+                $this->filesystem->readStream($this->path),
             );
         }
 
         // TODO SA-8354 inject dependencies
         $mountManager  = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
         $fileSystem    = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $transformPath = Storage\Manager::getTransformPath($this->file->getHash(), $this->cacheKey);
+        $transformPath = Storage\Manager::getTransformPath($this->path->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
-        $transformModel  = $transformMapper->findByHashAndCacheKey($this->file->getHash(), $this->cacheKey);
+        $transformModel  = $transformMapper->findByHashAndCacheKey($this->path->getHash(), $this->cacheKey);
         if ($transformModel && $transformModel->isStateDone()) {
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
             try {
-                return new StreamableFile(true, (string)$this->file->getMimetype(), $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+                return new StreamableFile(true, $mimetype, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
-                $state = $fileSystem->has($this->file->getPath())
+                $state = $fileSystem->has($this->path->getPath())
                     ? Storage\Transform\Model::STATE_PROCESSING
                     : Storage\Transform\Model::STATE_FAILED;
                 $transformMapper->save($transformModel->setSize(null)->setState($state));
@@ -184,15 +183,15 @@ class PathProcessor
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
-                $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
+                $transformMapper->createRecord($this->path->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
             }
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformSize, self::readStream($fileSystem, $transformPath));
+            return new StreamableFile(true, $mimetype, $transformSize, self::readStream($fileSystem, $transformPath));
         }
 
         // Transform does not exist on disk. Has the transformation been attempted before?
         if (!$transformModel) {
             // Transformation has NOT been attempted before. We will attempt it now.
-            $transformModel = $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, null, Storage\Transform\Model::STATE_PROCESSING);
+            $transformModel = $transformMapper->createRecord($this->path->getHash(), $this->cacheKey, null, Storage\Transform\Model::STATE_PROCESSING);
         } else {
             // Transformation HAS been attempted before.
             // If we are not retrying, or it's possible the prior attempt is still running, just return a placeholder
@@ -214,13 +213,13 @@ class PathProcessor
         try {
             $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
         } catch (
-        FileNotFoundException|
-        FileExistsException|
-        ImagineException\OutOfBoundsException|
-        ImagineException\RuntimeException|
-        OverflowException|
-        LayeredNonGifException|
-        CorruptImageException $e
+            FileNotFoundException
+            | FileExistsException
+            | ImagineException\OutOfBoundsException
+            | ImagineException\RuntimeException
+            | OverflowException
+            | LayeredNonGifException
+            | CorruptImageException $e
         ) {
             if ($permFail) {
                 /**
@@ -241,7 +240,7 @@ class PathProcessor
 
         return new StreamableFile(
             false,
-            (string)$this->file->getMimetype(),
+            $mimetype,
             $transformModel->getSize(),
             self::readStream($fileSystem, $transformPath)
         );
@@ -304,7 +303,7 @@ class PathProcessor
         // will generate a Warning that will be handled by the kernel's registered Error handler, which will throw an
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
-        if (!$this->filesystemProxy->fileExists($this->file)) {
+        if (!$this->filesystem->has($this->path)) {
             throw new FileNotFoundException("File not found");
         }
 
@@ -325,7 +324,7 @@ class PathProcessor
             },
             E_WARNING
         );
-        $imageSize       = getimagesizefromstring($this->filesystemProxy->read($this->file));
+        $imageSize       = getimagesizefromstring($this->filesystem->read($this->path));
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
         if ($imageSize === false) {
@@ -360,7 +359,7 @@ class PathProcessor
         while (!$image) {
             try {
                 $attempts++;
-                $image = $imagine->read($this->filesystemProxy->readStream($this->file));
+                $image = $imagine->read($this->filesystem->readStream($this->path));
             } catch (ImagineException\RuntimeException $e) {
                 if ($attempts > $maxAttempts) {
                     throw $e;
