@@ -70,7 +70,7 @@ class Definition implements IStrategy
      * @var string
      */
     private string $dateLocalFormat;
-    
+
 
     /**
      * The "perform" flag from the cli tool
