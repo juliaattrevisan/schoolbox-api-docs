@@ -862,7 +862,7 @@ class Controller extends Assessment\Controller
                  */
                 foreach ($latestResponse->getAllFiles() as $file) {
                     if ($file->getEditableInline()) {
-                        $editorContents = $file->read();
+                        $editorContents = $this->filesystemProxy->read($file);
                     }
                 }
             } else {
