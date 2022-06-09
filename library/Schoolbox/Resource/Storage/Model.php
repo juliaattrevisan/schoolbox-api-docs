@@ -468,6 +468,8 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     /**
      * Pipe the readstream of this file to some other stream resource
      *
+     * @deprecated use some other method for piping a stream to another
+     *
      * @param resource $to
      *
      * @return int
