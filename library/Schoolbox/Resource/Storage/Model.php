@@ -79,7 +79,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function read()
     {
-        return parent::read();
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
