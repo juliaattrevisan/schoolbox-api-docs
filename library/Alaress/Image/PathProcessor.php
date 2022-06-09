@@ -89,15 +89,17 @@ class PathProcessor
     /**
      * Constructor
      *
-     * @param string              $path
-     * @param FilesystemInterface $filesystem
-     * @param string              $cacheKey
-     * @param ITransform          $transform
-     * @param int                 $imageMagickTimeout
+     * @param string                $path
+     * @param FilesystemInterface   $filesystem
+     * @param Storage\HashGenerator $hashGenerator
+     * @param string                $cacheKey
+     * @param ITransform            $transform
+     * @param int                   $imageMagickTimeout
      */
     public function __construct(
         string $path,
         private FilesystemInterface $filesystem,
+        private Storage\HashGenerator $hashGenerator,
         string $cacheKey,
         ITransform $transform,
         int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
@@ -150,22 +152,29 @@ class PathProcessor
         }
 
         // TODO SA-8354 inject dependencies
-        $mountManager  = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
-        $fileSystem    = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $transformPath = Storage\Manager::getTransformPath($this->path->getHash(), $this->cacheKey);
+        $mountManager      = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
+        $storageFilesystem = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
+        $hash              = $this->hashGenerator->generateHash($this->filesystem->readStream($this->path));
+        $transformPath     = Storage\Manager::getTransformPath($hash, $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
-        $transformModel  = $transformMapper->findByHashAndCacheKey($this->path->getHash(), $this->cacheKey);
+        $transformModel  = $transformMapper->findByHashAndCacheKey($hash, $this->cacheKey);
         if ($transformModel && $transformModel->isStateDone()) {
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
             try {
-                return new StreamableFile(true, $mimetype, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+                return new StreamableFile(
+                    true,
+                    $mimetype,
+                    $transformModel->getSize(),
+                    self::readStream($storageFilesystem, $transformPath),
+                );
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
-                $state = $fileSystem->has($this->path->getPath())
+                $basePath = Storage\Manager::getPathFromHash($hash);
+                $state    = $storageFilesystem->has($basePath)
                     ? Storage\Transform\Model::STATE_PROCESSING
                     : Storage\Transform\Model::STATE_FAILED;
                 $transformMapper->save($transformModel->setSize(null)->setState($state));
@@ -178,20 +187,25 @@ class PathProcessor
 
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
-        if ($fileSystem->has($transformPath)) {
-            $transformSize = $fileSystem->getSize($transformPath);
+        if ($storageFilesystem->has($transformPath)) {
+            $transformSize = $storageFilesystem->getSize($transformPath);
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
-                $transformMapper->createRecord($this->path->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
+                $transformMapper->createRecord($hash, $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
             }
-            return new StreamableFile(true, $mimetype, $transformSize, self::readStream($fileSystem, $transformPath));
+            return new StreamableFile(true, $mimetype, $transformSize, self::readStream($storageFilesystem, $transformPath));
         }
 
         // Transform does not exist on disk. Has the transformation been attempted before?
         if (!$transformModel) {
             // Transformation has NOT been attempted before. We will attempt it now.
-            $transformModel = $transformMapper->createRecord($this->path->getHash(), $this->cacheKey, null, Storage\Transform\Model::STATE_PROCESSING);
+            $transformModel = $transformMapper->createRecord(
+                $hash,
+                $this->cacheKey,
+                null,
+                Storage\Transform\Model::STATE_PROCESSING,
+            );
         } else {
             // Transformation HAS been attempted before.
             // If we are not retrying, or it's possible the prior attempt is still running, just return a placeholder
@@ -211,7 +225,7 @@ class PathProcessor
         // are then base64 encoded. This will not throw an exception. We could catch it in a custom shutdown handler, but it's fine to leave in the
         // 'processing' state so this is not required
         try {
-            $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
+            $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $storageFilesystem, $transformPath);
         } catch (
             FileNotFoundException
             | FileExistsException
@@ -242,7 +256,7 @@ class PathProcessor
             false,
             $mimetype,
             $transformModel->getSize(),
-            self::readStream($fileSystem, $transformPath)
+            self::readStream($storageFilesystem, $transformPath)
         );
     }
 
