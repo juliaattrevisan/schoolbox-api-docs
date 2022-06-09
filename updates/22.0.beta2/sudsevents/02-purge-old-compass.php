@@ -67,6 +67,8 @@ $app = new class extends CliTool\App
 
 Once-off correctional tool
 
+This ALWAYS EXECUTES a hard-delete of compass calendar events.
+
 This removes the old Compass Events implementation which put timetable events into
 the schoolbox.event table, and all its relational pieces. This has since moved to
 SUDS Timetable and is no longer required here where it pollutes the event space.

@@ -55,6 +55,8 @@ $app = new class extends CliTool\App
 
 Once-off correctional tool
 
+This ALWAYS EXECUTES a soft-delete of tass calendar events.
+
 This removes all the old suds_tass events which our previous importer put events into
 the schoolbox.event table, and all its relational pieces. This has since moved to
 SUDS Events and is no longer required here where it pollutes the event space.
