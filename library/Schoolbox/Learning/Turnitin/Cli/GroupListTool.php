@@ -57,9 +57,9 @@ class GroupListTool extends CliTool\App
 Group List tool to inspect what Turnitin knows about its Groups;
 (a Turnitin Group is synonymous with our Submission Box)
 
-We had information that some Groups were missing two key fields due to me not 
+We had information that some Groups were missing two key fields due to me not
 supplying them in the Group tool.
-  * due_at 
+  * due_at
   * report_generation
 
 This inspector finds all the turnitin group ids that we know about in an instance,
@@ -138,5 +138,4 @@ HELP;
     {
         return parent::runAsRoot();
     }
-};
-
+}
