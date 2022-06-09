@@ -127,7 +127,7 @@ class Folder
                 $uniqueNames[] = $uniqueName;
                 $zipStream->addFileFromStream(
                     $path . DIRECTORY_SEPARATOR . $uniqueName,
-                    $file->readStream()
+                    $this->filesystemProxy->readStream($file)
                 );
             }
         }

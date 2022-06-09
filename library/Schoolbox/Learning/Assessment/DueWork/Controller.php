@@ -523,7 +523,7 @@ class Controller extends Assessment\Controller
                                 $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
                                 $this->sanitizeForFilename($file->getBasename())
                             );
-                            $zipStream->addFileFromStream($zipFilename, $file->readStream());
+                            $zipStream->addFileFromStream($zipFilename, $this->filesystemProxy->readStream($file));
                         }
                     }
                 }
