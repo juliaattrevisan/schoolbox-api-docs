@@ -439,6 +439,9 @@ class Controller extends Base
         $help->queryToCSV($statement, 'listOfSuperusers.csv');
     }
 
+    /**
+     * return list of reports for LMS Fundamentals Audit
+     */
     public function lms()
     {
         $this->taskDHelper->addSource('user', 'gradeGroups');
@@ -658,5 +661,65 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'yearLevelPermissions.csv');
+    }
+
+    /**
+     * return list of reports for Community Engagement Audit
+     */
+    public function community()
+    {
+        $this->taskDHelper->addSource('user', 'newsTopic');
+        $this->taskDHelper->addSource('user', 'newsServicePermissions');
+    }
+
+    /**
+     * COMMUNITY
+     * newsTopics.csv
+     */
+    public function newsTopics()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            NAME AS 'Topic Name',
+            slug AS 'Topic Tag'
+        FROM
+            newstopic
+        WHERE
+            deleted_at IS NULL
+        ORDER BY
+            sequence;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'newsTopics.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * newsServicePermissions.csv
+     */
+    public function newsServicePermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            Concat(u.firstname,' ', u.lastname, '(', u.id, ')') AS 'User',
+            CASE type
+              WHEN '3' THEN 'Moderator'
+              WHEN '2' THEN 'Write'
+              WHEN '1' THEN 'Read'
+              ELSE 'Other'
+            END AS 'News Permission'
+        FROM
+          useraccess ua
+        JOIN
+          user u ON ua.uid = u.id
+        WHERE
+          service = '3';
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'newsServicePermissions.csv');
     }
 }

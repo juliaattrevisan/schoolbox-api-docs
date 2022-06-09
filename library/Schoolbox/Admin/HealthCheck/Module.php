@@ -39,6 +39,9 @@ class Module extends BaseModule
         $this->register('GET', '/audit/submissionStates', 'submissionStates', $isAlaress);
         $this->register('GET', '/audit/lmsSettings', 'lmsSettings', $isAlaress);
         $this->register('GET', '/audit/yearLevelPermissions', 'yearLevelPermissions', $isAlaress);
+        // Community Engagement Audits
+        $this->register('GET', '/audit/newsTopics', 'newsTopics', $isAlaress);
+        $this->register('GET', '/audit/newsServicePermissions', 'newsServicePermissions', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
