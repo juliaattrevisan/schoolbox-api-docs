@@ -17,6 +17,16 @@ class Controller extends Base
     private Jwt $tokenBuilder;
 
     /**
+     * Usage for PST/Support:
+     * If you don't provide any additional parameters it will run all audits
+     * BASE URL: /adminv2/health-check-export/audit
+     *
+     * If you need to run a specific audit use the following;
+     *      /adminv2/health-check-export/audit?report=uxui
+     *      /adminv2/health-check-export/audit?report=uxui,lms,community
+     */
+
+    /**
      * Constructor
      *
      * @param Jwt            $tokenBuilder
@@ -260,7 +270,7 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'listOfRoles');
         $this->taskDHelper->addSource('user', 'listOfCampuses');
         $this->taskDHelper->addSource('user', 'listOfYearLevels');
-        $this->taskDHelper->addSource('user', 'listOfYearHouses');
+        $this->taskDHelper->addSource('user', 'listOfHouses');
         $this->taskDHelper->addSource('user', 'servicePermissions');
         $this->taskDHelper->addSource('user', 'listOfSuperusers');
         $this->taskDHelper->addSource('user', 'resourceBrowser');
@@ -444,13 +454,13 @@ class Controller extends Base
      */
     public function lms()
     {
-        $this->taskDHelper->addSource('user', 'gradeGroups');
-        $this->taskDHelper->addSource('user', 'academicPeriods');
-        $this->taskDHelper->addSource('user', 'workTypes');
-        $this->taskDHelper->addSource('user', 'submissionStates');
-        $this->taskDHelper->addSource('user', 'lmsSettings');
-        $this->taskDHelper->addSource('user', 'yearLevelPermissions');
-        $this->taskDHelper->addSource('user', 'homepageTemplates');
+        $this->taskDHelper->addSource('lms', 'gradeGroups');
+        $this->taskDHelper->addSource('lms', 'academicPeriods');
+        $this->taskDHelper->addSource('lms', 'workTypes');
+        $this->taskDHelper->addSource('lms', 'submissionStates');
+        $this->taskDHelper->addSource('lms', 'lmsSettings');
+        $this->taskDHelper->addSource('lms', 'yearLevelPermissions');
+        $this->taskDHelper->addSource('lms', 'homepageTemplates');
     }
 
     /**
@@ -668,13 +678,14 @@ class Controller extends Base
      */
     public function community()
     {
-        $this->taskDHelper->addSource('user', 'newsTopic');
-        $this->taskDHelper->addSource('user', 'newsServicePermissions');
-        $this->taskDHelper->addSource('user', 'newsSettings');
-        $this->taskDHelper->addSource('user', 'eventTypes');
-        $this->taskDHelper->addSource('user', 'calendarServicePermissions');
-        $this->taskDHelper->addSource('user', 'parentNewsNotifications');
-        $this->taskDHelper->addSource('user', 'parentNotifOverride');
+        $this->taskDHelper->addSource('community', 'newsTopics');
+        $this->taskDHelper->addSource('community', 'newsServicePermissions');
+        $this->taskDHelper->addSource('community', 'newsSettings');
+        $this->taskDHelper->addSource('community', 'eventTypes');
+        $this->taskDHelper->addSource('community', 'calendarServicePermissions');
+        $this->taskDHelper->addSource('community', 'parentNewsNotifications');
+        $this->taskDHelper->addSource('community', 'parentNotifOverride');
+        $this->taskDHelper->addSource('community', 'homepageTemplates');
     }
 
     /**
