@@ -345,20 +345,21 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     }
 
     /**
+     * TODO check usages to verify this is not being called to generate the size
+     *
      * @return int
-     * @throws FileNotFoundException
      */
     public function getSize()
     {
-        // Calculate size if not known
-
-        if (!$this->size) {
-            try {
-                $this->setSize(parent::getSize());
-            } catch (RuntimeException $e) {
-                throw new FileNotFoundException($this->getPath(), 0, $e);
-            }
-        }
+//        // Calculate size if not known
+//
+//        if (!$this->size) {
+//            try {
+//                $this->setSize(parent::getSize());
+//            } catch (RuntimeException $e) {
+//                throw new FileNotFoundException($this->getPath(), 0, $e);
+//            }
+//        }
 
         return $this->size;
     }
