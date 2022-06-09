@@ -61,6 +61,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
@@ -927,7 +928,9 @@ class DataSource
         // Create the factory
         $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
         $importerFactory = new CsvImporterFactory($markTypeMapper);
-        $importer        = $importerFactory->build($file->readStream(), $maxLevels, $dueWork);
+        // TODO inject (like every other mapper here)
+        $filesystemProxy = StorageMapper::getInstance()->getStorageFilesystemProxy();
+        $importer        = $importerFactory->build($filesystemProxy->readStream($file), $maxLevels, $dueWork);
         $this->importGrid($dueWork, $importer);
     }
 
