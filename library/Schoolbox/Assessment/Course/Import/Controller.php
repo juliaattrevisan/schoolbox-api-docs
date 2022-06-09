@@ -540,7 +540,8 @@ class Controller extends Base\Base
         $assessment = $this->importFactory->importAssessment($implId, $specAssessment, $context, !$isChecked, $this->getUser(), $dateData);
 
         // Recursive case
-        if ($subData) {
+        // If $subData exists but $assessment is null, the project is de-selected and removed with all subData
+        if ($assessment && $subData) {
             foreach ($subData as $subDatum) {
                 /** @var Project $project */
                 $project = $assessment;
