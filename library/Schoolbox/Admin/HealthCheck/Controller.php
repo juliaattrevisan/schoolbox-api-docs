@@ -444,6 +444,9 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'gradeGroups');
         $this->taskDHelper->addSource('user', 'academicPeriods');
         $this->taskDHelper->addSource('user', 'workTypes');
+        $this->taskDHelper->addSource('user', 'submissionStates
+submissionStates
+submissionStates');
 
     }
 
@@ -513,5 +516,28 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'workTypes.csv');
+    }
+    /**
+     * LMS
+     * submissionStates.csv
+     */
+    public function submissionStates()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            code AS 'Code',
+            IF(display_as = NULL, 'Empty', display_as) AS 'Display Name',
+            normalise_as AS 'Normalised Mark'
+        FROM
+            submission_errors
+        WHERE
+            deleted_at IS NULL
+        ORDER BY
+            sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'submissionStates.csv');
     }
 }
