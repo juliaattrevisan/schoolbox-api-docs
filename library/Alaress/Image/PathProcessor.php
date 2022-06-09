@@ -27,10 +27,8 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use OverflowException;
 use PDOException;
-use Schoolbox\Config\Loader;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
-use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
