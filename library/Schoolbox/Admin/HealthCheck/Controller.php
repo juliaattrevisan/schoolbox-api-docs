@@ -444,10 +444,8 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'gradeGroups');
         $this->taskDHelper->addSource('user', 'academicPeriods');
         $this->taskDHelper->addSource('user', 'workTypes');
-        $this->taskDHelper->addSource('user', 'submissionStates
-submissionStates
-submissionStates');
-
+        $this->taskDHelper->addSource('user', 'submissionStates');
+        $this->taskDHelper->addSource('user', 'lmsSettings');
     }
 
     /**
@@ -517,6 +515,7 @@ submissionStates');
         $help = new Helper();
         $help->queryToCSV($statement, 'workTypes.csv');
     }
+    
     /**
      * LMS
      * submissionStates.csv
@@ -539,5 +538,86 @@ submissionStates');
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'submissionStates.csv');
+    }
+
+    /**
+     * LMS
+     * lmsSettings.csv
+     */
+    public function lmsSettings()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            title AS 'LMS Policy',
+                IF(c.name = 'submission_access',
+                    CASE
+                        WHEN value = '0' then 'Staff Only'
+                        WHEN value = '1' then 'Staff & Students'
+                        WHEN value = '2' then 'Staff, Students their Parents'
+                    END,
+                IF(c.name = 'submission_visibility_max',
+                    CASE
+                        WHEN value = '0' then 'Staff Only'
+                        WHEN value = '1' then 'Staff & Students'
+                        WHEN value = '2' then 'Staff, Students their Parents'
+                    END,
+                IF(c.name = 'overall_grade',
+                    CASE
+                        WHEN value = '-2' then 'Percentage'
+                        WHEN value = '-1' then 'None'
+                        ELSE sgg.name
+                    END,
+                IF(c.name = 'default_grade_group', sgg.name,
+                IF(c.name = 'lms_resubmit_window',value,
+                IF(c.name = 'lms_duetime_default',value,
+                IF(value, 'ON', 'OFF'))))))) AS 'Option Selection'
+        FROM
+            config c
+        LEFT JOIN
+            submission_grade_group sgg on c.value = sgg.id
+        WHERE
+            c.hidden = 'false'
+        AND
+            c.name IN ('curriculum_tagging_enabled',
+                     'submission_access',
+                     'restrict_student_submissions',
+                     'show_overall_grade',
+                     'similarity_check_student_visible',
+                     'submission_access',
+                     'restrict_parent_duework_access',
+                     'display_grade_graph',
+                     'restrict_parent_grades',
+                     'enable_grades_criteria',
+                     'grade_comments_enable',
+                     'default_grade_group',
+                     'rubric_show_points',
+                     'similarity_check_allow_students_report_access',
+                     'allow_student_class_access',
+                     'destructive_activity_export_enabled',
+                     'custom_assessment_participation',
+                     'self_assessment_enabled',
+                     'course_markbook_enable',
+                     'assessment_calendar_enabled',
+                     'grade_gradient_enable',
+                     'class_markbook_enable',
+                     'rubric_markbook_enable',
+                     'grade_capability_display',
+                     'grade_progression_display',
+                     'lms_permit_staff_feedback_delete',
+                     'overall_grade',
+                     'lms_cohort_comparison',
+                     'view_rank',
+                     'lms_resubmit_window',
+                     'lms_duetime_default',
+                     'submission_visibility_max'
+
+        )
+        ORDER BY
+            c.sequence;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'lmsSettings.csv');
     }
 }

@@ -37,6 +37,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/academicPeriods', 'academicPeriods', $isAlaress);
         $this->register('GET', '/audit/workTypes', 'workTypes', $isAlaress);
         $this->register('GET', '/audit/submissionStates', 'submissionStates', $isAlaress);
+        $this->register('GET', '/audit/lmsSettings', 'lmsSettings', $isAlaress);
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
