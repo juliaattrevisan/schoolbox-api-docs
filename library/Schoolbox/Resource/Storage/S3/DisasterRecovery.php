@@ -161,6 +161,7 @@ class DisasterRecovery extends CliTool\App
 
             $s3Path = str_replace($backupDirLocal, $dailyBackupDir, $localPath);
 
+            // TODO rewrite to not use v1 API
             $file = new Flysystem\File($fileSystemAwsS3Backups, $s3Path);
             if ($file->exists()) {
                 if ($file->getSize() === filesize($localPath)) {
