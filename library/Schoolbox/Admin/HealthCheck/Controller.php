@@ -671,6 +671,8 @@ class Controller extends Base
         $this->taskDHelper->addSource('user', 'newsTopic');
         $this->taskDHelper->addSource('user', 'newsServicePermissions');
         $this->taskDHelper->addSource('user', 'newsSettings');
+        $this->taskDHelper->addSource('user', 'eventTypes');
+        $this->taskDHelper->addSource('user', 'calendarServicePermissions');
     }
 
     /**
@@ -751,5 +753,64 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'newsSettings.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * eventTypes.csv
+     */
+    public function eventTypes()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+                eventTypeID as 'ID',
+                eventType as 'Event',
+                eventColour as 'Event Colour'
+        FROM
+                luEventType
+        WHERE
+                deleted_at is NULL
+        ORDER BY
+                sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'eventTypes.csv');
+    }
+
+    /**
+     * COMMUNITY
+     * calendarServicePermissions.csv
+     */
+    public function calendarServicePermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+                  concat(u.firstname,' ', u.lastname, ' (', u.id, ')') AS 'User',
+                  lc.name as 'Campus',
+                  CASE type
+                      WHEN '3' THEN 'Moderator'
+                      WHEN '2' THEN 'Write'
+                      WHEN '1' THEN 'Read'
+                    ELSE 'Other'
+                  END as 'Permission'
+        FROM
+                  userAccess ua
+        LEFT JOIN
+                  user u on ua.uid = u.id
+        LEFT JOIN
+                  luCampus lc on ua.sid = lc.id
+        WHERE
+                  u.deleted_at is NULL
+        AND
+                  ua.service = '2'
+        ORDER BY
+                  ua.uid;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'calendarServicePermissions.csv');
     }
 }
