@@ -87,6 +87,13 @@ class Processor
     /**
      * Constructor
      *
+     * TODO this should take a path and a standard filesystem, rather than a
+     *      storage and a filesystem proxy.
+     *
+     * This is because it could work with either:
+     * * a file on disk
+     * * a file in storage
+     *
      * @param Storage\Model           $file
      * @param Storage\FilesystemProxy $filesystemProxy
      * @param string                  $cacheKey
