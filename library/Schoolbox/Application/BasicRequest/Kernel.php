@@ -9,6 +9,7 @@
 namespace Schoolbox\Application\BasicRequest;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\WebKernelAbstract;
@@ -454,6 +455,16 @@ class Kernel extends WebKernelAbstract
                     return $mountManager->getTempFilesystem();
                 }
             )
+        );
+        $di->set(
+            'filesystem.imageProcessorFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var FilesystemInterface $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new ProcessorFactory($storage, new HashGenerator());
+                }
+            ),
         );
 
 

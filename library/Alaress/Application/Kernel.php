@@ -15,6 +15,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Image\ProcessorFactory;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
@@ -1858,6 +1859,16 @@ abstract class Kernel
                     return $mountManager->getTempFilesystem();
                 }
             )
+        );
+        $di->set(
+            'filesystem.imageProcessorFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var FilesystemInterface $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new ProcessorFactory($storage, new HashGenerator());
+                }
+            ),
         );
 
 
