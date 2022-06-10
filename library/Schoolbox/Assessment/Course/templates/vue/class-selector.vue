@@ -10,7 +10,6 @@ import { ref, computed, onMounted  } from 'vue'
 import ClassSelectorSelectAll from './class-selector-select-all';
 import ClassSelectorSearchResult from './class-selector-search-result';
 import ClassSelectorSelectedClass from './class-selector-selected-class';
-import { gsap } from 'gsap/all';
 
 
 const props = defineProps({
@@ -124,8 +123,8 @@ const query = ref(''); //the search string to match against
 const queryInputEl = ref(null); 
 const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3  
 const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
-const isResultsCapped = ref(false);
-const resultsNotShownCount = ref(0);
+const isResultsCapped = ref(false); //to show a 'refine your search' note
+const resultsNotShownCount = ref(0); //a total of the results not visible in the list
 
 /**
  * the search string broken into words, to search for each word
@@ -133,13 +132,15 @@ const resultsNotShownCount = ref(0);
  * @returns { Array } the search string broken into single words
  */
 const queryWordList = computed(() => {
-    const queryTrimmed = query.value.trim();
-    const allWords = queryTrimmed.match(/\b(\w+)\b/g) ?? [];
-    return allWords.filter(word => word.length > 0);
+    const queryTrimmed = query.value.trim(); //remove any front or back white space
+    const re = /\s*(?:,|$)\s*/ //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
+    const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
+    return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
 });
 
 /**
- * the classes found relevant to the search input
+ * the classes found relevant to the search input, capped to the maximum 
+ * amount of results to be shown
  * 
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
@@ -149,11 +150,11 @@ const results = computed(() => {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) { 
         const fullResults = classes.value.filter(searchForName);
-        if (fullResults.length > CAPPED_RESULTS_LENGTH) {
-            isResultsCapped.value = true;
-            resultsNotShownCount.value = fullResults.length - CAPPED_RESULTS_LENGTH;
+        if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
+            isResultsCapped.value = true; //to display the results are capped note
+            resultsNotShownCount.value = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
             return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
-        } else {
+        } else {//otherwise just return them all
             return fullResults;
         }
     } else {
