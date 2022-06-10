@@ -13,7 +13,6 @@ use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
 use BadMethodCallException;
 use Config;
-use League\Flysystem\File;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -27,7 +26,7 @@ use Schoolbox\Resource\FilesystemFactory;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkable
+class Model implements IStorage, \Alaress\Json\Serializable, Linkable
 {
     use CreatedAtDate;
     use SerializeTrait;

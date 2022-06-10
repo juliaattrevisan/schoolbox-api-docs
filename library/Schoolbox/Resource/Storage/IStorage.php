@@ -9,7 +9,6 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\File\Mimetype;
 
 /**
@@ -103,44 +102,4 @@ interface IStorage
      * @return Alaress_Date_Format
      */
     public function getLastAccessed();
-
-    /**
-     * Check whether the file exists.
-     *
-     * @inherited from Flysystem\File
-     * @return bool
-     */
-    public function exists();
-
-    /**
-     * Read the file.
-     *
-     * @inherited from Flysystem\File
-     * @return string file contents
-     */
-    public function read();
-
-    /**
-     * Read the file as a stream.
-     *
-     * @inherited from Flysystem\File
-     * @return resource file stream
-     */
-    public function readStream();
-
-    /**
-     * Get this file's filesystem.
-     *
-     * @inherited from Flysystem\File
-     * @return FilesystemInterface
-     */
-    public function getFilesystem();
-
-    /**
-     * Get the path to the file on its filesystem.
-     *
-     * @inherited from Flysystem\File
-     * @return string
-     */
-    public function getPath();
 }

@@ -9,8 +9,6 @@
 
 namespace Schoolbox\Resource\File;
 
-use BadMethodCallException;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\File\Mimetype;
 
@@ -171,65 +169,5 @@ trait StorableTrait
     {
         $this->storage = $storage;
         return $this;
-    }
-
-    /**
-     * Check whether the file exists.
-     *
-     * @deprecated replace usages with `FilesystemProxy::fileExists`
-     *
-     * @return bool
-     */
-    public function exists()
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-    }
-
-    /**
-     * Read the file.
-     *
-     * @deprecated replace usages with `FilesystemProxy::read`
-     *
-     * @return string file contents
-     */
-    public function read()
-    {
-        return $this->storage->read();
-    }
-
-    /**
-     * Read the file as a stream.
-     *
-     * @deprecated replace usages with `FilesystemProxy::readStream`
-     *
-     * @return resource file stream
-     */
-    public function readStream()
-    {
-        return $this->storage->readStream();
-    }
-
-    /**
-     * Get this file's filesystem.
-     *
-     * @deprecated remove usages, use filesystem proxy instead
-     *
-     * @return FilesystemInterface
-     */
-    public function getFilesystem()
-    {
-        return $this->storage->getFilesystem();
-    }
-
-    /**
-     * Get the path to the file on its filesystem.
-     *
-     * @deprecated remove usages
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->storage->getPath();
     }
 }
