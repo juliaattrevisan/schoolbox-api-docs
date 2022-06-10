@@ -1,7 +1,7 @@
 #!/bin/bash
 # Can be invoked to either:
-# 1. Builds and runs a taskd container from local source, or
-# 2. Stops and removes any taskd containers built from local source.
+# 1. Build and run a taskd container from local source, or
+# 2. Stop and remove any taskd containers built from local source.
 
 # Global const
 readonly ARG_LOCAL="local"                              # If present, build image from local source. If absent, remove locally-built containers.
@@ -60,8 +60,8 @@ function validate_args(){
   fi
 }
 
+# stop existing locally-built container (identified via image tag + container name)
 function stop_container () {
-  # stop existing locally-built container (identified via image tag + container name)
   echo "[SB][$(date +%Y-%m-%d\ %X)] Stopping locally-built task daemon container";
   taskd_container_ids="$(docker ps -f ancestor=alaress/taskd:$IMAGE_TAG -q)"
   if [[ -n $taskd_container_ids ]]; then
@@ -74,13 +74,13 @@ function stop_container () {
 }
 
 
-# build image
+# build image from local source
 function build_image(){
   echo "[SB][$(date +%Y-%m-%d\ %X)] Rebuilding local task daemon image";
   docker build -q --tag alaress/taskd:$IMAGE_TAG --network host "$MOUNT_DIR_TASKD"
 }
 
-
+# start locally-build container
 function start_container () {
   declare extra_args=()
 
@@ -98,6 +98,7 @@ function start_container () {
     alaress/taskd:$IMAGE_TAG
 }
 
+# main logic flow
 function main(){
   parse_args "$@"
   validate_args
