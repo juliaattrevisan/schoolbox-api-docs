@@ -199,8 +199,12 @@ class Sessions implements IStrategy
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
