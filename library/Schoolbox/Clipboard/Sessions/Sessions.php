@@ -57,6 +57,17 @@ class Sessions implements IStrategy
 
 
     /**
+     * This is a giant slab of text that comes from the accumulation of Additional Fields'
+     * data which may, or may not, exist. If there's meaningful content, it's appended to
+     * the end of NOTES_TEMPLATE, with a horizontal rule for a separator
+     */
+    private const ADDITIONAL_FIELDS_TEMPLATE = "
+        <hr />
+        %s
+    ";
+
+
+    /**
      * This is used as the description for home team's outcome since all
      * clipboard teams are Home Teams (we never import enemy teams like this)
      */
@@ -259,6 +270,9 @@ class Sessions implements IStrategy
                 'includeStaff' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
+                /* These might also be known as "Additional Fields" in the clipboard ui
+                 */
+                'includeCustomFieldsMetadata' => 'true',
                 'startDateTime' => $startDateTime,
                 'endDateTime' => $endDateTime,
                 /* Apparently this should give you "only not cancelled" sessions
@@ -269,6 +283,19 @@ class Sessions implements IStrategy
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
             ]);
+
+            /* Store metadata for custom fields: their types and their labels
+             * This is to make their contents presentable in the frontend by
+             * appending it to each event's $notes
+             *
+             * Metadata is supplied in the $session var, not the $session['data']
+             * var; it's meant to apply to everything in the payload
+             *
+             * Therefore we can remember it per endpoint retrieval. Technically
+             * we'd only need to remember it once, I think, but I don't really
+             * see there being an advantage one way or the other; we canjust use
+             * the customFieldsMetadata struct as provided in each $session
+             */
 
             foreach ($sessions['data'] as $session) {
                 /* Sport identifiers
@@ -400,6 +427,28 @@ class Sessions implements IStrategy
                         $this->generateStatus($session),
                         nl2br(trim((string)$session['studentParentNotes']))
                     );
+
+if (!empty($session['customFieldsData'])) {
+    if (str_contains($session['title'], 'Hockey')) {
+        print_r($session);
+    }
+}
+
+
+
+                    /* TODO: Cram in a set of custom fields' metadata contents into $notes
+                     * by collating all the custom metadata records into one big slab
+                     */
+                    // $additionalFields .= ...
+
+                    /* customFieldMetadata is a set of key-value pairs:
+                     *    busDepartureTime
+                     *    studentArrivalTime
+                     *    coachstaffContactDetails
+                     *
+                     * so I guess we just concatenate all their values for now
+                     */
+                    // $notes .= $additionalFields
 
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups
