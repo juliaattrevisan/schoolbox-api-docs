@@ -325,16 +325,12 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     /**
      * Returns the full mime string for the file
      *
-     * @param bool $detect
+     * TODO check usages to verify this is not called with detect = true
      *
      * @return string
      */
-    public function getMime($detect = false)
+    public function getMime()
     {
-        if ($detect) {
-            return parent::getMimetype();
-        }
-
         if ($this->getMimetype() instanceof Mimetype) {
             return $this->getMimetype()->getMime();
         } else {
