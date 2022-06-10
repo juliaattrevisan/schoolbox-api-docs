@@ -11,7 +11,6 @@ declare(strict_types=1);
 use Alaress\Image;
 use Predis\ClientInterface;
 use Schoolbox\Application\Daemon\Kernel;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -65,13 +64,13 @@ $limits           = [
     3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
 ];
 
-// TODO inject lock inspector instaed of cache
+// TODO inject lock inspector instead of cache
 /** @var ClientInterface $redis */
-$redis           = $kernel->get('redis.cache');
-/** @var FilesystemProxy $filesystemProxy */
-$filesystemProxy = $kernel->get('filesystem.storageProxy');
-$parent          = new Image\Processor\Manager(
-    $filesystemProxy,
+$redis            = $kernel->get('redis.cache');
+/** @var Image\ProcessorFactory $processorFactory */
+$processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+$parent           = new Image\Processor\Manager(
+    $processorFactory,
     $timeInterval,
     $imageCountLimit,
     $workerCount,

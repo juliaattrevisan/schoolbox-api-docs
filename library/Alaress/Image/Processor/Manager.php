@@ -180,18 +180,18 @@ class Manager
     /**
      * Constructor
      *
-     * @param FilesystemProxy $filesystemProxy
-     * @param int             $timeInterval    Time period in minutes to look up images for processing
-     * @param int             $imageCountLimit Max number of images to process
-     * @param int             $workerCount     Max number of concurrent workers
-     * @param LoggerInterface $logger
-     * @param bool            $retryFailed
-     * @param int             $attemptsPerTransform
-     * @param int             $logLevel
-     * @param ClientInterface $redis
+     * @param Image\ProcessorFactory $processorFactory
+     * @param int                    $timeInterval    Time period in minutes to look up images for processing
+     * @param int                    $imageCountLimit Max number of images to process
+     * @param int                    $workerCount     Max number of concurrent workers
+     * @param LoggerInterface        $logger
+     * @param bool                   $retryFailed
+     * @param int                    $attemptsPerTransform
+     * @param int                    $logLevel
+     * @param ClientInterface        $redis
      */
     public function __construct(
-        private FilesystemProxy $filesystemProxy,
+        private Image\ProcessorFactory $processorFactory,
         int $timeInterval,
         int $imageCountLimit,
         int $workerCount,

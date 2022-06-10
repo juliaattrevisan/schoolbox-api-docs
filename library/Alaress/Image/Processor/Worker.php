@@ -251,6 +251,12 @@ class Worker extends CliTool\App
     ): void {
         $hash      = $hashObject->getHash();
         $processor = new Image\Processor($hashObject, $this->filesystemProxy, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
+        $processor = $this->processorFactory->buildForStorage(
+            $hashObject,
+            $cacheKey,
+            $transform,
+            $this->imageMagickTimeout,
+        );
 
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
