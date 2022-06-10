@@ -20,7 +20,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -71,11 +70,13 @@ if ($urlDetect->isStorageUrl()) {
         /* Unknown file
          */
         \SitePage::redirectToBrokenImageWithTransform('storage', $size);
+        exit;
     }
 } else {
     $storage = $cache->getFile();
     if (!$storage) {
         \SitePage::redirectToBrokenImageWithTransform('storage', $size, 400);
+        exit;
     }
 }
 
@@ -104,11 +105,10 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-    $processor       = new Image\Processor(
+    /** @var Image\ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $processor        = $processorFactory->buildForStorage(
         $storage,
-        $filesystemProxy,
         $transforms->getCacheKey($size),
         $transforms->retrieve($size),
     );
