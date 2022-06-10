@@ -11,8 +11,10 @@ namespace Schoolbox\Resource\Storage;
 
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\NotSupportedException;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
  * A proxy class for providing a `FilesystemInterface`-like facade when dealing
@@ -328,6 +330,18 @@ class FilesystemProxy
     public static function getPathFromHash(string $hash): string
     {
         return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
+    }
+
+    /**
+     * Helper function for determining whether this filesystem uses the S3
+     * adapter.
+     *
+     * @return bool
+     */
+    public function usesS3Adapter(): bool
+    {
+        return $this->filesystem instanceof Filesystem
+            && $this->filesystem->getAdapter() instanceof S3Adapter;
     }
 
     /**
