@@ -314,7 +314,7 @@ class FilesystemProxy
      * @param string $hash
      * @return string
      */
-    private static function getPathFromHash(string $hash): string
+    public static function getPathFromHash(string $hash): string
     {
         return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
     }

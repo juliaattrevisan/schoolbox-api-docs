@@ -6,7 +6,9 @@
  * @link        https://schoolbox.com.au/
  */
 
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 
@@ -28,9 +30,14 @@ $app = new class extends CliTool\App {
         $storageMapper = new StorageMapper();
         $mountManager  = $storageMapper->getManager();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
+
+        /** @var FilesystemInterface $storageFilesystem */
+        $storageFilesystem = $this->getDi()->get('filesystem.storage');
+
         /** @var Storage $svgFile */
         foreach ($svgFiles as $svgFile) {
-            $result = $mountManager->sanitize($svgFile, !$this->perform());
+            $path   = FilesystemProxy::getPathFromHash($svgFile->getHash());
+            $result = $mountManager->sanitize($svgFile, $storageFilesystem, $path, !$this->perform());
             if ($result) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
             } else {

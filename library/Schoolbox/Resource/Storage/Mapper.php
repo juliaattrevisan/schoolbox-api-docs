@@ -362,19 +362,16 @@ class Mapper extends BaseMapper implements Receiver
     public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiryAt = null): Model
     {
         /** @var MimetypeMapper $mtm */
-        $mtm = $this->getJoinMapper('allowedFileExtension');
+        $mtm     = $this->getJoinMapper('allowedFileExtension');
+        $storage = $this->createModel();
 
-        // Create storage object with no hash so that it is automatically created
-
-        $storage = $this->createModel()->setHash(null);
-
-        // Explicitly use temporary upload filesystem
-
-        $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
-
-        // TODO: Find a way to remove the need for this truncation
-
-        $storage->setPath(str_replace(sys_get_temp_dir(), '', $tempLocation));
+//        // Explicitly use temporary upload filesystem
+//
+//        $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
+//
+//        // TODO: Find a way to remove the need for this truncation
+//
+//        $storage->setPath(str_replace(sys_get_temp_dir(), '', $tempLocation));
 
         // Set file type metadata
 
@@ -390,7 +387,7 @@ class Mapper extends BaseMapper implements Receiver
         // By default files uploaded this way are public
 
         $storage->setPublic($public);
-        $this->getManager()->sanitize($storage);
+        $this->getManager()->sanitize($storage, $this->getManager()->getTempFilesystem(), $tempLocation);
 
         if (null !== $expiryAt) {
             $storage->setExpiryAt($expiryAt);

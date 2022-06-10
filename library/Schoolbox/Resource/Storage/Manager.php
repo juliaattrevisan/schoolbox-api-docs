@@ -245,24 +245,23 @@ class Manager
     /**
      * Sanitize file prior to storing.
      *
-     * @param Model $storage     The storage object for the file: required so
-     *                           that the sanitizer knows how to sanitise the
-     *                           file.
-     * @param bool  $dryRun      If true: don't actually sanitize: just return
-     *                           whether it would have been.
+     * @param Model               $storage    The storage object for the file: required so
+     *                                        that the sanitizer knows how to sanitise the
+     *                                        file.
+     * @param FilesystemInterface $filesystem The filesystem the file to sanitize exists on.
+     * @param string              $path       The path to the file to sanitize.
+     * @param bool                $dryRun     If true: don't actually sanitize: just return
+     *                                        whether it would have been.
      * @return bool
      * @throws FileNotFoundException
      */
-    public function sanitize(Model $storage, bool $dryRun = false): bool
+    public function sanitize(Model $storage, FilesystemInterface $filesystem, string $path, bool $dryRun = false): bool
     {
-        $fileSystem = $storage->getFilesystem();
-        $path       = $storage->getPath();
-
         if (!$this->sanitizer->accepts($storage->getMime())) {
             return false;
         }
         try {
-            $unsafeContent = $fileSystem->read($path);
+            $unsafeContent = $filesystem->read($path);
         } catch (FileNotFoundException $e) {
             return false;
         }
@@ -274,8 +273,8 @@ class Manager
             return true;
         }
         // update storage to match sanitized content
-        $result = $fileSystem->put($storage->getPath(), $sanitizedContent);
-        $storage->setHash((new HashGenerator())->generateHash($fileSystem->readStream($storage->getPath())));
+        $result = $filesystem->put($path, $sanitizedContent);
+        $storage->setHash((new HashGenerator())->generateHash($filesystem->readStream($path)));
         return $result;
     }
 
