@@ -15,6 +15,7 @@ use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Transform;
@@ -428,7 +429,7 @@ class Queue extends ResourceVideo
      */
     private function getSourceLocation($sourceObject)
     {
-        return $this->getConfig()->get('storage_dir') . '/' . $sourceObject->getPath();
+        return $this->getConfig()->get('storage_dir') . '/' . Manager::getPathFromHash($sourceObject->getHash());
     }
 
 

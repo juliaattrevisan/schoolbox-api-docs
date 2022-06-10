@@ -12,12 +12,14 @@ namespace Schoolbox\Video\CommandLineTool;
 use Alaress_Byte_Format;
 use Exception;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
@@ -110,6 +112,7 @@ class Processor extends CliTool\App
         $failed       = 0;
         $success      = 0;
 
+        /** @var FilesystemInterface $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
         /** @var Queue $mediaCurrent */
@@ -134,7 +137,7 @@ class Processor extends CliTool\App
 
                     $fileSystem = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
                     $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
-                    $filePath   = $storage->getPath();
+                    $filePath   = Manager::getPathFromHash($storage->getHash());
 
                     $log->info("");
                     $log->info("    - Processing Item:        {$countCurrent}/{$countTotal}");
