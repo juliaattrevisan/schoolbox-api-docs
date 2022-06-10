@@ -2,6 +2,7 @@
 import ClassSelector from '../../library/Schoolbox/Assessment/Course/templates/vue/class-selector';
 import { rest } from 'msw';
 import { data } from './dataClassSelector';
+import { largeData } from './largeDataClassSelector';
 
 export default {
     title: 'Components/Selectors/ClassSelector',
@@ -52,7 +53,7 @@ const Template = (args, { argTypes }) => ({
         `,
 });
 
-const endpoint = 'https://swapi.dev/api/films/';
+const endpoint = 'https://swapi.dev/api/films/'; //just using any active endpoint for a connection
 
 export const Default = Template.bind({});
 Default.parameters = {
@@ -98,4 +99,19 @@ PreSelectedClass.parameters = {
 PreSelectedClass.args = {
     endpoint: '',
     previouslySelectedClass: { id: 80, name: '9A English (9ENGA)' },
+}
+
+export const LargeData = Template.bind({});
+LargeData.parameters = {
+    controls: { hideNoControlsWarning: true },
+    msw: {
+        handlers: [
+            rest.get(endpoint, (req, res, ctx) => {
+                return res(ctx.json(largeData)) //we grab an endpoint and then modify the data before it's returned
+            }), 
+        ]
+    },
+}
+LargeData.args = {
+    endpoint: endpoint,
 }

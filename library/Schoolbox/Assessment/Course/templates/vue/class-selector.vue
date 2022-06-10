@@ -41,7 +41,8 @@ const props = defineProps({
 
 const isLoading = ref(true);
 const hasLoadError = ref(false);
-const classes = ref([]); //all the classes
+const classes = ref([]); //all the classes data
+const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
 
 /**
  * a class has already been previously selected, so the class-selector is not enabled
@@ -143,7 +144,12 @@ const results = computed(() => {
     if (query.value.length < minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) { 
-        return classes.value.filter(searchForName); 
+        const fullResults = classes.value.filter(searchForName);
+        if (fullResults.length > CAPPED_RESULTS_LENGTH) {
+            return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
+        } else {
+            return fullResults;
+        }
     } else {
         return [];
     }
@@ -238,45 +244,6 @@ function initMouseEvents () {
  */
 function clearInput () {
     query.value = '';
-}
-
-
-/*****************************************************************
- * 
- * Animating the search results
- * 
- ****************************************************************/
-
-/**
- * animate settings to help context when filtering
- * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
- * what happens before shown
- *
- * @param { DOMElement } element - the element that's animating
- */
-function onBeforeOnEnter (element) {
-    gsap.set(element, { opacity: 0, y: 10, height: 0 } );
-}
-
-/**
- * how the element animates on
- *
- * @param { DOMElement } element - the element that's animating
- * @param { Function } done - to be called once animation is complete
- */
-function onEnter (element, done) {
-    const delay = element.dataset.index * 0.025;
-    gsap.to(element, 0.3, { opacity: 1, y: 0, height: 'auto', delay: delay, onComplete: done } );
-}
-
-/**
- * how the element animates off
- *
- * @param { DOMElement } element - the element that's animating
- * @param { Function } done - to be called once animation is complete
- */
-function onLeave (element, done) {
-    gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
 }
 
 
@@ -430,13 +397,7 @@ function onClearAllSelected () {
         />
         <div class="search-results-container">
             <div class="search-results">
-                <transition-group
-                    tag="ul"
-                    :css="false"
-                    @before-enter="onBeforeOnEnter"
-                    @enter="onEnter"
-                    @leave="onLeave"
-                >
+                <ul>
                     <li v-if="showSelectAll">
                         <class-selector-select-all
                             :is-all-results-selected="isAllResultsSelected"
@@ -453,7 +414,7 @@ function onClearAllSelected () {
                             @select="onSelectResult"
                         />
                     </li>
-                </transition-group>
+                </ul>
             </div><!-- .search-results -->
         </div><!-- .search-results-container -->
         <div v-if="hasSelectedClasses" :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
