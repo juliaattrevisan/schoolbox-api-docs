@@ -287,11 +287,15 @@ class Manager
     /**
      * @param Model $storage
      *
+     * @throws BadMethodCallException this method is no longer supported: use
+     *                                `FilesystemProxy::delete`
+     *
      * @return bool
      */
     public function delete(Model $storage)
     {
-        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+//        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
     }
 
     /**

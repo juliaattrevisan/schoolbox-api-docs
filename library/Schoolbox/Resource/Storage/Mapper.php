@@ -127,7 +127,7 @@ class Mapper extends BaseMapper implements Receiver
      */
     public function deleteStorage(Model $storage)
     {
-        $this->getManager()->delete($storage);
+        $this->getStorageFilesystemProxy()->delete($storage);
     }
 
     /**

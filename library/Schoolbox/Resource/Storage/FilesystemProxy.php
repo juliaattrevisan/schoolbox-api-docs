@@ -160,13 +160,13 @@ class FilesystemProxy
      * * v3 `FilesystemAdapter::delete`
      *
      * @param IStorage $storage
-     * @throws FileNotFoundException
      */
     public function delete(IStorage $storage): void
     {
-        $this->filesystem->delete(self::getPathFromHash($storage->getHash()));
+        // Deleting the parent folder of the file deletes all of its transforms
+        $this->filesystem->deleteDir(dirname(self::getPathFromHash($storage->getHash())));
 
-        // TODO consider whether to delete the storage record too?
+        // Do not delete storage record here
     }
 
     /**
