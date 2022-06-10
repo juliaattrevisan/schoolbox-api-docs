@@ -167,9 +167,10 @@ class Mapper extends BaseMapper implements Receiver
             }
         }
 
-        // Ram media files into Video Queue table for transcoding
+        // Don't persist here: it was persisted in accept()
+//        $saveResult = $this->getManager()->save($storage);
 
-        $saveResult = $this->getManager()->save($storage);
+        // Ram media files into Video Queue table for transcoding
 
         if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
             $mapper = QueueMapper::getInstance();
@@ -181,7 +182,7 @@ class Mapper extends BaseMapper implements Receiver
             $mapper->save($videoQ);
         }
 
-        return $saveResult;
+        return true;
     }
 
     /**
