@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class Api
 {
-
     /**
      * POST to this endpoint
      */

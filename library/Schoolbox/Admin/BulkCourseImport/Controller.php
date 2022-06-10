@@ -36,8 +36,6 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
-
-
     private FolderMapper $folderMapper;
 
     private UserMapper $userMapper;

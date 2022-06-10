@@ -34,7 +34,6 @@ use Symfony\Component\Lock\Exception\LockConflictedException;
  */
 class Processor extends CliTool\App
 {
-
     public const LOCK_NAME = 'video_transcode';
 
 

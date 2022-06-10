@@ -26,7 +26,6 @@ use Schoolbox\Mapper;
  */
 class Controller extends Web\Controller\Base
 {
-
     /**
      * Profile CSVs
      * Processor consts for declaring which file is being supplied

@@ -28,7 +28,6 @@ use Schoolbox\Role;
  */
 class Importer
 {
-
     /**
      * Status string for successful row processing
      */

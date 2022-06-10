@@ -29,7 +29,6 @@ use Schoolbox\UserMapper;
  */
 abstract class AbstractFileMapper extends Schoolbox\Mapper
 {
-
     /**
      * @var Resource\Storage\Mapper
      */

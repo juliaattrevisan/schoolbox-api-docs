@@ -138,7 +138,7 @@ try {
         $transform,
     );
     $imageProcessor->load()->stream();
-} catch (Image\Exception\ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (Image\Exception\ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');
     $prefixGenerator->redirectTemporary($path);

@@ -33,7 +33,6 @@ use Schoolbox\Resource\Storage;
  */
 class Controller extends Base
 {
-
     /**
      * @var string
      */

@@ -24,7 +24,6 @@ use Schoolbox\Import\ImporterFactory;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */

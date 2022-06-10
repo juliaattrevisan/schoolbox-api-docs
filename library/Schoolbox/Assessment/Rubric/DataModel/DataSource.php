@@ -73,7 +73,6 @@ use UnexpectedValueException;
  */
 class DataSource
 {
-
     /**
      * Stores the singleton instance of the mapper
      *

@@ -67,7 +67,7 @@ try {
         );
         $imageProcessor->load()->stream();
     }
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
 } catch (Exception $e) {

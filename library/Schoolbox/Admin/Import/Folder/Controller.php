@@ -37,7 +37,6 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
-
     /**
      * @var RoleMapper
      */

@@ -34,7 +34,6 @@ use Schoolbox\Sync\Rule\Model as Rule;
  */
 class Controller extends Base
 {
-
     /**
      * @var string
      */

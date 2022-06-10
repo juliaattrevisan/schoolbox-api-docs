@@ -33,7 +33,6 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
  */
 class Controller extends Base
 {
-
     /**
      * @var External\Profile\Mapper
      */

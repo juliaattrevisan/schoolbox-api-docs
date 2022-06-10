@@ -55,7 +55,6 @@ use Schoolbox\Learning\Assessment\Redirect;
  */
 class Kernel extends WebKernelAbstract
 {
-
     /**
      * @inheritdoc
      */

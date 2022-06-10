@@ -111,7 +111,7 @@ try {
         $transforms->retrieve($size),
     );
     $processor->load()->stream();
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {

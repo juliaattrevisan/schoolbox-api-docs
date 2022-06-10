@@ -22,7 +22,6 @@ use Schoolbox\Resource\Storage;
  */
 class ImporterFactory
 {
-
     public const IMPORT_USER = 'adminImportUserAccount';
 
     public const IMPORT_STRUCTURE = 'adminImportTimetableStructure';

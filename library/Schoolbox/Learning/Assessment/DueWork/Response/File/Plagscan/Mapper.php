@@ -32,7 +32,6 @@ use Sentry\State\HubInterface;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * An instance of the Plagscan Connector
      * which is where files end up

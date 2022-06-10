@@ -22,7 +22,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-
     /**
      * @var ErrorMapper
      */

@@ -115,7 +115,7 @@ try {
         $portrait->retrieve(TRANSFORM_KEY),
     );
     $image->load()->stream();
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, $e->getHttpStatusCode());

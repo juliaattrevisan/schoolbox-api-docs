@@ -23,7 +23,6 @@ use Schoolbox\Resource\Browser\FullAccessController;
  */
 class Controller extends FullAccessController
 {
-
     /**
      * Overridden because files are uploaded to WebDav differently.
      *
