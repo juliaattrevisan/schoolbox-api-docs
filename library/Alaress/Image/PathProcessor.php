@@ -48,7 +48,7 @@ class PathProcessor
      * we need this value to be less than the request execution time limit (usually 60s)
      * to prevent temp files being left behind when the process is killed.
      */
-    private const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
+    public const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
 
     /**
      * Path to the file in the filesystem.
