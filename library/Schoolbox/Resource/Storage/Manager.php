@@ -206,55 +206,55 @@ class Manager
     }
 
 
-    /**
-     * @param string $tmpFilePath
-     * @param Model  $storage
-     * @return bool
-     * @throws BadMethodCallException this method is no longer supported: use
-     *                                `StorageMapper::accept` for now
-     */
-    private function move(string $tmpFilePath, Model $storage): bool
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-//        /** @var Filesystem $fsFrom */
-//        $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
-//        /** @var Filesystem $fsTo */
-//        $fsTo = $this->mountManager->getFilesystem(self::FS_STORAGE);
-//
-//        $adapterFrom = $fsFrom->getAdapter();
-//        $adapterTo   = $fsTo->getAdapter();
-//
-//        // Are they both local?
-//        if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
-//            // Attempt to move, rather than copy
-//            if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
-//                return false;
-//            }
-//
-//            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath, 0664);
-//            return rename(
-//                rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
-//                $adapterTo->getPathPrefix() . $storage->getPath()
-//            );
-//        }
-//
-//        try {
-//            return $this->mountManager->move(
-//                self::FS_TEMP . "://$tmpFilePath",
-//                self::FS_STORAGE . '://' . $storage->getPath()
-//            );
-//        } catch (FileExistsException $e) {
-//            // The file already exists in the storage backend.
-//            // This is fine, because the storage file's contents determine the
-//            // file path: we can assume it's the same file.
-//            try {
-//                $fsFrom->delete($tmpFilePath);
-//            } catch (FileNotFoundException $e2) {
-//                // The temp file didn't exist after all: that's fine too
-//            }
-//            return true;
-//        }
-    }
+//    /**
+//     * @param string $tmpFilePath
+//     * @param Model  $storage
+//     * @return bool
+//     * @throws BadMethodCallException this method is no longer supported: use
+//     *                                `StorageMapper::accept` for now
+//     */
+//    private function move(string $tmpFilePath, Model $storage): bool
+//    {
+//        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+////        /** @var Filesystem $fsFrom */
+////        $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
+////        /** @var Filesystem $fsTo */
+////        $fsTo = $this->mountManager->getFilesystem(self::FS_STORAGE);
+////
+////        $adapterFrom = $fsFrom->getAdapter();
+////        $adapterTo   = $fsTo->getAdapter();
+////
+////        // Are they both local?
+////        if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
+////            // Attempt to move, rather than copy
+////            if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
+////                return false;
+////            }
+////
+////            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath, 0664);
+////            return rename(
+////                rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
+////                $adapterTo->getPathPrefix() . $storage->getPath()
+////            );
+////        }
+////
+////        try {
+////            return $this->mountManager->move(
+////                self::FS_TEMP . "://$tmpFilePath",
+////                self::FS_STORAGE . '://' . $storage->getPath()
+////            );
+////        } catch (FileExistsException $e) {
+////            // The file already exists in the storage backend.
+////            // This is fine, because the storage file's contents determine the
+////            // file path: we can assume it's the same file.
+////            try {
+////                $fsFrom->delete($tmpFilePath);
+////            } catch (FileNotFoundException $e2) {
+////                // The temp file didn't exist after all: that's fine too
+////            }
+////            return true;
+////        }
+//    }
 
     /**
      * Sanitize file prior to storing.
