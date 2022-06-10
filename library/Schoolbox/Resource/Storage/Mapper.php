@@ -387,7 +387,13 @@ class Mapper extends BaseMapper implements Receiver
         // By default files uploaded this way are public
 
         $storage->setPublic($public);
-        $this->getManager()->sanitize($storage, $this->getManager()->getTempFilesystem(), $tempLocation);
+        $sanitized = $this->getManager()->sanitize($storage, $this->getManager()->getTempFilesystem(), $tempLocation);
+        if (isset($sanitized)) {
+            // TODO write the new content
+        }
+
+        // TODO work with a sanitized version of the file instead
+        //      (sanitize() should return sanitized content, instead of sanitizing in place)
 
         if (null !== $expiryAt) {
             $storage->setExpiryAt($expiryAt);

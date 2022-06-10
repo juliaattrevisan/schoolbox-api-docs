@@ -37,9 +37,12 @@ $app = new class extends CliTool\App {
         /** @var Storage $svgFile */
         foreach ($svgFiles as $svgFile) {
             $path   = FilesystemProxy::getPathFromHash($svgFile->getHash());
-            $result = $mountManager->sanitize($svgFile, $storageFilesystem, $path, !$this->perform());
-            if ($result) {
+            $result = $mountManager->sanitize($svgFile, $storageFilesystem, $path);
+            if (isset($result)) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
+                if ($this->perform()) {
+                    // TODO write the new content
+                }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
             }

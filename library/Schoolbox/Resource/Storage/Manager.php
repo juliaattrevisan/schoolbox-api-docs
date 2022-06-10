@@ -250,32 +250,35 @@ class Manager
      *                                        file.
      * @param FilesystemInterface $filesystem The filesystem the file to sanitize exists on.
      * @param string              $path       The path to the file to sanitize.
-     * @param bool                $dryRun     If true: don't actually sanitize: just return
-     *                                        whether it would have been.
-     * @return bool
+     * @return string|null Sanitized content if the item was sanitized, null if
+     *                     it was not sanitized.
      * @throws FileNotFoundException
      */
-    public function sanitize(Model $storage, FilesystemInterface $filesystem, string $path, bool $dryRun = false): bool
-    {
+    public function sanitize(
+        Model $storage,
+        FilesystemInterface $filesystem,
+        string $path,
+    ): ?string {
         if (!$this->sanitizer->accepts($storage->getMime())) {
-            return false;
+            return null;
         }
         try {
             $unsafeContent = $filesystem->read($path);
         } catch (FileNotFoundException $e) {
-            return false;
+            return null;
         }
         $sanitizedContent = $this->sanitizer->sanitize($storage->getMime(), $unsafeContent);
         if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
-            return false;
+            return null;
         }
-        if ($dryRun) {
-            return true;
-        }
-        // update storage to match sanitized content
-        $result = $filesystem->put($path, $sanitizedContent);
-        $storage->setHash((new HashGenerator())->generateHash($filesystem->readStream($path)));
-        return $result;
+        return $sanitizedContent;
+//        if ($dryRun) {
+//            return $sanitizedContent;
+//        }
+//        // update storage to match sanitized content
+//        $result = $filesystem->put($path, $sanitizedContent);
+//        $storage->setHash((new HashGenerator())->generateHash($filesystem->readStream($path)));
+//        return $result;
     }
 
     /**
