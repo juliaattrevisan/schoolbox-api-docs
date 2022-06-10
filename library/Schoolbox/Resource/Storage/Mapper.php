@@ -365,16 +365,7 @@ class Mapper extends BaseMapper implements Receiver
         $mtm     = $this->getJoinMapper('allowedFileExtension');
         $storage = $this->createModel();
 
-//        // Explicitly use temporary upload filesystem
-//
-//        $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
-//
-//        // TODO: Find a way to remove the need for this truncation
-//
-//        $storage->setPath(str_replace(sys_get_temp_dir(), '', $tempLocation));
-
         // Set file type metadata
-
         $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
         $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
 
@@ -385,9 +376,17 @@ class Mapper extends BaseMapper implements Receiver
         }
 
         // By default files uploaded this way are public
-
         $storage->setPublic($public);
-        $sanitized = $this->getManager()->sanitize($storage, $this->getManager()->getTempFilesystem(), $tempLocation);
+
+        // TODO: Find a way to remove the need for this truncation
+        // TODO handle all of this in the Manager class:
+        //      it knows how to move files from temp to S3 efficiently
+        $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
+        $sanitized                = $this->getManager()->sanitize(
+            $storage,
+            $this->getManager()->getTempFilesystem(),
+            $tempLocationInFilesystem,
+        );
         if (isset($sanitized)) {
             // TODO write the new content
             $this->getStorageFilesystemProxy()->write($storage, $sanitized);
@@ -395,7 +394,7 @@ class Mapper extends BaseMapper implements Receiver
             // write the old content
             $this->getStorageFilesystemProxy()->writeStream(
                 $storage,
-                $this->getManager()->getTempFilesystem()->readStream($tempLocation),
+                $this->getManager()->getTempFilesystem()->readStream($tempLocationInFilesystem),
             );
         }
 
