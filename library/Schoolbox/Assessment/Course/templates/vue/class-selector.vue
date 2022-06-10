@@ -42,7 +42,7 @@ const props = defineProps({
 const isLoading = ref(true);
 const hasLoadError = ref(false);
 const classes = ref([]); //all the classes data
-const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
+
 
 /**
  * a class has already been previously selected, so the class-selector is not enabled
@@ -123,6 +123,9 @@ async function loadClassList () {
 const query = ref(''); //the search string to match against
 const queryInputEl = ref(null); 
 const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3  
+const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
+const isResultsCapped = ref(false);
+const resultsNotShownCount = ref(0);
 
 /**
  * the search string broken into words, to search for each word
@@ -141,11 +144,14 @@ const queryWordList = computed(() => {
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const results = computed(() => {
+    isResultsCapped.value = false;
     if (query.value.length < minQueryLength) {
         return [];
     } else if (classes.value.filter(searchForName).length > 0) { 
         const fullResults = classes.value.filter(searchForName);
         if (fullResults.length > CAPPED_RESULTS_LENGTH) {
+            isResultsCapped.value = true;
+            resultsNotShownCount.value = fullResults.length - CAPPED_RESULTS_LENGTH;
             return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
         } else {
             return fullResults;
@@ -398,6 +404,7 @@ function onClearAllSelected () {
         <div class="search-results-container">
             <div class="search-results">
                 <ul>
+                    <li v-if="isResultsCapped" class="search-refine-note">{{ resultsNotShownCount }} search results not shown, try refining your search further.</li>
                     <li v-if="showSelectAll">
                         <class-selector-select-all
                             :is-all-results-selected="isAllResultsSelected"
@@ -476,6 +483,12 @@ function onClearAllSelected () {
             }
         }
     }
+}
+
+.search-refine-note {
+    background-color: #FAFAFA;
+    padding: 0.75rem;
+    font-style: italic;
 }
 
 .selected-classes-container {
