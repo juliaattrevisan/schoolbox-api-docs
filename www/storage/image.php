@@ -28,7 +28,7 @@ try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $size = $_GET['size'] ?? 'maxsize';
         $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $fileSystem = $resource->getFilesystem();
+        $fileSystem = $kernel->get('filesystem.storage');
 
         $transforms = new Transformation\Storage();
 

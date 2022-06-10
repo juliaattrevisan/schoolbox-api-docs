@@ -35,7 +35,7 @@ try {
             : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $basename = $resource->getBasename();
-        $fileSystem = $resource->getFilesystem();
+        $fileSystem = $kernel->get('filesystem.storage');
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
 

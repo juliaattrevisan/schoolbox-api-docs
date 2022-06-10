@@ -90,7 +90,7 @@ if (isset($type, $id)) {
                 $imageFilename = $videoQueue->getThumbnailPath();
             }
 
-            $filesystem = $videoQueue->getStorage()->getFilesystem();
+            $filesystem = $kernel->get('filesystem.storage');
 
             /** @var IConfigLoader $config */
             $config   = $kernel->get('config');

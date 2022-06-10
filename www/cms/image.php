@@ -60,7 +60,7 @@ try {
     $resource   = $file->getStorage();
     /** @var IConfigLoader $config */
     $config     = $kernel->getDependencyInjector()->get('config');
-    $fileSystem = $resource->getFilesystem();
+    $fileSystem = $kernel->get('filesystem.storage');
 
     if (
         $fileSystem instanceof Filesystem &&

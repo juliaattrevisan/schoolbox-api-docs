@@ -69,7 +69,7 @@ try {
         (int)$config->get('protect_teacher_photo')
     );
 
-    $fileSystem = $storageModel->getFilesystem();
+    $fileSystem = $kernel->get('filesystem.storage');
 
     $portrait  = new Image\Transformation\Portrait();
     $cacheKey  = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;

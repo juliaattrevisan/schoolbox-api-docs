@@ -81,7 +81,7 @@ if ($urlDetect->isStorageUrl()) {
 }
 
 try {
-    $fileSystem = $storage->getFilesystem();
+    $fileSystem = $kernel->get('filesystem.storage');
 
     /** @var IConfigLoader $config */
     $config = $kernel->get('config');

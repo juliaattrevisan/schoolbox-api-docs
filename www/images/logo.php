@@ -80,7 +80,7 @@ try {
         throw new Exception("No hash configured for logo '$logo'");
     }
     $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
-    $fileSystem     = $resource->getFilesystem();
+    $fileSystem     = $kernel->get('filesystem.storage');
 
     if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
         /** @var IConfigLoader $config */

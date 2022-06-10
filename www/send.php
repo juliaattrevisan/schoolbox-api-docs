@@ -79,7 +79,7 @@ if (is_numeric($_GET['id'])) {
     $basename       = $file->getBasename();
     /** @var Storage $storage */
     $storage      = $file->getStorage();
-    $fileSystem   = $storage->getFilesystem();
+    $fileSystem   = $kernel->get('filesystem.storage');
     $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
     if (
