@@ -7,7 +7,7 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\PathProcessor;
+use Alaress\Image\Processor;
 use Alaress\Image\ProcessorFactory;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;

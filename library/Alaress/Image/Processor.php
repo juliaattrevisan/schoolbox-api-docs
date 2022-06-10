@@ -35,12 +35,11 @@ use UnexpectedValueException;
 /**
  * Transforms images and persists to database + disk.
  *
- * This is a direct copy of `\Alaress\Image\Processor`: however, it accepts a
- * path and filesystem in its constructor, instead of a storage model and
- * filesystem proxy. This is because objects other than storage objects may be
- * processed.
+ * Now accepts a  path and filesystem in its constructor, instead of a storage
+ * model and filesystem proxy. This is because objects other than storage
+ * objects may be processed.
  */
-class PathProcessor
+class Processor
 {
     /**
      * Number of seconds that ImageMagick should timeout after by default.

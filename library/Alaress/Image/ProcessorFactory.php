@@ -48,16 +48,16 @@ class ProcessorFactory
      * @param ITransform $transform The set of transforms applied to the file.
      * @param int        $timeout   Time (in seconds) which the transform is
      *                              allowed to take.
-     * @return PathProcessor
+     * @return Processor
      */
     public function buildForLocalFile(
         string $baseDir,
         string $file,
         string $cacheKey,
         ITransform $transform,
-        int $timeout = PathProcessor::IMAGE_MAGICK_TIMEOUT_DEFAULT,
-    ): PathProcessor {
-        return new PathProcessor(
+        int $timeout = Processor::IMAGE_MAGICK_TIMEOUT_DEFAULT,
+    ): Processor {
+        return new Processor(
             $file,
             new Filesystem(new Local($baseDir)),
             $this->storageFilesystem,
@@ -78,15 +78,15 @@ class ProcessorFactory
      *                              object.
      * @param int        $timeout   Time (in seconds) which the transform is
      *                              allowed to take.
-     * @return PathProcessor
+     * @return Processor
      */
     public function buildForStorage(
         IStorage $storage,
         string $cacheKey,
         ITransform $transform,
-        int $timeout = PathProcessor::IMAGE_MAGICK_TIMEOUT_DEFAULT,
-    ): PathProcessor {
-        return new PathProcessor(
+        int $timeout = Processor::IMAGE_MAGICK_TIMEOUT_DEFAULT,
+    ): Processor {
+        return new Processor(
             Manager::getPathFromHash($storage->getHash()),
             $this->storageFilesystem,
             $this->storageFilesystem,
