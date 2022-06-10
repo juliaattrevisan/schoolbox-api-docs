@@ -188,14 +188,6 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     // Handler methods: all must be removed
 
     /**
-     * @deprecated remove this constructor, use 0 parameter constructor
-     */
-    public function __construct(FilesystemInterface $filesystem = null, $path = null)
-    {
-        parent::__construct($filesystem, $path);
-    }
-
-    /**
      * @deprecated remove usages, use filesystem proxy instead
      */
     public function setFilesystem(FilesystemInterface $filesystem)
