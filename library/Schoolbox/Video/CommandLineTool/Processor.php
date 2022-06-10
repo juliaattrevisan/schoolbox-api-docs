@@ -110,6 +110,8 @@ class Processor extends CliTool\App
         $failed       = 0;
         $success      = 0;
 
+        $storageFilesystem = $this->getDi()->get('filesystem.storage');
+
         /** @var Queue $mediaCurrent */
         foreach ($pendingQueue as $mediaCurrent) {
             $hash = $mediaCurrent->getHash();
@@ -155,7 +157,7 @@ class Processor extends CliTool\App
                     // Process the video
                     // ------------------------------------------------------------------------------------------------
 
-                    if ($mediaCurrent->process($log) == true) {
+                    if ($mediaCurrent->process($storageFilesystem, $log) == true) {
                         $mediaCurrent->setStatus(QueueMapper::STATUS_COMPLETED);
                     } else {
                         $mediaCurrent->setStatus(QueueMapper::STATUS_FAILED);
