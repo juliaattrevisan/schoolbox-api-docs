@@ -11,13 +11,13 @@
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Image\Transformation;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -74,22 +74,22 @@ $key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][
 try {
     /* Choose a caching method to use
      */
-    $hash           = Config::get($logo);
+    $hash            = Config::get($logo);
     if (!$hash) {
         // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
         throw new Exception("No hash configured for logo '$logo'");
     }
-    $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
-    $fileSystem     = $kernel->get('filesystem.storage');
-
-    if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
+    $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+    if ($filesystemProxy->usesS3Adapter()) {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 
         if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
 
-            $resourcePath = $resource->getPath();
+            $resourcePath = Manager::getPathFromHash($resource->getHash());
 
             $preSignedUrlDataObject = $preSignedUrlService->generate(
                 $resource,
@@ -113,7 +113,7 @@ try {
     );
     $imageProcessor->load()->stream();
     exit;
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     $responseCode = $e->getHttpStatusCode();
     $placeHolderFile = WEB_root . "/static/images" . $logoSizes[$logo][$size][2];

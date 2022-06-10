@@ -11,12 +11,12 @@
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Image\Transformation;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -27,24 +27,23 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $size = $_GET['size'] ?? 'maxsize';
-        $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $fileSystem = $kernel->get('filesystem.storage');
-
-        $transforms = new Transformation\Storage();
-
-        if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
+        $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
+        $transforms      = new Transformation\Storage();
+        if ($filesystemProxy->usesS3Adapter()) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 
             if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
-                $preSignedUrlService = new PreSignedUrlService($config);
-
-                $resourcePath = $resource->getPath();
-
+                $preSignedUrlService    = new PreSignedUrlService($config);
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $resource,
                     Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                    $transforms->getTranscodePath($resourcePath, $transforms->getCacheKey($size))
+                    $transforms->getTranscodePath(
+                        Manager::getPathFromHash($resource->getHash()),
+                        $transforms->getCacheKey($size),
+                    ),
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);

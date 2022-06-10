@@ -11,7 +11,6 @@
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Image\Transformation;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
@@ -19,7 +18,8 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -60,16 +60,14 @@ try {
     $resource   = $file->getStorage();
     /** @var IConfigLoader $config */
     $config     = $kernel->getDependencyInjector()->get('config');
-    $fileSystem = $kernel->get('filesystem.storage');
 
-    if (
-        $fileSystem instanceof Filesystem &&
-        $fileSystem->getAdapter() instanceof S3Adapter &&
-        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
-    ) {
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
+
+    if ($filesystemProxy->usesS3Adapter() && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
-        $resourcePath = $resource->getPath();
+        $resourcePath = Manager::getPathFromHash($resource->getHash());
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,

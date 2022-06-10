@@ -14,11 +14,11 @@
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -69,24 +69,22 @@ try {
         (int)$config->get('protect_teacher_photo')
     );
 
-    $fileSystem = $kernel->get('filesystem.storage');
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
 
     $portrait  = new Image\Transformation\Portrait();
     $cacheKey  = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
 
-    if (
-        $fileSystem instanceof Filesystem &&
-        $fileSystem->getAdapter() instanceof S3Adapter &&
-        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
-    ) {
+    if ($filesystemProxy->usesS3Adapter() && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
         $preSignedUrlService = new PreSignedUrlService($config);
-
-        $portraitPath = $storageModel->getPath();
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-            $portrait->getTranscodePath($portraitPath, $cacheKey)
+            $portrait->getTranscodePath(
+                Manager::getPathFromHash($storageModel->getHash()),
+                $cacheKey,
+            ),
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
