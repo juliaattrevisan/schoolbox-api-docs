@@ -7,17 +7,12 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\Processor;
 use Alaress\Image\ProcessorFactory;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\HashGenerator;
-use Schoolbox\Resource\Storage\Manager;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
