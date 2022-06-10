@@ -17,6 +17,7 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class Controller
@@ -55,16 +56,18 @@ class Controller extends UserAccount\Controller
      *
      * @param ImporterFactory       $importerFactory
      * @param IConfigLoader         $configLoader
+     * @param FilesystemProxy       $filesystemProxy
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         ImporterFactory $importerFactory,
         IConfigLoader $configLoader,
+        FilesystemProxy $filesystemProxy,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
-        parent::__construct($importerFactory, $configLoader);
+        parent::__construct($importerFactory, $configLoader, $filesystemProxy);
 
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;

@@ -62,6 +62,7 @@ class Module extends BaseModule
         return new Controller(
             new ImporterFactory(),
             $this->getConfig(),
+            $this->injector->get('filesystem.storageProxy'),
             $this->getMapperFactory()->get(TimetableCycleMapper::class),
             $this->getMapperFactory()->get(TimetablePeriodMapper::class)
         );
