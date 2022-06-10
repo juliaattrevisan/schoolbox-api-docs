@@ -8,15 +8,14 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache;
 use Alaress\Image;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\BasicRequest;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -130,13 +129,13 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-    $imageProcessor  = new Image\Processor(
-        Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
-        $filesystemProxy,
+    /** @var ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $imageProcessor   = $processorFactory->buildForLocalFile(
+        WEB_root,
+        '/static' . $path,
         $cache_key,
-        $transform
+        $transform,
     );
     $imageProcessor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {

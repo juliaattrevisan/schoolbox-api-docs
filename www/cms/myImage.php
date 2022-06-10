@@ -7,12 +7,17 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\PathProcessor;
+use Alaress\Image\ProcessorFactory;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\HashGenerator;
+use Schoolbox\Resource\Storage\Manager;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -77,9 +82,14 @@ if (isset($_GET['key'])) {
 
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
-/** @var FilesystemProxy $filesystemProxy */
-$filesystemProxy = $kernel->get('filesystem.storageProxy');
-$processor       = new Image\Processor($storageModel, $filesystemProxy, $cacheKey, $transform);
+
+/** @var ProcessorFactory $processorFactory */
+$processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+$processor        = $processorFactory->buildForStorage(
+    $storageModel,
+    $cacheKey,
+    $transform,
+);
 try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {

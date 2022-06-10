@@ -13,12 +13,12 @@
 
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -107,11 +107,10 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-    $image           = new Image\Processor(
+    /** @var ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $image            = $processorFactory->buildForStorage(
         $storageModel,
-        $filesystemProxy,
         $cacheKey,
         $portrait->retrieve(TRANSFORM_KEY),
     );

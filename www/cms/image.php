@@ -9,7 +9,7 @@
  */
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
-use Alaress\Image\Processor;
+use Alaress\Image\ProcessorFactory;
 use Alaress\Image\Transformation;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\BasicRequest\Kernel;
@@ -19,7 +19,6 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -81,10 +80,14 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-    $transform       = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
-    $imageProcessor  = new Processor($resource, $filesystemProxy, $cacheKey, $transform);
+    /** @var ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $transform        = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $imageProcessor   = $processorFactory->buildForStorage(
+        $resource,
+        $cacheKey,
+        $transform,
+    );
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
