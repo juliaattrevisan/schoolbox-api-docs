@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
+use BadMethodCallException;
 use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
@@ -147,28 +148,30 @@ class Manager
     /**
      * @param Model $storage
      *
-     * @throws FileException
+     * @throws BadMethodCallException this method is no longer supported: use
+     *                                `StorageMapper::accept` for now
      * @return bool
      */
     public function save(Model $storage)
     {
-        $tempPath = $storage->getPath();
-
-        $storage
-            ->setFilesystem($this->mountManager->getFilesystem(self::FS_STORAGE))
-            ->setPath($this->calcPath($storage));
-
-        // This should already be taken care of in the mapper, but better to be safe
-        if ($storage->getPath() === $tempPath) {
-            return true;
-        }
-
-        // Attempt to move the file from temp to storage dir
-        if (!$this->move($tempPath, $storage)) {
-            throw new FileException("Failed to move uploaded file, '{$storage->getBasename()}', to storage");
-        }
-
-        return true;
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+//        $tempPath = $storage->getPath();
+//
+//        $storage
+//            ->setFilesystem($this->mountManager->getFilesystem(self::FS_STORAGE))
+//            ->setPath($this->calcPath($storage));
+//
+//        // This should already be taken care of in the mapper, but better to be safe
+//        if ($storage->getPath() === $tempPath) {
+//            return true;
+//        }
+//
+//        // Attempt to move the file from temp to storage dir
+//        if (!$this->move($tempPath, $storage)) {
+//            throw new FileException("Failed to move uploaded file, '{$storage->getBasename()}', to storage");
+//        }
+//
+//        return true;
     }
 
     /**

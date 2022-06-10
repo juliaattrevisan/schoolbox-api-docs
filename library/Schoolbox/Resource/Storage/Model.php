@@ -200,7 +200,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function setFilesystem(FilesystemInterface $filesystem)
     {
-        return parent::setFilesystem($filesystem);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**

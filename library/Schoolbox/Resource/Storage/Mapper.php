@@ -9,7 +9,6 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress_Byte_Format;
 use League\Flysystem\FileNotFoundException;
 use PDO;
 use PDOStatement;
@@ -21,7 +20,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Video\QueueMapper;
 
 /**
@@ -30,6 +28,7 @@ use Schoolbox\Video\QueueMapper;
  *
  * @package Schoolbox\Resource\Storage
  * @method GenericCollection|Model[] findAll($options = [])
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper implements Receiver
 {
@@ -45,20 +44,20 @@ class Mapper extends BaseMapper implements Receiver
     /** @var bool */
     private $checkPrevious;
 
-    /**
-     * @param int $idValue
-     *
-     * @return Model
-     * @throws MapperException
-     */
-    public function createModel($idValue = null)
-    {
-        /** @var Model $model */
-        $model = parent::createModel($idValue);
-        $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
-
-        return $model;
-    }
+//    /**
+//     * @param int $idValue
+//     *
+//     * @return Model
+//     * @throws MapperException
+//     */
+//    public function createModel($idValue = null)
+//    {
+//        /** @var Model $model */
+//        $model = parent::createModel($idValue);
+//        $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
+//
+//        return $model;
+//    }
 
     /**
      * @return void
@@ -82,6 +81,7 @@ class Mapper extends BaseMapper implements Receiver
 
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
+        // TODO move all requireSafety checks into calls to accept() or whatever
         $requireSafety = true;
 
         $user = $this->getSessionUser();
