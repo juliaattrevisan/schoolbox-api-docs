@@ -41,7 +41,12 @@ $app = new class extends CliTool\App {
             if (isset($result)) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
                 if ($this->perform()) {
-                    // TODO write the new content
+                    // Modify the file's hash to match the sanitised result.
+                    // (This'll fail if somehow the unsanitised file is a FK.)
+                    /** @var FilesystemProxy $storageFilesystemProxy */
+                    $storageFilesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+                    $storageFilesystemProxy->write($svgFile, $result);
+                    $storageMapper->save($svgFile);
                 }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
