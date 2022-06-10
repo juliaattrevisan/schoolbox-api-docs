@@ -195,6 +195,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    Loader::getInstance()->get('date_local'),
                     Loader::getInstance()->get('photo_sis_import'),
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
                     (int)Loader::getInstance()->get('external_tass_addnum_father'),

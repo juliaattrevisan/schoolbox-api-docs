@@ -34,4 +34,10 @@ interface IApi
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array;
 }
