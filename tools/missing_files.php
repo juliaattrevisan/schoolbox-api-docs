@@ -27,7 +27,7 @@ $app = new class extends CliTool\App {
         $countAll = $files->count();
         foreach ($files as $file) {
             if ($filesystemProxy->fileExists($file)) {
-                if ($file->getFilesystem()->getSize($file->getPath()) === $file->getSize()) {
+                if ($filesystemProxy->fileSize($file) === $file->getSize()) {
                     $okCount++;
                     $this->getLogger()->info("File OK $okCount/$errorCount/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
                 } else {
