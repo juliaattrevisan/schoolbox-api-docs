@@ -390,6 +390,13 @@ class Mapper extends BaseMapper implements Receiver
         $sanitized = $this->getManager()->sanitize($storage, $this->getManager()->getTempFilesystem(), $tempLocation);
         if (isset($sanitized)) {
             // TODO write the new content
+            $this->getStorageFilesystemProxy()->write($storage, $sanitized);
+        } else {
+            // write the old content
+            $this->getStorageFilesystemProxy()->writeStream(
+                $storage,
+                $this->getManager()->getTempFilesystem()->readStream($tempLocation),
+            );
         }
 
         // TODO work with a sanitized version of the file instead

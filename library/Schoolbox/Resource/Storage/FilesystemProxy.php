@@ -104,14 +104,17 @@ class FilesystemProxy
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
         $hash = $this->hashGenerator->generateHash($resource);
-        // Put it in the filesystem, and also the storage
-        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
-        if ($storage instanceof Model) {
-            $storage->setHash($hash);
-        }
 
         // TODO is this resource rewound?
         $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+
+        // Put it in the filesystem, and also the storage
+        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
+        if ($storage instanceof Model) {
+            $storage
+                ->setHash($hash)
+                ->setSize($this->filesystem->getSize(self::getPathFromHash($hash)));
+        }
     }
 
     /**
