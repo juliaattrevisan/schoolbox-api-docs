@@ -216,28 +216,28 @@ class Mapper extends BaseMapper implements Receiver
         ";
     }
 
-    /**
-     * Ensures that path is always calculated on all hydrated objects.
-     * This used to be in `$this->hydrateSelect` - however, that method doesn't
-     * get called if this object is hydrated through a join from another mapper.
-     *
-     * @param array         $row
-     * @param string        $alias
-     * @param callable|null $callback
-     *
-     * @return null|Model
-     * @throws MapperException
-     */
-    public function hydrate(array $row, $alias = '', $callback = null)
-    {
-        /** @var null|Model $storage */
-        $storage = parent::hydrate($row, $alias, $callback);
-        if ($storage instanceof Model) {
-            $storage->setPath($this->getManager()->calcPath($storage));
-        }
-
-        return $storage;
-    }
+//    /**
+//     * Ensures that path is always calculated on all hydrated objects.
+//     * This used to be in `$this->hydrateSelect` - however, that method doesn't
+//     * get called if this object is hydrated through a join from another mapper.
+//     *
+//     * @param array         $row
+//     * @param string        $alias
+//     * @param callable|null $callback
+//     *
+//     * @return null|Model
+//     * @throws MapperException
+//     */
+//    public function hydrate(array $row, $alias = '', $callback = null)
+//    {
+//        /** @var null|Model $storage */
+//        $storage = parent::hydrate($row, $alias, $callback);
+//        if ($storage instanceof Model) {
+//            $storage->setPath($this->getManager()->calcPath($storage));
+//        }
+//
+//        return $storage;
+//    }
 
     /**
      * @param PDOStatement $statement

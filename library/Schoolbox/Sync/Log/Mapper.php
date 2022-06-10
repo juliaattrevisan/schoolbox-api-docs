@@ -95,10 +95,10 @@ class Mapper extends Schoolbox\Mapper
                                    ->hydrateJoin($r, 'allowedFileExtension', 'm')
                           );
 
-            // ensure path is set
-            if (!$store->getPath()) {
-                $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
-            }
+//            // ensure path is set
+//            if (!$store->getPath()) {
+//                $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+//            }
 
             $log->setStorage($store);
 
