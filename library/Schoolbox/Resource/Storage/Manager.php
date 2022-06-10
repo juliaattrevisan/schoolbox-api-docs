@@ -28,6 +28,13 @@ use function sprintf;
  * In principle, Mappers DO NOT influence the filesystem in anyway - that's what this class is for.
  * This is essentially a Schoolbox abstraction around Flysystem's MountManager.
  *
+ * TODO review how necessary this is once disentanglement of Flysystem from
+ *      model is done
+ *
+ * Most of this class' functionality is superseded by the filesystem proxy, but
+ * this class has some magic for efficiently copying files from one local
+ * filesystem to another.
+ *
  * @package Schoolbox\Resource\Storage
  */
 class Manager
@@ -177,22 +184,25 @@ class Manager
     /**
      * @param string $tmpFilePath
      * @param Model  $storage
+     * @throws BadMethodCallException this method is no longer supported: use
+     *                                `StorageMapper::accept` for now
      *
      * @return bool
      */
     protected function copy(string $tmpFilePath, Model $storage): bool
     {
-        try {
-            return $this->mountManager->copy(
-                self::FS_TEMP . "://$tmpFilePath",
-                self::FS_STORAGE . '://' . $storage->getPath()
-            );
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
-            // This is fine, because the storage file's contents determine the
-            // file path: we can assume it's the same file.
-            return true;
-        }
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+//        try {
+//            return $this->mountManager->copy(
+//                self::FS_TEMP . "://$tmpFilePath",
+//                self::FS_STORAGE . '://' . $storage->getPath()
+//            );
+//        } catch (FileExistsException $e) {
+//            // The file already exists in the storage backend.
+//            // This is fine, because the storage file's contents determine the
+//            // file path: we can assume it's the same file.
+//            return true;
+//        }
     }
 
 
@@ -200,49 +210,50 @@ class Manager
      * @param string $tmpFilePath
      * @param Model  $storage
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws Flysystem\FilesystemNotFoundException
+     * @throws BadMethodCallException this method is no longer supported: use
+     *                                `StorageMapper::accept` for now
      */
     private function move(string $tmpFilePath, Model $storage): bool
     {
-        /** @var Filesystem $fsFrom */
-        $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
-        /** @var Filesystem $fsTo */
-        $fsTo = $this->mountManager->getFilesystem(self::FS_STORAGE);
-
-        $adapterFrom = $fsFrom->getAdapter();
-        $adapterTo   = $fsTo->getAdapter();
-
-        // Are they both local?
-        if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
-            // Attempt to move, rather than copy
-            if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
-                return false;
-            }
-
-            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath, 0664);
-            return rename(
-                rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
-                $adapterTo->getPathPrefix() . $storage->getPath()
-            );
-        }
-
-        try {
-            return $this->mountManager->move(
-                self::FS_TEMP . "://$tmpFilePath",
-                self::FS_STORAGE . '://' . $storage->getPath()
-            );
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
-            // This is fine, because the storage file's contents determine the
-            // file path: we can assume it's the same file.
-            try {
-                $fsFrom->delete($tmpFilePath);
-            } catch (FileNotFoundException $e2) {
-                // The temp file didn't exist after all: that's fine too
-            }
-            return true;
-        }
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+//        /** @var Filesystem $fsFrom */
+//        $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
+//        /** @var Filesystem $fsTo */
+//        $fsTo = $this->mountManager->getFilesystem(self::FS_STORAGE);
+//
+//        $adapterFrom = $fsFrom->getAdapter();
+//        $adapterTo   = $fsTo->getAdapter();
+//
+//        // Are they both local?
+//        if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
+//            // Attempt to move, rather than copy
+//            if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
+//                return false;
+//            }
+//
+//            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath, 0664);
+//            return rename(
+//                rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
+//                $adapterTo->getPathPrefix() . $storage->getPath()
+//            );
+//        }
+//
+//        try {
+//            return $this->mountManager->move(
+//                self::FS_TEMP . "://$tmpFilePath",
+//                self::FS_STORAGE . '://' . $storage->getPath()
+//            );
+//        } catch (FileExistsException $e) {
+//            // The file already exists in the storage backend.
+//            // This is fine, because the storage file's contents determine the
+//            // file path: we can assume it's the same file.
+//            try {
+//                $fsFrom->delete($tmpFilePath);
+//            } catch (FileNotFoundException $e2) {
+//                // The temp file didn't exist after all: that's fine too
+//            }
+//            return true;
+//        }
     }
 
     /**
