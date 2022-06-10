@@ -80,7 +80,8 @@ class FilesystemProxy
      * @param string   $contents
      * @param array    $config
      * @return void
-     * @throws FileExistsException if somehow the file exists
+     * @throws FileNotFoundException if somehow the file wasn't found after it
+     *                               was written
      */
     public function write(IStorage $storage, string $contents, array $config = [])
     {
@@ -99,14 +100,21 @@ class FilesystemProxy
      * @param resource $resource
      * @param array    $config
      * @return void
-     * @throws FileExistsException if somehow the file exists
+     * @throws FileNotFoundException if somehow the file wasn't found after it
+     *                               was written
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
         $hash = $this->hashGenerator->generateHash($resource);
 
         // TODO is this resource rewound?
-        $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+        try {
+            $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+        } catch (FileExistsException $e) {
+            // The file already exists in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+        }
 
         // Put it in the filesystem, and also the storage
         // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
