@@ -17,6 +17,8 @@ use Schoolbox\Resource\Storage;
 
 /**
  * Hardcoded to use the local file system, regardless of system's configured storage implementation
+ *
+ * TODO kill this completely
  */
 class LocalFS
 {
