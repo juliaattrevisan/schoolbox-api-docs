@@ -216,7 +216,7 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function setPath($path)
     {
-        return parent::setPath($path);
+        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
     }
 
     /**
