@@ -328,38 +328,4 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
             'image' => new SitePageLink("/storage/image.php?hash={$this->getHash()}"),
         ];
     }
-
-
-    /**
-     * Serialize everything except the filesystem.
-     *
-     * This will mean unserialized files cannot have any filesystem-related
-     * operations performed on them, until `setFilesystem` is called on them.
-     *
-     * @see Mapper::getManager(), Manager::getFilesystem()
-     *
-     * @deprecated remove once this no longer inherits File
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        $vars = get_class_vars(get_class($this));
-        unset($vars['filesystem']);
-        return array_keys($vars);
-    }
-
-
-    /**
-     * On wakeup, resurrect the filesystem that was not serialized in `__sleep`.
-     *
-     * @deprecated remove once this no longer inherits File
-     */
-    public function __wakeup()
-    {
-        // TODO this really should not hit config. We don't even know if config exists at this point
-        $this->filesystem = (new FilesystemFactory())
-            ->build(Config::get('storage_dir'))
-            ->getFilesystem(Manager::FS_STORAGE);
-    }
 }
