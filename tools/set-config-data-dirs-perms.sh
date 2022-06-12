@@ -11,7 +11,7 @@
 #
 
 # Global const
-readonly LOCKFILE_INSPECTOR="/usr/share/schoolbox/tools/lock/inspector.sh"
+readonly LOCKFILE_INSPECTOR="/usr/local/bin/schoolbox-lock-inspector"
 readonly LOG=/usr/bin/alaress-logger
 readonly L_DEBUG=100
 readonly L_INFO=200
