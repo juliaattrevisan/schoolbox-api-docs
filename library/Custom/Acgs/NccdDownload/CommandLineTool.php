@@ -11,6 +11,7 @@ namespace Custom\Acgs\NccdDownload;
 use Alaress\Database\Predicate\Builder;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
@@ -291,32 +292,45 @@ class CommandLineTool extends App
      * Collect the files which have been uploaded to this assessment as part of
      * responses by teachers.
      *
-     * This only fetches the files from the most recent response.
+     * This fetches the files from all responses: if a file with the same name
+     * has been submitted twice, the later submitted version is used.
      *
      * @param IAssessable $assessment
      * @return array<int, array{storage: IStorage, filename: string, filemtime: int, comment:string|null}>
      */
     private function collectFilesFromAssessment(IAssessable $assessment): array
     {
-        // Get each participant who's uploaded something, and return the files
-        // from their most recent response.
         $files = [];
         foreach ($assessment->getAllParticipants() as $participant) {
-            $response = $participant->findMostRecentResponse();
-            if ($response instanceof DueWorkResponse) {
-                // Is there a file here?
-                if ($response->getAllFiles()->count()) {
-                    $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
-                    foreach ($response->getAllFiles() as $file) {
-                        $files[$file->getId()] = [
-                            'storage'   => $file,
-                            'filename'  => $file->getFilename(),
-                            'filemtime' => $response->getSubmittedAt()->getUnixTimeStamp(),
-                            'comment'   => $feedback ? $feedback->getComment() : null,
-                        ];
-                        // Only attach comment to the first file in the response
-                        $feedback = null;
+            foreach ($participant->getSubmittedResponses() as $response) {
+                /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int}> $participantFiles */
+                $participantFiles = [];
+                if ($response instanceof DueWorkResponse) {
+                    if ($response->getAllFiles()->count()) {
+                        $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
+                        foreach ($response->getAllFiles() as $file) {
+                            $filename  = $file->getFilename();
+                            $filemtime = $response->getSubmittedAt()->getUnixTimeStamp();
+                            // Override a previous file with the same name for
+                            // this participant, if it was submitted later.
+                            if (
+                                !isset($participantFiles[$filename])
+                                || $participantFiles[$filename]['filemtime'] < $filemtime
+                            ) {
+                                $participantFiles[$filename] = [
+                                    'storage'   => $file,
+                                    'filename'  => $filename,
+                                    'filemtime' => $filemtime,
+                                    'comment'   => $feedback ? $feedback->getComment() : null,
+                                ];
+                                // Only attach comment to the first file in the response
+                                $feedback = null;
+                            }
+                        }
                     }
+                }
+                foreach ($participantFiles as $participantFile) {
+                    $files[$participantFile['storage']->getId()] = $participantFile;
                 }
             }
         }
