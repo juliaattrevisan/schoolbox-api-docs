@@ -149,7 +149,7 @@ module.exports = {
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
-
+        
         // Libraries
         clipboard: './www/static/js/clipboard/clipboard.js',
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
@@ -228,7 +228,7 @@ module.exports = {
 
         //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
-
+        
         //Sass
         main: './www/static/css/core/main.scss',
         editor: './www/static/css/core/editor.scss',
@@ -325,15 +325,20 @@ module.exports = {
                     {
                         resourceQuery: /^\?vue/,
                         use: [
-                            'vue-style-loader',
-                            'css-loader',
-                            'sass-loader'
+                            { loader: 'vue-style-loader' },
+                            {
+                                loader: 'css-loader',
+                                options: {
+                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
+                                }
+                            },
+                            { loader: 'sass-loader' },
                         ]
                     },
                     {
                         use: [
                             {
-                                loader: 'file-loader',
+                                loader: 'file-loader', //to emit the css `main` and `editor` into the /core directory
                                 options: {
                                     name: '[name].css',
                                     outputPath: '../../css/core/'
@@ -343,8 +348,8 @@ module.exports = {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    url: false,
-                                    modules: false
+                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
+                                    modules: false //disable css modules for all files: https://github.com/css-modules/css-modules
                                 }
                             },
                             {
@@ -352,7 +357,7 @@ module.exports = {
                                 options: {
                                     sassOptions: {
                                         indentWidth: 4,
-                                        includePaths: ['../../css/core/'],
+                                        includePaths: ['../../css/core/'], //where our base css file is loaded
                                     },
                                 },
                             }

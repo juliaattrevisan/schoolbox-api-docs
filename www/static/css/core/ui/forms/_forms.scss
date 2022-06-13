@@ -89,11 +89,11 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // We use this mixin to give us form styles for rows inside of forms
 @mixin form-row-base {
   .row {
-    margin: 0 ((-$form-spacing) / 2);
+    margin: 0 calc(strip-unit(-$form-spacing) / 2);
 
     .column,
     .columns {
-      padding: 0 ($form-spacing / 2);
+      padding: 0 calc($form-spacing / 2);
     }
 
     // Use this to collapse the margins of a form row
@@ -113,7 +113,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   input.columns,
   textarea.column,
   textarea.columns {
-    padding-#{$default-float}: ($form-spacing / 2);
+    padding-#{$default-float}: calc($form-spacing / 2);
   }
 }
 
@@ -134,7 +134,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   font-size: $input-font-size;
   height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
   margin: 0 0 $form-spacing 0;
-  padding: $form-spacing / 2;
+  padding: calc($form-spacing / 2);
   width: 100%;
   box-sizing: border-box;
   @if $input-include-glowing-effect {
@@ -185,7 +185,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
     text-align: right;
   } @else if $alignment == inline {
     margin: 0 0 $form-spacing 0;
-    padding: $form-spacing / 2 + rem-calc($input-border-width) 0;
+    padding: calc($form-spacing / 2) + rem-calc($input-border-width) 0;
   }
 }
 
@@ -370,7 +370,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   font-family: $input-font-family;
   font-size: $input-font-size;
   line-height: normal;
-  padding: ($form-spacing / 2);
+  padding: calc($form-spacing / 2);
   @include radius(0);
   &.radius {
     @include radius($global-radius);
@@ -696,7 +696,7 @@ form {
         color: $aluminum; 
         font-weight: normal; 
     }
-    margin: 0 0 $form-spacing / 2 0;
+    margin: 0 0 calc($form-spacing / 2) 0;
 }
 
 label {
@@ -755,7 +755,7 @@ input[type="radio"] {
 }
 
 input[type="number"] {
-    padding: 0 0 0 $form-spacing / 2;
+    padding: 0 0 0 calc($form-spacing / 2);
 }
 
 select {

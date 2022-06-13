@@ -386,7 +386,7 @@
 
   [type="text"],
   select {
-    margin-bottom: rem-calc(($base-font-size / 2));
+    margin-bottom: rem-calc(calc($base-font-size / 2));
   }
 }
 

@@ -19,9 +19,9 @@ $include-html-button-classes: $include-html-classes;
 
  */
 $button-input-scale: 250 !default;
-$global-button-input-height: rem-calc(($base-font-size  * ($button-input-scale / 100))) !default;
+$global-button-input-height: rem-calc(($base-font-size  * calc($button-input-scale / 100))) !default;
 $global-button-height: $global-button-input-height;
-$global-button-padding: rem-calc(($base-font-size / 2));
+$global-button-padding: rem-calc(calc($base-font-size / 2));
 
 // We use these to build padding for buttons.
 $button-med: $global-button-padding;

@@ -86,7 +86,7 @@ $alert-transition-ease: ease-out;
   color: $alert-close-color;
   font-size: $alert-close-font-size;
   line-height: .9;
-  margin-top: -($alert-close-font-size / 2);
+  margin-top: calc(($alert-close-font-size * -1) / 2);
   opacity: $alert-close-opacity;
   padding: $alert-close-padding;
   position: absolute;
