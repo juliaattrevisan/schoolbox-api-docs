@@ -302,14 +302,14 @@ class CommandLineTool extends App
     {
         $files = [];
         foreach ($assessment->getAllParticipants() as $participant) {
+            $participantFiles = [];
             foreach ($participant->getSubmittedResponses() as $response) {
                 /** @var array<string, array{storage: DueWorkResponseFile, filename: string, filemtime: int}> $participantFiles */
-                $participantFiles = [];
                 if ($response instanceof DueWorkResponse) {
                     if ($response->getAllFiles()->count()) {
                         $feedback = $participant->findMostRecentInstructorGivenPublishedFeedback();
                         foreach ($response->getAllFiles() as $file) {
-                            $filename  = $file->getFilename();
+                            $filename  = $file->getBasename();
                             $filemtime = $response->getSubmittedAt()->getUnixTimeStamp();
                             // Override a previous file with the same name for
                             // this participant, if it was submitted later.
@@ -319,7 +319,7 @@ class CommandLineTool extends App
                             ) {
                                 $participantFiles[$filename] = [
                                     'storage'   => $file,
-                                    'filename'  => $filename,
+                                    'filename'  => $file->getFilename(),
                                     'filemtime' => $filemtime,
                                     'comment'   => $feedback ? $feedback->getComment() : null,
                                 ];
@@ -329,9 +329,9 @@ class CommandLineTool extends App
                         }
                     }
                 }
-                foreach ($participantFiles as $participantFile) {
-                    $files[$participantFile['storage']->getId()] = $participantFile;
-                }
+            }
+            foreach ($participantFiles as $participantFile) {
+                $files[$participantFile['storage']->getId()] = $participantFile;
             }
         }
         return $files;
