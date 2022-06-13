@@ -1,0 +1,17 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div id='email-dkim-container'>
+                <email-dkim
+                        src-domain-list="{{ routeLookupIfAuthorized('emailDKIM.getDomainJsonList') }}"
+                        src-add-domain="{{ routeLookupIfAuthorized('emailDKIM.postDomain') }}"
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/emailDkim.js?v={{ config.site_version }}"></script>
+        </div>
+    </div>
+</div>

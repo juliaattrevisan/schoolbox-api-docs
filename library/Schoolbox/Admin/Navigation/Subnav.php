@@ -769,6 +769,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Control how we send email from the platform.',
                     ],
+                    '/adminv2/email-dkim'                  => [
+                        'name'        => 'Email DKIM',
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
+                        'children'    => [],
+                        'description' => '',
+                    ],
                     '/adminv2/setting/External%20DB'          => [
                         'name'        => 'External DB',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_EXTERNAL] ?? []) > 0,
