@@ -24,7 +24,6 @@ use Schoolbox\Mapper\Exception\CallbackException;
  */
 class RoleMapper extends Mapper
 {
-
     /**
      * Setup mapper
      *

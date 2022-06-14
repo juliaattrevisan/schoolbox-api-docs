@@ -23,7 +23,6 @@ use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
  */
 class CampusMapper extends Mapper
 {
-
     /**
      * @inheritDoc
      *
