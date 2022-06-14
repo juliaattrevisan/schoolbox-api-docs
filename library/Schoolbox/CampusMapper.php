@@ -251,7 +251,7 @@ class CampusMapper extends Mapper
         if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
             throw new CallbackException(
                 sprintf(
-                    'A Campus with the title "%s" already exists, you must have a unique title',
+                    'A Campus with the name "%s" already exists, you must have a unique name',
                     $model->getName()
                 )
             );

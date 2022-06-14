@@ -70,7 +70,7 @@ class HouseMapper extends Schoolbox\Mapper
         if (!$this->isUnique(['house' => $model->getHouse()], $model->getId())) {
             throw new CallbackException(
                 sprintf(
-                    'A house with the title "%s" already exists, you must have a unique title',
+                    'A house with the name "%s" already exists, you must have a unique name',
                     $model->getHouse()
                 )
             );
