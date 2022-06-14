@@ -151,7 +151,7 @@ class FetchPagesFromCsvCest
 
         #THEN
         try {
-            $i->seeResponseCodeIs('400');
+            $i->seeResponseCodeIs(400);
             if ($example[4] == '401') {
                 $skippedTest = true;
             }
