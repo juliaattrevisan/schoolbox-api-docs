@@ -134,20 +134,13 @@ class RoleMapper extends Mapper
         if (trim($model->getName() ?? '') === '') {
             throw new CallbackException("Role name cannot be empty");
         }
-        $query  = 'SELECT id, name FROM `groups` WHERE deleted_at IS NULL AND name = :name';
-        $params = ['name' => $model->getName()];
-        if ($model->getId()) {
-            $query        .= " AND id != :id";
-            $params['id'] = $model->getId();
-        }
-
-        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($collisionRows)) {
-            $collisions = array_map(static function (array $row) {
-                return "id: {$row['id']}, name: '{$row['name']}'";
-            }, $collisionRows);
-            throw new CallbackException("Role name must be unique. Collisions found: " . implode(', ', $collisions));
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A Role with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
         }
 
         return true;
