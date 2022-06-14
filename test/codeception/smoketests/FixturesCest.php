@@ -37,7 +37,7 @@ class FixturesCest
         $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
         $i->sendRequest($newSeason);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', '/fixtures/seasons');
     }
 
@@ -63,7 +63,7 @@ class FixturesCest
         $updateSeason->setFormParam('name', $seasonName);
         $i->sendRequest($updateSeason);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', '/fixtures/seasons');
     }
 
@@ -87,7 +87,7 @@ class FixturesCest
         $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::ARCHIVE);
         $i->sendRequest($archivePayload);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -113,7 +113,7 @@ class FixturesCest
         $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::RESTORE);
         $i->sendRequest($archivePayload);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -136,7 +136,7 @@ class FixturesCest
         $archivePayload = new Payload\Fixtures\Seasons\ChangeState($newSeason, Payload\Fixtures\Seasons\ChangeState::DELETE);
         $i->sendRequest($archivePayload);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -153,7 +153,7 @@ class FixturesCest
 
         $i->sendRequest($newStatus);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -180,7 +180,7 @@ class FixturesCest
 
         $i->sendRequest($updateStatus);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -204,7 +204,7 @@ class FixturesCest
 
         $i->sendRequest($deleteStatus);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
     /**
@@ -221,7 +221,7 @@ class FixturesCest
 
         $i->sendRequest($newVenue);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -248,7 +248,7 @@ class FixturesCest
 
         $i->sendRequest($updateVenue);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -272,7 +272,7 @@ class FixturesCest
 
         $i->sendRequest($deleteVenue);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
 
@@ -290,7 +290,7 @@ class FixturesCest
 
         $i->sendRequest($newSchool);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -317,7 +317,7 @@ class FixturesCest
 
         $i->sendRequest($updateSchool);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -341,7 +341,7 @@ class FixturesCest
 
         $i->sendRequest($deleteSchool);
 
-        $i->seeResponseCodeIs('200');
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -358,7 +358,7 @@ class FixturesCest
 
         $i->sendRequest($newSport);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -389,7 +389,7 @@ class FixturesCest
 
         $i->sendRequest($updateSport);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -413,7 +413,7 @@ class FixturesCest
 
         $i->sendRequest($deleteSport);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
 
@@ -447,7 +447,7 @@ class FixturesCest
 
         $i->sendRequest($newDivision);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -493,7 +493,7 @@ class FixturesCest
 
         $i->sendRequest($addPlayer);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -543,7 +543,7 @@ class FixturesCest
 
         $i->sendRequest($removePlayer);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -587,7 +587,7 @@ class FixturesCest
 
         $i->sendRequest($updateDivision);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -628,7 +628,7 @@ class FixturesCest
 
         $i->sendRequest($deleteDivision);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
 
@@ -671,7 +671,7 @@ class FixturesCest
 
         $i->sendRequest($newTeam);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -723,7 +723,7 @@ class FixturesCest
 
         $i->sendRequest($updateTeam);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -773,7 +773,7 @@ class FixturesCest
 
         $i->sendRequest($updateTeam);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
 
@@ -832,7 +832,7 @@ class FixturesCest
 
         $i->sendRequest($addPlayer);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -901,7 +901,7 @@ class FixturesCest
 
         $i->sendRequest($setPosition);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -978,7 +978,7 @@ class FixturesCest
 
         $i->sendRequest($reorderPlayers);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
 
@@ -1041,7 +1041,7 @@ class FixturesCest
 
         $i->sendRequest($removePlayer);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -1108,7 +1108,7 @@ class FixturesCest
 
         $i->sendRequest($createMatch);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -1186,7 +1186,7 @@ class FixturesCest
 
         $i->sendRequest($updateMatch);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -1260,7 +1260,7 @@ class FixturesCest
 
         $i->sendRequest($deleteMatch);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 
 
@@ -1335,7 +1335,7 @@ class FixturesCest
 
         $i->sendRequest($createResult);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -1418,7 +1418,7 @@ class FixturesCest
 
         $i->sendRequest($updateResult);
 
-        $i->seeResponseCodeIs('303');
+        $i->seeResponseCodeIs(303);
     }
 
     /**
@@ -1499,6 +1499,6 @@ class FixturesCest
 
         $i->sendRequest($deleteResult);
 
-        $i->seeResponseCodeIs('204');
+        $i->seeResponseCodeIs(204);
     }
 }
