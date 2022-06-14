@@ -130,9 +130,6 @@ class PastoralCest
 
         #THEN
         $i->seeResponseCodeIs(200);
-        #WHEN
-        $i->sendGET($i->grabHttpHeader('location'));
-        $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jenni Reed
         $i->impersonateUser(27);
@@ -181,9 +178,6 @@ class PastoralCest
         $i->amGoingTo("Send request add private comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
         $i->sendRequest($pastoralCommentPayload);
 
-        $i->seeResponseCodeIs(200);
-
-        $i->sendGET($i->grabHttpHeader('location'));
         $i->seeResponseCodeIs(200);
     }
 
