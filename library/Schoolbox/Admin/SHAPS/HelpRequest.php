@@ -23,6 +23,8 @@ use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use Custom\Help\CourseParticipation;
 
+use function http_build_query;
+
 class HelpRequest
 {
     /**
@@ -30,20 +32,20 @@ class HelpRequest
      *
      * @var Auth\Parameters
      */
-    private $authParams;
+    private Auth\Parameters $authParams;
 
     /**
      * Data source for users in the local Schoolbox instance
      *
      * @var UserMapper
      */
-    private $userMapper;
+    private UserMapper $userMapper;
 
 
     /**
      * HelpRequest constructor.
-     * @param Auth\Parameters         $authParams
-     * @param UserMapper              $userMapper
+     * @param Auth\Parameters $authParams
+     * @param UserMapper      $userMapper
      */
     public function __construct(Auth\Parameters $authParams, UserMapper $userMapper)
     {
@@ -88,16 +90,16 @@ class HelpRequest
      * ->execute('get', 'courses');
      * This returns an array of...stuff
      *
-     * @param string $method
-     * @param string $endpoint
-     * @param array  $formParams
-     * @param array  $queryParams
+     * @param string     $method
+     * @param string     $endpoint
+     * @param array|null $formParams
+     * @param array      $queryParams
      * @return array
      * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
      * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
-    private function execute(string $method, string $endpoint, array $formParams = null, array $queryParams = []): array
+    private function execute(string $method, string $endpoint, ?array $formParams = null, array $queryParams = []): array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
@@ -108,7 +110,7 @@ class HelpRequest
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
         $defaultQueryParams = ['ts' => $auth['timestamp']];
-        $queryString        = \http_build_query(array_merge($defaultQueryParams, $queryParams));
+        $queryString        = http_build_query(array_merge($defaultQueryParams, $queryParams));
         $uri                = "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}?$queryString";
         $headers            = [
             'Host'           => $auth['host'],
@@ -118,7 +120,7 @@ class HelpRequest
         if (null === $formParams) {
             $body = null;
         } else {
-            $body                    = \http_build_query($formParams, '', '&');
+            $body                    = http_build_query($formParams);
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
@@ -172,10 +174,11 @@ class HelpRequest
          * Order by surname and firstname, then index it by the user id
          */
         return $this->userMapper->findByColumn('id', array_keys($users), [
-            'order' => [
-                'lastname' => 'asc',
-                'firstname' => 'asc'
-            ]
+            'order'   => [
+                'lastname'  => 'asc',
+                'firstname' => 'asc',
+            ],
+            'deleted' => true,
         ])->indexBy('id');
     }
 
@@ -195,7 +198,6 @@ class HelpRequest
         $provisionedUsers = $this->findProvisionedUsers();
 
         foreach ($enrolments as $i => $enrolment) {
-
             /** @var array $participants */
             $participants = $enrolment['participants'];
 
@@ -224,6 +226,59 @@ class HelpRequest
         return $this->authParams->getServerUrl();
     }
 
+    /**
+     * Provision course participation
+     * @param array $userIds
+     * @param array $courses
+     * @return array
+     */
+    public function provisionUserParticipation(array $userIds, array $courses): array
+    {
+        $users         = $this->userMapper->findByColumn('id', $userIds, ['deleted' => true]);
+        $coursePayload = [];
+        foreach ($courses as $courseId => $add) {
+            foreach ($users as $user) {
+                if ($add && $user->isDeleted()) {
+                    // do not attempt to add deleted user to a course
+                    continue;
+                }
+                $coursePayload[$courseId][$user->getEmail()] = $add;
+            }
+        }
+        $data = [];
+
+        try {
+            $this->execute('post', 'courses', ['course' => $coursePayload], ['byUsername' => '1']);
+            $code    = 200;
+            $message = 'OK';
+        } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
+            // 400: empty payload (should never get this) or some users failed
+            $code    = 400;
+            $message = 'Bad Request';
+            if ($e->getResponse()) {
+                try {
+                    $data = json_decode($e->getResponse()->getBody()->getContents(), true);
+                    foreach ($data as $key => $emailAddress) {
+                        $data[$key]['message'] = sprintf("Failed to modify participation for %s", $emailAddress);
+                    }
+                } catch (\RuntimeException $e) {
+                    // Not much we can do here.
+                }
+            }
+        } catch (GuzzleException $e) {
+            // any other exception
+            $code    = 500;
+            $message = 'Internal Server Error';
+        }
+        // Build response
+        return [
+            'data'   => $data,
+            'status' => [
+                'code'    => $code,
+                'message' => $message,
+            ],
+        ];
+    }
 
     /**
      * Provision users
@@ -232,11 +287,9 @@ class HelpRequest
      * @return array
      * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      */
-    public function provisionUsers($userIds): array
+    public function provisionUsers(array $userIds): array
     {
         $payload = $this->buildProvisionUsersPayload($userIds);
-        $code    = 400;
-        $message = 'Bad Request';
         $data    = [];
         if (!empty($payload)) {
             // Send each user to Help
@@ -244,14 +297,17 @@ class HelpRequest
                 $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
                 $code    = 200;
                 $message = 'OK';
-            }  /** @noinspection PhpRedundantCatchClauseInspection */
-            catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
+            } catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
                 // 400: empty payload (should never get this) or some users failed
                 $code    = 400;
                 $message = 'Bad Request';
                 if ($e->getResponse()) {
                     try {
-                        $data = json_decode($e->getResponse()->getBody()->getContents());
+                        // Build human-readable error message
+                        $data = json_decode($e->getResponse()->getBody()->getContents(), true);
+                        foreach ($data as $key => $failedUserData) {
+                            $data[$key]['message'] = sprintf("Failed to provision user %s: %s", $failedUserData[1]['id'], $failedUserData[0] ?? '');
+                        }
                     } catch (\RuntimeException $e) {
                         // Not much we can do here.
                     }
@@ -261,6 +317,10 @@ class HelpRequest
                 $code    = 500;
                 $message = 'Internal Server Error';
             }
+        } else {
+            // empty payload
+            $code    = 400;
+            $message = 'Bad Request';
         }
 
         // Build response
@@ -279,23 +339,21 @@ class HelpRequest
      * @param array $userIds
      * @return array
      */
-    private function buildProvisionUsersPayload($userIds): array
+    private function buildProvisionUsersPayload(array $userIds): array
     {
         $userPayload = [];
-        if (is_iterable($userIds)) {
-            foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
-                /** @var User $user */
-                if (!$user->getRole()->isStaff()) {
-                    continue;
-                }
-                $userPayload[] = [
-                    'id'        => $user->getId(),
-                    'email'     => $user->getEmail(),
-                    'title'     => $user->getTitle(),
-                    'firstname' => $user->getFirstname(),
-                    'lastname'  => $user->getLastname(),
-                ];
+        foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
+            /** @var User $user */
+            if (!$user->getRole()->isStaff()) {
+                continue;
             }
+            $userPayload[] = [
+                'id'        => $user->getId(),
+                'email'     => $user->getEmail(),
+                'title'     => $user->getTitle(),
+                'firstname' => $user->getFirstname(),
+                'lastname'  => $user->getLastname(),
+            ];
         }
         return $userPayload;
     }

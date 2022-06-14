@@ -26,7 +26,6 @@ use UnexpectedValueException;
 
 class Handler
 {
-
     public const PARTICIPANT_ROLE_NAMES = ['School Staff', 'Hero Teacher', 'Prospect'];
     public const DEFAULT_PARTICIPANT_ROLE_NAME = 'School Staff';
 
@@ -277,7 +276,7 @@ class Handler
             // update user object
             $user
                 ->setUsername($userData['email']) // yes, email -> username is on purpose
-                ->setTitle($userData['title'])
+                ->setTitle($userData['title'] ?? '')
                 ->setFirstname($userData['firstname'])
                 ->setLastname($userData['lastname'])
                 ->setAltEmail($userData['email'])

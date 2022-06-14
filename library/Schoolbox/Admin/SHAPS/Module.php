@@ -14,8 +14,10 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Admin\SHAPS\Auth\Parameters;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
@@ -47,18 +49,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getAll', $getPerms);
-        $this->register('GET', '/provisioning/provisioned', 'getProvisioned', $getPerms);
-        $this->register('GET', '/provisioning/unprovisioned', 'getUnprovisioned', $getPerms);
-        $this->register('GET', '/provisioning/search', 'getUserProvisioningSearch', $getPerms);
-
-        $this->register('GET', '/courses', 'getUsersInCourses', $getPerms);
-        $this->register('GET', '/courses/search', 'getUserEnrolmentSearch', $getPerms);
-        $this->register('GET', '/courses/{userId}', 'getSearchCoursesForUser', $getPerms);
-
-
-        $this->register('GET', '/provisioning/{userId}', 'getSearchUsers', $getPerms);
-        $this->register('GET', '/provisioning/provisionedUsers', 'getProvisionedUsersJSON', $getPerms);
-
+        $this->register('POST', '/users', 'getAllStaff', $getPerms);
 
         // Separated so as not to cause merge conflicts
         $this->register('POST', '/provision', 'postProvision', $postPerms);
@@ -71,6 +62,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
             new Parameters(
                 $this->getConfig()->get('schoolbox_help_url'),
                 $this->getConfig()->get('site_school_code'),
