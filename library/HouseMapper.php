@@ -66,20 +66,14 @@ class HouseMapper extends Schoolbox\Mapper
         if (trim($model->getHouse() ?? '') === '') {
             throw new CallbackException("House name cannot be empty");
         }
-        $query  = 'SELECT id, house FROM house WHERE deleted_at IS NULL AND house = :name';
-        $params = ['house' => $model->getHouse()];
-        if ($model->getId()) {
-            $query        .= " AND id != :id";
-            $params['id'] = $model->getId();
-        }
 
-        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($collisionRows)) {
-            $collisions = array_map(static function (array $row) {
-                return "id: {$row['id']}, name: '{$row['name']}'";
-            }, $collisionRows);
-            throw new CallbackException("House name must be unique. Collisions found: " . implode(', ', $collisions));
+        if (!$this->isUnique(['title' => $model->getHouse()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A house with the title "%s" already exists, you must have a unique title',
+                    $model->getHouse()
+                )
+            );
         }
 
         return true;
