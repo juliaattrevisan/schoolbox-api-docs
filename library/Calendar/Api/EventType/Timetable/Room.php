@@ -153,7 +153,9 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setPublishDate(null);
                 $event->setTitle($room['Description'] . ' (' . $room['ClassCode'] . ')');
                 $event->setCampusList($campusId);
-                $event->setResourceId($this->roomCodes[$room['RoomCode']]);
+                if (isset($this->roomCodes[$room['RoomCode']])) {
+                    $event->setResourceId($this->roomCodes[$room['RoomCode']]);
+                }
 
                 // Load room and category if they aren't already there.
                 $userExternalId = $room['StaffID'];
@@ -179,7 +181,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $room['ClassCode']
                     );
                 }
-                if ($categoryList[$key] instanceof FolderModel) {
+                if (($categoryList[$key] ?? null) instanceof FolderModel) {
                     $event->setCategoryId($categoryList[$key]->getId());
                     $event->setCategoryName($categoryList[$key]->getName());
                 }
