@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
 
 abstract class Base extends AchievementReportBase
 {
-
     /**
      * Rearrange into a meaningful structure
      *
@@ -43,14 +42,12 @@ abstract class Base extends AchievementReportBase
 
             /* Initialise
              */
-            if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = [
-                    'term1' => '',
-                    'term2' => '',
-                    'term3' => '',
-                    'term4' => '',
-                ];
-            }
+            $yearStack[$studentYear][$courseName][$assessArea] ??= [
+                'term1' => '',
+                'term2' => '',
+                'term3' => '',
+                'term4' => '',
+            ];
 
             /* Assign values
              */
@@ -67,14 +64,12 @@ abstract class Base extends AchievementReportBase
 
             /* Initialise
              */
-            if (!is_array($yearStack[$studentYear][$courseName][$assessArea])) {
-                $yearStack[$studentYear][$courseName][$assessArea] = [
-                    'term1' => '',
-                    'term2' => '',
-                    'term3' => '',
-                    'term4' => '',
-                ];
-            }
+            $yearStack[$studentYear][$courseName][$assessArea] ??= [
+                'term1' => '',
+                'term2' => '',
+                'term3' => '',
+                'term4' => '',
+            ];
 
             /* Assign values
              */

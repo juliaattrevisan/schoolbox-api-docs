@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-
     /**
      * Internal/External types
      *
@@ -62,7 +61,10 @@ class Controller extends Base
     {
         /* Check whether the Achievement Reports are enabled
          */
-        if (!(new ValidAccess())->isSatisfiedBy($this->getConfigLoader()->get('dio_achievement_report_enabled'), $this->getUser())) {
+        if (
+            !(new ValidAccess())->isSatisfiedBy($this->getConfigLoader()->get('dio_achievement_report_enabled'), $this->getUser())
+            || !isset($externalUser['StudentID'])
+        ) {
             $this->getResponse()->content->set([
                 'template' => '@achievementreport/unavailable.twig',
                 'data' => [
@@ -884,7 +886,7 @@ class Controller extends Base
                 ],
                 'externalUser' => $externalUser,
                 'user'         => $user,
-                'year'         => $year,
+                'year'         => $currentYear,
                 'headings'     => $mypData['headings'],
                 'subjects'     => $mypData['data'],
                 'grades'       => $mypBase->getMYPGrade(),

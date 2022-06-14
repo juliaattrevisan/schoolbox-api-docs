@@ -9,20 +9,11 @@
     elements: navigation
 } %}
 <div class="row achievement-report myp">
-    {% include '@myp/result.twig' with {subjects: subjects, grades: grades, headings: headings} %}
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Further Information</h2>
-            <section class="content">
-                {{ (config.dio_achievement_report_myp_footer ?? '')|purify }}
-            </section>
-        </div>
-    </div>
-    {% if (historical | length) > 0 %}
     <div class="row">
         <div class="small-12 columns">
-            <h2 class="subheader">MYP Results By Year</h2>
             <ul id="historical" class="sub-nav">
+                <li data-year id="data-{{ year }}" class="active"><a>{{ year }}</a>
+                </li>
                 {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
                     <li data-year id="data-{{ year }}"><a>{{ year }}</a>
                     </li>
@@ -30,12 +21,22 @@
             </ul>
         </div>
     </div>
+    <div data-result id="data-{{ year }}-result">
+        {% include '@myp/result.twig' with {subjects: subjects, grades: grades, headings: headings} %}
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">Further Information</h2>
+                <section class="content">
+                    {{ (config.dio_achievement_report_myp_footer ?? '')|purify }}
+                </section>
+            </div>
+        </div>
+    </div>
     {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
         <div data-result id="data-{{ year }}-result" class="hide">
             {% include '@myp/result.twig' with {subjects: data.subjects.data, grades: data.grades, headings: data.subjects.headings} %}
         </div>
     {% endfor %}
-    {% endif %}
 </div>
 <script>
     $('#historical').on('click', '[data-year]', function () {
