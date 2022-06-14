@@ -93,20 +93,13 @@ class Mapper extends Schoolbox\Mapper
         if (trim($model->getName() ?? '') === '') {
             throw new CallbackException("YearLevel name cannot be empty");
         }
-        $query  = 'SELECT id, name FROM lu_year_level WHERE deleted_at IS NULL AND name = :name';
-        $params = ['name' => $model->getName()];
-        if ($model->getId()) {
-            $query        .= " AND id != :id";
-            $params['id'] = $model->getId();
-        }
-
-        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($collisionRows)) {
-            $collisions = array_map(static function (array $row) {
-                return "id: {$row['id']}, name: '{$row['name']}'";
-            }, $collisionRows);
-            throw new CallbackException("YearLevel name must be unique. Collisions found: " . implode(', ', $collisions));
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A YearLevel with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
         }
 
         return true;
