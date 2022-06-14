@@ -103,6 +103,9 @@ export default {
             } finally {
                 this.hasUpdated = true;
                 this.isProcessing = false;
+                this.updateFields.courseIds.forEach((value, key) => {
+                    this.updateFields.courseIds[key] = null;
+                });
                 this.$emit('updated');
             }
         },
