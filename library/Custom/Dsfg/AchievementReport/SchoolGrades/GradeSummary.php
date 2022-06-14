@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
 class GradeSummary extends Base
 {
-
     /**
      * Heading
      *

@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\Comments\Comments;
 
 class EntriesAndResults extends Base
 {
-
     /**
      * Heading
      *

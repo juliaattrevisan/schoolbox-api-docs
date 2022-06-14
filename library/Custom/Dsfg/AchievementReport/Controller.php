@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-
     /**
      * Internal/External types
      *

@@ -16,7 +16,6 @@ use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
  */
 class Base extends AchievementReportBase
 {
-
     /**
      * @inheritDoc
      */

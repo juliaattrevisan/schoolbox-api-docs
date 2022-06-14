@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
 
 abstract class Base extends AchievementReportBase
 {
-
     /**
      * Rearrange into a meaningful structure
      *
