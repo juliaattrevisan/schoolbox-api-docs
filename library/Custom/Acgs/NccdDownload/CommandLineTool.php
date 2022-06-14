@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -119,7 +120,6 @@ class CommandLineTool extends App
         $folderFiles     = [];
         $fileMapper      = FileMapper::getInstance();
         foreach ($statement->getIterator() as $row) {
-
             // Figure out which student is referenced by the folder:
             // If there is none, skip this folder
             $student = $this->extractStudentFromFolderName($row['name']);
