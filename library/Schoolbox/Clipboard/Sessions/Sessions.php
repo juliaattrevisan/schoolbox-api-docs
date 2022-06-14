@@ -68,6 +68,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * This represents the custom fields' key-value pair
+     */
+    private const ADDITIONAL_FIELDS_TUPLE = "%s: %s<br />";
+
+
+    /**
      * This is used as the description for home team's outcome since all
      * clipboard teams are Home Teams (we never import enemy teams like this)
      */
@@ -296,6 +302,7 @@ class Sessions implements IStrategy
              * see there being an advantage one way or the other; we canjust use
              * the customFieldsMetadata struct as provided in each $session
              */
+            $customFieldsMetadata = $sessions['customFieldsMetadata'] ?? null;
 
             foreach ($sessions['data'] as $session) {
                 /* Sport identifiers
@@ -428,27 +435,43 @@ class Sessions implements IStrategy
                         nl2br(trim((string)$session['studentParentNotes']))
                     );
 
-if (!empty($session['customFieldsData'])) {
-    if (str_contains($session['title'], 'Hockey')) {
-        print_r($session);
-    }
-}
-
-
-
-                    /* TODO: Cram in a set of custom fields' metadata contents into $notes
+                    /* Cram in a set of custom fields' metadata contents into $notes
                      * by collating all the custom metadata records into one big slab
                      */
-                    // $additionalFields .= ...
+                    if ($customFieldsMetadata && $session['customFieldsData']) {
+                        $customFields = [];
 
-                    /* customFieldMetadata is a set of key-value pairs:
-                     *    busDepartureTime
-                     *    studentArrivalTime
-                     *    coachstaffContactDetails
-                     *
-                     * so I guess we just concatenate all their values for now
-                     */
-                    // $notes .= $additionalFields
+                        foreach ($session['customFieldsData'] as $key => $value) {
+                            /* Look up what this was meant to be called
+                             */
+                            $label = $customFieldsMetadata[$key]['label'];
+
+                            /* If there's a meaningful value, stack it up
+                             * Otherwise ignore it
+                             */
+                            if ('' !== trim((string)$value)) {
+                                $customFields[] = sprintf(
+                                    self::ADDITIONAL_FIELDS_TUPLE,
+                                    $label,
+                                    $value
+                                );
+                            }
+                        }
+
+                        /* Use a standard html break for a separator
+                         * I assume each key/value appears on its own line
+                         */
+                        if (\count($customFields)) {
+                            /* customFieldMetadata is a set of key-value pairs:
+                             *    busDepartureTime
+                             *    studentArrivalTime
+                             *    coachstaffContactDetails
+                             *
+                             * so I guess we just concatenate all their values for now
+                             */
+                            $notes .= implode('', $customFields);
+                        }
+                    }
 
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups
