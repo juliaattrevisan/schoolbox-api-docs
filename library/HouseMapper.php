@@ -67,7 +67,7 @@ class HouseMapper extends Schoolbox\Mapper
             throw new CallbackException("House name cannot be empty");
         }
 
-        if (!$this->isUnique(['title' => $model->getHouse()], $model->getId())) {
+        if (!$this->isUnique(['house' => $model->getHouse()], $model->getId())) {
             throw new CallbackException(
                 sprintf(
                     'A house with the title "%s" already exists, you must have a unique title',
