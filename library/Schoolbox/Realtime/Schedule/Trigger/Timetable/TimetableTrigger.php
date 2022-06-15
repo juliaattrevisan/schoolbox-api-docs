@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
+use _PHPStan_e04cc8dfb\Nette\InvalidArgumentException;
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
 use Alaress\Scheduler\Event\EventInterface;
@@ -125,7 +126,13 @@ abstract class TimetableTrigger extends AbstractTrigger
         $len  = count($definition['number']);
 
         for ($i = 1; $i < $len; ++$i) {
-            $start = $this->extractPeriodStart($definition, $i, $now);
+            try {
+                $start = $this->extractPeriodStart($definition, $i, $now);
+            } catch (\InvalidArgumentException $e) {
+                /* Unknown label/periodIndex combo
+                 */
+                continue;
+            }
 
             try {
                 return $this->testPeriod($start, new \Alaress_Date_NullDate(), $now);
@@ -152,8 +159,14 @@ abstract class TimetableTrigger extends AbstractTrigger
         $len  = count($definition['number']);
 
         for ($i = 1; $i < $len; ++$i) {
-            $start = $this->extractPeriodStart($definition, $i, $now);
-            $end   = $this->extractPeriodEnd($definition, $i, $now);
+            try {
+                $start = $this->extractPeriodStart($definition, $i, $now);
+                $end   = $this->extractPeriodEnd($definition, $i, $now);
+            } catch (\InvalidArgumentException $e) {
+                /* Unknown label/periodIndex combo
+                 */
+                continue;
+            }
 
             try {
                 return $this->testPeriod($start, $end, $now);
@@ -203,6 +216,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      * @param int   $periodIndex
      * @param ADF   $now
      * @return ADF
+     * @throws \InvalidArgumentException
      */
     protected function extractPeriodStart(array $definition, $periodIndex, ADF $now)
     {
@@ -215,6 +229,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      * @param int   $periodIndex
      * @param ADF   $now
      * @return ADF
+     * @throws \InvalidArgumentException
      */
     protected function extractPeriodEnd(array $definition, $periodIndex, ADF $now)
     {
@@ -224,13 +239,22 @@ abstract class TimetableTrigger extends AbstractTrigger
 
     /**
      * @param array  $definition
-     * @param string $label
      * @param int    $periodIndex
+     * @param string $label
      * @param ADF    $now
      * @return ADF
+     * @throws \InvalidArgumentException
      */
     protected function extractPeriodTime(array $definition, $periodIndex, $label, ADF $now)
     {
+        if (!isset($definition[$label][$periodIndex])) {
+            throw new \InvalidArgumentException(sprintf(
+                'Timetable definition keys ($label %s, $periodIndex %s) does not exist in $definition struct',
+                $label,
+                $periodIndex
+            ));
+        }
+
         return new ADF(strtotime($definition[$label][$periodIndex], $now->getUnixTimeStamp()), 'U');
     }
 
