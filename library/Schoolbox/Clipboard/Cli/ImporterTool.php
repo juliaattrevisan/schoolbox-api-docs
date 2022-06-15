@@ -16,7 +16,6 @@ use Schoolbox\Application\CliTool;
  */
 class ImporterTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

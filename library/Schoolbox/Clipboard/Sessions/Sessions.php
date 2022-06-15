@@ -22,7 +22,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Sessions implements IStrategy
 {
-
     /**
      * Short-circuit to prevent infinite loops
      */

@@ -19,7 +19,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Factory
 {
-
     /**
      * @var LoggerInterface
      */
