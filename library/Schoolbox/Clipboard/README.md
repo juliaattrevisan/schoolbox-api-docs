@@ -48,4 +48,4 @@ Typically you'll want everything. To do it you can combine the flags:
 
 `php /usr/share/schoolbox/clipboard/importer.php --membership --sessions --perform -vvv`
 
-This is the command specified in the crontab. Alternatively you can import partially, as described in the following sections.
+This is the command specified in the crontab. Alternatively you can import partially, as described in the preceding sections.
