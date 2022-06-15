@@ -128,6 +128,7 @@ class Bulk_Folder
         $folderImageColumn  = $this->determineColumnIndex($headerRow, 'image', false);
         $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
         $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
+        $templateColumn     = $this->determineColumnIndex($headerRow, 'template', false);
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -146,7 +147,8 @@ class Bulk_Folder
                 $folderCodeColumns,
                 $yearLevelColumns,
                 $yearLevels,
-                $perform
+                $perform,
+                $templateColumn
             );
         }
 
@@ -184,7 +186,8 @@ class Bulk_Folder
         array $folderCodeColumnIndexes,
         array $yearLevelColumnIndexes,
         GenericCollection $yearLevels,
-        bool $perform
+        bool $perform,
+        int $templateColumnIndex
     ): array {
 
         $parentId   = trim($row[$parentColumnIndex]);
@@ -203,7 +206,24 @@ class Bulk_Folder
             return $this->buildRowResult($rowIdx, '', $folderName, 'Not Added', "Could not find parent folder {$parentId}");
         }
 
-        $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($this->templateID));
+        $warnings = [];
+
+        //set template id to default
+        $templateId = $this->templateID;
+        //if template has been set in the csv
+        if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
+            try {
+                //grab that template if it exists
+                $templateObj = \Schoolbox\Resource\HomepageTemplateMapper::getInstance()->findOneByColumn('name', trim($row[$templateColumnIndex]));
+                $templateId = $templateObj->getId();
+            } catch (MapperException $e) {
+                //noop csv template does not exist, ignore the template and use the one specified in the webform
+                $warnings[] = sprintf('%s is not a homepage template.', trim($row[$templateColumnIndex]));
+            }
+        }
+        //set homepage to the specified template
+        $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($templateId));
+        $warnings[] = sprintf('csv template: %s, tempalteID: %s', trim($row[$templateColumnIndex]), $templateId);
 
         // Create new Folder
         $newFolder = (new Folder\Model())
@@ -211,8 +231,6 @@ class Bulk_Folder
             ->setParent($parent)
             ->setHomepage($homepageConfig);
         $homepageConfig->setCategory($newFolder);
-
-        $warnings = [];
 
         // Folder Colour
         $folderColour = $folderColourColumnIndex >= 0 ? trim($row[$folderColourColumnIndex]) : '';
@@ -409,7 +427,8 @@ class Bulk_Folder
      */
     private function saveHomepageConfig($homepageConfig): void
     {
-        if ($this->templateID) {
+        //save the template config when there is a template specified
+        if ($homepageConfig->getTemplate()->getId()) {
             $this->homepageConfigMapper->save($homepageConfig);
             $this->homepageConfigMapper->resetToTemplate($homepageConfig);
         }
