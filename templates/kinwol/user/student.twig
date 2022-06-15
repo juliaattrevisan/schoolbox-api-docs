@@ -1,49 +1,63 @@
 {% extends '@core/user/student.twig' %}
 {% block specialAlert %}
     {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
-        <div class="alert-box-icon highlight">
-            <span class="icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}"></span>
-        </div>
+        <button class="alert-box-icon highlight icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}"></button>
     {% endif %}
 {% endblock specialAlert %}
 
 {% block englishSecond %}
     {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
-        <div class="alert-box-icon highlight">
-            <span class="icon-eng-second-lang" title="English as an Additional Language"></span>
-        </div>
+        <button class="alert-box-icon highlight icon-eng-second-lang" title="English as an Additional Language"></button>
     {% endif %}
 {% endblock englishSecond %}
 
 {% block medicalAlert %}
     {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
-        <div class="alert-box-icon alert">
-            <span class="icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}"></span>
-        </div>
+        <button class="alert-box-icon alert icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}"></button>
     {% endif %}
 {% endblock medicalAlert %}
 
 {% block individualEducationPlan %}
     {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
-        <div class="alert-box-icon highlight">
-            <span class="icon-curriculum" title="Individual Education Plan"></span>
-        </div>
+        <button class="alert-box-icon highlight icon-curriculum" title="Individual Education Plan"></button>
     {% endif %}
 {% endblock individualEducationPlan %}
 
 {% block synergeticComments %}
     {% if externalUser.Comment is not empty and showComments %}
-        <div class="alert-box-icon highlight">
-            <span class="icon-info" title="{{ externalUser.Comment | nl2br }}"></span>
-        </div>
+        <button class="alert-box-icon highlight icon-info" title="{{ externalUser.Comment | nl2br }}"></button>
     {% endif %}
 {% endblock synergeticComments %}
 
 {% block contacts_alert %}
     {# Only staff may view contact alerts #}
     {% if showContactsAlert %}
-        <div class="alert-box-icon alert">
-            <span class="icon-alert" title="{{ message | nl2br }}"></span>
-        </div>
+        <button class="alert-box-icon alert icon-alert" title="{{ message | nl2br }}"></button>
     {% endif %}
 {% endblock contacts_alert %}
+
+<script>
+    /**
+     * Kinross Wolaroi would like their alerts less prominent and to minimise the risk of visibility to others while on screen
+     * As a result the alerts have been changed to buttons with just the relevant icon initially visible
+     * Once the alert is selected the title attribute will be referenced to add the text to the button
+     * The title attribute is still shown on hover when available, and the click ensures visibility across all devices 
+     */
+    const alertButtons = document.querySelectorAll('[data-alert-button]');
+    alertButtons.forEach((alertButton) => {
+        alertButton.addEventListener('click', (event) => {
+            alertButton.textContent = alertButton.getAttribute('title');
+        });
+    });
+</script>
+
+<style>
+    .alert-box { 
+        /* make padding-right the same as all others, so the icon sits in the middle of the button when unselected */ 
+        padding: 0.875rem; 
+    }
+    .alert-box:empty {
+        /* was display:none, so need to ensure our empty buttons are initially visible */ 
+        display: block;
+    }
+</style>
