@@ -227,10 +227,13 @@ class Transactor
             $relocated = true;
         }
 
-        /* If Similarity Check is enabled, and turnitin is enabled,
+        /* If Similarity Check is enabled, and turnitin is enabled, and this is an implementation,
          * send the attachments to turnitin to use as exclusion data for student submissions
+         *
+         * (We only care about assessment implementations because turnitin has no utility for
+         * assessment specifications, so skip those ones)
          */
-        if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled()) {
+        if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled() && $this->assessment->isImplementation()) {
             /* If turnitin is enabled, create a group attachment for each file
              */
             if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
@@ -243,7 +246,7 @@ class Transactor
                  * TODO There should be an easier way to do this, but idk,
                  *  something is going funny in the swamp
                  */
-                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $this->assessment->getId(), ['cache' => false]);
+                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $this->assessment->getId(), [ 'cache' => false ]);
 
                 $turnitinGroupMapper = Turnitin\Group\Mapper::getInstance();
 
