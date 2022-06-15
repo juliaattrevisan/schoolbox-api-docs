@@ -466,6 +466,7 @@ DESCRIPTION
     NCCD page content consists of:
     * files uploaded directly to the page
     * files submitted by a teacher to one of the due works within an NCCD course, as well as any comments which have been given in feedback
+    * files from due work submissions which are not published will be excluded
 
     Comments and HTML content (including the content of the Online Submission box) will be converted to PDF before outputting to the ZIP.
 
@@ -480,10 +481,19 @@ OPTIONS
         If provided: only output NCCD information for the first LIMIT students found.
 
     --start START
-        If provided: only include files uploaded or submitted on or after this date.
+        If provided: only include files modified or submitted on or after this date.  If supplied, this date must be supplied in "YYYY-MM-DD" format.
+
+        The following dates are used for comparisons:
+        * for files uploaded directly to a page, the file's last modified time is used
+        * for files submitted by a teacher to a due work, the file's submission time is used
 
     --end END
         If provided: only include files uploaded or submitted on or before this date.
+
+    -v
+        Increase verbosity of output (repeat up to 3 times for increased verbosity)
+
+
 HELP;
         exit;
     }
