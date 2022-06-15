@@ -88,7 +88,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 'campusCode'    => $campusCode,
             ];
             $longestDay = $this->getConnector()->executeQuery($query, $params)->fetch();
-            $day        = $longestDay['day_code'];
+            if (!empty($longestDay)) {
+                $day = $longestDay['day_code'];
+            }
         }
 
         $query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
