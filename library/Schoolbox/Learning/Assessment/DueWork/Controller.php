@@ -1738,12 +1738,29 @@ class Controller extends Assessment\Controller
                 continue;
             }
             // File is eligible, and not yet queued.
-            $kamiModel = $this->kamiMapper->createModel()
-                                          ->setStudentSubmissionFile($file)
-                                          ->setStatusQueued();
-            $this->kamiMapper->save($kamiModel);
+
+            /* Try to find out if this file already existed in kami
+             *
+             * If it did, just skip past it - there's been no consideration
+             * for what happens to dupes, plus, mapper cache messes with you
+             */
+            try {
+                $kamiModel = $this->kamiMapper->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Create a new one if it didn't already exist
+                 */
+                $kamiModel = $this->kamiMapper->createModel()
+                    ->setStudentSubmissionFile($file)
+                    ->setStatusQueued();
+
+                $this->kamiMapper->save($kamiModel);
+            }
+
+            /* Pile it into whatever lookup this is
+             */
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }
+
         return $kamiModels;
     }
 
