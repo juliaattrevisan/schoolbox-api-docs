@@ -140,42 +140,44 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
-        $bus->add(new Hierarchy\Prepare(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $seasonMapper,
-            $sportMapper,
-            $positionMapper,
-            $divisionMapper,
-            $teamMapper,
-            $teamPlayerMapper,
-            $teamPositionMapper,
-            $divisionUserMapper
-        ))
-        ->add(new Hierarchy\Team(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $api,
-            $membership,
-            $registry,
-            $userLookup,
-            $divisionUserMapper,
-            $teamPlayerMapper,
-            $teamPositionMapper,
-            $userMapper
-        ))
-        ->add(new Hierarchy\Cleanup(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $seasonMapper,
-            $sportMapper,
-            $positionMapper,
-            $divisionMapper,
-            $teamMapper
-        ));
+        if ($membership) {
+            $bus->add(new Hierarchy\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper,
+                $teamPlayerMapper,
+                $teamPositionMapper,
+                $divisionUserMapper
+            ))
+            ->add(new Hierarchy\Team(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $api,
+                $membership,
+                $registry,
+                $userLookup,
+                $divisionUserMapper,
+                $teamPlayerMapper,
+                $teamPositionMapper,
+                $userMapper
+            ))
+            ->add(new Hierarchy\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper
+            ));
+        }
 
         /* Optionally load Sessions (the equivalent of schoolbox Matchups)
          * This is where we assign people to positions, add coaches, etc.
