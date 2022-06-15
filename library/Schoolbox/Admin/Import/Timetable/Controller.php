@@ -28,7 +28,6 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
  */
 class Controller extends UserAccount\Controller
 {
-
     /**
      * @var string
      */
