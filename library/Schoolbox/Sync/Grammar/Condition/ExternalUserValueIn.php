@@ -80,7 +80,7 @@ class ExternalUserValueIn extends Condition\In
     private function matchesValidValue($value): bool
     {
         foreach ($this->validValues as $validValue) {
-            if ($value == $validValue) {
+            if ($value === $validValue || fnmatch($validValue, $value, FNM_CASEFOLD | FNM_NOESCAPE)) {
                 return true;
             }
         }
