@@ -3,10 +3,6 @@ Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
 Admin,User Management Activity Report,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all
 Admin,User Management Login Log,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all
 Admin,User Management Schoolbox Help All,https://vagrant.dev.schoolbox.cloud/adminv2/shaps
-Admin,User Management Schoolbox Help Provisioned,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned
-Admin,User Management Schoolbox Help Not Provisioned,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned
-Admin,User Management Schoolbox Help Search,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search
-Admin,User Management Schoolbox Help Courses,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses
 Admin,User Management Remove Users,https://vagrant.dev.schoolbox.cloud/adminv2/user/stale
 Admin,Create a user,https://vagrant.dev.schoolbox.cloud/adminv2/user/create
 Admin,Go to service permissions,https://vagrant.dev.schoolbox.cloud/adminv2/service/permissions
