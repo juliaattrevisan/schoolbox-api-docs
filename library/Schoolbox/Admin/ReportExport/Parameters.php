@@ -15,7 +15,6 @@ use Schoolbox\Role;
 
 class Parameters
 {
-
     /**
      * Report options
      */
