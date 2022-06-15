@@ -59,10 +59,9 @@ class Sessions implements IStrategy
     /**
      * This is a giant slab of text that comes from the accumulation of Additional Fields'
      * data which may, or may not, exist. If there's meaningful content, it's appended to
-     * the end of NOTES_TEMPLATE, with a horizontal rule for a separator
+     * the end of NOTES_TEMPLATE, with e.g. a horizontal rule for a separator
      */
     private const ADDITIONAL_FIELDS_TEMPLATE = "
-        <hr />
         %s
     ";
 
@@ -70,7 +69,7 @@ class Sessions implements IStrategy
     /**
      * This represents the custom fields' key-value pair
      */
-    private const ADDITIONAL_FIELDS_TUPLE = "%s: %s<br />";
+    private const ADDITIONAL_FIELDS_TUPLE = "<strong>%s:</strong> %s<br />";
 
 
     /**
