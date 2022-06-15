@@ -25,13 +25,13 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
      */
     private const OPT_LONG_HELP = 'help';
+
 
     /**
      * An arbitrarily-chosen string to denote where these events came from
@@ -66,6 +66,8 @@ $app = new class extends CliTool\App
 
 Once-off correctional tool
 
+This ALWAYS EXECUTES a hard-delete of compass calendar events
+
 This removes the old Compass Events implementation which put timetable events into
 the schoolbox.event table, and all its relational pieces. This has since moved to
 SUDS Timetable and is no longer required here where it pollutes the event space.
@@ -77,6 +79,20 @@ Usage: php 00-purge-old-compass.php --perform
 
 
 HELP;
+            exit;
+        }
+
+        /* Check if you're running SUDS Compass first
+         *
+         * If you are, continue deleting the event records associated with a suds_compass import
+         * (these should be loaded into SUDS Timetable instead of schoolbox.events, separately)
+         *
+         * Otherwise, don't do anything and just exit politely
+         * This script had the potential to cross-over into tass calendar which also uses the same
+         * concept of setting potentially-deleteable events' updated_at to 0000-00-00
+         */
+        if (\Schoolbox\External\Importer\Endpoint\Factory::COMPASS !== $this->getConfig()->get('schooldata_import_data_source')) {
+            $this->getLogger()->info('Compass purge did not run: this schoolbox instance did not use SUDS Compass. No changes required; exiting');
             exit;
         }
 

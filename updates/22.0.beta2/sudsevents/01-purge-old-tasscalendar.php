@@ -25,7 +25,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
@@ -55,6 +54,8 @@ $app = new class extends CliTool\App
 
 Once-off correctional tool
 
+This ALWAYS EXECUTES a soft-delete of tass calendar events.
+
 This removes all the old suds_tass events which our previous importer put events into
 the schoolbox.event table, and all its relational pieces. This has since moved to
 SUDS Events and is no longer required here where it pollutes the event space.
@@ -69,6 +70,20 @@ HELP;
             exit;
         }
 
+        /* Check if you're running SUDS TASS first
+         *
+         * If you are, continue deleting the event records associated with a suds_tass import
+         * (these should be loaded into SUDS Events instead of schoolbox.events, separately)
+         *
+         * Otherwise, don't do anything and just exit politely
+         * This script had the potential to cross-over into compass calendar which also uses the same
+         * concept of setting potentially-deleteable events' updated_at to 0000-00-00
+         */
+        if (\Schoolbox\External\Importer\Endpoint\Factory::TASS_API !== $this->getConfig()->get('schooldata_import_data_source')) {
+            $this->getLogger()->info('TASS Calendar purge did not run: this schoolbox instance did not use SUDS TASS. No changes required; exiting');
+            exit;
+        }
+
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
         $eventSourceMapper = \Event\Source\Mapper::getInstance();
         $source = \Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Factory::SOURCE_NAME;
@@ -80,7 +95,7 @@ HELP;
                 AND {$eventSourceMapper->getTable()}.`deleted_at` IS NULL
                 SET {$eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
                 {$eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$eventSourceMapper->getTable()}.`source_name` = :sourceName
+                WHERE {$eventSourceMapper->getTable()}.`source_name` IN (:sourceName, 'ParentCalendar', 'ParentNotices', 'StudentCalendar', 'StudentNotices', 'TeacherCalendar', 'TeacherNotices')
             ";
 
         $statement = $eventSourceMapper->getDatabase()->prepare($query);
