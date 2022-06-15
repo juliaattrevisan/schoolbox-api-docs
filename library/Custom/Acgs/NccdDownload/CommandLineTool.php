@@ -10,8 +10,7 @@ declare(strict_types=1);
 namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress_Date_Format;
-use InvalidArgumentException;
+use DateTimeImmutable;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
@@ -122,43 +121,48 @@ class CommandLineTool extends App
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->outputHelp();
         }
-        $logger  = $this->getLogger();
+        $logger = $this->getLogger();
 
         // Parse outfile
+        $logger->notice(sprintf('Params:'));
         $outfile = $this->getOpt(self::OPT_LONG_OUTFILE);
         if (!$outfile) {
             $logger->error('An outfile (--outfile) must be supplied.');
             exit(1);
+        } else {
+            $logger->notice(sprintf('    Outfile: %s', $outfile));
         }
 
         // Parse start date
         $startDate = $this->getOpt(self::OPT_LONG_START);
         if (isset($startDate)) {
-            try {
-                $startDate = (new Alaress_Date_Format($startDate, Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
-            } catch (InvalidArgumentException $e) {
+            $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $startDate);
+            if (!$startDate) {
                 $logger->error('If provided: start date must be in YYYY-MM-DD format.');
                 exit(1);
             }
+            $startDate = $startDate->modify('00:00:00');
+            $logger->notice(sprintf('    Start:   %s', $startDate->format(DateTimeImmutable::RFC3339)));
         }
 
         // Parse end date
         $endDate = $this->getOpt(self::OPT_LONG_END);
         if (isset($endDate)) {
-            try {
-                $endDate = (new Alaress_Date_Format($endDate, Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
-            } catch (InvalidArgumentException $e) {
+            $endDate = DateTimeImmutable::createFromFormat('Y-m-d', $endDate);
+            if (!$endDate) {
                 $logger->error('If provided: end date must be in YYYY-MM-DD format.');
                 exit(1);
             }
+            $endDate = $endDate->modify('00:00:00 +1 day -1 second');
+            $logger->notice(sprintf('    End:     %s', $endDate->format(DateTimeImmutable::RFC3339)));
         }
 
-        var_dump(
-            $startDate->getDatabaseDate() ?? null,
-            $startDate->getUnixTimeStamp() ?? null,
-            $endDate->getDatabaseDate() ?? null,
-            $endDate->getUnixTimeStamp() ?? null,
-        );
+        // Parse limit
+        $limit = $this->getOptAsInt(self::OPT_LONG_LIMIT);
+        if ($limit) {
+            $logger->notice(sprintf('    Limit:   %d', $limit));
+        }
+
 
         $this->baseUri = (new UrlFactory($this->getConfig()))->buildFullyQualified()->toString();
 
@@ -175,7 +179,6 @@ class CommandLineTool extends App
             AND   cs.id IN {$params}
             ORDER BY f.name, f.id
         ";
-        $limit = $this->getOptAsInt(self::OPT_LONG_LIMIT);
         if ($limit) {
             // I'd rather use bound params for this,
             // but I can't get them to bind using this API
