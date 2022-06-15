@@ -86,7 +86,7 @@ class Module extends AbstractModule
             );
 
         $hasReadAccess =
-            new Rule\Any (
+            new Rule\Any(
                 $hasEditAccess,
                 new Rule\All(
                     $hasFolderReadAccess,
@@ -221,7 +221,7 @@ class Module extends AbstractModule
             throw new NotFound();
         }
         if (!$link instanceof Resource\Link) {
-            throw new Resource\Exception("Requested file is not a link");
+            throw new Resource\Exception("Requested link is not a link");
         }
 
         return [

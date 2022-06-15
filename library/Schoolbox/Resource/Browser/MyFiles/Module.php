@@ -49,7 +49,6 @@ class Module extends AbstractModule
                         }
                         throw new Unauthorized();
                     })
-
                 )
             );
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasFileAccess, $preloadFile);
