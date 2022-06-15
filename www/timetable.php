@@ -257,7 +257,7 @@ foreach ($userList as $user) {
                                         } catch (\Schoolbox\Mapper\Exception $e) {
                                         }
                                         // When failed to find the user, use staffSurname it exists
-                                        if (empty($name) && $class['staffSurname']) {
+                                        if (empty($name) && !empty($class['staffSurname'] ?? '')) {
                                             $name = $class['staffSurname'];
                                             // Optionally prepend a title, if that exists
                                             if ($class['staffTitle']) {

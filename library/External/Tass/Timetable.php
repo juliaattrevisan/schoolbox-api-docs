@@ -88,7 +88,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 'campusCode'    => $campusCode,
             ];
             $longestDay = $this->getConnector()->executeQuery($query, $params)->fetch();
-            $day        = $longestDay['day_code'];
+            if (!empty($longestDay)) {
+                $day = $longestDay['day_code'];
+            }
         }
 
         $query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
@@ -317,7 +319,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         // Build the timetable
         // TODO do this somewhere generic as it's the same for all connectors
-        if (is_array($timetabledef['desc'])) {
+        if (is_array($timetabledef['desc'] ?? false)) {
             foreach ($timetabledef['desc'] as $x => $name) {
                 $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
                 $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
