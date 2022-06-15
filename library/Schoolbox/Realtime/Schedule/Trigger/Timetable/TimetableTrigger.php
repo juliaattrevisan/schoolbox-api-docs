@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
-use _PHPStan_e04cc8dfb\Nette\InvalidArgumentException;
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
 use Alaress\Scheduler\Event\EventInterface;
