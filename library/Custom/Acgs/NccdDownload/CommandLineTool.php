@@ -11,6 +11,7 @@ namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
@@ -133,28 +134,38 @@ class CommandLineTool extends App
             $logger->notice(sprintf('    Outfile: %s', $outfile));
         }
 
-        // Parse start date
-        $startDate = $this->getOpt(self::OPT_LONG_START);
-        if (isset($startDate)) {
-            $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $startDate);
-            if (!$startDate) {
-                $logger->error('If provided: start date must be in YYYY-MM-DD format.');
+        // Parse start time
+        /** @var DateTimeImmutable|null $startTime */
+        $startTime = null;
+        $startOpt  = $this->getOpt(self::OPT_LONG_START);
+        if (isset($startOpt)) {
+            $startTime = DateTimeImmutable::createFromFormat('Y-m-d', $startOpt);
+            if (!$startTime) {
+                $logger->error('If provided: start must be in YYYY-MM-DD format.');
                 exit(1);
             }
-            $startDate = $startDate->modify('00:00:00');
-            $logger->notice(sprintf('    Start:   %s', $startDate->format(DateTimeImmutable::RFC3339)));
+            $startTime = $startTime->modify('00:00:00');
+            $logger->notice(sprintf('    Start:   %s', $startTime->format(DateTimeInterface::RFC3339)));
         }
 
-        // Parse end date
-        $endDate = $this->getOpt(self::OPT_LONG_END);
-        if (isset($endDate)) {
-            $endDate = DateTimeImmutable::createFromFormat('Y-m-d', $endDate);
-            if (!$endDate) {
-                $logger->error('If provided: end date must be in YYYY-MM-DD format.');
+        // Parse end time
+        /** @var DateTimeImmutable|null $endTime */
+        $endTime = null;
+        $endOpt   = $this->getOpt(self::OPT_LONG_END);
+        if (isset($endOpt)) {
+            $endTime = DateTimeImmutable::createFromFormat('Y-m-d', $endOpt);
+            if (!$endTime) {
+                $logger->error('If provided: end must be in YYYY-MM-DD format.');
                 exit(1);
             }
-            $endDate = $endDate->modify('00:00:00 +1 day -1 second');
-            $logger->notice(sprintf('    End:     %s', $endDate->format(DateTimeImmutable::RFC3339)));
+            $endTime = $endTime->modify('00:00:00 +1 day -1 second');
+            $logger->notice(sprintf('    End:     %s', $endTime->format(DateTimeInterface::RFC3339)));
+        }
+
+        // Validate start <= end
+        if ($startTime && $endTime && $startTime > $endTime) {
+            $logger->error('If both start and end are provided: start must be before or equal to end.');
+            exit(1);
         }
 
         // Parse limit
@@ -306,6 +317,8 @@ class CommandLineTool extends App
             }
         }
 
+        // Put the files into the zip, skipping files outside of the start/end
+        // time (if one provided)
         $zip       = new ZipArchive();
         $zipStatus = $zip->open($outfile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         if ($zipStatus !== true) {
@@ -313,6 +326,31 @@ class CommandLineTool extends App
             exit(1);
         }
         foreach ($files as $fileTuple) {
+            // Start is after the file's modified time: skip
+            $fileTime = (new DateTimeImmutable())->setTimestamp($fileTuple['filemtime']);
+            if ($startTime && $startTime > $fileTime) {
+                $logger->debug(
+                    sprintf(
+                        'Skipping file "%s": mtime %s is before start time %s',
+                        $fileTuple['filename'],
+                        $fileTime->format(DateTimeInterface::RFC3339),
+                        $startTime->format(DateTimeInterface::RFC3339),
+                    )
+                );
+                continue;
+            }
+            // End is before the file's modified time: skip
+            if ($endTime && $endTime < $fileTime) {
+                $logger->debug(
+                    sprintf(
+                        'Skipping file "%s": mtime %s is after start time %s',
+                        $fileTuple['filename'],
+                        $fileTime->format(DateTimeInterface::RFC3339),
+                        $startTime->format(DateTimeInterface::RFC3339),
+                    )
+                );
+                continue;
+            }
             $path = $fileTuple['path'];
             $logger->info(sprintf('Adding file "%s" to "%s"', $fileTuple['filename'], $path));
 
@@ -357,6 +395,12 @@ class CommandLineTool extends App
                 exit(1);
             }
             $zip->setMtimeName($path, $fileTuple['filemtime']);
+        }
+
+        if ($zip->numFiles === 0) {
+            $logger->warning('No files were added to the ZIP');
+        } else {
+            $logger->notice(sprintf('Added %d files to ZIP', $zip->numFiles));
         }
         $zip->close();
     }
