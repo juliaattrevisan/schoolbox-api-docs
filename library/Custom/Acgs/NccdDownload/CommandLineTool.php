@@ -42,9 +42,29 @@ class CommandLineTool extends App
     private const OPT_LONG_OUTFILE = 'outfile:';
 
     /**
-     * Outfile option
+     * Limit option
      */
     private const OPT_LONG_LIMIT = 'limit:';
+
+    /**
+     * Start date option
+     */
+    private const OPT_LONG_START = 'start:';
+
+    /**
+     * End date option
+     */
+    private const OPT_LONG_END = 'end:';
+
+    /**
+     * Help option
+     */
+    private const OPT_LONG_HELP = 'help';
+
+    /**
+     * Help option
+     */
+    private const OPT_SHORT_HELP = 'h';
 
     /**
      * The ID(s) of the NCCD information courses.
@@ -73,9 +93,23 @@ class CommandLineTool extends App
     /**
      * @inheritdoc
      */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_OUTFILE, self::OPT_LONG_LIMIT];
+        return [
+            self::OPT_LONG_OUTFILE,
+            self::OPT_LONG_LIMIT,
+            self::OPT_LONG_START,
+            self::OPT_LONG_END,
+            self::OPT_LONG_HELP,
+        ];
     }
 
     /**
@@ -83,6 +117,9 @@ class CommandLineTool extends App
      */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->outputHelp();
+        }
         $logger  = $this->getLogger();
         $outfile = $this->getOpt(self::OPT_LONG_OUTFILE);
         if (!$outfile) {
@@ -403,5 +440,51 @@ class CommandLineTool extends App
         $result = file_get_contents($tmpfile);
         unlink($tmpfile);
         return $result;
+    }
+
+    /**
+     * Output help text and exit.
+     *
+     * @return never-return
+     */
+    private function outputHelp(): void
+    {
+        echo <<<HELP
+NAME
+    {$this->getToolFilename()} - export NCCD pages content
+
+SYNOPSIS
+    {$this->getToolFilename()} --outfile OUTFILE [--limit LIMIT] [--start START] [--end END] [-v]
+
+DESCRIPTION
+    Outputs NCCD page content to OUTFILE in ZIP format.
+
+    NCCD pages are distinguishable by:
+    * their importation of one of the NCCD courses
+    * the page's name contains a student's external ID in curly brackets, e.g. "Student Name {12345}"
+
+    NCCD page content consists of:
+    * files uploaded directly to the page
+    * files submitted by a teacher to one of the due works within an NCCD course, as well as any comments which have been given in feedback
+
+    Comments and HTML content (including the content of the Online Submission box) will be converted to PDF before outputting to the ZIP.
+
+OPTIONS
+    -h, --help
+        Output this help text and exit.
+
+    --outfile OUTFILE
+        The ZIP file to output NCCD page content to.
+
+    --limit LIMIT
+        If provided: only output NCCD information for the first LIMIT students found.
+
+    --start START
+        If provided: only include files uploaded or submitted on or after this date.
+
+    --end END
+        If provided: only include files uploaded or submitted on or before this date.
+HELP;
+        exit;
     }
 }
