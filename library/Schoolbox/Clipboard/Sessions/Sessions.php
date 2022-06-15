@@ -381,6 +381,9 @@ class Sessions implements IStrategy
                      *
                      * Sometimes clipboard sends data with microseconds in there, which carbon won't understand
                      * with the date format we want to use - explode it out first
+                     *
+                     * We set the timezone to be appropriate to wherever the schoolbox instance happens to be
+                     * so that frontend can render the UTC timestamp correctly
                      */
                     $startAt = (new \Alaress_Date_Format(explode('.', $session['startDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
                         ->setTimezone($this->timezone);
