@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
+use InvalidArgumentException;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
@@ -121,11 +123,42 @@ class CommandLineTool extends App
             $this->outputHelp();
         }
         $logger  = $this->getLogger();
+
+        // Parse outfile
         $outfile = $this->getOpt(self::OPT_LONG_OUTFILE);
         if (!$outfile) {
             $logger->error('An outfile (--outfile) must be supplied.');
             exit(1);
         }
+
+        // Parse start date
+        $startDate = $this->getOpt(self::OPT_LONG_START);
+        if (isset($startDate)) {
+            try {
+                $startDate = (new Alaress_Date_Format($startDate, Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
+            } catch (InvalidArgumentException $e) {
+                $logger->error('If provided: start date must be in YYYY-MM-DD format.');
+                exit(1);
+            }
+        }
+
+        // Parse end date
+        $endDate = $this->getOpt(self::OPT_LONG_END);
+        if (isset($endDate)) {
+            try {
+                $endDate = (new Alaress_Date_Format($endDate, Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
+            } catch (InvalidArgumentException $e) {
+                $logger->error('If provided: end date must be in YYYY-MM-DD format.');
+                exit(1);
+            }
+        }
+
+        var_dump(
+            $startDate->getDatabaseDate() ?? null,
+            $startDate->getUnixTimeStamp() ?? null,
+            $endDate->getDatabaseDate() ?? null,
+            $endDate->getUnixTimeStamp() ?? null,
+        );
 
         $this->baseUri = (new UrlFactory($this->getConfig()))->buildFullyQualified()->toString();
 
@@ -302,7 +335,7 @@ class CommandLineTool extends App
 
             // Convert this to PDF if it's HTML
             if ($fileTuple['mimetype'] === 'text/html') {
-                $this->getLogger()->info(sprintf('Converting file "%s" to PDF', $path));
+                $logger->info(sprintf('Converting file "%s" to PDF', $path));
                 // Convert extension
                 $path        = sprintf(
                     '%s/%s.pdf',
