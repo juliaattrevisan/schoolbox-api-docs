@@ -122,6 +122,12 @@ class Sessions implements IStrategy
 
 
     /**
+     * @var string
+     */
+    private string $timezone;
+
+
+    /**
      * @var Registry
      */
     private Registry $registry;
@@ -176,6 +182,7 @@ class Sessions implements IStrategy
      * @param bool                                  $perform
      * @param LockInterface                         $lock
      * @param IApi                                  $api
+     * @param string                                $timezone
      * @param Registry                              $registry
      * @param Person                                $userLookup
      * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
@@ -189,6 +196,7 @@ class Sessions implements IStrategy
         bool $perform,
         LockInterface $lock,
         IApi $api,
+        string $timezone,
         Registry $registry,
         Person $userLookup,
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
@@ -201,6 +209,7 @@ class Sessions implements IStrategy
         $this->perform = $perform;
         $this->lock = $lock;
         $this->api = $api;
+        $this->timezone = $timezone;
         $this->registry = $registry;
         $this->userLookup = $userLookup;
         $this->venueMapper = $venueMapper;
@@ -363,22 +372,21 @@ class Sessions implements IStrategy
 
                     $matchupName = trim($session['title']);
 
-                    /*
-                     * Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
+                    /* Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
                      * so lets force the creation of the date object to be a UTC timezone,
                      * then update that object to the local timezone specified from the DB config.
                      *
                      * The rest of the system expects all dates to be in a local timezone, NOT UTC
                      * https://api-docs.clipboard.app/?id=timestamps
+                     *
+                     * Sometimes clipboard sends data with microseconds in there, which carbon won't understand
+                     * with the date format we want to use - explode it out first
                      */
-                    //grab local TZ from DB
-                    $localTZ = ConfigMapper::getInstance()->getConfigLoader()->get('date_timezone');
-                    $startAt = new \Alaress_Date_Format($session['startDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $startAt->setTimezone($localTZ);
-                    $finishAt = new \Alaress_Date_Format($session['endDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $finishAt->setTimezone($localTZ);
+                    $startAt = (new \Alaress_Date_Format(explode('.', $session['startDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
+
+                    $finishAt = (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
 
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard

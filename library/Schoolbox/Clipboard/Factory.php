@@ -54,24 +54,33 @@ class Factory
 
 
     /**
+     * @var string
+     */
+    private string $timezone;
+
+
+    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param LockInterface   $lock
      * @param string          $host
      * @param string          $token
+     * @param string          $timezone
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         LockInterface $lock,
         string $host,
-        string $token
+        string $token,
+        string $timezone
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->lock = $lock;
         $this->host = $host;
         $this->token = $token;
+        $this->timezone = $timezone;
     }
 
 
@@ -206,6 +215,7 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $api,
+                $this->timezone,
                 $registry,
                 $userLookup,
                 $venueMapper,
