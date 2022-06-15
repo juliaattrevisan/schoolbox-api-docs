@@ -44,7 +44,6 @@ use UnexpectedValueException;
  */
 class Transactor
 {
-
     /**
      * @var IAssessable
      */
