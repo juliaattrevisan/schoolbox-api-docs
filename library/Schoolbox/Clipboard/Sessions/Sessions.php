@@ -469,7 +469,10 @@ class Sessions implements IStrategy
                              *
                              * so I guess we just concatenate all their values for now
                              */
-                            $notes .= implode('', $customFields);
+                            $notes .= sprintf(
+                                self::ADDITIONAL_FIELDS_TEMPLATE,
+                                implode('', $customFields)
+                            );
                         }
                     }
 
