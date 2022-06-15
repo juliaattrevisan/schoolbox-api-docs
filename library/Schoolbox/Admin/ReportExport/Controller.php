@@ -493,6 +493,7 @@ class Controller extends ConfigController
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'reportTitle'                => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
             'showSummary'                => $params->getShowSummary(),
+            'summaryHeading'             => $params->getSummaryHeading(),
             'showSummaryOverallGrade'    => $params->getShowSummaryOverallGrade(),
             'showSummaryGrades'          => $params->getShowSummaryGrades(),
             'showSummaryComments'        => $params->getShowSummaryComments(),

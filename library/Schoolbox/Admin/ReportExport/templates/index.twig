@@ -149,17 +149,25 @@
                     </fieldset>
                     <fieldset id="summaryPageOptions" class="hide">
                         {% for optionId, summaryPageOption in summaryPageOptions %}
-                            <div class="small-12 medium-6 large-6 columns">
-                                <label for="{{ optionId }}">{{ summaryPageOption }}</label>
-                                <div class="switch">
-                                    <input name="{{ optionId }}" id="{{ optionId }}"
-                                           type="checkbox" value="1"/>
-                                    <label for="{{ optionId }}">
-                                        <span>ON</span>
-                                        <span>OFF</span>
-                                    </label>
+
+                            {% if 'summaryHeading' == optionId %}
+                                <div class="small-12 columns">
+                                    <label for="{{ optionId }}">{{ summaryPageOption }}</label>
+                                    <input type="text" name="{{ optionId }}" id="{{ optionId }}" value="" />
                                 </div>
-                            </div>
+                            {% else %}
+                                <div class="small-12 medium-6 large-6 columns">
+                                    <label for="{{ optionId }}">{{ summaryPageOption }}</label>
+                                    <div class="switch">
+                                        <input name="{{ optionId }}" id="{{ optionId }}"
+                                               type="checkbox" value="1"/>
+                                        <label for="{{ optionId }}">
+                                            <span>ON</span>
+                                            <span>OFF</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     </fieldset>
                     <fieldset id="summaryPageAssessmentOptions" class="hide">

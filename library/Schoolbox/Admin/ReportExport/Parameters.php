@@ -15,7 +15,6 @@ use Schoolbox\Role;
 
 class Parameters
 {
-
     /**
      * Report options
      */
@@ -28,6 +27,7 @@ class Parameters
     public const END_DATE                 = 'endDate';
     public const VIEW_AS                  = 'viewAs';
     public const SHOW_SUMMARY             = 'showSummary';
+    public const SUMMARY_HEADING          = 'summaryHeading';
     public const WORK_TYPES               = 'workTypes';
     public const SHOW_CLASS               = 'showClass';
     public const CLASS_WORK_TYPES         = 'classWorkTypes';
@@ -44,7 +44,9 @@ class Parameters
     public const SHOW_CLASS_COMMENTS      = 'showClassComments';
     public const SHOW_CLASS_RUBRICS       = 'showClassRubrics';
 
+
     public const SUMMARY_PAGE_OPTIONS = [
+        self::SUMMARY_HEADING => 'Heading',
         self::SHOW_OVERALL_GRADE => 'Show overall grade',
     ];
 
@@ -78,6 +80,8 @@ class Parameters
 
     // summary
     private bool $showSummary;
+
+    private string $summaryHeading;
 
     private bool $showSummaryOverallGrade;
 
@@ -119,6 +123,7 @@ class Parameters
         $this->termIds    = (isset($params[self::TERMS]) && $params[self::TERMS] !== null) ? $this->filter($params[self::TERMS]) : [];
         // summary
         $this->showSummary             = (bool)($params[self::SHOW_SUMMARY] ?? false);
+        $this->summaryHeading          = (string)($params[self::SUMMARY_HEADING] ?? '');
         $this->showSummaryOverallGrade = (bool)($params[self::SHOW_OVERALL_GRADE] ?? false);
         $this->summaryWorkTypeIds      = (isset($params[self::WORK_TYPES]) && $params[self::WORK_TYPES] !== null) ? $this->filter($params[self::WORK_TYPES]) : [];
         $this->showSummaryGrades       = (bool)($params[self::SHOW_GRADES] ?? false);
@@ -176,6 +181,16 @@ class Parameters
     {
         return $this->showSummary;
     }
+
+
+    /**
+     * @return string
+     */
+    public function getSummaryHeading(): string
+    {
+        return $this->summaryHeading;
+    }
+
 
     /**
      * @return bool
@@ -341,6 +356,7 @@ class Parameters
         // summary
         $params[self::SHOW_SUMMARY] = $this->showSummary;
         if ($this->showSummary) {
+            $params[self::SUMMARY_HEADING]    = $this->summaryHeading;
             $params[self::SHOW_OVERALL_GRADE] = $this->showSummaryOverallGrade;
             $params[self::WORK_TYPES]         = implode(',', $this->summaryWorkTypeIds);
             $params[self::SHOW_GRADES]        = $this->showSummaryGrades;
