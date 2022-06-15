@@ -1445,6 +1445,8 @@ abstract class Kernel
                     'unitSpecificationMapper'  => $mapperFactory->getLazy(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class),
                     'assessmentMapperProxy'    => $di->lazyGet('assessmentDataSource'),
                     'plagscanMapper'           => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
+                    'turnitinGroupMapper'      => $mapperFactory->getLazy(\Schoolbox\Learning\Turnitin\Group\Mapper::class),
+                    'submissionBoxMapper'      => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBoxMapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                     'router'                   => $di->lazyGet('router'),
