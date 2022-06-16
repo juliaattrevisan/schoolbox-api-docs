@@ -16,7 +16,6 @@ use Schoolbox\Application\CliTool;
  */
 class ImporterTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
@@ -126,7 +125,7 @@ HELP;
          */
         if (!$this->getConfig()->get('clipboard_enabled')) {
             $this->getLogger()->info('Clipboard integration is not enabled; exiting');
-            exit();
+            exit;
         }
 
         /* Check that this isn't currently running
@@ -146,7 +145,8 @@ HELP;
                 $this->perform(),
                 $lock,
                 (string)$this->getConfig()->get('clipboard_endpoint_host'),
-                (string)$this->getConfig()->get('clipboard_endpoint_token')
+                (string)$this->getConfig()->get('clipboard_endpoint_token'),
+                (string)$this->getCOnfig()->get('date_timezone')
             ))->produce(
                 $this->getOpt(self::OPT_LONG_MEMBERSHIP),
                 $this->getOpt(self::OPT_LONG_SESSIONS),

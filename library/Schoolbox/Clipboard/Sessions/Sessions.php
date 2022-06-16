@@ -22,7 +22,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Sessions implements IStrategy
 {
-
     /**
      * Short-circuit to prevent infinite loops
      */
@@ -54,6 +53,22 @@ class Sessions implements IStrategy
         %s
         <p>%s</p>
     ";
+
+
+    /**
+     * This is a giant slab of text that comes from the accumulation of Additional Fields'
+     * data which may, or may not, exist. If there's meaningful content, it's appended to
+     * the end of NOTES_TEMPLATE, with e.g. a horizontal rule for a separator
+     */
+    private const ADDITIONAL_FIELDS_TEMPLATE = "
+        %s
+    ";
+
+
+    /**
+     * This represents the custom fields' key-value pair
+     */
+    private const ADDITIONAL_FIELDS_TUPLE = "<strong>%s:</strong> %s<br />";
 
 
     /**
@@ -104,6 +119,12 @@ class Sessions implements IStrategy
      * @var IApi
      */
     private IApi $api;
+
+
+    /**
+     * @var string
+     */
+    private string $timezone;
 
 
     /**
@@ -161,6 +182,7 @@ class Sessions implements IStrategy
      * @param bool                                  $perform
      * @param LockInterface                         $lock
      * @param IApi                                  $api
+     * @param string                                $timezone
      * @param Registry                              $registry
      * @param Person                                $userLookup
      * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
@@ -174,6 +196,7 @@ class Sessions implements IStrategy
         bool $perform,
         LockInterface $lock,
         IApi $api,
+        string $timezone,
         Registry $registry,
         Person $userLookup,
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
@@ -186,6 +209,7 @@ class Sessions implements IStrategy
         $this->perform = $perform;
         $this->lock = $lock;
         $this->api = $api;
+        $this->timezone = $timezone;
         $this->registry = $registry;
         $this->userLookup = $userLookup;
         $this->venueMapper = $venueMapper;
@@ -199,8 +223,12 @@ class Sessions implements IStrategy
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -255,6 +283,9 @@ class Sessions implements IStrategy
                 'includeStaff' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
+                /* These might also be known as "Additional Fields" in the clipboard ui
+                 */
+                'includeCustomFieldsMetadata' => 'true',
                 'startDateTime' => $startDateTime,
                 'endDateTime' => $endDateTime,
                 /* Apparently this should give you "only not cancelled" sessions
@@ -265,6 +296,20 @@ class Sessions implements IStrategy
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
             ]);
+
+            /* Store metadata for custom fields: their types and their labels
+             * This is to make their contents presentable in the frontend by
+             * appending it to each event's $notes
+             *
+             * Metadata is supplied in the $session var, not the $session['data']
+             * var; it's meant to apply to everything in the payload
+             *
+             * Therefore we can remember it per endpoint retrieval. Technically
+             * we'd only need to remember it once, I think, but I don't really
+             * see there being an advantage one way or the other; we canjust use
+             * the customFieldsMetadata struct as provided in each $session
+             */
+            $customFieldsMetadata = $sessions['customFieldsMetadata'] ?? null;
 
             foreach ($sessions['data'] as $session) {
                 /* Sport identifiers
@@ -327,22 +372,24 @@ class Sessions implements IStrategy
 
                     $matchupName = trim($session['title']);
 
-                    /*
-                     * Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
+                    /* Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
                      * so lets force the creation of the date object to be a UTC timezone,
                      * then update that object to the local timezone specified from the DB config.
                      *
                      * The rest of the system expects all dates to be in a local timezone, NOT UTC
                      * https://api-docs.clipboard.app/?id=timestamps
+                     *
+                     * Sometimes clipboard sends data with microseconds in there, which carbon won't understand
+                     * with the date format we want to use - explode it out first
+                     *
+                     * We set the timezone to be appropriate to wherever the schoolbox instance happens to be
+                     * so that frontend can render the UTC timestamp correctly
                      */
-                    //grab local TZ from DB
-                    $localTZ = ConfigMapper::getInstance()->getConfigLoader()->get('date_timezone');
-                    $startAt = new \Alaress_Date_Format($session['startDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $startAt->setTimezone($localTZ);
-                    $finishAt = new \Alaress_Date_Format($session['endDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $finishAt->setTimezone($localTZ);
+                    $startAt = (new \Alaress_Date_Format(explode('.', $session['startDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
+
+                    $finishAt = (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
 
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
@@ -396,6 +443,47 @@ class Sessions implements IStrategy
                         $this->generateStatus($session),
                         nl2br(trim((string)$session['studentParentNotes']))
                     );
+
+                    /* Cram in a set of custom fields' metadata contents into $notes
+                     * by collating all the custom metadata records into one big slab
+                     */
+                    if ($customFieldsMetadata && $session['customFieldsData']) {
+                        $customFields = [];
+
+                        foreach ($session['customFieldsData'] as $key => $value) {
+                            /* Look up what this was meant to be called
+                             */
+                            $label = $customFieldsMetadata[$key]['label'];
+
+                            /* If there's a meaningful value, stack it up
+                             * Otherwise ignore it
+                             */
+                            if ('' !== trim((string)$value)) {
+                                $customFields[] = sprintf(
+                                    self::ADDITIONAL_FIELDS_TUPLE,
+                                    $label,
+                                    $value
+                                );
+                            }
+                        }
+
+                        /* Use a standard html break for a separator
+                         * I assume each key/value appears on its own line
+                         */
+                        if (\count($customFields)) {
+                            /* customFieldMetadata is a set of key-value pairs:
+                             *    busDepartureTime
+                             *    studentArrivalTime
+                             *    coachstaffContactDetails
+                             *
+                             * so I guess we just concatenate all their values for now
+                             */
+                            $notes .= sprintf(
+                                self::ADDITIONAL_FIELDS_TEMPLATE,
+                                implode('', $customFields)
+                            );
+                        }
+                    }
 
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups
