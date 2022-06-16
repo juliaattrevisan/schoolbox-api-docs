@@ -29,7 +29,6 @@ use Schoolbox\YearLevel;
  */
 class Bulk_Folder
 {
-
     /**
      * Default id for HomepageTemplate instance
      *

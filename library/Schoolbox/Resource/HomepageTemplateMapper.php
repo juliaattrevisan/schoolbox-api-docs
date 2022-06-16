@@ -112,7 +112,7 @@ class HomepageTemplateMapper extends Mapper
      */
     protected function validateName(HomepageTemplate $model): bool
     {
-        if (trim($model->getName() ?? '') === '') {
+        if (trim($model->getName()) === '') {
             throw new CallbackException("Homepage Template name cannot be empty");
         }
 
