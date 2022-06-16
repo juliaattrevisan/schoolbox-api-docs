@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -35,6 +33,32 @@ try {
 } catch (Schoolbox\Mapper\Exception $e) {
     redirectToBroken(404);
     exit;
+}
+
+$allFiles = \Component\Eportfolio\FileListMapper::getInstance()->findByColumn('file_id', $image->getId());
+
+$isViewable = false;
+
+if ($allFiles->count()) {
+    foreach ($allFiles as $currentFile) {
+        $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $image->getOwner(), $currentFile->getPageId());
+
+        /* If you can view one of the pages that this file is shared on,
+         * break out of here
+         */
+        if ($authenticator->canView()) {
+            $isViewable = true;
+
+            break;
+        }
+    }
+}
+
+/* If the file was never viewable on any eportfolio page and you aren't
+ * the owner, get out
+ */
+if (!$isViewable && ($_SESSION['user']->getId() != $image->getOwner()->getId()) && !$_SESSION['user']->isSuperuser()) {
+    error(5);
 }
 
 if (isset($_GET['key'])) {

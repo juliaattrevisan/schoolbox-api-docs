@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
@@ -36,10 +37,19 @@ class Module extends AbstractModule
             return $this->preloadFile($params);
         };
         $getHomepageIdCallback = function ($params) {
-            return $this->preloadFile($params)['file']->getFolder()->getId();
+            if (isset($params['file']) && $params['file'] instanceof Resource\File\Model) {
+                return $params['file']->getFolder()->getId();
+            }
+            if (isset($params['link']) && $params['link'] instanceof Resource\Link) {
+                return $params['link']->getFolder()->getId();
+            }
+            throw new Unauthorized();
         };
         $preloadFolder         = function ($params) {
             return $this->preloadFolder($params);
+        };
+        $preloadLink           = function ($params) {
+            return $this->preloadLink($params);
         };
 
         $hasEditAccess =
@@ -59,16 +69,52 @@ class Module extends AbstractModule
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_READ,
                         function ($params): int {
-                            return $params['sourceFolder']->getId();
+                            if (isset($params['sourceFolder']) && $params['sourceFolder'] instanceof Resource\Folder\Model) {
+                                return $params['sourceFolder']->getId();
+                            }
+                            if (isset($params['file']) && $params['file'] instanceof Resource\File\Model) {
+                                return $params['file']->getFolder()->getId();
+                            }
+                            if (isset($params['link']) && $params['link'] instanceof Resource\Link) {
+                                return $params['link']->getFolder()->getId();
+                            }
+                            throw new Unauthorized();
                         },
                         Access::getInstance()
                     )
                 )
             );
 
+        $hasReadAccess =
+            new Rule\Any(
+                $hasEditAccess,
+                new Rule\All(
+                    $hasFolderReadAccess,
+                    new Rule\Callback(function (array $params): bool {
+                        if (
+                            isset($params['file'])
+                            && $params['file'] instanceof Resource\File\Model
+                            && !$params['file']->isHidden()
+                        ) {
+                            return true;
+                        }
+                        if (
+                            isset($params['link'])
+                            && $params['link'] instanceof Resource\Link
+                            && !$params['link']->isHidden()
+                        ) {
+                            return true;
+                        }
+                        throw new Unauthorized();
+                    })
+                )
+            );
+
         $this->register('GET', '/folder/{componentID:\d+}/files/{sourceFolderID:\d+}', 'showFiles', $hasFolderReadAccess, $preloadFolder);
         $this->register('GET', '/folder/files/{sourceFolderID:\d+}', 'showFolderFiles', $hasFolderReadAccess, $preloadFolder);
-        $this->register('PATCH', '/file/{fileId}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
+        $this->register('PATCH', '/file/{fileId:\d+}/ajax', 'patchFileInfo', $hasEditAccess, $preloadFile);
+        $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
+        $this->register('GET', '/link/{linkId:\d+}/info', 'showLinkInfo', $hasReadAccess, $preloadLink);
     }
 
     /**
@@ -80,7 +126,6 @@ class Module extends AbstractModule
     public function initRoutes(Router $router, $basePath)
     {
         parent::initRoutes($router, $basePath);
-        $this->addGetRoute($router, 'showLinkInfo', $basePath, '/link/{linkId}/info')->addTokens(['linkId' => '\d+']);
     }
 
     /**
@@ -158,6 +203,29 @@ class Module extends AbstractModule
 
         return [
             'sourceFolder' => $folder,
+        ];
+    }
+
+    /**
+     * Preload a link object
+     *
+     * @param array $params
+     * @return array
+     * @throws Resource\Exception
+     */
+    private function preloadLink(array $params): array
+    {
+        try {
+            $link = $this->getMapperFactory()->get(Resource\LinkMapper::class)->findById($params['linkId']);
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+        if (!$link instanceof Resource\Link) {
+            throw new Resource\Exception("Requested link is not a link");
+        }
+
+        return [
+            'link' => $link,
         ];
     }
 }
