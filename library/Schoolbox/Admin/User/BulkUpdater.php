@@ -183,9 +183,9 @@ class BulkUpdater
          */
         $this->userIds = array_map('intval', $userIds);
 
-        /* Only update campus assignation if Unchanged was never selected
+        /* Only update campus assignation if selected
          */
-        if (!in_array(self::UNCHANGED, $campusIds, false)) {
+        if (count($campusIds) > 0) {
             $this->campusIds = array_map('intval', $campusIds);
             //check if campus still exists... yay multiplayer schoolbox
             $bindings           = Builder::getBindings($this->campusIds, 'c');
