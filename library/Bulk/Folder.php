@@ -221,13 +221,18 @@ class Bulk_Folder
         $templateId = $this->templateID;
         //if template has been set in the csv
         if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
-            try {
+            //if template name is 'No template' then set to default 0, else check db list
+            if ('No template' == trim($row[$templateColumnIndex])) {
+                $templateId = 0;
+            } else {
                 //grab that template if it exists
                 $templateObj = $this->homepageTemplateList->getBy('name', trim($row[$templateColumnIndex]));
-                $templateId = $templateObj->getId();
-            } catch (MapperException $e) {
-                //noop csv template does not exist, ignore the template and use the one specified in the webform
-                $warnings[] = sprintf('%s is not a homepage template.', trim($row[$templateColumnIndex]));
+                if (null !== $templateObj) {
+                    $templateId = $templateObj->getId();
+                } else {
+                    //noop csv template does not exist, ignore the template and use the one specified in the webform
+                    $warnings[] = sprintf('%s is not a homepage template.', trim($row[$templateColumnIndex]));
+                }
             }
         }
         //set homepage to the specified template
