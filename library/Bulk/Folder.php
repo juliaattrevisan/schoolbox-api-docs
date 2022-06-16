@@ -232,7 +232,6 @@ class Bulk_Folder
         }
         //set homepage to the specified template
         $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($templateId));
-        $warnings[] = sprintf('csv template: %s, tempalteID: %s', trim($row[$templateColumnIndex]), $templateId);
 
         // Create new Folder
         $newFolder = (new Folder\Model())
