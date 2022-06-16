@@ -5,42 +5,39 @@
     <div class="small-12 island">
         {% block header %}
         {% endblock header %}
-
-        <div class="scroll-wrapper">
-            <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
-                <input type="hidden" name="id_token" value="{{ jwt }}">
-            </form>
-            <script type="text/javascript">
-                window.addEventListener("message", event => {
-                    // Check that the event is from a trusted source
-                    if (![
-                        "https://analytics.intellischool.cloud",
-                        "https://analytics.intellischool.xyz",
-                        "https://analytics.intellischool.dev"
-                    ].includes(event.origin)
-                    )
-                        return;
-                    // Act on the event
-                    if (event.data && event.data.intellischool && typeof(event.data.intellischool) === "object")  {
-                        switch (event.data.intellischool.action)
-                        {
-                            case "resize":
-                                if (event.data.intellischool.height) {
-                                    document.getElementById('iframe').height = Math.ceil(event.data.intellischool.height);
-                                }
-                                return;
-                            default:
-                                // Unknown event, do nothing
-                                return;
-                        }
+        <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
+            <input type="hidden" name="id_token" value="{{ jwt }}">
+        </form>
+        <script type="text/javascript">
+            window.addEventListener("message", event => {
+                // Check that the event is from a trusted source
+                if (![
+                    "https://analytics.intellischool.cloud",
+                    "https://analytics.intellischool.xyz",
+                    "https://analytics.intellischool.dev"
+                ].includes(event.origin)
+                )
+                    return;
+                // Act on the event
+                if (event.data && event.data.intellischool && typeof(event.data.intellischool) === "object")  {
+                    switch (event.data.intellischool.action)
+                    {
+                        case "resize":
+                            if (event.data.intellischool.height) {
+                                document.getElementById('iframe').height = Math.ceil(event.data.intellischool.height);
+                            }
+                            return;
+                        default:
+                            // Unknown event, do nothing
+                            return;
                     }
-                }, false);
-                document.addEventListener("DOMContentLoaded", function() {
-                    document.getElementById('iframeForm').submit();
-                });
-            </script>
-            <iframe style="min-height:500px;overflow: hidden" name="iframe" id="iframe">
-            </iframe>
-        </div>
+                }
+            }, false);
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('iframeForm').submit();
+            });
+        </script>
+        <iframe style="min-height:500px;overflow: hidden" name="iframe" id="iframe">
+        </iframe>
     </div>
 </div>
