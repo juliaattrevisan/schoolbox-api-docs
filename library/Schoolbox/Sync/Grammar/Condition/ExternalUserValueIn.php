@@ -15,7 +15,6 @@ use Schoolbox\Collection;
 
 class ExternalUserValueIn extends Condition\In
 {
-
     /** @var string */
     protected $entityLabel = 'externalUser';
 
