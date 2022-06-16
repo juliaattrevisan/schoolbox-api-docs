@@ -231,7 +231,7 @@ module.exports = {
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
         
         //Sass
-        main: './www/static/css/core/main.scss',
+        core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',
 
     },
