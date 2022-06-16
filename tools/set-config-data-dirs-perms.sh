@@ -197,7 +197,7 @@ function parse_sql_credentials(){
 function check_script_overlap() {
   stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
   lock_file=$stream_dir/config-data-dirs.lock;
-  if ! $LOCKFILE_INSPECTOR --lockfile "$lock_file"; then
+  if ! $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args; then
     if ! type mail &> /dev/null; then
       warn "mail is not available. Cannot send email."
     else
@@ -320,7 +320,7 @@ function update_directories(){
       find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
-  $LOCKFILE_INSPECTOR --lockfile "$lock_file" --rm
+  $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args --rm
 }
 
 
