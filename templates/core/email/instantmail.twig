@@ -37,6 +37,7 @@
                         </p>
                     </td>
                 </tr>
+                <tr>
                     <td>
                         {% if msg.meta.blurb is defined and (msg.meta.blurb | length > 0) %}
                             {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
@@ -48,6 +49,7 @@
                             <a href="{{ msg.href }}" class="more">{{ msg.meta.readMore.string }}</a>
                         {% endif %}
                     </td>
+                </tr>
                 {% endif %}
             </table>
         </td>
