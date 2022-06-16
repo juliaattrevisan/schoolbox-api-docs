@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Mapper\Exception\CallbackException;
+
 /**
  * @method House createModel($idValue = null)
  */
@@ -29,6 +31,8 @@ class HouseMapper extends Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     /**
@@ -48,5 +52,30 @@ class HouseMapper extends Schoolbox\Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param House $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(House $model): bool
+    {
+        if (trim($model->getHouse() ?? '') === '') {
+            throw new CallbackException("House name cannot be empty");
+        }
+
+        if (!$this->isUnique(['house' => $model->getHouse()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A house with the name "%s" already exists, you must have a unique name',
+                    $model->getHouse()
+                )
+            );
+        }
+
+        return true;
     }
 }
