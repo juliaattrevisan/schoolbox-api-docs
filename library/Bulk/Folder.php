@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
@@ -72,6 +73,13 @@ class Bulk_Folder
     /** @var FileMapper */
     private $fileMapper;
 
+    private HomepageTemplateMapper $homepageTemplateMapper;
+
+    /**
+     * list of homepage templates to help
+     */
+    private $homepageTemplateList;
+
     /**
      * Constructor
      *
@@ -98,6 +106,8 @@ class Bulk_Folder
         $this->yearLevelMapper      = YearLevel\Mapper::getInstance();
         $this->storageMapper        = StorageMapper::getInstance();
         $this->fileMapper           = FileMapper::getInstance();
+        $this->homepageTemplateMapper = HomepageTemplateMapper::getInstance();
+        $this->homepageTemplateList = $this->homepageTemplateMapper->findAll();
     }
 
 
@@ -213,7 +223,7 @@ class Bulk_Folder
         if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
             try {
                 //grab that template if it exists
-                $templateObj = \Schoolbox\Resource\HomepageTemplateMapper::getInstance()->findOneByColumn('name', trim($row[$templateColumnIndex]));
+                $templateObj = $this->homepageTemplateList->getBy('name', trim($row[$templateColumnIndex]));
                 $templateId = $templateObj->getId();
             } catch (MapperException $e) {
                 //noop csv template does not exist, ignore the template and use the one specified in the webform
