@@ -36,6 +36,7 @@
     {% endif %}
 {% endblock contacts_alert %}
 
+{% block alertScriptandStyleUpdates %}
 <script>
     /**
      * Kinross Wolaroi would like their alerts less prominent and to minimise the risk of visibility to others while on screen
@@ -50,7 +51,6 @@
         });
     });
 </script>
-
 <style>
     .alert-box { 
         /* make padding-right the same as all others, so the icon sits in the middle of the button when unselected */ 
@@ -61,3 +61,4 @@
         display: block;
     }
 </style>
+{% endblock alertScriptandStyleUpdates %}
