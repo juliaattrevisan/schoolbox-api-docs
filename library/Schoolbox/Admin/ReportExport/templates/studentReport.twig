@@ -412,8 +412,6 @@
     {# Summary #}
     {% if showSummary %}
         {% for folder in folders %}
-            {# if there are no filtered assessments for this folder, ignore the folder #}
-            {% if (summaryAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
             <div class="folder-title">
@@ -425,7 +423,7 @@
                 <p class="grade">{{ weightedMean ?? '' }}</p>
                 {% endif %}
             </div>
-
+            {% if (summaryAssessments[folder.id] ?? [])| length %}
                 {% for assessment in summaryAssessments[folder.id] %}
                     {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
                     {% include '@adminReportExport/assessmentReport.twig' with
