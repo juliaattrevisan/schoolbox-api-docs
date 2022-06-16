@@ -107,7 +107,6 @@ class Bulk_Folder
         $this->storageMapper        = StorageMapper::getInstance();
         $this->fileMapper           = FileMapper::getInstance();
         $this->homepageTemplateMapper = HomepageTemplateMapper::getInstance();
-        $this->homepageTemplateList = $this->homepageTemplateMapper->findAll();
     }
 
 
@@ -226,7 +225,7 @@ class Bulk_Folder
                 $templateId = 0;
             } else {
                 //grab that template if it exists
-                $templateObj = $this->homepageTemplateList->getBy('name', trim($row[$templateColumnIndex]));
+                $templateObj = $this->getHomepageTemplateList()->getOffset(trim($row[$templateColumnIndex]));
                 if (null !== $templateObj) {
                     $templateId = $templateObj->getId();
                 } else {
@@ -580,5 +579,17 @@ class Bulk_Folder
     {
         $nameProperty = $this->yearLevelMapper->getPropertyFromColumn($this->yearLevelMapper::COL_NAME);
         return $this->yearLevelMapper->findAll()->indexBy($nameProperty);
+    }
+
+    /**
+     * Helper to only hit the db once to get the HomepageTemplates
+     * but to still return them in a standard format.
+     */
+    private function getHomepageTemplateList(): GenericCollection
+    {
+        if (null === $this->homepageTemplateList) {
+            $this->homepageTemplateList = $this->homepageTemplateMapper->findAll()->indexBy('name');
+        }
+        return $this->homepageTemplateList;
     }
 }
