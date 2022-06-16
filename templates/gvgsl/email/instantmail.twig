@@ -46,6 +46,7 @@
                         </p>
                     </td>
                 </tr>
+                <tr>
                     <td>
                         {% if msg.meta.blurb %}
                             {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
@@ -53,6 +54,7 @@
                             <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
                         {% endif %}
                     </td>
+                </tr>
                 {% endif %}
             </table>
         </td>
