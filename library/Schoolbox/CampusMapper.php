@@ -244,7 +244,7 @@ class CampusMapper extends Mapper
      */
     protected function validateName(Campus $model): bool
     {
-        if (trim($model->getName() ?? '') === '') {
+        if (trim($model->getName()) === '') {
             throw new CallbackException("Campus name cannot be empty");
         }
         if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
