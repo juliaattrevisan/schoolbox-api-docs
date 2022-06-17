@@ -41,12 +41,12 @@ $app = new class extends CliTool\App {
             if (isset($result)) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
                 if ($this->perform()) {
-                    // Modify the file's hash to match the sanitised result.
-                    // (This'll fail if somehow the unsanitised file is a FK.)
-                    /** @var FilesystemProxy $storageFilesystemProxy */
-                    $storageFilesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-                    $storageFilesystemProxy->write($svgFile, $result);
-                    $storageMapper->save($svgFile);
+                    // Write the sanitised content to the existing file path.
+                    // This violates an apparent rule that the storage file's
+                    // path should match its hash, but it's the only viable way
+                    // so far to ensure the sanitised content is accessible via
+                    // its original hash.
+                    $storageFilesystem->write($path, $result);
                 }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
