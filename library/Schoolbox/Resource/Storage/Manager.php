@@ -72,20 +72,6 @@ class Manager
     }
 
     /**
-     * Convert the likes of "a6a0cf26c2966cb" to "a6a0c/f26c2/966cb/a6a0cf26c2966cb" for balanced storage.
-     * 5 hex digits = 16^5 = 1,048,576 <= the maximum number of inodes that would exist in any one directory,
-     * which is well within the acceptable limits of filesystems we use.
-     *
-     * @param IStorage $storage
-     *
-     * @return string
-     */
-    public function calcPath(IStorage $storage)
-    {
-        return self::getPathFromHash($storage->getHash());
-    }
-
-    /**
      * Returns a relative path for the specified hash
      *
      * @param string $hash
@@ -108,60 +94,60 @@ class Manager
         return sprintf('%s-%s', self::getPathFromHash($hash), $cacheKey);
     }
 
-    /**
-     * @param Model $storage
-     *
-     * @throws BadMethodCallException this method is no longer supported: use
-     *                                `StorageMapper::accept` for now
-     * @return bool
-     */
-    public function save(Model $storage)
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-//        $tempPath = $storage->getPath();
+//    /**
+//     * @param Model $storage
+//     *
+//     * @throws BadMethodCallException this method is no longer supported: use
+//     *                                `StorageMapper::accept` for now
+//     * @return bool
+//     */
+//    public function save(Model $storage)
+//    {
+//        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+////        $tempPath = $storage->getPath();
+////
+////        $storage
+////            ->setFilesystem($this->mountManager->getFilesystem(self::FS_STORAGE))
+////            ->setPath($this->calcPath($storage));
+////
+////        // This should already be taken care of in the mapper, but better to be safe
+////        if ($storage->getPath() === $tempPath) {
+////            return true;
+////        }
+////
+////        // Attempt to move the file from temp to storage dir
+////        if (!$this->move($tempPath, $storage)) {
+////            throw new FileException("Failed to move uploaded file, '{$storage->getBasename()}', to storage");
+////        }
+////
+////        return true;
+//    }
 //
-//        $storage
-//            ->setFilesystem($this->mountManager->getFilesystem(self::FS_STORAGE))
-//            ->setPath($this->calcPath($storage));
+//    /**
+//     * @param string $tmpFilePath
+//     * @param Model  $storage
+//     * @throws BadMethodCallException this method is no longer supported: use
+//     *                                `StorageMapper::accept` for now
+//     *
+//     * @return bool
+//     */
+//    protected function copy(string $tmpFilePath, Model $storage): bool
+//    {
+//        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+////        try {
+////            return $this->mountManager->copy(
+////                self::FS_TEMP . "://$tmpFilePath",
+////                self::FS_STORAGE . '://' . $storage->getPath()
+////            );
+////        } catch (FileExistsException $e) {
+////            // The file already exists in the storage backend.
+////            // This is fine, because the storage file's contents determine the
+////            // file path: we can assume it's the same file.
+////            return true;
+////        }
+//    }
 //
-//        // This should already be taken care of in the mapper, but better to be safe
-//        if ($storage->getPath() === $tempPath) {
-//            return true;
-//        }
 //
-//        // Attempt to move the file from temp to storage dir
-//        if (!$this->move($tempPath, $storage)) {
-//            throw new FileException("Failed to move uploaded file, '{$storage->getBasename()}', to storage");
-//        }
-//
-//        return true;
-    }
-
-    /**
-     * @param string $tmpFilePath
-     * @param Model  $storage
-     * @throws BadMethodCallException this method is no longer supported: use
-     *                                `StorageMapper::accept` for now
-     *
-     * @return bool
-     */
-    protected function copy(string $tmpFilePath, Model $storage): bool
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-//        try {
-//            return $this->mountManager->copy(
-//                self::FS_TEMP . "://$tmpFilePath",
-//                self::FS_STORAGE . '://' . $storage->getPath()
-//            );
-//        } catch (FileExistsException $e) {
-//            // The file already exists in the storage backend.
-//            // This is fine, because the storage file's contents determine the
-//            // file path: we can assume it's the same file.
-//            return true;
-//        }
-    }
-
-
 //    /**
 //     * @param string $tmpFilePath
 //     * @param Model  $storage
@@ -251,19 +237,19 @@ class Manager
 //        return $result;
     }
 
-    /**
-     * @param Model $storage
-     *
-     * @throws BadMethodCallException this method is no longer supported: use
-     *                                `FilesystemProxy::delete`
-     *
-     * @return bool
-     */
-    public function delete(Model $storage)
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-//        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
-    }
+//    /**
+//     * @param Model $storage
+//     *
+//     * @throws BadMethodCallException this method is no longer supported: use
+//     *                                `FilesystemProxy::delete`
+//     *
+//     * @return bool
+//     */
+//    public function delete(Model $storage)
+//    {
+//        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
+////        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
+//    }
 
     /**
      * Passthrough method
