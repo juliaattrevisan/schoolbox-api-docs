@@ -389,7 +389,7 @@ class Mapper extends BaseMapper implements Receiver
             $tempLocationInFilesystem,
         );
         if (isset($sanitized)) {
-            // TODO write the new content
+            // write the new content
             $this->getStorageFilesystemProxy()->write($storage, $sanitized);
         } else {
             // write the old content
@@ -398,9 +398,6 @@ class Mapper extends BaseMapper implements Receiver
                 $this->getManager()->getTempFilesystem()->readStream($tempLocationInFilesystem),
             );
         }
-
-        // TODO work with a sanitized version of the file instead
-        //      (sanitize() should return sanitized content, instead of sanitizing in place)
 
         if (null !== $expiryAt) {
             $storage->setExpiryAt($expiryAt);
