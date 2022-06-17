@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 // we should not be in SitePage context for this
 if (isset($this)) {
     error(2);
@@ -83,7 +85,11 @@ if ($action == 'delete') {
     $homepageTemplate->setName($name)->setLeftColumnWidth(69.5)->setRightColumnWidth(29.5);
 
     $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();
-    $homepageTemplateMapper->create($homepageTemplate);
+    try {
+        $homepageTemplateMapper->create($homepageTemplate);
+    } catch (UnexpectedValueException $e) {
+        throw new SchoolboxException($e->getMessage(), 0, $e);
+    }
 }
 
 SitePage::backToTheFuture(1);
