@@ -21,6 +21,17 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App {
     /* @var array */
 
+    /**
+     * This process needs to write to storage, thus it must run as `www-data`.
+     */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function run(): void
     {
         if ($this->perform()) {
