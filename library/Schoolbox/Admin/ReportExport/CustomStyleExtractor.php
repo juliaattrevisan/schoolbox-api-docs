@@ -25,7 +25,7 @@ class CustomStyleExtractor
      * which we can then extract with a regex. It allows schools' rules to have
      * increased specificity and thus override our existing html/css
      */
-    private const STYLE_PREFIX = '.summative-report';
+    private const REGEX = '/\.summative-report[^{]*{[^}]*}/';
 
 
     /**
@@ -46,14 +46,18 @@ class CustomStyleExtractor
          * .summative-report anything { anything }
          * .summative-report[^{]*{.*}
          */
+        preg_match_all(self::REGEX, $skinConfig, $matches);
 
         /* For everything that matches, pile it into a stack
+         * implode it into a string
          */
+        if (\count($matches[0])) {
+            /* Return it, because then it gets rammed into the bottom of an existing inline stylesheet somewhere
+             */
+            return implode("\n", $matches[0]);
+        }
 
-        /* implode it into a string
-         */
-
-        /* Return it, because then it gets rammed into the bottom of an existing inline stylesheet somewhere
+        /* No custom styles detected; return empty string
          */
         return '';
     }
