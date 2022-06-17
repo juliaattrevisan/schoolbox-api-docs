@@ -333,6 +333,18 @@ class FilesystemProxy
     }
 
     /**
+     * Returns a filesystem path for the specified hash + cache key.
+     *
+     * @param string $hash
+     * @param string $cacheKey
+     * @return string
+     */
+    public static function getTransformPath(string $hash, string $cacheKey): string
+    {
+        return sprintf('%s-%s', self::getPathFromHash($hash), $cacheKey);
+    }
+
+    /**
      * Helper function for determining whether this filesystem uses the S3
      * adapter.
      *

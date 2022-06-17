@@ -71,29 +71,6 @@ class Manager
         $this->sanitizer         = $sanitizer;
     }
 
-    /**
-     * Returns a relative path for the specified hash
-     *
-     * @param string $hash
-     * @return string
-     */
-    public static function getPathFromHash(string $hash): string
-    {
-        return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
-    }
-
-    /**
-     * Returns a relative path for the specified hash + cacheKey
-     *
-     * @param string $hash
-     * @param string $cacheKey
-     * @return string
-     */
-    public static function getTransformPath(string $hash, string $cacheKey): string
-    {
-        return sprintf('%s-%s', self::getPathFromHash($hash), $cacheKey);
-    }
-
 //    /**
 //     * @param Model $storage
 //     *

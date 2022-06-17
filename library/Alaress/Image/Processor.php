@@ -127,7 +127,7 @@ class Processor
         }
 
         $hash          = $this->hashGenerator->generateHash($this->pathFilesystem->readStream($this->path));
-        $transformPath = Storage\Manager::getTransformPath($hash, $this->cacheKey);
+        $transformPath = Storage\FilesystemProxy::getTransformPath($hash, $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
