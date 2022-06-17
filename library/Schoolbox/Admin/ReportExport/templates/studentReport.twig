@@ -16,7 +16,6 @@
 
     /* Typography
      */
-    p,
     h1, h2, h3, h4, h5, h6 {
         color: black;
         margin: 0;
@@ -46,6 +45,11 @@
 
     h6 {
         font-size: 1rem;
+    }
+
+    p {
+        color: black;
+        line-height: 1.5rem;
     }
 
     /* Make background colours print
@@ -430,7 +434,9 @@
         {% endif %}
 
         <div class="introduction">
+            <article>
             {{ config.report_export_introduction | purify }}
+            </article>
         </div>
     </div>
 
