@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress_Byte_Format;
 use League\Flysystem\FileNotFoundException;
 use PDO;
 use PDOStatement;
@@ -113,11 +114,41 @@ class Mapper extends BaseMapper implements Receiver
      * @param Model $storage
      *
      * @throws FileException
-     * @throws FileNotFoundException
      */
     public function safetyCheck(Model $storage)
     {
-        $this->getManager()->safetyCheck($storage);
+        $fileMime    = $storage->getMimetype();
+        $errorSuffix = "Try a different file or contact your IT administrator.";
+
+        // Assert: Mime set
+
+        if (!$fileMime instanceof Mimetype) {
+            throw new FileException(
+                "This file has no detectable type. {$errorSuffix}",
+                FileException::CODE_MIMETYPE_NOT_FOUND
+            );
+        }
+
+        // Assert: Mime type allowed
+
+        if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
+            throw new FileException(
+                "This file is not a valid file type. {$errorSuffix}",
+                FileException::CODE_MIMETYPE_NOT_ALLOWED
+            );
+        }
+
+        // Assert: Acceptable size
+
+        if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
+            throw new FileException(
+                sprintf(
+                    "This file exceeds the file size restriction of %s. %s",
+                    Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
+                    $errorSuffix,
+                ),
+            );
+        }
     }
 
     /**

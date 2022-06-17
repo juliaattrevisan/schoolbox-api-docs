@@ -72,50 +72,6 @@ class Manager
     }
 
     /**
-     * Perform safety checks on file uploads performed by non superusers
-     *
-     * @param Model $storage
-     *
-     * @throws FileException
-     * @throws FileNotFoundException
-     */
-    public function safetyCheck(Model $storage)
-    {
-        $fileMime = $storage->getMimetype();
-        $fileName = $storage->getBasename();
-
-        $errorSuffix = "Try a different file or contact your IT administrator.";
-
-        // Assert: Mime set
-
-        if (!$fileMime instanceof Mimetype) {
-            throw new FileException(
-                "This file has no detectable type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_FOUND
-            );
-        }
-
-        // Assert: Mime type allowed
-
-        if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
-            throw new FileException(
-                "This file is not a valid file type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_ALLOWED
-            );
-        }
-
-        // Assert: Acceptable size
-
-        if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
-            $humanSize = $this->alaressByteFormat->bytesToString($fileMime->getActualMaxFileSize());
-            throw new FileException(
-                "This file exceeds the file size restriction of {$humanSize}. {$errorSuffix}",
-                FileException::CODE_FILE_TOO_LARGE
-            );
-        }
-    }
-
-    /**
      * Convert the likes of "a6a0cf26c2966cb" to "a6a0c/f26c2/966cb/a6a0cf26c2966cb" for balanced storage.
      * 5 hex digits = 16^5 = 1,048,576 <= the maximum number of inodes that would exist in any one directory,
      * which is well within the acceptable limits of filesystems we use.
