@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource;
 
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception\CallbackException;
 
 /**
  * Class HomepageTemplateMapper
@@ -30,6 +31,8 @@ class HomepageTemplateMapper extends Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('left_column_width', self::TYPE_DECIMAL);
         $this->uses('right_column_width', self::TYPE_DECIMAL);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     /**
@@ -98,5 +101,30 @@ class HomepageTemplateMapper extends Mapper
         $templateNone->setId(HomepageTemplate::HOMEPAGE_KEEP_EXISTING);
         $templateNone->setName("Keep Existing");
         return $templateNone;
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param HomepageTemplate $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(HomepageTemplate $model): bool
+    {
+        if (trim($model->getName()) === '') {
+            throw new CallbackException("Homepage Template name cannot be empty");
+        }
+
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A Homepage Template with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
+        }
+
+        return true;
     }
 }

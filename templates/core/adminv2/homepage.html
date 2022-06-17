@@ -121,6 +121,10 @@
                 $templateSelect.find('option:selected').text($newNameInput.val());
                 $modal.foundation('reveal', 'close');
                 $toastDiv.toastTimeout({text: 'Template renamed.', css: 'success'});
+            }).fail(function() {
+                $modal.find('input').prop('disabled', false);
+                $modal.foundation('reveal', 'close');
+                $toastDiv.toastTimeout({text: 'Template rename failed.', css: 'alert'});
             });
         });
 
