@@ -313,6 +313,10 @@ $align-class-breakpoints:
       padding: $code-padding;
     }
 
+    pre {
+      overflow: auto; //contain overflow in all browsers.
+    }
+
     /* Lists */
     ul,
     ol,
