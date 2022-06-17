@@ -59,6 +59,7 @@ class ProcessorFactory
     ): Processor {
         return new Processor(
             $file,
+            null,
             new Filesystem(new Local($baseDir)),
             $this->storageFilesystem,
             $this->hashGenerator,
@@ -88,6 +89,7 @@ class ProcessorFactory
     ): Processor {
         return new Processor(
             Manager::getPathFromHash($storage->getHash()),
+            $storage->getMime(),
             $this->storageFilesystem,
             $this->storageFilesystem,
             $this->hashGenerator,

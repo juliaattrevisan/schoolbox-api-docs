@@ -53,6 +53,8 @@ class Processor
      * Constructor
      *
      * @param string                $path               Path to the file in the filesystem
+     * @param string|null           $mimetype           If provided: the file's mimetype.
+     *                                                  If not provided: will attempt to determine from `$path`.
      * @param FilesystemInterface   $pathFilesystem     The filesystem on which `$path` is stored
      * @param FilesystemInterface   $storageFilesystem  The filesystem on which storage transforms are stored.
      *                                                  This may be a different filesystem to `$pathFilesystem`.
@@ -73,6 +75,7 @@ class Processor
      */
     public function __construct(
         private string $path,
+        private ?string $mimetype,
         private FilesystemInterface $pathFilesystem,
         private FilesystemInterface $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
@@ -109,7 +112,7 @@ class Processor
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
-        $mimetype   = $this->pathFilesystem->getMimetype($this->path);
+        $mimetype   = $this->mimetype ?? $this->pathFilesystem->getMimetype($this->path);
         $fileFormat = $this->getFormatFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
