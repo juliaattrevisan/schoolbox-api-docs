@@ -504,10 +504,10 @@ class Controller extends ConfigController
             'showClassComments'          => $params->getShowClassComments(),
             'showClassRubrics'           => $params->getShowClassRubrics(),
 
-            /* TODO Extract any .summative-report styles from Admin Skin Config
+            /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
-            'customReportStyle'          => ''
+            'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
         ];
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
