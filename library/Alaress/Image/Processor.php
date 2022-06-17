@@ -50,11 +50,6 @@ class Processor
     public const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
 
     /**
-     * Path to the file in the filesystem.
-     */
-    private $path;
-
-    /**
      * The $key is a way to uniquely associate a cached image with a particular
      * series of transformations applied to it.
      *
@@ -86,7 +81,7 @@ class Processor
     /**
      * Constructor
      *
-     * @param string                $path
+     * @param string                $path              Path to the file in the filesystem
      * @param FilesystemInterface   $pathFilesystem    The filesystem on which `$path` is stored
      * @param FilesystemInterface   $storageFilesystem The filesystem on which storage transforms are stored.
      *                                                 This may be a different filesystem to `$pathFilesystem`.
@@ -96,7 +91,7 @@ class Processor
      * @param int                   $imageMagickTimeout
      */
     public function __construct(
-        string $path,
+        private string $path,
         private FilesystemInterface $pathFilesystem,
         private FilesystemInterface $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
@@ -104,7 +99,6 @@ class Processor
         ITransform $transform,
         int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
     ) {
-        $this->path     = $path;
         $this->cacheKey = $cacheKey;
         $this->transform          = $transform;
         $this->imageMagickTimeout = $imageMagickTimeout;
