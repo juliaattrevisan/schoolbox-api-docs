@@ -142,7 +142,7 @@ class Migration extends CliTool\App
         $countAll = count($files);
         foreach ($files as $file) {
             $count++;
-            $baseName = "{$file['filename']}.{$file['extension']}";
+            $baseName = "{$file['filename']}.{$file['ext']}";
             $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
             if ($this->migrateFile($file['hash'])) {
                 $countFilesInS3++;
