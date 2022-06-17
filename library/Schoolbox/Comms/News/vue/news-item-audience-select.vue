@@ -705,9 +705,9 @@ export default {
         <div data-reveal id="audience-browse" class="reveal-modal no-pad">
 
             <template v-if="canCreateComplex">
-                <dl class="tabs text-center" role="tablist">
-                    <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Audience</a></dd>
-                    <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Composite Audience</a></dd>
+                <dl class="tabs text-center" role="list">
+                    <dd :class="{ active: pageShow.index || pageShow.valueSelect }"><a @click="showPage('index')">Select Audience</a></dd>
+                    <dd :class="{ active: pageShow.intersect }"><a @click="advancedToggle()">Create Composite Audience</a></dd>
                 </dl>
             </template>
 
