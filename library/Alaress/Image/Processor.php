@@ -50,58 +50,36 @@ class Processor
     public const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
 
     /**
-     * The $key is a way to uniquely associate a cached image with a particular
-     * series of transformations applied to it.
-     *
-     * It is used as the latter part of the transform's filename, eg "[hash]-[cacheKey]".
-     * It is NOT the same as the transform name. A transform can take parameters and thus a single
-     * transform can map to multiple cacheKeys.
-     *
-     * e.g. e2685ab-square64
-     *
-     * @var string
-     */
-    private $cacheKey;
-
-    /** @var ITransform */
-    private $transform;
-
-    /**
-     * Number of seconds to allow image magick to process the transform.
-     *
-     * * For web requests, this value must be less than the php-fpm request timeout to prevent temp files
-     *   being left on disk.
-     * * For CLI requests, it should be less than the Lock + max execution times.
-     *
-     * @var int
-     */
-    private int $imageMagickTimeout;
-
-
-    /**
      * Constructor
      *
-     * @param string                $path              Path to the file in the filesystem
-     * @param FilesystemInterface   $pathFilesystem    The filesystem on which `$path` is stored
-     * @param FilesystemInterface   $storageFilesystem The filesystem on which storage transforms are stored.
-     *                                                 This may be a different filesystem to `$pathFilesystem`.
-     * @param Storage\HashGenerator $hashGenerator     Helper for generating a storage hash out of `$path`
-     * @param string                $cacheKey
-     * @param ITransform            $transform
-     * @param int                   $imageMagickTimeout
+     * @param string                $path               Path to the file in the filesystem
+     * @param FilesystemInterface   $pathFilesystem     The filesystem on which `$path` is stored
+     * @param FilesystemInterface   $storageFilesystem  The filesystem on which storage transforms are stored.
+     *                                                  This may be a different filesystem to `$pathFilesystem`.
+     * @param Storage\HashGenerator $hashGenerator      Helper for generating a storage hash out of `$path`
+     * @param string                $cacheKey           Uniquely associate a cached image with a particular series of
+     *                                                  transformations applied to it.
+     *                                                  It is used as the latter part of the transform's filename,
+     *                                                  e.g. "[hash]-[cacheKey]".
+     *                                                  It is NOT the same as the transform name: a transform can take
+     *                                                  parameters and thus a single transform can map to multiple
+     *                                                  cacheKeys, e.g. e2685ab-square64, e2685ab-square128...
+     * @param ITransform            $transform          The transform to apply
+     * @param int                   $imageMagickTimeout Number of seconds to allow ImageMagick to process the transform.
+     *                                                  * for web requests, this value must be less than the php-fpm
+     *                                                    request timeout to prevent temp files being left on disk
+     *                                                  * for CLI requests, it should be less than the Lock + max
+     *                                                    execution times.
      */
     public function __construct(
         private string $path,
         private FilesystemInterface $pathFilesystem,
         private FilesystemInterface $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
-        string $cacheKey,
-        ITransform $transform,
-        int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
+        private string $cacheKey,
+        private ITransform $transform,
+        private int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT,
     ) {
-        $this->cacheKey = $cacheKey;
-        $this->transform          = $transform;
-        $this->imageMagickTimeout = $imageMagickTimeout;
     }
 
     /**
