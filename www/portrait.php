@@ -18,7 +18,6 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -82,7 +81,7 @@ try {
             $storageModel,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
             $portrait->getTranscodePath(
-                Manager::getPathFromHash($storageModel->getHash()),
+                FilesystemProxy::getPathFromHash($storageModel->getHash()),
                 $cacheKey,
             ),
         );

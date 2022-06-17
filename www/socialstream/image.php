@@ -20,7 +20,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -95,7 +94,7 @@ try {
             $storage,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
             $transforms->getTranscodePath(
-                Manager::getPathFromHash($storage->getHash()),
+                FilesystemProxy::getPathFromHash($storage->getHash()),
                 $transforms->getCacheKey($size),
             ),
         );

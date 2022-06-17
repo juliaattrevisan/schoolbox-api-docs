@@ -19,7 +19,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -67,7 +66,7 @@ try {
     if ($filesystemProxy->usesS3Adapter() && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
-        $resourcePath = Manager::getPathFromHash($resource->getHash());
+        $resourcePath = FilesystemProxy::getPathFromHash($resource->getHash());
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,

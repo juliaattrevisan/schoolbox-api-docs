@@ -14,7 +14,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -61,7 +60,7 @@ try {
                     $preSignedUrlDataObject = $preSignedUrlService->generate(
                         $resource,
                         Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
-                        Manager::getPathFromHash($resource->getHash()),
+                        FilesystemProxy::getPathFromHash($resource->getHash()),
                         $cacheControl,
                         $disposition
                     );

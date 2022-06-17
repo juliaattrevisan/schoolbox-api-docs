@@ -19,7 +19,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
-use Schoolbox\Resource\Storage\Manager;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
@@ -136,7 +136,7 @@ class Processor extends CliTool\App
 
                     $fileSystem = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
                     $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
-                    $filePath   = Manager::getPathFromHash($storage->getHash());
+                    $filePath   = FilesystemProxy::getPathFromHash($storage->getHash());
 
                     $log->info("");
                     $log->info("    - Processing Item:        {$countCurrent}/{$countTotal}");

@@ -256,7 +256,7 @@ class Migration extends CliTool\App
      */
     private function migrateFile(string $hash): bool
     {
-        $relativePath = Storage\Manager::getPathFromHash($hash);
+        $relativePath = Storage\FilesystemProxy::getPathFromHash($hash);
         // Does file exist locally?
         $filepath     = "{$this->storageDir}/{$relativePath}";
         $foundLocally = file_exists($filepath);

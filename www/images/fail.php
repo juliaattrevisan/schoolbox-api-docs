@@ -120,7 +120,7 @@ try {
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get($browserCacheTimeoutConfigName)),
-            $transforms->getTranscodePath(Storage\Manager::getPathFromHash($hash), $cache_key),
+            $transforms->getTranscodePath(Storage\FilesystemProxy::getPathFromHash($hash), $cache_key),
             ['private', 'must-revalidate'],
             PreSignedUrlService::DISPOSITION_INLINE,
             'image/png',

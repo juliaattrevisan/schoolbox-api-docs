@@ -145,7 +145,7 @@ class Processor
                 );
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
-                $basePath = Storage\Manager::getPathFromHash($hash);
+                $basePath = Storage\FilesystemProxy::getPathFromHash($hash);
                 $state    = $this->storageFilesystem->has($basePath)
                     ? Storage\Transform\Model::STATE_PROCESSING
                     : Storage\Transform\Model::STATE_FAILED;

@@ -12,9 +12,9 @@ namespace Alaress\Image;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Resource\Storage\Manager;
 
 /**
  * Factory class for building image processors, which are used for generating
@@ -88,7 +88,7 @@ class ProcessorFactory
         int $timeout = Processor::IMAGE_MAGICK_TIMEOUT_DEFAULT,
     ): Processor {
         return new Processor(
-            Manager::getPathFromHash($storage->getHash()),
+            FilesystemProxy::getPathFromHash($storage->getHash()),
             $storage->getMime(),
             $this->storageFilesystem,
             $this->storageFilesystem,

@@ -20,7 +20,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -91,7 +90,7 @@ if (is_numeric($_GET['id'])) {
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $storage,
                     Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
-                    Manager::getPathFromHash($storage->getHash()),
+                    FilesystemProxy::getPathFromHash($storage->getHash()),
                     $cacheControl,
                     $disposition
                 );

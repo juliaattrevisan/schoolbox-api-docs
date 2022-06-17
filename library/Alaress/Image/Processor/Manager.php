@@ -710,7 +710,7 @@ class Manager
             $this->logger->debug($this->prefixLog("Checking mutex required: '$hash'"));
             if ($this->localStorageDir !== null) {
                 // If using local storage
-                $path        = \Schoolbox\Resource\Storage\Manager::getPathFromHash($hash);
+                $path        = FilesystemProxy::getPathFromHash($hash);
                 $cmd         = "/usr/bin/identify -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
                 $countLayers = (int)exec($cmd, $output, $exitCode);
                 if ($exitCode) {

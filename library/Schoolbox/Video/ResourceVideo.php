@@ -250,7 +250,7 @@ class ResourceVideo
     {
         return sprintf(
             '%s-%s',
-            Storage\Manager::getPathFromHash($this->getStorage()->getHash()),
+            Storage\FilesystemProxy::getPathFromHash($this->getStorage()->getHash()),
             $transform,
         );
     }
