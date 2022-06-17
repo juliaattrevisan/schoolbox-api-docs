@@ -218,7 +218,7 @@ class Controller extends ConfigController
             /* Check the config to see what Role Type should have come out in the zip
              * This lets you prevent staff users from getting a pdf when you only wanted students
              */
-            $roleIds = $this->roleMapper->findByColumn('group_type', $this->getConfigLoader()->get('report_roletype'))->indexBy('id')->keys();
+            $roleIds = $this->roleMapper->findByColumn('group_type', Role::STUDENT)->indexBy('id')->keys();
 
             $students   = $this->userBulkMapper->bulkModifySearch(
                 empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
