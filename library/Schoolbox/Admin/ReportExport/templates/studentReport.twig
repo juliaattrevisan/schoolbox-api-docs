@@ -173,6 +173,7 @@
         font-size: 0.75rem;
         font-style: italic;
         margin-top: 0.25rem;
+        margin-bottom: 0;
     }
 
     /* A grade value, suitable for Folder Title
@@ -281,6 +282,12 @@
         width: 100%;
     }
 
+    /* All p elements get squished to fit more aggressively
+     */
+    .rubric-wrap p {
+        line-height: 1rem;
+    }
+
     /* Rubric table
      * This is the only table element we render here
      */
@@ -294,8 +301,8 @@
     /* Headings were oddly grey by intent but black we go
      */
     th p {
-        text-align: left;
         padding-left: 0.25rem;
+        text-align: left;
         word-wrap: break-word;
     }
 
