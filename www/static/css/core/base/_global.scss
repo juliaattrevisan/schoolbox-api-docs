@@ -82,6 +82,11 @@
       position: relative;
     }
 
+    ::selection { //to customise the portion of a document that has been highlighted
+		color: $accent-background;
+		background-color: $accent-foreground;
+	}
+
     a:hover { 
         cursor: $cursor-pointer-value; 
     }
