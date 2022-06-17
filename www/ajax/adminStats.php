@@ -203,6 +203,11 @@ switch ($_POST['module']) {
             break;
         }
         $data = fread($socket, 48);
+        // This occurs if firewall is blocking outbound connections to port 123
+        if ($data === false) {
+            $output = ['error' => 'Unable to fetch time from NTP server.', 'errno' => -1,];
+            break;
+        }
         fclose($socket);
         $decoded   = unpack('N12', $data);
         $timestamp = sprintf('%u', $decoded[9]);
