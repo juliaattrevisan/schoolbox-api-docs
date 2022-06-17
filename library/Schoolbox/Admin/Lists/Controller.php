@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -208,8 +209,13 @@ class Controller extends Base
                         $newIds = array_merge($newIds, $affectedIds);
                     }
                 } catch (\Exception $e) {
-                    $this->sendError('Could not save: ' . $e->getMessage());
-                    return;
+                    //return a nice json error message
+                    $problem = (new ApiProblem(sprintf("Could not save: %s", $e->getMessage())))
+                        ->setStatus(400)
+                        ->asArray();
+                    $this->getResponse()->status->setCode(400);
+                    $this->getResponse()->content->set($this->buildJsonOutput($problem));
+                    return; //exit early the user is part of the group.
                 }
             }
         }
