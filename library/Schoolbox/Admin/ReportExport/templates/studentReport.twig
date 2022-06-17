@@ -239,9 +239,16 @@
      */
     .summary .folder-title {
         border-bottom: 1px solid #ccc;
-        margin-top: 2rem;
-        margin-left: 2rem;
-        padding-left: 0;
+        clear: both;
+        margin: 2rem 0 0.5rem 2rem;
+        padding: 0 0 0.5rem 0;
+    }
+
+    /* Reduce the bottom margin in the Summary area
+     * because we don't have the wrapping block here
+     */
+    .summary .grade {
+        margin: 0 0 0.5rem 0;
     }
 
     .summary .feedback-assessment-container {
