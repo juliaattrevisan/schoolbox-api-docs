@@ -1,5 +1,5 @@
 <style>
-    .text-center, .card.compact [class*=icon-] {
+    .text-center {
         text-align: center !important;
     }
 
@@ -107,37 +107,16 @@
     /* The thing that tells you about students
      */
     .card {
-        width: 100%;
-        clear: both;
-        float: left;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        position: relative;
+        align-items: center;
+        display: flex;
     }
 
-    /* Removes side padding on student card at top when there's no picture
-     */
-    .card.no-pad {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .card .name {
-        margin: 0;
+    .card img {
+        margin-right: 0.75rem;
     }
 
     .card .year {
-        font-size: 1.2rem;
-        margin: 0 0 1rem 0;
-    }
-
-    .compact img {
-        width: 2rem;
-    }
-
-    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
-        float: left;
-        margin-right: 0.75rem;
+        margin: 0;
     }
 
     /* Introductory text
@@ -268,10 +247,7 @@
      * and layout, but we don't need its excess padding
      */
     .class-page .card.compact {
-        display: flex;
-        align-items: center;
         margin: 0.75rem 0 0 0;
-        padding: 0;
     }
 
     /* Special cosmetic representation of semantic h5
@@ -437,23 +413,25 @@
         {% endif %}
     </div>
 
-    <div class="card {% if not student.portrait %}no-pad{% endif %}">
+    <div class="card">
         {% if student.portrait %}
         <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
         {% endif %}
-        <h3 class="name">{{ student.fullname }}</h3>
+        <div>
+            <h3 class="name">{{ student.fullname }}</h3>
 
-        {# Only show year if it was ever set and meaningful
-         #}
-        {% if student.year and student.year.longName != '' %}
-        <p class="year">{{ student.year.longName }}</p>
-        {% endif %}
-
-        <div class="introduction">
-            <article>
-            {{ config.report_export_introduction | purify }}
-            </article>
+            {# Only show year if it was ever set and meaningful
+             #}
+            {% if student.year and student.year.longName != '' %}
+            <p class="year">{{ student.year.longName }}</p>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="introduction">
+        <article>
+            {{ config.report_export_introduction | purify }}
+        </article>
     </div>
 
     {# Summary #}
