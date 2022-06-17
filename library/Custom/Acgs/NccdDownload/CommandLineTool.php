@@ -23,6 +23,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User;
@@ -325,6 +326,8 @@ class CommandLineTool extends App
             $logger->error(sprintf('Could not create ZIP file (%s)', $zip->getStatusString()));
             exit(1);
         }
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
         foreach ($files as $fileTuple) {
             // Start is after the file's modified time: skip
             $fileTime = (new DateTimeImmutable())->setTimestamp($fileTuple['filemtime']);
@@ -358,7 +361,9 @@ class CommandLineTool extends App
             // (If debug is on: give a hint where it might be found on prod)
             /** @var IStorage|null $file */
             $file        = $fileTuple['file'];
-            $fileContent = $file ? $file->read() : ($fileTuple['fileContent'] ?? false);
+            $fileContent = $file
+                ? $filesystemProxy->read($file)
+                : ($fileTuple['fileContent'] ?? false);
             if ($fileContent === false) {
                 $logger->warning(sprintf('Could not add file "%s" to "%s": skipping', $fileTuple['filename'], $path));
                 if ($file) {
