@@ -2,7 +2,7 @@
 
 {% block details %}
 
-                                    {% if externalUser.SchoolStaffCode is defined and externalUser.SchoolStaffCode%}
+                                    {% if externalUser.SchoolStaffCode is defined and isStaff and externalUser.SchoolStaffCode%}
                                         <dt class="small-12 medium-3">Staff Code:</dt>
                                         <dd class="small-12 medium-9">{{ externalUser.SchoolStaffCode }}</dd>
                                     {% endif %}
@@ -22,7 +22,7 @@
                                         <dt class="small-12 medium-3">Room:</dt>
                                         <dd class="small-12 medium-9">{{ externalUser.StaffRoom }}</dd>
                                     {% endif %}
-                                    {% if externalUser.StaffExtension is defined and externalUser.StaffExtension %}
+                                    {% if externalUser.StaffExtension is defined and isStaff and externalUser.StaffExtension %}
                                         <dt class="small-12 medium-3">Extension:</dt>
                                         <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
                                     {% endif %}
