@@ -178,21 +178,20 @@ class Manager
     /**
      * Sanitize file prior to storing.
      *
-     * @param Model               $storage    The storage object for the file: required so
-     *                                        that the sanitizer knows how to sanitise the
-     *                                        file.
-     * @param FilesystemInterface $filesystem The filesystem the file to sanitize exists on.
+     * @param FilesystemInterface $filesystem The filesystem the file to
+     *                                        sanitize exists on.
      * @param string              $path       The path to the file to sanitize.
+     * @param string              $mimetype   The mimetype of the file to
+     *                                        sanitize.
      * @return string|null Sanitized content if the item was sanitized, null if
      *                     it was not sanitized.
-     * @throws FileNotFoundException
      */
     public function sanitize(
-        Model $storage,
         FilesystemInterface $filesystem,
         string $path,
+        string $mimetype,
     ): ?string {
-        if (!$this->sanitizer->accepts($storage->getMime())) {
+        if (!$this->sanitizer->accepts($mimetype)) {
             return null;
         }
         try {
@@ -200,18 +199,11 @@ class Manager
         } catch (FileNotFoundException $e) {
             return null;
         }
-        $sanitizedContent = $this->sanitizer->sanitize($storage->getMime(), $unsafeContent);
+        $sanitizedContent = $this->sanitizer->sanitize($mimetype, $unsafeContent);
         if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
             return null;
         }
         return $sanitizedContent;
-//        if ($dryRun) {
-//            return $sanitizedContent;
-//        }
-//        // update storage to match sanitized content
-//        $result = $filesystem->put($path, $sanitizedContent);
-//        $storage->setHash((new HashGenerator())->generateHash($filesystem->readStream($path)));
-//        return $result;
     }
 
 //    /**

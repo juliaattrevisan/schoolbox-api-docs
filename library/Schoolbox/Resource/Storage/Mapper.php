@@ -412,12 +412,13 @@ class Mapper extends BaseMapper implements Receiver
 
         // TODO: Find a way to remove the need for this truncation
         // TODO handle all of this in the Manager class:
-        //      it knows how to move files from temp to S3 efficiently
+        //      it knows how to move files from temp to storage
+        //      (whether local or S3) efficiently
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
         $sanitized                = $this->getManager()->sanitize(
-            $storage,
             $this->getManager()->getTempFilesystem(),
             $tempLocationInFilesystem,
+            $storage->getMime(),
         );
         if (isset($sanitized)) {
             // write the new content
