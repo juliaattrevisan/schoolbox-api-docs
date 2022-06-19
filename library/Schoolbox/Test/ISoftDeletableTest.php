@@ -94,7 +94,6 @@ class ISoftDeletableTest extends TestCase
             if ($mapper instanceof Resource\AbstractFileMapper) {
                 $mapper->setStorageMapper(new class extends Resource\Storage\Mapper
                 {
-
                     /**
                      * @param int $idValue
                      * @return Resource\Storage\Model
@@ -104,18 +103,6 @@ class ISoftDeletableTest extends TestCase
                         return new Resource\Storage\Model();
                     }
                 });
-            }
-            // Special case for Storage Mapper
-            if ($mapper instanceof Resource\Storage\Mapper) {
-                $fileSystem = new Filesystem(new NullAdapter());
-                $mgr        = new MountManager([Resource\Storage\Manager::FS_STORAGE => $fileSystem]);
-                $mapper->setManager(
-                    new Resource\Storage\Manager(
-                        $mgr,
-                        new Alaress_Byte_Format(),
-                        new Resource\Storage\Sanitizer\Composite()
-                    )
-                );
             }
             $mappers[] = [$mapper, $reflection, $className];
         }

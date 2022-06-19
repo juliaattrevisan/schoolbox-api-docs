@@ -36,33 +36,6 @@ use Schoolbox\Video\QueueMapper;
 class Mapper extends BaseMapper implements Receiver
 {
     /**
-     * Lazy-loaded on first use.
-     * We cannot instantiate during a construct setup hook as it has a dependency on the config loader which will
-     * blow up if getInstance() is called on this class from a php unit test context.
-     *
-     * @var Manager
-     */
-    private $manager;
-
-    /** @var bool */
-    private $checkPrevious;
-
-//    /**
-//     * @param int $idValue
-//     *
-//     * @return Model
-//     * @throws MapperException
-//     */
-//    public function createModel($idValue = null)
-//    {
-//        /** @var Model $model */
-//        $model = parent::createModel($idValue);
-//        $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
-//
-//        return $model;
-//    }
-
-    /**
      * @return void
      * @throws MapperException
      */
@@ -449,47 +422,7 @@ class Mapper extends BaseMapper implements Receiver
         return $storage;
     }
 
-    /**
-     * @param bool $bool
-     *
-     * @return self
-     */
-    public function checkPrevious($bool)
-    {
-        $this->checkPrevious = $bool;
-
-        return $this;
-    }
-
     // Getters & Setters
-
-    // TODO: This does not belong here, but where does it go
-
-    /**
-     * @deprecated The mount manager from DI (filesystem.mountManager) should be
-     *             used instead, and injected where necessary.
-     *
-     * @return Manager
-     */
-    public function getManager()
-    {
-        if ($this->manager === null) {
-            $this->manager = self::getDi()->get('filesystem.mountManager');
-        }
-        return $this->manager;
-    }
-
-    /**
-     * @param Manager $manager
-     *
-     * @return self
-     */
-    public function setManager($manager)
-    {
-        $this->manager = $manager;
-
-        return $this;
-    }
 
     /**
      * Simplified method for retrieving a proxy for the mapper's filesystem.
