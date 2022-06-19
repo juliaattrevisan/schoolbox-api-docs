@@ -12,9 +12,9 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\MountManager;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
-use Psr\Log\NullLogger;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -34,7 +34,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
@@ -414,23 +413,18 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.mountManager',
             $di->lazy(
-                function () use ($di, $config) {
-                    /** @var Sanitizer\ISanitizer $sanitizer  */
-                    $sanitizer = $di->get('storage.sanitizer');
-                    return new Manager(
-                        (new FilesystemFactory())->build($config->get('storage_dir')),
-                        new \Alaress_Byte_Format(),
-                        $sanitizer
-                    );
+                function () use ($config) {
+                    return (new FilesystemFactory())->build($config->get('storage_dir'));
                 }
             )
         );
         $di->set(
             'filesystem.storage',
             $di->lazy(
-                function () use ($config) {
-                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
-                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
                 }
             )
         );
@@ -447,9 +441,10 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.temp',
             $di->lazy(
-                function () use ($config) {
-                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
-                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
                 }
             )
         );

@@ -48,6 +48,7 @@ use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\MountManager;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -148,7 +149,6 @@ use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
@@ -1819,23 +1819,18 @@ abstract class Kernel
         $di->set(
             'filesystem.mountManager',
             $di->lazy(
-                function () use ($di, $config) {
-                    /** @var Sanitizer\ISanitizer $sanitizer  */
-                    $sanitizer = $di->get('storage.sanitizer');
-                    return new Manager(
-                        (new FilesystemFactory())->build($config->get('storage_dir')),
-                        new \Alaress_Byte_Format(),
-                        $sanitizer
-                    );
+                function () use ($config) {
+                    return (new FilesystemFactory())->build($config->get('storage_dir'));
                 }
             )
         );
         $di->set(
             'filesystem.storage',
             $di->lazy(
-                function () use ($config) {
-                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
-                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
                 }
             )
         );
@@ -1852,9 +1847,10 @@ abstract class Kernel
         $di->set(
             'filesystem.temp',
             $di->lazy(
-                function () use ($config) {
-                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
-                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
                 }
             )
         );
