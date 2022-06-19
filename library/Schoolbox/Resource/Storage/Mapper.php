@@ -184,21 +184,22 @@ class Mapper extends BaseMapper implements Receiver
      */
     protected function postSave(Model $storage, Model $previous = null)
     {
+        // TODO move all of this into the new accept() method
         // Don't re-copy this file if it's already in storage, and either:
         // * config flag OFF, or:
         // * previous exists and size hasn't changed?
-        $filesystemProxy = new FilesystemProxy($this->getManager()->getStorageFilesystem(), new HashGenerator());
-        if ($previous) {
-            if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE)) {
-                return true;
-            }
-            if (
-                $filesystemProxy->fileExists($previous)
-                && $filesystemProxy->fileSize($storage) === $filesystemProxy->fileSize($previous)
-            ) {
-                return true;
-            }
-        }
+//        $filesystemProxy = new FilesystemProxy($this->getManager()->getStorageFilesystem(), new HashGenerator());
+//        if ($previous) {
+//            if (!$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE)) {
+//                return true;
+//            }
+//            if (
+//                $filesystemProxy->fileExists($previous)
+//                && $filesystemProxy->fileSize($storage) === $filesystemProxy->fileSize($previous)
+//            ) {
+//                return true;
+//            }
+//        }
 
         // Don't persist here: it was persisted in accept()
 //        $saveResult = $this->getManager()->save($storage);
