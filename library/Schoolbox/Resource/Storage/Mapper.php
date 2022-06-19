@@ -129,6 +129,9 @@ class Mapper extends BaseMapper implements Receiver
     /**
      * Post-delete callback
      *
+     * TODO this shouldn't be necessary: storage files should be cleaned up by
+     *      another process
+     *
      * @param Model $storage
      */
     public function deleteStorage(Model $storage)
@@ -289,20 +292,32 @@ class Mapper extends BaseMapper implements Receiver
     }
 
     /**
-     * @param Model $object
+     * For safety reasons don't allow the storage mapper's `delete` to be called
+     * directly: instead, `actualDelete` must be called.
      *
-     * @return bool
+     * This protects against inadvertent deletion of the files which back onto
+     * storage objects..
+     *
+     * @param Model|Collection<Model> $object
+     *
+     * @return never-return
      * @throws MapperException
      */
     public function delete($object)
     {
-        // protect storage objects from accidental deletion by forcing a second, undocument parameter that must be TRUE
-        $args = func_get_args();
+        throw new MapperException("Attempt to delete Storage file denied");
+    }
 
-        if (count($args) < 2 || $args[1] !== true) {
-            throw new MapperException("Attempt to delete Storage file denied");
-        }
 
+    /**
+     * Actually delete a storage object.
+     *
+     * @param Model|Collection<Model> $object
+     * @return bool
+     * @throws MapperException if the file couldn't be deleted.
+     */
+    public function actualDelete($object): bool
+    {
         try {
             // postDelete will throw a file exception if the file can't be deleted
             return parent::delete($object);
