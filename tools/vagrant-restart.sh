@@ -50,25 +50,15 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
-
-# Start and rebuild task daemon
+# Rebuild & restart task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir
-if [ $taskd_build_from_local -gt 0 ]; then
-  "$SITE_ROOT"/tools/taskd/rebuild.sh
-else
-  accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
-  if [[ -z $accessToken ]]; then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Cannot start task daemon: not building from local dir, and unable to derive Dockerhub access token from .env environment file";
-  else
-    # Docker login needs the `pass` package to actually accept a password,
-    # otherwise this error gets raised:
-    # "Cannot autolaunch D-Bus without X11 $DISPLAY"
-    # TODO move this to base box
-    apt install -y pass
-    "$SITE_ROOT"/tools/taskd/rebuild.sh --pull-from-dockerhub --dockerhub-access-token=$accessToken
-  fi
+declare taskd_args=()
+if [ "$taskd_build_from_local" == 1 ]; then
+  taskd_args+=(--local)
 fi;
-
+if ! "$SITE_ROOT"/tools/taskd/rebuild.sh "${taskd_args[@]}"; then
+  exit 1
+fi
 
 # Need to read the actual run-time value, rather than puppet-configured value, as it's possible to
 # `vagrant up` without a `vagrant provision` so the puppet value may not have yet been applied
