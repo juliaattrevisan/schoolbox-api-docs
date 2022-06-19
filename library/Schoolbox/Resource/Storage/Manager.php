@@ -174,38 +174,38 @@ class Manager
 ////            return true;
 ////        }
 //    }
-
-    /**
-     * Sanitize file prior to storing.
-     *
-     * @param FilesystemInterface $filesystem The filesystem the file to
-     *                                        sanitize exists on.
-     * @param string              $path       The path to the file to sanitize.
-     * @param string              $mimetype   The mimetype of the file to
-     *                                        sanitize.
-     * @return string|null Sanitized content if the item was sanitized, null if
-     *                     it was not sanitized.
-     */
-    public function sanitize(
-        FilesystemInterface $filesystem,
-        string $path,
-        string $mimetype,
-    ): ?string {
-        if (!$this->sanitizer->accepts($mimetype)) {
-            return null;
-        }
-        try {
-            $unsafeContent = $filesystem->read($path);
-        } catch (FileNotFoundException $e) {
-            return null;
-        }
-        $sanitizedContent = $this->sanitizer->sanitize($mimetype, $unsafeContent);
-        if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
-            return null;
-        }
-        return $sanitizedContent;
-    }
-
+//
+//    /**
+//     * Sanitize file prior to storing.
+//     *
+//     * @param FilesystemInterface $filesystem The filesystem the file to
+//     *                                        sanitize exists on.
+//     * @param string              $path       The path to the file to sanitize.
+//     * @param string              $mimetype   The mimetype of the file to
+//     *                                        sanitize.
+//     * @return string|null Sanitized content if the item was sanitized, null if
+//     *                     it was not sanitized.
+//     */
+//    public function sanitize(
+//        FilesystemInterface $filesystem,
+//        string $path,
+//        string $mimetype,
+//    ): ?string {
+//        if (!$this->sanitizer->accepts($mimetype)) {
+//            return null;
+//        }
+//        try {
+//            $unsafeContent = $filesystem->read($path);
+//        } catch (FileNotFoundException $e) {
+//            return null;
+//        }
+//        $sanitizedContent = $this->sanitizer->sanitize($mimetype, $unsafeContent);
+//        if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
+//            return null;
+//        }
+//        return $sanitizedContent;
+//    }
+//
 //    /**
 //     * @param Model $storage
 //     *

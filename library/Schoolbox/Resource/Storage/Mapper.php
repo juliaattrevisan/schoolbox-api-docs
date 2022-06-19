@@ -21,6 +21,7 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Video\QueueMapper;
 
 /**
@@ -415,7 +416,10 @@ class Mapper extends BaseMapper implements Receiver
         //      it knows how to move files from temp to storage
         //      (whether local or S3) efficiently
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
-        $sanitized                = $this->getManager()->sanitize(
+        /** @var Sanitizer\ISanitizer $sanitizer */
+        $sanitizer                = self::getDi()->get('storage.sanitizer');
+        $helper                   = new Sanitizer\Helper($sanitizer);
+        $sanitized                = $helper->sanitize(
             $this->getManager()->getTempFilesystem(),
             $tempLocationInFilesystem,
             $storage->getMime(),

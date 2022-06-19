@@ -12,6 +12,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Resource\Storage\Sanitizer;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -40,16 +41,19 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info('Running in dry-run mode: use -p to write changes to filesystem');
         }
         $storageMapper = new StorageMapper();
-        $mountManager  = $storageMapper->getManager();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
 
         /** @var FilesystemInterface $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
+        /** @var Sanitizer\ISanitizer $sanitizer */
+        $sanitizer = $this->getDi()->get('storage.sanitizer');
+        $helper    = new Sanitizer\Helper($sanitizer);
+
         /** @var Storage $svgFile */
         foreach ($svgFiles as $svgFile) {
             $path   = FilesystemProxy::getPathFromHash($svgFile->getHash());
-            $result = $mountManager->sanitize($storageFilesystem, $path, $svgFile->getMime());
+            $result = $helper->sanitize($storageFilesystem, $path, $svgFile->getMime());
             if (isset($result)) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
                 if ($this->perform()) {
