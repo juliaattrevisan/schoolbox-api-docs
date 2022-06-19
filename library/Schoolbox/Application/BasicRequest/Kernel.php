@@ -428,10 +428,9 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.storage',
             $di->lazy(
-                function () use ($di) {
-                    /** @var Manager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getStorageFilesystem();
+                function () use ($config) {
+                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
+                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
                 }
             )
         );
@@ -448,10 +447,9 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.temp',
             $di->lazy(
-                function () use ($di) {
-                    /** @var Manager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getTempFilesystem();
+                function () use ($config) {
+                    $filesystem = (new FilesystemFactory())->build($config->get('storage_dir'));
+                    return $filesystem->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
                 }
             )
         );

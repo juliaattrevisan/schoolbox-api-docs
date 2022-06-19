@@ -219,36 +219,36 @@ class Manager
 //        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
 ////        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
 //    }
-
-    /**
-     * Passthrough method
-     *
-     * @param string $prefix
-     *
-     * @return FilesystemInterface
-     */
-    public function getFilesystem($prefix)
-    {
-        return $this->mountManager->getFilesystem($prefix);
-    }
-
-    /**
-     * Convenience method for fetching storage filesystem.
-     *
-     * @return FilesystemInterface
-     */
-    public function getStorageFilesystem(): FilesystemInterface
-    {
-        return $this->getFilesystem(self::FS_STORAGE);
-    }
-
-    /**
-     * Convenience method for fetching temp filesystem.
-     *
-     * @return FilesystemInterface
-     */
-    public function getTempFilesystem(): FilesystemInterface
-    {
-        return $this->getFilesystem(self::FS_TEMP);
-    }
+//
+//    /**
+//     * Passthrough method
+//     *
+//     * @param string $prefix
+//     *
+//     * @return FilesystemInterface
+//     */
+//    public function getFilesystem($prefix)
+//    {
+//        return $this->mountManager->getFilesystem($prefix);
+//    }
+//
+//    /**
+//     * Convenience method for fetching storage filesystem.
+//     *
+//     * @return FilesystemInterface
+//     */
+//    public function getStorageFilesystem(): FilesystemInterface
+//    {
+//        return $this->getFilesystem(self::FS_STORAGE);
+//    }
+//
+//    /**
+//     * Convenience method for fetching temp filesystem.
+//     *
+//     * @return FilesystemInterface
+//     */
+//    public function getTempFilesystem(): FilesystemInterface
+//    {
+//        return $this->getFilesystem(self::FS_TEMP);
+//    }
 }

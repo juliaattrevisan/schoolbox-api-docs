@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Byte_Format;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
 use PDO;
 use PDOStatement;
 use Schoolbox;
@@ -418,9 +419,11 @@ class Mapper extends BaseMapper implements Receiver
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
         /** @var Sanitizer\ISanitizer $sanitizer */
         $sanitizer                = self::getDi()->get('storage.sanitizer');
+        /** @var FilesystemInterface $tempFilesystem */
+        $tempFilesystem           = self::getDi()->get('filesystem.temp');
         $helper                   = new Sanitizer\Helper($sanitizer);
         $sanitized                = $helper->sanitize(
-            $this->getManager()->getTempFilesystem(),
+            $tempFilesystem,
             $tempLocationInFilesystem,
             $storage->getMime(),
         );
@@ -429,9 +432,10 @@ class Mapper extends BaseMapper implements Receiver
             $this->getStorageFilesystemProxy()->write($storage, $sanitized);
         } else {
             // write the old content
+            // TODO handle this efficiently with the mount manager?
             $this->getStorageFilesystemProxy()->writeStream(
                 $storage,
-                $this->getManager()->getTempFilesystem()->readStream($tempLocationInFilesystem),
+                $tempFilesystem->readStream($tempLocationInFilesystem),
             );
         }
 

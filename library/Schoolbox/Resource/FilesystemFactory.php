@@ -34,6 +34,9 @@ use const PHP_SAPI;
  */
 class FilesystemFactory
 {
+    public const FILE_SYSTEM_STORAGE = 'storage';
+    public const FILE_SYSTEM_TEMP    = 'upload';
+
     public const FILE_SYSTEM_ADAPTER_LOCAL = 'local';
     public const FILE_SYSTEM_ADAPTER_AWS_S3 = 'awsS3';
 
