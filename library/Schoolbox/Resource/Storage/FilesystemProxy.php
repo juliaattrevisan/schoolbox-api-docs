@@ -109,9 +109,6 @@ class FilesystemProxy
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
-        $hash = $this->hashGenerator->generateHash($resource);
-        $path = self::getPathFromHash($hash);
-
         // Return early if `$storage` already has a hash, and either:
         // * `$verifyPrevious` is off
         // * the file already exists in storage, and its size is as it should be
@@ -122,11 +119,17 @@ class FilesystemProxy
             if (!$this->verifyPrevious) {
                 return;
             }
-            if ($this->filesystem->has($path) && $storage->getSize() === $this->filesystem->getSize($path)) {
+            $previousPath = self::getPathFromHash($previousHash);
+            if (
+                $this->filesystem->has($previousPath)
+                && $storage->getSize() === $this->filesystem->getSize($previousPath)
+            ) {
                 return;
             }
         }
 
+        $hash = $this->hashGenerator->generateHash($resource);
+        $path = self::getPathFromHash($hash);
         try {
             $this->filesystem->writeStream($path, $resource, $config);
         } catch (FileExistsException $e) {
