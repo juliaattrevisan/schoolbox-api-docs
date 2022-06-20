@@ -108,10 +108,19 @@ class FilesystemProxy
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
         $hash = $this->hashGenerator->generateHash($resource);
+        $path = self::getPathFromHash($hash);
 
-        // TODO is this resource rewound?
+        // If upload verification is off, exit early if:
+        // the file is uploaded, and the storage and path sizes match
+        $verifyPrevious = true;
+        if (!$verifyPrevious) {
+            if ($this->filesystem->has($path) && $storage->getSize() === $this->filesystem->getSize($path)) {
+                return;
+            }
+        }
+
         try {
-            $this->filesystem->writeStream(self::getPathFromHash($hash), $resource, $config);
+            $this->filesystem->writeStream($path, $resource, $config);
         } catch (FileExistsException $e) {
             // The file already exists in the storage backend.
             // This is fine, because the storage file's contents determine the
@@ -123,7 +132,7 @@ class FilesystemProxy
         if ($storage instanceof Model) {
             $storage
                 ->setHash($hash)
-                ->setSize($this->filesystem->getSize(self::getPathFromHash($hash)));
+                ->setSize($this->filesystem->getSize($path));
         }
     }
 
