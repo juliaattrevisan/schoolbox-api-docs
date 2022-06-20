@@ -22,7 +22,6 @@ use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
-
     /**
      * @var int
      */
