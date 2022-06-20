@@ -19,7 +19,6 @@ use Schoolbox\User;
  */
 class External_Schoolbox_User implements External_UserInterface
 {
-
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
