@@ -8,6 +8,8 @@
  *
  */
 
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 class Component_Dashboard_RssController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -24,7 +26,15 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
             $size = Config::get('welcome_rss_limit');
         }
         $this->rss->setLimit($size);
-        $this->rss->stream();
+        try {
+            $this->rss->stream();
+        } catch (SchoolboxException $e) {
+            /**
+             * `$this->rss->stream()` has the ability to throw a `SchoolboxException` usually due to a Guzzle exception
+             * will only occur when the cache gets the URL the first time, or on a cache refresh.
+             * catch this and set an empty state.
+             */
+        }
     }
 
 
