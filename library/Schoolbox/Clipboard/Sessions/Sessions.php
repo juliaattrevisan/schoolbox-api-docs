@@ -14,7 +14,6 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
-use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -38,6 +37,17 @@ class Sessions implements IStrategy
      * A placeholder venue if one wasn't specified by Clipboard
      */
     private const UNSPECIFIED_LOCATION = 'Unspecified location';
+
+
+    /**
+     * Whitelist meaningful results
+     *     W     We won
+     *     L     We lost
+     *     D     It's a draw
+     *     F     We forfeited
+     *     OF    Opponent forfeited
+     */
+    private const VALID_RESULT_OUTCOMES = ['W', 'L', 'D', 'F', 'OF'];
 
 
     /**
@@ -500,24 +510,38 @@ class Sessions implements IStrategy
                     /* Figure out existing results for the home team
                      * then update it to whatever it currently is
                      */
-                    try {
-                        $result = $this->resultMapper
-                            ->findOneByColumnList([
-                                'match_id' => $matchup->getId(),
-                                'team_id' => $team->getId()
-                            ]);
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        $result = $this->resultMapper->createModel()
-                            ->setMatchup($matchup)
-                            ->setTeam($team);
-                    }
+                    $resultDescription = $this->generateResult($session);
 
-                    /* Update home team's description with whatever it is now
+                    /* If the resultDescription is null, it means this matchup
+                     * shouldn't have a result; delete all results if they existed
                      */
-                    $result->setDescription($this->generateResult($result, $session));
+                    if (null === $resultDescription) {
+                        foreach ($matchup->getResults() as $currentResult) {
+                            $this->resultMapper->delete($currentResult);
+                        }
+                    } else {
+                        /* There was something meaningful to say; save a new Result
+                         * if one doesn't already exist for this matchup and team
+                         */
+                        try {
+                            $result = $this->resultMapper
+                                ->findOneByColumnList([
+                                    'match_id' => $matchup->getId(),
+                                    'team_id' => $team->getId()
+                                ]);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            $result = $this->resultMapper->createModel()
+                                ->setMatchup($matchup)
+                                ->setTeam($team);
+                        }
 
-                    if ($this->perform) {
-                        $this->resultMapper->save($result);
+                        /* Update home team's description with whatever it is now
+                         */
+                        $result->setDescription($resultDescription);
+
+                        if ($this->perform) {
+                            $this->resultMapper->save($result);
+                        }
                     }
                 }
             }
@@ -660,23 +684,53 @@ class Sessions implements IStrategy
     /**
      * Generate a slab of text for the home team's result description
      *
-     * @param \Schoolbox\Fixtures\Result\Model $result
-     * @param array                            $session
-     * @return string
+     * @param array         $session
+     * @return string|null
      */
-    private function generateResult(\Schoolbox\Fixtures\Result\Model $result, array $session): string
+    private function generateResult(array $session): ?string
     {
+        /* Whitelist meaningful results
+         *     W     We won
+         *     L     We lost
+         *     D     It's a draw
+         *     F     We forfeited
+         *     OF    Opponent forfeited
+         *
+         * Confirmed with Ed Kolyer that 'NR' means "No Results" and is functionally
+         * equivalent to a null
+         *
+         * Not in any of the valid result outcomes? Nothing to say
+         *
+         * Exit early
+         */
+        if (!\in_array($session['result'], self::VALID_RESULT_OUTCOMES, true)) {
+            $this->log->debug('No valid results recorded; skipping result creation.');
+
+            return null;
+        }
+
         /* Neither team has anything interesting in the results fields
          * Nothing to say
          */
         if ('' === trim((string)$session['organisationScore']) && '' === trim((string)$session['opponentScore'])) {
-            return '';
+            $this->log->debug('Our score and opponent scores are empty; skipping result creation.');
+
+            return null;
         }
 
-        return sprintf(
+        /* I guess something meaningful happened here
+         */
+        $result = sprintf(
             self::RESULT_TEMPLATE,
-            $session['organisationScore'] ?? '',
-            $session['opponentScore'] ?? ''
+            $session['organisationScore'],
+            $session['opponentScore']
         );
+
+        $this->log->debug(sprintf(
+            'Found result for this matchup: %s',
+            $result
+        ));
+
+        return $result;
     }
 }
