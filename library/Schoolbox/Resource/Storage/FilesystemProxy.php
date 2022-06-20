@@ -36,12 +36,14 @@ class FilesystemProxy
     /**
      * Constructor
      *
-     * @param FilesystemInterface $filesystem    base filesystem this class proxies
-     * @param HashGenerator       $hashGenerator method for generating hashes for storage files
+     * @param FilesystemInterface $filesystem     Base filesystem this class proxies.
+     * @param HashGenerator       $hashGenerator  Method for generating hashes for storage files.
+     * @param bool                $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
      */
     public function __construct(
         private FilesystemInterface $filesystem,
         private HashGenerator $hashGenerator,
+        private bool $verifyPrevious,
     ) {
     }
 
@@ -110,10 +112,16 @@ class FilesystemProxy
         $hash = $this->hashGenerator->generateHash($resource);
         $path = self::getPathFromHash($hash);
 
-        // If upload verification is off, exit early if:
-        // the file is uploaded, and the storage and path sizes match
-        $verifyPrevious = true;
-        if (!$verifyPrevious) {
+        // Return early if `$storage` already has a hash, and either:
+        // * `$verifyPrevious` is off
+        // * the file already exists in storage, and its size is as it should be
+        // TODO determine if a storage file could ever have its hash modified
+        //      (doesn't saving a new file always create a new storage record?)
+        $previousHash = $storage->getHash();
+        if ($previousHash) {
+            if (!$this->verifyPrevious) {
+                return;
+            }
             if ($this->filesystem->has($path) && $storage->getSize() === $this->filesystem->getSize($path)) {
                 return;
             }

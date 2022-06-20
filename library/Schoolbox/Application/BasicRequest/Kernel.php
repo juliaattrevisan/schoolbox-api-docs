@@ -434,10 +434,14 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.storageProxy',
             $di->lazy(
-                function () use ($di) {
+                function () use ($di, $config) {
                     /** @var FilesystemInterface $storage */
                     $storage = $di->get('filesystem.storage');
-                    return new FilesystemProxy($storage, new HashGenerator());
+                    return new FilesystemProxy(
+                        $storage,
+                        new HashGenerator(),
+                        $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
+                    );
                 }
             )
         );
