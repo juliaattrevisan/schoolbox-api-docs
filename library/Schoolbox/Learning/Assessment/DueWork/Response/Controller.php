@@ -259,7 +259,6 @@ class Controller extends Base
 
             /* Similarity Check status
              */
-            'plagscanApiEnabled' => false,
             'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,

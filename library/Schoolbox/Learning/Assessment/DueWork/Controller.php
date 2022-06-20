@@ -395,7 +395,6 @@ class Controller extends Assessment\Controller
 
             /* Similarity Check status
              */
-            'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'turnitinApiEnabled'     => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
