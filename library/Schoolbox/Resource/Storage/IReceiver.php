@@ -24,7 +24,7 @@ use Schoolbox\User;
 interface IReceiver
 {
     /**
-     * Accept a new file upload
+     * Accept a new file upload.
      *
      * @param string                   $basename      The name to give the file in storage.
      * @param string                   $tempLocation  The location in temp storage where the file currently exists.
@@ -42,7 +42,7 @@ interface IReceiver
     ): Model;
 
     /**
-     * Accept a datastream upload
+     * Accept a resource stream (or string file contents) upload.
      *
      * @param string                   $basename      The name to give the file in storage.
      * @param resource|string          $fp            Either a pointer to a file, or its contents.
