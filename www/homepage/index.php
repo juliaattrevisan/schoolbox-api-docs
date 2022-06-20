@@ -271,6 +271,12 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
             $this->setVar($output);
 
+            /* Initialise category counts if they don't already exist
+             */
+            if (!isset($tabList[$component->getComponentCategory()]['count'])) {
+                $tabList[$component->getComponentCategory()]['count'] = 0;
+            }
+
             if ($component->getComponentCategory() != $previous->getComponentCategory() && $i > 1) {
                 $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 $this->setVar('homepage_component_block', '');
@@ -298,11 +304,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
             //
             // This was set to $component->componentCategoryName - a non-existent value
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
-            if (isset($tabList[$component->getComponentCategory()]['count'])) {
-                $tabList[$component->getComponentCategory()]['count']++;
-            } else {
-                $tabList[$component->getComponentCategory()]['count'] = 0;
-            }
+            $tabList[$component->getComponentCategory()]['count']++;
         }
     } else {
         $this->setVar([
