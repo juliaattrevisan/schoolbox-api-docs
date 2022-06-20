@@ -18,7 +18,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
@@ -92,8 +91,8 @@ class FilesystemFactory
         }
 
         return new MountManager([
-            Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-            Manager::FS_STORAGE => $fs_storage
+            self::FILE_SYSTEM_TEMP    => new Filesystem(new Local($tempDir)),
+            self::FILE_SYSTEM_STORAGE => $fs_storage
         ]);
     }
 
