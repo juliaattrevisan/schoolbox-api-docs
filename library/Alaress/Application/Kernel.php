@@ -1854,8 +1854,8 @@ abstract class Kernel
                     'storageMapper'          => $mapperFactory->getLazy(StorageMapper::class),
                     'mimetypeMapper'         => $mapperFactory->getLazy(MimetypeMapper::class),
                     'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
-                    'sanitizer'              => $di->lazyGet('filesystem.sanitizer'),
-                    'tempFilesystem'         => $di->lazyGet('filesystem.tempFilesystem'),
+                    'sanitizer'              => $di->lazyGet('storage.sanitizer'),
+                    'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
                     'currentUser'            => $di->lazyGet('user'),
                 ],
             )
