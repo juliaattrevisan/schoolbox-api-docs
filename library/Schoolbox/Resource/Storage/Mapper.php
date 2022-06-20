@@ -373,7 +373,7 @@ class Mapper extends BaseMapper implements Receiver
 
         file_put_contents($tempLocation, $fp);
 
-        return $this->accept($basename, $tempLocation, $public, $expiryAt);
+        return $this->accept($basename, $tempLocation, $public, $expiryAt, $uploadingUser);
     }
 
 
