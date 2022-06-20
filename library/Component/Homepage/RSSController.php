@@ -12,7 +12,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle

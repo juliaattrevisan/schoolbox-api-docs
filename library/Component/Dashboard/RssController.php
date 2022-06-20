@@ -12,7 +12,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Component_Dashboard_RssController extends Component_Dashboard_ControllerAbstract
 {
-
     protected $rss;
 
     public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
