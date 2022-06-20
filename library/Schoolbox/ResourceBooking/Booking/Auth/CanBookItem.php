@@ -35,7 +35,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class CanBookItem implements Rule\IAuthorizationRule
 {
-
     /**
      * @var Item\Mapper
      */
