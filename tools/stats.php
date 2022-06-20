@@ -82,8 +82,6 @@ $app = new class extends CliTool\App {
             'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
             'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
             'assessment_visibility_parent' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 2',
-            'plagscan_docs'     => 'SELECT count(*) FROM plagscan_document WHERE status = 3 and deleted_at is null',
-            'plagscan_errors'   => 'SELECT count(*) FROM plagscan_document WHERE status = -1 and deleted_at is null',
             'kami_docs'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "done" and deleted_at is null',
             'kami_processing'   => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "processing" and deleted_at is null',
             'kami_errors'       => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
