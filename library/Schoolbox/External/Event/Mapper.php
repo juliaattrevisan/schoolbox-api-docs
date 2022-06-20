@@ -89,7 +89,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$folderColumnString}, 
+                {$folderColumnString},
                 {$folderCodeColumnString}
             FROM {$this->getTable()}
             LEFT JOIN {$this->folderCodeMapper->getTable()} fc ON {$this->getTable()}.code = fc.code AND fc.deleted_at IS NULL
@@ -179,17 +179,17 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
             SELECT
                 {$this->getColumnString()},
-                {$folderColumnString}, 
+                {$folderColumnString},
                 {$folderCodeColumnString},
-                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`, 
+                u.id AS `u.id`, u.title AS `u.title`, u.firstname AS `u.firstname`, u.lastname AS `u.lastname`,
                 g.group_type as `g.group_type`
             FROM {$this->getTable()}
             LEFT JOIN {$this->folderCodeMapper->getTable()} fc ON {$this->getTable()}.code = fc.code AND fc.deleted_at IS NULL
             LEFT JOIN {$this->folderMapper->getTable()} f ON fc.folder_id = f.id AND f.deleted_at IS NULL
             LEFT JOIN sis_class sc ON sis_event.code = sc.code
             LEFT JOIN sis_class_user scu ON sc.id = scu.class_id
-            LEFT JOIN `user` u ON scu.external_id = u.synergy_id
-            LEFT JOIN `groups` g ON u.group_id = g.id
+            LEFT JOIN `user` u ON scu.external_id = u.synergy_id AND u.deleted_at IS NULL
+            LEFT JOIN `groups` g ON u.group_id = g.id AND g.deleted_at IS NULL
             WHERE {$where}
             AND (group_type = :studentRoleType OR group_type = :staffRoleType)
         ";
