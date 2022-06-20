@@ -77,6 +77,7 @@ use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\IConfigLoader;
@@ -150,6 +151,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
@@ -1842,6 +1844,20 @@ abstract class Kernel
                     $storage = $di->get('filesystem.storage');
                     return new FilesystemProxy($storage, new HashGenerator());
                 }
+            )
+        );
+        $di->set(
+            'filesystem.receiver',
+            $di->lazyNew(
+                Receiver::class,
+                [
+                    'storageMapper'          => $mapperFactory->getLazy(StorageMapper::class),
+                    'mimetypeMapper'         => $mapperFactory->getLazy(MimetypeMapper::class),
+                    'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
+                    'sanitizer'              => $di->lazyGet('filesystem.sanitizer'),
+                    'tempFilesystem'         => $di->lazyGet('filesystem.tempFilesystem'),
+                    'currentUser'            => $di->lazyGet('user'),
+                ],
             )
         );
         $di->set(

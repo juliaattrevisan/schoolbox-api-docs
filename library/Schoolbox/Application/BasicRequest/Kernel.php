@@ -23,6 +23,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Instance;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -34,6 +35,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
@@ -436,6 +439,20 @@ class Kernel extends WebKernelAbstract
                     $storage = $di->get('filesystem.storage');
                     return new FilesystemProxy($storage, new HashGenerator());
                 }
+            )
+        );
+        $di->set(
+            'filesystem.receiver',
+            $di->lazyNew(
+                Receiver::class,
+                [
+                    'storageMapper'          => $mapperFactory->getLazy(StorageMapper::class),
+                    'mimetypeMapper'         => $mapperFactory->getLazy(MimetypeMapper::class),
+                    'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
+                    'sanitizer'              => $di->lazyGet('filesystem.sanitizer'),
+                    'tempFilesystem'         => $di->lazyGet('filesystem.tempFilesystem'),
+                    'currentUser'            => $di->lazyGet('user'),
+                ],
             )
         );
         $di->set(
