@@ -347,9 +347,9 @@ class Mapper extends BaseMapper implements Receiver
      * @throws \UnexpectedValueException
      */
     public function acceptStream(
-        $basename,
-        $fp,
-        $public = false,
+        string $basename,
+        mixed $fp,
+        bool $public = false,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model {
@@ -394,9 +394,9 @@ class Mapper extends BaseMapper implements Receiver
      * @throws \UnexpectedValueException
      */
     public function accept(
-        $basename,
-        $tempLocation,
-        $public = true,
+        string $basename,
+        string $tempLocation,
+        bool $public = true,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model {

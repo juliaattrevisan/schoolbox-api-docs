@@ -34,9 +34,9 @@ interface Receiver
      * @return Model
      */
     public function accept(
-        $basename,
-        $tempLocation,
-        $public = false,
+        string $basename,
+        string $tempLocation,
+        bool $public = false,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model;
@@ -52,9 +52,9 @@ interface Receiver
      * @return Model
      */
     public function acceptStream(
-        $basename,
-        $fp,
-        $public = false,
+        string $basename,
+        mixed $fp,
+        bool $public = false,
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model;
