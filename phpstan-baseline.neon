@@ -5386,11 +5386,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Model.php
 
 		-
-			message: "#^Variable \\$plagscan in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Mapper.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$submittedAt with type mixed is not subtype of native type Alaress_Date_Format\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Model.php
