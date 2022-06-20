@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -10,13 +11,10 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
-use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
 

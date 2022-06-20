@@ -10,11 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Test;
 
-use Alaress_Byte_Format;
 use Component_InstanceMapper;
-use League\Flysystem\Adapter\NullAdapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\MountManager;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -26,14 +22,12 @@ use Schoolbox\External\SubjectMapper;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use Schoolbox\Resource;
 use Schoolbox\TagCloud;
 use Schoolbox\Video;
 use SplFileInfo;
 
 class ISoftDeletableTest extends TestCase
 {
-
     /**
      * Ensure that if a mapper has a soft-delete column, then its model implements ISoftDeletable
      *

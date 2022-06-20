@@ -17,7 +17,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 class GarbageCollector
 {
-
     /** @var Check[] */
     protected $checks = [];
 

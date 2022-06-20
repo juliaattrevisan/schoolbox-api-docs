@@ -15,7 +15,6 @@ use Schoolbox\Resource;
 
 class ExternalFileSystemHandler extends FileSystemHandler
 {
-
     /** @var FetcherInterface */
     protected $fetcher;
 

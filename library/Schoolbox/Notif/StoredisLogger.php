@@ -29,7 +29,6 @@ use Schoolbox\File;
  */
 class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterface
 {
-
     /** @var Predis\Client */
     protected $client;
 
