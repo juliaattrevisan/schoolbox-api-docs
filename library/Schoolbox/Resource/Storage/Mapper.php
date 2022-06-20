@@ -59,27 +59,26 @@ class Mapper extends BaseMapper implements Receiver
 
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
-        // TODO move all requireSafety checks into calls to accept() or whatever
-        $requireSafety = true;
-
-        $user = $this->getSessionUser();
-        if ($user) {
-            $requireSafety = $user->isSuperuser() == false;
-        } elseif (PHP_SAPI == 'cli') {
-            $requireSafety = false;
-        }
-
-        if ($requireSafety) {
-            $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'safetyCheck']);
-        } else {
-            $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
-                /** @var Model $model */
-                if (!$model->getMimetype() instanceof Mimetype) {
-                    // For super users only, we allow this
-                    $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
-                }
-            });
-        }
+//        $requireSafety = true;
+//
+//        $user = $this->getSessionUser();
+//        if ($user) {
+//            $requireSafety = $user->isSuperuser() == false;
+//        } elseif (PHP_SAPI == 'cli') {
+//            $requireSafety = false;
+//        }
+//
+//        if ($requireSafety) {
+//            $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'safetyCheck']);
+//        } else {
+//            $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+//                /** @var Model $model */
+//                if (!$model->getMimetype() instanceof Mimetype) {
+//                    // For super users only, we allow this
+//                    $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
+//                }
+//            });
+//        }
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
@@ -392,6 +391,7 @@ class Mapper extends BaseMapper implements Receiver
      * @throws MapperException
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws FileException
      */
     public function accept(
         string $basename,
@@ -412,6 +412,21 @@ class Mapper extends BaseMapper implements Receiver
             $storage->setMimetype($mtm->getByFilename($basename));
         } catch (FileException $e) {
             // We are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
+        }
+
+        // Run the safety check
+        $user = $uploadingUser ?? $this->getSessionUser();
+        $requireSafety = true;
+        if ($user) {
+            $requireSafety = $user->isSuperuser();
+        } elseif (PHP_SAPI === 'cli') {
+            $requireSafety = false;
+        }
+        if ($requireSafety) {
+            $this->safetyCheck($storage);
+        } elseif (!$storage->getMimetype() instanceof Mimetype) {
+            // For superusers only, we allow an unknown mimetype
+            $storage->setMimetype($mtm->getUnknownMime());
         }
 
         // By default files uploaded this way are public
