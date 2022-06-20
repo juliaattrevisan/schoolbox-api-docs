@@ -551,4 +551,44 @@ class Controller extends Base
          *  in odd circumstances; but what do we display in that case?
          */
     }
+
+    /**
+     * Dump out a plagscan report
+     *
+     * @param IAssessable $assessment
+     * @param IResponse $response
+     * @param Plagscan $plagscan
+     * @param Participant $participant
+     */
+    public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan, Participant $participant)
+    {
+        $data = [
+            'plagscan' => $plagscan,
+            'assessment' => $assessment,
+            'response' => $response,
+            'participant' => $participant,
+            'interactiveAvailable' => false
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));
+    }
+
+    /**
+     * Loads up the Plagscan report contents - used in conjunction with
+     * getPlagscanReport() because this loads plagscan-formatted html
+     * which needs to be spawned in an iframe (sigh)
+     *
+     * @param Plagscan $plagscan
+     */
+    public function getPlagscanReportContents(Plagscan $plagscan)
+    {
+        /* Assume all files were migrated successfully so load the html
+         * contents from the storage instance
+         */
+        $data = [
+            'html' => $plagscan->getStorage()->read(),
+        ];
+
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
+    }
 }
