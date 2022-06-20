@@ -35,7 +35,7 @@ use Schoolbox\Video\QueueMapper;
  * @method GenericCollection|Model[] findAll($options = [])
  * @method Model createModel($idValue = null)
  */
-class Mapper extends BaseMapper implements Receiver
+class Mapper extends BaseMapper implements IReceiver
 {
     /**
      * @return void

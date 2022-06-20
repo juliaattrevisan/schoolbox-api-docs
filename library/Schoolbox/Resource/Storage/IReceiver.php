@@ -21,7 +21,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Resource\Storage
  */
-interface Receiver
+interface IReceiver
 {
     /**
      * Accept a new file upload

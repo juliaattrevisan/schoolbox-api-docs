@@ -41,7 +41,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     /** @var resource */
     protected $stream;
 
-    /** @var Storage\Receiver */
+    /** @var Storage\IReceiver */
     protected $receiver;
 
     /** @var LoggerInterface[] */
@@ -54,12 +54,12 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
     /**
      * @param string                  $filename
-     * @param Storage\Receiver        $receiver
+     * @param Storage\IReceiver       $receiver
      * @param FormatterInterface|null $formatter
      */
     public function __construct(
         $filename,
-        Storage\Receiver $receiver,
+        Storage\IReceiver $receiver,
         FormatterInterface $formatter = null
     ) {
         $this->file = $filename;
