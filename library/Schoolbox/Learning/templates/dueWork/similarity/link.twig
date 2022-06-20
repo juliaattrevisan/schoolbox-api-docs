@@ -21,12 +21,27 @@
     {# If the turnitin api was configured then assume we're using that
      # instead of plag (mutually exclusive)
      #}
-    {% include '@learning/dueWork/turnitin/link.twig' with {
-        assessment:   assessment,
-        response:     response,
-        participant:  participant,
-        currentFile:  currentFile
-    } %}
+    {% if currentFile.turnitin.hasReport %}
+        {% include '@learning/dueWork/turnitin/link.twig' with {
+            assessment:   assessment,
+            response:     response,
+            participant:  participant,
+            currentFile:  currentFile
+        } %}
+    {% elseif (currentFile.plagscan.plagscanId ?? false) %}
+        {# Fall back to loading a plag
+         # Check that a plag document exists first
+         #}
+        {% include '@learning/dueWork/plagscan/link.twig' with {
+            assessmentId: assessment.id,
+            assessment:   assessment,
+            responseId:   response.id,
+            response:     response,
+            participant:  participant,
+            plagscan:     currentFile.plagscan,
+            plagscanId:   currentFile.plagscan.plagscanId ?? false
+        } %}
+    {% endif %}
 {% endif %}
 
 {# You might not be using either similiarity checkers; do nothing #}
