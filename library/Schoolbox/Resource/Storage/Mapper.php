@@ -329,21 +329,10 @@ class Mapper extends BaseMapper implements IReceiver
 
 
     /**
-     * Accept a resource stream (or string file contents) upload
+     * @inheritdoc
      *
-     * @param string                   $basename
-     * @param resource|string          $fp
-     * @param bool                     $public
-     * @param Alaress_Date_Format|null $expiryAt
-     * @param User|null                $uploadingUser The user uploading the file: if not provided, do not run the
-     *                                                safety check.
-     * @return Model
-     * @throws BaseMapper\DefinitionException
-     * @throws FileException
-     * @throws FileNotFoundException
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @deprecated The receiver from DI (filesystem.receiver) should be used
+     *             instead, and injected where necessary.
      */
     public function acceptStream(
         string $basename,
@@ -352,46 +341,44 @@ class Mapper extends BaseMapper implements IReceiver
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model {
-        // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
-        // (just like an upload)
-
-        $tempLocation = sb_tempnam('otfs');
-
-        /* Temporary location didn't get created. There might be a number of reasons why that might
-         * be the case; no write access to the specified location, disk full, etc.
-         *
-         * CLI Tools:
-         * If you ended up following a fatal from a cli tool, you should try running it with sudo
-         * Otherwise your logged-in account might not have write access to $tempLocation
-         */
-        if ('' === (string)$tempLocation) {
-            throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
-        }
-
-        // Dump the stream into our tempfile
-
-        file_put_contents($tempLocation, $fp);
-
-        return $this->accept($basename, $tempLocation, $public, $expiryAt, $uploadingUser);
+        /** @var Receiver $receiver */
+        $receiver = self::getDi()->get('filesystem.receiver');
+        return $receiver->acceptStream(
+            $basename,
+            $fp,
+            $public,
+            $expiryAt,
+            $uploadingUser,
+        );
+//        // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
+//        // (just like an upload)
+//
+//        $tempLocation = sb_tempnam('otfs');
+//
+//        /* Temporary location didn't get created. There might be a number of reasons why that might
+//         * be the case; no write access to the specified location, disk full, etc.
+//         *
+//         * CLI Tools:
+//         * If you ended up following a fatal from a cli tool, you should try running it with sudo
+//         * Otherwise your logged-in account might not have write access to $tempLocation
+//         */
+//        if ('' === (string)$tempLocation) {
+//            throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
+//        }
+//
+//        // Dump the stream into our tempfile
+//
+//        file_put_contents($tempLocation, $fp);
+//
+//        return $this->accept($basename, $tempLocation, $public, $expiryAt, $uploadingUser);
     }
 
 
     /**
-     * Accept a new file upload
+     * @inheritdoc
      *
-     * @param string                   $basename
-     * @param string                   $tempLocation
-     * @param bool                     $public
-     * @param Alaress_Date_Format|null $expiryAt
-     * @param User|null                $uploadingUser The user uploading the file: if not provided, do not run the
-     *                                                safety check.
-     * @return Model
-     * @throws BaseMapper\DefinitionException
-     * @throws FileNotFoundException
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     * @throws FileException
+     * @deprecated The receiver from DI (filesystem.receiver) should be used
+     *             instead, and injected where necessary.
      */
     public function accept(
         string $basename,
@@ -400,72 +387,81 @@ class Mapper extends BaseMapper implements IReceiver
         ?Alaress_Date_Format $expiryAt = null,
         ?User $uploadingUser = null,
     ): Model {
-        /** @var MimetypeMapper $mtm */
-        $mtm     = $this->getJoinMapper('allowedFileExtension');
-        $storage = $this->createModel();
-
-        // Set file type metadata
-        $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
-        $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
-
-        try {
-            $storage->setMimetype($mtm->getByFilename($basename));
-        } catch (FileException $e) {
-            // We are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
-        }
-
-        // Run the safety check
-        $user = $uploadingUser ?? $this->getSessionUser();
-        $requireSafety = true;
-        if ($user) {
-            $requireSafety = $user->isSuperuser();
-        } elseif (PHP_SAPI === 'cli') {
-            $requireSafety = false;
-        }
-        if ($requireSafety) {
-            $this->safetyCheck($storage);
-        } elseif (!$storage->getMimetype() instanceof Mimetype) {
-            // For superusers only, we allow an unknown mimetype
-            $storage->setMimetype($mtm->getUnknownMime());
-        }
-
-        // By default files uploaded this way are public
-        $storage->setPublic($public);
-
-        // TODO: Find a way to remove the need for this truncation
-        // TODO handle all of this in the Manager class:
-        //      it knows how to move files from temp to storage
-        //      (whether local or S3) efficiently
-        $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
-        /** @var Sanitizer\ISanitizer $sanitizer */
-        $sanitizer                = self::getDi()->get('storage.sanitizer');
-        /** @var FilesystemInterface $tempFilesystem */
-        $tempFilesystem           = self::getDi()->get('filesystem.temp');
-        $helper                   = new Sanitizer\Helper($sanitizer);
-        $sanitized                = $helper->sanitize(
-            $tempFilesystem,
-            $tempLocationInFilesystem,
-            $storage->getMime(),
+        /** @var Receiver $receiver */
+        $receiver = self::getDi()->get('filesystem.receiver');
+        return $receiver->accept(
+            $basename,
+            $tempLocation,
+            $public,
+            $expiryAt,
+            $uploadingUser,
         );
-        if (isset($sanitized)) {
-            // write the new content
-            $this->getStorageFilesystemProxy()->write($storage, $sanitized);
-        } else {
-            // write the old content
-            // TODO handle this efficiently with the mount manager?
-            $this->getStorageFilesystemProxy()->writeStream(
-                $storage,
-                $tempFilesystem->readStream($tempLocationInFilesystem),
-            );
-        }
-
-        if (null !== $expiryAt) {
-            $storage->setExpiryAt($expiryAt);
-        }
-
-        $this->save($storage);
-
-        return $storage;
+//        /** @var MimetypeMapper $mtm */
+//        $mtm     = $this->getJoinMapper('allowedFileExtension');
+//        $storage = $this->createModel();
+//
+//        // Set file type metadata
+//        $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
+//        $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
+//
+//        try {
+//            $storage->setMimetype($mtm->getByFilename($basename));
+//        } catch (FileException $e) {
+//            // We are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
+//        }
+//
+//        // Run the safety check
+//        $user = $uploadingUser ?? $this->getSessionUser();
+//        $requireSafety = true;
+//        if ($user) {
+//            $requireSafety = $user->isSuperuser();
+//        } elseif (PHP_SAPI === 'cli') {
+//            $requireSafety = false;
+//        }
+//        if ($requireSafety) {
+//            $this->safetyCheck($storage);
+//        } elseif (!$storage->getMimetype() instanceof Mimetype) {
+//            // For superusers only, we allow an unknown mimetype
+//            $storage->setMimetype($mtm->getUnknownMime());
+//        }
+//
+//        // By default files uploaded this way are public
+//        $storage->setPublic($public);
+//
+//        // TODO: Find a way to remove the need for this truncation
+//        // TODO handle all of this in the Manager class:
+//        //      it knows how to move files from temp to storage
+//        //      (whether local or S3) efficiently
+//        $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
+//        /** @var Sanitizer\ISanitizer $sanitizer */
+//        $sanitizer                = self::getDi()->get('storage.sanitizer');
+//        /** @var FilesystemInterface $tempFilesystem */
+//        $tempFilesystem           = self::getDi()->get('filesystem.temp');
+//        $helper                   = new Sanitizer\Helper($sanitizer);
+//        $sanitized                = $helper->sanitize(
+//            $tempFilesystem,
+//            $tempLocationInFilesystem,
+//            $storage->getMime(),
+//        );
+//        if (isset($sanitized)) {
+//            // write the new content
+//            $this->getStorageFilesystemProxy()->write($storage, $sanitized);
+//        } else {
+//            // write the old content
+//            // TODO handle this efficiently with the mount manager?
+//            $this->getStorageFilesystemProxy()->writeStream(
+//                $storage,
+//                $tempFilesystem->readStream($tempLocationInFilesystem),
+//            );
+//        }
+//
+//        if (null !== $expiryAt) {
+//            $storage->setExpiryAt($expiryAt);
+//        }
+//
+//        $this->save($storage);
+//
+//        return $storage;
     }
 
     // Getters & Setters
