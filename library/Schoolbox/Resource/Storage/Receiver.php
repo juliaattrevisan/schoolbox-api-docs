@@ -34,7 +34,7 @@ class Receiver implements IReceiver
      *                                                    content of storage objects.
      * @param ISanitizer          $sanitizer              Sanitizer for file content of storage objects.
      * @param FilesystemInterface $tempFilesystem         Temporary file system: files will be extracted from here.
-     * @param User                $currentUser            The current user: used to determine if the file is acceptable.
+     * @param User|null           $currentUser            The current user: used to determine if the file is acceptable.
      */
     public function __construct(
         private Mapper $storageMapper,
@@ -42,7 +42,7 @@ class Receiver implements IReceiver
         private FilesystemProxy $storageFilesystemProxy,
         private ISanitizer $sanitizer,
         private FilesystemInterface $tempFilesystem,
-        private User $currentUser,
+        private ?User $currentUser,
     ) {
     }
 
