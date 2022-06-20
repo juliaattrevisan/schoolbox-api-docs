@@ -162,7 +162,7 @@ class Series
     ) {
         $relatedItems  = [];
         foreach ($related ?: [] as $relatedItem) {
-            if ($relatedItem['resource_id']) {
+            if ($relatedItem['resource_id'] ?? null) {
                 $relatedItems[$relatedItem['resource_id']] = $relatedItem;
             }
         }
