@@ -48,6 +48,7 @@ class Receiver implements IReceiver
 
     /**
      * @inheritdoc
+     * @throws FileException if the temp file couldn't be created
      */
     public function acceptStream(
         string $basename,
@@ -80,6 +81,7 @@ class Receiver implements IReceiver
 
     /**
      * @inheritdoc
+     * @throws FileException if the file is not uploadable
      */
     public function accept(
         string $basename,
@@ -104,7 +106,7 @@ class Receiver implements IReceiver
         $user          = $uploadingUser ?? $this->currentUser;
         $requireSafety = true;
         if ($user) {
-            $requireSafety = $user->isSuperuser();
+            $requireSafety = !$user->isSuperuser();
         } elseif (PHP_SAPI === 'cli') {
             $requireSafety = false;
         }
@@ -148,14 +150,16 @@ class Receiver implements IReceiver
     }
 
     /**
-     * Safety check that a file may be uploaded.
+     * Safety check that a file may be uploaded; checks that:
+     * * the file has a recognised and allowed mimetype
+     * * the file is not larger than the file's allowed size
      *
      * Skipped if the receiver is run in a CLI (where there is no user context),
      * or the current user is a superuser.
      *
      * @param Model $storage
      *
-     * @throws FileException
+     * @throws FileException if the file isn't uploadable for any reason
      */
     private function assertStorageUploadable(Model $storage): void
     {
