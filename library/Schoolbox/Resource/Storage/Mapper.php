@@ -84,48 +84,48 @@ class Mapper extends BaseMapper implements IReceiver
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
 
-    /**
-     * Pre-save callback
-     *
-     * @param Model $storage
-     *
-     * @throws FileException
-     */
-    public function safetyCheck(Model $storage)
-    {
-        $fileMime    = $storage->getMimetype();
-        $errorSuffix = "Try a different file or contact your IT administrator.";
-
-        // Assert: Mime set
-
-        if (!$fileMime instanceof Mimetype) {
-            throw new FileException(
-                "This file has no detectable type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_FOUND
-            );
-        }
-
-        // Assert: Mime type allowed
-
-        if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
-            throw new FileException(
-                "This file is not a valid file type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_ALLOWED
-            );
-        }
-
-        // Assert: Acceptable size
-
-        if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
-            throw new FileException(
-                sprintf(
-                    "This file exceeds the file size restriction of %s. %s",
-                    Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
-                    $errorSuffix,
-                ),
-            );
-        }
-    }
+//    /**
+//     * Pre-save callback
+//     *
+//     * @param Model $storage
+//     *
+//     * @throws FileException
+//     */
+//    public function safetyCheck(Model $storage)
+//    {
+//        $fileMime    = $storage->getMimetype();
+//        $errorSuffix = "Try a different file or contact your IT administrator.";
+//
+//        // Assert: Mime set
+//
+//        if (!$fileMime instanceof Mimetype) {
+//            throw new FileException(
+//                "This file has no detectable type. {$errorSuffix}",
+//                FileException::CODE_MIMETYPE_NOT_FOUND
+//            );
+//        }
+//
+//        // Assert: Mime type allowed
+//
+//        if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
+//            throw new FileException(
+//                "This file is not a valid file type. {$errorSuffix}",
+//                FileException::CODE_MIMETYPE_NOT_ALLOWED
+//            );
+//        }
+//
+//        // Assert: Acceptable size
+//
+//        if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
+//            throw new FileException(
+//                sprintf(
+//                    "This file exceeds the file size restriction of %s. %s",
+//                    Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
+//                    $errorSuffix,
+//                ),
+//            );
+//        }
+//    }
 
     /**
      * Post-delete callback
