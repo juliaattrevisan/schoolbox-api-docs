@@ -119,7 +119,7 @@ class HomepageTemplateMapper extends Mapper
         if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
             throw new CallbackException(
                 sprintf(
-                    'A Homepage Template with the name "%s" already exists, you must have a unique name',
+                    'A homepage template with the name "%s" already exists, you must have a unique name',
                     $model->getName()
                 )
             );
