@@ -89,21 +89,6 @@ class ISoftDeletableTest extends TestCase
                 continue;
             }
             $mapper->setConfigLoader(new TestLoader());
-
-            // Special case for resource mappers that depend on the storage mapper
-            if ($mapper instanceof Resource\AbstractFileMapper) {
-                $mapper->setStorageMapper(new class extends Resource\Storage\Mapper
-                {
-                    /**
-                     * @param int $idValue
-                     * @return Resource\Storage\Model
-                     */
-                    public function createModel($idValue = null): Resource\Storage\Model
-                    {
-                        return new Resource\Storage\Model();
-                    }
-                });
-            }
             $mappers[] = [$mapper, $reflection, $className];
         }
         return $mappers;

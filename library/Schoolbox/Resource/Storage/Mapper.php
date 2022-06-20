@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress_Byte_Format;
+use Alaress_Date_Format;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use PDO;
@@ -23,6 +24,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Sanitizer;
+use Schoolbox\User;
 use Schoolbox\Video\QueueMapper;
 
 /**
@@ -330,10 +332,12 @@ class Mapper extends BaseMapper implements Receiver
     /**
      * Accept a resource stream (or string file contents) upload
      *
-     * @param string                    $filename
-     * @param resource|string           $fp
-     * @param bool                      $public
-     * @param \Alaress_Date_Format|null $expiryAt
+     * @param string                   $basename
+     * @param resource|string          $fp
+     * @param bool                     $public
+     * @param Alaress_Date_Format|null $expiryAt
+     * @param User|null                $uploadingUser The user uploading the file: if not provided, do not run the
+     *                                                safety check.
      * @return Model
      * @throws BaseMapper\DefinitionException
      * @throws FileException
@@ -342,8 +346,13 @@ class Mapper extends BaseMapper implements Receiver
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function acceptStream($filename, $fp, $public = false, ?\Alaress_Date_Format $expiryAt = null): Model
-    {
+    public function acceptStream(
+        $basename,
+        $fp,
+        $public = false,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model {
         // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
         // (just like an upload)
 
@@ -364,17 +373,19 @@ class Mapper extends BaseMapper implements Receiver
 
         file_put_contents($tempLocation, $fp);
 
-        return $this->accept($filename, $tempLocation, $public, $expiryAt);
+        return $this->accept($basename, $tempLocation, $public, $expiryAt);
     }
 
 
     /**
      * Accept a new file upload
      *
-     * @param string                    $basename
-     * @param string                    $tempLocation
-     * @param bool                      $public
-     * @param \Alaress_Date_Format|null $expiryAt
+     * @param string                   $basename
+     * @param string                   $tempLocation
+     * @param bool                     $public
+     * @param Alaress_Date_Format|null $expiryAt
+     * @param User|null                $uploadingUser The user uploading the file: if not provided, do not run the
+     *                                                safety check.
      * @return Model
      * @throws BaseMapper\DefinitionException
      * @throws FileNotFoundException
@@ -382,8 +393,13 @@ class Mapper extends BaseMapper implements Receiver
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiryAt = null): Model
-    {
+    public function accept(
+        $basename,
+        $tempLocation,
+        $public = true,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model {
         /** @var MimetypeMapper $mtm */
         $mtm     = $this->getJoinMapper('allowedFileExtension');
         $storage = $this->createModel();

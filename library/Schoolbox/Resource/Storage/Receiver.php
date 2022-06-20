@@ -9,6 +9,9 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress_Date_Format;
+use Schoolbox\User;
+
 /**
  * Interface Receiver
  *
@@ -20,24 +23,39 @@ namespace Schoolbox\Resource\Storage;
  */
 interface Receiver
 {
-
     /**
      * Accept a new file upload
      *
-     * @param string $basename
-     * @param string $tempLocation
-     * @param bool   $public
+     * @param string                   $basename      The name to give the file in storage.
+     * @param string                   $tempLocation  The location in temp storage where the file currently exists.
+     * @param bool                     $public        Should the file be public in storage?
+     * @param Alaress_Date_Format|null $expiryAt      When (if ever) should the file expire?
+     * @param User|null                $uploadingUser The user uploading the file.
      * @return Model
      */
-    public function accept($basename, $tempLocation, $public = false);
+    public function accept(
+        $basename,
+        $tempLocation,
+        $public = false,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model;
 
     /**
      * Accept a datastream upload
      *
-     * @param string   $basename
-     * @param resource $fp
-     * @param bool     $public
+     * @param string                   $basename      The name to give the file in storage.
+     * @param resource|string          $fp            Either a pointer to a file, or its contents.
+     * @param bool                     $public        Should the file be public in storage?
+     * @param Alaress_Date_Format|null $expiryAt      When (if ever) should the file expire?
+     * @param User|null                $uploadingUser The user uploading the file.
      * @return Model
      */
-    public function acceptStream($basename, $fp, $public = false);
+    public function acceptStream(
+        $basename,
+        $fp,
+        $public = false,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model;
 }
