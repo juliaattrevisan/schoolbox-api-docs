@@ -209,13 +209,7 @@ class Controller extends Base
                         $newIds = array_merge($newIds, $affectedIds);
                     }
                 } catch (\Exception $e) {
-                    //return a nice json error message
-                    $problem = (new ApiProblem(sprintf("Could not save: %s", $e->getMessage())))
-                        ->setStatus(400)
-                        ->asArray();
-                    $this->getResponse()->status->setCode(400);
-                    $this->getResponse()->content->set($this->buildJsonOutput($problem));
-                    return; //exit early the user is part of the group.
+                    throw \Schoolbox\Error\Mapper::getInstance()->generateException(null, null, 'Could not save: ' . $e->getMessage());
                 }
             }
         }

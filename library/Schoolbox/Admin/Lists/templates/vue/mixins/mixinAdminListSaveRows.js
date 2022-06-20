@@ -33,7 +33,10 @@ export default {
                 this.updateSequenceOrder();
                 const response = await fetch(this.loadedData.saveRoute, {
                     method: 'POST',
-                    body: this.getSaveAllFormData()
+                    body: this.getSaveAllFormData(),
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 });
                 const contentType = response.headers.get('content-type');
                 if (response.status === 200) {
