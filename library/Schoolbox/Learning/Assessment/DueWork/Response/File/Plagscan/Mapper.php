@@ -23,7 +23,6 @@ use Schoolbox\Resource\Storage\Model as Storage;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * Mapping.
      */
