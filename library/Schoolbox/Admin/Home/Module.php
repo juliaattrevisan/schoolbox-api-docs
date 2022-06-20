@@ -30,6 +30,7 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addGetRoute($router, 'getSslRenewalHelp', $basePath, "/ssl-renewal-help");
         $this->addGetRoute($router, 'getHealthcheck', $basePath, "/healthcheck");
         $this->addGetRoute($router, 'getDisasterRecovery', $basePath, "/disaster-recovery");
         $this->addGetRoute($router, 'dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");

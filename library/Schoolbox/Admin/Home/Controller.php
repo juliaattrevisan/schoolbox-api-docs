@@ -228,6 +228,24 @@ class Controller extends Base
     }
 
     /**
+     * Shows a page of common troubleshooting steps to help users troubleshoot SSL renewal being offline
+     */
+    public function getSslRenewalHelp()
+    {
+        $this->response->content->set(
+            array(
+                'template' => '@adminHome/ssl-renewal-help.twig',
+                'data' => array(
+                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'is_cloud'  => $this->isCloudHosted(),
+                    'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
+                ),
+            )
+        );
+    }
+
+    /**
      * Provides a view of the current external DB health, linked from the admin dashboard
      */
     public function getHealthcheck()

@@ -1,0 +1,14 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">SSL Renewal Help</h2>
+        </div>
+    </div>
+</div>
