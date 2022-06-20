@@ -7061,11 +7061,6 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
 
 		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\Mapper\\:\\:\\$checkPrevious is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Mapper.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
@@ -7624,11 +7619,6 @@ parameters:
 			message: "#^Variable \\$assessmentDataSource in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: tools/assessment/csv.php
-
-		-
-			message: "#^Dead catch \\- League\\\\Flysystem\\\\FileExistsException is never thrown in the try block\\.$#"
-			count: 1
-			path: tools/custom/dcc/pastoral-import.php
 
 		-
 			message: "#^Constant class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:ACCESS_LEVEL_PRIVATE is unused\\.$#"
