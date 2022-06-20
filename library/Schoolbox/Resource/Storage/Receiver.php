@@ -81,7 +81,6 @@ class Receiver implements IReceiver
 
     /**
      * @inheritdoc
-     * @throws FileException if the file is not uploadable
      */
     public function accept(
         string $basename,
@@ -103,11 +102,10 @@ class Receiver implements IReceiver
         }
 
         // Run the safety check
-        $user          = $uploadingUser ?? $this->currentUser;
-        $requireSafety = true;
+        $user = $uploadingUser ?? $this->currentUser;
         if ($user) {
             $requireSafety = !$user->isSuperuser();
-        } elseif (PHP_SAPI === 'cli') {
+        } else {
             $requireSafety = false;
         }
         if ($requireSafety) {

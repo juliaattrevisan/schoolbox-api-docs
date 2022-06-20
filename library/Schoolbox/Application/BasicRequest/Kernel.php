@@ -451,7 +451,8 @@ class Kernel extends WebKernelAbstract
                     'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
                     'sanitizer'              => $di->lazyGet('storage.sanitizer'),
                     'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
-                    'currentUser'            => $di->lazyGet('user'),
+                    // CLI scripts have no current user, thus this is null
+                    'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
                 ],
             )
         );
