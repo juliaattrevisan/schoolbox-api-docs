@@ -64,6 +64,13 @@ class TrimmerTool extends CliTool\App
 
 
     /**
+     * Number of event ids to process, per chunk
+     * TODO: Potentially configurable on as a flag
+     */
+    private const CHUNK_SIZE = 50;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -109,6 +116,16 @@ HELP;
         /* Set 1: Find all the soft-deleted events from everywhere
          */
         $softDeletedEventIds = $this->findSoftDeletedEvents();
+
+        /* Display count of candidate events found
+         * This lets you manually correlate what you might see in workbench explorations
+         */
+        $this->getLogger()->info(sprintf(
+            'Permanently hard-deleting %s soft-deleted event(s)',
+            \count($softDeletedEventIds)
+        ));
+
+        $this->permanentlyDelete($softDeletedEventIds);
 
         /* Set 2: Find old tasscalendar softdeleted remnants
          * These exist because eventmapper softdeleted events
@@ -190,6 +207,33 @@ HELP;
         return $statement->fetchColumnArray('id');
     }
 
+
+    /**
+     * Permanently delete all the set of identifiers, $eventIds,
+     * and all their relationships
+     *
+     * @param array $eventIds
+     * @return void
+     */
+    private function permanentlyDelete(array $eventIds): void
+    {
+        $chunks = array_chunk($eventIds, self::CHUNK_SIZE);
+
+        /*     For each n-sized chunk,
+         *         Refresh lock, giving yourself TTL seconds to process this next set of operations
+         *
+         *         For each event in the chunk,
+         *             if perform mode is enabled,
+         *                 Delete its relationships in the relationship tables:
+         *                 (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
+         *                 event_attendance, event_campus, event_folder, event_role, event_source, event_user
+         *
+         *                 Then delete the event itself
+         *
+         *             Otherwise, in planning mode,
+         *                 log the name of the event and its id as being a candidate for removal
+         */
+    }
 
     /**
      * FIXME Decide whether this script must be run as root
