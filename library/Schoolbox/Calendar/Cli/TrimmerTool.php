@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace SChoolbox\Calendar\Cli;
+namespace Schoolbox\Calendar\Cli;
 
 use Schoolbox\Application\CliTool;
 use Symfony\Component\Lock\LockInterface;
