@@ -69,7 +69,7 @@
         "ext-pdo": "*",
         "ext-posix": "*",
         "firebase/php-jwt": "^5.0",
-        "okta/jwt-verifier": "~1.0",
+        "okta/jwt-verifier": "~1.0, <1.4",
         "ext-openssl": "*",
         "stomp-php/stomp-php": "~5.0.0",
         "cboden/ratchet": "^0.4.1",
