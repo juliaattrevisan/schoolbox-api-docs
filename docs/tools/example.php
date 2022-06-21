@@ -104,7 +104,7 @@ HELP;
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit();
+            exit;
         }
 
         /* FIXME Main algorithm goes here

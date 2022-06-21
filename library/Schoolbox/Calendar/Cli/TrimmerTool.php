@@ -93,11 +93,16 @@ class TrimmerTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Write an explanation about what your tool does and what arguments it accepts
+Dead Event Trimmer finds extraneous events and removes them, along with thie relationships.
 
-Usage: example.php [--flag] [--input mytest.txt]
-        --flag      Example flag (on/off)
-        --input     Example input value (arg which has user-inputted value)
+Dead Event candidtes are those which:
+    * are soft deleted
+    * finished more than 1 year ago
+    * used old suds tassapi source names ParentCalendar, ParentNotice, StudentCalendar, etc. et al.
+    
+There is no planning mode, but you must use --perform to mutate data.
+
+Usage: php trimmer.php [--perform]
 
 
 HELP;
@@ -110,9 +115,9 @@ HELP;
          * specifically check for acquisition
          */
         try {
-            $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit();
+            exit;
         }
 
         /* Set 1: Find all the soft-deleted events from everywhere
