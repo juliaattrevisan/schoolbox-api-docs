@@ -25,7 +25,6 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
