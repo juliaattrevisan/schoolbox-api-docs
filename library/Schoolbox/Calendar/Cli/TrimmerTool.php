@@ -284,7 +284,7 @@ HELP;
                  *     Then delete the event itself
                  */
                 foreach (self::TABLES as $table => $identifier) {
-                    $this->getLogger()->info(sprintf(
+                    $this->getLogger()->debug(sprintf(
                         'Deleting %s candidate events from %s table',
                         \count($chunk),
                         $table
