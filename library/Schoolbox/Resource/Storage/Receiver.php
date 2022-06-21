@@ -134,6 +134,11 @@ class Receiver implements IReceiver
                 $storage,
                 $this->tempFilesystem->readStream($tempLocationInFilesystem),
             );
+//            $this->storageFilesystemProxy->writeFromFilesystemAndLocation(
+//                $storage,
+//                $this->tempFilesystem,
+//                $tempLocationInFilesystem,
+//            );
         }
 
         if (null !== $expiryAt) {
