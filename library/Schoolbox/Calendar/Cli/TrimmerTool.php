@@ -108,6 +108,7 @@ HELP;
 
         /* Set 1: Find all the soft-deleted events from everywhere
          */
+        $softDeletedEventIds = $this->findSoftDeletedEvents();
 
         /* Set 2: Find old tasscalendar softdeleted remnants
          * These exist because eventmapper softdeleted events
@@ -167,6 +168,26 @@ HELP;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+    }
+
+
+    /**
+     * Set 1: Find all the soft-deleted events from everywhere
+     *
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function findSoftDeletedEvents(): array
+    {
+        $statement = $this->getDatabaseInternal()->query("
+           SELECT id
+           FROM `event`
+           WHERE deleted_at IS NOT NULL            
+        ");
+
+        $statement->execute();
+
+        return $statement->fetchColumnArray('id');
     }
 
 
