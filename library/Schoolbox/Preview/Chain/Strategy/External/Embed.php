@@ -19,7 +19,7 @@ class Embed extends Base
      * Test the oEmbed capability
      * http://www.oembed.com/
      *
-     * @return string
+     * @return array
      */
     public function test()
     {
