@@ -73,7 +73,10 @@ class TokenParser
     public function findUserFromToken(string $token): User
     {
         // Parse the token and extract a user from it
-        $decodedToken = $this->jwtVerifier->verify($token);
+        // This line is squelched due to an unfixed warning in 3rd party method
+        // `JwtVerifier::validateClientId`: the eventual solution is to remove
+        // `okta/jwt-verifier` completely, but for now just ignore the warning.
+        $decodedToken = @$this->jwtVerifier->verify($token);
         $claims       = $decodedToken->getClaims();
 
         // The identification in the token seems to be in one of two claims:
