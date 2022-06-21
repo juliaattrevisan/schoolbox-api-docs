@@ -39,7 +39,6 @@ use Schoolbox\User;
 
 abstract class ResourceNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
     const TRIGGER_DELETED = 'deleted';
