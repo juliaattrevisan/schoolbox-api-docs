@@ -148,31 +148,42 @@ HELP;
 //
 //        $this->permanentlyDelete($lock, $softDeletedEventIds);
 
-        /* Set 2: Find old tasscalendar softdeleted remnants
-         * These exist because eventmapper softdeleted events
-         * These were deprecated in favour of using suds_tassapi source name.
-         *
-         * A fix should have already prevented these from being active
-         * (they should already be soft deleted) but check anyway
-         *
-         * Find all the events that used the ancient tasscalendar source names
-         * Any event using these old source names should be permanently deleted:
-         *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
+//        /* Set 2: Find old tasscalendar softdeleted remnants
+//         * These exist because eventmapper softdeleted events
+//         * These were deprecated in favour of using suds_tassapi source name.
+//         *
+//         * A fix should have already prevented these from being active
+//         * (they should already be soft deleted) but check anyway
+//         *
+//         * Find all the events that used the ancient tasscalendar source names
+//         * Any event using these old source names should be permanently deleted:
+//         *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
+//         */
+//        $oldTassEventIds = $this->findOldTassEvents();
+//
+//        /* Display count of candidate events found
+//         * This lets you manually correlate what you might see in workbench explorations
+//         */
+//        $this->getLogger()->info(sprintf(
+//            'Permanently hard-deleting %s old suds tass event(s)',
+//            \count($oldTassEventIds)
+//        ));
+//
+//        $this->permanentlyDelete($lock, $oldTassEventIds);
+
+        /* Set 3: old events that finished more than a year ago
          */
-        $oldTassEventIds = $this->findOldTassEvents();
+        $ancientEventIds = $this->findAncientEvents();
 
         /* Display count of candidate events found
          * This lets you manually correlate what you might see in workbench explorations
          */
         $this->getLogger()->info(sprintf(
-            'Permanently hard-deleting %s old suds tass event(s)',
-            \count($oldTassEventIds)
+            'Permanently hard-deleting %s ancient event(s) that ended ages ago',
+            \count($ancientEventIds)
         ));
 
-        $this->permanentlyDelete($lock, $oldTassEventIds);
-
-        /* Set 3: old events that finished more than a year ago
-         */
+        $this->permanentlyDelete($lock, $ancientEventIds);
 
 //        /* TODO Implement your iterations here, refreshing lock each time
 //         *  This will grant you LOCK_TTL more seconds to do another iteration,
@@ -241,6 +252,28 @@ HELP;
 
         return $statement->fetchColumnArray('id');
     }
+
+
+    /**
+     * Set 3: Find events that finished ages ago
+     * TODO: Interval (ancientness) could be made configurable
+     *
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function findAncientEvents(): array
+    {
+        $statement = $this->getDatabaseInternal()->query("
+           SELECT id
+           FROM `event`
+           WHERE end_datetime < NOW() - INTERVAL 1 YEAR       
+        ");
+
+        $statement->execute();
+
+        return $statement->fetchColumnArray('id');
+    }
+
 
     /**
      * Permanently delete all the set of identifiers, $eventIds,
