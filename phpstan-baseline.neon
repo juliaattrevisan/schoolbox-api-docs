@@ -6376,36 +6376,6 @@ parameters:
 			path: library/Schoolbox/Preview/Chain/Strategy/Base.php
 
 		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\Embed\\:\\:test\\(\\) should return string but returns array\\<string, array\\<string, array\\<string, string\\>\\|string\\>\\|string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Embed.php
-
-		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\Embed\\:\\:test\\(\\) should return string but returns array\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Embed.php
-
-		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\IFrame\\:\\:test\\(\\) should return string but returns array\\<string, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/IFrame.php
-
-		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\IFrame\\:\\:test\\(\\) should return string but returns array\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/IFrame.php
-
-		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\Image\\:\\:test\\(\\) should return string but returns array\\<string, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Image.php
-
-		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\External\\\\Image\\:\\:test\\(\\) should return string but returns array\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/External/Image.php
-
-		-
 			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\IFrame\\:\\:setContentTypes\\(\\) is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/Preview/Chain/Strategy/Internal/IFrame.php
