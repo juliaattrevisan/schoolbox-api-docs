@@ -35,7 +35,6 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
