@@ -657,17 +657,17 @@ class Manager
                     }
                 } else {
                     // Worker Process
-                    $worker = new Worker(
-                        $t->getHash(),
-                        $t->getCacheKey(),
-                        $t->getTransform(),
-                        self::TIMED_OUT_THRESHOLD,
-                        self::IMAGICK_TIME_LIMIT,
-                        $this->retryFailed,
-                        $this->attemptsPerTransform
+                    $command = sprintf(
+                        'php %s %s %s %s %s %s',
+                        escapeshellarg(SITE_root . '/tools/image/worker.php'),
+                        escapeshellarg($t->getHash()),
+                        escapeshellarg($t->getCacheKey()),
+                        escapeshellarg(base64_encode(serialize($t->getTransform()))),
+                        escapeshellarg($this->retryFailed ? '1' : '0'),
+                        escapeshellarg((string)$this->attemptsPerTransform),
                     );
-                    (new CliTool\Kernel($worker, [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]))->runApp();
-                    exit;
+                    passthru($command, $resultCode);
+                    exit($resultCode);
                 }
             }
             usleep(self::SPINLOCK_WAIT_TIME_MICRO);
