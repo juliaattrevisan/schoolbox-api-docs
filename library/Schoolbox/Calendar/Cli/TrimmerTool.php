@@ -91,7 +91,7 @@ class TrimmerTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Dead Event Trimmer finds extraneous events and removes them, along with thi relationships.
+Dead Event Trimmer finds extraneous events and removes them, along with their relationships.
 
 Dead Event candidates are those which:
     * are soft deleted
