@@ -31,7 +31,7 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getParent(string $externalUserId): array
     {
-        if (empty($externalUserId)) {
+        if (!is_numeric($externalUserId)) {
             return [];
         }
 
@@ -74,6 +74,9 @@ class External_Schoolpro_User implements External_UserInterface
 
         if (\count($externalUserIds)) {
             foreach ($externalUserIds as $studentId) {
+                if (!is_numeric($studentId)) {
+                    continue;
+                }
                 /* Get the contacts for $studentId
                  */
                 $vars = [
@@ -125,7 +128,7 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getStudent(string $externalUserId): array
     {
-        if (empty($externalUserId)) {
+        if (!is_numeric($externalUserId)) {
             return [];
         }
 
@@ -224,6 +227,9 @@ class External_Schoolpro_User implements External_UserInterface
         $studentContactList = [];
 
         foreach ($externalUserId as $userId) {
+            if (!is_numeric($userId)) {
+                continue;
+            }
             $vars = [
                 'sbGetStudentContact',
                 [
@@ -296,7 +302,7 @@ class External_Schoolpro_User implements External_UserInterface
     {
         $externalId = $user->getExternalId();
 
-        if (empty($externalId)) {
+        if (!is_numeric($externalId)) {
             return [];
         }
 
@@ -365,7 +371,7 @@ class External_Schoolpro_User implements External_UserInterface
      */
     public function getEnrolledStudents(string $externalUserId): array
     {
-        if (empty($externalUserId)) {
+        if (!is_numeric($externalUserId)) {
             return [];
         }
 
