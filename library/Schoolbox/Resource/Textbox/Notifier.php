@@ -84,6 +84,7 @@ class Notifier extends ResourceNotifier
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.textbox.$resourceId.$action")
+            ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
 
         $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());

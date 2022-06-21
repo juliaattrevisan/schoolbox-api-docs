@@ -234,6 +234,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.$kind.$id.$action")
+            ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
 
         $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
