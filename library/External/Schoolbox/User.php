@@ -19,7 +19,6 @@ use Schoolbox\User;
  */
 class External_Schoolbox_User implements External_UserInterface
 {
-
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
@@ -255,36 +254,45 @@ class External_Schoolbox_User implements External_UserInterface
 
 
     /**
-     * {@inheritDoc}
+     * Get portrait for the user from sis_user_profile, if newer than the existing photo.
+     * Return existing portrait otherwise.
      *
      * @param User $user
      * @return Storage\Model|null
      */
     public function getPortrait(User $user): ?Storage\Model
     {
-        if ($user->getPortrait()) {
+        if (!$user->getExternalId()) {
             return $user->getPortrait();
         }
 
         $hash = $this->internalDatabase->executeQuery(
-            'SELECT portrait_hash
+            'SELECT portrait_hash, updated_at
                 FROM sis_user_profile
                 WHERE external_id = :externalUserId
             ',
             [
                 'externalUserId' => $user->getExternalId(),
             ]
-        )->fetchColumn();
+        )->fetch();
 
-        if ($hash) {
-            $storageMapper = Storage\Mapper::getInstance();
-            try {
-                $portrait = $storageMapper->findByHash($hash);
-                $user->setPortrait($portrait);
-                \Schoolbox\UserMapper::getInstance()->save($user);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // noop
-            }
+        if (
+            !$hash
+            || ($user->getPortrait()
+                && $user->getPortrait()->getCreatedAt()->gt(Alaress_Date_Format::newDatabaseDate($hash['updated_at'])))
+        ) {
+            return $user->getPortrait();
+        }
+
+        // using hash from sis_user_profile table
+
+        $storageMapper = Storage\Mapper::getInstance();
+        try {
+            $portrait = $storageMapper->findByHash($hash['portrait_hash']);
+            $user->setPortrait($portrait);
+            \Schoolbox\UserMapper::getInstance()->save($user);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
         }
 
         return $user->getPortrait();
