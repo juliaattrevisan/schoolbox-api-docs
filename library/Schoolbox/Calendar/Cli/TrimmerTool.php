@@ -134,19 +134,19 @@ HELP;
             exit();
         }
 
-        /* Set 1: Find all the soft-deleted events from everywhere
-         */
-        $softDeletedEventIds = $this->findSoftDeletedEvents();
-
-        /* Display count of candidate events found
-         * This lets you manually correlate what you might see in workbench explorations
-         */
-        $this->getLogger()->info(sprintf(
-            'Permanently hard-deleting %s soft-deleted event(s)',
-            \count($softDeletedEventIds)
-        ));
-
-        $this->permanentlyDelete($lock, $softDeletedEventIds);
+//        /* Set 1: Find all the soft-deleted events from everywhere
+//         */
+//        $softDeletedEventIds = $this->findSoftDeletedEvents();
+//
+//        /* Display count of candidate events found
+//         * This lets you manually correlate what you might see in workbench explorations
+//         */
+//        $this->getLogger()->info(sprintf(
+//            'Permanently hard-deleting %s soft-deleted event(s)',
+//            \count($softDeletedEventIds)
+//        ));
+//
+//        $this->permanentlyDelete($lock, $softDeletedEventIds);
 
         /* Set 2: Find old tasscalendar softdeleted remnants
          * These exist because eventmapper softdeleted events
@@ -159,6 +159,17 @@ HELP;
          * Any event using these old source names should be permanently deleted:
          *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
          */
+        $oldTassEventIds = $this->findOldTassEvents();
+
+        /* Display count of candidate events found
+         * This lets you manually correlate what you might see in workbench explorations
+         */
+        $this->getLogger()->info(sprintf(
+            'Permanently hard-deleting %s old suds tass event(s)',
+            \count($oldTassEventIds)
+        ));
+
+        $this->permanentlyDelete($lock, $oldTassEventIds);
 
         /* Set 3: old events that finished more than a year ago
          */
@@ -205,6 +216,31 @@ HELP;
         return $statement->fetchColumnArray('id');
     }
 
+
+    /**
+     * Set 2: Find all the old tass events which used the old source_names
+     *
+     * These should already have been soft-deleted, resulting in no identifiers
+     * found; but, in the weird instance where they did exist, they should be removed
+     * This guarantees their termination in case e.g. an updated failed, leaving broken data
+     *
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function findOldTassEvents(): array
+    {
+        $statement = $this->getDatabaseInternal()->query("
+           SELECT e.id
+           FROM `event` e
+           INNER JOIN event_source es ON e.id = es.event_id
+           WHERE e.deleted_at IS NOT NULL
+           AND es.source_name IN ('ParentCalendar', 'ParentNotices', 'StudentCalendar', 'StudentNotices', 'TeacherCalendar', 'TeacherNotices')            
+        ");
+
+        $statement->execute();
+
+        return $statement->fetchColumnArray('id');
+    }
 
     /**
      * Permanently delete all the set of identifiers, $eventIds,
