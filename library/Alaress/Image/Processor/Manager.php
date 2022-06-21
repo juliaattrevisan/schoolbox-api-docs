@@ -60,7 +60,7 @@ class Manager
     // If a transformation is 'processing' and was last updated greater than this number of seconds ago,
     // assume it has died and attempt another transformation.
     // TODO expose as CLI option
-    private const TIMED_OUT_THRESHOLD = 300;
+    public const TIMED_OUT_THRESHOLD = 300;
 
     // List of transformations that we will generate for each image
     private const CUSTOM_TRANSFORMS  = [
@@ -77,7 +77,7 @@ class Manager
     private const SPINLOCK_WAIT_TIME_MICRO = 5000;
 
     // How many seconds should CLI have to process a single transformation
-    private const IMAGICK_TIME_LIMIT = 3600;
+    public const IMAGICK_TIME_LIMIT = 3600;
 
     // If file is GIF and larger than this, only allow 1 simultaneous execution
     private const MUTEX_FILESIZE_LIMIT_BYTES = 1000000;
