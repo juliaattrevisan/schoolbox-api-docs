@@ -42,7 +42,12 @@ class CSV extends AbstractCSV
         foreach ($assessmentSpecs as $assessmentSpec) {
             $mark = '';
             if (key_exists($assessmentSpec->getId(), $courseAverages)) {
-                $mark = sprintf("%6.2f %%", $courseAverages[$assessmentSpec->getId()]['published']);
+                /* There isn't a published feedback
+                 * Nothing to show; exit early
+                 */
+                if (isset($courseAverages[$assessmentSpec->getId()]['published'])) {
+                    $mark = sprintf("%6.2f %%", $courseAverages[$assessmentSpec->getId()]['published']);
+                }
             }
             $courseAverageData = $this->appendData($courseAverageData, $assessmentSpec, $mark);
         }
@@ -70,7 +75,12 @@ class CSV extends AbstractCSV
                 $mark           = '';
                 $assessmentImpl = $classAssessments->offsetGet($assessmentSpec->getId());
                 if ($assessmentImpl && key_exists($assessmentImpl->getId(), $classAverages)) {
-                    $mark = sprintf("%6.2f %%", $classAverages[$assessmentImpl->getId()]['published']);
+                    /* There isn't a published feedback
+                     * Nothing to show; exit early
+                     */
+                    if (isset($classAverages[$assessmentImpl->getId()]['published'])) {
+                        $mark = sprintf("%6.2f %%", $classAverages[$assessmentImpl->getId()]['published']);
+                    }
                 }
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
             }
@@ -83,11 +93,22 @@ class CSV extends AbstractCSV
             $this->exportRow($rowHeaders, $classAveragesData);
             // Per Students
             foreach (($courseMarkbook->getCourseImportStudents())[$class->getId()] as $student) {
+                $studentAverageMark = '-';
+
+                if (isset($studentAverageMarks[$student->getId()])) {
+                    /* There isn't a published feedback
+                     * Nothing to show; exit early
+                     */
+                    if (isset($studentAverageMarks[$student->getId()]['published']['hr'])) {
+                        $studentAverageMark = $studentAverageMarks[$student->getId()]['published']['hr'];
+                    }
+                }
+
                 $studentData = [
                     $student->getExternalId(),
                     $student->getFirstname(),
                     $student->getLastname(),
-                    isset($studentAverageMarks[$student->getId()]) ? $studentAverageMarks[$student->getId()]['published']['hr'] : '-',
+                    $studentAverageMark
                 ];
                 if ($this->viewRank) {
                     array_push($studentData, $rank[$student->getId()]);
@@ -172,6 +193,13 @@ class CSV extends AbstractCSV
      */
     private function appendStudentMarks(array $row, IAssessable $assessment, IAssessable $assessmentImpl, array $currentMark, User $student): array
     {
+        /* There isn't a published feedback
+         * Nothing to show; exit early
+         */
+        if (!isset($currentMark['published'])) {
+            return [];
+        }
+
         $humanReadableMark = $currentMark['published']['hr'];
         if ($this->hasTotalMarkColumn($assessment)) {
             $row[] = $this->parseNumerator($humanReadableMark);
