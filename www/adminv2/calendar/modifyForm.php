@@ -65,7 +65,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
             /* Update and save config
              */
-            $config->setLabel($attribs['label']);
+            $config->setLabel(trim($attribs['label']));
             $configRecord->updateConfig($config);
             Calendar_Api_Config_Mapper::getInstance()->save([$configRecord]);
         }
