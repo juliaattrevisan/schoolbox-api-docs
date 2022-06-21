@@ -35,7 +35,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class CanBookItem implements Rule\IAuthorizationRule
 {
-
     /**
      * @var Item\Mapper
      */
@@ -60,7 +59,7 @@ class CanBookItem implements Rule\IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         // TODO simplify this rule, and define it as separate ones
-        if ($params['item'] instanceof Item\Model) {
+        if (($params['item'] ?? null) instanceof Item\Model) {
 
             /** @var Item\Model $item */
             $item = $params['item'];
