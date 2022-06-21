@@ -134,42 +134,44 @@ HELP;
             exit();
         }
 
-//        /* Set 1: Find all the soft-deleted events from everywhere
-//         */
-//        $softDeletedEventIds = $this->findSoftDeletedEvents();
-//
-//        /* Display count of candidate events found
-//         * This lets you manually correlate what you might see in workbench explorations
-//         */
-//        $this->getLogger()->info(sprintf(
-//            'Permanently hard-deleting %s soft-deleted event(s)',
-//            \count($softDeletedEventIds)
-//        ));
-//
-//        $this->permanentlyDelete($lock, $softDeletedEventIds);
+        /* Set 1: Find all the soft-deleted events from everywhere
+         */
+        $softDeletedEventIds = $this->findSoftDeletedEvents();
 
-//        /* Set 2: Find old tasscalendar softdeleted remnants
-//         * These exist because eventmapper softdeleted events
-//         * These were deprecated in favour of using suds_tassapi source name.
-//         *
-//         * A fix should have already prevented these from being active
-//         * (they should already be soft deleted) but check anyway
-//         *
-//         * Find all the events that used the ancient tasscalendar source names
-//         * Any event using these old source names should be permanently deleted:
-//         *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
-//         */
-//        $oldTassEventIds = $this->findOldTassEvents();
-//
-//        /* Display count of candidate events found
-//         * This lets you manually correlate what you might see in workbench explorations
-//         */
-//        $this->getLogger()->info(sprintf(
-//            'Permanently hard-deleting %s old suds tass event(s)',
-//            \count($oldTassEventIds)
-//        ));
-//
-//        $this->permanentlyDelete($lock, $oldTassEventIds);
+        /* Display count of candidate events found
+         * This lets you manually correlate what you might see in workbench explorations
+         */
+        $this->getLogger()->info(sprintf(
+            'Permanently hard-deleting %s soft-deleted event(s)',
+            \count($softDeletedEventIds)
+        ));
+
+        $this->permanentlyDelete($lock, $softDeletedEventIds);
+
+
+        /* Set 2: Find old tasscalendar softdeleted remnants
+         * These exist because eventmapper softdeleted events
+         * These were deprecated in favour of using suds_tassapi source name.
+         *
+         * A fix should have already prevented these from being active
+         * (they should already be soft deleted) but check anyway
+         *
+         * Find all the events that used the ancient tasscalendar source names
+         * Any event using these old source names should be permanently deleted:
+         *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
+         */
+        $oldTassEventIds = $this->findOldTassEvents();
+
+        /* Display count of candidate events found
+         * This lets you manually correlate what you might see in workbench explorations
+         */
+        $this->getLogger()->info(sprintf(
+            'Permanently hard-deleting %s old suds tass event(s)',
+            \count($oldTassEventIds)
+        ));
+
+        $this->permanentlyDelete($lock, $oldTassEventIds);
+
 
         /* Set 3: old events that finished more than a year ago
          */
