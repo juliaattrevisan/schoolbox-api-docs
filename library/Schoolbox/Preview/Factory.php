@@ -76,7 +76,9 @@ class Factory
             /* External Chain
              */
             $result = (new External($url->getUrl()))->getResult();
-            $result['src'] = $this->translator->translate($result['src']);
+            if (isset($result['src'])) {
+                $result['src'] = $this->translator->translate($result['src']);
+            }
         }
 
         /* Set up html fragment
@@ -84,7 +86,7 @@ class Factory
         $fragment = null;
 
         if (($result['type'] ?? null) !== 'inline') {
-            $fragment = $result['src'];
+            $fragment = $result['src'] ?? null;
         }
 
         return [

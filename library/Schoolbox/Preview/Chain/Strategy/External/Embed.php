@@ -31,7 +31,7 @@ class Embed extends Base
         if ($embedCode != $this->getUrl()) {
             return [
                 'type' => 'inline',
-                'src'  => $embedCode,
+                'src'  => null,
                 'twig' => [
                     'template' => '@preview/Strategy/External/Embed.twig',
                     'data' => [
