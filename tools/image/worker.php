@@ -13,18 +13,18 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-[, $hash, $cacheKey, $transform, $retryFailed, $attemptsPerTransform] = $argv;
-if (!isset($hash, $cacheKey, $transform, $retryFailed, $attemptsPerTransform)) {
-    printf("At least 5 parameters must be passed: received %d\n", $argc - 1);
+$opts = getopt('', ['hash:', 'cache-key:', 'transform:', 'retry-failed', 'attempts:']);
+if (!isset($opts['hash'], $opts['cache-key'], $opts['transform'], $opts['attempts'])) {
+    printf("The following parameters must be provided: hash, cache-key, transform, attempts\n");
     exit(1);
 }
 $worker = new Worker(
-    $hash,
-    $cacheKey,
-    unserialize(base64_decode($transform)),
+    $opts['hash'],
+    $opts['cache-key'],
+    unserialize(base64_decode($opts['transform'])),
     Manager::TIMED_OUT_THRESHOLD,
     Manager::IMAGICK_TIME_LIMIT,
-    (bool)$retryFailed,
-    (int)$attemptsPerTransform,
+    (bool)($opts['retry-failed'] ?? false),
+    (int)$opts['attempts'],
 );
 (new CliTool\Kernel($worker, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();

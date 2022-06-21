@@ -16,13 +16,13 @@ use Alaress\Image;
 use Alaress\Image\Transformation\ITransformFactory;
 use Alaress\Lock\InstanceLockFactory;
 use InvalidArgumentException;
+use Monolog\Logger;
 use OutOfBoundsException;
 use PDO;
 use PDOException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External as SchoolboxExternal;
 use Schoolbox\Resource\FilesystemFactory;
@@ -657,13 +657,20 @@ class Manager
                     }
                 } else {
                     // Worker Process
+                    $verbosity = match ($this->logLevel) {
+                        Logger::DEBUG  => '-vvv',
+                        Logger::INFO   => '-vv',
+                        Logger::NOTICE => '-v',
+                        default        => '',
+                    };
                     $command = sprintf(
-                        'php %s %s %s %s %s %s',
+                        'php %s %s --hash %s --cache-key %s --transform %s %s --attempts %s',
                         escapeshellarg(SITE_root . '/tools/image/worker.php'),
+                        $verbosity,
                         escapeshellarg($t->getHash()),
                         escapeshellarg($t->getCacheKey()),
                         escapeshellarg(base64_encode(serialize($t->getTransform()))),
-                        escapeshellarg($this->retryFailed ? '1' : '0'),
+                        ($this->retryFailed ? '--retry-failed' : ''),
                         escapeshellarg((string)$this->attemptsPerTransform),
                     );
                     passthru($command, $resultCode);
