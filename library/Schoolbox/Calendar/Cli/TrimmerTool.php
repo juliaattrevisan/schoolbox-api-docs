@@ -73,6 +73,25 @@ class TrimmerTool extends CliTool\App
 
 
     /**
+     * A list of all schema where an event might exist
+     * These are mutated in-order
+     */
+    private const TABLES = [
+        'event_attendance' => 'event_id',
+        'event_campus' => 'event_id',
+        'event_folder' => 'event_id',
+        'event_role' => 'event_id',
+        'event_source' => 'event_id',
+        'event_user' => 'event_id',
+        /* This must be last and can only be deleted once we've removed
+         * all the foreign key dependencies
+         */
+        'event' => 'id'
+    ];
+
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -144,29 +163,6 @@ HELP;
         /* Set 3: old events that finished more than a year ago
          */
 
-        /* For each set of identifiers,
-         *     (The list of identifiers could contain literally zillions of event ids
-         *     where each event has FKs everywhere, so we'll have to do them in groups
-         *     Do 500 events at a time, I guess, by chunking this list)
-         *
-         *     Display count of candidate events found
-         *     This lets you manually correlate what you might see in workbench explorations
-         *
-         *     For each n-sized chunk,
-         *         Refresh lock, giving yourself TTL seconds to process this next set of operations
-         *
-         *         For each event in the chunk,
-         *             if perform mode is enabled,
-         *                 Delete its relationships in the relationship tables:
-         *                 (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
-         *                 event_attendance, event_campus, event_folder, event_role, event_source, event_user
-         *
-         *                 Then delete the event itself
-         *
-         *             Otherwise, in planning mode,
-         *                 log the name of the event and its id as being a candidate for removal
-         */
-
 //        /* TODO Implement your iterations here, refreshing lock each time
 //         *  This will grant you LOCK_TTL more seconds to do another iteration,
 //         *  until the script unlocks itself
@@ -217,6 +213,7 @@ HELP;
      * @param LockInterface $lock
      * @param array         $eventIds
      * @return void
+     * @throws \Alaress\Database\Exception
      * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
      * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      */
@@ -229,19 +226,37 @@ HELP;
          */
         foreach ($chunks as $chunk) {
             $lock->refresh();
-        }
 
-        /*         For each event in the chunk,
-         *             if perform mode is enabled,
-         *                 Delete its relationships in the relationship tables:
-         *                 (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
-         *                 event_attendance, event_campus, event_folder, event_role, event_source, event_user
-         *
-         *                 Then delete the event itself
-         *
-         *             Otherwise, in planning mode,
-         *                 log the name of the event and its id as being a candidate for removal
-         */
+            /* Prep them for a query
+             */
+            $ids = implode(',', $chunk);
+
+            /* Only execute mutations if you're in perform mode
+             */
+            if ($this->perform()) {
+                /* For each event in the chunk,
+                 *     Delete its relationships in the relationship tables:
+                 *     (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
+                 *     event_attendance, event_campus, event_folder, event_role, event_source, event_user
+                 *
+                 *     Then delete the event itself
+                 */
+                foreach (self::TABLES as $table => $identifier) {
+                    $this->getLogger()->info(sprintf(
+                        'Deleting %s candidate events from %s table',
+                        \count($chunk),
+                        $table
+                    ));
+
+                    $statement = $this->getDatabaseInternal()->query("
+                        DELETE FROM {$table}
+                        WHERE {$identifier} IN ({$ids})
+                    ");
+
+                    $statement->execute();
+                }
+            }
+        }
     }
 
     /**
