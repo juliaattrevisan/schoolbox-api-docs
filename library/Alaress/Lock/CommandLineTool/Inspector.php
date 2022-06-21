@@ -15,7 +15,7 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use SChoolbox\Calendar\Cli\TrimmerTool;
+use Schoolbox\Calendar\Cli\TrimmerTool;
 use Schoolbox\Clipboard\Cli\ImporterTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
