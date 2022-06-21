@@ -28,7 +28,7 @@ class Image extends Base
     /**
      * Test the Content-Types
      *
-     * @return string
+     * @return array
      */
     public function test()
     {

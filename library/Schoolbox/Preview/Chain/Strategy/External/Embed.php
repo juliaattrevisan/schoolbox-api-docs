@@ -19,7 +19,7 @@ class Embed extends Base
      * Test the oEmbed capability
      * http://www.oembed.com/
      *
-     * @return string
+     * @return array
      */
     public function test()
     {
@@ -31,6 +31,7 @@ class Embed extends Base
         if ($embedCode != $this->getUrl()) {
             return [
                 'type' => 'inline',
+                'src'  => null,
                 'twig' => [
                     'template' => '@preview/Strategy/External/Embed.twig',
                     'data' => [

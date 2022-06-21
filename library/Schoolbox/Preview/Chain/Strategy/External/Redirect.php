@@ -17,6 +17,8 @@ class Redirect extends Base
      * Base case
      *
      * Just redirect to the location via twig
+     *
+     * @return array
      */
     public function test()
     {
