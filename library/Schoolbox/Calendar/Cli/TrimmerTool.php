@@ -92,9 +92,9 @@ class TrimmerTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Dead Event Trimmer finds extraneous events and removes them, along with thie relationships.
+Dead Event Trimmer finds extraneous events and removes them, along with thi relationships.
 
-Dead Event candidtes are those which:
+Dead Event candidates are those which:
     * are soft deleted
     * finished more than 1 year ago
     * used old suds tassapi source names ParentCalendar, ParentNotices, StudentCalendar, etc. et al.
@@ -171,6 +171,11 @@ HELP;
         ));
 
         $this->permanentlyDelete($lock, $ancientEventIds);
+
+
+        /* Add more data sets here, as needed
+         */
+
 
         /* We're outta here
          */
