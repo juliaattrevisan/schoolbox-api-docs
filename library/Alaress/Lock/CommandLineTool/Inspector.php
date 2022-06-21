@@ -15,6 +15,7 @@ use External\Canvas\Importer\Cli\AnnouncementsTool;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use SChoolbox\Calendar\Cli\TrimmerTool;
 use Schoolbox\Clipboard\Cli\ImporterTool;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
@@ -93,6 +94,10 @@ class Inspector extends CliTool\App
         /* Expired Storage Removal Tool
          */
         ExpiryTool::EXPIRED_STORAGE_REMOVAL_LOCK_NAME => 'Expired Storage Removal Tool (./tools/storage/expired-storage-removal.php)',
+
+        /* Dead Event Trimmer
+         */
+        TrimmerTool::LOCK_NAME => 'Dead Event Trimmer Tool (./tools/calendar/trimmer.php)',
     ];
 
 
