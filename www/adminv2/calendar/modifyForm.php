@@ -41,7 +41,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             } elseif ($config instanceof Calendar_Api_Config_Connector_Vcal) {
                 /* Add urls
                  */
-                $config->setUrl($attribs['url']);
+                //trim the url as the front end won't always catch the whitespace in the url
+                $config->setUrl(trim($attribs['url']));
                 $config->setAuthorization($attribs['authorization']);
 
 
@@ -64,7 +65,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
             /* Update and save config
              */
-            $config->setLabel($attribs['label']);
+            $config->setLabel(trim($attribs['label']));
             $configRecord->updateConfig($config);
             Calendar_Api_Config_Mapper::getInstance()->save([$configRecord]);
         }
