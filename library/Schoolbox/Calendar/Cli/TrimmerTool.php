@@ -97,7 +97,7 @@ Dead Event Trimmer finds extraneous events and removes them, along with thie rel
 Dead Event candidtes are those which:
     * are soft deleted
     * finished more than 1 year ago
-    * used old suds tassapi source names ParentCalendar, ParentNotice, StudentCalendar, etc. et al.
+    * used old suds tassapi source names ParentCalendar, ParentNotices, StudentCalendar, etc. et al.
     
 There is no planning mode, but you must use --perform to mutate data.
 
@@ -206,6 +206,8 @@ HELP;
      * These should already have been soft-deleted, resulting in no identifiers
      * found; but, in the weird instance where they did exist, they should be removed
      * This guarantees their termination in case e.g. an updated failed, leaving broken data
+     *
+     * TODO You can remove this set once they no longer exist in the wild
      *
      * @return array
      * @throws \Alaress\Database\Exception
