@@ -92,7 +92,7 @@ config:
 
   #Comms
   comms_comments_enabled: { hide: false }
-  comms_statistics_enabled : {value: false, hide: true}
+  comms_statistics_enabled : {value: true, hide: true}
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
   push_notifications_enabled: { edit: true }
