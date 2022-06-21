@@ -31,7 +31,7 @@ class TrimmerTool extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const MY_TOOL_LOCK_NAME = 'example';
+    public const LOCK_NAME = 'event_trimmer';
 
 
     /**
@@ -47,22 +47,6 @@ class TrimmerTool extends CliTool\App
      * Print help text for those who don't know how to use this tool
      */
     private const OPT_LONG_HELP = 'help';
-
-
-    /**
-     * --flag
-     *
-     * An example arg that's a boolean on/off
-     */
-    private const OPT_LONG_FLAG = 'flag';
-
-
-    /**
-     * --input
-     *
-     * An example arg that has an actual value, denoted by the colon
-     */
-    private const OPT_LONG_INPUT = 'input:';
 
 
     /**
@@ -90,7 +74,6 @@ class TrimmerTool extends CliTool\App
     ];
 
 
-
     /**
      * @inheritdoc
      */
@@ -98,8 +81,6 @@ class TrimmerTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FLAG,
-            self::OPT_LONG_INPUT
         ];
     }
 
@@ -187,23 +168,8 @@ HELP;
 
         $this->permanentlyDelete($lock, $ancientEventIds);
 
-//        /* TODO Implement your iterations here, refreshing lock each time
-//         *  This will grant you LOCK_TTL more seconds to do another iteration,
-//         *  until the script unlocks itself
-//         */
-//        try {
-//            for ($i = 0; $i < 10; $i++) {
-//                $this->refreshLock($lock);
-//
-//                /* Your logic goes here
-//                 */
-//            }
-//        } catch (\Alaress\Lock\LockRefreshException $e) {
-//            /* Lock TTL expired; just leave politely
-//             */
-//            exit();
-//        }
-
+        /* We're outta here
+         */
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
