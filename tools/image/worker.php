@@ -11,15 +11,17 @@ use Alaress\Image\Processor\Manager;
 use Alaress\Image\Processor\Worker;
 use Schoolbox\Application\CliTool;
 
-[$hash, $cacheKey, $transform, $retryFailed, $attemptsPerTransform] = $argv;
+require_once __DIR__ . '/../../conf/core/require.php';
+
+[, $hash, $cacheKey, $transform, $retryFailed, $attemptsPerTransform] = $argv;
 if (!isset($hash, $cacheKey, $transform, $retryFailed, $attemptsPerTransform)) {
-    printf("At least 5 parameters must be passed: received %d\n", $argc);
+    printf("At least 5 parameters must be passed: received %d\n", $argc - 1);
     exit(1);
 }
 $worker = new Worker(
     $hash,
     $cacheKey,
-    $transform,
+    unserialize(base64_decode($transform)),
     Manager::TIMED_OUT_THRESHOLD,
     Manager::IMAGICK_TIME_LIMIT,
     (bool)$retryFailed,
