@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace SChoolbox\Calendar\Cli;
 
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\LockInterface;
+
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 
@@ -125,7 +127,7 @@ HELP;
             \count($softDeletedEventIds)
         ));
 
-        $this->permanentlyDelete($softDeletedEventIds);
+        $this->permanentlyDelete($lock, $softDeletedEventIds);
 
         /* Set 2: Find old tasscalendar softdeleted remnants
          * These exist because eventmapper softdeleted events
@@ -212,17 +214,24 @@ HELP;
      * Permanently delete all the set of identifiers, $eventIds,
      * and all their relationships
      *
-     * @param array $eventIds
+     * @param LockInterface $lock
+     * @param array         $eventIds
      * @return void
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      */
-    private function permanentlyDelete(array $eventIds): void
+    private function permanentlyDelete(LockInterface $lock, array $eventIds): void
     {
         $chunks = array_chunk($eventIds, self::CHUNK_SIZE);
 
-        /*     For each n-sized chunk,
-         *         Refresh lock, giving yourself TTL seconds to process this next set of operations
-         *
-         *         For each event in the chunk,
+        /* For each n-sized chunk,
+         * Refresh lock, giving yourself TTL seconds to process this next set of operations
+         */
+        foreach ($chunks as $chunk) {
+            $lock->refresh();
+        }
+
+        /*         For each event in the chunk,
          *             if perform mode is enabled,
          *                 Delete its relationships in the relationship tables:
          *                 (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
