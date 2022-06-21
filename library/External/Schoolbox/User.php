@@ -254,7 +254,8 @@ class External_Schoolbox_User implements External_UserInterface
 
 
     /**
-     * {@inheritDoc}
+     * Get portrait for the user from sis_user_profile, if newer than the existing photo.
+     * Return existing portrait otherwise.
      *
      * @param User $user
      * @return Storage\Model|null
