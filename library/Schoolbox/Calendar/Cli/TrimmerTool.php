@@ -97,7 +97,7 @@ HELP;
 
         /* Decide how loudly to announce lock acquisition failure
          *
-         * Simply using $lock = $this->>acquireLock() will keep you safe, even if you don't
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
          * specifically check for acquisition
          */
         try {
@@ -106,26 +106,63 @@ HELP;
             exit();
         }
 
-        /* FIXME Main algorithm goes here
+        /* Set 1: Find all the soft-deleted events from everywhere
          */
-        $this->getLogger()->info('Script commencing.');
 
-        /* TODO Implement your iterations here, refreshing lock each time
-         *  This will grant you LOCK_TTL more seconds to do another iteration,
-         *  until the script unlocks itself
+        /* Set 2: Find old tasscalendar softdeleted remnants
+         * These exist because eventmapper softdeleted events
+         * These were deprecated in favour of using suds_tassapi source name.
+         *
+         * A fix should have already prevented these from being active
+         * (they should already be soft deleted) but check anyway
+         *
+         * Find all the events that used the ancient tasscalendar source names
+         * Any event using these old source names should be permanently deleted:
+         *     ParentCalendar, ParentNotices, StudentCalendar, StudentNotices, TeacherCalendar, TeacherNotices
          */
-        try {
-            for ($i = 0; $i < 10; $i++) {
-                $this->refreshLock($lock);
 
-                /* Your logic goes here
-                 */
-            }
-        } catch (\Alaress\Lock\LockRefreshException $e) {
-            /* Lock TTL expired; just leave politely
-             */
-            exit();
-        }
+        /* Set 3: old events that finished more than a year ago
+         */
+
+        /* For each set of identifiers,
+         *     (The list of identifiers could contain literally zillions of event ids
+         *     where each event has FKs everywhere, so we'll have to do them in groups
+         *     Do 500 events at a time, I guess, by chunking this list)
+         *
+         *     Display count of candidate events found
+         *     This lets you manually correlate what you might see in workbench explorations
+         *
+         *     For each n-sized chunk,
+         *         Refresh lock, giving yourself TTL seconds to process this next set of operations
+         *
+         *         For each event in the chunk,
+         *             if perform mode is enabled,
+         *                 Delete its relationships in the relationship tables:
+         *                 (can probably fit this into a series of chunked deletion join WHERE event.id IN ...)
+         *                 event_attendance, event_campus, event_folder, event_role, event_source, event_user
+         *
+         *                 Then delete the event itself
+         *
+         *             Otherwise, in planning mode,
+         *                 log the name of the event and its id as being a candidate for removal
+         */
+
+//        /* TODO Implement your iterations here, refreshing lock each time
+//         *  This will grant you LOCK_TTL more seconds to do another iteration,
+//         *  until the script unlocks itself
+//         */
+//        try {
+//            for ($i = 0; $i < 10; $i++) {
+//                $this->refreshLock($lock);
+//
+//                /* Your logic goes here
+//                 */
+//            }
+//        } catch (\Alaress\Lock\LockRefreshException $e) {
+//            /* Lock TTL expired; just leave politely
+//             */
+//            exit();
+//        }
 
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');

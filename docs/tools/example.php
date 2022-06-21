@@ -98,7 +98,7 @@ HELP;
 
         /* Decide how loudly to announce lock acquisition failure
          *
-         * Simply using $lock = $this->>acquireLock() will keep you safe, even if you don't
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
          * specifically check for acquisition
          */
         try {
