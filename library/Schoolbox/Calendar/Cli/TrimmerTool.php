@@ -13,7 +13,6 @@ namespace SChoolbox\Calendar\Cli;
 use Schoolbox\Application\CliTool;
 use Symfony\Component\Lock\LockInterface;
 
-
 require_once __DIR__ . '/../../../../conf/core/require.php';
 
 /**
@@ -53,7 +52,7 @@ class TrimmerTool extends CliTool\App
      * Number of event ids to process, per chunk
      * TODO: Potentially configurable on as a flag
      */
-    private const CHUNK_SIZE = 50;
+    private const CHUNK_SIZE = 500;
 
 
     /**
