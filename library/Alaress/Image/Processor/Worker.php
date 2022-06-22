@@ -21,6 +21,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\File as SchoolboxFile;
 use Schoolbox\Instance;
 use Schoolbox\Mapper as SchoolboxMapper;
@@ -33,9 +34,18 @@ use Throwable;
  * The worker process logic used by the background cron job that pre-transforms images
  *
  * A new worker is spawned for every distinct transformation.
+ *
+ * Not intended to be called directly by end users: this should be called only
+ * by the image processor.
  */
 class Worker extends CliTool\App
 {
+    private const OPT_LONG_HASH         = 'hash:';
+    private const OPT_LONG_CACHE_KEY    = 'cache-key:';
+    private const OPT_LONG_TRANSFORM    = 'transform:';
+    private const OPT_LONG_RETRY_FAILED = 'retry-failed';
+    private const OPT_LONG_ATTEMPTS     = 'attempts';
+
     /**
      * The original file hash
      *
@@ -122,6 +132,19 @@ class Worker extends CliTool\App
         return 'www-data';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HASH,
+            self::OPT_LONG_CACHE_KEY,
+            self::OPT_LONG_TRANSFORM,
+            self::OPT_LONG_RETRY_FAILED,
+            self::OPT_LONG_ATTEMPTS,
+        ];
+    }
 
     /** @inheritDoc */
     public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
@@ -168,10 +191,31 @@ class Worker extends CliTool\App
      */
     public function run(): void
     {
-        $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$this->hash}, CacheKey: '{$this->cacheKey}'"));
+        $hash = $this->getOpt(self::OPT_LONG_HASH);
+        if (!isset($hash)) {
+            $this->getLogger()->error('A hash must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $cacheKey = $this->getOpt(self::OPT_LONG_CACHE_KEY);
+        if (!isset($cacheKey)) {
+            $this->getLogger()->error('A cache-key must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $transform = $this->getOpt(self::OPT_LONG_TRANSFORM);
+        if (!isset($transform)) {
+            $this->getLogger()->error('A transform must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $transform = unserialize(base64_decode($transform));
+        if (!$transform instanceof ITransform) {
+            $this->getLogger()->error('A transform must be provided, and a base64-encoded serialized ITransform instance');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
         $hashObject = $this->fetchHashObject();
         if ($hashObject) {
-            $this->generateTransform($hashObject, $this->cacheKey, $this->transform);
+            $this->generateTransform($hashObject, $cacheKey, $transform);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
