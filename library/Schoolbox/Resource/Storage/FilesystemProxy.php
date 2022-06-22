@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage;
 
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
@@ -118,12 +117,11 @@ class FilesystemProxy
 
         $hash = $this->hashGenerator->generateHash($resource);
         $path = self::getPathFromHash($hash);
-        try {
+        // The file may already exist in the storage backend.
+        // This is fine, because the storage file's contents determine the
+        // file path: we can assume it's the same file.
+        if (!$this->filesystem->fileExists($path)) {
             $this->filesystem->writeStream($path, $resource, $config);
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
-            // This is fine, because the storage file's contents determine the
-            // file path: we can assume it's the same file.
         }
 
         // Put it in the filesystem, and also the storage
@@ -176,26 +174,18 @@ class FilesystemProxy
         }
 
         // Otherwise, copy the new file into storage
-        try {
-            $mountManager = new MountManager([
-                FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
-                FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
-            ]);
-            $mountManager->move(
-                FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
-                FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
-            );
-            // @phpstan-ignore-next-line: move() can throw this exception
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
-            // This is fine, because the storage file's contents determine the
-            // file path: we can assume it's the same file.
-            try {
-                $tempFilesystem->delete($tempPath);
-            } catch (FileNotFoundException $e2) {
-                // The temp file didn't exist after all: that's fine too
-            }
-        }
+        $mountManager = new MountManager([
+            FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
+            FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
+        ]);
+        $mountManager->move(
+            FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
+            FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
+        );
+        // The file may already exist in the storage backend.
+        // This is fine, because the storage file's contents determine the
+        // file path: we can assume it's the same file.
+        // @phpstan-ignore-next-line: move() can throw this exception
         $this->updateStorage($storage, $hash, $storagePath);
     }
 

@@ -22,7 +22,6 @@ use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
-use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemAdapter;
 use OverflowException;
@@ -107,7 +106,6 @@ class Processor
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws ConcurrentTransformationException
-     * @throws FileExistsException
      */
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
@@ -210,7 +208,6 @@ class Processor
             );
         } catch (
             FileNotFoundException
-            | FileExistsException
             | ImagineException\OutOfBoundsException
             | ImagineException\RuntimeException
             | OverflowException
@@ -252,7 +249,6 @@ class Processor
      * @param string            $transformPath
      * @return int
      * @throws CorruptImageException
-     * @throws FileExistsException
      * @throws FileNotFoundException If original storage file not found on disk
      * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException

@@ -94,7 +94,6 @@ class Migration extends CliTool\App
     /**
      * @inheritDoc
      * @throws AlaressDatabase\Exception
-     * @throws Flysystem\FileExistsException
      * @throws InvalidArgumentException
      * @throws \Psr\Log\InvalidArgumentException
      */
@@ -126,7 +125,6 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
-     * @throws Flysystem\FileExistsException
      * @throws AlaressDatabase\Exception
      * @throws \Psr\Log\InvalidArgumentException
      */
@@ -252,7 +250,6 @@ class Migration extends CliTool\App
      *
      * @param string $hash
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
-     * @throws Flysystem\FileExistsException
      */
     private function migrateFile(string $hash): bool
     {
@@ -298,7 +295,6 @@ class Migration extends CliTool\App
      *
      * @param string $filepathLocalAbsolute
      * @return bool Whether the move was successful
-     * @throws Flysystem\FileExistsException
      */
     private function moveFileToS3(string $filepathLocalAbsolute): bool
     {

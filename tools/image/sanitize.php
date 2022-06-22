@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use League\Flysystem\FileExistsException;
 use League\Flysystem\FilesystemAdapter;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -62,11 +61,7 @@ $app = new class extends CliTool\App {
                     // path should match its hash, but it's the only viable way
                     // so far to ensure the sanitised content is accessible via
                     // its original hash.
-                    try {
-                        $storageFilesystem->write($path, $result);
-                    } catch (FileExistsException $e) {
-                        $storageFilesystem->update($path, $result);
-                    }
+                    $storageFilesystem->write($path, $result);
                 }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
