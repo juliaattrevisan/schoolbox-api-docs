@@ -35,7 +35,6 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
@@ -347,8 +346,9 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if ($booking->getResource()->canUserModerateThisItem($this->getUser())) {
+                if ($booking->getResource()->canUserModerateThisItem($this->getUser()) && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()) {
                     /* If you're a Moderator and can moderate this request,
+                     * and you created the booking in the first place,
                      * set it to Approved - otherwise you'll end up approving your own request anyway
                      */
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
@@ -605,8 +605,9 @@ class Controller extends Base
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
             $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-        } elseif ($resource->canUserModerateThisItem($this->getUser())) {
+        } elseif ($resource->canUserModerateThisItem($this->getUser()) && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()) {
             /* If you're a Moderator and can moderate this request,
+             * and you created the booking in the first place,
              * set it to Approved - otherwise you'll end up approving your own request anyway
              */
             $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
