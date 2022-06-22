@@ -138,7 +138,10 @@ class Worker extends CliTool\App
         $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
-        $processor = $this->fetchProcessor($hash, $cacheKey, $transform);
+
+        /** @var Image\ProcessorFactory $processorFactory */
+        $processorFactory = $this->getDi()->get('filesystem.imageProcessorFactory');
+        $processor        = $this->fetchProcessor($processorFactory, $hash, $cacheKey, $transform);
         if ($processor) {
             $this->generateTransform($processor, $hash, $cacheKey, $attempts, $retryFailed);
         }
@@ -151,16 +154,22 @@ class Worker extends CliTool\App
      *
      * Normally this is a storage file, but in rare cases may represent a static file.
      *
-     * @param string $hash
+     * @param Image\ProcessorFactory $processorFactory
+     * @param string                 $hash
+     * @param string                 $cacheKey
+     * @param ITransform             $transform
      * @return Image\Processor|null
-     * @throws LogicException
      */
-    private function fetchProcessor(string $hash, string $cacheKey, ITransform $transform): ?Image\Processor
-    {
+    private function fetchProcessor(
+        Image\ProcessorFactory $processorFactory,
+        string $hash,
+        string $cacheKey,
+        ITransform $transform,
+    ): ?Image\Processor {
         /** @var Storage\Model|null $hashObject */
         $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $hash)->first();
         if ($hashObject) {
-            return $this->processorFactory->buildForStorage(
+            return $processorFactory->buildForStorage(
                 $hashObject,
                 $cacheKey,
                 $transform,
@@ -217,7 +226,7 @@ class Worker extends CliTool\App
             if ($itemHash === $hash) {
                 $fileName = str_replace(WEB_root, '', $item->getPathname());
                 $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
-                return $this->processorFactory->buildForLocalFile(
+                return $processorFactory->buildForLocalFile(
                     WEB_root,
                     $fileName,
                     $cacheKey,
@@ -243,16 +252,20 @@ class Worker extends CliTool\App
     /**
      * Apply the specified transform to the storage object and save it using specified cache key
      *
-     * @param Storage\Model    $hashObject
-     * @param string           $cacheKey
-     * @param Image\ITransform $transform
-     * @param int              $attempts
-     * @param bool             $retryFailed
      * @param Image\Processor $processor
+     * @param string          $hash
+     * @param string          $cacheKey
+     * @param int             $attempts
+     * @param bool            $retryFailed
      * @return void
      */
-    private function generateTransform(Image\Processor $processor, string $hash, string $cacheKey, int $attempts, bool $retryFailed): void
-    {
+    private function generateTransform(
+        Image\Processor $processor,
+        string $hash,
+        string $cacheKey,
+        int $attempts,
+        bool $retryFailed,
+    ): void {
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
             //we are in the cli, so perm fail any images that fail here.
