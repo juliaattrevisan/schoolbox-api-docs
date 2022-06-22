@@ -171,7 +171,7 @@ HELP;
                 continue;
             }
             $this->deleteRecordFromStorageTransformTable($fileName);
-            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->getSize($path));
+            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->fileSize($path));
         }
     }
 

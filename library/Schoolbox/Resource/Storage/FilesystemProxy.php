@@ -228,7 +228,7 @@ class FilesystemProxy
     public function delete(IStorage $storage): void
     {
         // Deleting the parent folder of the file deletes all of its transforms
-        $this->filesystem->deleteDir(dirname(self::getPathFromHash($storage->getHash())));
+        $this->filesystem->delete(dirname(self::getPathFromHash($storage->getHash())));
 
         // Do not delete storage record here
     }
@@ -289,7 +289,7 @@ class FilesystemProxy
      */
     public function visibility(IStorage $storage): string
     {
-        return $this->filesystem->getVisibility(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->visibility(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -303,7 +303,7 @@ class FilesystemProxy
      */
     public function mimeType(IStorage $storage): string
     {
-        return $this->filesystem->getMimetype(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->mimeType(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -317,7 +317,7 @@ class FilesystemProxy
      */
     public function lastModified(IStorage $storage): int
     {
-        return $this->filesystem->getTimestamp(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->lastModified(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -331,7 +331,7 @@ class FilesystemProxy
      */
     public function fileSize(IStorage $storage): int
     {
-        return $this->filesystem->getSize(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->fileSize(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -484,7 +484,7 @@ class FilesystemProxy
         if ($storage instanceof Model) {
             $storage
                 ->setHash($hash)
-                ->setSize($this->filesystem->getSize($path));
+                ->setSize($this->filesystem->fileSize($path));
         }
     }
 }

@@ -411,7 +411,7 @@ class Queue extends ResourceVideo
     private function uploadTranscode(Filesystem $filesystem, $filename)
     {
         $this->log('Saving transcode to storage');
-        $filesystem->put($this->getTranscodePath(), file_get_contents($filename));
+        $filesystem->write($this->getTranscodePath(), file_get_contents($filename));
 
         $this->log('Deleting local transcode file');
         unlink($filename);
@@ -489,14 +489,8 @@ class Queue extends ResourceVideo
         string $fileName,
         string $destinationPath
     ): void {
-
         // If it already exists we have to update, otherwise write
-
-        if ($filesystem->has($destinationPath)) {
-            $filesystem->update($destinationPath, file_get_contents($fileName));
-        } else {
-            $filesystem->write($destinationPath, file_get_contents($fileName));
-        }
+        $filesystem->write($destinationPath, file_get_contents($fileName));
 
         $this->createStorageTransform($destinationPath, filesize($fileName));
         // Remove the thumbnail

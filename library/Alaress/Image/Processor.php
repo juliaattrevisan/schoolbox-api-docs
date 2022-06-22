@@ -110,7 +110,7 @@ class Processor
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
-        $mimetype   = $this->mimetype ?? $this->pathFilesystem->getMimetype($this->path);
+        $mimetype   = $this->mimetype ?? $this->pathFilesystem->mimeType($this->path);
         $fileFormat = $this->getFormatFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
@@ -119,7 +119,7 @@ class Processor
             return new StreamableFile(
                 true,
                 $mimetype,
-                $this->pathFilesystem->getSize($this->path),
+                $this->pathFilesystem->fileSize($this->path),
                 $this->pathFilesystem->readStream($this->path),
             );
         }
@@ -158,7 +158,7 @@ class Processor
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
         if ($this->storageFilesystem->has($transformPath)) {
-            $transformSize = $this->storageFilesystem->getSize($transformPath);
+            $transformSize = $this->storageFilesystem->fileSize($transformPath);
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
