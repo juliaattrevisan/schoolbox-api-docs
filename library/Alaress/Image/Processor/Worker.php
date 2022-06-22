@@ -216,11 +216,12 @@ class Worker extends CliTool\App
             $this->getLogger()->error('An attempts value must be provided, and be greater than 0');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
+        $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
         $hashObject = $this->fetchHashObject($hash);
         if ($hashObject) {
-            $this->generateTransform($hashObject, $cacheKey, $transform, $attempts);
+            $this->generateTransform($hashObject, $cacheKey, $transform, $attempts, $retryFailed);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
@@ -318,9 +319,15 @@ class Worker extends CliTool\App
      * @param string           $cacheKey
      * @param Image\ITransform $transform
      * @param int              $attempts
+     * @param bool             $retryFailed
      */
-    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform, int $attempts): void
-    {
+    private function generateTransform(
+        Storage\Model $hashObject,
+        string $cacheKey,
+        Image\ITransform $transform,
+        int $attempts,
+        bool $retryFailed,
+    ): void {
         $hash      = $hashObject->getHash();
         $processor = new Image\Processor($hashObject, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
 
@@ -344,7 +351,7 @@ class Worker extends CliTool\App
             // * we attempted to transcode a non-GIF layered image
             // * this is a staging instance and file not found on disk. This is normal after a prd-to-stg sync
             if (
-                !$this->suppressSentryReporting &&
+                !$retryFailed &&
                 !($e instanceof LayeredNonGifException) &&
                 !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof FileNotFoundException)
             ) {
