@@ -321,8 +321,9 @@ class Migration extends CliTool\App
                 $countUploadAttempts = 0;
                 while (!$writeSucceeded && $countUploadAttempts < $this->maxUploadAttempts) {
                     try {
-                        $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
-                    } catch (S3Exception $e) {
+                        $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+                        $writeSucceeded = true;
+                    } catch (Flysystem\FilesystemException $e) {
                         $sleep = 2 ** $countUploadAttempts;
                         $countUploadAttempts++;
                         $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");
