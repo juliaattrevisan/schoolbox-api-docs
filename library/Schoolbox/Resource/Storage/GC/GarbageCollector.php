@@ -163,6 +163,8 @@ class GarbageCollector
     /**
      * @param string $hash
      * @throws MapperException
+     * @throws FlysystemException if the storage file can't be deleted from the
+     *                            filesystem.
      */
     protected function removeFromStorage($hash)
     {
