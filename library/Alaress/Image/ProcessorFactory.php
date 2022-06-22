@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Image;
 
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use Schoolbox\Resource\Storage\FilesystemProxy;

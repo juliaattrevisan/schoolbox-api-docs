@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
@@ -154,6 +154,7 @@ class FilesystemProxy
         $storagePath = self::getPathFromHash($hash);
 
         // Are they both local? Attempt to move, rather than copy if so
+        // TODO does Flysystem3 let me interrogate the adapter?
         if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
             $adapterFrom = $tempFilesystem->getAdapter();
             $adapterTo   = $this->filesystem->getAdapter();

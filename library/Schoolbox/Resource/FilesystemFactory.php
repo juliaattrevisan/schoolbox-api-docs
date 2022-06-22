@@ -13,7 +13,7 @@ use Aws\S3\S3Client;
 use GuzzleHttp;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use LogicException;
