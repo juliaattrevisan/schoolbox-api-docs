@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
+use League\Flysystem\Adapter\Local;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\MountManager;
 use League\Flysystem\NotSupportedException;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
@@ -144,6 +147,66 @@ class FilesystemProxy
             $storage
                 ->setHash($hash)
                 ->setSize($this->filesystem->getSize($path));
+        }
+    }
+
+    /**
+     * Efficient method for writing from a filesystem into a storage file.
+     *
+     * Detects if `$this->filesystem` and the source filesystem are the same,
+     * and if so performs a rename instead of a move.
+     *
+     * @param IStorage            $storage
+     * @param FilesystemInterface $tempFilesystem
+     * @param string              $tempPath
+     * @return void
+     * @throws FileNotFoundException if somehow the file doesn't exist in temp?
+     */
+    public function writeFromFilesystemAndLocation(
+        IStorage $storage,
+        FilesystemInterface $tempFilesystem,
+        string $tempPath
+    ) {
+        $adapterFrom = $tempFilesystem->getAdapter();
+        $adapterTo   = $this->filesystem->getAdapter();
+        $hash        = $this->hashGenerator->generateHash($tempFilesystem->readStream($tempPath));
+        $storagePath = self::getPathFromHash($hash);
+
+        // Are they both local? Attempt to move, rather than copy if so
+        if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
+            if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
+                return;
+            }
+
+            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
+            rename(
+                rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
+                $adapterTo->getPathPrefix() . $storagePath
+            );
+            return;
+        }
+
+        // Otherwise, copy the new file into storage
+
+        try {
+            $mountManager = new MountManager([
+                FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
+                FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
+            ]);
+            $mountManager->move(
+                FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
+                FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
+            );
+        } catch (FileExistsException $e) {
+            // The file already exists in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+            try {
+                $tempFilesystem->delete($tempPath);
+            } catch (FileNotFoundException $e2) {
+                // The temp file didn't exist after all: that's fine too
+            }
+            return;
         }
     }
 
