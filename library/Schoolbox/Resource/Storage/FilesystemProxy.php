@@ -12,14 +12,13 @@ namespace Schoolbox\Resource\Storage;
 use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\MountManager;
 use League\Flysystem\NotSupportedException;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
- * A proxy class for providing a `FilesystemAdapter`-like facade when dealing
+ * A proxy class for providing a `Filesystem`-like facade when dealing
  * with `IStorage` objects, instead of paths.
  *
  * This provides a Flysystem v3-like proxy, even though currently it wraps a
@@ -38,12 +37,12 @@ class FilesystemProxy
     /**
      * Constructor
      *
-     * @param FilesystemAdapter $filesystem     Base filesystem this class proxies.
-     * @param HashGenerator     $hashGenerator  Method for generating hashes for storage files.
-     * @param bool              $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
+     * @param Filesystem    $filesystem     Base filesystem this class proxies.
+     * @param HashGenerator $hashGenerator  Method for generating hashes for storage files.
+     * @param bool          $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
      */
     public function __construct(
-        private FilesystemAdapter $filesystem,
+        private Filesystem $filesystem,
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
     ) {
@@ -52,7 +51,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::has` (with file name)
-     * * v3 `FilesystemAdapter::fileExists`
+     * * v3 `Filesystem::fileExists`
      *
      * @param IStorage $storage
      * @return bool
@@ -65,7 +64,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::has` (with folder name)
-     * * v3 `FilesystemAdapter::directoryExists`
+     * * v3 `Filesystem::directoryExists`
      *
      * @param IStorage $storage
      * @return never-return
@@ -80,7 +79,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::write`
-     * * v3 `FilesystemAdapter::write`
+     * * v3 `Filesystem::write`
      *
      * @param IStorage $storage
      * @param string   $contents
@@ -100,7 +99,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::writeStream`
-     * * v3 `FilesystemAdapter::writeStream`
+     * * v3 `Filesystem::writeStream`
      *
      * @param IStorage $storage
      * @param resource $resource
@@ -135,15 +134,15 @@ class FilesystemProxy
      * Detects if `$this->filesystem` and the source filesystem are the same,
      * and if so performs a rename instead of a move.
      *
-     * @param IStorage          $storage
-     * @param FilesystemAdapter $tempFilesystem
-     * @param string            $tempPath
+     * @param IStorage   $storage
+     * @param Filesystem $tempFilesystem
+     * @param string     $tempPath
      * @return void
      * @throws UnableToReadFile if somehow the file doesn't exist in temp?
      */
     public function writeFromFilesystemAndLocation(
         IStorage $storage,
-        FilesystemAdapter $tempFilesystem,
+        Filesystem $tempFilesystem,
         string $tempPath
     ) {
         if ($this->shortCircuit($storage)) {
@@ -193,7 +192,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::read`
-     * * v3 `FilesystemAdapter::read`
+     * * v3 `Filesystem::read`
      *
      * @param IStorage $storage
      * @return string
@@ -207,7 +206,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::readStream`
-     * * v3 `FilesystemAdapter::readStream`
+     * * v3 `Filesystem::readStream`
      *
      * @param IStorage $storage
      * @return resource
@@ -222,7 +221,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::delete` (with file name)
-     * * v3 `FilesystemAdapter::delete`
+     * * v3 `Filesystem::delete`
      *
      * @param IStorage $storage
      */
@@ -237,7 +236,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::delete` (with folder name)
-     * * v3 `FilesystemAdapter::deleteDirectory`
+     * * v3 `Filesystem::deleteDirectory`
      *
      * @param IStorage $storage
      * @return never-return
@@ -252,7 +251,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::createDir` (with folder name)
-     * * v3 `FilesystemAdapter::createDirectory`
+     * * v3 `Filesystem::createDirectory`
      *
      * @param IStorage $storage
      * @param array    $config
@@ -268,7 +267,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::setVisibility`
-     * * v3 `FilesystemAdapter::setVisibility`
+     * * v3 `Filesystem::setVisibility`
      *
      * @param IStorage $storage
      * @param string   $visibility
@@ -282,7 +281,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::setVisibility`
-     * * v3 `FilesystemAdapter::visibility`
+     * * v3 `Filesystem::visibility`
      *
      * @param IStorage $storage
      * @return string
@@ -296,7 +295,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getMimetype`
-     * * v3 `FilesystemAdapter::mimeType`
+     * * v3 `Filesystem::mimeType`
      *
      * @param IStorage $storage
      * @return string
@@ -310,7 +309,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getTimestamp`
-     * * v3 `FilesystemAdapter::lastModified`
+     * * v3 `Filesystem::lastModified`
      *
      * @param IStorage $storage
      * @return int
@@ -324,7 +323,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getSize`
-     * * v3 `FilesystemAdapter::fileSize`
+     * * v3 `Filesystem::fileSize`
      *
      * @param IStorage $storage
      * @return int
@@ -338,7 +337,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::listContents`.
-     * * v3 `FilesystemAdapter::listContents`
+     * * v3 `Filesystem::listContents`
      *
      * @param IStorage $storage
      * @param bool     $recursive
@@ -355,7 +354,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::rename`
-     * * v3 `FilesystemAdapter::move`
+     * * v3 `Filesystem::move`
      *
      * @param IStorage $source
      * @param IStorage $destination
@@ -371,7 +370,7 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::copy`
-     * * v3 `FilesystemAdapter::copy`
+     * * v3 `Filesystem::copy`
      *
      * @param IStorage $source
      * @param IStorage $destination

@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -42,7 +42,7 @@ $app = new class extends CliTool\App {
         $storageMapper = new StorageMapper();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
 
-        /** @var FilesystemAdapter $storageFilesystem */
+        /** @var Filesystem $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
         /** @var Sanitizer\ISanitizer $sanitizer */

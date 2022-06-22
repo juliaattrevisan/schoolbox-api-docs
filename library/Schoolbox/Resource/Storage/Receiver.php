@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Filesystem;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
@@ -31,7 +31,7 @@ class Receiver implements IReceiver
      * @param FilesystemProxy   $storageFilesystemProxy Proxy for a filesystem object, for persisting the actual file
      *                                                  content of storage objects.
      * @param ISanitizer        $sanitizer              Sanitizer for file content of storage objects.
-     * @param FilesystemAdapter $tempFilesystem         Temporary file system: files will be extracted from here.
+     * @param Filesystem        $tempFilesystem         Temporary file system: files will be extracted from here.
      * @param User|null         $currentUser            The current user: used to determine if the file is acceptable.
      */
     public function __construct(
@@ -39,7 +39,7 @@ class Receiver implements IReceiver
         private MimetypeMapper $mimetypeMapper,
         private FilesystemProxy $storageFilesystemProxy,
         private ISanitizer $sanitizer,
-        private FilesystemAdapter $tempFilesystem,
+        private Filesystem $tempFilesystem,
         private ?User $currentUser,
     ) {
     }

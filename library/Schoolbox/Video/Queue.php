@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Video;
 
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -101,7 +101,7 @@ class Queue extends ResourceVideo
     /**
      * Determines if file is audio or video and does corresponding processing
      *
-     * @param FilesystemAdapter    $filesystem Filesystem to write transcodes to
+     * @param Filesystem           $filesystem Filesystem to write transcodes to
      * @param LoggerInterface|null $logger     Optional logger for debugging purposes
      *
      * @return bool
@@ -109,7 +109,7 @@ class Queue extends ResourceVideo
      * @throws MapperException
      * @throws \League\Flysystem\UnableToReadFile
      */
-    public function process(FilesystemAdapter $filesystem, LoggerInterface $logger = null)
+    public function process(Filesystem $filesystem, LoggerInterface $logger = null)
     {
         // Grab transcoding configuration
 
@@ -183,13 +183,13 @@ class Queue extends ResourceVideo
     /**
      * Take audio file and transcode into MP3 for playback via HTML5 <audio> tag
      *
-     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
      * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processAudio(FilesystemAdapter $filesystem)
+    public function processAudio(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -249,13 +249,13 @@ class Queue extends ResourceVideo
     /**
      * Takes existing file and transcode into web format and creates thumbnail
      *
-     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
      * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processVideo(FilesystemAdapter $filesystem)
+    public function processVideo(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -405,10 +405,10 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @param string $filename
      */
-    private function uploadTranscode(FilesystemAdapter $filesystem, $filename)
+    private function uploadTranscode(Filesystem $filesystem, $filename)
     {
         $this->log('Saving transcode to storage');
         $filesystem->put($this->getTranscodePath(), file_get_contents($filename));
@@ -478,14 +478,14 @@ class Queue extends ResourceVideo
     /**
      * Upload preview image to storage
      *
-     * @param FilesystemAdapter $filesystem      Filesystem to write transcodes to
+     * @param Filesystem        $filesystem      Filesystem to write transcodes to
      * @param string            $fileName        Local filename to be uploaded
      * @param string            $destinationPath Destination to which the image should be uploaded
      * @throws \League\Flysystem\UnableToReadFile
      * @throws MapperException
      */
     private function uploadPreviewImage(
-        FilesystemAdapter $filesystem,
+        Filesystem $filesystem,
         string $fileName,
         string $destinationPath
     ): void {

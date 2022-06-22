@@ -23,7 +23,7 @@ use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\UnableToReadFile;
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\Filesystem;
 use OverflowException;
 use PDOException;
 use Schoolbox\Mapper;
@@ -54,8 +54,8 @@ class Processor
      * @param string                $path               Path to the file in the filesystem
      * @param string|null           $mimetype           If provided: the file's mimetype.
      *                                                  If not provided: will attempt to determine from `$path`.
-     * @param FilesystemAdapter     $pathFilesystem     The filesystem on which `$path` is stored
-     * @param FilesystemAdapter     $storageFilesystem  The filesystem on which storage transforms are stored.
+     * @param Filesystem            $pathFilesystem     The filesystem on which `$path` is stored
+     * @param Filesystem            $storageFilesystem  The filesystem on which storage transforms are stored.
      *                                                  This may be a different filesystem to `$pathFilesystem`.
      * @param Storage\HashGenerator $hashGenerator      Helper for generating a storage hash out of `$path`
      * @param string                $cacheKey           Uniquely associate a cached image with a particular series of
@@ -75,8 +75,8 @@ class Processor
     public function __construct(
         private string $path,
         private ?string $mimetype,
-        private FilesystemAdapter $pathFilesystem,
-        private FilesystemAdapter $storageFilesystem,
+        private Filesystem $pathFilesystem,
+        private Filesystem $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
         private string $cacheKey,
         private ITransform $transform,
@@ -243,10 +243,10 @@ class Processor
     /**
      * Transforms the image, writes it to disk, and return the transformed file's size
      *
-     * @param int               $maxAttempts How many times should we attempt to read the original file into memory
-     * @param string            $fileFormat
-     * @param FilesystemAdapter $fileSystem
-     * @param string            $transformPath
+     * @param int        $maxAttempts How many times should we attempt to read the original file into memory
+     * @param string     $fileFormat
+     * @param Filesystem $fileSystem
+     * @param string     $transformPath
      * @return int
      * @throws CorruptImageException
      * @throws UnableToReadFile If original storage file not found on disk
@@ -256,7 +256,7 @@ class Processor
      * @throws LayeredNonGifException
      * @throws OverflowException
      */
-    private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemAdapter $fileSystem, string $transformPath): int
+    private function generateTransformation(int $maxAttempts, string $fileFormat, Filesystem $fileSystem, string $transformPath): int
     {
         $image = $this->loadImageFromFile($maxAttempts);
         $image = (new RotateOrientation())->manipulate($image);

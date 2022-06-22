@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Storage\SeekableStream;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemAdapter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
@@ -52,12 +51,12 @@ class Factory
     /**
      * Build a seekable stream given a filesystem and path.
      *
-     * @param FilesystemAdapter $filesystem
-     * @param string            $path
+     * @param Filesystem $filesystem
+     * @param string     $path
      * @return resource
      * @throws UnableToReadFile ... if `$path` isn't in `$filesystem`
      */
-    public function buildSeekableStream(FilesystemAdapter $filesystem, string $path)
+    public function buildSeekableStream(Filesystem $filesystem, string $path)
     {
         // getAdapter() isn't on FilesystemAdapter, it only happens to exist
         // on all of its implementations.

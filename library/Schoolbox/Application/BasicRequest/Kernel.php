@@ -11,7 +11,6 @@ namespace Schoolbox\Application\BasicRequest;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
-use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\MountManager;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
@@ -435,7 +434,7 @@ class Kernel extends WebKernelAbstract
             'filesystem.storageProxy',
             $di->lazy(
                 function () use ($di, $config) {
-                    /** @var FilesystemAdapter $storage */
+                    /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
                     return new FilesystemProxy(
                         $storage,
@@ -474,7 +473,7 @@ class Kernel extends WebKernelAbstract
             'filesystem.imageProcessorFactory',
             $di->lazy(
                 function () use ($di) {
-                    /** @var FilesystemAdapter $storage */
+                    /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
                     return new ProcessorFactory($storage, new HashGenerator());
                 }
