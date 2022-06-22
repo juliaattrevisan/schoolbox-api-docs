@@ -211,11 +211,16 @@ class Worker extends CliTool\App
             $this->getLogger()->error('A transform must be provided, and a base64-encoded serialized ITransform instance');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
+        $attempts = $this->getOptAsInt(self::OPT_LONG_ATTEMPTS);
+        if (!isset($attempts) || $attempts <= 0) {
+            $this->getLogger()->error('An attempts value must be provided, and be greater than 0');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
         $hashObject = $this->fetchHashObject($hash);
         if ($hashObject) {
-            $this->generateTransform($hashObject, $cacheKey, $transform);
+            $this->generateTransform($hashObject, $cacheKey, $transform, $attempts);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
@@ -312,16 +317,17 @@ class Worker extends CliTool\App
      * @param Storage\Model    $hashObject
      * @param string           $cacheKey
      * @param Image\ITransform $transform
+     * @param int              $attempts
      */
-    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform): void
+    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform, int $attempts): void
     {
         $hash      = $hashObject->getHash();
-        $processor = new Image\Processor($hashObject, $cacheKey, $transform, $this->imageMagickTimeout);
+        $processor = new Image\Processor($hashObject, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
 
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
             //we are in the cli, so perm fail any images that fail here.
-            $transformFile = $processor->load($this->attemptsPerTransform, $this->timeOutThreshold, true);
+            $transformFile = $processor->load($attempts, Manager::TIMED_OUT_THRESHOLD, true);
             if (!$transformFile->isCacheHit()) {
                 $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'success')));
             } else {
