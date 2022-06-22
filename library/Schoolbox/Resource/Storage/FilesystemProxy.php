@@ -167,27 +167,28 @@ class FilesystemProxy
         FilesystemInterface $tempFilesystem,
         string $tempPath
     ) {
-        $adapterFrom = $tempFilesystem->getAdapter();
-        $adapterTo   = $this->filesystem->getAdapter();
         $hash        = $this->hashGenerator->generateHash($tempFilesystem->readStream($tempPath));
         $storagePath = self::getPathFromHash($hash);
 
         // Are they both local? Attempt to move, rather than copy if so
-        if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
-            if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
+        if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
+            $adapterFrom = $tempFilesystem->getAdapter();
+            $adapterTo   = $this->filesystem->getAdapter();
+            if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
+                if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
+                    return;
+                }
+
+                chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
+                rename(
+                    rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
+                    $adapterTo->getPathPrefix() . $storagePath
+                );
                 return;
             }
-
-            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
-            rename(
-                rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
-                $adapterTo->getPathPrefix() . $storagePath
-            );
-            return;
         }
 
         // Otherwise, copy the new file into storage
-
         try {
             $mountManager = new MountManager([
                 FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
