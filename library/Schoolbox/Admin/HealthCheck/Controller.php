@@ -749,17 +749,23 @@ class Controller extends Base
         $statement = $database->prepare("
         SELECT
             title AS 'Option',
-            IF(value = 'list', 'List-Left', IF(value = 'list-reversed', 'List-Right',
-                                              IF(value = 1, 'Enabled',
-                                                IF(value = 0, 'Disabled', value
-                                                  )
-                                                )
-                                              )
-              ) AS 'Choice'
+            IF(value = 'list', 'List-Left',
+            IF(value = 'list-reversed', 'List-Right',
+            IF(value = '1', 'Enabled',
+            IF(value = '0', 'Disabled', value
+            )))) AS 'Choice'
         FROM
             config
         WHERE
-            configid IN ( 412, 100, 426, 101, 414, 415, 513, 514 )
+            name IN (
+            'news_staff_post_enabled',
+            'global_moderation',
+            'comms_comments_enabled',
+            'news_default_expiry',
+            'read_more',
+            'save_for_later',
+            'comms_news_article_list_layout',
+            'comms_news_article_list_fallback_image')
         ORDER BY
           sequence;
         ");
