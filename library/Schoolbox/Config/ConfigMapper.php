@@ -124,6 +124,10 @@ class ConfigMapper extends Mapper
     public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
     public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
 
+    public const NAME_MAIL_ENABLED    = 'mail_enable';
+    public const NAME_MAIL_ADDRESS    = 'mail_address';
+    public const NAME_EMAIL_SIGNATURE = 'email_signature';
+
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
 

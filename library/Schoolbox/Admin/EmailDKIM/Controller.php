@@ -64,30 +64,6 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
-//    public function getCreate()
-//    {
-//        $new = $this->emailDKIMMapper->createModel();
-//        $this->getModify($new);
-//    }
-//
-//    public function getModify(Model $emailDKIM)
-//    {
-//        $this->getResponse()->content->set(
-//            [
-//                'template' => '@emailDKIM/modify.twig',
-//                'data'     => [
-//                    'pageCurrent'    => $this->router->generate('emailDKIM.getDomainListPage'),
-//                    'allBreadcrumbs' => array_merge(
-//                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('emailDKIM.getDomainListPage')),
-//                        [[$emailDKIM->getId() ? 'Modify' : 'Add', null]]
-//                    ),
-//                    'emailDKIM'      => $emailDKIM,
-//                ],
-//                'title'    => $emailDKIM->getId() ? 'Modify' : 'Add',
-//            ]
-//        );
-//    }
-
     public function postDomain()
     {
         $id     = $this->request->post->get('dkimId');

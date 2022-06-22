@@ -143,7 +143,7 @@ class Session
             if (Config::get('mail_enable') == 0 || $user->getUseInternalMail() || ($groupHandler->isParent() && !$user->getLocalEmail())) {
                 $_SESSION['mailhandle'] = "mailto:";
             } else {
-                $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
+                $_SESSION['mailhandle'] = "/mail/createMail?replyto=";
             }
 
             //superuser value, used to bypass most security checks

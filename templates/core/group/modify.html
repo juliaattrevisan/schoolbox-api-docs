@@ -323,13 +323,13 @@
     </ul>
 
     <!-- BEGIN mail_all_form -->
-    <form action="/mail/createMail.php" method="post" id="emailAll">
+    <form action="/mail/create" method="post" id="emailAll">
         <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
         <input type="hidden" name="bcc" value="{EMAILALL}"/>
     </form>
     <!-- END mail_all_form -->
     <!-- BEGIN mail_all_parents_form -->
-    <form action="/mail/createMail.php" method="post" id="emailAllParentsForm">
+    <form action="/mail/create" method="post" id="emailAllParentsForm">
         <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;" />
         <input type="hidden" name="bcc" value="" id="emailAllParentsBcc" />
     </form>

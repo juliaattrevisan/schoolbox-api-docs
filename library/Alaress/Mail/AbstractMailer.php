@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
@@ -120,6 +121,8 @@ abstract class AbstractMailer implements IMailer
                     }
                 }
             }
+        } elseif ($to instanceof Address) {
+            $this->email->addTo($to);
         } else {
             foreach (self::parseAddressString($to ?? '')[self::KEY_VALID] as $address => $name) {
                 $this->email->addTo(new Address($address, $name ?? ''));
@@ -127,13 +130,30 @@ abstract class AbstractMailer implements IMailer
         }
     }
 
+    public function setCc(Address $cc)
+    {
+     $this->email->addCc($cc);
+    }
+
+    public function setBcc(Address $cc)
+    {
+        $this->email->addBcc($cc);
+    }
 
     public function setSubject($subject)
     {
         $this->email->subject($subject);
     }
 
+    public function setText(string $text)
+    {
+        $this->email->text($text);
+    }
 
+    public function setHtml(string $html)
+    {
+        $this->email->html($html);
+    }
     /**
      * @param string $email
      * @param string $name
@@ -525,5 +545,12 @@ abstract class AbstractMailer implements IMailer
     public static function implodeGlue(): string
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
+    }
+
+
+    public function sign()
+    {
+        $signer = new DkimSigner($privateKey, $domain, 'schoolbox');
+        $signer->sign($this->email);
     }
 }

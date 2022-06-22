@@ -676,7 +676,7 @@ export default {
             <ul class="meta">
                 <li>Composing for <span data-relation="dynamicUsersSlot"></span></li>
             </ul>
-            <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
+            <form ref="form" action="/mail/create" method="post" v-on:submit.prevent class="class-list-form">
                 <fieldset class="checklist">
                     <legend>Recipients</legend>
                     <ul class="option-list">

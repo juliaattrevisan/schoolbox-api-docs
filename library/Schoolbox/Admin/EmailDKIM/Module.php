@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -11,8 +11,6 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule\All;
-use Alaress\Authorizer\Rule\Any;
-use Alaress\Authorizer\Rule\HasHomepageAccess;
 use Alaress\Authorizer\Rule\IsConfigOn;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
@@ -21,11 +19,6 @@ use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -42,7 +35,7 @@ class Module extends BaseModule
         $perm             = new All(
             new IsLoggedIn(),
             new IsSuperuser(),
-            new IsConfigOn('mail_enable', $this->getConfig())
+            new IsConfigOn(ConfigMapper::NAME_MAIL_ENABLED, $this->getConfig())
         );
         $preloadEmailDKIM = function (array $params) {
             return $this->preloadEmailDKIM($params);
