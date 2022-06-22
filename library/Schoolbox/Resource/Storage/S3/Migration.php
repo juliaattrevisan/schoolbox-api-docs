@@ -13,7 +13,7 @@ use Alaress_Byte_Format;
 use Alaress\Database as AlaressDatabase;
 use Aws\S3\Exception\S3Exception;
 use InvalidArgumentException;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem;
 use League\Flysystem\Filesystem;
 use Monolog\Logger;

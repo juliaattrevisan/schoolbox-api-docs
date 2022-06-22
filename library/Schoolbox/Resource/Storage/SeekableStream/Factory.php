@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\SeekableStream;
 
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;

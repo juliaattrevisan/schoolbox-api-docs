@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\CanOverwriteFiles;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem\Config;
 use Schoolbox\Resource\FilesystemFactory;
 
