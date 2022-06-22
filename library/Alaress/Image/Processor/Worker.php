@@ -44,7 +44,7 @@ class Worker extends CliTool\App
     private const OPT_LONG_CACHE_KEY    = 'cache-key:';
     private const OPT_LONG_TRANSFORM    = 'transform:';
     private const OPT_LONG_RETRY_FAILED = 'retry-failed';
-    private const OPT_LONG_ATTEMPTS     = 'attempts';
+    private const OPT_LONG_ATTEMPTS     = 'attempts:';
 
     /** @inheritDoc */
     public function getRequiredProcessUser(): ?string
