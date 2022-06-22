@@ -39,7 +39,6 @@ use Schoolbox\User;
 
 abstract class ResourceNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
     const TRIGGER_DELETED = 'deleted';
@@ -234,6 +233,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.$kind.$id.$action")
+            ->setMeta(['time' => \Alaress_Date_Format::now()->getUnixTimeStamp()])
             ->addFilter('roletype', [$roletype]);
 
         $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
