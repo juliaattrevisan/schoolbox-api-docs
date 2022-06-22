@@ -66,11 +66,8 @@ $limits           = [
 
 // TODO inject lock inspector instead of cache
 /** @var ClientInterface $redis */
-$redis            = $kernel->get('redis.cache');
-/** @var Image\ProcessorFactory $processorFactory */
-$processorFactory = $kernel->get('filesystem.imageProcessorFactory');
-$parent           = new Image\Processor\Manager(
-    $processorFactory,
+$redis  = $kernel->get('redis.cache');
+$parent = new Image\Processor\Manager(
     $timeInterval,
     $imageCountLimit,
     $workerCount,
