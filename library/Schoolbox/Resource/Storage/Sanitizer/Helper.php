@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Sanitizer;
 
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\FilesystemAdapter;
 
 /**
@@ -50,7 +50,7 @@ class Helper
         }
         try {
             $unsafeContent = $filesystem->read($path);
-        } catch (FileNotFoundException $e) {
+        } catch (UnableToReadFile $e) {
             return null;
         }
         $sanitizedContent = $this->sanitizer->sanitize($mimetype, $unsafeContent);

@@ -100,7 +100,7 @@ function getFileAtIndex($meta, $i)
  * @return array
  * @throws PDOException
  * @throws UnexpectedValueException
- * @throws \League\Flysystem\FileNotFoundException
+ * @throws \League\Flysystem\UnableToReadFile
  * @throws \Schoolbox\File\Exception
  * @throws \Schoolbox\Mapper\DefinitionException
  * @throws \Schoolbox\Mapper\Exception

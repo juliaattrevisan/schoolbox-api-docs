@@ -10,7 +10,7 @@
  */
 
 use Alaress\Exception\UnreachableException;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
@@ -141,7 +141,7 @@ if (isset($type) && isset($id)) {
     $videoStream   = null;
     try {
         $videoStream = $fileSystem->readStream($video->getTranscodePath());
-    } catch (FileNotFoundException $e) {
+    } catch (UnableToReadFile $e) {
         fail();
     }
     if (!is_resource($videoStream)) {

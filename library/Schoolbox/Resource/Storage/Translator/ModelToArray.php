@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Translator;
 
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Resource\Storage\Model;
 
@@ -68,7 +68,7 @@ class ModelToArray
 
         try {
             $size = $storage->getSize();
-        } catch (FileNotFoundException $e) {
+        } catch (UnableToReadFile $e) {
             // There might not be a file attached
             $size = null;
         }

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\SeekableStream;
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use Schoolbox\IConfigLoader;
@@ -55,7 +55,7 @@ class Factory
      * @param FilesystemAdapter $filesystem
      * @param string            $path
      * @return resource
-     * @throws FileNotFoundException ... if `$path` isn't in `$filesystem`
+     * @throws UnableToReadFile ... if `$path` isn't in `$filesystem`
      */
     public function buildSeekableStream(FilesystemAdapter $filesystem, string $path)
     {

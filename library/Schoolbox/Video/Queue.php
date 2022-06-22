@@ -107,7 +107,7 @@ class Queue extends ResourceVideo
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
     public function process(FilesystemAdapter $filesystem, LoggerInterface $logger = null)
     {
@@ -187,7 +187,7 @@ class Queue extends ResourceVideo
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
     public function processAudio(FilesystemAdapter $filesystem)
     {
@@ -253,7 +253,7 @@ class Queue extends ResourceVideo
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
     public function processVideo(FilesystemAdapter $filesystem)
     {
@@ -481,7 +481,7 @@ class Queue extends ResourceVideo
      * @param FilesystemAdapter $filesystem      Filesystem to write transcodes to
      * @param string            $fileName        Local filename to be uploaded
      * @param string            $destinationPath Destination to which the image should be uploaded
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      * @throws MapperException
      */
     private function uploadPreviewImage(

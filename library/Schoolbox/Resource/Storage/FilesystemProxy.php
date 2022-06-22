@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage;
 
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\MountManager;
@@ -86,7 +86,7 @@ class FilesystemProxy
      * @param string   $contents
      * @param array    $config
      * @return void
-     * @throws FileNotFoundException if somehow the file wasn't found after it
+     * @throws UnableToReadFile if somehow the file wasn't found after it
      *                               was written
      */
     public function write(IStorage $storage, string $contents, array $config = [])
@@ -106,8 +106,8 @@ class FilesystemProxy
      * @param resource $resource
      * @param array    $config
      * @return void
-     * @throws FileNotFoundException if somehow the file wasn't found after it
-     *                               was written
+     * @throws UnableToReadFile if somehow the file wasn't found after it
+     *                          was written
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
@@ -139,7 +139,7 @@ class FilesystemProxy
      * @param FilesystemAdapter $tempFilesystem
      * @param string            $tempPath
      * @return void
-     * @throws FileNotFoundException if somehow the file doesn't exist in temp?
+     * @throws UnableToReadFile if somehow the file doesn't exist in temp?
      */
     public function writeFromFilesystemAndLocation(
         IStorage $storage,
@@ -196,7 +196,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException if the file wasn't found
+     * @throws UnableToReadFile if the file wasn't found
      */
     public function read(IStorage $storage): string
     {
@@ -210,7 +210,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return resource
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function readStream(IStorage $storage)
     {
@@ -271,7 +271,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @param string   $visibility
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function setVisibility(IStorage $storage, string $visibility): void
     {
@@ -285,7 +285,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function visibility(IStorage $storage): string
     {
@@ -299,7 +299,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function mimeType(IStorage $storage): string
     {
@@ -313,7 +313,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return int
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function lastModified(IStorage $storage): int
     {
@@ -327,7 +327,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return int
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function fileSize(IStorage $storage): int
     {
@@ -477,7 +477,7 @@ class FilesystemProxy
      * @param string   $hash
      * @param string   $path
      * @return void
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     private function updateStorage(IStorage $storage, string $hash, string $path): void
     {

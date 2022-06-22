@@ -14,7 +14,7 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -288,7 +288,7 @@ class Worker extends CliTool\App
             if (
                 !$retryFailed &&
                 !($e instanceof LayeredNonGifException) &&
-                !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof FileNotFoundException)
+                !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof UnableToReadFile)
             ) {
                 $this->captureException($e);
             }

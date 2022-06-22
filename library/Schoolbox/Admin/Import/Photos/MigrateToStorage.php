@@ -75,7 +75,7 @@ class MigrateToStorage
     /**
      * Migrate files from the $portraitPath into storage, assigning them to users
      *
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      * @throws \PDOException
      */
     public function migrate(): void

@@ -22,7 +22,7 @@ use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\FilesystemAdapter;
 use OverflowException;
 use PDOException;
@@ -95,7 +95,7 @@ class Processor
      * @param bool     $permFail   should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
      * @return StreamableFile
      * @throws DomainException
-     * @throws Flysystem\FileNotFoundException
+     * @throws Flysystem\UnableToReadFile
      * @throws Flysystem\FilesystemNotFoundException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
@@ -141,7 +141,7 @@ class Processor
                     $transformModel->getSize(),
                     $this->readStream($transformPath),
                 );
-            } catch (Flysystem\FileNotFoundException $e) {
+            } catch (Flysystem\UnableToReadFile $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
                 $basePath = Storage\FilesystemProxy::getPathFromHash($hash);
                 $state    = $this->storageFilesystem->has($basePath)
@@ -207,7 +207,7 @@ class Processor
                 $transformPath,
             );
         } catch (
-            FileNotFoundException
+            UnableToReadFile
             | ImagineException\OutOfBoundsException
             | ImagineException\RuntimeException
             | OverflowException
@@ -249,7 +249,7 @@ class Processor
      * @param string            $transformPath
      * @return int
      * @throws CorruptImageException
-     * @throws FileNotFoundException If original storage file not found on disk
+     * @throws UnableToReadFile If original storage file not found on disk
      * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
@@ -285,7 +285,7 @@ class Processor
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
-     * @throws FileNotFoundException If original storage file not found on disk
+     * @throws UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
      * @throws ImagickException If we can't set the Imagick processing timeout
      */
@@ -296,7 +296,7 @@ class Processor
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
         if (!$this->pathFilesystem->has($this->path)) {
-            throw new FileNotFoundException("File not found");
+            throw new UnableToReadFile("File not found");
         }
 
         // Die extremely early if this is corrupted or giant
@@ -415,13 +415,13 @@ class Processor
      *
      * @param string $path
      * @return resource
-     * @throws Flysystem\FileNotFoundException if the stream was not found
+     * @throws Flysystem\UnableToReadFile if the stream was not found
      */
     private function readStream(string $path)
     {
         $stream = $this->storageFilesystem->readStream($path);
         if (!is_resource($stream)) {
-            throw new Flysystem\FileNotFoundException($path);
+            throw new Flysystem\UnableToReadFile($path);
         }
         return $stream;
     }
