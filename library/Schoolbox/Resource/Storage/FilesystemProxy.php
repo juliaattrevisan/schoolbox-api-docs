@@ -112,23 +112,8 @@ class FilesystemProxy
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
-        // Return early if `$storage` already has a hash, and either:
-        // * `$verifyPrevious` is off
-        // * the file already exists in storage, and its size is as it should be
-        // TODO determine if a storage file could ever have its hash modified
-        //      (doesn't saving a new file always create a new storage record?)
-        $previousHash = $storage->getHash();
-        if ($previousHash) {
-            if (!$this->verifyPrevious) {
-                return;
-            }
-            $previousPath = self::getPathFromHash($previousHash);
-            if (
-                $this->filesystem->has($previousPath)
-                && $storage->getSize() === $this->filesystem->getSize($previousPath)
-            ) {
-                return;
-            }
+        if ($this->shortCircuit($storage)) {
+            return;
         }
 
         $hash = $this->hashGenerator->generateHash($resource);
@@ -143,11 +128,7 @@ class FilesystemProxy
 
         // Put it in the filesystem, and also the storage
         // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
-        if ($storage instanceof Model) {
-            $storage
-                ->setHash($hash)
-                ->setSize($this->filesystem->getSize($path));
-        }
+        $this->updateStorage($storage, $hash, $path);
     }
 
     /**
@@ -167,6 +148,10 @@ class FilesystemProxy
         FilesystemInterface $tempFilesystem,
         string $tempPath
     ) {
+        if ($this->shortCircuit($storage)) {
+            return;
+        }
+
         $hash        = $this->hashGenerator->generateHash($tempFilesystem->readStream($tempPath));
         $storagePath = self::getPathFromHash($hash);
 
@@ -176,6 +161,7 @@ class FilesystemProxy
             $adapterTo   = $this->filesystem->getAdapter();
             if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
                 if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
+                    // TODO is this an error?
                     return;
                 }
 
@@ -184,6 +170,7 @@ class FilesystemProxy
                     rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
                     $adapterTo->getPathPrefix() . $storagePath
                 );
+                $this->updateStorage($storage, $hash, $storagePath);
                 return;
             }
         }
@@ -207,8 +194,8 @@ class FilesystemProxy
             } catch (FileNotFoundException $e2) {
                 // The temp file didn't exist after all: that's fine too
             }
-            return;
         }
+        $this->updateStorage($storage, $hash, $storagePath);
     }
 
     /**
@@ -460,5 +447,53 @@ class FilesystemProxy
     private static function generateLocationSpecificMethodException(): NotSupportedException
     {
         throw new NotSupportedException(sprintf('%s does not support location methods', __CLASS__));
+    }
+
+    /**
+     * Should file upload be short-circuited?
+     *
+     * Short-circuit if `$storage` already has a hash, and either:
+     * * `$verifyPrevious` is off
+     * * the file already exists in storage, and its size is as it should be
+     * TODO determine if a storage file could ever have its hash modified
+     *      (doesn't saving a new file always create a new storage record?)
+     *
+     * @param IStorage $storage
+     * @return bool
+     */
+    private function shortCircuit(IStorage $storage): bool
+    {
+        $previousHash = $storage->getHash();
+        if ($previousHash) {
+            if (!$this->verifyPrevious) {
+                return true;
+            }
+            $previousPath = self::getPathFromHash($previousHash);
+            if (
+                $this->filesystem->has($previousPath)
+                && $storage->getSize() === $this->filesystem->getSize($previousPath)
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Update the storage record's hash and file size.
+     *
+     * @param IStorage $storage
+     * @param string   $hash
+     * @param string   $path
+     * @return void
+     * @throws FileNotFoundException
+     */
+    private function updateStorage(IStorage $storage, string $hash, string $path): void
+    {
+        if ($storage instanceof Model) {
+            $storage
+                ->setHash($hash)
+                ->setSize($this->filesystem->getSize($path));
+        }
     }
 }

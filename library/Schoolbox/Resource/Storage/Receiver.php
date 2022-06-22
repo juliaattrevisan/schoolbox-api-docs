@@ -129,16 +129,11 @@ class Receiver implements IReceiver
             $this->storageFilesystemProxy->write($storage, $sanitized);
         } else {
             // write the old content
-            // TODO handle this efficiently with the mount manager?
-            $this->storageFilesystemProxy->writeStream(
+            $this->storageFilesystemProxy->writeFromFilesystemAndLocation(
                 $storage,
-                $this->tempFilesystem->readStream($tempLocationInFilesystem),
+                $this->tempFilesystem,
+                $tempLocationInFilesystem,
             );
-//            $this->storageFilesystemProxy->writeFromFilesystemAndLocation(
-//                $storage,
-//                $this->tempFilesystem,
-//                $tempLocationInFilesystem,
-//            );
         }
 
         if (null !== $expiryAt) {
