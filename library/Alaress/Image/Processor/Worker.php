@@ -138,9 +138,9 @@ class Worker extends CliTool\App
         $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
-        $processor = $this->fetchProcessor();
+        $processor = $this->fetchProcessor($hash, $cacheKey, $transform);
         if ($processor) {
-            $this->generateTransform($processor);
+            $this->generateTransform($processor, $hash, $cacheKey, $attempts, $retryFailed);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
@@ -155,16 +155,16 @@ class Worker extends CliTool\App
      * @return Image\Processor|null
      * @throws LogicException
      */
-    private function fetchProcessor(): ?Image\Processor
+    private function fetchProcessor(string $hash, string $cacheKey, ITransform $transform): ?Image\Processor
     {
         /** @var Storage\Model|null $hashObject */
         $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $hash)->first();
         if ($hashObject) {
             return $this->processorFactory->buildForStorage(
                 $hashObject,
-                $this->cacheKey,
-                $this->transform,
-                $this->imageMagickTimeout,
+                $cacheKey,
+                $transform,
+                Manager::IMAGICK_TIME_LIMIT,
             );
         }
         // This is most likely the rare case where we failed to transcode a static image.
@@ -220,9 +220,9 @@ class Worker extends CliTool\App
                 return $this->processorFactory->buildForLocalFile(
                     WEB_root,
                     $fileName,
-                    $this->cacheKey,
-                    $this->transform,
-                    $this->imageMagickTimeout,
+                    $cacheKey,
+                    $transform,
+                    Manager::IMAGICK_TIME_LIMIT,
                 );
             }
         }
@@ -251,16 +251,16 @@ class Worker extends CliTool\App
      * @param Image\Processor $processor
      * @return void
      */
-    private function generateTransform(Image\Processor $processor): void
+    private function generateTransform(Image\Processor $processor, string $hash, string $cacheKey, int $attempts, bool $retryFailed): void
     {
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
             //we are in the cli, so perm fail any images that fail here.
             $transformFile = $processor->load($attempts, Manager::TIMED_OUT_THRESHOLD, true);
             if (!$transformFile->isCacheHit()) {
-                $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $this->hash . '-' . $this->cacheKey, 'success')));
+                $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'success')));
             } else {
-                $this->getLogger()->warning($this->prefixLog(sprintf("%s: %s", $this->hash . '-' . $this->cacheKey, 'already cached')));
+                $this->getLogger()->warning($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'already cached')));
             }
         } catch (ConcurrentTransformationException $e) {
             // Another process (probably a php-fpm web request) is already processing this transformation, and has not
@@ -280,7 +280,7 @@ class Worker extends CliTool\App
                 $this->captureException($e);
             }
             // Print all exceptions in chain
-            $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $this->hash . '-' . $this->cacheKey, "Failed")));
+            $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, "Failed")));
             while ($e) {
                 $this->getLogger()->error($this->prefixLog($e->getMessage()));
                 foreach (explode("\n", $e->getTraceAsString()) as $line) {
