@@ -462,7 +462,7 @@ class FilesystemProxy
             $previousPath = self::getPathFromHash($previousHash);
             if (
                 $this->filesystem->has($previousPath)
-                && $storage->getSize() === $this->filesystem->getSize($previousPath)
+                && $storage->getSize() === $this->filesystem->fileSize($previousPath)
             ) {
                 return true;
             }
