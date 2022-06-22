@@ -185,6 +185,7 @@ class FilesystemProxy
                 FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
                 FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
             );
+            // @phpstan-ignore-next-line: move() can throw this exception
         } catch (FileExistsException $e) {
             // The file already exists in the storage backend.
             // This is fine, because the storage file's contents determine the
