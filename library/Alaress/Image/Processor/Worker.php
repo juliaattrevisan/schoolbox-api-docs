@@ -213,7 +213,7 @@ class Worker extends CliTool\App
         }
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
-        $hashObject = $this->fetchHashObject();
+        $hashObject = $this->fetchHashObject($hash);
         if ($hashObject) {
             $this->generateTransform($hashObject, $cacheKey, $transform);
         }
@@ -226,19 +226,20 @@ class Worker extends CliTool\App
      *
      * Normally this is a storage file, but in rare cases may represent a static file.
      *
+     * @param string $hash
      * @return Storage\Model|null
      * @throws LogicException
      * @throws SchoolboxFile\Exception
      * @throws SchoolboxMapper\Exception
      */
-    private function fetchHashObject(): ?Storage\Model
+    private function fetchHashObject(string $hash): ?Storage\Model
     {
         /** @var Storage\Model|null $hashObject */
-        $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $this->hash)->first();
+        $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $hash)->first();
         if (!$hashObject) {
             // This is most likely the rare case where we failed to transcode a static image.
             // We need to locate that image from the hash.
-            $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$this->hash}, searching static files..."));
+            $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$hash}, searching static files..."));
 
             $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
             $excludedExtensions = [
@@ -280,10 +281,10 @@ class Worker extends CliTool\App
                 if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
                     continue;
                 }
-                $fp   = fopen($item->getPathname(), 'rb');
-                $hash = $hashGenerator->generateHash($fp);
+                $fp       = fopen($item->getPathname(), 'rb');
+                $itemHash = $hashGenerator->generateHash($fp);
                 fclose($fp);
-                if ($hash === $this->hash) {
+                if ($itemHash === $hash) {
                     $fileName = str_replace(WEB_root, '', $item->getPathname());
                     $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
                     $hashObject = LocalFS::getStorageModel(WEB_root, $fileName);
