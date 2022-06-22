@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -208,8 +209,7 @@ class Controller extends Base
                         $newIds = array_merge($newIds, $affectedIds);
                     }
                 } catch (\Exception $e) {
-                    $this->sendError('Could not save: ' . $e->getMessage());
-                    return;
+                    throw new SchoolboxException('Could not save: ' . $e->getMessage());
                 }
             }
         }
