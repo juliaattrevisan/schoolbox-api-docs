@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Sanitizer;
 
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 
 /**
  * Helper for performing file sanitization.
@@ -32,16 +32,16 @@ class Helper
     /**
      * Sanitize file prior to storing.
      *
-     * @param FilesystemInterface $filesystem The filesystem the file to
-     *                                        sanitize exists on.
-     * @param string              $path       The path to the file to sanitize.
-     * @param string              $mimetype   The mimetype of the file to
+     * @param FilesystemAdapter $filesystem The filesystem the file to
+     *                                      sanitize exists on.
+     * @param string            $path       The path to the file to sanitize.
+     * @param string            $mimetype   The mimetype of the file to
      *                                        sanitize.
      * @return string|null Sanitized content if the item was sanitized, null if
      *                     it was not sanitized.
      */
     public function sanitize(
-        FilesystemInterface $filesystem,
+        FilesystemAdapter $filesystem,
         string $path,
         string $mimetype,
     ): ?string {

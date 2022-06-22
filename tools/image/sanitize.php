@@ -7,7 +7,7 @@
  */
 
 use League\Flysystem\FileExistsException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -43,7 +43,7 @@ $app = new class extends CliTool\App {
         $storageMapper = new StorageMapper();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
 
-        /** @var FilesystemInterface $storageFilesystem */
+        /** @var FilesystemAdapter $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
         /** @var Sanitizer\ISanitizer $sanitizer */

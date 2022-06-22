@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
@@ -26,20 +26,20 @@ class Receiver implements IReceiver
     /**
      * Constructor
      *
-     * @param Mapper              $storageMapper          Mapper for persisting the database record for storage objects.
-     * @param MimetypeMapper      $mimetypeMapper         Mapper for retrieving mimetypes for storage objects.
-     * @param FilesystemProxy     $storageFilesystemProxy Proxy for a filesystem object, for persisting the actual file
-     *                                                    content of storage objects.
-     * @param ISanitizer          $sanitizer              Sanitizer for file content of storage objects.
-     * @param FilesystemInterface $tempFilesystem         Temporary file system: files will be extracted from here.
-     * @param User|null           $currentUser            The current user: used to determine if the file is acceptable.
+     * @param Mapper            $storageMapper          Mapper for persisting the database record for storage objects.
+     * @param MimetypeMapper    $mimetypeMapper         Mapper for retrieving mimetypes for storage objects.
+     * @param FilesystemProxy   $storageFilesystemProxy Proxy for a filesystem object, for persisting the actual file
+     *                                                  content of storage objects.
+     * @param ISanitizer        $sanitizer              Sanitizer for file content of storage objects.
+     * @param FilesystemAdapter $tempFilesystem         Temporary file system: files will be extracted from here.
+     * @param User|null         $currentUser            The current user: used to determine if the file is acceptable.
      */
     public function __construct(
         private Mapper $storageMapper,
         private MimetypeMapper $mimetypeMapper,
         private FilesystemProxy $storageFilesystemProxy,
         private ISanitizer $sanitizer,
-        private FilesystemInterface $tempFilesystem,
+        private FilesystemAdapter $tempFilesystem,
         private ?User $currentUser,
     ) {
     }

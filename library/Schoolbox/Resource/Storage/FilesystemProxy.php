@@ -13,14 +13,14 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\MountManager;
 use League\Flysystem\NotSupportedException;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
- * A proxy class for providing a `FilesystemInterface`-like facade when dealing
+ * A proxy class for providing a `FilesystemAdapter`-like facade when dealing
  * with `IStorage` objects, instead of paths.
  *
  * This provides a Flysystem v3-like proxy, even though currently it wraps a
@@ -39,12 +39,12 @@ class FilesystemProxy
     /**
      * Constructor
      *
-     * @param FilesystemInterface $filesystem     Base filesystem this class proxies.
-     * @param HashGenerator       $hashGenerator  Method for generating hashes for storage files.
-     * @param bool                $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
+     * @param FilesystemAdapter $filesystem     Base filesystem this class proxies.
+     * @param HashGenerator     $hashGenerator  Method for generating hashes for storage files.
+     * @param bool              $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
      */
     public function __construct(
-        private FilesystemInterface $filesystem,
+        private FilesystemAdapter $filesystem,
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
     ) {
@@ -137,15 +137,15 @@ class FilesystemProxy
      * Detects if `$this->filesystem` and the source filesystem are the same,
      * and if so performs a rename instead of a move.
      *
-     * @param IStorage            $storage
-     * @param FilesystemInterface $tempFilesystem
-     * @param string              $tempPath
+     * @param IStorage          $storage
+     * @param FilesystemAdapter $tempFilesystem
+     * @param string            $tempPath
      * @return void
      * @throws FileNotFoundException if somehow the file doesn't exist in temp?
      */
     public function writeFromFilesystemAndLocation(
         IStorage $storage,
-        FilesystemInterface $tempFilesystem,
+        FilesystemAdapter $tempFilesystem,
         string $tempPath
     ) {
         if ($this->shortCircuit($storage)) {

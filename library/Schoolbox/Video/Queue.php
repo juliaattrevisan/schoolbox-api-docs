@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Video;
 
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -101,7 +101,7 @@ class Queue extends ResourceVideo
     /**
      * Determines if file is audio or video and does corresponding processing
      *
-     * @param FilesystemInterface  $filesystem Filesystem to write transcodes to
+     * @param FilesystemAdapter    $filesystem Filesystem to write transcodes to
      * @param LoggerInterface|null $logger     Optional logger for debugging purposes
      *
      * @return bool
@@ -110,7 +110,7 @@ class Queue extends ResourceVideo
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
      */
-    public function process(FilesystemInterface $filesystem, LoggerInterface $logger = null)
+    public function process(FilesystemAdapter $filesystem, LoggerInterface $logger = null)
     {
         // Grab transcoding configuration
 
@@ -184,13 +184,13 @@ class Queue extends ResourceVideo
     /**
      * Take audio file and transcode into MP3 for playback via HTML5 <audio> tag
      *
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
      * @throws \League\Flysystem\FileNotFoundException
      */
-    public function processAudio(FilesystemInterface $filesystem)
+    public function processAudio(FilesystemAdapter $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -250,14 +250,14 @@ class Queue extends ResourceVideo
     /**
      * Takes existing file and transcode into web format and creates thumbnail
      *
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
      */
-    public function processVideo(FilesystemInterface $filesystem)
+    public function processVideo(FilesystemAdapter $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -407,10 +407,10 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param FilesystemAdapter $filesystem Filesystem to write transcodes to
      * @param string $filename
      */
-    private function uploadTranscode(FilesystemInterface $filesystem, $filename)
+    private function uploadTranscode(FilesystemAdapter $filesystem, $filename)
     {
         $this->log('Saving transcode to storage');
         $filesystem->put($this->getTranscodePath(), file_get_contents($filename));
@@ -480,15 +480,15 @@ class Queue extends ResourceVideo
     /**
      * Upload preview image to storage
      *
-     * @param FilesystemInterface $filesystem      Filesystem to write transcodes to
-     * @param string              $fileName        Local filename to be uploaded
-     * @param string              $destinationPath Destination to which the image should be uploaded
+     * @param FilesystemAdapter $filesystem      Filesystem to write transcodes to
+     * @param string            $fileName        Local filename to be uploaded
+     * @param string            $destinationPath Destination to which the image should be uploaded
      * @throws \League\Flysystem\FileExistsException
      * @throws \League\Flysystem\FileNotFoundException
      * @throws MapperException
      */
     private function uploadPreviewImage(
-        FilesystemInterface $filesystem,
+        FilesystemAdapter $filesystem,
         string $fileName,
         string $destinationPath
     ): void {

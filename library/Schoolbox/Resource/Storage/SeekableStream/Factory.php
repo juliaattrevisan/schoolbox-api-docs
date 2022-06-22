@@ -12,7 +12,7 @@ namespace Schoolbox\Resource\Storage\SeekableStream;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
@@ -21,7 +21,7 @@ use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
  * Factory class for building a stream resource which is guaranteed to support
  * seek operations (`fseek`, `rewind`).
  *
- * Not all `\League\Flysystem\FilesystemInterface::readStream` implementations
+ * Not all `\League\Flysystem\FilesystemAdapter::readStream` implementations
  * are guaranteed to return a stream which is readable: notably, the AWS S3
  * implementation does not.
  *
@@ -52,14 +52,14 @@ class Factory
     /**
      * Build a seekable stream given a filesystem and path.
      *
-     * @param FilesystemInterface $filesystem
-     * @param string              $path
+     * @param FilesystemAdapter $filesystem
+     * @param string            $path
      * @return resource
      * @throws FileNotFoundException ... if `$path` isn't in `$filesystem`
      */
-    public function buildSeekableStream(FilesystemInterface $filesystem, string $path)
+    public function buildSeekableStream(FilesystemAdapter $filesystem, string $path)
     {
-        // getAdapter() isn't on FilesystemInterface, it only happens to exist
+        // getAdapter() isn't on FilesystemAdapter, it only happens to exist
         // on all of its implementations.
         // Therefore check it's an actual filesystem and not a mount manager.
         if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof AwsS3Adapter) {

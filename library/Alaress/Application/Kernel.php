@@ -47,7 +47,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemAdapter;
 use League\Flysystem\MountManager;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
@@ -1840,7 +1840,7 @@ abstract class Kernel
             'filesystem.storageProxy',
             $di->lazy(
                 function () use ($di, $config) {
-                    /** @var FilesystemInterface $storage */
+                    /** @var FilesystemAdapter $storage */
                     $storage = $di->get('filesystem.storage');
                     return new FilesystemProxy(
                         $storage,
@@ -1879,7 +1879,7 @@ abstract class Kernel
             'filesystem.imageProcessorFactory',
             $di->lazy(
                 function () use ($di) {
-                    /** @var FilesystemInterface $storage */
+                    /** @var FilesystemAdapter $storage */
                     $storage = $di->get('filesystem.storage');
                     return new ProcessorFactory($storage, new HashGenerator());
                 }
