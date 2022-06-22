@@ -95,8 +95,7 @@ class Processor
      * @param bool     $permFail   should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
      * @return StreamableFile
      * @throws DomainException
-     * @throws Flysystem\UnableToReadFile
-     * @throws Flysystem\FilesystemNotFoundException
+     * @throws Flysystem\FilesystemException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
      * @throws InsufficientHydrationException

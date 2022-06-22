@@ -11,6 +11,7 @@ namespace Schoolbox\Application\BasicRequest;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
+use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;

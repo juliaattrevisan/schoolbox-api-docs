@@ -94,7 +94,6 @@ class DisasterRecovery extends CliTool\App
     /**
      * Uploads new backup and deletes any old stale backups
      *
-     * @throws Flysystem\RootViolationException
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
@@ -199,7 +198,6 @@ class DisasterRecovery extends CliTool\App
      * @param Filesystem $fileSystemAwsS3Backups
      * @param string     $dailyBackupDir
      * @throws InvalidArgumentException
-     * @throws Flysystem\RootViolationException
      * @throws UnexpectedValueException
      */
     private function deleteStaleBackups(Filesystem $fileSystemAwsS3Backups, string $dailyBackupDir): void
@@ -211,9 +209,12 @@ class DisasterRecovery extends CliTool\App
                 // Safety check, this should never happen
                 throw new UnexpectedValueException("Attempted to delete current backup '$backupToDelete'");
             }
-            if (!$this->perform() || $fileSystemAwsS3Backups->deleteDir('/' . $backupToDelete)) {
+            try {
+                if ($this->perform()) {
+                    $fileSystemAwsS3Backups->deleteDirectory('/' . $backupToDelete);
+                }
                 $this->getLogger()->info("Successfully deleted backup '$backupToDelete'");
-            } else {
+            } catch (Flysystem\FilesystemException $e) {
                 $this->getLogger()->error("Unable to delete backup '$backupToDelete'");
             }
         }
