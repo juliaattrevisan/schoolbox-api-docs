@@ -103,7 +103,7 @@ class Controller extends Base
     /**
      * specific URL for assessmentAudit on folder 0
      */
-    public function assessmentAudit()
+    private function assessmentAudit()
     {
         //helper URL object
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
@@ -130,7 +130,7 @@ class Controller extends Base
     /**
      * return list of reports for uxui
      */
-    public function uxui()
+    private function uxui()
     {
         $this->taskDHelper->addSource('uxui', 'topMenuReport');
         $this->taskDHelper->addSource('uxui', 'sideMenuReport');
@@ -265,7 +265,7 @@ class Controller extends Base
     /**
      * return list of reports for user management audit
      */
-    public function user()
+    private function user()
     {
         $this->taskDHelper->addSource('user', 'listOfRoles');
         $this->taskDHelper->addSource('user', 'listOfCampuses');
@@ -452,7 +452,7 @@ class Controller extends Base
     /**
      * return list of reports for LMS Fundamentals Audit
      */
-    public function lms()
+    private function lms()
     {
         $this->taskDHelper->addSource('lms', 'gradeGroups');
         $this->taskDHelper->addSource('lms', 'academicPeriods');
@@ -676,7 +676,7 @@ class Controller extends Base
     /**
      * return list of reports for Community Engagement Audit
      */
-    public function community()
+    private function community()
     {
         $this->taskDHelper->addSource('community', 'newsTopics');
         $this->taskDHelper->addSource('community', 'newsServicePermissions');
