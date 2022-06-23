@@ -19,9 +19,10 @@
  #}
 {% if turnitinApiEnabled %}
     {# If the turnitin api was configured then assume we're using that
-     # instead of plag (mutually exclusive)
+     # instead of plag (mutually exclusive). Check that a turnitin_report
+     # db row exists, and that it's nonhistorical
      #}
-    {% if currentFile.turnitin.hasReport %}
+    {% if currentFile.turnitin and currentFile.turnitin.hasReport %}
         {% include '@learning/dueWork/turnitin/link.twig' with {
             assessment:   assessment,
             response:     response,
