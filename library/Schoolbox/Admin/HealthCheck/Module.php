@@ -21,7 +21,6 @@ class Module extends BaseModule
     {
         $isAlaress = new Rule\IsSchoolboxAdmin();
         $this->register('GET', '/audit', 'getAudit', $isAlaress);
-        $this->register('GET', '/audit/assessmentAudit', 'assessmentAudit', $isAlaress);
         // UXUI Audits
         $this->register('GET', '/audit/topMenuReport', 'topMenuReport', $isAlaress);
         $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', $isAlaress);
