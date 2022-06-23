@@ -99,6 +99,8 @@ class CalendarFactory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    \Schoolbox\External\Profile\Student\Mapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
                     \Schoolbox\CampusMapper::getInstance(),
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper::getInstance(),

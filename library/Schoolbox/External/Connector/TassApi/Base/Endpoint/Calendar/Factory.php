@@ -14,6 +14,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\ApiCertification;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\EDiary\EDiary;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -132,6 +133,8 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
         \Schoolbox\CampusMapper $campusMapper,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
@@ -143,12 +146,15 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->studentProfileMapper = $studentProfileMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
         $this->campusMapper = $campusMapper;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
         $this->roletypeRelationMapper = $roletypeRelationMapper;
         $this->campusRelationMapper = $campusRelationMapper;
         $this->roleMapper = $roleMapper;
+
     }
 
 
@@ -246,6 +252,22 @@ class Factory
                 $this->perform,
                 $this->eventMapper,
                 self::SOURCE_NAME
+            ))
+            ->add(new EDiary(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->studentProfileMapper,
+                $this->staffProfileMapper,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
             ))
 //            ->add(new ParentCalendar(
 //                $this->log,
