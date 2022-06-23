@@ -7066,11 +7066,6 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/Model.php
 
 		-
-			message: "#^Dead catch \\- Aws\\\\S3\\\\Exception\\\\S3Exception is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/S3/Migration.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Translator/ModelToArray.php
