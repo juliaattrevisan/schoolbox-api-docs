@@ -141,8 +141,6 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
     /**
      * Returns the full mime string for the file
      *
-     * TODO check usages to verify this is not called with detect = true
-     *
      * @return string
      */
     public function getMime()

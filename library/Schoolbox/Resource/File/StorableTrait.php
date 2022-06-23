@@ -73,10 +73,9 @@ trait StorableTrait
     /**
      * Returns the full mime string for the file
      *
-     * @param  bool   $detect
      * @return string
      */
-    public function getMime($detect = false)
+    public function getMime()
     {
         return $this->getMimetype()->getMime();
     }
