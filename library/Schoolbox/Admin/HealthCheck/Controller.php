@@ -302,7 +302,7 @@ class Controller extends Base
             g.NAME   AS 'Role Name',
             Count(*) AS 'User Count'
         FROM
-            groups g
+            `groups` g
         JOIN
             user u ON g.id = u.group_id
         WHERE
@@ -834,7 +834,7 @@ class Controller extends Base
         FROM
             msg_route_perm mrp
         LEFT JOIN
-            groups g on g.id = mrp.role_id
+            `groups` g on g.id = mrp.role_id
         JOIN
             msg_source ms on ms.id = mrp.msg_source_id
         WHERE
