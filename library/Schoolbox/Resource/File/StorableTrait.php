@@ -14,9 +14,6 @@ use Schoolbox\File\Mimetype;
 
 /**
  * Trait for common features of models which contain a storage file.
- *
- * TODO determine if this is still even required: many of these methods back
- *      onto Storage methods which will be removed
  */
 trait StorableTrait
 {
