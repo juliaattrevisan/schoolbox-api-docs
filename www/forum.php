@@ -87,7 +87,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* output pagination */
 
-$threadList = $threadMapper->findByColumn('categoryID', $category->getId())->getAll();
+$threadCount = $threadMapper->findByColumn('categoryID', $category->getId())->count();
 $pageNum = $this->arg[1] ?? 1;
 
 if (!$pageNum) {
@@ -95,7 +95,7 @@ if (!$pageNum) {
 }
 
 $threadPerPage = \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE;
-$totalPages = count($threadList) ? ceil(count($threadList) / $threadPerPage) : 0;
+$totalPages = $threadCount ? ceil($threadCount / $threadPerPage) : 0;
 $threadIndex = $threadPerPage * ($pageNum - 1);
 
 $this->setVar(array(
@@ -150,7 +150,6 @@ $threadList = new \Schoolbox\Collection($threadMapper->findByColumn(
 )->getAll());
 
 if (0 !== count($threadList)) {
-    $userHandler = new User();
     $j = 0;
     $threadPostCounts = $threadMapper->findPostCount($threadList);
     foreach ($threadList as $thread) {
