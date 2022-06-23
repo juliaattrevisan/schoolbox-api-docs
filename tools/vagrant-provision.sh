@@ -266,7 +266,7 @@ declare -A env_vars=(
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
   [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
   [FACTER_iam_access_key]="$aws_iam_key"
-  [FACTER_iam_access_key]="$aws_iam_secret"
+  [FACTER_iam_secret_key]="$aws_iam_secret"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
