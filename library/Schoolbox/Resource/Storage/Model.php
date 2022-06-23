@@ -155,22 +155,10 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
     }
 
     /**
-     * TODO check usages to verify this is not being called to generate the size
-     *
      * @return int
      */
     public function getSize()
     {
-//        // Calculate size if not known
-//
-//        if (!$this->size) {
-//            try {
-//                $this->setSize(parent::getSize());
-//            } catch (RuntimeException $e) {
-//                throw new FileNotFoundException($this->getPath(), 0, $e);
-//            }
-//        }
-
         return $this->size;
     }
 
