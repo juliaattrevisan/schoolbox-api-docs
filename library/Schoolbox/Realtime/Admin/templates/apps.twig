@@ -106,14 +106,14 @@
             <h2 class="subheader">Register New App</h2>
             <form id="new-app" method="post" action="{{ routeLookup('adminMessages.postModifyApp') }}" class="mage">
                 <section>
-                    <fieldset class="content" data-mage="part-1">
+                    <fieldset class="content" data-mage="part-1" data-has-error-placeholder>
                         <legend>Provider</legend>
                         <div class="small-12 column">
                             {#<label>Select the provider of your new application to register:</label>#}
                         </div>
                         {% for provider, providerInfo in providers %}
                             <div class="column small-12 medium-4{%  if loop.last %} end{% endif %}">
-                                <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" data-radio-block />
+                                <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" />
                                 <label for="provider-{{ provider }}" class="block">
                                     <i class="icon-mobile"></i> {{ providerInfo.description }}
                                 </label>
