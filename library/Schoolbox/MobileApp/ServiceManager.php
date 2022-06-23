@@ -267,7 +267,6 @@ class ServiceManager implements IServiceManager
         if ($this->apnsCertRequiresUpdate($hash)) {
             // copy the cert from storage
             $fp = fopen($this->getTempCertFilename($hash), 'wb');
-            // TODO consider a filesystem proxy method for copying to temp
             stream_copy_to_stream($this->filesystemProxy->readStream($storage), $fp);
             fclose($fp);
         }
