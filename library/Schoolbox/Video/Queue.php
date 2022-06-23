@@ -455,10 +455,10 @@ class Queue extends ResourceVideo
             $this->log('Downloading file to local disk');
             $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", $storage->getExtension());
             $mediaFileOut  = fopen($mediaFilename, "w");
-
-            // TODO disentangle the model from the storage logic
-            $filesystemProxy = $this->storageMapper->getStorageFilesystemProxy();
-            stream_copy_to_stream($filesystemProxy->readStream($this->getStorage()), $mediaFileOut);
+            stream_copy_to_stream(
+                $this->storageMapper->getStorageFilesystemProxy()->readStream($this->getStorage()),
+                $mediaFileOut,
+            );
             fclose($mediaFileOut);
 
             // Remember that we created this temporary file so we can delete it later
