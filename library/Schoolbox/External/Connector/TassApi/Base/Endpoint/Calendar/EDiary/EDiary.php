@@ -203,11 +203,6 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        /* This comes from an API request at TASS
-         * We want events bracketed by 1 month in the past and 12 months in the future
-         */
-        $endpoint = 'getStudentEDiary';
-
         /* Get a list of Student external ids
          * Use the profile mappers to get a 1D array of those
          * For each person in that set,
@@ -217,7 +212,7 @@ class EDiary implements IStrategy
 
         foreach ($studentFeedCategories['calendar'] as $feed) {
             foreach ($userProfiles as $userProfile) {
-                $this->importStudentEvents($userProfile, $feed, $endpoint);
+                $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
             }
         }
 
@@ -234,11 +229,6 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        /* This comes from an API request at TASS
-         * We want events bracketed by 1 month in the past and 12 months in the future
-         */
-        $endpoint = 'getTeacherEDiary';
-
         /* Get a list of Staff external ids
          * Use the profile mappers to get a 1D array of those
          *
@@ -249,7 +239,7 @@ class EDiary implements IStrategy
 
         foreach ($staffFeedCategories['calendar'] as $feed) {
             foreach ($userProfiles as $userProfile) {
-                $this->importStaffEvents($userProfile, $feed, $endpoint);
+                $this->importStaffEvents($userProfile, $feed, 'getTeacherEDiary');
             }
         }
     }
@@ -280,6 +270,9 @@ class EDiary implements IStrategy
             $userProfile->getBaseProfile()->getExternalId()
         ));
 
+        /* This comes from an API request at TASS
+         * We want events bracketed by 1 month in the past and 12 months in the future
+         */
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $endpoint,
             [
