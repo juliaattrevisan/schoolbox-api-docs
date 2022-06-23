@@ -208,38 +208,23 @@
                             </fieldset>
 
                             {# Render roughly-equal column lengths #}
-                            <fieldset>
+                            <fieldset data-has-error-placeholder>
                                 <label class="content required">Campus Involvement</label>
-
                                 <div class="row content">
-                                    {% set numPerColumn = (campuses|length/3)|round(0, 'ceil') %}
-
+                                    <div class="column small-12 medium-12 error-placeholder"></div>
                                     {# Work out if the user is in this campus- really need to write a collection.contains() method #}
                                     {% for campus in campuses %}
-                                        {% if numPerColumn == 1 or loop.index % numPerColumn == 1 %}
-                                            <div class="small-12 medium-4 columns">
-                                        {% endif %}
-
+                                    <div class="small-12 medium-4 columns">
                                         {% set campusChecked = false %}
                                         {% for userCampus in user.campusCollection %}
                                             {% if userCampus.id == campus.id %}
                                                 {% set campusChecked = true %}
                                             {% endif %}
                                         {% endfor %}
-                                        <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
-                                        <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
-
-                                        {% if loop.last or loop.index % numPerColumn == 0 %}
-                                            </div>
-                                        {% endif %}
+                                            <input id="campus-{{ campus.id }}" type="checkbox" name="campus[]" value="{{ campus.id }}" {% if campusChecked %}checked{% endif %}>
+                                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+                                        </div>
                                     {% endfor %}
-
-                                    {# Special case for two campuses
-                                    # Render an empty nbsp; div otherwise it looks like a 2-column layout
-                                    #}
-                                    {% if campuses|length == 2 %}
-                                        <div class="small-12 medium-4 columns">&nbsp;</div>
-                                    {% endif %}
                                 </div>
                             </fieldset>
                             <fieldset>
