@@ -38,6 +38,7 @@ let __newComponentTabsContainer; //to reinsert the newComponentClone into the ne
 export function initAddNewComponents () {
     initListeners();
     initDraggables();
+    initNewComponentPositions();
 }
 
 /**
@@ -107,6 +108,27 @@ function addNewDraggable (component) {
 }
 
 /**
+ * To be able to sort elements and snap back to correct position
+ * When sorting and snapping back, these points are used to animate the components movements
+ */
+function initNewComponentPositions () {
+    document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
+        component.dataset.originalLeft = component.getBoundingClientRect().left;
+        component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
+        component.dataset.leftDifference = 0;
+        component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
+    });
+}
+
+
+/*****************************************************************
+ * 
+ * COMPONENT CLICKED
+ * 
+ ****************************************************************/
+
+/**
  * Add in the new component to the top of the page
  * It animates from the new components tabs to the top of the 'top' container
  * Once it's in place we then move onto loading the new component
@@ -149,7 +171,6 @@ function onNewComponentClicked (event) {
                 __isFlipping = false;
                 reinsertNewComponentButton();
                 __referenceElement.remove(); //and now the placeholder can be pulled out
-                updateSortableElements();
                 addNewComponent();
             },
         });
@@ -197,7 +218,6 @@ function onDragStart (event) {
         updateDocumentOnDragStart();
         disableAllOtherDraggables();
         extractNewComponent();
-        updateSortableElements(); //ensure we have the most up to date positions
     }
 }
 
@@ -275,19 +295,6 @@ function extractNewComponent () {
     });
 }
 
-/**
- * To be able to sort elements and snap back to correct position
- * When sorting and snapping back, these points are used to animate the components movements
- */
-function updateSortableElements () {
-    document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
-        component.dataset.originalLeft = component.getBoundingClientRect().left;
-        component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
-        component.dataset.leftDifference = 0;
-        component.dataset.topDifference = 0;
-        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
-    });
-}
 
 
 /*****************************************************************
@@ -309,7 +316,8 @@ function onDrag () {
 }
 
 /**
- *  Don't be checking while have hardly dragged or while the window is scrolling
+ * Don't be checking while another drag is already occuring, have hardly dragged, 
+ * while the window is scrolling or a FLIP is taking place
  * 
  * @returns { Boolean } 
  */
@@ -479,7 +487,7 @@ function alignNewComponent () {
 function onAlignNewComponentComplete () {
     resetNewComponent();
     updateDocumentOnDragEnd();
-    updateSortableElements();
+    // updateSortableElements();
     if (__hasNewComponent) {
         addNewComponent();
     } else {
