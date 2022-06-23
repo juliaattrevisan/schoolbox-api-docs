@@ -19,7 +19,7 @@ require_once __DIR__ . '/../../../../conf/core/require.php';
  * This finds all the dead schoolbox events and removes them.
  * These are targeted for termination:
  *
- *     ultra-old events
+ *     ancient events
  *     soft-deleted events
  *     deprecated tasscalendar events
  */
@@ -45,6 +45,21 @@ class TrimmerTool extends CliTool\App
      * Print help text for those who don't know how to use this tool
      */
     private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * --remove-older-than=...
+     *
+     * An optional flag that, when specified, will remove events that are older
+     * than NOW() - x years. If you specified 10, it'd remove events that had a
+     * finish datetime older than 10 years ago.
+     *
+     * If you don't specify it, it won't remove any ancient events.
+     *
+     * Caveat: if you specify 0, it's going to delete all events everywhere, which
+     * is extremely hazardous. I've prevented this from happening
+     */
+    private const OPT_REMOVE_OLDER_THAN = 'remove-older-than:';
 
 
     /**
@@ -79,6 +94,7 @@ class TrimmerTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_REMOVE_OLDER_THAN
         ];
     }
 
@@ -95,12 +111,19 @@ Dead Event Trimmer finds extraneous events and removes them, along with their re
 
 Dead Event candidates are those which:
     * are soft deleted
-    * finished more than 1 year ago
     * used old suds tassapi source names ParentCalendar, ParentNotices, StudentCalendar, etc. et al.
+    * (optionally) finished more than x years ago; you can choose this interval
+    
+--remove-older-than, if provided, will remove events whose finish date is older than NOW() minus
+the years specified. If you provided 5 for this arg, the script deletes events whose finish date
+was older than 5 years ago. If you omit this flag entirely, it won't delete any events based on
+their finish date (ancient events are left untouched)
+
+--remove-older-than should be specified as a positive integer
     
 There is no planning mode, but you must use --perform to mutate data.
 
-Usage: php trimmer.php [--perform]
+Usage: php trimmer.php [--remove-older-than=5] [--perform]
 
 
 HELP;
@@ -157,19 +180,39 @@ HELP;
         $this->permanentlyDelete($lock, $oldTassEventIds);
 
 
-        /* Set 3: old events that finished more than a year ago
+        /* Set 3: old events that finished more than OPT_REMOVE_OLDER_THAN years ago
+         * This depends on a cli flag being set; if it's not set, skip it
          */
-        $ancientEventIds = $this->findAncientEvents();
+        if ('' !== trim((string)$this->getOpt(self::OPT_REMOVE_OLDER_THAN))) {
+            $yearsAgo = (int)$this->getOpt(self::OPT_REMOVE_OLDER_THAN);
 
-        /* Display count of candidate events found
-         * This lets you manually correlate what you might see in workbench explorations
-         */
-        $this->getLogger()->info(sprintf(
-            'Permanently hard-deleting %s ancient event(s) that ended ages ago',
-            \count($ancientEventIds)
-        ));
+            /* Exit early: specifically deny something extremely hazardous
+             *
+             * This would have deleted all events everywhere, because INTERVAL 0 YEAR
+             * means "everything before NOW()"
+             *
+             * Also prevents negative numbers
+             */
+            if ($yearsAgo < 1) {
+                $this->getLogger()->warning('You were about to delete all events everywhere; exiting without removing anything that could be classified as an ancient event');
+                exit;
+            }
 
-        $this->permanentlyDelete($lock, $ancientEventIds);
+            /* Otherwise carry on
+             */
+            $ancientEventIds = $this->findAncientEvents($yearsAgo);
+
+            /* Display count of candidate events found
+             * This lets you manually correlate what you might see in workbench explorations
+             */
+            $this->getLogger()->info(sprintf(
+                'Permanently hard-deleting %s ancient event(s) that ended more than %s years ago',
+                \count($ancientEventIds),
+                $yearsAgo
+            ));
+
+            $this->permanentlyDelete($lock, $ancientEventIds);
+        }
 
 
         /* Add more data sets here, as needed
@@ -234,17 +277,17 @@ HELP;
 
     /**
      * Set 3: Find events that finished ages ago
-     * TODO: Interval (ancientness) could be made configurable
      *
+     * @param int $yearsAgo
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    private function findAncientEvents(): array
+    private function findAncientEvents(int $yearsAgo): array
     {
         $statement = $this->getDatabaseInternal()->query("
            SELECT id
            FROM `event`
-           WHERE end_datetime < NOW() - INTERVAL 1 YEAR       
+           WHERE end_datetime < NOW() - INTERVAL {$yearsAgo} YEAR       
         ");
 
         $statement->execute();
