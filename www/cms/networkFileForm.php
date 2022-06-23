@@ -38,7 +38,6 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
         // if file was ajax-uploaded
         if (isset($_POST['attachment'])) {
             try {
-                // TODO is this the correct method for handling files from collector?
                 /** @var FilesystemProxy $filesystemProxy */
                 $filesystemProxy = $kernel->get('filesystem.storageProxy');
                 $factory         = new CollectorFactory();
