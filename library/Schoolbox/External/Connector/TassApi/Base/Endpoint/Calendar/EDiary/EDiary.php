@@ -195,24 +195,20 @@ class EDiary implements IStrategy
          *
          * This algorithmic complexity is about to take a toll on tass
          */
-        $studentFeedCategories = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
-            'getEDiaryFeeds',
-            [
-                'type' => 'S'
-            ],
-            Api::VERSION_2
-        );
+        $feeds = $this->getFeedList('S');
 
         /* Get a list of Student external ids
          * Use the profile mappers to get a 1D array of those
          * For each person in that set,
          * Hit the endpoint and grab their calendar
          */
-        $userProfiles = $this->studentProfileMapper->findAll();
+        if ($feeds) {
+            $userProfiles = $this->studentProfileMapper->findAll();
 
-        foreach ($studentFeedCategories['calendar'] as $feed) {
-            foreach ($userProfiles as $userProfile) {
-                $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
+            foreach ($feeds as $feed) {
+                foreach ($userProfiles as $userProfile) {
+                    $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
+                }
             }
         }
 
@@ -221,27 +217,49 @@ class EDiary implements IStrategy
          *
          * This algorithmic complexity is about to take a toll on tass
          */
-        $staffFeedCategories = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
-            'getEDiaryFeeds',
+        $feeds = $this->getFeedList('T');
+
+        if ($feeds) {
+            /* Get a list of Staff external ids
+             * Use the profile mappers to get a 1D array of those
+             *
+             * For each person in that set,
+             * Hit the endpoint and grab their calendar
+             */
+            $userProfiles = $this->staffProfileMapper->findAll();
+
+            foreach ($feeds as $feed) {
+                foreach ($userProfiles as $userProfile) {
+                    $this->importStaffEvents($userProfile, $feed, 'getTeacherEDiary');
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Get a list of ediary feeds which categorise all ediary events for everyone
+     *
+     * @param string $type
+     * @return array|null
+     */
+    private function getFeedList(string $type): ?array
+    {
+        $endpoint = 'getEDiaryFeeds';
+
+        $this->log->info(sprintf(
+            'Accessing endpoint %s with arg %s to get feed list',
+            $endpoint,
+            $type
+        ));
+
+        return $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+            $endpoint,
             [
-                'type' => 'T'
+                'type' => $type
             ],
             Api::VERSION_2
         );
-
-        /* Get a list of Staff external ids
-         * Use the profile mappers to get a 1D array of those
-         *
-         * For each person in that set,
-         * Hit the endpoint and grab their calendar
-         */
-        $userProfiles = $this->staffProfileMapper->findAll();
-
-        foreach ($staffFeedCategories['calendar'] as $feed) {
-            foreach ($userProfiles as $userProfile) {
-                $this->importStaffEvents($userProfile, $feed, 'getTeacherEDiary');
-            }
-        }
     }
 
 
