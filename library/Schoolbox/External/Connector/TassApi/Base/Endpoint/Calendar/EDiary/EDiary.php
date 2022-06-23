@@ -15,7 +15,7 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 /**
  * Downloads the eDiary contents for each student
  */
-class Base implements IStrategy
+class EDiary implements IStrategy
 {
     /**
      * @var LoggerInterface
@@ -86,6 +86,30 @@ class Base implements IStrategy
      */
     public function import(): void
     {
+        /* Get a list of Student external ids
+         * Use the profile mappers to get a 1D array of those
+         */
 
+        /* For each person in that set,
+         * Hit the endpoint and grab their calendar
+         */
+
+        /* Process each event
+         */
+
+        /* Get a list of Staff external ids
+         * Use the profile mappers to get a 1D array of those
+         */
+
+        /* For each person in that set,
+         * Hit the endpoint and grab their calendar
+         */
+
+        /* Process each event
+         */
     }
+
+
+
+    public function importEdiaryEvent(array $ediary) {}
 }
