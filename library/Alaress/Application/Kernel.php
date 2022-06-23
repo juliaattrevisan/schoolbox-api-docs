@@ -1829,10 +1829,8 @@ abstract class Kernel
         $di->set(
             'filesystem.storage',
             $di->lazy(
-                function () use ($di) {
-                    /** @var MountManager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
+                function () use ($config) {
+                    return (new FilesystemFactory())->buildStorage($config);
                 }
             )
         );
@@ -1868,10 +1866,8 @@ abstract class Kernel
         $di->set(
             'filesystem.temp',
             $di->lazy(
-                function () use ($di) {
-                    /** @var MountManager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
+                function () {
+                    return (new FilesystemFactory())->buildTemp();
                 }
             )
         );

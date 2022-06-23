@@ -18,6 +18,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
@@ -61,6 +62,35 @@ class FilesystemFactory
         return $this->buildSpecific($storageDir, sys_get_temp_dir());
     }
 
+    /**
+     * Build the storage filesystem, as defined by config.
+     *
+     * @param IConfigLoader $config
+     * @return Filesystem
+     */
+    public function buildStorage(IConfigLoader $config): Filesystem
+    {
+        $adapter        = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+        $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
+        $fsConfig       = $enableReUpload ? ['disable_asserts' => true] : null;
+        return match ($adapter) {
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(new Local($config->get('storage_dir')), $fsConfig),
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($fsConfig, self::PREFIX_STORAGE),
+            default                          => throw new UnexpectedValueException(
+                "Unrecognised filesystem adapter: '$adapter'",
+            ),
+        };
+    }
+
+    /**
+     * Return a temp filesystem.
+     *
+     * @return Filesystem
+     */
+    public function buildTemp(): Filesystem
+    {
+        return new Filesystem(new Local(sys_get_temp_dir()));
+    }
 
     /**
      * @param string $storageDir
