@@ -7,8 +7,142 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 island">
+        <div class="medium-12 large-7 island">
             <h2 class="subheader">SSL Renewal Help</h2>
+            <section class="content">
+                <label>Problem</label>
+                <p>This this</p>
+                <label>Troubleshooting</label>
+                <p>This this</p>
+            </section>
+            <h3 class="subheader">Troubleshooting</h3>
+            <section>
+                <ul class="information-list expandable-card">
+                    <li>
+                        <div>
+                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_port_80"></div>
+                            <div class="column-left columns content">
+                                Port 80 timeout
+                            </div>
+                            <div class="right-align content">
+                                <span class="full-width neutral label" data-light="ssl_port_80">Testing...</span>
+                            </div>
+                        </div>
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_port_80" style="display: none;">
+                            <p>Here is my stuff!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_https_upgrade"></div>
+                            <div class="column-left columns content">
+                                HTTP > HTTPS upgrade
+                            </div>
+                            <div class="right-align content">
+                                <span class="full-width neutral label" data-light="ssl_https_upgrade">Testing...</span>
+                            </div>
+                        </div>
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_https_upgrade" style="display: none;">
+                            <p>Here is my stuff!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_upstream_error"></div>
+                            <div class="column-left columns content">
+                                Upstream error responses
+                            </div>
+                            <div class="right-align content">
+                                <span class="full-width neutral label" data-light="ssl_upstream_error">Testing...</span>
+                            </div>
+                        </div>
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_upstream_error" style="display: none;">
+                            <p>Here is my stuff!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_user_agent"></div>
+                            <div class="column-left columns content">
+                                User agent blocking
+                            </div>
+                            <div class="right-align content">
+                                <span class="full-width neutral label" data-light="ssl_user_agent">Testing...</span>
+                            </div>
+                        </div>
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_user_agent" style="display: none;">
+                            <p>Here is my stuff!</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_geoblocking"></div>
+                            <div class="column-left columns content">
+                                Geoblocking
+                            </div>
+                            <div class="right-align content">
+                                <span class="full-width neutral label" data-light="ssl_geoblocking">Testing...</span>
+                            </div>
+                        </div>
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_geoblocking" style="display: none;">
+                            <p>Here is my stuff!</p>
+                        </div>
+                    </li>
+                </ul>
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-collapser]').collapsable();
+                    });
+                </script>
+            </section>
+
+        </div>
+        <div class="show-for-large-up large-5 island">
+            <h2 class="subheader">Test Summary</h2>
+            <section>
+                <ul class="information-list">
+                    <li>
+                        <div class="small-5 columns content">
+                            Port 80 timeout
+                        </div>
+                        <div class="small-7 columns content">
+                            <span class="full-width neutral label" data-light="ssl_port_80">Testing...</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="small-5 columns content">
+                            HTTP > HTTPS upgrade
+                        </div>
+                        <div class="small-7 columns content">
+                            <span class="full-width neutral label" data-light="ssl_https_upgrade">Testing...</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="small-5 columns content">
+                            Upstream error responses
+                        </div>
+                        <div class="small-7 columns content">
+                            <span class="full-width neutral label" data-light="ssl_upstream_error">Testing...</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="small-5 columns content">
+                            User agent blocking
+                        </div>
+                        <div class="small-7 columns content">
+                            <span class="full-width neutral label" data-light="ssl_user_agent">Testing...</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="small-5 columns content">
+                            Geoblocking
+                        </div>
+                        <div class="small-7 columns content">
+                            <span class="full-width neutral label" data-light="ssl_geoblocking">Testing...</span>
+                        </div>
+                    </li>
+                </ul>
+            </section>
         </div>
     </div>
 </div>
