@@ -197,7 +197,6 @@ class FilesystemProxy
         // The file may already exist in the storage backend.
         // This is fine, because the storage file's contents determine the
         // file path: we can assume it's the same file.
-        // @phpstan-ignore-next-line: move() can throw this exception
         $this->updateStorage($storage, $hash, $storagePath);
     }
 
