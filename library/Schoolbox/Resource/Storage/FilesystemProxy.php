@@ -10,6 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage;
 
 use League\Flysystem\Local\LocalFilesystemAdapter as Local;
+use League\Flysystem\UnableToCheckDirectoryExistence;
+use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
@@ -34,6 +39,16 @@ use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
  */
 class FilesystemProxy
 {
+    /**
+     * Generic exception for non-supported directory operations.
+     */
+    private const ERROR_DIRECTORY_SPECIFIC_METHOD = __CLASS__ . ' does not support directory methods';
+
+    /**
+     * Generic exception for non-supported location operations.
+     */
+    private const ERROR_LOCATION_SPECIFIC_METHOD = __CLASS__ . ' does not support location methods';
+
     /**
      * Constructor
      *
@@ -68,12 +83,12 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCheckDirectoryExistence
      * @noinspection PhpUnusedParameterInspection
      */
     public function directoryExists(IStorage $storage): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCheckDirectoryExistence(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
@@ -240,12 +255,12 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToDeleteDirectory
      * @noinspection PhpUnusedParameterInspection
      */
     public function deleteDirectory(IStorage $storage): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToDeleteDirectory(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
@@ -256,12 +271,12 @@ class FilesystemProxy
      * @param IStorage $storage
      * @param array    $config
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCreateDirectory
      * @noinspection PhpUnusedParameterInspection
      */
     public function createDirectory(IStorage $storage, array $config = []): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCreateDirectory(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
@@ -342,12 +357,12 @@ class FilesystemProxy
      * @param IStorage $storage
      * @param bool     $recursive
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCheckDirectoryExistence
      * @noinspection PhpUnusedParameterInspection
      */
     public function listContents(IStorage $storage, bool $recursive = false)
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCheckDirectoryExistence(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
 
@@ -359,12 +374,12 @@ class FilesystemProxy
      * @param IStorage $source
      * @param IStorage $destination
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToMoveFile
      * @noinspection PhpUnusedParameterInspection
      */
     public function move(IStorage $source, IStorage $destination): void
     {
-        throw self::generateLocationSpecificMethodException();
+        throw new UnableToMoveFile(self::ERROR_LOCATION_SPECIFIC_METHOD);
     }
 
     /**
@@ -375,12 +390,12 @@ class FilesystemProxy
      * @param IStorage $source
      * @param IStorage $destination
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCopyFile
      * @noinspection PhpUnusedParameterInspection
      */
     public function copy(IStorage $source, IStorage $destination): void
     {
-        throw self::generateLocationSpecificMethodException();
+        throw new UnableToCopyFile(self::ERROR_LOCATION_SPECIFIC_METHOD);
     }
 
     /**
@@ -416,28 +431,6 @@ class FilesystemProxy
     {
         return $this->filesystem instanceof Filesystem
             && $this->filesystem->getAdapter() instanceof S3Adapter;
-    }
-
-    /**
-     * Generate generic exception for non-supported directory operations
-     * (e.g. `createDirectory`, `directoryExists`).
-     *
-     * @return NotSupportedException
-     */
-    private static function generateDirectorySpecificMethodException(): NotSupportedException
-    {
-        throw new NotSupportedException(sprintf('%s does not support directory methods', __CLASS__));
-    }
-
-    /**
-     * Generate generic exception for non-supported location operations
-     * (e.g. `copy`, `move`).
-     *
-     * @return NotSupportedException
-     */
-    private static function generateLocationSpecificMethodException(): NotSupportedException
-    {
-        throw new NotSupportedException(sprintf('%s does not support location methods', __CLASS__));
     }
 
     /**
