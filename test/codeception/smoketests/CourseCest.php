@@ -380,8 +380,7 @@ class CourseCest
          * remove 1 task and 1 due work not yet exported to the class
          * export a due work and a task to the class not yet exported
          */
-
-        $unit_name   = $title . 'second unit added';
+        $unit_name   = $title . ' second unit added';
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
         $unitSpecPayload->setFormParam('name', $unit_name);
         $i->amGoingTo('Send request create a second unit spec');
@@ -390,22 +389,30 @@ class CourseCest
         $unit_folder = $i->grabFirstFolderByTitle($unit_name);
         $unitSpecId = $unitSpec->getId();
         $unit_folderId = $unit_folder->getId();
-        $this->createAssessment($i,$unitSpecId,$unit_folderId);
-
-       // $assessment_title = 'Assessment Due Work for Course tests On Unit 2 spec ID ' . $unitSpec->getId() . ' at ' . $timestamp;
-
-//        $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpec->getId(), $unit_folder->getId(), AssessmentType::TYPE_DUE_WORK);
-//        $newAssessmentRequest->setTitle($assessment_title);
-
-//        $i->amGoingTo('Send request create assessment on Unit spec #' . $unitSpec->getId());
-//        $i->sendRequest($newAssessmentRequest);
-//        $dueWorkUnitSpec = $i->grabFirstAssessmentByTitle($assessment_title);
-
-
+        $this->createAssessment($i,$unitSpecId,$unit_folderId,'due work 1');
         $modifyCourse = new Payload\Course\Specification\Update($course_spec);
         $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
         $i->amGoingTo('Send save request for the newly created course');
         $i->sendRequest($modifyCourse);
+
+        $unit_name   = $title . ' third unit added';
+        $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
+        $unitSpecPayload->setFormParam('name', $unit_name);
+        $i->amGoingTo('Send request create a third unit spec');
+        $i->sendRequest($unitSpecPayload);
+        $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
+        $unit_folder = $i->grabFirstFolderByTitle($unit_name);
+        $unitSpecId = $unitSpec->getId();
+        $unit_folderId = $unit_folder->getId();
+        $this->createAssessment($i,$unitSpecId,$unit_folderId,'due work 1');
+        $this->createAssessment($i,$unitSpecId,$unit_folderId,'due work 2');
+        $this->createAssessment($i,$unitSpecId,$unit_folderId,'due work 3');
+        $this->createAssessment($i,$unitSpecId,$unit_folderId,'due work 4');
+        $modifyCourse = new Payload\Course\Specification\Update($course_spec);
+        $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
+        $i->amGoingTo('Send save request for the newly created course');
+        $i->sendRequest($modifyCourse);
+
 
 
         #WHEN
@@ -485,16 +492,16 @@ class CourseCest
     /** Convenience helper to create assessments
      * @param IntegrationTester $i
      */
-    public function createAssessment(IntegrationTester $i, int $unitSpecId, int $unitFolderId) {
+    public function createAssessment(IntegrationTester $i, int $unitSpecId, int $unitFolderId, string $title) {
 
         $timestamp      = time();
-        $assessment_title = 'Assessment Due Work for Course tests On Unit spec ID ' . $unitSpecId . ' at ' . $timestamp;
+        $assessment_title = 'Assessment' . $title . ' for Course tests On Unit spec ID '  . $unitSpecId . ' at ' . $timestamp;
 
         $newAssessmentRequest = new Payload\Assessable\Create(AssessmentContextType::TYPE_UNIT_SPECIFICATION, $unitSpecId, $unitFolderId, AssessmentType::TYPE_DUE_WORK);
         $newAssessmentRequest->setTitle($assessment_title);
 
         $i->amGoingTo('Send request create assessment on Unit spec #' . $unitSpecId);
         $i->sendRequest($newAssessmentRequest);
-        $dueWorkUnitSpec = $i->grabFirstAssessmentByTitle($assessment_title);
+        return $i->grabFirstAssessmentByTitle($assessment_title);
     }
 }
