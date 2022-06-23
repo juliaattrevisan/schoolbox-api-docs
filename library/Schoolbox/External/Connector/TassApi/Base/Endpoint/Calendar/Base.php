@@ -14,7 +14,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 
 /**
  * Class Base
