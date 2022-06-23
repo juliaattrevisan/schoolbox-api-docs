@@ -130,7 +130,9 @@ function addNewDraggable (component) {
         type: 'x, y',
         trigger: componentTrigger,
         autoScroll: 1,
-        onDragStart: (event) => onDragStart(event),
+        onDragStart: function () {
+            onDragStart(this);
+        }, 
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
     })[0];
@@ -148,9 +150,11 @@ function addNewDraggable (component) {
  * Sub in a placeholder to use in place of the element being dragged, 
  * which gets pulled out so it can go into any other parent container 
  * that contains the COMPONENT_SELECTOR
+ * 
+ * @param { Draggable }
  */
-function onDragStart (event) {
-    __activeComponent = event.target.closest(COMPONENT_SELECTOR); //use the parent container regardless of selection to ensure correct dimensions etc
+function onDragStart (draggableInstance) {
+    __activeComponent = draggableInstance.target;
     __referenceElement = getReferenceElement();
     __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
     updateDocumentOnDragStart();

@@ -167,7 +167,7 @@ function onNewComponentClicked (draggableInstance) {
         Flip.from(state, {
             absolute: true, //to accurately animate elements
             duration: ANIMATE_SPEED * 2,
-            ease: "power1.inOut",
+            ease: 'power1.inOut',
             nested: true, //as Flip.getState() contains parents (COMPONENT_CONTAINERS_SELECTOR) and children (SORTABLE_SELECTOR)
             zIndex: 9999, //ensure it stays on top
             onComplete: () => {
