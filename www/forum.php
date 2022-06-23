@@ -87,7 +87,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* output pagination */
 
-$threadCount = $threadMapper->findByColumn('categoryID', $category->getId())->count();
+$threadCount = $threadMapper->countByColumn('categoryID', $category->getId());
 $pageNum = $this->arg[1] ?? 1;
 
 if (!$pageNum) {
