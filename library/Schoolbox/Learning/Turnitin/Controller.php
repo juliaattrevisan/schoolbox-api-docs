@@ -255,7 +255,7 @@ class Controller extends Base
         /* Find the corresponding report, if it exists
          */
         try {
-            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId, ['deleted']);
+            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
         } catch (\Schoolbox\Mapper\Exception\Deleted $deleted) {
             $model = $deleted->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
