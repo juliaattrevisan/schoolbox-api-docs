@@ -784,7 +784,7 @@ class SitePage extends Page
             $referer = parse_url($_SERVER['HTTP_REFERER']);
             if ($referer['host'] === $_SERVER['SERVER_NAME']) {
                 foreach (array('create', 'modify') as $path) {
-                    if (stripos($referer['path'], $path) !== false) {
+                    if (stripos($referer['path'] ?? '', $path) !== false) {
                         header("X-XSS-Protection: 0\r\n");
                         return true;
                     }
