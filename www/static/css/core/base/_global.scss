@@ -1,137 +1,113 @@
 
-@include exports("global") {
+/*
+    The following global styles is a combination of: 
+    1. A CSS reset from: https://www.joshwcomeau.com/css/custom-css-reset/
+    2. Foundations own overrides
+    3. Our own specific tweaks
 
-    // Meta styles are a dependancy of the Javascript.
-    // Used to provide media query values for javascript components.
-    // Forward slash placed around everything to convince PhantomJS to read the value.
+    We had previously used normalize (github.com/necolas/normalize.css) 
+    But it hasn't been updated in over five years and browsers have moved
+    on quite a bit since then. Addtionally, Foundation itself pretty
+    aggresively sets everything to how it sees fit. 
 
-    meta.foundation-version {
-        font-family: "/5.5.3/";
-    }
+    Moving forward I've tried to tidy up such global overrides as much as possible. 
+    This is so as we update our UI components, we can minimise the legacy that 
+    gets in the way and hopefully make it easier for new components to exist
+    in the existing setup.
+*/
 
-    meta.foundation-mq-small {
-        font-family: "/" + unquote($small-up) + "/";
-        width: lower-bound($small-range);
-    }
+// Use a more-intuitive box-sizing model.
+*, *::before, *::after {
+    box-sizing: border-box;
+}
 
-    meta.foundation-mq-small-only {
-        font-family: "/" + unquote($small-only) + "/";
-        width: lower-bound($small-range);
-    }
+// Remove default margin and padding
+* {
+    margin: 0;
+    padding: 0;
+}
 
-    meta.foundation-mq-medium {
-        font-family: "/" + unquote($medium-up) + "/";
-        width: lower-bound($medium-range);
-    }
+html {
+    scroll-behavior: smooth; //to allow smooth browser scrolling when animating to an anchor tag
+}
 
-    meta.foundation-mq-medium-only {
-        font-family: "/" + unquote($medium-only) + "/";
-        width: lower-bound($medium-range);
-    }
+html,
+body { 
+    font-size: $base-font-size; 
+    height: 100%; //Allow percentage-based heights in the application
+}
 
-    meta.foundation-mq-large {
-        font-family: "/" + unquote($large-up) + "/";
-        width: lower-bound($large-range);
-    }
+// Default body styles
+body {
+    background: $body-bg;
+    color: $body-font-color;
+    cursor: $cursor-auto-value;
+    font-family: $body-font-family;
+    font-style: $body-font-style;
+    font-weight: $body-font-weight;
+    line-height: $base-line-height; // Set to $base-line-height to take on browser default of 150%
+    padding: 0;
+    position: relative;
+    -webkit-font-smoothing: antialiased; //Improve text rendering when available
+}
 
-    meta.foundation-mq-large-only {
-        font-family: "/" + unquote($large-only) + "/";
-        width: lower-bound($large-range);
-    }
+::selection { //to customise the portion of a document that has been highlighted
+    background-color: $accent-foreground;
+    color: $accent-background;
+}
 
-    meta.foundation-mq-xlarge {
-        font-family: "/" + unquote($xlarge-up) + "/";
-        width: lower-bound($xlarge-range);
-    }
+// Grid Defaults to get images and embeds to work properly
+// Get rid of gap under images by making them display: inline-block; by default
+img { 
+    display: inline-block;
+    height: auto; 
+    max-width: 100%; 
+    vertical-align: middle;
+}
 
-    meta.foundation-mq-xlarge-only {
-        font-family: "/" + unquote($xlarge-only) + "/";
-        width: lower-bound($xlarge-range);
-    }
+// if an image has no src, hide it.
+img[src=""] {
+    display: none;
+}
 
-    meta.foundation-mq-xxlarge {
-        font-family: "/" + unquote($xxlarge-up) + "/";
-        width: lower-bound($xxlarge-range);
-    }
+// Improve media defaults
+picture, video, canvas {
+    display: block;
+    max-width: 100%;
+}
 
-    meta.foundation-data-attribute-namespace {
-        font-family: #{$namespace};
+//don't allow max-width when using map_canvas, I assume because
+//setting it prevents it from displaying completely
+#map_canvas,
+.map_canvas,
+.mqa-display {
+    img,
+    embed,
+    object { 
+        max-width: none !important;
     }
+}
 
-    //to allow smooth browswer scrolling when animating to an anchor tag
-    html {
-        scroll-behavior: smooth;
-    }
+// Miscellaneous useful HTML classes
+.left { 
+    float: left !important; 
+}
 
-    html,
-    body { 
-        font-size: $base-font-size; 
-    }
+.right { 
+    float: right !important; 
+}
 
-    // Default body styles
-    body {
-      background: $body-bg;
-      color: $body-font-color;
-      cursor: $cursor-auto-value;
-      font-family: $body-font-family;
-      font-style: $body-font-style;
-      font-weight: $body-font-weight;
-      line-height: $base-line-height; // Set to $base-line-height to take on browser default of 150%
-      margin: 0;
-      padding: 0;
-      position: relative;
-    }
+.clearfix { 
+    @include clearfix;
+}
 
-    a:hover { 
-        cursor: $cursor-pointer-value; 
-    }
+// Make sure textarea takes on height automatically
+textarea { 
+    height: auto; 
+    min-height: 50px; 
+}
 
-    // Grid Defaults to get images and embeds to work properly
-    // Get rid of gap under images by making them display: inline-block; by default
-    img { 
-        display: inline-block;
-        max-width: 100%; 
-        height: auto; 
-        vertical-align: middle;
-    }
-
-    // if an image has no src, hide it.
-    img[src=""] {
-        display: none;
-    }
-
-    //don't allow max-width when using map_canvas, I assume because
-    //setting it prevents it from displaying completely
-    #map_canvas,
-    .map_canvas,
-    .mqa-display {
-        img,
-        embed,
-        object { 
-            max-width: none !important;
-        }
-    }
-
-    // Miscellaneous useful HTML classes
-    .left { 
-        float: left !important; 
-    }
-    .right { 
-        float: right !important; 
-    }
-    .clearfix { 
-        @include clearfix;
-    }
-
-    // Make sure textarea takes on height automatically
-    textarea { 
-        height: auto; 
-        min-height: 50px; 
-    }
-
-    // Make select elements 100% width by default
-    select { 
-        width: 100%; 
-    }
-
+// Make select elements 100% width by default
+select { 
+    width: 100%; 
 }

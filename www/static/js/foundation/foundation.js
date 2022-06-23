@@ -19,28 +19,6 @@
     document.documentElement.classList.add('touch');
   } 
 
-  var header_helpers = function (class_array) {
-    var head = $('head');
-    head.prepend($.map(class_array, function (class_name) {
-      if (head.has('.' + class_name).length === 0) {
-        return '<meta class="' + class_name + '" />';
-      }
-    }));
-  };
-
-  header_helpers([
-    'foundation-mq-small',
-    'foundation-mq-small-only',
-    'foundation-mq-medium',
-    'foundation-mq-medium-only',
-    'foundation-mq-large',
-    'foundation-mq-large-only',
-    'foundation-mq-xlarge',
-    'foundation-mq-xlarge-only',
-    'foundation-mq-xxlarge',
-    'foundation-data-attribute-namespace']);
-
-
   // private Fast Selector wrapper,
   // returns jQuery object. Only use where
   // getElementById is not available.
