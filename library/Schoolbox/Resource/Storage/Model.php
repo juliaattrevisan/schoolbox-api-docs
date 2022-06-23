@@ -265,21 +265,6 @@ class Model implements IStorage, \Alaress\Json\Serializable, Linkable
 
 
     /**
-     * Pipe the readstream of this file to some other stream resource
-     *
-     * @deprecated use some other method for piping a stream to another
-     *
-     * @param resource $to
-     *
-     * @return int
-     */
-    public function pipe($to)
-    {
-        throw new BadMethodCallException(sprintf('%s::%s is no longer supported', __CLASS__, __FUNCTION__));
-    }
-
-
-    /**
      * @return array
      */
     public function getDefaultJsonMap(): array
