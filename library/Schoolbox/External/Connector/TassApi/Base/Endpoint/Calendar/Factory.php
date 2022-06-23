@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
 
 /**
  * Class Factory
@@ -32,7 +31,6 @@ use Schoolbox\UserMapper;
  */
 class Factory
 {
-
     /**
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed
@@ -154,7 +152,6 @@ class Factory
         $this->roletypeRelationMapper = $roletypeRelationMapper;
         $this->campusRelationMapper = $campusRelationMapper;
         $this->roleMapper = $roleMapper;
-
     }
 
 

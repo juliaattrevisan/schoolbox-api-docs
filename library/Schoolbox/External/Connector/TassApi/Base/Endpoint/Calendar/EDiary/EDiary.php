@@ -148,8 +148,7 @@ class EDiary implements IStrategy
         Registry $registry,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to
-    )
-    {
+    ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -157,6 +156,7 @@ class EDiary implements IStrategy
         $this->eventTypes = $eventTypes;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
+        $this->eventMapper = $eventMapper;
         $this->roletypeRelationMapper = $roletypeRelationMapper;
         $this->campusRelationMapper = $campusRelationMapper;
 

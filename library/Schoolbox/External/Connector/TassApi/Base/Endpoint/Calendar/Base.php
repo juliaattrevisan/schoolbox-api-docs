@@ -29,7 +29,6 @@ use Schoolbox\RoleMapper;
  */
 class Base
 {
-
     /**
      * @var LoggerInterface
      */

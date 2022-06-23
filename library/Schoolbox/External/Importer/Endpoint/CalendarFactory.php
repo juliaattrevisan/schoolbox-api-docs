@@ -24,7 +24,6 @@ use Schoolbox\RoleMapper;
  */
 class CalendarFactory implements IFactory
 {
-
     /**
      * The family of importers that we can spawn
      */
