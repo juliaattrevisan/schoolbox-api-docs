@@ -162,7 +162,6 @@ if (0 !== count($threadList)) {
             'THREAD_AUTHOR_EXTERNAL_ID' => $thread->getUser()->getExternalId(),
             'THREAD_TIME' => $thread->getDate()->getRelativeTime(),
             'THREAD_LAST_POST_TIME' => $thread->getLastPostDate()->getRelativeTime(),
-            'THREAD_LAST_POST_ID' => $thread->getLastPost()->getId(),
             'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread->getLastPostUser()->getExternalId(),
             'THREAD_LAST_POST_USER_ID' => $thread->getLastPostUser()->getId(),
             'THREAD_LAST_POST_USER' => $thread->getLastPostUser()->getFullname(),
