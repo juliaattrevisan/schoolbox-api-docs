@@ -1819,14 +1819,6 @@ abstract class Kernel
 
         // Filesystems
         $di->set(
-            'filesystem.mountManager',
-            $di->lazy(
-                function () use ($config) {
-                    return (new FilesystemFactory())->build($config->get('storage_dir'));
-                }
-            )
-        );
-        $di->set(
             'filesystem.storage',
             $di->lazy(
                 function () use ($config) {

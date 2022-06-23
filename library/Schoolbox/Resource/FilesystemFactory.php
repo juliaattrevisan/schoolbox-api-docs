@@ -52,16 +52,6 @@ class FilesystemFactory
      */
     private const S3_CONNECT_TIMEOUT_WEB = 5;
 
-
-    /**
-     * @param string $storageDir
-     * @return MountManager
-     */
-    public function build($storageDir)
-    {
-        return $this->buildSpecific($storageDir, sys_get_temp_dir());
-    }
-
     /**
      * Build the storage filesystem, as defined by config.
      *
@@ -90,40 +80,6 @@ class FilesystemFactory
     public function buildTemp(): Filesystem
     {
         return new Filesystem(new Local(sys_get_temp_dir()));
-    }
-
-    /**
-     * @param string $storageDir
-     * @param string $tempDir
-     * @return MountManager
-     * @throws UnexpectedValueException If configured filesystem adapter is not recognised
-     * @throws LogicException           If root path to local filesystem is not readable
-     */
-    public function buildSpecific($storageDir, $tempDir)
-    {
-        // TODO SA-8354: inject this
-        $config = new \Schoolbox\Config\Loader();
-
-        $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
-        $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
-        $fsConfig = $enableReUpload ? ['disable_asserts' => true] : null;
-        switch ($adapter) {
-            case self::FILE_SYSTEM_ADAPTER_LOCAL:
-                // Use local storage
-                $fs_storage = new Filesystem(new Local($storageDir), $fsConfig);
-                break;
-            case self::FILE_SYSTEM_ADAPTER_AWS_S3:
-                // Use AWS S3 for storage
-                $fs_storage = $this->buildAwsS3FileSystem($fsConfig, self::PREFIX_STORAGE);
-                break;
-            default:
-                throw new UnexpectedValueException("Unrecognised filesystem adapter: '$adapter'");
-        }
-
-        return new MountManager([
-            self::FILE_SYSTEM_TEMP    => new Filesystem(new Local($tempDir)),
-            self::FILE_SYSTEM_STORAGE => $fs_storage
-        ]);
     }
 
     /**
