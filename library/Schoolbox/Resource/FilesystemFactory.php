@@ -62,7 +62,7 @@ class FilesystemFactory
     {
         $adapter        = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
         $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
-        $fsConfig       = $enableReUpload ? ['disable_asserts' => true] : null;
+        $fsConfig       = $enableReUpload ? ['disable_asserts' => true] : [];
         return match ($adapter) {
             self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(new Local($config->get('storage_dir')), $fsConfig),
             self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, $fsConfig, self::PREFIX_STORAGE),
