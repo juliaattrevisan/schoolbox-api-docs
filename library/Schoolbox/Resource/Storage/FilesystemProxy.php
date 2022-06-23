@@ -419,20 +419,6 @@ class FilesystemProxy
     }
 
     /**
-     * Helper function for determining whether this filesystem uses the S3
-     * adapter.
-     *
-     * TODO remove, and use config instead
-     *
-     * @return bool
-     */
-    public function usesS3Adapter(): bool
-    {
-        return $this->filesystem instanceof Filesystem
-            && $this->filesystem->getAdapter() instanceof S3Adapter;
-    }
-
-    /**
      * Should file upload be short-circuited?
      *
      * Short-circuit if `$storage` already has a hash, and either:

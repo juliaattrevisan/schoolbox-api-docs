@@ -13,6 +13,7 @@ use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -36,9 +37,6 @@ try {
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
 
-        /** @var FilesystemProxy $filesystemProxy */
-        $filesystemProxy = $kernel->get('filesystem.storageProxy');
-
         /* Optionally override filename
          *
          * fetch.php can't distinguish between identical files that were uploaded
@@ -50,10 +48,12 @@ try {
             $basename = urldecode($_GET['name']);
         }
 
-        if (!$bypassPresignedUrls && $filesystemProxy->usesS3Adapter()) {
-            /** @var IConfigLoader $config */
-            $config = $kernel->get('config');
-
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+        if (
+            !$bypassPresignedUrls
+            && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        ) {
             if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService = new PreSignedUrlService($config);
                 try {
@@ -73,6 +73,8 @@ try {
         }
 
         //send headers
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
         header("Content-Type: $contentType");
         header("Cache-control: private");
         header("Content-Ranges: none");
