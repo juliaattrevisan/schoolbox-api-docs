@@ -65,7 +65,7 @@ class FilesystemFactory
         $fsConfig       = $enableReUpload ? ['disable_asserts' => true] : null;
         return match ($adapter) {
             self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(new Local($config->get('storage_dir')), $fsConfig),
-            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($fsConfig, self::PREFIX_STORAGE),
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, $fsConfig, self::PREFIX_STORAGE),
             default                          => throw new UnexpectedValueException(
                 "Unrecognised filesystem adapter: '$adapter'",
             ),
@@ -99,14 +99,13 @@ class FilesystemFactory
     /**
      * Returns an AWS S3 file system, optionally with root set to $prefix
      *
-     * @param array|null $fsConfig
-     * @param string     $prefix
+     * @param IConfigLoader $config
+     * @param array|null    $fsConfig
+     * @param string        $prefix
      * @return Filesystem
-     * @throws InvalidArgumentException
      */
-    public function buildAwsS3FileSystem(array $fsConfig = null, string $prefix = ''): Filesystem
+    public function buildAwsS3FileSystem(IConfigLoader $config, array $fsConfig = null, string $prefix = ''): Filesystem
     {
-        $config              = new \Schoolbox\Config\Loader();
         $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
         $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
         $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
