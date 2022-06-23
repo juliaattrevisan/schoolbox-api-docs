@@ -17,17 +17,11 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 
-
 /**
  * Downloads the eDiary contents for each student
  */
 class EDiary implements IStrategy
 {
-    /**
-     * An artificial event type assigned to all eDiary events
-     */
-    private const EVENT_TYPE_EDIARY = 'eDiary';
-
     /**
      * @var LoggerInterface
      */
@@ -196,6 +190,19 @@ class EDiary implements IStrategy
      */
     public function import(): void
     {
+        /* I think the ediary feed endpoint was supposed to supply the synonymous
+         * eventType string associated with each ediary event
+         *
+         * This algorithmic complexity is about to take a toll on tass
+         */
+        $studentFeedCategories = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+            'getEDiaryFeeds',
+            [
+                'type' => 'S'
+            ],
+            Api::VERSION_2
+        );
+
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
@@ -208,9 +215,24 @@ class EDiary implements IStrategy
          */
         $userProfiles = $this->studentProfileMapper->findAll();
 
-        foreach ($userProfiles as $userProfile) {
-            $this->importStudentEvents($userProfile, $endpoint);
+        foreach ($studentFeedCategories['calendar'] as $feed) {
+            foreach ($userProfiles as $userProfile) {
+                $this->importStudentEvents($userProfile, $feed, $endpoint);
+            }
         }
+
+        /* I think the ediary feed endpoint was supposed to supply the synonymous
+         * eventType string associated with each ediary event
+         *
+         * This algorithmic complexity is about to take a toll on tass
+         */
+        $staffFeedCategories = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+            'getEDiaryFeeds',
+            [
+                'type' => 'T'
+            ],
+            Api::VERSION_2
+        );
 
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
@@ -225,8 +247,10 @@ class EDiary implements IStrategy
          */
         $userProfiles = $this->staffProfileMapper->findAll();
 
-        foreach ($userProfiles as $userProfile) {
-            $this->importStaffEvents($userProfile, $endpoint);
+        foreach ($staffFeedCategories['calendar'] as $feed) {
+            foreach ($userProfiles as $userProfile) {
+                $this->importStaffEvents($userProfile, $feed, $endpoint);
+            }
         }
     }
 
@@ -237,20 +261,22 @@ class EDiary implements IStrategy
      * for everyone contained in $users
      *
      * @param \Schoolbox\External\Profile\Student\Model $userProfile
+     * @param array                                     $feed
      * @param string                                    $endpoint
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, string $endpoint): void
+    public function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed, string $endpoint): void
     {
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
         $this->log->info(sprintf(
-            'Accessing endpoint %s for human with external id %s',
+            'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
+            $feed['code'],
             $userProfile->getBaseProfile()->getExternalId()
         ));
 
@@ -258,13 +284,14 @@ class EDiary implements IStrategy
             $endpoint,
             [
                 'studcode' => $userProfile->getBaseProfile()->getExternalId(),
+                'feedcode' => $feed['code'],
                 'start_date' => $this->from->getUsingFormat('d/m/Y'),
                 'end_date' => $this->to->getUsingFormat('d/m/Y')
             ],
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, Role::STUDENT, $tassEvents);
+        $this->importEvents($endpoint, $feed, Role::STUDENT, $tassEvents);
     }
 
 
@@ -274,20 +301,22 @@ class EDiary implements IStrategy
      * for everyone contained in $users
      *
      * @param \Schoolbox\External\Profile\Staff\Model $userProfile
+     * @param array                                   $feed
      * @param string                                  $endpoint
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, string $endpoint): void
+    public function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed, string $endpoint): void
     {
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
         $this->log->info(sprintf(
-            'Accessing endpoint %s for human with external id %s',
+            'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
+            $feed['code'],
             $userProfile->getBaseProfile()->getExternalId()
         ));
 
@@ -295,13 +324,14 @@ class EDiary implements IStrategy
             $endpoint,
             [
                 'tchcode' => $userProfile->getBaseProfile()->getExternalId(),
+                'feedcode' => $feed['code'],
                 'start_date' => $this->from->getUsingFormat('d/m/Y'),
                 'end_date' => $this->to->getUsingFormat('d/m/Y')
             ],
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, Role::STAFF, $tassEvents);
+        $this->importEvents($endpoint, $feed, Role::STAFF, $tassEvents);
     }
 
 
@@ -309,6 +339,7 @@ class EDiary implements IStrategy
      * Shank in all the events from the api endpoint into SUDS Events
      *
      * @param string     $endpoint
+     * @param array      $feed
      * @param string     $roleType
      * @param array|null $tassEvents
      * @return void
@@ -316,7 +347,7 @@ class EDiary implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importEvents(string $endpoint, string $roleType, ?array $tassEvents): void
+    private function importEvents(string $endpoint, array $feed, string $roleType, ?array $tassEvents): void
     {
         /* This might be null, or buggy
          * Exit early in that scenario
@@ -379,10 +410,11 @@ class EDiary implements IStrategy
             $guid = (string)$tassEvent['id'];
 
             /* Event Type equivalent
-             * These ediary events don't come with a type; just use a default one
-             * chozen in the calendar subscription screen dropdown
+             *
+             * These ediary events don't come with a type; I think it's specified
+             * by the ediary feed name
              */
-            $eventType = self::EVENT_TYPE_EDIARY;
+            $eventType = $feed['desc'];
 
             /* Assign campus relations
              *
@@ -550,7 +582,6 @@ class EDiary implements IStrategy
 
         $this->registry->remember($endpoint, $summaryData);
     }
-
 
 
     /**
