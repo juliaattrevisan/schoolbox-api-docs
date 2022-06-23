@@ -16,7 +16,7 @@
         "@fullcalendar/resource-timeline": "~5.11.0",
         "@fullcalendar/timegrid": "~5.11.0",
         "@fullcalendar/vue3": "~5.11.0",
-        "@gsap/business": "~3.9.1",
+        "@gsap/business": "~3.10.4",
         "@microsoft/immersive-reader-sdk": "~1.2.0",
         "axios": "~0.21.2",
         "clipboard": "~2.0.6",
