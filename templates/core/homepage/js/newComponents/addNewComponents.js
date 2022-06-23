@@ -98,10 +98,13 @@ function addNewDraggable (component) {
     component.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(component, {
         type: 'x, y',
-        trigger: component,
         autoScroll: 1,
-        onClick: (event) => onNewComponentClicked(event),
-        onDragStart: (event) => onDragStart(event),
+        onClick: function () {
+            onNewComponentClicked(this);
+        }, 
+        onDragStart: function () {
+            onDragStart(this);
+        }, 
         onDrag: () => onDrag(),
         onDragEnd: () => onDragEnd(),
     })[0];
@@ -133,9 +136,9 @@ function initNewComponentPositions () {
  * It animates from the new components tabs to the top of the 'top' container
  * Once it's in place we then move onto loading the new component
  * 
- * @param { MouseEvent }  
+ * @param { Draggable }  
  */
-function onNewComponentClicked (event) {
+function onNewComponentClicked (draggableInstance) {
 
     if (!__isProcessing) {
 
@@ -145,7 +148,7 @@ function onNewComponentClicked (event) {
 
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
         
-        updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
+        updateNewComponentVars(draggableInstance.target); //use the parent container regardless of selection to ensure correct dimensions etc
         __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
         __referenceElement.removeAttribute('data-component'); //in this instance we don't want the reference element to animate
         disableAllOtherDraggables();
@@ -204,15 +207,13 @@ function onNewComponentClicked (event) {
  * Sub in a referenceElement to use in place of the element being dragged, 
  * which gets pulled out so it can go into any other parent container 
  * that contains the COMPONENT_SELECTOR
+ * 
+ * @param { Draggable }
  */
-function onDragStart (event) {
+function onDragStart (draggableInstance) {
     if (!__isProcessing) {
         __isProcessing = true;
-        try {
-            updateNewComponentVars(event.target.closest(COMPONENT_SELECTOR)); //use the parent container regardless of selection to ensure correct dimensions etc
-        } catch (error) {
-            updateNewComponentVars(event.target.querySelector(COMPONENT_SELECTOR)); //otherwise look down the tree, as the <li></li> could be the event.target
-        }
+        updateNewComponentVars(draggableInstance.target); //use the parent container regardless of selection to ensure correct dimensions etc
         __startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
         __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
         updateDocumentOnDragStart();
