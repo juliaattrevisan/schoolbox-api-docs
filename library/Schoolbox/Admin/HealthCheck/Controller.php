@@ -81,16 +81,65 @@ class Controller extends Base
         if ('all' === $query) {
             $reports = $validReports;
         }
-        //array of URLs to send to TaskD (this will be the URLs of the csv file downloads)
-        $sources = [];
         //loop through all reports and build the sources / routes for all of them.
         foreach ($reports as $report) {
-            if (!in_array($report, $validReports)) {
-                throw new SchoolboxException("Report '{$report}' Does not exist.");
+            switch ($report) {
+                case 'assessmentAudit':
+                    /**
+                     * specific URL for assessmentAudit on folder 0
+                     */
+                    //helper URL object
+                    $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+                    $this->taskDHelper->addSource('assessmentAudit', 'assessmentAudit', $urlBase->setPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0]))->toString());
+                    break;
+                case 'uxui':
+                    /**
+                     * list of reports for uxui
+                     */
+                    $this->taskDHelper->addSource('uxui', 'topMenuReport');
+                    $this->taskDHelper->addSource('uxui', 'sideMenuReport');
+                    $this->taskDHelper->addSource('uxui', 'resourceBrowser');
+                    $this->taskDHelper->addSource('uxui', 'homepageTemplates');
+                    break;
+                case 'user':
+                    /**
+                     * list of reports for user management audit
+                     */
+                    $this->taskDHelper->addSource('user', 'listOfRoles');
+                    $this->taskDHelper->addSource('user', 'listOfCampuses');
+                    $this->taskDHelper->addSource('user', 'listOfYearLevels');
+                    $this->taskDHelper->addSource('user', 'listOfHouses');
+                    $this->taskDHelper->addSource('user', 'servicePermissions');
+                    $this->taskDHelper->addSource('user', 'listOfSuperusers');
+                    $this->taskDHelper->addSource('user', 'resourceBrowser');
+                    break;
+                case 'lms':
+                    /**
+                     * list of reports for LMS Fundamentals Audit
+                     */
+                    $this->taskDHelper->addSource('lms', 'gradeGroups');
+                    $this->taskDHelper->addSource('lms', 'academicPeriods');
+                    $this->taskDHelper->addSource('lms', 'workTypes');
+                    $this->taskDHelper->addSource('lms', 'submissionStates');
+                    $this->taskDHelper->addSource('lms', 'lmsSettings');
+                    $this->taskDHelper->addSource('lms', 'yearLevelPermissions');
+                    $this->taskDHelper->addSource('lms', 'homepageTemplates');
+                    break;
+                case 'community':
+                    /**
+                     * list of reports for Community Engagement Audit
+                     */
+                    $this->taskDHelper->addSource('community', 'newsTopics');
+                    $this->taskDHelper->addSource('community', 'newsServicePermissions');
+                    $this->taskDHelper->addSource('community', 'newsSettings');
+                    $this->taskDHelper->addSource('community', 'eventTypes');
+                    $this->taskDHelper->addSource('community', 'calendarServicePermissions');
+                    $this->taskDHelper->addSource('community', 'parentNewsNotifications');
+                    $this->taskDHelper->addSource('community', 'homepageTemplates');
+                    break;
+                default:
+                    throw new SchoolboxException("Report '{$report}' Does not exist.");
             }
-
-            //the report name looks to be valid, lets add it to the list
-            $this->$report();
         }
 
         //after looping through all reports, send them all to here...
@@ -98,16 +147,6 @@ class Controller extends Base
 
         //redirect home
         $this->getResponse()->redirect->found('/');
-    }
-
-    /**
-     * specific URL for assessmentAudit on folder 0
-     */
-    private function assessmentAudit()
-    {
-        //helper URL object
-        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-        $this->taskDHelper->addSource('assessmentAudit', 'assessmentAudit', $urlBase->setPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0]))->toString());
     }
 
     /**
@@ -125,17 +164,6 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'HomepageTempates.csv');
-    }
-
-    /**
-     * return list of reports for uxui
-     */
-    private function uxui()
-    {
-        $this->taskDHelper->addSource('uxui', 'topMenuReport');
-        $this->taskDHelper->addSource('uxui', 'sideMenuReport');
-        $this->taskDHelper->addSource('uxui', 'resourceBrowser');
-        $this->taskDHelper->addSource('uxui', 'homepageTemplates');
     }
 
     /**
@@ -260,20 +288,6 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'ResourceBrowser.csv');
-    }
-
-    /**
-     * return list of reports for user management audit
-     */
-    private function user()
-    {
-        $this->taskDHelper->addSource('user', 'listOfRoles');
-        $this->taskDHelper->addSource('user', 'listOfCampuses');
-        $this->taskDHelper->addSource('user', 'listOfYearLevels');
-        $this->taskDHelper->addSource('user', 'listOfHouses');
-        $this->taskDHelper->addSource('user', 'servicePermissions');
-        $this->taskDHelper->addSource('user', 'listOfSuperusers');
-        $this->taskDHelper->addSource('user', 'resourceBrowser');
     }
 
     /**
@@ -447,20 +461,6 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'listOfSuperusers.csv');
-    }
-
-    /**
-     * return list of reports for LMS Fundamentals Audit
-     */
-    private function lms()
-    {
-        $this->taskDHelper->addSource('lms', 'gradeGroups');
-        $this->taskDHelper->addSource('lms', 'academicPeriods');
-        $this->taskDHelper->addSource('lms', 'workTypes');
-        $this->taskDHelper->addSource('lms', 'submissionStates');
-        $this->taskDHelper->addSource('lms', 'lmsSettings');
-        $this->taskDHelper->addSource('lms', 'yearLevelPermissions');
-        $this->taskDHelper->addSource('lms', 'homepageTemplates');
     }
 
     /**
@@ -671,20 +671,6 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'yearLevelPermissions.csv');
-    }
-
-    /**
-     * return list of reports for Community Engagement Audit
-     */
-    private function community()
-    {
-        $this->taskDHelper->addSource('community', 'newsTopics');
-        $this->taskDHelper->addSource('community', 'newsServicePermissions');
-        $this->taskDHelper->addSource('community', 'newsSettings');
-        $this->taskDHelper->addSource('community', 'eventTypes');
-        $this->taskDHelper->addSource('community', 'calendarServicePermissions');
-        $this->taskDHelper->addSource('community', 'parentNewsNotifications');
-        $this->taskDHelper->addSource('community', 'homepageTemplates');
     }
 
     /**
