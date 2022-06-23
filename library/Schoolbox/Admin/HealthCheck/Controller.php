@@ -68,7 +68,7 @@ class Controller extends Base
     public function getAudit()
     {
         //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessmentAudit', 'uxui', 'user', 'lms', 'community'];
+        $validReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
@@ -86,11 +86,11 @@ class Controller extends Base
             switch ($report) {
                 case 'assessmentAudit':
                     /**
-                     * specific URL for assessmentAudit on folder 0
+                     * specific URL for assessment on folder 0
                      */
                     //helper URL object
                     $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-                    $this->taskDHelper->addSource('assessmentAudit', 'assessmentAudit', $urlBase->setPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0]))->toString());
+                    $this->taskDHelper->addSource('assessment', 'assessment', $urlBase->setPath($this->getRouter()->generate('learning.getAssessmentAudit', ['folderId' => 0]))->toString());
                     break;
                 case 'uxui':
                     /**
