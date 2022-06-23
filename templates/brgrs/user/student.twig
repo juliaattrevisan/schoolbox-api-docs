@@ -1,0 +1,13 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_studiesCode %}
+    {% if externalUser.StudentStudiesCode ?? false %}
+        {# Only students and staff can see this
+         # Hide it from the parents SA-13852
+         #}
+        {% if isSelf or isStaff %}
+            <dt class="no-margin small-6 medium-3">{{ locale.studies_code.proper }}:</dt>
+            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_studiesCode %}
