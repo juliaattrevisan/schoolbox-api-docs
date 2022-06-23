@@ -18,13 +18,7 @@ class Helper
             $tmpArray = [];
             //iterate through each entry in the row
             foreach ($row as $label => $value) {
-                //check each column in the row
-                //if they are numeric ignore them, and continue
-                //using the assumption the column headers will NOT be numbers, but be alpha strings
-                if (is_numeric($label)) {
-                    continue;
-                }
-                //label is not an int, add the value array object
+                //label is the column heading, add the value array object
                 $tmpArray[$label] = $value;
             }
             $outputArray[] = $tmpArray;
@@ -50,13 +44,7 @@ class Helper
             $rowOutput = [];
             //iterate through each entry in the row
             foreach ($row as $label => $value) {
-                //check each column in the row
-                //if they are numeric ignore them, and continue
-                //using the assumption the column headers will NOT be numbers, but be alpha strings
-                if (is_numeric($label)) {
-                    continue;
-                }
-                //label is not an int, add the value array object
+                //label is the heading, add the value array object
                 $rowHeadings[] = $label;
                 $rowOutput[] = $value;
             }
