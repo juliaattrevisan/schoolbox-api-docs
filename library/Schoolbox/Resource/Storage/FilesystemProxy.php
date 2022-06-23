@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
-use League\Flysystem\Local\LocalFilesystemAdapter as Local;
+use League\Flysystem\DirectoryListing;
+use League\Flysystem\FilesystemException;
+//use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\UnableToCheckDirectoryExistence;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
@@ -18,7 +20,6 @@ use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
-use League\Flysystem\NotSupportedException;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
@@ -26,16 +27,13 @@ use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
  * A proxy class for providing a `Filesystem`-like facade when dealing
  * with `IStorage` objects, instead of paths.
  *
- * This provides a Flysystem v3-like proxy, even though currently it wraps a
- * v1 Flysystem object. Where the two interfaces differ, v3 will be used.
- *
  * Directory-specific methods are not proxied, because directories are not
  * relevant for `IStorage` objects. All of these methods raise a
- * `NotSupportedException`.
+ * directory-related exception.
  *
  * Location-specific methods are not proxied, because an `IStorage` object's
  * location is determined by its hash. All of these methods raise a
- * `NotSupportedException`.
+ * copy or move related exception.
  */
 class FilesystemProxy
 {
@@ -70,10 +68,11 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return bool
+     * @throws FilesystemException
      */
     public function fileExists(IStorage $storage): bool
     {
-        return $this->filesystem->has(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->fileExists(self::getPathFromHash($storage->getHash()));
     }
 
     /**
@@ -100,8 +99,7 @@ class FilesystemProxy
      * @param string   $contents
      * @param array    $config
      * @return void
-     * @throws UnableToReadFile if somehow the file wasn't found after it
-     *                               was written
+     * @throws FilesystemException
      */
     public function write(IStorage $storage, string $contents, array $config = [])
     {
@@ -120,8 +118,7 @@ class FilesystemProxy
      * @param resource $resource
      * @param array    $config
      * @return void
-     * @throws UnableToReadFile if somehow the file wasn't found after it
-     *                          was written
+     * @throws FilesystemException
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
@@ -153,7 +150,7 @@ class FilesystemProxy
      * @param Filesystem $tempFilesystem
      * @param string     $tempPath
      * @return void
-     * @throws UnableToReadFile if somehow the file doesn't exist in temp?
+     * @throws FilesystemException
      */
     public function writeFromFilesystemAndLocation(
         IStorage $storage,
@@ -169,24 +166,24 @@ class FilesystemProxy
 
         // Are they both local? Attempt to move, rather than copy if so
         // TODO does Flysystem3 let me interrogate the adapter?
-        if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
-            $adapterFrom = $tempFilesystem->getAdapter();
-            $adapterTo   = $this->filesystem->getAdapter();
-            if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
-                if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
-                    // TODO is this an error?
-                    return;
-                }
-
-                chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
-                rename(
-                    rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
-                    $adapterTo->getPathPrefix() . $storagePath
-                );
-                $this->updateStorage($storage, $hash, $storagePath);
-                return;
-            }
-        }
+//        if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
+//            $adapterFrom = $tempFilesystem->getAdapter();
+//            $adapterTo   = $this->filesystem->getAdapter();
+//            if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
+//                if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
+//                    // TODO is this an error?
+//                    return;
+//                }
+//
+//                chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
+//                rename(
+//                    rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
+//                    $adapterTo->getPathPrefix() . $storagePath
+//                );
+//                $this->updateStorage($storage, $hash, $storagePath);
+//                return;
+//            }
+//        }
 
         // Otherwise, copy the new file into storage
         $mountManager = new MountManager([
@@ -211,7 +208,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws UnableToReadFile if the file wasn't found
+     * @throws FilesystemException
      */
     public function read(IStorage $storage): string
     {
@@ -225,7 +222,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return resource
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     public function readStream(IStorage $storage)
     {
@@ -239,6 +236,7 @@ class FilesystemProxy
      * * v3 `Filesystem::delete`
      *
      * @param IStorage $storage
+     * @throws FilesystemException
      */
     public function delete(IStorage $storage): void
     {
@@ -286,7 +284,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @param string   $visibility
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     public function setVisibility(IStorage $storage, string $visibility): void
     {
@@ -300,7 +298,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     public function visibility(IStorage $storage): string
     {
@@ -314,7 +312,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return string
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     public function mimeType(IStorage $storage): string
     {
@@ -328,7 +326,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return int
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     public function lastModified(IStorage $storage): int
     {
@@ -356,15 +354,14 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @param bool     $recursive
-     * @return never-return
+     * @return DirectoryListing
      * @throws UnableToCheckDirectoryExistence
      * @noinspection PhpUnusedParameterInspection
      */
-    public function listContents(IStorage $storage, bool $recursive = false)
+    public function listContents(IStorage $storage, bool $recursive = false): DirectoryListing
     {
         throw new UnableToCheckDirectoryExistence(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
-
 
     /**
      * Proxy for:
@@ -425,6 +422,8 @@ class FilesystemProxy
      * Helper function for determining whether this filesystem uses the S3
      * adapter.
      *
+     * TODO remove, and use config instead
+     *
      * @return bool
      */
     public function usesS3Adapter(): bool
@@ -444,6 +443,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return bool
+     * @throws FilesystemException
      */
     private function shortCircuit(IStorage $storage): bool
     {
@@ -470,7 +470,7 @@ class FilesystemProxy
      * @param string   $hash
      * @param string   $path
      * @return void
-     * @throws UnableToReadFile
+     * @throws FilesystemException
      */
     private function updateStorage(IStorage $storage, string $hash, string $path): void
     {
