@@ -99,7 +99,11 @@ class DisasterRecovery extends CliTool\App
      */
     private function execute(): void
     {
-        $fileSystemAwsS3Backups = (new FilesystemFactory())->buildAwsS3FileSystem(null, self::PREFIX_BACKUPS);
+        $fileSystemAwsS3Backups = (new FilesystemFactory())->buildAwsS3FileSystem(
+            $this->getConfig(),
+            null,
+            self::PREFIX_BACKUPS,
+        );
 
         $dailyBackupDir = $this->getOpt(self::OPT_LONG_BACKUP_DIR);
         if (!$dailyBackupDir || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dailyBackupDir)) {
@@ -161,15 +165,14 @@ class DisasterRecovery extends CliTool\App
             $s3Path = str_replace($backupDirLocal, $dailyBackupDir, $localPath);
 
             // TODO rewrite to not use v1 API
-            $file = new Flysystem\File($fileSystemAwsS3Backups, $s3Path);
-            if ($file->exists()) {
-                if ($file->getSize() === filesize($localPath)) {
+            if ($fileSystemAwsS3Backups->fileExists($s3Path)) {
+                if ($fileSystemAwsS3Backups->fileSize($s3Path) === filesize($localPath)) {
                     $this->getLogger()->info("File already in S3 and size matches: '$s3Path'");
                     continue;
                 }
                 $this->getLogger()->info("File in S3 but size different, re-uploading: '$s3Path'");
                 if ($this->perform()) {
-                    $file->delete();
+                    $fileSystemAwsS3Backups->delete($s3Path);
                 }
             }
 
@@ -181,9 +184,12 @@ class DisasterRecovery extends CliTool\App
                 continue;
             }
 
-            if (!$this->perform() || $file->writeStream($fp)) {
+            try {
+                if ($this->perform()) {
+                    $fileSystemAwsS3Backups->writeStream($s3Path, $fp);
+                }
                 $this->getLogger()->info("Successfully uploaded file: '$s3Path'");
-            } else {
+            } catch (Flysystem\FilesystemException $e) {
                 $message = "Unable to upload file: '$s3Path'";
                 $this->getLogger()->error($message);
                 $this->notFatalErrors[] = $message;

@@ -401,9 +401,10 @@ class Migration extends CliTool\App
 
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
-            $transcodeFile     = new Flysystem\File($this->fileSystemAwsS3, $filepath);
-
-            $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $transcodeFile->getPath(), $this->filesInS3);
+            $foundInS3         = array_key_exists(
+                FilesystemFactory::PREFIX_STORAGE . $filepath,
+                $this->filesInS3,
+            );
             if ($foundInS3) {
                 $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
 
