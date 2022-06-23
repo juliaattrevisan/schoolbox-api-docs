@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
@@ -26,7 +27,6 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
  */
 class Controller extends Base
 {
-
     /**
      * The header which turnitin uses to tell us which step it just did
      */
@@ -255,7 +255,9 @@ class Controller extends Base
         /* Find the corresponding report, if it exists
          */
         try {
-            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
+            $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId, ['deleted']);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $deleted) {
+            $model = $deleted->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw new Turnitin\Exception\Exception(sprintf(
                 'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
