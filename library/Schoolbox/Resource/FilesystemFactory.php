@@ -129,7 +129,10 @@ class FilesystemFactory
         $client->registerStreamWrapper();
 
         return new Filesystem(
-            new Adapter(new AwsS3Adapter($client, $otfs_s3_bucket, $prefix)),
+            new Adapter(
+                new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
+                $otfs_s3_bucket,
+            ),
             $fsConfig
         );
     }

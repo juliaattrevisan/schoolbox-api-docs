@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
 
-use League\Flysystem\Adapter\AbstractAdapter;
-use League\Flysystem\Adapter\CanOverwriteFiles;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem\Config;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\UnableToReadFile;
 use Schoolbox\Resource\FilesystemFactory;
 
 /**
@@ -32,24 +33,21 @@ use Schoolbox\Resource\FilesystemFactory;
  * their native async methods with a progress callback that streams it out to
  * the user as we receive it.
  */
-class Adapter extends AbstractAdapter implements CanOverwriteFiles
+class Adapter implements FilesystemAdapter
 {
-    /**
-     * Base AWS S3 adapter: most adapter methods proxy this.
-     *
-     * Expects that its S3 client's `registerStreamWrapper` method has been
-     * called.
-     */
-    private AwsS3Adapter $baseAdapter;
-
     /**
      * Constructor
      *
-     * @param AwsS3Adapter $baseAdapter
+     * @param AwsS3Adapter $baseAdapter Base AWS S3 adapter: most adapter methods proxy this.
+     *                                  Expects that its S3 client's `registerStreamWrapper` method has been called.
+     * @param string       $bucket      The S3 bucket to read from.
+     *                                  Must be passed here because `AwsS3Adapter` instance's bucket is no longer
+     *                                  accessible outside the instance.
      */
-    public function __construct(AwsS3Adapter $baseAdapter)
-    {
-        $this->baseAdapter = $baseAdapter;
+    public function __construct(
+        private AwsS3Adapter $baseAdapter,
+        private string $bucket,
+    ) {
     }
 
     /**
@@ -60,31 +58,27 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * a file's `readStream` method, as it returns only the stream.
      *
      * @param string $path
-     * @return array|bool
+     * @return resource
      */
-    public function readStream($path)
+    public function readStream(string $path)
     {
         $context = stream_context_create([
             's3' => ['seekable' => true],
         ]);
 
         // Return seekable stream
-        $bucket = $this->baseAdapter->getBucket();
+        error_clear_last();
         $prefix = FilesystemFactory::PREFIX_STORAGE;
-        $stream = fopen(
-            "s3://{$bucket}/{$prefix}{$path}",
+        $stream = @fopen(
+            sprintf("s3://%s/%s%s", $this->bucket, $prefix, $path),
             "rb",
             false,
             $context,
         );
         if ($stream === false) {
-            return false;
+            throw UnableToReadFile::fromLocation($path, error_get_last()['message'] ?? '');
         }
-        return [
-            'type'   => 'file',
-            'path'   => $this->applyPathPrefix($path),
-            'stream' => $stream
-        ];
+        return $stream;
     }
 
     /**
@@ -94,95 +88,39 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * @inheritdoc
      */
-    public function write($path, $contents, Config $config)
+    public function fileExists(string $path): bool
     {
-        return $this->baseAdapter->write($path, $contents, $config);
+        return $this->baseAdapter->fileExists($path);
     }
 
     /**
      * @inheritdoc
      */
-    public function writeStream($path, $resource, Config $config)
+    public function directoryExists(string $path): bool
     {
-        return $this->baseAdapter->writeStream($path, $resource, $config);
+        return $this->baseAdapter->directoryExists($path);
     }
 
     /**
      * @inheritdoc
      */
-    public function update($path, $contents, Config $config)
+    public function write(string $path, string $contents, Config $config): void
     {
-        return $this->baseAdapter->update($path, $contents, $config);
+        $this->baseAdapter->write($path, $contents, $config);
     }
 
     /**
      * @inheritdoc
      */
-    public function updateStream($path, $resource, Config $config)
+    public function writeStream(string $path, $contents, Config $config): void
     {
-        return $this->baseAdapter->updateStream($path, $resource, $config);
+        $this->baseAdapter->writeStream($path, $contents, $config);
     }
 
     /**
      * @inheritdoc
      */
-    public function rename($path, $newpath)
-    {
-        return $this->baseAdapter->rename($path, $newpath);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function copy($path, $newpath)
-    {
-        return $this->baseAdapter->copy($path, $newpath);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function delete($path)
-    {
-        return $this->baseAdapter->delete($path);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteDir($dirname)
-    {
-        return $this->baseAdapter->deleteDir($dirname);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createDir($dirname, Config $config)
-    {
-        return $this->baseAdapter->createDir($dirname, $config);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setVisibility($path, $visibility)
-    {
-        return $this->baseAdapter->setVisibility($path, $visibility);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function has($path)
-    {
-        return $this->baseAdapter->has($path);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function read($path)
+    public function read(string $path): string
     {
         return $this->baseAdapter->read($path);
     }
@@ -190,48 +128,88 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
     /**
      * @inheritdoc
      */
-    public function listContents($directory = '', $recursive = false)
+    public function delete(string $path): void
     {
-        return $this->baseAdapter->listContents($directory, $recursive);
+        $this->baseAdapter->delete($path);
     }
 
     /**
      * @inheritdoc
      */
-    public function getMetadata($path)
+    public function deleteDirectory(string $path): void
     {
-        return $this->baseAdapter->getMetadata($path);
+        $this->baseAdapter->deleteDirectory($path);
     }
 
     /**
      * @inheritdoc
      */
-    public function getSize($path)
+    public function createDirectory(string $path, Config $config): void
     {
-        return $this->baseAdapter->getSize($path);
+        $this->baseAdapter->createDirectory($path, $config);
     }
 
     /**
      * @inheritdoc
      */
-    public function getMimetype($path)
+    public function setVisibility(string $path, string $visibility): void
     {
-        return $this->baseAdapter->getMimetype($path);
+        $this->baseAdapter->setVisibility($path, $visibility);
     }
 
     /**
      * @inheritdoc
      */
-    public function getTimestamp($path)
+    public function visibility(string $path): FileAttributes
     {
-        return $this->baseAdapter->getTimestamp($path);
+        return $this->baseAdapter->visibility($path);
     }
 
     /**
      * @inheritdoc
      */
-    public function getVisibility($path)
+    public function mimeType(string $path): FileAttributes
     {
-        return $this->baseAdapter->getVisibility($path);
+        return $this->baseAdapter->mimeType($path);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function lastModified(string $path): FileAttributes
+    {
+        return $this->baseAdapter->lastModified($path);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function fileSize(string $path): FileAttributes
+    {
+        return $this->baseAdapter->fileSize($path);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function listContents(string $path, bool $deep): iterable
+    {
+        return $this->baseAdapter->listContents($path, $deep);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function move(string $source, string $destination, Config $config): void
+    {
+        $this->baseAdapter->move($source, $destination, $config);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function copy(string $source, string $destination, Config $config): void
+    {
+        $this->baseAdapter->copy($source, $destination, $config);
     }
 }
