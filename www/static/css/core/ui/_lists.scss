@@ -33,3 +33,363 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     margin-right: $inline-list-default-float-list-margin;
     margin-bottom: $inline-list-default-float-list-margin;
 }
+
+/*
+ * Uses .expander, .selector or .grip
+ * Use %placeholders to prevent the same CSS getting spat out over and over again.
+ */
+ %interaction-li {
+    display: flex;
+    align-items: center;
+}
+%interaction-selector {
+    padding: 0 0.75rem;
+    flex: 1 2.25rem;
+    &:before {
+        padding: 0;
+    }
+}
+@mixin list-interaction ($selector, $cursor, $icon: "", $color: $content-ui-foreground) {
+    > li {
+        > div:first-of-type {
+            @extend %interaction-li;
+        }
+        ul.information-list {
+            flex: 1 100%;
+        }
+        .#{$selector} {
+            @if str-length($icon) > 0 {
+                @extend .icon-#{$icon};
+            }
+            @extend %interaction-selector;
+            cursor: $cursor;
+            &:before {
+                color: $color;
+            }
+        }
+    }
+}
+
+%information-list {
+    @include responsive-sides(1, padding);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
+
+%information-li {
+    @include grid-row(
+        $behavior: nest
+    ); // there is no scenario in which .information-list > li will operate as anything other than a row
+    @include responsive-sides(-1, margin);
+    border-bottom: 1px solid $body-bg;
+    position: relative;
+    overflow: visible;
+    list-style: none;
+    transition: background-color 0.3s ease-in;
+}
+
+%card-article {
+    padding: 1rem;
+    clear: both;
+    word-wrap: break-word;
+}
+
+%ui-sortable-helper {
+    border-bottom: none;
+    background-color: $row-action-hover-background;
+}
+
+@mixin information-list() {
+    @extend %information-list;
+    &.expandable,
+    &.expandable-card {
+        @include list-interaction(expander, pointer);
+        ul {
+            list-style: none;
+            margin: 0;
+        }
+        li .expander {
+            flex: 1 2.5rem;
+        }
+    }
+    &.card-selectable {
+        @include list-interaction(selector, pointer);
+        li .selector {
+            flex: 1 3rem;
+            label {
+                padding: 0 !important;
+            }
+        }
+        .package-title {
+            overflow: visible;
+            white-space: normal;
+        }
+    }
+    &.sortable,
+    &.sortable-card {
+        @include list-interaction(grip, move, grip);
+        .grip:before {
+            font-size: 1rem; // enforce grips being full size
+        }
+        .ui-sortable-helper {
+            @extend %ui-sortable-helper;
+        }
+    }
+    &.sortable,
+    &.sortable-card,
+    &.unsortable {
+        .columns,
+        .column {
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+            @media #{$medium-only} {
+                padding-bottom: 0.75rem;
+                padding-top: 0.75rem;
+            }
+            @media #{$small-only} {
+                padding-bottom: 0.5rem;
+                padding-top: 0.5rem;
+            }
+        }
+        input,
+        select {
+            margin-bottom: 0;
+        }
+    }
+    &.group {
+        border-bottom: 0.5rem solid $body-bg;
+        &:last-of-type {
+            border-bottom: 0;
+        }
+        > li:nth-child(n + 2) {
+            padding: 0.25rem;
+        }
+    }
+    > li {
+        @extend %information-li;
+        > &:first-child {
+            padding-top: 0;
+        }
+        &:last-child {
+            border-bottom: 0;
+        }
+        input[type="radio"]:not(.plain) + label.checkbox-label,
+        input[type="checkbox"]:not(.plain) + label.checkbox-label {
+            margin-top: 0.5rem;
+        }
+    }
+    form {
+        margin: 0;
+    }
+    nav a:hover {
+        background-color: $row-action-hover-background;
+    }
+    .card {
+        flex: 1 100%;
+    }
+    // <article> immediately follows <nav> has a special layout rule to display content
+    .list-item ~ article,
+    .card ~ article {
+        @extend %card-article;
+        p:last-child {
+            margin-bottom: 0;
+        }
+        // Zero padding article, if it is empty Whitespaces and empty elements inside <article> don't count
+        &:empty {
+            padding: 0;
+        }
+    }
+}
+
+// The original list
+// All other lists include (@extend) these styles
+.information-list {
+    @include information-list;
+}
+
+// Activity list
+.activity-list {
+    @include information-list;
+    li {
+        .grade {
+            text-align: center;
+            font-weight: $font-weight-bold;
+            font-size: rem-calc(($base-font-size + 2));
+            min-width: 6rem;
+        }
+    }
+    // Specific to Grade page
+    &.group {
+        li {
+            padding: 0 !important;
+
+            &.subject-group {
+                border-bottom: 0;
+            }
+        }
+        li ul li {
+            border-top: 0;
+        }
+    }
+    // Grades expandable layout
+    .unit {
+        border-top: 2px solid $body-bg;
+
+        .card {
+            padding: 0.5rem 0 0.5rem 0;
+        }
+    }
+    .unit ~ [data-collapsable] ul li:first-child {
+        border-top: 0;
+    }
+    .assessment {
+        border-top: 1px solid $body-bg;
+        .progress-tick.tiny {
+            margin-left: 0;
+        }
+        @media #{$medium-up} {
+            .content {
+                padding-left: 3rem;
+            }
+        }
+    }
+    .project .assessment {
+        background-color: $vapor;
+        border-top: 1px solid $body-bg;
+        border-left: 3rem solid $white;
+        @media #{$small-only} {
+            border-left: 1rem solid $white;
+        }
+    }
+}
+
+// Subject list
+.subject-list {
+    @include information-list;
+    .subject-group {
+        border-bottom: 0;
+    }
+    li {
+        .grade {
+            text-align: center;
+            font-weight: $font-weight-bold;
+            font-size: rem-calc(($base-font-size + 2));
+            min-width: 6rem;
+        }
+        a:hover {
+            background-color: $row-hover-background;
+        }
+        ul {
+            clear: both;
+            margin: 0;
+            li:last-child {
+                padding-bottom: 0;
+            }
+        }
+    }
+}
+
+.news-list {
+    @include information-list;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    @include responsive-sides($importance: !important);
+}
+
+.permission-list {
+    @include information-list;
+    [class*="icon-"]:before {
+        padding: 0;
+    }
+    span:not([data-perm-container]) > [class*="icon-"]:before {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    a {
+        // Button splash & .actions-small-# a[class*="icon-"] specificity causes this
+        overflow: inherit !important;
+        opacity: 1 !important;
+    }
+    input:checked + label {
+        background-color: $content-ui-submit-background;
+        a {
+            color: $content-ui-submit-foreground;
+        }
+    }
+}
+
+// this is like inline list, but it flexes to full width. Basically a more flexible version of the button bar
+.flex-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    li {
+        flex: 1 auto;
+        margin: 1px 1px 0 0;
+    }
+    a {
+        flex: 1 auto;
+        &:empty:before {
+            float: none !important; // grrrr :(
+        }
+        &.overflow {
+            width: 3rem;
+        }
+    }
+}
+
+// Show & Hide Task List
+.task-list {
+    clear: both;
+    transition: max-height 0.3s ease-out;
+}
+
+// Lists with action buttons
+.action-list {
+    @include information-list;
+    clear: both;
+    > li {
+        &:hover {
+            background-color: $row-hover-background;
+        }
+    }
+    .expanded .task-list {
+        max-height: 100%;
+        transition: max-height 0.3s ease-in;
+    }
+}
+
+/* Resource List in File Picker Accordion
+ * You can get to this list via a File Picker Accordion, by clicking
+ * on any dropzone. This is a differently-styled list than the one in
+ * Resource Browser from the Main Navigation (that's a jstree)
+ */
+.resource-list {
+    @extend .action-list;
+    .card {
+        a {
+            color: $content-ui-foreground;
+        }
+        .size-32 {
+            color: $content-ui-foreground;
+            padding-top: 1rem;
+        }
+    }
+    > .resource {
+        vertical-align: middle;
+        a {
+            display: block;
+            padding: 0.5rem 0 0.5rem 0;
+            &[class^="icon-"]:before,
+            &[class*=" icon-"]:before {
+                vertical-align: middle;
+            }
+            img[class^="mime-"],
+            img[class*=" mime-"] {
+                vertical-align: middle;
+            }
+        }
+    }
+}

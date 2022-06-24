@@ -10,11 +10,12 @@ $cdn-prefix: '../../';
 @import "utils/modifiers";
 @import "utils/visibility";
 
-@import "ui/icons";
-
 @import "base/global";
 @import "base/typography";
 
+@import "layout/grid";
+
+@import "ui/icons";
 @import "ui/lists";
 @import "ui/forms/labels";
 @import "ui/progress-bars";
