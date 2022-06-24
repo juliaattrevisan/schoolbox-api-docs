@@ -73,10 +73,9 @@ abstract class AbstractMailer implements IMailer
      *
      * @param string $template
      * @param string $subject
-     * @param string $to
-     * @param string $host
+     * @param string|array|Address|User $to
      */
-    public function __construct($template, $subject = '', $to = '', $host = '')
+    public function __construct(string $template, string $subject, string|array|Address|User $to)
     {
         $this->email = new Email();
         $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
@@ -104,9 +103,14 @@ abstract class AbstractMailer implements IMailer
     }
 
 
-    public function setTo($to)
+    public function setTo(string|array|Address|User $to)
     {
-        if (\is_array($to)) {
+
+        if ($to instanceof User) {
+            $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
+        } elseif ($to instanceof Address) {
+            $this->email->addTo($to);
+        } elseif (\is_array($to)) {
             if ($to['email']) {
                 //Assume one dimensional array
                 $this->email->addTo(new Address($to['email'], $to['name'] ?? ''));
@@ -121,10 +125,8 @@ abstract class AbstractMailer implements IMailer
                     }
                 }
             }
-        } elseif ($to instanceof Address) {
-            $this->email->addTo($to);
         } else {
-            foreach (self::parseAddressString($to ?? '')[self::KEY_VALID] as $address => $name) {
+            foreach (self::parseAddressString($to)[self::KEY_VALID] as $address => $name) {
                 $this->email->addTo(new Address($address, $name ?? ''));
             }
         }
@@ -548,7 +550,7 @@ abstract class AbstractMailer implements IMailer
     }
 
 
-    public function sign()
+    public function sign($privateKey, $domain)
     {
         $signer = new DkimSigner($privateKey, $domain, 'schoolbox');
         $signer->sign($this->email);

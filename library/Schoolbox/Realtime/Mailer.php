@@ -17,6 +17,7 @@ use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Twig\Error\RuntimeError;
 use UnderflowException;
@@ -61,16 +62,13 @@ class Mailer
      * @throws UnderflowException
      * @return bool
      */
-    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC): bool
+    public function sendListContents(QueueInterface $list, User $recipient, string $template, string $subject = '', int $sortDir = SORT_ASC): bool
     {
         $address = trim($recipient->getEmail());
 
         if (empty($address)) {
             throw new RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
-
-        // format rfc2822
-        $address = sprintf('"%s" <%s>', $recipient->formatName(), $address);
 
         $decorator = new Decorator();
 
@@ -91,8 +89,8 @@ class Mailer
         $context['recipient'] = $recipient->getFirstname();
 
         // build the email object
-        $email = $this->emailFactory->build($template, $subject);
-        $email->setContext($context)->setTo($address);
+        $email = $this->emailFactory->build($template, $subject, new Address($address, $recipient->formatName()));
+        $email->setContext($context);
 
         // we can only include the reply-to header if there is but one email
         if ($this->useReplyTo && $decorator->count() === 1) {

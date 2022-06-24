@@ -1,0 +1,37 @@
+{% extends 'schoolmail.twig' %}
+<div style="font-family: Calibri, 'Trebuchet MS',Arial,Helvetica,sans-serif">
+    <p>This is an automated notification regarding the following leave request for <strong>{{ LEAVE_USER_NAME }}</strong>. Please
+        do not reply to this email. Instead, contact your child's Housemaster if there are any issues.</p>
+
+    <p><strong>Leave Status: {{ LEAVE_STATUS }}</strong></p>
+
+    <h3>Leave Details</h3>
+    <p><strong><em>Start Leave</em></strong><br />{{ LEAVE_START }}</p>
+    <p><strong><em>End Leave</em></strong><br />{{ LEAVE_FINISH }}</p>
+    <p><strong>Description</strong><br />{{ LEAVE_DESCRIPTION }}</p>
+    <p><strong>Created by</strong><br />{{ LEAVE_AUTHOR_NAME }}</p>
+
+    <h3>Contact Information</h3>
+    <p>
+        <strong>Host</strong> {{ LEAVE_HOST_NAME }}<br />
+        <strong>Host Contact:</strong> {{ LEAVE_HOST_PHONE }}
+    </p>
+
+    <p><strong>Student Contact:</strong> {{ LEAVE_STUDENT_PHONE }}</p>
+
+    {% if LEAVE_SUBMITTED_BY is defined %}
+        <p><strong>Submitted by</strong> <em>{{ LEAVE_SUBMITTED_BY }}</em></p>
+    {% endif %}
+
+    {% if LEAVE_AUTHORISED_BY is defined %}
+        <p><strong>Authorised by</strong> <em>{{ LEAVE_AUTHORISED_BY }}</em><br />
+            <strong>Confirmed by</strong> {{ LEAVE_CONFIRMED_BY }}</p>
+    {% endif %}
+
+    {% if LEAVE_REJECTED_BY is defined %}
+        <p><strong>Rejected by</strong> <em>{{ LEAVE_REJECTED_BY }}</em></p>
+    {% endif %}
+
+    <h3>Terms &amp; Conditions of Leave</h3>
+    {{ TERMS_AND_CONDITIONS }}
+</div>

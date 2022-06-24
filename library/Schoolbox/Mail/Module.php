@@ -47,6 +47,7 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/createMail', 'getCreateMail', $perm);
         $this->register(self::METHOD_POST, '/create', 'postCreateMail', $perm);
         $this->register(self::METHOD_POST, '/send', 'send', $perm);
+        $this->register(self::METHOD_POST, '/emailForm', 'emailForm', new IsConfigOn(ConfigMapper::NAME_MAIL_ENABLED, $this->getConfig()));
     }
 
     /**

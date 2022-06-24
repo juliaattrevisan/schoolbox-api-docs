@@ -11,7 +11,9 @@ namespace Alaress\Mail;
 
 use Schoolbox\IConfigLoader;
 use Psr\Log\LoggerInterface;
+use Schoolbox\User;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
 
 interface IMailer
 {
@@ -43,7 +45,7 @@ interface IMailer
      */
     public static function buildAddress($address, $name = '');
 
-    public function __construct($template, $subject = '', $to = '', $host = '');
+    public function __construct(string $template, string $subject, string|array|Address|User $to);
 
     public function setFrom(string $email, string $name = '');
 
@@ -51,7 +53,7 @@ interface IMailer
 
     public function setFromAsCurrentUser();
 
-    public function setTo($to);
+    public function setTo(string|array|Address|User $to);
 
     public function setSubject($subject);
 

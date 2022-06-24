@@ -11,8 +11,9 @@
  */
 abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Notice
 {
-    protected $email             = null;
-    protected $emailTemplateFile = 'modules/leave/userNoticeEmail.html';
+    protected ?\Schoolbox\Mail\TwigEmail $email = null;
+
+    protected string $emailTemplateFile = 'leave/userNoticeEmail.twig';
 
     /**
      * Setup
@@ -21,17 +22,10 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
     {
         $subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $email = new Mailer(
-            Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
-            $subject,
-            $this->getRequest()->getUser()->getEmail()
-        );
+        $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory(\Schoolbox\Config\Loader::getInstance());
+        $email = $twigEmailFactory->build($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
-        $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
-        $email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
-        $email->setBlock($email->t_label, 'rejected_by', 'rejected_by_block');
-
-        $email->setVar([
+        $context = [
             'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
             'LEAVE_AUTHOR_NAME'    => $this->getRequest()->getAuthor()->formatName(),
             'LEAVE_STATUS'         => $this->getRequest()->getStatus(true),
@@ -42,9 +36,10 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
             'LEAVE_HOST_PHONE'     => $this->getRequest()->getHostPhone(),
             'LEAVE_STUDENT_PHONE'  => $this->getRequest()->getUserPhone(),
             'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
-        ]);
+        ];
 
-        $this->setEmail($email);
+        $email->setContext($context);
+        $this->email = $email;
     }
 
     /**
@@ -55,30 +50,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
         $email = new \Email($this->getRequest()->getUser()->getEmail());
 
         if ($email->isValid()) {
-            $this->getEmail()->send();
+            $this->email->send();
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set email
-     *
-     * @param Mailer $email
-     */
-    protected function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Get email
-     *
-     * @return Mailer
-     */
-    protected function getEmail()
-    {
-        return $this->email;
     }
 }

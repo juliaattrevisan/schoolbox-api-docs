@@ -13,59 +13,47 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice
 {
-    /**
-     * @var Mailer
-     */
-    protected $email = null;
-    protected $emailTemplateFile = 'modules/leave/parentNoticeEmail.html';
+    protected ?\Schoolbox\Mail\TwigEmail $email = null;
 
-    private $externalUser = null;
+    protected string $emailTemplateFile = 'leave/parentNoticeEmail.twig';
+
+    private ?External_User $externalUser = null;
 
     /**
      * Setup
      */
     public function setup()
     {
-
         /* For getting all the parents of a child
          */
-        $this->setExternalUser(new External_User());
+        $this->externalUser = new External_User();
 
         $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
+        $subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        /* Set destination email address in loop in send()
-         */
-        $email = new Mailer(
-            Mailer::translateTemplatePathToMailPath($this->getEmailTemplateFile()),
-            $subject,
-            ''
-        );
+        $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory(\Schoolbox\Config\Loader::getInstance());
+        $email = $twigEmailFactory->build($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
-        $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
-        $email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
-        $email->setBlock($email->t_label, 'rejected_by', 'rejected_by_block');
+        $context = [
+            'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
+            'LEAVE_AUTHOR_NAME'    => $this->getRequest()->getAuthor()->formatName(),
+            'LEAVE_STATUS'         => $this->getRequest()->getStatus(true),
+            'LEAVE_START'          => $this->getRequest()->getStart()->getLong(),
+            'LEAVE_FINISH'         => $this->getRequest()->getFinish()->getLong(),
+            'LEAVE_DESCRIPTION'    => $this->getRequest()->getDescription(),
+            'LEAVE_HOST_NAME'      => $this->getRequest()->getHostName(),
+            'LEAVE_HOST_PHONE'     => $this->getRequest()->getHostPhone(),
+            'LEAVE_STUDENT_PHONE'  => $this->getRequest()->getUserPhone(),
+            'LEAVE_HOST_MOBILE'    => $this->getRequest()->getHostMobile(),
+            'LEAVE_HOST_ADDRESS'   => $this->getRequest()->getHostAddress(),
+            'LEAVE_COLLECTOR_NAME' => $this->getRequest()->getCollectorName(),
+            'LEAVE_RETURNER_NAME'  => $this->getRequest()->getReturnerName(),
+            'LEAVE_REASON'         => $this->getRequest()->getReason(),
+            'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
+        ];
 
-        $email->setVar(
-            array(
-                'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
-                'LEAVE_AUTHOR_NAME'    => $this->getRequest()->getAuthor()->formatName(),
-                'LEAVE_STATUS'         => $this->getRequest()->getStatus(true),
-                'LEAVE_START'          => $this->getRequest()->getStart()->getLong(),
-                'LEAVE_FINISH'         => $this->getRequest()->getFinish()->getLong(),
-                'LEAVE_DESCRIPTION'    => $this->getRequest()->getDescription(),
-                'LEAVE_HOST_NAME'      => $this->getRequest()->getHostName(),
-                'LEAVE_HOST_PHONE'     => $this->getRequest()->getHostPhone(),
-                'LEAVE_STUDENT_PHONE'  => $this->getRequest()->getUserPhone(),
-                'LEAVE_HOST_MOBILE'    => $this->getRequest()->getHostMobile(),
-                'LEAVE_HOST_ADDRESS'   => $this->getRequest()->getHostAddress(),
-                'LEAVE_COLLECTOR_NAME' => $this->getRequest()->getCollectorName(),
-                'LEAVE_RETURNER_NAME'  => $this->getRequest()->getReturnerName(),
-                'LEAVE_REASON'         => $this->getRequest()->getReason(),
-                'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
-            )
-        );
-
-        $this->setEmail($email);
+        $email->setContext($context);
+        $this->email = $email;
     }
 
     /**
@@ -73,7 +61,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
      */
     public function send()
     {
-        $allParents = $this->getExternalUser()->getStudentContactList([$this->getRequest()->getUser()->getExternalId()]);
+        $allParents = $this->externalUser->getStudentContactList([$this->getRequest()->getUser()->getExternalId()]);
 
         if (is_array($allParents)) {
             $emailList = array();
@@ -101,52 +89,13 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
                 if ($email->isValid()) {
                     // Ensure the current user has a valid email too
                     try {
-                        $this->getEmail()->setFromAsCurrentUser();
+                        $this->email->setFromAsCurrentUser();
                     } catch (RfcComplianceException $e) {
                         // noop - falls back to whatever the default address is
                     }
-                    $this->getEmail()->send($email->getEmail());
+                    $this->email->send($email->getEmail());
                 }
             }
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set email
-     *
-     * @param Mailer $email
-     */
-    protected function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Get email
-     *
-     * @return Mailer
-     */
-    protected function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param External_User $externalUser
-     */
-    private function setExternalUser($externalUser)
-    {
-        $this->externalUser = $externalUser;
-    }
-
-    /**
-     * @return External_User
-     */
-    private function getExternalUser()
-    {
-        return $this->externalUser;
     }
 }

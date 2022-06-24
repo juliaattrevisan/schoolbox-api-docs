@@ -10,9 +10,9 @@
 namespace Schoolbox\Notif;
 
 use Alaress\Lumberjack;
+use Alaress\Mail\AbstractMailer;
 use ConfigFallback;
 use Database;
-use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -116,7 +116,7 @@ class Notifactory
      */
     public function setTransport(TransportInterface $transport = null)
     {
-        $this->transport = $transport ?: Mailer::getConfiguredTransport($this->conf, true);
+        $this->transport = $transport ?: AbstractMailer::getConfiguredTransport($this->conf, true);
         return $this;
     }
 

@@ -236,7 +236,7 @@ class Controller extends Base
             $this->sendError('No recipient provided');
         }
         $attachments = $this->request->post->get('attachment') ?? [];
-        $mail        = new SimpleEmail('');
+        $mail        = new SimpleEmail('', $subject, $to);
 
         //get users email address to use in from field
         $fromEmail = new Email($this->getUser()->getEmail());
@@ -256,7 +256,7 @@ class Controller extends Base
         //if id is submitted to form convert to email
         if (is_numeric($to)) {
             try {
-                $toUser = $this->userMapper->findById($to);
+                $toUser  = $this->userMapper->findById($to);
                 $toEmail = new Email($toUser->getEmail());
                 if (!$toEmail->isValid()) {
                     $this->sendError('Your email address is not valid.');
@@ -316,5 +316,119 @@ class Controller extends Base
     {
         $emailAddresses = AbstractMailer::parseAddressString(AbstractMailer::standardiseEmailSeparator($addressString));
         return $emailAddresses[AbstractMailer::KEY_VALID] ?? [];
+    }
+
+    /**
+     * www/emailForm.php
+     * @return void
+     * @throws TransportExceptionInterface
+     * @throws \Alaress\Web\Controller\Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function emailForm()
+    {
+        /* This form used to be for generic emails, now only used for the feedback form
+           It requires the following variables;
+                    template - template filename to be used
+                    email - email address of sender
+           The following are optional but recommended variables
+                    subject - subject of email to be sent
+                    name - name of sender
+                    confirmation - location to redirect user to after submission, ie a confirmation page
+        */
+
+        $recaptcha = new \ReCaptcha(
+            $this->getConfigLoader()->get('recaptcha_public_api_key'),
+            $this->getConfigLoader()->get('recaptcha_private_api_key'),
+        );
+
+        if (!$this->getSession()->getId() && !$recaptcha->verify($this->request->post->get('g-recaptcha-response'))) {
+            $this->sendError("The Human Checker (reCAPTCHA) failed.");
+        }
+
+        if ($this->getUser()) {
+            $name = $this->getUser()->getFullName();
+        } else {
+            $name = $this->request->post->get('name');
+        }
+
+        if ($this->validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
+            foreach ($_POST as $key => $var) {
+                if (!$this->checkSpamHeaders($var)) {
+                    $this->getResponse()->redirect->to('/');
+                }
+
+                $key = strtoupper($key);
+                if (is_array($var)) {
+                    $context[$key] = implode(AbstractMailer::implodeGlue(), $var);
+                } else {
+                    $context[$key] = $var;
+                }
+            }
+
+            $context['NAME'] = $name;
+            $context['hideUnsubscribe'] = true;
+
+            $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory($this->getConfigLoader());
+            $subject          = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
+            $to               = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
+            $email            = $twigEmailFactory->build('feedback.twig', $subject, $to);
+            $email->setReplyTo($_POST['email'], $name);
+            $email->setContext($context);
+            $email->send();
+            /*  if($_POST['receipt']) {
+                    $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
+                    $receiptHandler->setVar($output);
+                    $receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+                    $receiptHandler->send();
+                }
+            */
+        }
+
+        if (preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation'])) {
+            $this->getResponse()->redirect->to($_POST['confirmation']);
+        } else {
+            $this->getResponse()->redirect->to('/feedback/thank-you');
+        }
+    }
+
+    private function checkSpamHeaders($text)
+    {
+        //checks for common spammer injected headers
+        if (stristr($text, 'Content-Type:') !== false) {
+            return false;
+        }
+        if (stristr($text, 'MIME-Version:') !== false) {
+            return false;
+        }
+        if (stristr($text, 'Bcc:') !== false) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    private function validateEmailAddress($email)
+    {
+        //check from contains valid email
+        if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
+            return false;
+        }
+
+        //do domain lookup
+        [$alias, $domain] = explode('@', $email);
+
+        //this prevents appending of localhost to lookup
+        $domain = $domain . '.';
+
+        //check for mx records or that it resolves
+        if (getmxrr($domain, $temp)) {
+            return true;
+        } elseif (checkdnsrr($domain, 'ANY')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

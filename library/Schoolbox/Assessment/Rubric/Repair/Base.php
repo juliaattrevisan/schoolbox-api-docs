@@ -17,8 +17,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmail;
+use Schoolbox\Mail\TwigEmailFactory;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
@@ -385,13 +384,11 @@ abstract class Base extends CliTool\App
     {
         $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
         if ($mailto) {
-            $mailer = new TwigEmail($template);
-            $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
-            $mailer->setFrom($this->getConfig()->get('mail_from_address'));
-            $mailer->setSubject($subject);
+            $twigEmailFactory = new TwigEmailFactory($this->getConfig(), $this->log);
+            $mailer = $twigEmailFactory->build($template, $subject, $mailto);
             $mailer->setContext($context);
             try {
-                $mailer->send($mailto);
+                $mailer->send();
             } catch (TransportExceptionInterface $e) {
                 $this->log->error(sprintf('Could not send mail to "%s"', $mailto));
             }

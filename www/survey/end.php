@@ -17,6 +17,7 @@ $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
 
+/** @var SitePage $this */
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
 }
@@ -115,6 +116,7 @@ if (!$attempt['finish']) {
     $this->setVar('endAssess_block', '');
 }
 
+/** @var \Schoolbox\Resource\Folder\Model $folder */
 $trail = new Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [

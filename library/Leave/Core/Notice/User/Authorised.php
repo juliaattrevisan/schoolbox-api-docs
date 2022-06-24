@@ -22,13 +22,11 @@ class Leave_Core_Notice_User_Authorised extends Leave_Core_Notice_User_Abstract
 
         /* Custom replacements
          */
-        $this->getEmail()->setVar(array(
-            'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
-            'LEAVE_CONFIRMED_BY' => $this->getRequest()->getConfirmedByMapIndex($this->getRequest()->getConfirmedBy()),
-        ));
-
-        $this->getEmail()->setVar('submitted_by_block', '');
-        $this->getEmail()->parse('authorised_by_block', 'authorised_by');
-        $this->getEmail()->setVar('rejected_by_block', '');
+        $this->email->setContext(
+            [
+                'LEAVE_AUTHORISED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
+                'LEAVE_CONFIRMED_BY'  => $this->getRequest()->getConfirmedByMapIndex($this->getRequest()->getConfirmedBy()),
+            ]
+        );
     }
 }

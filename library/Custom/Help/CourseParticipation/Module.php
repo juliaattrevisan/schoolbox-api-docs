@@ -68,7 +68,7 @@ class Module extends Alaress\Module\Module
                 $mapperFactory->get(Reset\Mapper::class),
                 $mapperFactory->get(UserMapper::class),
                 new TwigEmailFactory(
-                    new CoreContext($this->getConfig()),
+                    $this->getConfig(),
                     new NullLogger()
                 )
             )

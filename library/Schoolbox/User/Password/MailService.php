@@ -14,6 +14,7 @@ use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 
 /**
  * Class MailService
@@ -160,23 +161,23 @@ class MailService
      */
     private function sendResetToUsers(
         array $users,
-        $remoteAddress,
-        $canResetTemplate,
-        $canNotResetTemplate,
-        $subject = null
+        string $remoteAddress,
+        string $canResetTemplate,
+        string $canNotResetTemplate,
+        ?string $subject = null
     ) {
         $sent = [];
+        $subject     = $subject ?: $this->config->get('title') . ' Password Reset';
 
         if (empty($users)) {
             // No users to mail to were found.
             // To mitigate timing attacks: craft the email regardless, and send
             // it to the blackhole.
-            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
+            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig', $subject, '');
             $email->sendToBlackhole();
             return $sent;
         }
 
-        $subject     = $subject ?: $this->config->get('title') . ' Password Reset';
         $fromAddress = $this->config->get('password_change_email_from');
         $fromName    = $this->config->get('mail_from_name');
 
@@ -223,32 +224,24 @@ class MailService
      */
     private function sendResetWithTemplate(Reset\Model $reset, $template, $subject, $fromAddress, $fromName)
     {
-        $user  = $reset->getUser();
-        $email = $this->mailFactory->build($template, $subject);
+        $user = $reset->getUser();
+        if (!filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
+            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig', $subject, '');
+            $email->sendToBlackhole();
+            return true;
+        }
 
+        $email = $this->mailFactory->build($template, $subject, new Address($user->getEmail(), $user->formatName()));
         $email->setFrom($fromAddress, $fromName);
         $email->encodeBase64();
-
+        $email->setContext([
+                               'user'            => $user,
+                               'reset'           => $reset,
+                               'hideUnsubscribe' => true,
+                           ]);
         try {
-            if (filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
-                // Only try and send the email if we got a valid address in the end
-                $email->setContext([
-                    'user'            => $user,
-                    'reset'           => $reset,
-                    'hideUnsubscribe' => true
-                ]);
-
-                return $email->send([
-                    'name'  => $user->formatName(),
-                    'email' => $user->getEmail()
-                ]);
-            }
-
-            // Not a valid email address, send blackhole email
-            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
-            $email->sendToBlackhole();
-            // technically this email "sent"
-            return true;
+            // Only try and send the email if we got a valid address in the end
+            return $email->send();
         } catch (TransportExceptionInterface $e) {
             return false;
         }
