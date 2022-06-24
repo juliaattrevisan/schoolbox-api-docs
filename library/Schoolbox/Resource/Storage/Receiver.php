@@ -93,6 +93,10 @@ class Receiver implements IReceiver
         $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
         $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
 
+        // Find the location within the filesystem where the temp file lives.
+        // TODO: Find a way to remove the need for this truncation
+        $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
+
         try {
             $storage->setMimetype($this->mimetypeMapper->getByFilename($basename));
         } catch (FileException $e) {
@@ -107,7 +111,7 @@ class Receiver implements IReceiver
             $requireSafety = false;
         }
         if ($requireSafety) {
-            $this->assertStorageUploadable($storage);
+            $this->assertStorageUploadable($storage, $this->tempFilesystem->fileSize($tempLocationInFilesystem));
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype
             $storage->setMimetype($this->mimetypeMapper->getUnknownMime());
@@ -116,10 +120,8 @@ class Receiver implements IReceiver
         // By default files uploaded this way are public
         $storage->setPublic($public);
 
-        // TODO: Find a way to remove the need for this truncation
-        $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
-        $helper                   = new Sanitizer\Helper($this->sanitizer);
-        $sanitized                = $helper->sanitize(
+        $helper    = new Sanitizer\Helper($this->sanitizer);
+        $sanitized = $helper->sanitize(
             $this->tempFilesystem,
             $tempLocationInFilesystem,
             $storage->getMime(),
@@ -154,10 +156,11 @@ class Receiver implements IReceiver
      * or the current user is a superuser.
      *
      * @param Model $storage
+     * @param int   $fileSize The size of the file which would be uploaded
      *
      * @throws FileException if the file isn't uploadable for any reason
      */
-    private function assertStorageUploadable(Model $storage): void
+    private function assertStorageUploadable(Model $storage, int $fileSize): void
     {
         $fileMime    = $storage->getMimetype();
         $errorSuffix = "Try a different file or contact your IT administrator.";
@@ -179,7 +182,7 @@ class Receiver implements IReceiver
         }
 
         // Assert: Acceptable size
-        if ($fileMime->getActualMaxFileSize() < $storage->getSize()) {
+        if ($fileMime->getActualMaxFileSize() < $fileSize) {
             throw new FileException(
                 sprintf(
                     "This file exceeds the file size restriction of %s. %s",
