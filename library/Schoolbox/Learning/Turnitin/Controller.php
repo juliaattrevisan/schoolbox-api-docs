@@ -259,11 +259,6 @@ class Controller extends Base
         } catch (\Schoolbox\Mapper\Exception\Deleted $deleted) {
             $model = $deleted->getDeletedObject();
         } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
-            $e->setMessage(sprintf(
-                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
-                $turnitinSubmissionId
-            ));
-
             throw $e;
         }
 
