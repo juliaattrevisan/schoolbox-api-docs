@@ -15,7 +15,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Registry;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
-use Schoolbox\Role;
 
 /**
  * Downloads the eDiary contents for each student
@@ -271,7 +270,7 @@ class EDiary implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed, string $endpoint): void
+    private function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed, string $endpoint): void
     {
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
 
@@ -299,7 +298,7 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, $userExternalId, $feed, Role::STUDENT, $tassEvents);
+        $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
     }
 
 
@@ -316,7 +315,7 @@ class EDiary implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed, string $endpoint): void
+    private function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed, string $endpoint): void
     {
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
 
@@ -341,7 +340,7 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, $userExternalId, $feed, Role::STAFF, $tassEvents);
+        $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
     }
 
 
@@ -351,14 +350,13 @@ class EDiary implements IStrategy
      * @param string     $endpoint
      * @param string     $userExternalId
      * @param array      $feed
-     * @param string     $roleType
      * @param array|null $tassEvents
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importEvents(string $endpoint, string $userExternalId, array $feed, string $roleType, ?array $tassEvents): void
+    private function importEvents(string $endpoint, string $userExternalId, array $feed, ?array $tassEvents): void
     {
         /* This might be null, or buggy
          * Exit early in that scenario
