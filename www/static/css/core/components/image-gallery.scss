@@ -1,13 +1,12 @@
 .img-gallery {
-  @extend .inline-list;
-  margin-left: 0;
-  margin-bottom: 0;
-
-  a {
-    display: $inline-list-display;
-    float: $default-float;
-    list-style: none;
-    max-height: 100px;
-    max-width: 100px;
-  }
+    @extend .inline-list;
+    margin-left: 0;
+    margin-bottom: 0;
+    a {
+        display: block;
+        float: $default-float;
+        list-style: none;
+        max-height: 100px;
+        max-width: 100px;
+    }
 }
