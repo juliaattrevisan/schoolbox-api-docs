@@ -101,7 +101,6 @@ class DisasterRecovery extends CliTool\App
     {
         $fileSystemAwsS3Backups = (new FilesystemFactory())->buildAwsS3FileSystem(
             $this->getConfig(),
-            null,
             self::PREFIX_BACKUPS,
         );
 

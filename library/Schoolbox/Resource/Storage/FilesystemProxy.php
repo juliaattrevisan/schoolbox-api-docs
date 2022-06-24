@@ -165,13 +165,11 @@ class FilesystemProxy
         $storagePath = self::getPathFromHash($hash);
 
         // Are they both local? Attempt to move, rather than copy if so
-        // TODO does Flysystem3 let me interrogate the adapter?
 //        if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
 //            $adapterFrom = $tempFilesystem->getAdapter();
 //            $adapterTo   = $this->filesystem->getAdapter();
 //            if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
 //                if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
-//                    // TODO is this an error?
 //                    return;
 //                }
 //

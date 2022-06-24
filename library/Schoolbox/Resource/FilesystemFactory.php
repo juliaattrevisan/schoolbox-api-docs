@@ -11,12 +11,11 @@ namespace Schoolbox\Resource;
 
 use Aws\S3\S3Client;
 use GuzzleHttp;
-use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
+use League\Flysystem\Config;
 use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
-use League\Flysystem\MountManager;
-use LogicException;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
@@ -60,12 +59,30 @@ class FilesystemFactory
      */
     public function buildStorage(IConfigLoader $config): Filesystem
     {
-        $adapter        = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
-        $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
-        $fsConfig       = $enableReUpload ? ['disable_asserts' => true] : [];
+        $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
         return match ($adapter) {
-            self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(new Local($config->get('storage_dir')), $fsConfig),
-            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, $fsConfig, self::PREFIX_STORAGE),
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(
+                new Local(
+                    $config->get('storage_dir'),
+                    // Allow group-writable public files and folders
+                    PortableVisibilityConverter::fromArray([
+                        'file' => [
+                            'public'  => 0664,
+                            'private' => 0600,
+                        ],
+                        'dir' => [
+                            'public'  => 0775,
+                            'private' => 0700,
+                        ],
+                    ]),
+                ),
+                // Default to public file availability
+                [
+                    Config::OPTION_VISIBILITY           => 'public',
+                    Config::OPTION_DIRECTORY_VISIBILITY => 'public',
+                ],
+            ),
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE),
             default                          => throw new UnexpectedValueException(
                 "Unrecognised filesystem adapter: '$adapter'",
             ),
@@ -100,11 +117,10 @@ class FilesystemFactory
      * Returns an AWS S3 file system, optionally with root set to $prefix
      *
      * @param IConfigLoader $config
-     * @param array|null    $fsConfig
      * @param string        $prefix
      * @return Filesystem
      */
-    public function buildAwsS3FileSystem(IConfigLoader $config, array $fsConfig = null, string $prefix = ''): Filesystem
+    public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = ''): Filesystem
     {
         $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
         $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
@@ -133,7 +149,6 @@ class FilesystemFactory
                 new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
                 $otfs_s3_bucket,
             ),
-            $fsConfig
         );
     }
 }
