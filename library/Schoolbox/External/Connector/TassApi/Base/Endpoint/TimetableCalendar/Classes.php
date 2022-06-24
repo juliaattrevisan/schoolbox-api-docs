@@ -10,6 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\ClassEntry;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -45,29 +49,74 @@ class Classes implements IStrategy
 
 
     /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
+     * A list of timetable calendar entries, which is a list of days
+     *
      * @var array
      */
     private array $timetableCalendar = [];
 
 
     /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
+
+
+    /**
+     * A list of classInvolvements that we saw previously
+     *
+     * @var array
+     */
+    private array $classInvolvements = [];
+
+
+    /**
      * Constructor
      *
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param array           $api
-     * @param Lookup          $lookup
+     * @param LoggerInterface                  $log
+     * @param bool                             $perform
+     * @param array                            $api
+     * @param Lookup                           $lookup
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper                 $classEntryMapper
+     * @param ClassInvolvementMapper           $classInvolvementMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         array $api,
-        Lookup $lookup
+        Lookup $lookup,
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
         $this->lookup = $lookup;
+        $this->eventMapper = $eventMapper;
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
     }
 
 
@@ -201,32 +250,29 @@ class Classes implements IStrategy
                                                     [PRD_DESC] => Form Assembly
                                                 )
             */
-
-            $this->process($timetable);
+            $this->process($person, $timetable);
         }
     }
 
 
     /**
-     * Create individual SUDS Timetable events out of each eleemnt
+     * Create individual SUDS Timetable events out of each element
      * inside this person's $timetable
      *
+     * @param array $person
      * @param array $timetable
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function process(array $timetable): void
+    private function process(array $person, array $timetable): void
     {
-        $timetableCalendar = $this->fetchTimetableCalendar($timetable['TT_ID']);
-        print_r($timetable);
-        die();
-        print_r($timetableCalendar);
-        die();
-
-
         /* Timetable Calendar gives us a list of Days and Dates
          * Each entry in there represents a day in the timetable,
          * which contains multiple periods
          */
+        $timetableCalendar = $this->fetchTimetableCalendar($timetable['TT_ID']);
 
         /* For each entry in Timetable Calendar, set up a series of SUDS Timetable records
          * You can get a date here, but you'll need to make multiple records.
@@ -237,19 +283,184 @@ class Classes implements IStrategy
          * This will get us a list of Periods happening in that day,
          * and their times
          */
+        foreach ($timetableCalendar as $dayDefinition) {
+            $day = trim((string)$dayDefinition['DAY_CODE']);
 
-            /* For each entry in $timetable[$day], create a new SUDS Timetable event
-             * Use the date that we got from the outer loop
-             * Combine it with the time in the current array element
-             * Save it
+            /* This is a day in the calendar where there isn't a Day Code
+             * There is no roster of periods to assign to this date
+             * It's probably a weekend, or a non-teaching day somehow
+             *
+             * Skip it
              */
+            if ('' === $day) {
+                continue;
+            }
 
-            /* Create a new involvement for this event if one doesn't already exist
-             * (This superpositions on top of Additional Subjects)
-             */
+            $date = explode(' ', $dayDefinition['TTDATE'])[0];
 
+            foreach ($timetable['DAYS'][$day]['PERIODS'] as $periodData) {
+                /* Extract the useful time from this microsecond format
+                 */
+                $startTime = substr($periodData['PRD_START'], 11, 8);
+                $endTime = substr($periodData['PRD_END'], 11, 8);
+
+                foreach ($periodData['SUBJECTS'] as $subject) {
+                    /* For each entry in $timetable[$day], create a new SUDS Timetable event
+                     * Use the date that we got from the outer loop
+                     * Combine it with the time in the current array element
+                     * Save it
+                     */
+                    $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+                    $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
+
+                    $title = trim((string)$subject['SUB_DESC']);
+                    $detail = '';
+                    $room = trim((string)$subject['ROOM_CODE']);
+                    $classCode = (new Code())->encode((string)$subject['SUBTAB_YEAR_GRP'], (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
+                    $period = trim((string)$periodData['PRD_CODE']);
+                    $type = '';
+                    $guid = '';
+
+                    /* Cram in everything else
+                     */
+                    $event = $this->eventMapper->createModel()
+                        ->setTitle($title)
+                        ->setDetail($detail)
+                        ->setLocation($room)
+                        ->setCode($classCode)
+                        ->setDay($day)
+                        ->setPeriod($period)
+                        ->setStartAt($startAt)
+                        ->setFinishAt($finishAt)
+                        ->setType($type)
+                        ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                        ->setGuid($guid)
+                        ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+
+                    /* Save it and remember what we saw in case we need to reuse this later
+                     */
+                    $this->log->debug(sprintf(
+                        'Creating new timetable event %s - %s, %s, %s-%s',
+                        $event->getTitle(),
+                        $event->getDay(),
+                        $event->getPeriod(),
+                        $event->getStartAt()->getDatabase(),
+                        $event->getFinishAt()->getDatabase()
+                    ));
+
+                    if ($this->perform) {
+                        $this->eventMapper->save($event);
+                    }
+
+                    /* Save sis_class record
+                     */
+                    $classEntry = $this->createClassEntry($event);
+
+                    /* Create a new involvement for this event if one doesn't already exist
+                     * (This superpositions on top of Additional Subjects)
+                     */
+                    $name = trim("{$person['firstname']} {$person['lastname']}");
+
+                    $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
+                }
+            }
+        }
     }
 
+
+    /**
+     * Create (or reuse) a ClassEntry corresponding to $event
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @return ClassEntry
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createClassEntry(\Schoolbox\External\Event\Model $event): ClassEntry
+    {
+        if (isset($this->classEntries[$event->getCode()])) {
+            $classEntry = $this->classEntries[$event->getCode()];
+        } else {
+            try {
+                $classEntry = $this->classEntryMapper->findOneByColumn('code', $event->getCode());
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $classEntry = $this->classEntryMapper->createModel()
+                    ->setName($event->getTitle())
+                    ->setCode($event->getCode());
+            }
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($classEntry);
+            }
+
+            $this->classEntries[$event->getCode()] = $classEntry;
+        }
+
+        return $classEntry;
+    }
+
+
+    /**
+     * Save an involvement for user $externalId, whose name is $name,
+     * for the sis_event $event
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @param string                          $name
+     * @param string                          $externalId
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            $this->log->debug(sprintf(
+                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                $name,
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        } else {
+            try {
+                $classInvolvement = $this->classInvolvementMapper->findOneByColumnList([
+                    'class_id' => $classEntry->getId(),
+                    'external_id' => $externalId
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $classInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setClass($classEntry)
+                    ->setExternalId($externalId);
+            }
+
+            if ($this->perform) {
+                $this->classInvolvementMapper->save($classInvolvement);
+            }
+
+            $this->classInvolvements[$classEntry->getId()][$externalId] = true;
+
+            $this->log->debug(sprintf(
+                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                $name,
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        }
+    }
 
     /**
      * Get the Timetable Calendar for a particular TTID

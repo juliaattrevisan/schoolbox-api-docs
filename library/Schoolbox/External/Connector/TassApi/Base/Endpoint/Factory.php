@@ -383,7 +383,10 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
-                $lookup
+                $lookup,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
             ))
             ->add(new ApiCertification(
                 $this->log,
