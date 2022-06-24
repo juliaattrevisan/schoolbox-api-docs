@@ -38,7 +38,7 @@ let __newComponentTabsContainer; //to reinsert the newComponentClone into the ne
 export function initAddNewComponents () {
     initListeners();
     initDraggables();
-    initNewComponentPositions();
+    updateSortableElements();
 }
 
 /**
@@ -114,12 +114,13 @@ function addNewDraggable (component) {
  * To be able to sort elements and snap back to correct position
  * When sorting and snapping back, these points are used to animate the components movements
  */
-function initNewComponentPositions () {
+ function updateSortableElements () {
     document.querySelectorAll(COMPONENT_SELECTOR).forEach((component) => {
         component.dataset.originalLeft = component.getBoundingClientRect().left;
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
+        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -173,6 +174,7 @@ function onNewComponentClicked (draggableInstance) {
                 __isFlipping = false;
                 reinsertNewComponentButton();
                 __referenceElement.remove(); //and now the placeholder can be pulled out
+                updateSortableElements();
                 addNewComponent();
             },
         });
@@ -218,6 +220,7 @@ function onDragStart (draggableInstance) {
         updateDocumentOnDragStart();
         disableAllOtherDraggables();
         extractNewComponent();
+        updateSortableElements();
     }
 }
 
@@ -487,7 +490,7 @@ function alignNewComponent () {
 function onAlignNewComponentComplete () {
     resetNewComponent();
     updateDocumentOnDragEnd();
-    // updateSortableElements();
+    updateSortableElements();
     if (__hasNewComponent) {
         addNewComponent();
     } else {
