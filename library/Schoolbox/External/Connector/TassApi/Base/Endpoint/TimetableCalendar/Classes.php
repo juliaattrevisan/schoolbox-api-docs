@@ -124,6 +124,84 @@ class Classes implements IStrategy
              */
             $timetable = $data['student_timetable'][0];
 
+            /* Example timetable extract
+
+                Array
+                (
+                    [HSE_CODE] => A
+                    [DESC_TEXT] => Secondary School Timetable 2022/1
+                    [HSE_NAME] => Ashkanasy
+                    [DAYS] => Array
+                        (
+                            [11] => Array
+                                (
+                                    [PERIODS] => Array
+                                        (
+                                            [11] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 1224
+                                                                    [FROM_DATE] =>
+                                                                    [SUB_SHORT] => RE
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => 504
+                                                                    [TO_DATE] =>
+                                                                    [TCH_CODE] => RIC
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 12
+                                                                    [CLASS] => D
+                                                                    [YEAR_GRP] =>
+                                                                    [TT_PRIORITY] => 999
+                                                                    [SUB_DESC] => Unit 3&4 Religion & Society
+                                                                    [SUB_ABREV] => RE
+                                                                    [LINE_CODE] => 12
+                                                                    [SUBTAB_YEAR_GRP] => 12
+                                                                    [DATE_RANGE] =>
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 15:30:00.0
+                                                    [PRD_CODE] => 11
+                                                    [PRD_START] => 1900-01-01 14:38:00.0
+                                                    [PRD_DESC] => Period 6
+                                                )
+
+                                            [2] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 1218
+                                                                    [FROM_DATE] =>
+                                                                    [SUB_SHORT] => MC
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => 131
+                                                                    [TO_DATE] =>
+                                                                    [TCH_CODE] => PEA
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 12
+                                                                    [CLASS] => C
+                                                                    [YEAR_GRP] =>
+                                                                    [TT_PRIORITY] => 999
+                                                                    [SUB_DESC] => Yr 12 Mechanech
+                                                                    [SUB_ABREV] => MC
+                                                                    [LINE_CODE] => 12
+                                                                    [SUBTAB_YEAR_GRP] => 12
+                                                                    [DATE_RANGE] =>
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 08:59:00.0
+                                                    [PRD_CODE] => 2
+                                                    [PRD_START] => 1900-01-01 08:50:00.0
+                                                    [PRD_DESC] => Form Assembly
+                                                )
+            */
+
             $this->process($timetable);
         }
     }
@@ -143,6 +221,33 @@ class Classes implements IStrategy
         die();
         print_r($timetableCalendar);
         die();
+
+
+        /* Timetable Calendar gives us a list of Days and Dates
+         * Each entry in there represents a day in the timetable,
+         * which contains multiple periods
+         */
+
+        /* For each entry in Timetable Calendar, set up a series of SUDS Timetable records
+         * You can get a date here, but you'll need to make multiple records.
+         *
+         * To do it,
+         * For each entry in Timetable Calendar, get the Day Code
+         * then use that to look up the corresponding struct in $timetable
+         * This will get us a list of Periods happening in that day,
+         * and their times
+         */
+
+            /* For each entry in $timetable[$day], create a new SUDS Timetable event
+             * Use the date that we got from the outer loop
+             * Combine it with the time in the current array element
+             * Save it
+             */
+
+            /* Create a new involvement for this event if one doesn't already exist
+             * (This superpositions on top of Additional Subjects)
+             */
+
     }
 
 
@@ -168,6 +273,38 @@ class Classes implements IStrategy
                 'tt_id' => $ttid
             ]);
         }
+
+        /* Example extract
+            [tt_calendar] => Array
+                (
+                    [0] => Array
+                        (
+                            [CAT_NUM] =>
+                            [CMPY_CODE] => 01
+                            [TTDATE] => 2022-02-01 00:00:00.0
+                            [RECORD_ID] => 22324
+                            [LABEL] => Tue 01/02/2022
+                            [ID] => 63-2022-02-01
+                            [TABLE_ID] => ttcalendar
+                            [VALUE] => 2022-02-01
+                            [TT_ID] => 63
+                            [DAY_CODE] => 2
+                        )
+
+                    [1] => Array
+                        (
+                            [CAT_NUM] =>
+                            [CMPY_CODE] => 01
+                            [TTDATE] => 2022-02-02 00:00:00.0
+                            [RECORD_ID] => 22325
+                            [LABEL] => Wed 02/02/2022
+                            [ID] => 63-2022-02-02
+                            [TABLE_ID] => ttcalendar
+                            [VALUE] => 2022-02-02
+                            [TT_ID] => 63
+                            [DAY_CODE] => 3
+                        )
+         */
 
         return $this->timetableCalendar[$ttid]['tt_calendar'];
     }
