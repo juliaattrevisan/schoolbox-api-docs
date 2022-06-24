@@ -154,7 +154,7 @@ if (isset($type) && isset($id)) {
     // ----------------------------------------------------------------------------------------------------------------
 
     /** @var int $videoSize */
-    $videoSize = $fileSystem->getSize($video->getTranscodePath());
+    $videoSize = $fileSystem->fileSize($video->getTranscodePath());
 
     // Make sure the video actually had content
 
@@ -278,6 +278,8 @@ function getLocalFilesystemPath(ResourceVideo $video, IConfigLoader $config)
 /**
  * If we are unable to stream the video this is where we will end up, for now it just fails. We may want to change this
  * to something more meaningful or a placeholder failed video.
+ *
+ * @return never-return
  */
 function fail()
 {
