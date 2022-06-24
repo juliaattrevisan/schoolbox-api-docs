@@ -22,7 +22,6 @@ $container-bg: white !default;
     text-align: center;
     margin-bottom: 1rem;
     width: 100%;
-
     [class^="icon-"],
     [class*=" icon-"] {
         @extend .size-48;
@@ -49,11 +48,11 @@ $container-bg: white !default;
     }
 }
 
+// A general error display
 .error-state section {
     background-color: transparent;
     color: $jet;
     padding: 2rem;
-
     h1,
     h2 {
         color: $jet;
@@ -75,14 +74,8 @@ $container-bg: white !default;
     }
 }
 
-// component-container already has it's own margin-bottom,
-// empty states in information lists shouldn't have padding or margin
-.component-container .empty-state,
-.information-list .empty-state {
-    margin-bottom: 0;
-}
-
-.trace {
+//an error stack trace
+.error-stack-trace {
     pre {
         display: inline;
         &:before {
@@ -90,6 +83,13 @@ $container-bg: white !default;
             display: block;
         }
     }
+}
+
+// component-container already has it's own margin-bottom,
+// empty states in information lists shouldn't have padding or margin
+.component-container .empty-state,
+.information-list .empty-state {
+    margin-bottom: 0;
 }
 
 // Deleting Components
@@ -106,18 +106,6 @@ $container-bg: white !default;
     }
 }
 
-// Disabled elements
-:disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-section {
-    label {
-        font-size: $paragraph-font-size;
-    }
-}
-
 // Make a list vertically scrollable if too much content
 .information-list.scrollable-list {
     max-height: 10rem;
@@ -126,7 +114,6 @@ section {
 
 .scrollable {
     overflow: auto;
-
     table {
         margin-bottom: 0;
     }
@@ -139,7 +126,6 @@ section {
 
 %content {
     padding: rem-calc(($base-font-size - 4));
-
     .subheader {
         margin-top: 0;
     }
@@ -178,14 +164,11 @@ section {
 
 // Labels
 .label {
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     text-transform: uppercase;
     margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
-
-    /* A generic label used to indicate something is taking place
-     * Used mainly in label-timeout indicators
-     */
+    // A generic label used to indicate something is taking place, used mainly in label-timeout indicators
     &.highlight {
         color: $accent-foreground;
         background-color: $accent-background;
@@ -204,7 +187,6 @@ section {
             }
         }
     }
-
     // Label colors
     &.reviewed {
         @include label($bg: tint($success-color, 74%));
@@ -241,12 +223,10 @@ section {
     font-family: serif;
     font-style: italic;
     text-align: center;
-
     &.has-tip {
         border-bottom: 0;
         color: $white;
         font-weight: 400;
-
         &:hover {
             color: $white;
         }
@@ -283,7 +263,6 @@ section {
     font-size: $small-font-size;
     background-color: $content-ui-background;
     border-radius: 0.5rem;
-
     &.icon-help:before {
         color: $monsoon;
     }
@@ -305,7 +284,6 @@ section {
     line-height: 1;
     font-size: 1rem;
     text-decoration: none;
-
     &:before {
         @extend .icon-down-arrow;
         display: inline-block;
@@ -403,7 +381,6 @@ $selector-width: 2.25rem;
 }
 @mixin information-list() {
     @extend %information-list;
-
     &.expandable,
     &.expandable-card {
         @include list-interaction(expander, pointer);
@@ -491,20 +468,14 @@ $selector-width: 2.25rem;
     .card {
         flex: 1 100%;
     }
-    /* <article> immediately follows <nav> has a special
-     * layout rule to display content
-     */
+    // <article> immediately follows <nav> has a special layout rule to display content
     .list-item ~ article,
     .card ~ article {
         @extend %card-article;
-
         p:last-child {
             margin-bottom: 0;
         }
-
-        /* Zero padding article, if it is empty
-         * Whitespaces and empty elements inside <article> don't count
-         */
+        // Zero padding article, if it is empty Whitespaces and empty elements inside <article> don't count
         &:empty {
             padding: 0;
         }
@@ -554,11 +525,9 @@ $selector-width: 2.25rem;
     }
     .assessment {
         border-top: 1px solid $body-bg;
-
         .progress-tick.tiny {
             margin-left: 0;
         }
-
         @media #{$medium-up} {
             .content {
                 padding-left: 3rem;
@@ -611,22 +580,18 @@ $selector-width: 2.25rem;
 
 .permission-list {
     @include information-list;
-
     [class*="icon-"]:before {
         padding: 0;
     }
-
     span:not([data-perm-container]) > [class*="icon-"]:before {
         padding-right: 0.5rem;
         padding-left: 0.5rem;
     }
-
     a {
         // Button splash & .actions-small-# a[class*="icon-"] specificity causes this
         overflow: inherit !important;
         opacity: 1 !important;
     }
-
     input:checked + label {
         background-color: $content-ui-submit-background;
         a {
@@ -635,7 +600,7 @@ $selector-width: 2.25rem;
     }
 }
 
-@mixin hide-n($size, $media-down, $media-up, $count: $total-columns) {
+@mixin hide-n ($size, $media-down, $media-up, $count: $total-columns) {
     @for $i from 1 through $count {
         &.#{$size}-#{$i} {
             > li {
@@ -671,12 +636,10 @@ $selector-width: 2.25rem;
     display: flex;
     list-style: none;
     margin: 0;
-
     li {
         flex: 1 auto;
         margin: 1px 1px 0 0;
     }
-
     a {
         flex: 1 auto;
         &:empty:before {
@@ -691,9 +654,8 @@ $selector-width: 2.25rem;
 .grade {
     font-size: rem-calc(($base-font-size - 4));
     padding: 0.285rem 1rem;
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
-
+    print-color-adjust: exact;
     &.gradient-none-bg {
         background-color: $aluminum;
     }
@@ -720,9 +682,8 @@ $selector-width: 2.25rem;
 // Grades that sit along side of other elements
 .flex-grade {
     display: flex;
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
-
+    print-color-adjust: exact;
     .sibling {
         flex: 1;
     }
@@ -738,18 +699,15 @@ $selector-width: 2.25rem;
         flex: 1 0 auto;
         padding: 0.5rem 0.75rem;
     }
-
     .gradient-none-bg {
         background-color: $aluminum;
     }
-
     .grade {
         align-items: center;
         display: flex;
         flex: 0 0 auto;
         justify-content: center;
         margin-left: 0.75rem;
-
         span {
             color: $white;
             line-height: inherit;
@@ -765,7 +723,6 @@ $selector-width: 2.25rem;
         @media #{$medium-down} {
             flex-wrap: wrap;
             justify-content: center;
-
             .txt p {
                 margin-bottom: 0.5rem;
             }
@@ -875,11 +832,9 @@ $selector-width: 2.25rem;
 // Reveal
 .reveal-modal {
     min-height: auto;
-
     &:focus {
         outline: none;
     }
-
     h1,
     h2,
     h3,
@@ -890,7 +845,6 @@ $selector-width: 2.25rem;
         // (it's in a CSS native function)
         max-width: calc(100% - #{rem-calc(($base-font-size * 2.5))});
     }
-
     .component-action {
         margin: 0 -0.875rem -0.875rem;
         section {
@@ -901,18 +855,15 @@ $selector-width: 2.25rem;
             }
         }
     }
-
     .checklist {
         overflow-y: auto;
     }
-
     #filesystem-browse,
     #filesystem-myfile {
         max-height: rem-calc(420);
         overflow-y: scroll;
         overflow-x: hidden;
     }
-
     .close-reveal-modal {
         right: $reveal-close-right;
 
@@ -920,16 +871,13 @@ $selector-width: 2.25rem;
             right: 0.5rem;
         }
     }
-
     form {
         margin: 0;
     }
-
     // Fix spacing for forms inside modals that have columns
     form.has-columns {
         margin-left: -0.875rem;
         margin-right: -0.875rem;
-
         fieldset {
             padding: 0;
         }
@@ -950,7 +898,6 @@ $selector-width: 2.25rem;
         margin: 0;
         text-align: right;
     }
-
     .button,
     button,
     input {
@@ -962,18 +909,15 @@ $selector-width: 2.25rem;
         font-weight: $font-weight-semibold;
         color: $body-font-color;
         padding: 0.5rem 0.75rem;
-
         &:hover {
             background-color: transparent;
         }
-
         &.submit {
             background-color: transparent;
             color: $content-ui-submit-background;
             width: auto;
         }
     }
-
     .close-reveal-modal {
         top: auto;
         right: auto;
@@ -1084,7 +1028,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
     @extend .no-text;
     @extend .icon-approve;
-
     &:before {
         color: $white;
         text-align: center;
@@ -1092,17 +1035,14 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
         height: 100%;
         visibility: hidden;
     }
-
     &:not(.readonly):hover {
         &:before {
             visibility: visible;
         }
     }
-
     &.small {
         @include progress-tick($progress-tick-size-small);
     }
-
     &.tiny {
         @include progress-tick($progress-tick-size-tiny);
         display: inline-block;
@@ -1112,7 +1052,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             display: none;
         }
     }
-
     &.pending {
         @extend .icon-approve;
         background-color: $warning-color;
@@ -1123,7 +1062,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             transform: rotate(-135deg);
         }
     }
-
     &.reviewed {
         @extend .icon-approve;
         background-color: $success-color;
@@ -1133,10 +1071,8 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             visibility: visible;
         }
     }
-
     &.failed {
         background-color: $alert-color;
-
         &:before {
             visibility: visible;
             content: "\0021";
@@ -1181,7 +1117,6 @@ dl {
     &.inline-dl {
         @include grid-row($behavior: nest);
         margin-bottom: 1rem;
-
         dt,
         dd {
             @include grid-column($columns: false, $position: true);
@@ -1328,7 +1263,6 @@ $train-line-unvisited-color: $content-ui-background;
         a {
             display: block;
             margin: $train-line-stop-size 0.5rem;
-
             // Smaller stops that have no icons (Nub)
             // The 0.4 multiplier and offset is empirical - I don't know what the math is
             // to derive it from the stop size or segment width
@@ -1365,7 +1299,6 @@ article {
     // Scroll WYSIWYG content areas when wide tables exist.
     overflow-x: auto;
     overflow-y: hidden;
-
     // Enforce right text alignment for right-aligned blocks within user-generated
     // content.
     // Otherwise: most do, but some don't (notably: discussion threads)

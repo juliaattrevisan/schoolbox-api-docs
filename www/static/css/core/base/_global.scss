@@ -55,6 +55,12 @@ body {
     color: $accent-background;
 }
 
+// Disabled elements
+:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 // Grid Defaults to get images and embeds to work properly
 // Get rid of gap under images by making them display: inline-block; by default
 img { 

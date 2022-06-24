@@ -431,6 +431,12 @@ $select-hover-bg-color: tint($warning-color, 50%);
       }
     }
 
+    section {
+        label {
+            font-size: $paragraph-font-size;
+        }
+    }
+
     /* Attach elements to the beginning or end of an input */
     .prefix,
     .postfix {
