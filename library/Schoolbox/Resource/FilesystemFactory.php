@@ -62,23 +62,7 @@ class FilesystemFactory
     {
         $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
         return match ($adapter) {
-            self::FILE_SYSTEM_ADAPTER_LOCAL  => new Filesystem(
-                new Local(
-                    $config->get('storage_dir'),
-                    // Allow group-writable public files and folders
-                    PortableVisibilityConverter::fromArray(
-                        [
-                            'file' => [Visibility::PUBLIC => 0664,],
-                            'dir'  => [Visibility::PUBLIC => 0775,],
-                        ],
-                        Visibility::PUBLIC,
-                    ),
-                ),
-                [
-                    Config::OPTION_VISIBILITY           => Visibility::PUBLIC,
-                    Config::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
-                ],
-            ),
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => $this->buildLocalFileSystem($config),
             self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE),
             default                          => throw new UnexpectedValueException(
                 "Unrecognised filesystem adapter: '$adapter'",
@@ -109,6 +93,33 @@ class FilesystemFactory
         return PHP_SAPI === 'cli' ? 0 : self::S3_CONNECT_TIMEOUT_WEB;
     }
 
+    /**
+     * Build a local file system.
+     *
+     * @param IConfigLoader $config
+     * @return Filesystem
+     */
+    public function buildLocalFileSystem(IConfigLoader $config): Filesystem
+    {
+        $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_LOCAL);
+        return new Filesystem(
+            new Local(
+                $config->get('storage_dir'),
+                // Allow group-writable public files and folders
+                PortableVisibilityConverter::fromArray(
+                    [
+                        'file' => [Visibility::PUBLIC => 0664,],
+                        'dir'  => [Visibility::PUBLIC => 0775,],
+                    ],
+                    $visibility,
+                ),
+            ),
+            [
+                Config::OPTION_VISIBILITY           => $visibility,
+                Config::OPTION_DIRECTORY_VISIBILITY => $visibility,
+            ],
+        );
+    }
 
     /**
      * Returns an AWS S3 file system, optionally with root set to $prefix
@@ -141,15 +152,33 @@ class FilesystemFactory
         // may use it
         $client->registerStreamWrapper();
 
+        $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
         return new Filesystem(
             new Adapter(
                 new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
                 $otfs_s3_bucket,
             ),
             [
-                Config::OPTION_VISIBILITY           => Visibility::PRIVATE,
-                Config::OPTION_DIRECTORY_VISIBILITY => Visibility::PRIVATE,
+                Config::OPTION_VISIBILITY           => $visibility,
+                Config::OPTION_DIRECTORY_VISIBILITY => $visibility,
             ],
         );
+    }
+
+    /**
+     * Helper for determining a filesystem type's default visibility.
+     *
+     * @param string $adapter
+     * @return string
+     */
+    public static function buildDefaultVisibility(string $adapter): string
+    {
+        return match ($adapter) {
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => Visibility::PUBLIC,
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => Visibility::PRIVATE,
+            default                          => throw new UnexpectedValueException(
+                "Unrecognised filesystem adapter: '$adapter'",
+            ),
+        };
     }
 }
