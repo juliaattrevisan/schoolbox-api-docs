@@ -79,7 +79,7 @@ if (isset($type) && isset($id)) {
 
     $storage = $video->getStorage();
     /** @var Filesystem $fileSystem */
-    $fileSystem = $storage->getFilesystem();
+    $fileSystem = $kernel->get('filesystem.storage');
     /** @var IConfigLoader $config */
     $config = $kernel->getDependencyInjector()->get('config');
 

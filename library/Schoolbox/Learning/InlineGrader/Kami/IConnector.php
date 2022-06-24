@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Alaress_Date_Format;
@@ -22,7 +23,6 @@ use Alaress_Date_Format;
  */
 interface IConnector
 {
-
     // Session options
     const SESSION_THEME_LIGHT = 'light';
     const SESSION_THEME_DARK = 'dark';
@@ -50,12 +50,13 @@ interface IConnector
      *
      * Note that this method cost 4c each time you hit the production or proxy server
      *
-     * @param IStorage $storage
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
      * @return Document
      * @throws Exception\EmptyApiKeyException If no Kami API key configured
      * @throws Exception\ResponseDecodeException If cannot decode the Kami response
      */
-    public function uploadDocument(IStorage $storage): Document;
+    public function uploadDocument(IStorage $storage, FilesystemProxy $filesystemProxy): Document;
 
 
     /**

@@ -80,7 +80,8 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Component_ConfigMapper::class),
             ),
             $assessmentDataSource,
-            $this->getMapperFactory()->get(ErrorMapper::class)
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 

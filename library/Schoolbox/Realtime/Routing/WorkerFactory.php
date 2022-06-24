@@ -24,6 +24,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\Filter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 class WorkerFactory
@@ -58,6 +59,7 @@ class WorkerFactory
      * @param UserMapper            $userMapper
      * @param RoutePermissionMapper $routePermMapper
      * @param \Schoolbox\Instance   $instance
+     * @param FilesystemProxy       $filesystemProxy
      */
     public function __construct(
         IConfigLoader $conf,
@@ -66,7 +68,8 @@ class WorkerFactory
         RegistryMapper $registryMapper,
         UserMapper $userMapper,
         RoutePermissionMapper $routePermMapper,
-        Schoolbox\Instance $instance
+        Schoolbox\Instance $instance,
+        private FilesystemProxy $filesystemProxy
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -91,6 +94,7 @@ class WorkerFactory
             $this->registryMapper,
             $this->instance,
             $this->conf->get('title'),
+            $this->filesystemProxy,
             MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 

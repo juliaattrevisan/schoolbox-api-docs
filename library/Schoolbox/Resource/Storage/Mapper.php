@@ -9,19 +9,17 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress_Byte_Format;
-use League\Flysystem\FileNotFoundException;
+use Alaress_Date_Format;
 use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Collection;
-use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\User;
 use Schoolbox\Video\QueueMapper;
 
 /**
@@ -30,36 +28,10 @@ use Schoolbox\Video\QueueMapper;
  *
  * @package Schoolbox\Resource\Storage
  * @method GenericCollection|Model[] findAll($options = [])
+ * @method Model createModel($idValue = null)
  */
-class Mapper extends BaseMapper implements Receiver
+class Mapper extends BaseMapper implements IReceiver
 {
-    /**
-     * Lazy-loaded on first use.
-     * We cannot instantiate during a construct setup hook as it has a dependency on the config loader which will
-     * blow up if getInstance() is called on this class from a php unit test context.
-     *
-     * @var Manager
-     */
-    private $manager;
-
-    /** @var bool */
-    private $checkPrevious;
-
-    /**
-     * @param int $idValue
-     *
-     * @return Model
-     * @throws MapperException
-     */
-    public function createModel($idValue = null)
-    {
-        /** @var Model $model */
-        $model = parent::createModel($idValue);
-        $model->setFilesystem($this->getManager()->getFilesystem(Manager::FS_STORAGE));
-
-        return $model;
-    }
-
     /**
      * @return void
      * @throws MapperException
@@ -82,52 +54,21 @@ class Mapper extends BaseMapper implements Receiver
 
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
-        $requireSafety = true;
-
-        $user = $this->getSessionUser();
-        if ($user) {
-            $requireSafety = $user->isSuperuser() == false;
-        } elseif (PHP_SAPI == 'cli') {
-            $requireSafety = false;
-        }
-
-        if ($requireSafety) {
-            $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'safetyCheck']);
-        } else {
-            $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
-                /** @var Model $model */
-                if (!$model->getMimetype() instanceof Mimetype) {
-                    // For super users only, we allow this
-                    $model->setMimetype(MimetypeMapper::getInstance()->getUnknownMime());
-                }
-            });
-        }
-
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
 
     /**
-     * Pre-save callback
-     *
-     * @param Model $storage
-     *
-     * @throws FileException
-     * @throws FileNotFoundException
-     */
-    public function safetyCheck(Model $storage)
-    {
-        $this->getManager()->safetyCheck($storage);
-    }
-
-    /**
      * Post-delete callback
+     *
+     * TODO this shouldn't be necessary: storage files should be cleaned up by
+     *      another process
      *
      * @param Model $storage
      */
     public function deleteStorage(Model $storage)
     {
-        $this->getManager()->delete($storage);
+        $this->getStorageFilesystemProxy()->delete($storage);
     }
 
     /**
@@ -143,30 +84,12 @@ class Mapper extends BaseMapper implements Receiver
 
     /**
      * @param Model $storage
-     * @param Model $previous
      *
-     * @return bool
-     * @throws FileException
-     * @throws FileNotFoundException
+     * @return true
      */
-    protected function postSave(Model $storage, Model $previous = null)
+    protected function postSave(Model $storage)
     {
-        // Is this file already in the storage table and (config flag OFF or (previous exists and size appears correct))?
-        if (
-            $previous &&
-            (
-                !$this->getConfigLoader()->get(Schoolbox\Config\ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE) ||
-                ($previous->exists() && $storage->getSize() === $previous->getFilesystem()->getSize($previous->getPath()))
-            )
-        ) {
-            // no copying to take place
-            return true;
-        }
-
         // Ram media files into Video Queue table for transcoding
-
-        $saveResult = $this->getManager()->save($storage);
-
         if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
             $mapper = QueueMapper::getInstance();
             $videoQ = $mapper->createModel();
@@ -177,7 +100,7 @@ class Mapper extends BaseMapper implements Receiver
             $mapper->save($videoQ);
         }
 
-        return $saveResult;
+        return true;
     }
 
     /**
@@ -209,29 +132,6 @@ class Mapper extends BaseMapper implements Receiver
           FROM $table
           LEFT JOIN {$this->getJoinSql('allowedFileExtension', '', '', true)}
         ";
-    }
-
-    /**
-     * Ensures that path is always calculated on all hydrated objects.
-     * This used to be in `$this->hydrateSelect` - however, that method doesn't
-     * get called if this object is hydrated through a join from another mapper.
-     *
-     * @param array         $row
-     * @param string        $alias
-     * @param callable|null $callback
-     *
-     * @return null|Model
-     * @throws MapperException
-     */
-    public function hydrate(array $row, $alias = '', $callback = null)
-    {
-        /** @var null|Model $storage */
-        $storage = parent::hydrate($row, $alias, $callback);
-        if ($storage instanceof Model) {
-            $storage->setPath($this->getManager()->calcPath($storage));
-        }
-
-        return $storage;
     }
 
     /**
@@ -277,20 +177,32 @@ class Mapper extends BaseMapper implements Receiver
     }
 
     /**
-     * @param Model $object
+     * For safety reasons don't allow the storage mapper's `delete` to be called
+     * directly: instead, `actualDelete` must be called.
      *
-     * @return bool
+     * This protects against inadvertent deletion of the files which back onto
+     * storage objects..
+     *
+     * @param Model|Collection<Model> $object
+     *
+     * @return never-return
      * @throws MapperException
      */
     public function delete($object)
     {
-        // protect storage objects from accidental deletion by forcing a second, undocument parameter that must be TRUE
-        $args = func_get_args();
+        throw new MapperException("Attempt to delete Storage file denied");
+    }
 
-        if (count($args) < 2 || $args[1] !== true) {
-            throw new MapperException("Attempt to delete Storage file denied");
-        }
 
+    /**
+     * Actually delete a storage object.
+     *
+     * @param Model|Collection<Model> $object
+     * @return bool
+     * @throws MapperException if the file couldn't be deleted.
+     */
+    public function actualDelete($object): bool
+    {
         try {
             // postDelete will throw a file exception if the file can't be deleted
             return parent::delete($object);
@@ -301,147 +213,74 @@ class Mapper extends BaseMapper implements Receiver
 
 
     /**
-     * Accept a resource stream (or string file contents) upload
+     * @inheritdoc
      *
-     * @param string                    $filename
-     * @param resource|string           $fp
-     * @param bool                      $public
-     * @param \Alaress_Date_Format|null $expiryAt
-     * @return Model
-     * @throws BaseMapper\DefinitionException
-     * @throws FileException
-     * @throws FileNotFoundException
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @deprecated The receiver from DI (filesystem.receiver) should be used
+     *             instead, and injected where necessary.
      */
-    public function acceptStream($filename, $fp, $public = false, ?\Alaress_Date_Format $expiryAt = null): Model
-    {
-        // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
-        // (just like an upload)
-
-        $tempLocation = sb_tempnam('otfs');
-
-        /* Temporary location didn't get created. There might be a number of reasons why that might
-         * be the case; no write access to the specified location, disk full, etc.
-         *
-         * CLI Tools:
-         * If you ended up following a fatal from a cli tool, you should try running it with sudo
-         * Otherwise your logged-in account might not have write access to $tempLocation
-         */
-        if ('' === (string)$tempLocation) {
-            throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
-        }
-
-        // Dump the stream into our tempfile
-
-        file_put_contents($tempLocation, $fp);
-
-        return $this->accept($filename, $tempLocation, $public, $expiryAt);
+    public function acceptStream(
+        string $basename,
+        mixed $fp,
+        bool $public = false,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model {
+        /** @var Receiver $receiver */
+        $receiver = self::getDi()->get('filesystem.receiver');
+        return $receiver->acceptStream(
+            $basename,
+            $fp,
+            $public,
+            $expiryAt,
+            $uploadingUser,
+        );
     }
 
 
     /**
-     * Accept a new file upload
+     * @inheritdoc
      *
-     * @param string                    $basename
-     * @param string                    $tempLocation
-     * @param bool                      $public
-     * @param \Alaress_Date_Format|null $expiryAt
-     * @return Model
-     * @throws BaseMapper\DefinitionException
-     * @throws FileNotFoundException
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @deprecated The receiver from DI (filesystem.receiver) should be used
+     *             instead, and injected where necessary.
      */
-    public function accept($basename, $tempLocation, $public = true, ?\Alaress_Date_Format $expiryAt = null): Model
-    {
-        /** @var MimetypeMapper $mtm */
-        $mtm = $this->getJoinMapper('allowedFileExtension');
-
-        // Create storage object with no hash so that it is automatically created
-
-        $storage = $this->createModel()->setHash(null);
-
-        // Explicitly use temporary upload filesystem
-
-        $storage->setFilesystem($this->getManager()->getFilesystem(Manager::FS_TEMP));
-
-        // TODO: Find a way to remove the need for this truncation
-
-        $storage->setPath(str_replace(sys_get_temp_dir(), '', $tempLocation));
-
-        // Set file type metadata
-
-        $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
-        $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
-
-        try {
-            $storage->setMimetype($mtm->getByFilename($basename));
-        } catch (FileException $e) {
-            // We are going to allow the mime to remain NULL, which will shortly be caught in the safetyCheck
-        }
-
-        // By default files uploaded this way are public
-
-        $storage->setPublic($public);
-        $this->getManager()->sanitize($storage);
-
-        if (null !== $expiryAt) {
-            $storage->setExpiryAt($expiryAt);
-        }
-
-        $this->save($storage);
-
-        return $storage;
-    }
-
-    /**
-     * @param bool $bool
-     *
-     * @return self
-     */
-    public function checkPrevious($bool)
-    {
-        $this->checkPrevious = $bool;
-
-        return $this;
+    public function accept(
+        string $basename,
+        string $tempLocation,
+        bool $public = true,
+        ?Alaress_Date_Format $expiryAt = null,
+        ?User $uploadingUser = null,
+    ): Model {
+        /** @var Receiver $receiver */
+        $receiver = self::getDi()->get('filesystem.receiver');
+        return $receiver->accept(
+            $basename,
+            $tempLocation,
+            $public,
+            $expiryAt,
+            $uploadingUser,
+        );
     }
 
     // Getters & Setters
 
-    // TODO: This does not belong here, but where does it go
-
     /**
-     * @return Manager
-     */
-    public function getManager()
-    {
-        if ($this->manager === null) {
-            $factory = new FilesystemFactory();
-
-            /** @var Sanitizer\ISanitizer $sanitizer  */
-            $sanitizer     = self::getDi()->get('storage.sanitizer');
-            $this->manager = new Manager(
-                $factory->build($this->config_loader->get('storage_dir')),
-                new Alaress_Byte_Format(),
-                $sanitizer
-            );
-        }
-
-        return $this->manager;
-    }
-
-    /**
-     * @param Manager $manager
+     * Simplified method for retrieving a proxy for the mapper's filesystem.
      *
-     * @return self
+     * This shouldn't be required long-term: the storage mapper shouldn't
+     * necessarily need to know how files are stored. This is only a convenience
+     * for classes which can't easily have the filesystem proxy from the DI
+     * container injected.
+     *
+     * (Look, it's not wonderful but it IS better than having the filesystem in
+     * the model!)
+     *
+     * @deprecated The proxy filesystem from DI (filesystem.mountManager) should
+     *             be used instead, and injected where necessary.
+     *
+     * @return FilesystemProxy
      */
-    public function setManager($manager)
+    public function getStorageFilesystemProxy()
     {
-        $this->manager = $manager;
-
-        return $this;
+        return self::getDi()->get('filesystem.storageProxy');
     }
 }

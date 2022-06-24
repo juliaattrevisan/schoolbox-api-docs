@@ -70,6 +70,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -181,7 +182,8 @@ class Controller extends Assessment\Controller
         Turnitin\File\Mapper $turnitinFileMapper,
         Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
         \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        private FilesystemProxy $filesystemProxy,
     ) {
         parent::__construct(
             $userMapper,
@@ -514,14 +516,14 @@ class Controller extends Assessment\Controller
                 if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to the ZIP archive
                     foreach ($response->getAllFiles() as $file) {
-                        if ($file->exists()) {
+                        if ($this->filesystemProxy->fileExists($file)) {
                             $zipFilename = sprintf(
                                 "%s/%s/%s",
                                 $baseFolderName,
                                 $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
                                 $this->sanitizeForFilename($file->getBasename())
                             );
-                            $zipStream->addFileFromStream($zipFilename, $file->readStream());
+                            $zipStream->addFileFromStream($zipFilename, $this->filesystemProxy->readStream($file));
                         }
                     }
                 }
@@ -860,7 +862,7 @@ class Controller extends Assessment\Controller
                  */
                 foreach ($latestResponse->getAllFiles() as $file) {
                     if ($file->getEditableInline()) {
-                        $editorContents = $file->read();
+                        $editorContents = $this->filesystemProxy->read($file);
                     }
                 }
             } else {

@@ -9,13 +9,14 @@
 
 namespace Schoolbox\Resource\File;
 
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\File\Mimetype;
 
+/**
+ * Trait for common features of models which contain a storage file.
+ */
 trait StorableTrait
 {
-
     /** @var int */
     protected $id;
 
@@ -69,10 +70,9 @@ trait StorableTrait
     /**
      * Returns the full mime string for the file
      *
-     * @param  bool   $detect
      * @return string
      */
-    public function getMime($detect = false)
+    public function getMime()
     {
         return $this->getMimetype()->getMime();
     }
@@ -165,60 +165,5 @@ trait StorableTrait
     {
         $this->storage = $storage;
         return $this;
-    }
-
-    /**
-     * Check whether the file exists.
-     *
-     * @inherited from Flysystem\File
-     * @return bool
-     */
-    public function exists()
-    {
-        return $this->storage->exists();
-    }
-
-    /**
-     * Read the file.
-     *
-     * @inherited from Flysystem\File
-     * @return string file contents
-     */
-    public function read()
-    {
-        return $this->storage->read();
-    }
-
-    /**
-     * Read the file as a stream.
-     *
-     * @inherited from Flysystem\File
-     * @return resource file stream
-     */
-    public function readStream()
-    {
-        return $this->storage->readStream();
-    }
-
-    /**
-     * Get this file's filesystem.
-     *
-     * @inherited from Flysystem\File
-     * @return FilesystemInterface
-     */
-    public function getFilesystem()
-    {
-        return $this->storage->getFilesystem();
-    }
-
-    /**
-     * Get the path to the file on its filesystem.
-     *
-     * @inherited from Flysystem\File
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->storage->getPath();
     }
 }

@@ -8,8 +8,8 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache;
 use Alaress\Image;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\BasicRequest;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
@@ -120,7 +120,7 @@ try {
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get($browserCacheTimeoutConfigName)),
-            $transforms->getTranscodePath(Storage\Manager::getPathFromHash($hash), $cache_key),
+            $transforms->getTranscodePath(Storage\FilesystemProxy::getPathFromHash($hash), $cache_key),
             ['private', 'must-revalidate'],
             PreSignedUrlService::DISPOSITION_INLINE,
             'image/png',
@@ -129,13 +129,16 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $imageProcessor = new Image\Processor(
-        Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
+    /** @var ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $imageProcessor   = $processorFactory->buildForLocalFile(
+        WEB_root,
+        '/static' . $path,
         $cache_key,
-        $transform
+        $transform,
     );
     $imageProcessor->load()->stream();
-} catch (Image\Exception\ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (Image\Exception\ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');
     $prefixGenerator->redirectTemporary($path);

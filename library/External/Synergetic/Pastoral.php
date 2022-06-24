@@ -1183,17 +1183,21 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             );
         ";
 
-        $query = $this->connector->prepareQuery($sql, [
-            'filename' => ['value' => $upload->getRealname()],
-            'classificationCode' => ['value' => $classificationCode],
-            'createdById' => ['value' => $externalId],
-            'modifiedById' => ['value' => $externalId],
-            'document' => ['value' => bin2hex($storage->read())],
-            'createdDate' => ['value' => $date],
-            'modifiedDate' => ['value' => $date],
-            'sourceDate' => ['value' => $sourceDate],
-            'documentType' => ['value' => $extension],
-        ]);
+        $filesystemProxy = StorageMapper::getInstance()->getStorageFilesystemProxy();
+        $query           = $this->connector->prepareQuery(
+            $sql,
+            [
+                'filename' => ['value' => $upload->getRealname()],
+                'classificationCode' => ['value' => $classificationCode],
+                'createdById' => ['value' => $externalId],
+                'modifiedById' => ['value' => $externalId],
+                'document' => ['value' => bin2hex($filesystemProxy->read($storage))],
+                'createdDate' => ['value' => $date],
+                'modifiedDate' => ['value' => $date],
+                'sourceDate' => ['value' => $sourceDate],
+                'documentType' => ['value' => $extension],
+            ]
+        );
 
         try {
             $this->connector->beginTransaction();

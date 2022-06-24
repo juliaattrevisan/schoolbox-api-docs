@@ -248,6 +248,10 @@ class ResourceVideo
      */
     private function getTransformPath(string $transform): string
     {
-        return "{$this->getStorage()->getPath()}-$transform";
+        return sprintf(
+            '%s-%s',
+            Storage\FilesystemProxy::getPathFromHash($this->getStorage()->getHash()),
+            $transform,
+        );
     }
 }

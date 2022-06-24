@@ -134,7 +134,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('filesystem.storageProxy'),
+        );
     }
 
 

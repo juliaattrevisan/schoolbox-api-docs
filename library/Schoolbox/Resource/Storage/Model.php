@@ -11,10 +11,8 @@ namespace Schoolbox\Resource\Storage;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
+use BadMethodCallException;
 use Config;
-use League\Flysystem\File;
-use League\Flysystem\FileNotFoundException;
-use RuntimeException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -28,7 +26,7 @@ use Schoolbox\Resource\FilesystemFactory;
  *
  * @package Schoolbox\Resource\Storage
  */
-class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkable
+class Model implements IStorage, \Alaress\Json\Serializable, Linkable
 {
     use CreatedAtDate;
     use SerializeTrait;
@@ -59,7 +57,6 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      * @var Alaress_Date_Format|null
      */
     protected ?\Alaress_Date_Format $expiryAt = null;
-
 
     /**
      * @return string
@@ -106,19 +103,6 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
      */
     public function getHash()
     {
-        // Calculate hash if not known
-
-        if (!$this->hash) {
-            // Don't calc it if no path
-
-            if (!$this->path) {
-                return null;
-            }
-
-            // TODO hash generator should be injected
-            $this->setHash((new HashGenerator())->generateHash($this->readStream()));
-        }
-
         return $this->hash;
     }
 
@@ -157,16 +141,10 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
     /**
      * Returns the full mime string for the file
      *
-     * @param bool $detect
-     *
      * @return string
      */
-    public function getMime($detect = false)
+    public function getMime()
     {
-        if ($detect) {
-            return parent::getMimetype();
-        }
-
         if ($this->getMimetype() instanceof Mimetype) {
             return $this->getMimetype()->getMime();
         } else {
@@ -176,20 +154,9 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
 
     /**
      * @return int
-     * @throws FileNotFoundException
      */
     public function getSize()
     {
-        // Calculate size if not known
-
-        if (!$this->size) {
-            try {
-                $this->setSize(parent::getSize());
-            } catch (RuntimeException $e) {
-                throw new FileNotFoundException($this->getPath(), 0, $e);
-            }
-        }
-
         return $this->size;
     }
 
@@ -296,27 +263,6 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
 
 
     /**
-     * Pipe the readstream of this file to some other stream resource
-     *
-     * @param resource $to
-     *
-     * @return int
-     */
-    public function pipe($to)
-    {
-        $from = $this->readStream();
-
-        $size = 0;
-
-        while (!feof($from)) {
-            $size += fwrite($to, fread($from, 8192));
-        }
-
-        return $size;
-    }
-
-
-    /**
      * @return array
      */
     public function getDefaultJsonMap(): array
@@ -338,35 +284,5 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
             'fetch' => new SitePageLink("/storage/fetch.php?hash={$this->getHash()}"),
             'image' => new SitePageLink("/storage/image.php?hash={$this->getHash()}"),
         ];
-    }
-
-
-    /**
-     * Serialize everything except the filesystem.
-     *
-     * This will mean unserialized files cannot have any filesystem-related
-     * operations performed on them, until `setFilesystem` is called on them.
-     *
-     * @see Mapper::getManager(), Manager::getFilesystem()
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        $vars = get_class_vars(get_class($this));
-        unset($vars['filesystem']);
-        return array_keys($vars);
-    }
-
-
-    /**
-     * On wakeup, resurrect the filesystem that was not serialized in `__sleep`.
-     */
-    public function __wakeup()
-    {
-        // TODO this really should not hit config. We don't even know if config exists at this point
-        $this->filesystem = (new FilesystemFactory())
-            ->build(Config::get('storage_dir'))
-            ->getFilesystem(Manager::FS_STORAGE);
     }
 }

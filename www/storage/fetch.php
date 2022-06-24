@@ -9,12 +9,11 @@
  */
 
 use Alaress\Exception\UnreachableException;
-use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -34,9 +33,11 @@ try {
             : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $basename = $resource->getBasename();
-        $fileSystem = $resource->getFilesystem();
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
+
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
 
         /* Optionally override filename
          *
@@ -49,11 +50,7 @@ try {
             $basename = urldecode($_GET['name']);
         }
 
-        if (
-            !$bypassPresignedUrls
-            && $fileSystem instanceof Flysystem\Filesystem
-            && $fileSystem->getAdapter() instanceof S3Adapter
-        ) {
+        if (!$bypassPresignedUrls && $filesystemProxy->usesS3Adapter()) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 
@@ -63,7 +60,7 @@ try {
                     $preSignedUrlDataObject = $preSignedUrlService->generate(
                         $resource,
                         Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
-                        $resource->getPath(),
+                        FilesystemProxy::getPathFromHash($resource->getHash()),
                         $cacheControl,
                         $disposition
                     );
@@ -81,7 +78,7 @@ try {
         header("Content-Ranges: none");
         header("Content-Disposition: $disposition; filename=\"$basename\"");
         header("Content-Length: " . $resource->getSize());
-        fpassthru($resource->readStream());
+        fpassthru($filesystemProxy->readStream($resource));
         exit;
     }
 } catch (Exception $ex) {

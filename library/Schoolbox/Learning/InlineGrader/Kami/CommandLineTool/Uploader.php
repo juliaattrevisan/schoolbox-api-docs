@@ -26,7 +26,6 @@ use Throwable;
  */
 class Uploader extends CliTool\App
 {
-
     public const LOCK_NAME = 'kami_upload';
 
 
@@ -147,6 +146,7 @@ class Uploader extends CliTool\App
             $this->getLogger(),
             $lock,
             $sentry instanceof HubInterface ? $sentry : null,
+            $this->getDi()->get('filesystem.storageProxy'),
         );
 
         // Run the uploader

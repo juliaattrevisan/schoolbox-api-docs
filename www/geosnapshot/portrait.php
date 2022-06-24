@@ -13,6 +13,7 @@
 
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -106,9 +107,15 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve(TRANSFORM_KEY));
+    /** @var ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $image            = $processorFactory->buildForStorage(
+        $storageModel,
+        $cacheKey,
+        $portrait->retrieve(TRANSFORM_KEY),
+    );
     $image->load()->stream();
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, $e->getHttpStatusCode());

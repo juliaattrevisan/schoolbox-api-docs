@@ -16,6 +16,7 @@ use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use GuzzleHttp\Exception\ConnectException;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Sentry\State\HubInterface;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -30,7 +31,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Uploader
 {
-
     /** @var bool */
     private $dryRun;
 
@@ -69,6 +69,7 @@ class Uploader
      * @param LoggerInterface   $log
      * @param LockInterface     $lock
      * @param HubInterface|null $sentry
+     * @param FilesystemProxy   $filesystemProxy
      */
     public function __construct(
         bool $dryRun,
@@ -77,7 +78,8 @@ class Uploader
         Mapper $kamiMapper,
         LoggerInterface $log,
         LockInterface $lock,
-        ?HubInterface $sentry
+        ?HubInterface $sentry,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->dryRun        = $dryRun;
         $this->kamiConnector = $kamiConnector;
@@ -261,7 +263,10 @@ class Uploader
         $countFailedAttempts = 0;
         return $this->jitter->retry(function () use ($kamiModel, &$countFailedAttempts) {
             try {
-                return $this->kamiConnector->uploadDocument($kamiModel->getStudentSubmissionFile()->getStorage());
+                return $this->kamiConnector->uploadDocument(
+                    $kamiModel->getStudentSubmissionFile()->getStorage(),
+                    $this->filesystemProxy,
+                );
             } catch (Exception\NotFound $e) {
                 // file not found
                 throw $e;

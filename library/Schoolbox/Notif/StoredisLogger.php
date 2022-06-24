@@ -29,14 +29,13 @@ use Schoolbox\File;
  */
 class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterface
 {
-
     /** @var Predis\Client */
     protected $client;
 
     /** @var string */
     protected $key;
 
-    /** @var Storage\Receiver */
+    /** @var Storage\IReceiver */
     protected $receiver;
 
     /** @var LoggerInterface[] */
@@ -46,13 +45,13 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
     /**
      * @param Predis\ClientInterface $redisClient
      * @param string                 $redisKey
-     * @param Storage\Receiver       $receiver
+     * @param Storage\IReceiver      $receiver
      * @param FormatterInterface     $formatter
      */
     public function __construct(
         Predis\ClientInterface $redisClient,
         $redisKey,
-        Storage\Receiver $receiver,
+        Storage\IReceiver $receiver,
         FormatterInterface $formatter = null
     ) {
         $this->key      = $redisKey;

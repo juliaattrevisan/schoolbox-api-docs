@@ -13,6 +13,7 @@ use GuzzleHttp\Exception\TransferException;
 use Proxy\Server;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\ValidFiles;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class Connector
@@ -89,10 +90,11 @@ class Connector
     /**
      * Connector constructor.
      *
-     * @param int    $plagscanClientId
-     * @param string $plagscanApiKey
+     * @param int             $plagscanClientId
+     * @param string          $plagscanApiKey
+     * @param FilesystemProxy $filesystemProxy
      */
-    public function __construct(int $plagscanClientId, string $plagscanApiKey)
+    public function __construct(int $plagscanClientId, string $plagscanApiKey, private FilesystemProxy $filesystemProxy)
     {
         $this->validFiles = new ValidFiles();
         $this->client = new Client([
@@ -135,7 +137,7 @@ class Connector
          * for database only. You'll have the records for the files, but not the data itself, in which
          * case you have no hope of succeeding
          */
-        if (!$submissionFile->exists()) {
+        if (!$this->filesystemProxy->fileExists($submissionFile)) {
             throw new \DomainException('Error: File does not exist in storage.');
         }
 
@@ -147,7 +149,7 @@ class Connector
         $postData = [
             [
                 'name'     => 'fileUpload',
-                'contents' => $submissionFile->getStorage()->read(),
+                'contents' => $this->filesystemProxy->read($submissionFile),
                 'filename' => $filename,
             ],
         ];

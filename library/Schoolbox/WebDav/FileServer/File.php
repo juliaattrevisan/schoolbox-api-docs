@@ -16,6 +16,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\WebDav\HasUserSource;
 
@@ -78,12 +79,13 @@ class File extends DAV\File
     /**
      * Constructor
      *
-     * @param string        $path
-     * @param callable      $userSource
-     * @param FolderMapper  $folderMapper
-     * @param FileMapper    $fileMapper
-     * @param StorageMapper $storageMapper
-     * @param Access        $accessor
+     * @param string          $path
+     * @param callable        $userSource
+     * @param FolderMapper    $folderMapper
+     * @param FileMapper      $fileMapper
+     * @param StorageMapper   $storageMapper
+     * @param Access          $accessor
+     * @param FilesystemProxy $filesystemProxy
      */
     public function __construct(
         $path,
@@ -91,7 +93,8 @@ class File extends DAV\File
         FolderMapper $folderMapper,
         FileMapper $fileMapper,
         StorageMapper $storageMapper,
-        Access $accessor
+        Access $accessor,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->setFolderMapper($folderMapper);
         $this->setFileMapper($fileMapper);
@@ -138,7 +141,7 @@ class File extends DAV\File
      */
     public function get()
     {
-        return $this->getFile()->readStream();
+        return $this->filesystemProxy->readStream($this->file);
     }
 
 

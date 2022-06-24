@@ -50,18 +50,6 @@ class Factory
     }
 
     /**
-     * Build a seekable stream given a storage object.
-     *
-     * @param IStorage $storage
-     * @return resource
-     * @throws FileNotFoundException
-     */
-    public function buildSeekableStreamFromStorage(IStorage $storage)
-    {
-        return $this->buildSeekableStream($storage->getFilesystem(), $storage->getPath());
-    }
-
-    /**
      * Build a seekable stream given a filesystem and path.
      *
      * @param FilesystemInterface $filesystem

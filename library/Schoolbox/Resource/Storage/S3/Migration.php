@@ -142,7 +142,7 @@ class Migration extends CliTool\App
         $countAll = count($files);
         foreach ($files as $file) {
             $count++;
-            $baseName = "{$file['filename']}.{$file['extension']}";
+            $baseName = "{$file['filename']}.{$file['ext']}";
             $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
             if ($this->migrateFile($file['hash'])) {
                 $countFilesInS3++;
@@ -256,7 +256,7 @@ class Migration extends CliTool\App
      */
     private function migrateFile(string $hash): bool
     {
-        $relativePath = Storage\Manager::getPathFromHash($hash);
+        $relativePath = Storage\FilesystemProxy::getPathFromHash($hash);
         // Does file exist locally?
         $filepath     = "{$this->storageDir}/{$relativePath}";
         $foundLocally = file_exists($filepath);
@@ -326,8 +326,7 @@ class Migration extends CliTool\App
                 while (!$writeSucceeded && $countUploadAttempts < $this->maxUploadAttempts) {
                     try {
                         $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
-                    } /** @noinspection PhpRedundantCatchClauseInspection */
-                    catch (S3Exception $e) {
+                    } catch (S3Exception $e) {
                         $sleep = 2 ** $countUploadAttempts;
                         $countUploadAttempts++;
                         $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");

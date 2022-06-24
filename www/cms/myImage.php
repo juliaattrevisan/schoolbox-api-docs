@@ -7,6 +7,7 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -76,7 +77,14 @@ if (isset($_GET['key'])) {
 
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
-$processor    = new Image\Processor($storageModel, $cacheKey, $transform);
+
+/** @var ProcessorFactory $processorFactory */
+$processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+$processor        = $processorFactory->buildForStorage(
+    $storageModel,
+    $cacheKey,
+    $transform,
+);
 try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {

@@ -2,6 +2,7 @@
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -36,7 +37,11 @@ if ($isSuperuser || $isAllowedTeacher) {
         // Ensure the file is available locally
         $filename = tempnam(Config::get('zip_dir'), 'zip');
         $fp       = fopen($filename, 'wb');
-        stream_copy_to_stream($result->readStream(), $fp);
+
+        // TODO is this the correct method for handling files from collector?
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
+        stream_copy_to_stream($filesystemProxy->readStream($result), $fp);
         fclose($fp);
     } elseif (strlen($_FILES['file']['tmp_name']) > 0) {
         $filename = $_FILES['file']['tmp_name'];

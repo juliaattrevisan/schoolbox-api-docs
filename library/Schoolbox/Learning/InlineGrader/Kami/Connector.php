@@ -22,6 +22,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\InlineGrader\Kami\Exception;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
@@ -33,7 +34,6 @@ use stdClass;
  */
 class Connector implements IConnector
 {
-
     // Intentional trailing slash (@see http://docs.guzzlephp.org/en/stable/quickstart.html#creating-a-client)
     // Correspond to API paths. @see http://docs.kamiembeddingapi.apiary.io
     public const BASE_URI = 'https://api.notablepdf.com/';
@@ -130,7 +130,8 @@ class Connector implements IConnector
      *
      * Note that this method cost 4c each time you hit the production or proxy server
      *
-     * @param IStorage $storage
+     * @param IStorage        $storage
+     * @param FilesystemProxy $filesystemProxy
      * @return Document
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\EmptyApiKeyException If no Kami API key configured
@@ -140,7 +141,7 @@ class Connector implements IConnector
      * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
      * @throws GuzzleException
      */
-    public function uploadDocument(IStorage $storage): Document
+    public function uploadDocument(IStorage $storage, FilesystemProxy $filesystemProxy): Document
     {
         $this->assertEnabled();
 
@@ -156,7 +157,7 @@ class Connector implements IConnector
                 ],
                 [
                     'name'     => 'document',
-                    'contents' => $storage->read(),
+                    'contents' => $filesystemProxy->read($storage),
                     'filename' => $storage->getBasename(),
                 ],
             ],

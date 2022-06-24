@@ -26,7 +26,6 @@ use Schoolbox\Import\ImporterFactory;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
@@ -62,6 +61,7 @@ class Module extends BaseModule
         return new Controller(
             new ImporterFactory(),
             $this->getConfig(),
+            $this->injector->get('filesystem.storageProxy'),
             $this->getMapperFactory()->get(ClassEntryMapper::class),
             $this->getMapperFactory()->get(ClassInvolvementMapper::class),
         );

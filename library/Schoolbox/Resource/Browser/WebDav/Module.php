@@ -49,6 +49,7 @@ class Module extends AbstractModule
             ->setTreeBuilder(new TreeBuilder($dav))
             ->setFolderMapper($dav)
             ->setNamespace($this->basename)
-            ->setNodeType(NodeFactory::WEBDAV);
+            ->setNodeType(NodeFactory::WEBDAV)
+            ->setFilesystemProxy($this->injector->get('filesystem.storageProxy'));
     }
 }

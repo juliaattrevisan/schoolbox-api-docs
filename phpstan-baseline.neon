@@ -7061,27 +7061,12 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
 
 		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\Mapper\\:\\:\\$checkPrevious is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Mapper.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
 
 		-
-			message: "#^Method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:getHash\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:setBasename\\(\\) should return \\$this\\(Schoolbox\\\\Resource\\\\Storage\\\\Model\\) but returns Schoolbox\\\\Resource\\\\Storage\\\\Model\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
-			message: "#^Return type \\(Schoolbox\\\\File\\\\Mimetype\\) of method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:getMimetype\\(\\) should be compatible with return type \\(string\\|false\\) of method League\\\\Flysystem\\\\File\\:\\:getMimetype\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
 
@@ -7396,11 +7381,6 @@ parameters:
 			path: library/Schoolbox/UserNotifier.php
 
 		-
-			message: "#^Property Schoolbox\\\\Video\\\\Queue\\:\\:\\$storageMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Video/Queue.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Video/ResourceVideo.php
@@ -7639,11 +7619,6 @@ parameters:
 			message: "#^Variable \\$assessmentDataSource in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: tools/assessment/csv.php
-
-		-
-			message: "#^Dead catch \\- League\\\\Flysystem\\\\FileExistsException is never thrown in the try block\\.$#"
-			count: 1
-			path: tools/custom/dcc/pastoral-import.php
 
 		-
 			message: "#^Constant class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:ACCESS_LEVEL_PRIVATE is unused\\.$#"

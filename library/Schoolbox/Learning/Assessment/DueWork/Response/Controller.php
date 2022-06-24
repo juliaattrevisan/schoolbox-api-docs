@@ -38,11 +38,11 @@ use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
 class Controller extends Base
 {
-
     /**
      * @var ErrorMapper
      */
@@ -74,12 +74,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param DataSource  $responseDataSource
+     * @param ErrorMapper       $errorMapper
+     * @param DataSource        $responseDataSource
      * @param BreadcrumbFactory $bakery
-     * @param Term\Mapper $termMapper
-     * @param Kami\Mapper $kamiMapper
-     * @param Kami\Connector $kamiConnector
+     * @param Term\Mapper       $termMapper
+     * @param Kami\Mapper       $kamiMapper
+     * @param Kami\Connector    $kamiConnector
+     * @param Access            $access
+     * @param FilesystemProxy   $filesystemProxy
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -88,7 +90,8 @@ class Controller extends Base
         Term\Mapper $termMapper,
         Kami\Mapper $kamiMapper,
         Kami\Connector $kamiConnector,
-        Access $access
+        Access $access,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -605,7 +608,7 @@ class Controller extends Base
          * contents from the storage instance
          */
         $data = [
-            'html' => $plagscan->getStorage()->read(),
+            'html' => $this->filesystemProxy->read($plagscan->getStorage()),
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));

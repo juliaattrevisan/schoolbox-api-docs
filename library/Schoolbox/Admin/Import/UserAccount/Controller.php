@@ -33,7 +33,6 @@ use Schoolbox\Resource\Storage;
  */
 class Controller extends Base
 {
-
     /**
      * @var string
      */
@@ -55,11 +54,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ImporterFactory $importerFactory
-     * @param IConfigLoader   $configLoader
+     * @param ImporterFactory         $importerFactory
+     * @param IConfigLoader           $configLoader
+     * @param Storage\FilesystemProxy $filesystemProxy
      */
-    public function __construct(ImporterFactory $importerFactory, IConfigLoader $configLoader)
-    {
+    public function __construct(
+        ImporterFactory $importerFactory,
+        IConfigLoader $configLoader,
+        private Storage\FilesystemProxy $filesystemProxy,
+    ) {
         $this->importerFactory = $importerFactory;
         $this->navigation = new Direct($configLoader);
     }
@@ -211,7 +214,7 @@ class Controller extends Base
      */
     protected function buildReader(Storage\IStorage $upload): Reader
     {
-        return $this->importerFactory->buildReader($this->basename, $upload);
+        return $this->importerFactory->buildReader($this->basename, $this->filesystemProxy->readStream($upload));
     }
 
 
@@ -261,7 +264,7 @@ class Controller extends Base
      */
     protected function parseLogLines($logger): array
     {
-        $stream   = $logger->flushToStorage()->readStream();
+        $stream   = $this->filesystemProxy->readStream($logger->flushToStorage());
         $logLines = [];
 
         while ($line = fgets($stream)) {

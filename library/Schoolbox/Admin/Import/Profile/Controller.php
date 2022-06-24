@@ -14,11 +14,11 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
-use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\External;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /**
  * Class Controller
@@ -33,7 +33,6 @@ use Schoolbox\Resource\Attachment\Zone;
  */
 class Controller extends Base
 {
-
     /**
      * @var External\Profile\Mapper
      */
@@ -78,13 +77,15 @@ class Controller extends Base
      * @param External\Profile\Student\Mapper      $studentMapper
      * @param External\Profile\Staff\Mapper        $staffMapper
      * @param External\Profile\Relationship\Mapper $relationshipMapper
+     * @param FilesystemProxy                      $filesystemProxy
      */
     public function __construct(
         External\Profile\Mapper $baseMapper,
         External\Profile\Parent\Mapper $parentMapper,
         External\Profile\Student\Mapper $studentMapper,
         External\Profile\Staff\Mapper $staffMapper,
-        External\Profile\Relationship\Mapper $relationshipMapper
+        External\Profile\Relationship\Mapper $relationshipMapper,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->baseProfileMapper = $baseMapper;
         $this->parentProfileMapper = $parentMapper;
@@ -190,6 +191,7 @@ class Controller extends Base
                         $this->staffProfileMapper,
                         $this->relationshipMapper,
                         null,
+                        $this->filesystemProxy,
                     );
 
                     /* Actually persist changes

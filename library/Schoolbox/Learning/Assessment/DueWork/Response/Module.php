@@ -400,6 +400,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Kami\Mapper::class),
             $this->injector->get('kamiConnector'),
             $this->getMapperFactory()->get(Access::class),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 

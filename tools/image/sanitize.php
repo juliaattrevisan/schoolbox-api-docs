@@ -6,9 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
+use League\Flysystem\FileExistsException;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Resource\Storage\Sanitizer;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -18,6 +22,17 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App {
     /* @var array */
 
+    /**
+     * This process needs to write to storage, thus it must run as `www-data`.
+     */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function run(): void
     {
         if ($this->perform()) {
@@ -26,13 +41,33 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info('Running in dry-run mode: use -p to write changes to filesystem');
         }
         $storageMapper = new StorageMapper();
-        $mountManager  = $storageMapper->getManager();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
+
+        /** @var FilesystemInterface $storageFilesystem */
+        $storageFilesystem = $this->getDi()->get('filesystem.storage');
+
+        /** @var Sanitizer\ISanitizer $sanitizer */
+        $sanitizer = $this->getDi()->get('storage.sanitizer');
+        $helper    = new Sanitizer\Helper($sanitizer);
+
         /** @var Storage $svgFile */
         foreach ($svgFiles as $svgFile) {
-            $result = $mountManager->sanitize($svgFile, !$this->perform());
-            if ($result) {
+            $path   = FilesystemProxy::getPathFromHash($svgFile->getHash());
+            $result = $helper->sanitize($storageFilesystem, $path, $svgFile->getMime());
+            if (isset($result)) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
+                if ($this->perform()) {
+                    // Write the sanitised content to the existing file path.
+                    // This violates an apparent rule that the storage file's
+                    // path should match its hash, but it's the only viable way
+                    // so far to ensure the sanitised content is accessible via
+                    // its original hash.
+                    try {
+                        $storageFilesystem->write($path, $result);
+                    } catch (FileExistsException $e) {
+                        $storageFilesystem->update($path, $result);
+                    }
+                }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
             }

@@ -16,6 +16,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\File\Model as FileModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\SubjectServer\Server as SubjectList;
@@ -80,12 +81,13 @@ class Folder extends DAV\Collection
     /**
      * Constructor
      *
-     * @param string        $path
-     * @param callable      $userSource
-     * @param FolderMapper  $folderMapper
-     * @param FileMapper    $fileMapper
-     * @param StorageMapper $storageMapper
-     * @param Access        $accessor
+     * @param string          $path
+     * @param callable        $userSource
+     * @param FolderMapper    $folderMapper
+     * @param FileMapper      $fileMapper
+     * @param StorageMapper   $storageMapper
+     * @param Access          $accessor
+     * @param FilesystemProxy $filesystemProxy
      * @throws \Schoolbox\Mapper\Exception
      */
     public function __construct(
@@ -94,7 +96,8 @@ class Folder extends DAV\Collection
         FolderMapper $folderMapper,
         FileMapper $fileMapper,
         StorageMapper $storageMapper,
-        Access $accessor
+        Access $accessor,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->setFolderMapper($folderMapper);
         $this->setFileMapper($fileMapper);
@@ -141,7 +144,8 @@ class Folder extends DAV\Collection
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),
-                    $this->getAccessor()
+                    $this->getAccessor(),
+                    $this->filesystemProxy,
                 );
             }
         }
@@ -160,7 +164,8 @@ class Folder extends DAV\Collection
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),
-                    $this->getAccessor()
+                    $this->getAccessor(),
+                    $this->filesystemProxy,
                 );
             }
         }
@@ -232,7 +237,8 @@ class Folder extends DAV\Collection
                 $this->getFolderMapper(),
                 $this->getFileMapper(),
                 $this->getStorageMapper(),
-                $this->getAccessor()
+                $this->getAccessor(),
+                $this->filesystemProxy,
             );
         } else {
             $realname = pathinfo($name, PATHINFO_FILENAME);
@@ -250,7 +256,8 @@ class Folder extends DAV\Collection
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
                     $this->getStorageMapper(),
-                    $this->getAccessor()
+                    $this->getAccessor(),
+                    $this->filesystemProxy,
                 );
             } else {
                 throw new DAV\Exception\NotFound('The file with name "' . $name . '" could not be found');

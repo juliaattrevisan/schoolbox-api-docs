@@ -23,7 +23,6 @@ use Schoolbox\Resource\Browser\FullAccessController;
  */
 class Controller extends FullAccessController
 {
-
     /**
      * Overridden because files are uploaded to WebDav differently.
      *
@@ -43,7 +42,7 @@ class Controller extends FullAccessController
                 $baseFile,
                 [
                     'name'     => $file->getBasename(),
-                    'resource' => $file->readStream(),
+                    'resource' => $this->filesystemProxy->readStream($file),
                 ]
             );
         }

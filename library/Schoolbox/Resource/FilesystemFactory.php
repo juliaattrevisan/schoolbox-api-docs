@@ -18,7 +18,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\Storage\Manager;
 use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
@@ -34,6 +33,9 @@ use const PHP_SAPI;
  */
 class FilesystemFactory
 {
+    public const FILE_SYSTEM_STORAGE = 'storage';
+    public const FILE_SYSTEM_TEMP    = 'upload';
+
     public const FILE_SYSTEM_ADAPTER_LOCAL = 'local';
     public const FILE_SYSTEM_ADAPTER_AWS_S3 = 'awsS3';
 
@@ -89,8 +91,8 @@ class FilesystemFactory
         }
 
         return new MountManager([
-            Manager::FS_TEMP    => new Filesystem(new Local($tempDir)),
-            Manager::FS_STORAGE => $fs_storage
+            self::FILE_SYSTEM_TEMP    => new Filesystem(new Local($tempDir)),
+            self::FILE_SYSTEM_STORAGE => $fs_storage
         ]);
     }
 

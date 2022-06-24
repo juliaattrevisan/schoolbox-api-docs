@@ -49,6 +49,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(External\Profile\Student\Mapper::class),
             $this->getMapperFactory()->get(External\Profile\Staff\Mapper::class),
             $this->getMapperFactory()->get(External\Profile\Relationship\Mapper::class),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 }

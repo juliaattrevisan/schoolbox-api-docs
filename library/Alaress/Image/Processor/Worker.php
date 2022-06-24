@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Alaress\Image\Processor;
 
 use Alaress\Image;
-use Alaress\Image\Cache\LocalFS;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress\Image\ImagickConfigParser;
@@ -139,9 +138,12 @@ class Worker extends CliTool\App
         $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
 
         $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
-        $hashObject = $this->fetchHashObject($hash);
-        if ($hashObject) {
-            $this->generateTransform($hashObject, $cacheKey, $transform, $attempts, $retryFailed);
+
+        /** @var Image\ProcessorFactory $processorFactory */
+        $processorFactory = $this->getDi()->get('filesystem.imageProcessorFactory');
+        $processor        = $this->fetchProcessor($processorFactory, $hash, $cacheKey, $transform);
+        if ($processor) {
+            $this->generateTransform($processor, $hash, $cacheKey, $attempts, $retryFailed);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
@@ -152,73 +154,88 @@ class Worker extends CliTool\App
      *
      * Normally this is a storage file, but in rare cases may represent a static file.
      *
-     * @param string $hash
-     * @return Storage\Model|null
-     * @throws LogicException
-     * @throws SchoolboxFile\Exception
-     * @throws SchoolboxMapper\Exception
+     * @param Image\ProcessorFactory $processorFactory
+     * @param string                 $hash
+     * @param string                 $cacheKey
+     * @param ITransform             $transform
+     * @return Image\Processor|null
      */
-    private function fetchHashObject(string $hash): ?Storage\Model
-    {
+    private function fetchProcessor(
+        Image\ProcessorFactory $processorFactory,
+        string $hash,
+        string $cacheKey,
+        ITransform $transform,
+    ): ?Image\Processor {
         /** @var Storage\Model|null $hashObject */
         $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $hash)->first();
-        if (!$hashObject) {
-            // This is most likely the rare case where we failed to transcode a static image.
-            // We need to locate that image from the hash.
-            $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$hash}, searching static files..."));
+        if ($hashObject) {
+            return $processorFactory->buildForStorage(
+                $hashObject,
+                $cacheKey,
+                $transform,
+                Manager::IMAGICK_TIME_LIMIT,
+            );
+        }
+        // This is most likely the rare case where we failed to transcode a static image.
+        // We need to locate that image from the hash.
+        $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$hash}, searching static files..."));
 
-            $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
-            $excludedExtensions = [
-                '1',
-                'checksum',
-                'css',
-                'csv',
-                'def',
-                'editorconfig',
-                'eot',
-                'gitattributes',
-                'gitignore',
-                'htm',
-                'html',
-                'js',
-                'jshintrc',
-                'json',
-                'jst',
-                'less',
-                'lock',
-                'map',
-                'md',
-                'npmignore',
-                'otf',
-                'php',
-                'psd',
-                'scss',
-                'spmignore',
-                'ttf',
-                'txt',
-                'woff',
-                'woff2',
-                'xml',
-                'yml',
-            ];
-            $hashGenerator      = new Storage\HashGenerator();
-            foreach ($itr as $item) {
-                /** @var SplFileInfo $item */
-                if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
-                    continue;
-                }
-                $fp       = fopen($item->getPathname(), 'rb');
-                $itemHash = $hashGenerator->generateHash($fp);
-                fclose($fp);
-                if ($itemHash === $hash) {
-                    $fileName = str_replace(WEB_root, '', $item->getPathname());
-                    $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
-                    $hashObject = LocalFS::getStorageModel(WEB_root, $fileName);
-                    break;
-                }
+        $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
+        $excludedExtensions = [
+            '1',
+            'checksum',
+            'css',
+            'csv',
+            'def',
+            'editorconfig',
+            'eot',
+            'gitattributes',
+            'gitignore',
+            'htm',
+            'html',
+            'js',
+            'jshintrc',
+            'json',
+            'jst',
+            'less',
+            'lock',
+            'map',
+            'md',
+            'npmignore',
+            'otf',
+            'php',
+            'psd',
+            'scss',
+            'spmignore',
+            'ttf',
+            'txt',
+            'woff',
+            'woff2',
+            'xml',
+            'yml',
+        ];
+        $hashGenerator = new Storage\HashGenerator();
+        foreach ($itr as $item) {
+            /** @var SplFileInfo $item */
+            if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
+                continue;
+            }
+            $fp       = fopen($item->getPathname(), 'rb');
+            $itemHash = $hashGenerator->generateHash($fp);
+            fclose($fp);
+            if ($itemHash === $hash) {
+                $fileName = str_replace(WEB_root, '', $item->getPathname());
+                $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
+                return $processorFactory->buildForLocalFile(
+                    WEB_root,
+                    $fileName,
+                    $cacheKey,
+                    $transform,
+                    Manager::IMAGICK_TIME_LIMIT,
+                );
             }
         }
-        return $hashObject;
+        return null;
     }
 
     /**
@@ -235,22 +252,20 @@ class Worker extends CliTool\App
     /**
      * Apply the specified transform to the storage object and save it using specified cache key
      *
-     * @param Storage\Model    $hashObject
-     * @param string           $cacheKey
-     * @param Image\ITransform $transform
-     * @param int              $attempts
-     * @param bool             $retryFailed
+     * @param Image\Processor $processor
+     * @param string          $hash
+     * @param string          $cacheKey
+     * @param int             $attempts
+     * @param bool            $retryFailed
+     * @return void
      */
     private function generateTransform(
-        Storage\Model $hashObject,
+        Image\Processor $processor,
+        string $hash,
         string $cacheKey,
-        Image\ITransform $transform,
         int $attempts,
         bool $retryFailed,
     ): void {
-        $hash      = $hashObject->getHash();
-        $processor = new Image\Processor($hashObject, $cacheKey, $transform, Manager::IMAGICK_TIME_LIMIT);
-
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
             //we are in the cli, so perm fail any images that fail here.

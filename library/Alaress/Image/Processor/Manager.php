@@ -26,6 +26,7 @@ use RuntimeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External as SchoolboxExternal;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -177,6 +178,8 @@ class Manager
     private array $requiresMutexCache = [];
 
     /**
+     * Constructor
+     *
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
      * @param int             $workerCount     Max number of concurrent workers
@@ -705,7 +708,7 @@ class Manager
             $this->logger->debug($this->prefixLog("Checking mutex required: '$hash'"));
             if ($this->localStorageDir !== null) {
                 // If using local storage
-                $path        = \Schoolbox\Resource\Storage\Manager::getPathFromHash($hash);
+                $path        = FilesystemProxy::getPathFromHash($hash);
                 $cmd         = "/usr/bin/identify -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
                 $countLayers = (int)exec($cmd, $output, $exitCode);
                 if ($exitCode) {

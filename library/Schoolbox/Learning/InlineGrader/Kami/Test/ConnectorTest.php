@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
@@ -25,7 +26,6 @@ use Schoolbox\User;
 
 class ConnectorTest extends TestCase
 {
-
     /**
      * @dataProvider providerInvalidSiteSchoolCode
      * @param null|string $siteSchoolCode
@@ -137,7 +137,7 @@ class ConnectorTest extends TestCase
         ResponseInterface $response
     ): void {
         $connector = new MockConnector($this->getMockClient($response));
-        $document  = $connector->uploadDocument($this->getMockStorage());
+        $document  = $connector->uploadDocument($this->getStorage(), $this->getMockFilesystemProxy());
         $this->assertEquals($documentIdentifier, $document->getId());
         $this->assertEquals($name, $document->getName());
         $this->assertEquals($fileStatus, $document->getFileStatus());
@@ -163,7 +163,7 @@ class ConnectorTest extends TestCase
             json_encode(["errors" => ["Record Not Found"],])
         );
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->uploadDocument($this->getMockStorage());
+        $connector->uploadDocument($this->getStorage(), $this->getMockFilesystemProxy());
     }
 
 
@@ -187,7 +187,7 @@ class ConnectorTest extends TestCase
             ])
         );
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->uploadDocument($this->getMockStorage());
+        $connector->uploadDocument($this->getStorage(), $this->getMockFilesystemProxy());
     }
 
 
@@ -203,7 +203,7 @@ class ConnectorTest extends TestCase
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->uploadDocument($this->getMockStorage());
+        $connector->uploadDocument($this->getStorage(), $this->getMockFilesystemProxy());
     }
 
 
@@ -217,7 +217,7 @@ class ConnectorTest extends TestCase
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException::class);
         $response  = new Response(201, [], 'LOL');
         $connector = new MockConnector($this->getMockClient($response));
-        $connector->uploadDocument($this->getMockStorage());
+        $connector->uploadDocument($this->getStorage(), $this->getMockFilesystemProxy());
     }
 
 
@@ -1261,23 +1261,39 @@ class ConnectorTest extends TestCase
     }
 
 
-    private function getMockStorage()
+    /**
+     * Create a storage object for use in tests.
+     *
+     * @return Storage\Model
+     */
+    private function getStorage()
     {
-        $storage = new class () extends Storage\Model
-        {
-            public function read()
-            {
-                return 'some random file contents';
-            }
-
-            public function readStream()
-            {
-                return fopen('data://text/plain,' . 'some random file contents', 'rb');
-            }
-        };
+        $storage = new Storage\Model();
         $storage->setFilename('filename');
         $storage->setExtension('ext');
         return $storage;
+    }
+
+
+    /**
+     * Create a mock filesystem proxy object.
+     *
+     * @return MockObject|Storage\FilesystemProxy
+     */
+    private function getMockFilesystemProxy()
+    {
+        $mock = $this->createMock(Storage\FilesystemProxy::class);
+        $mock
+            ->expects($this->any())
+            ->method('read')
+            ->willReturn('some random file contents');
+        $mock
+            ->expects($this->any())
+            ->method('readStream')
+            ->willReturnCallback(function () {
+                return fopen('data://text/plain,' . 'some random file contents', 'rb');
+            });
+        return $mock;
     }
 
 

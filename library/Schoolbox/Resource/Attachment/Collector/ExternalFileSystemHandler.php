@@ -15,23 +15,22 @@ use Schoolbox\Resource;
 
 class ExternalFileSystemHandler extends FileSystemHandler
 {
-
     /** @var FetcherInterface */
     protected $fetcher;
 
-    /** @var Resource\Storage\Receiver */
+    /** @var Resource\Storage\IReceiver */
     protected $receiver;
 
 
     /**
-     * @param File\ILocator             $locator
-     * @param Resource\Storage\Receiver $receiver
-     * @param FetcherInterface          $fetcher
-     * @param File\IStorageWrapper      $wrapper
+     * @param File\ILocator              $locator
+     * @param Resource\Storage\IReceiver $receiver
+     * @param FetcherInterface           $fetcher
+     * @param File\IStorageWrapper       $wrapper
      */
     public function __construct(
         File\ILocator $locator,
-        Resource\Storage\Receiver $receiver,
+        Resource\Storage\IReceiver $receiver,
         FetcherInterface $fetcher,
         File\IStorageWrapper $wrapper = null
     ) {

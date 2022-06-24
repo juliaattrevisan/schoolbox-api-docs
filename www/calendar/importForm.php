@@ -11,6 +11,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 // not in SitePage context?
 if (!isset($this)) {
@@ -58,9 +59,11 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
         }
 
         // Ensure the file is available locally
-        $file = sb_tempnam('cal');
-        $fp   = fopen($file, 'wb');
-        stream_copy_to_stream($result->readStream(), $fp);
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+        $file            = sb_tempnam('cal');
+        $fp              = fopen($file, 'wb');
+        stream_copy_to_stream($filesystemProxy->readStream($result), $fp);
         fclose($fp);
 
         $factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);

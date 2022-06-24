@@ -15,6 +15,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Image\ProcessorFactory;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
@@ -46,6 +47,8 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
+use League\Flysystem\FilesystemInterface;
+use League\Flysystem\MountManager;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -74,6 +77,7 @@ use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\IConfigLoader;
@@ -142,8 +146,12 @@ use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
@@ -1807,6 +1815,77 @@ abstract class Kernel
                 );
             })
         );
+
+
+        // Filesystems
+        $di->set(
+            'filesystem.mountManager',
+            $di->lazy(
+                function () use ($config) {
+                    return (new FilesystemFactory())->build($config->get('storage_dir'));
+                }
+            )
+        );
+        $di->set(
+            'filesystem.storage',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
+                }
+            )
+        );
+        $di->set(
+            'filesystem.storageProxy',
+            $di->lazy(
+                function () use ($di, $config) {
+                    /** @var FilesystemInterface $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new FilesystemProxy(
+                        $storage,
+                        new HashGenerator(),
+                        $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
+                    );
+                }
+            )
+        );
+        $di->set(
+            'filesystem.receiver',
+            $di->lazyNew(
+                Receiver::class,
+                [
+                    'storageMapper'          => $mapperFactory->getLazy(StorageMapper::class),
+                    'mimetypeMapper'         => $mapperFactory->getLazy(MimetypeMapper::class),
+                    'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
+                    'sanitizer'              => $di->lazyGet('storage.sanitizer'),
+                    'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
+                    // CLI scripts have no current user, thus this is null
+                    'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                ],
+            )
+        );
+        $di->set(
+            'filesystem.temp',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var MountManager $mountManager */
+                    $mountManager = $di->get('filesystem.mountManager');
+                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
+                }
+            )
+        );
+        $di->set(
+            'filesystem.imageProcessorFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var FilesystemInterface $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new ProcessorFactory($storage, new HashGenerator());
+                }
+            ),
+        );
+
 
         return $di;
     }

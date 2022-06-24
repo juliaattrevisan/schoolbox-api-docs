@@ -13,6 +13,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder as ResourceFolder;
 use Schoolbox\Resource\File as ResourceFile;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use ZipStream;
 
@@ -60,13 +61,15 @@ class Folder
      * @param Access                $access
      * @param ResourceFolder\Mapper $folderMapper
      * @param ResourceFile\Mapper   $fileMapper
+     * @param FilesystemProxy       $filesystemProxy
      */
     public function __construct(
         ResourceFolder\Model $folder,
         User $currentUser,
         Access $access,
         ResourceFolder\Mapper $folderMapper,
-        ResourceFile\Mapper $fileMapper
+        ResourceFile\Mapper $fileMapper,
+        private FilesystemProxy $filesystemProxy
     ) {
         $this->folder       = $folder;
         $this->currentUser  = $currentUser;
@@ -119,12 +122,12 @@ class Folder
         );
         foreach ($fileList as $file) {
             // Ensure filenames are unique
-            if ($file->getStorage()->exists()) {
+            if ($this->filesystemProxy->fileExists($file)) {
                 $uniqueName    = $this->uniqueFileName($file->getBasename(), $uniqueNames);
                 $uniqueNames[] = $uniqueName;
                 $zipStream->addFileFromStream(
                     $path . DIRECTORY_SEPARATOR . $uniqueName,
-                    $file->readStream()
+                    $this->filesystemProxy->readStream($file)
                 );
             }
         }
