@@ -12,15 +12,13 @@
 // (currently CDN_PREFIX + '/css/core/main.css')
 $cdn-prefix: "../..";
 
-// Utils
-@import "utils/colors";
-@import "utils/font-faces";
-@import "utils/variables";
-@import "utils/mixins";
-@import "utils/functions";
-@import "utils/settings";
-
 // Base
+@import "base/colors";
+@import "base/font-faces";
+@import "base/variables";
+@import "base/mixins";
+@import "base/functions";
+@import "base/settings";
 @import "base/global";
 @import "base/typography";
 

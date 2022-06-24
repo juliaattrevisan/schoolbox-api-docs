@@ -164,7 +164,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/core/utils/_variables.scss';
+@import 'www/static/css/core/base/_variables.scss';
 
 .list-container { //to contain the .pop-out-list and the .update-button
     display: flex;

@@ -1,12 +1,11 @@
 $cdn-prefix: '../../';
 
-//@import "utils/skin";
-@import "utils/colors";
-@import "utils/variables";
-@import "utils/mixins";
-@import "utils/functions";
+@import "base/colors";
+@import "base/variables";
+@import "base/mixins";
+@import "base/functions";
 
-@import "utils/settings";
+@import "base/settings";
 @import "ui/icons";
 
 @import "base/global";
@@ -15,7 +14,6 @@ $cdn-prefix: '../../';
 @import "ui/iframe";
 @import "components/editor/custom-styles.scss";
 
-//@import "utils/custom";
 
 html, body {
     height: 100%;
