@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
+use League\Flysystem\Config;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FilesystemException;
 //use League\Flysystem\Local\LocalFilesystemAdapter as Local;
@@ -20,6 +21,7 @@ use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
+use League\Flysystem\Visibility;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
@@ -183,6 +185,9 @@ class FilesystemProxy
 //            }
 //        }
 
+        // Create the new folder as public (default setting)
+        $this->filesystem->createDirectory(dirname($storagePath));
+
         // Otherwise, copy the new file into storage
         $mountManager = new MountManager([
             FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
@@ -192,6 +197,12 @@ class FilesystemProxy
             FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
             FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
         );
+
+        // Moving a file using the mount manager doesn't appropriately set its
+        // visibility permissions.
+        // Need to recurse through the entire tree and set it to be public?
+        $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
+
         // The file may already exist in the storage backend.
         // This is fine, because the storage file's contents determine the
         // file path: we can assume it's the same file.
