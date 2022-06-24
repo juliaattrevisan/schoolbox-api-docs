@@ -360,43 +360,44 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->dateLocalFormat,
-                $lookup,
-                $timetableRegistry,
-                $cycleRegistry,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\AdditionalSubjects(
-                $this->log,
-                $this->perform,
-                $api,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $timetableRegistry,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
+
+//            ->add(new Timetable\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->timetablePeriodMapper,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+//            ->add(new Timetable\Definition(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->dateLocalFormat,
+//                $lookup,
+//                $timetableRegistry,
+//                $cycleRegistry,
+//                $this->timetableCycleMapper,
+//                $this->timetablePeriodMapper
+//            ))
+//            ->add(new Timetable\AdditionalSubjects(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $lookup,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+//            ->add(new Timetable\Classes(
+//                $this->log,
+//                $this->perform,
+//                $lookup,
+//                $timetableRegistry,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
