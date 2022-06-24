@@ -518,6 +518,7 @@ class Classes implements IStrategy
         }
     }
 
+
     /**
      * Get the Timetable Calendar for a particular TTID
      * if we haven't already done so

@@ -42,7 +42,6 @@ use UnexpectedValueException;
  */
 class Factory implements IFactory
 {
-
     /**
      * The family of importers that we can spawn
      */
