@@ -393,3 +393,40 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         }
     }
 }
+
+// description list element
+dl {
+    &.inline-dl {
+        @include grid-row($behavior: nest);
+        margin-bottom: 1rem;
+        dt,
+        dd {
+            @include grid-column($columns: false, $position: true);
+            margin-bottom: 0;
+        }
+
+        dt {
+            clear: left;
+        }
+
+        dd {
+            clear: right;
+        }
+    }
+}
+
+//a meta list
+ul.meta {
+    list-style: none;
+    line-height: 1.5rem;
+    margin-bottom: 0.5rem;
+    > li {
+        $meta-icon-margin: 1rem;
+        $meta-indent: 1rem + $meta-icon-margin;
+        text-indent: -1 * $meta-indent;
+        padding-left: $meta-indent;
+        &[class^="icon-"]:before {
+            padding-right: $meta-icon-margin;
+        }
+    }
+}

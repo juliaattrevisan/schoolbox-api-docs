@@ -654,43 +654,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     font-size: $h1-font-size;
 }
 
-ul.meta {
-    list-style: none;
-    line-height: 1.5rem;
-    margin-bottom: 0.5rem;
-    > li {
-        $meta-icon-margin: 1rem;
-        $meta-indent: 1rem + $meta-icon-margin;
-
-        text-indent: -1 * $meta-indent;
-        padding-left: $meta-indent;
-
-        &[class^="icon-"]:before {
-            padding-right: $meta-icon-margin;
-        }
-    }
-}
-
-dl {
-    &.inline-dl {
-        @include grid-row($behavior: nest);
-        margin-bottom: 1rem;
-        dt,
-        dd {
-            @include grid-column($columns: false, $position: true);
-            margin-bottom: 0;
-        }
-
-        dt {
-            clear: left;
-        }
-
-        dd {
-            clear: right;
-        }
-    }
-}
-
 // Profiles
 .profile {
     .alert-box, .pastoral-flags {
@@ -876,6 +839,7 @@ li article ol {
     margin-bottom: $list-margin-bottom;
 }
 
+// an overlay that is displayed while something is processing
 .wait-overlay {
     position: absolute;
     top: 0;
