@@ -324,10 +324,10 @@ class Factory
 //         */
 //        $cycleRegistry = new TimetableRegistry();
 //
-//        /* Cache a list of known users and periods
-//         * Every student timetable processing uses info stored there
-//         */
-//        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new TimetableCalendar\Lookup($this->periodMapper);
 
         /* Purge previously-imported profile relationships and classes
          */
@@ -389,15 +389,14 @@ class Factory
 //                $this->timetableCycleMapper,
 //                $this->timetablePeriodMapper
 //            ))
-//            ->add(new Timetable\AdditionalSubjects(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
+            ->add(new TimetableCalendar\AdditionalSubjects(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
 //            ->add(new Timetable\Classes(
 //                $this->log,
 //                $this->perform,
