@@ -30,6 +30,11 @@ $cdn-prefix: "../..";
 // Shared user interface
 @import "ui/icons";
 @import "ui/skeleton";
+@import "ui/inline-lists";
+@import "ui/forms/labels";
+@import "ui/progress-bars";
+@import "ui/reveal";
+@import "ui/thumbs";
 @import "ui/content";
 @import "ui/accordion";
 

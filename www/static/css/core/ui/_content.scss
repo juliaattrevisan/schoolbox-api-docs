@@ -4,14 +4,6 @@
     or just not specific enough to go into a sepearate sass file
 */
 
-$container-bg: white !default;
-
-@import "inline-lists";
-@import "forms/labels";
-@import "progress-bars";
-@import "reveal";
-@import "thumbs";
-
 
 // Empty States
 .empty-state {
@@ -119,6 +111,7 @@ $container-bg: white !default;
     }
 }
 
+$container-bg: white;
 %container {
     background-color: $container-bg;
     margin-bottom: $base-font-size;

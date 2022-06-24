@@ -14,6 +14,12 @@ $cdn-prefix: '../../';
 
 @import "base/global";
 @import "base/typography";
+
+@import "ui/inline-lists";
+@import "ui/forms/labels";
+@import "ui/progress-bars";
+@import "ui/reveal";
+@import "ui/thumbs";
 @import "ui/content";
 @import "ui/iframe";
 @import "components/editor/custom-styles.scss";
