@@ -10,23 +10,8 @@ $container-bg: white !default;
 @import "forms/labels";
 @import "progress-bars";
 @import "reveal";
-@import "../utils/visibility";
 @import "thumbs";
 
-
-.align-middle {
-    vertical-align: middle;
-}
-
-.align-bottom {
-    vertical-align: bottom;
-}
-
-.inline-list > li {
-    margin-left: 0;
-    margin-right: $inline-list-default-float-list-margin;
-    margin-bottom: $inline-list-default-float-list-margin;
-}
 
 // Empty States
 .empty-state {

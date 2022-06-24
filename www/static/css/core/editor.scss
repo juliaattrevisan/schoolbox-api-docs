@@ -4,8 +4,12 @@ $cdn-prefix: '../../';
 @import "base/variables";
 @import "base/mixins";
 @import "base/functions";
-
 @import "base/settings";
+
+@import "utils/meta";
+@import "utils/modifiers";
+@import "utils/visibility";
+
 @import "ui/icons";
 
 @import "base/global";

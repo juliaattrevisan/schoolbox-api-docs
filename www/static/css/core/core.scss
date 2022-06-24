@@ -22,6 +22,11 @@ $cdn-prefix: "../..";
 @import "base/global";
 @import "base/typography";
 
+//Utils
+@import "utils/meta";
+@import "utils/modifiers";
+@import "utils/visibility";
+
 // General
 @import "ui/icons";
 @import "ui/skeleton";

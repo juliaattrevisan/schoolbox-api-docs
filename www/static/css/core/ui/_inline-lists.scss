@@ -54,3 +54,9 @@ $inline-list-children-display: block !default;
     }
   }
 }
+
+.inline-list > li {
+    margin-left: 0;
+    margin-right: $inline-list-default-float-list-margin;
+    margin-bottom: $inline-list-default-float-list-margin;
+}
