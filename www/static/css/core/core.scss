@@ -27,6 +27,13 @@ $cdn-prefix: "../..";
 @import "utils/modifiers";
 @import "utils/visibility";
 
+// Layout
+@import "layout/footer";
+@import "layout/grid";
+@import "layout/container";
+@import "layout/login";
+@import "layout/flex";
+
 // Shared user interface
 @import "ui/icons";
 @import "ui/skeleton";
@@ -75,14 +82,6 @@ $cdn-prefix: "../..";
 @import "ui/iframe";
 @import "ui/cards";
 @import "ui/highcharts";
-
-// Layout
-@import "layout/footer";
-@import "layout/grid";
-@import "layout/header";
-@import "layout/container";
-@import "layout/login";
-@import "layout/flex";
 
 // Schoolbox Areas
 @import "components/evaluation/evaluation";
