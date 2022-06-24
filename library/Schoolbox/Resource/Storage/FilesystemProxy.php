@@ -137,9 +137,15 @@ class FilesystemProxy
             $this->filesystem->writeStream($path, $resource, $config);
         }
 
-        // Put it in the filesystem, and also the storage
-        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
-        $this->updateStorage($storage, $hash, $path);
+        // umask setting may prevent group/other-writable files:
+        // storage files are supposed to be group-writable though, so switch off
+        // the umask and restore it once done.
+        $oldUmask = umask(0);
+        try {
+            $this->updateStorage($storage, $hash, $path);
+        } finally {
+            umask($oldUmask);
+        }
     }
 
     /**
@@ -185,28 +191,36 @@ class FilesystemProxy
 //            }
 //        }
 
-        // Create the new folder as public (default setting)
-        $this->filesystem->createDirectory(dirname($storagePath));
+        // umask setting may prevent group/other-writable files:
+        // storage files are supposed to be group-writable though, so switch off
+        // the umask and restore it once done.
+        $oldUmask = umask(0);
+        try {
+            // Create the new folder as public (default setting)
+            $this->filesystem->createDirectory(dirname($storagePath));
 
-        // Otherwise, copy the new file into storage
-        $mountManager = new MountManager([
-            FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
-            FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
-        ]);
-        $mountManager->move(
-            FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
-            FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
-        );
+            // Otherwise, copy the new file into storage
+            $mountManager = new MountManager([
+                FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
+                FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
+            ]);
+            $mountManager->move(
+                FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
+                FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
+            );
 
-        // Moving a file using the mount manager doesn't appropriately set its
-        // visibility permissions.
-        // Need to recurse through the entire tree and set it to be public?
-        $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
+            // Moving a file using the mount manager doesn't appropriately set its
+            // visibility permissions.
+            // Need to recurse through the entire tree and set it to be public?
+            $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
 
-        // The file may already exist in the storage backend.
-        // This is fine, because the storage file's contents determine the
-        // file path: we can assume it's the same file.
-        $this->updateStorage($storage, $hash, $storagePath);
+            // The file may already exist in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+            $this->updateStorage($storage, $hash, $storagePath);
+        } finally {
+            umask($oldUmask);
+        }
     }
 
     /**
