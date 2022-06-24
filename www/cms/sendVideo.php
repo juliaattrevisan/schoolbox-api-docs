@@ -17,6 +17,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -105,7 +106,7 @@ if (isset($type) && isset($id)) {
 
     // Redir to the presigned URL if it is enabled
     if (
-        $fileSystem->getAdapter() instanceof S3Adapter
+        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
         && $config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)
     ) {
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
