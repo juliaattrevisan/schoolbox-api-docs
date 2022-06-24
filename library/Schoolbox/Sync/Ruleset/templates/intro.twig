@@ -1,3 +1,8 @@
+{#
+    data:
+        upsCronTime String - 24hr format time that the UPS cron is schedule to run
+        timezone    String - timezone that the UPS cron time relates to
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -18,7 +23,8 @@
                     A rule also may contain multiple effects which perform the mapping of the SIS data to the appropriate field in Schoolbox.<p>
                 <p>Once you have made changes to the UPS you can test your changes with a dry-run without consequences. After a dry run you can view the log output of what would have occurred.</p>
                 <p>You can also enable or disable the UPS individually for each role type at any time.  Make sure you keep the role deactivated till you have completed some dry run tests and are confident it is ready to run.</p>
-                <p>The UPS will run nightly and only perform changes for the role types that have been activated to run.</p>
+                <p>The UPS will run daily at <strong>{{ upsCronTime }} {{ timezone }} time</strong> and only perform changes for the role types that have been activated to run.</p>
+                <p>You can update the UPS scheduled run time <a href="/adminv2/setting/External%20DB#ups_cron_run_time">here</a>. Changes will take up to 30min to take effect.</p>
             </section>
             <h2 class="subheader">Recent Runs</h2>
             {% if logs is empty %}
