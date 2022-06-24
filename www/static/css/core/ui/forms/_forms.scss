@@ -1218,6 +1218,12 @@ ul.filters {
 
 .filter-interaction {
     border-bottom: 1px solid #ededed;
+    .filter-summary {
+        line-height: 2rem;
+    }
+    input[type="submit"] {
+        margin-bottom: 0;
+    }
 }
 
 // flex version of columns for filter results

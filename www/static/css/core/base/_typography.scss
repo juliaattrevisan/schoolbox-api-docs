@@ -361,6 +361,11 @@ blockquote p {
     }
 }
 
+// For meta text that's inline with other text, remove bottom margin and add left margin
+.meta.inline {
+    margin: 0 0 0 0.375rem;
+}
+
 // Deleted or struck out content
 .strike,
 .del {

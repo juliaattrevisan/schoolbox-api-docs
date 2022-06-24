@@ -1,9 +1,9 @@
 /*
     Shared Schoolbox styles for 'content', 
     which is a bit of a catch all for styles that are shared across multiple pages
-    or just not specific enough to go into a sepearate sass file
+    but are just not specific enough to go into a sepearate sass file or into a 
+    more relevant sass file
 */
-
 
 // Empty States
 .empty-state {
@@ -104,13 +104,6 @@
     overflow-y: auto;
 }
 
-.scrollable {
-    overflow: auto;
-    table {
-        margin-bottom: 0;
-    }
-}
-
 $container-bg: white;
 %container {
     background-color: $container-bg;
@@ -155,7 +148,7 @@ $container-bg: white;
     }
 }
 
-// Labels
+// Labels, see Labels at: https://vagrant.dev.schoolbox.cloud/pantry
 .label {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -240,7 +233,8 @@ $container-bg: white;
     height: 1rem;
 }
 
-// Hints
+// Tooltips that reveal further information on selection
+// Typically they sit next to a label
 .hint {
     color: $content-ui-foreground !important;
     top: -1px;
@@ -273,6 +267,7 @@ $container-bg: white;
     }
 }
 
+// reveal more info on selection, see Expandable on: https://vagrant.dev.schoolbox.cloud/pantry
 .expander {
     color: $content-ui-foreground;
     line-height: 1;
@@ -291,15 +286,6 @@ $container-bg: white;
     }
     &.expanded:before {
         transform: rotate(180deg);
-    }
-}
-
-.filter-interaction {
-    .filter-summary {
-        line-height: 2rem;
-    }
-    input[type="submit"] {
-        margin-bottom: 0;
     }
 }
 
@@ -329,11 +315,6 @@ nav {
         text-transform: lowercase;
         font-variant: small-caps;
     }
-}
-
-// For meta text that's inline with other text, remove bottom margin and add left margin
-.meta.inline {
-    margin: 0 0 0 0.375rem;
 }
 
 // Grades that sit along side of other elements
@@ -408,7 +389,7 @@ nav {
     content: "none";
 }
 
-// Schoolbox Loader
+// Schoolbox Loader: https://vagrant.dev.schoolbox.cloud/pantry
 .loader {
     background-color: $accent-foreground;
     border-radius: 0.5rem;
@@ -417,14 +398,8 @@ nav {
     height: 3rem;
     animation: sb-loader 1.2s infinite ease-in-out;
 }
-// for loaders inside headings, use span.
-span.loader {
-    border-radius: 0.2rem;
-    display: inline-block;
-    margin: 0 0.5rem;
-    width: 1rem;
-    height: 1rem;
-}
+
+// spin in 3d vertically then horizontally 
 @keyframes sb-loader {
     0% {
         transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
@@ -435,6 +410,15 @@ span.loader {
     100% {
         transform: perspective(7.5rem) rotateX(-180deg) rotateY(-179.9deg);
     }
+}
+
+// for loaders inside headings, use span.
+span.loader {
+    border-radius: 0.2rem;
+    display: inline-block;
+    margin: 0 0.5rem;
+    width: 1rem;
+    height: 1rem;
 }
 
 .progress-tick-form {
@@ -450,7 +434,7 @@ $progress-tick-size-regular: rem-calc($base-font-size * 2);
 $progress-tick-size-small: rem-calc($base-font-size * 1.25);
 $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 
-@mixin progress-tick($progress-tick-size) {
+@mixin progress-tick ($progress-tick-size) {
     width: $progress-tick-size;
     height: $progress-tick-size;
     min-width: $progress-tick-size;
