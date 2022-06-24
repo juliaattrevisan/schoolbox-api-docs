@@ -303,6 +303,7 @@ $container-bg: white;
     }
 }
 
+// don't show navigation elements when printing the page
 nav {
     @extend .hide-for-print;
 }
@@ -417,7 +418,6 @@ nav {
         .column {
             padding-bottom: 1rem;
             padding-top: 1rem;
-
             @media #{$medium-only} {
                 padding-bottom: 0.75rem;
                 padding-top: 0.75rem;
@@ -533,7 +533,6 @@ nav {
         background-color: $vapor;
         border-top: 1px solid $body-bg;
         border-left: 3rem solid $white;
-
         @media #{$small-only} {
             border-left: 1rem solid $white;
         }
