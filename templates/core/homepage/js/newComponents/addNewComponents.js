@@ -99,7 +99,7 @@ function addNewDraggable (component) {
     return Draggable.create(component, {
         type: 'x, y',
         autoScroll: 1,
-        onClick: function () {
+        onClick: function () { //not using arrow functions here as we need to pass 'this' through
             onNewComponentClicked(this);
         }, 
         onDragStart: function () {
@@ -120,7 +120,6 @@ function initNewComponentPositions () {
         component.dataset.originalTop = component.getBoundingClientRect().top + window.scrollY;
         component.dataset.leftDifference = 0;
         component.dataset.topDifference = 0;
-        component.removeAttribute('data-flip-id'); //sometimes FLIP currently leaves this behind 
     });
 }
 
@@ -148,7 +147,7 @@ function onNewComponentClicked (draggableInstance) {
 
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
         
-        updateNewComponentVars(draggableInstance.target); //use the parent container regardless of selection to ensure correct dimensions etc
+        updateNewComponentVars(draggableInstance.target); 
         __referenceElement = getReferenceElement(); //to use a reference where the new component is / where it will be dragged to
         __referenceElement.removeAttribute('data-component'); //in this instance we don't want the reference element to animate
         disableAllOtherDraggables();
