@@ -103,3 +103,8 @@ textarea {
 select { 
     width: 100%; 
 }
+
+// Ensure time is on one line
+time {
+    white-space: nowrap;
+}

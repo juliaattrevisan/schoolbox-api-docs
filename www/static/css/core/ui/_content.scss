@@ -214,6 +214,7 @@ $container-bg: white !default;
     }
 }
 
+//For individual student learning plan notes
 .individualisation {
     background-color: #9a9a9a;
     display: inline-block;
@@ -969,30 +970,6 @@ span.loader {
     }
 }
 
-.minw-1 {
-    min-width: 1rem;
-}
-.minw-15 {
-    min-width: 1.5rem;
-}
-.minw-2 {
-    min-width: 2rem;
-}
-.minw-3 {
-    min-width: 3rem;
-}
-.minw-4 {
-    min-width: 4rem;
-}
-
-.three-panels {
-    .property-panel {
-        .information-list > li {
-            @extend %content;
-        }
-    }
-}
-
 .progress-tick-form {
     transition: all 240ms cubic-bezier(0.15, 1.4, 0.7, 1.35);
     &[disabled] {
@@ -1090,10 +1067,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 .countdown {
     font-weight: 100;
     font-size: $h1-font-size;
-}
-
-time {
-    white-space: nowrap;
 }
 
 ul.meta {
@@ -1335,10 +1308,6 @@ li article ol {
             display: table-cell;
         }
     }
-}
-
-.border-none {
-    border: none !important;
 }
 
 //this higlights the selected config option when an option has been selected
