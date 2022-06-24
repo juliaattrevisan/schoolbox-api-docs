@@ -73,15 +73,9 @@ class EDiary implements IStrategy
 
 
     /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
+     * @var \Schoolbox\External\Event\User\Mapper
      */
-    protected \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    protected \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
+    protected \Schoolbox\External\Event\User\Mapper $userRelationMapper;
 
 
     /**
@@ -126,8 +120,7 @@ class EDiary implements IStrategy
      * @param \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper
      * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param \Schoolbox\External\Event\Roletype\Mapper  $roletypeRelationMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper    $campusRelationMapper
+     * @param \Schoolbox\External\Event\User\Mapper      $userRelationMapper
      * @param string                                     $source
      * @param Registry                                   $registry
      * @param \Alaress_Date_Format                       $from
@@ -142,8 +135,7 @@ class EDiary implements IStrategy
         \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
+        \Schoolbox\External\Event\User\Mapper $userRelationMapper,
         string $source,
         Registry $registry,
         \Alaress_Date_Format $from,
@@ -157,8 +149,7 @@ class EDiary implements IStrategy
         $this->studentProfileMapper = $studentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->eventMapper = $eventMapper;
-        $this->roletypeRelationMapper = $roletypeRelationMapper;
-        $this->campusRelationMapper = $campusRelationMapper;
+        $this->userRelationMapper = $userRelationMapper;
 
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
@@ -210,6 +201,8 @@ class EDiary implements IStrategy
                     $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
                 }
             }
+        } else {
+            $this->log->info('No feed data found; skipping');
         }
 
         /* I think the ediary feed endpoint was supposed to supply the synonymous
@@ -233,6 +226,8 @@ class EDiary implements IStrategy
                     $this->importStaffEvents($userProfile, $feed, 'getTeacherEDiary');
                 }
             }
+        } else {
+            $this->log->info('No feed data found; skipping');
         }
     }
 
@@ -278,6 +273,8 @@ class EDiary implements IStrategy
      */
     public function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed, string $endpoint): void
     {
+        $userExternalId = $userProfile->getBaseProfile()->getExternalId();
+
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
@@ -285,7 +282,7 @@ class EDiary implements IStrategy
             'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
             $feed['code'],
-            $userProfile->getBaseProfile()->getExternalId()
+            $userExternalId
         ));
 
         /* This comes from an API request at TASS
@@ -294,7 +291,7 @@ class EDiary implements IStrategy
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $endpoint,
             [
-                'studcode' => $userProfile->getBaseProfile()->getExternalId(),
+                'studcode' => $userExternalId,
                 'feedcode' => $feed['code'],
                 'start_date' => $this->from->getUsingFormat('d/m/Y'),
                 'end_date' => $this->to->getUsingFormat('d/m/Y')
@@ -302,7 +299,7 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, $feed, Role::STUDENT, $tassEvents);
+        $this->importEvents($endpoint, $userExternalId, $feed, Role::STUDENT, $tassEvents);
     }
 
 
@@ -321,6 +318,8 @@ class EDiary implements IStrategy
      */
     public function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed, string $endpoint): void
     {
+        $userExternalId = $userProfile->getBaseProfile()->getExternalId();
+
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
@@ -328,13 +327,13 @@ class EDiary implements IStrategy
             'Accessing endpoint %s using feed code %s for human with external id %s',
             $endpoint,
             $feed['code'],
-            $userProfile->getBaseProfile()->getExternalId()
+            $userExternalId
         ));
 
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
             $endpoint,
             [
-                'tchcode' => $userProfile->getBaseProfile()->getExternalId(),
+                'tchcode' => $userExternalId,
                 'feedcode' => $feed['code'],
                 'start_date' => $this->from->getUsingFormat('d/m/Y'),
                 'end_date' => $this->to->getUsingFormat('d/m/Y')
@@ -342,7 +341,7 @@ class EDiary implements IStrategy
             Api::VERSION_2
         );
 
-        $this->importEvents($endpoint, $feed, Role::STAFF, $tassEvents);
+        $this->importEvents($endpoint, $userExternalId, $feed, Role::STAFF, $tassEvents);
     }
 
 
@@ -350,6 +349,7 @@ class EDiary implements IStrategy
      * Shank in all the events from the api endpoint into SUDS Events
      *
      * @param string     $endpoint
+     * @param string     $userExternalId
      * @param array      $feed
      * @param string     $roleType
      * @param array|null $tassEvents
@@ -358,7 +358,7 @@ class EDiary implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importEvents(string $endpoint, array $feed, string $roleType, ?array $tassEvents): void
+    private function importEvents(string $endpoint, string $userExternalId, array $feed, string $roleType, ?array $tassEvents): void
     {
         /* This might be null, or buggy
          * Exit early in that scenario
@@ -427,13 +427,6 @@ class EDiary implements IStrategy
              */
             $eventType = $feed['desc'];
 
-            /* Assign campus relations
-             *
-             * Link it to all the campuses in schoolbox unless you can specifically determine
-             * a particular campus relation via "campus_code"
-             */
-            $campuses = $this->findCampuses((string)$tassEvent['campus_code']);
-
             /* Find an event instance that used guid
              */
             try {
@@ -490,57 +483,23 @@ class EDiary implements IStrategy
                 $missingEventTypes[$eventType] = $eventType;
             }
 
-            /* Some diagnostic loggings
-             */
-            $this->log->debug(sprintf(
-                '%s event "%s" is in campuses: %s',
-                $this->source,
-                $event->getTitle(),
-                implode(', ', $campuses->getPropertyValues('name'))
-            ));
-
-            $this->log->debug(sprintf(
-                '%s event "%s" is in role type: %s',
-                $this->source,
-                $event->getTitle(),
-                $roleType
-            ));
-
             /* Save it
              */
             if ($this->perform) {
                 $this->eventMapper->save($event);
 
-                /* Assign role relations
-                 *
-                 * These are role-specific and hardcoded per strat, but there might be multiple
-                 * instances of the same role type
+                /* Assign user relations
                  */
-                $this->roletypeRelationMapper->save($this->roletypeRelationMapper->createModel()
+                $this->userRelationMapper->save($this->userRelationMapper->createModel()
                     ->setEventId($event->getId())
-                    ->setRoleType($roleType));
+                    ->setExternalId($userExternalId));
 
                 $this->log->info(sprintf(
-                    'Saved %s event "%s" with roletype relationship %s',
+                    'Saved %s event "%s" with user relationship %s',
                     $this->source,
                     $event->getTitle(),
-                    $roleType
+                    $userExternalId
                 ));
-
-                /* Slam in all the relevant campuses
-                 */
-                foreach ($campuses as $campus) {
-                    $this->campusRelationMapper->save($this->campusRelationMapper->createModel()
-                        ->setEventId($event->getId())
-                        ->setCampusName($campus->getName()));
-
-                    $this->log->info(sprintf(
-                        'Saved %s event "%s" with campus relationship %s',
-                        $this->source,
-                        $event->getTitle(),
-                        $campus->getName()
-                    ));
-                }
 
                 $this->log->info(sprintf(
                     'Saved %s event "%s" with guid %s',
@@ -592,32 +551,5 @@ class EDiary implements IStrategy
         ];
 
         $this->registry->remember($endpoint, $summaryData);
-    }
-
-
-    /**
-     * Generate a list of campus ids which might be associated with $campusCode
-     *
-     * @param string $campusCode
-     * @return GenericCollection
-     * @throws \UnexpectedValueException
-     */
-    protected function findCampuses(string $campusCode): GenericCollection
-    {
-        $campuses = new \Schoolbox\GenericCollection(\Schoolbox\Campus::class);
-
-        foreach ($this->campuses as $campus) {
-            if ($campus->getName() === $campusCode || $campus->getExtTimetableCode() === $campusCode) {
-                $campuses->add($campus);
-            }
-        }
-
-        /* If you didn't match any campuses, add them all
-         */
-        if (!\count($campuses)) {
-            return $this->campuses;
-        }
-
-        return $campuses;
     }
 }

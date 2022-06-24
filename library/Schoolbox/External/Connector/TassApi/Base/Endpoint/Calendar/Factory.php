@@ -107,6 +107,12 @@ class Factory
 
 
     /**
+     * @var \Schoolbox\External\Event\User\Mapper
+     */
+    private \Schoolbox\External\Event\User\Mapper $userRelationMapper;
+
+
+    /**
      * @var RoleMapper
      */
     private RoleMapper $roleMapper;
@@ -115,16 +121,19 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                           $log
-     * @param bool                                      $perform
-     * @param string                                    $host
-     * @param string                                    $key
-     * @param CampusMapper                              $campusMapper
-     * @param EventTypeMapper                           $eventTypeMapper
-     * @param \Schoolbox\External\Event\Mapper          $eventMapper
-     * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
-     * @param RoleMapper                                $roleMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param string                                     $host
+     * @param string                                     $key
+     * @param \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper
+     * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
+     * @param CampusMapper                               $campusMapper
+     * @param EventTypeMapper                            $eventTypeMapper
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param \Schoolbox\External\Event\Roletype\Mapper  $roletypeRelationMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper    $campusRelationMapper
+     * @param \Schoolbox\External\Event\User\Mapper      $userRelationMapper
+     * @param RoleMapper                                 $roleMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -138,6 +147,7 @@ class Factory
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
+        \Schoolbox\External\Event\User\Mapper $userRelationMapper,
         RoleMapper $roleMapper
     ) {
         $this->log = $log;
@@ -151,6 +161,7 @@ class Factory
         $this->eventMapper = $eventMapper;
         $this->roletypeRelationMapper = $roletypeRelationMapper;
         $this->campusRelationMapper = $campusRelationMapper;
+        $this->userRelationMapper = $userRelationMapper;
         $this->roleMapper = $roleMapper;
     }
 
@@ -259,8 +270,7 @@ class Factory
                 $this->studentProfileMapper,
                 $this->staffProfileMapper,
                 $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
+                $this->userRelationMapper,
                 self::SOURCE_NAME,
                 $registry,
                 $from,

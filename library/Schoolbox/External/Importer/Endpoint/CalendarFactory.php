@@ -105,6 +105,7 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance(),
                     RoleMapper::getInstance()
                 ))->produce();
 
