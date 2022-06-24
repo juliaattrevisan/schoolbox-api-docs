@@ -146,6 +146,10 @@ class FilesystemFactory
                 new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
                 $otfs_s3_bucket,
             ),
+            [
+                Config::OPTION_VISIBILITY           => Visibility::PRIVATE,
+                Config::OPTION_DIRECTORY_VISIBILITY => Visibility::PRIVATE,
+            ],
         );
     }
 }

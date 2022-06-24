@@ -196,10 +196,11 @@ class FilesystemProxy
         // the umask and restore it once done.
         $oldUmask = umask(0);
         try {
-            // Create the new folder as public (default setting)
+            // Create the new folder with the filesystem's default visibility
+            // (public for local, private for s3)
             $this->filesystem->createDirectory(dirname($storagePath));
 
-            // Otherwise, copy the new file into storage
+            // Copy the new file into storage
             $mountManager = new MountManager([
                 FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
                 FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
@@ -209,9 +210,10 @@ class FilesystemProxy
                 FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
             );
 
-            // Moving a file using the mount manager doesn't appropriately set its
-            // visibility permissions.
-            // Need to recurse through the entire tree and set it to be public?
+            // Moving a file using the mount manager doesn't appropriately set
+            // its visibility permissions.
+            // Need to set the file's permissions to the filesystem's default
+            // visibility (public for local, private for s3)
             $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
 
             // The file may already exist in the storage backend.
