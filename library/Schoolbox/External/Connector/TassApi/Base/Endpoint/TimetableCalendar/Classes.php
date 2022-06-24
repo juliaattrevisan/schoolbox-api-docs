@@ -289,6 +289,7 @@ class Classes implements IStrategy
      * @param array $person
      * @param array $timetable
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -327,6 +328,32 @@ class Classes implements IStrategy
 
             $date = explode(' ', $dayDefinition['TTDATE'])[0];
 
+            /* Fetch PAST_THRESHOLD days into the past, so people can see where they've been
+             */
+            $dateCheck = new \Alaress_Date_Format($date, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+            if ($dateCheck->isPast() && $dateCheck->diffInDays($now) > self::PAST_THRESHOLD) {
+                $this->log->debug(sprintf(
+                    'Timetable Calendar record on %s is too far in the past; skipping',
+                    $dateCheck->getDatabaseDate()
+                ));
+
+                continue;
+            }
+
+            /* Don't fetch too many from the future
+             */
+            if ($dateCheck->isFuture() && $dateCheck->diffInDays($now) > self::FUTURE_THRESHOLD) {
+                $this->log->debug(sprintf(
+                    'Timetable Calendar record on %s is too far into the future; skipping',
+                    $dateCheck->getDatabaseDate()
+                ));
+
+                continue;
+            }
+
+            /* Process relevant dates
+             */
             foreach ($timetable['DAYS'][$day]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
@@ -349,30 +376,6 @@ class Classes implements IStrategy
                     $period = trim((string)$periodData['PRD_CODE']);
                     $type = '';
                     $guid = '';
-
-                    /* Fetch PAST_THRESHOLD days into the past, so people can see where they've been
-                     */
-                    if ($startAt->isPast() && $startAt->diffInDays($now) > self::PAST_THRESHOLD) {
-                        $this->log->debug(sprintf(
-                            '%s on %s is too far in the past; skipping',
-                            $title,
-                            $startAt->getDatabaseDate()
-                        ));
-
-                        continue;
-                    }
-
-                    /* Don't fetch too many from the future
-                     */
-                    if ($startAt->isFuture() && $startAt->diffInDays($now) > self::FUTURE_THRESHOLD) {
-                        $this->log->debug(sprintf(
-                            '%s on %s is too far into the future; skipping',
-                            $title,
-                            $startAt->getDatabaseDate()
-                        ));
-
-                        continue;
-                    }
 
                     /* Cram in everything else
                      */

@@ -310,13 +310,6 @@ class Factory
             $api[$module] = new Api($this->host, $this->key, $module);
         }
 
-        /* Timetable Registry
-         *
-         * This registry contains all the timetables we iteratively shanked from an endpoint
-         * so we can trade space for time
-         */
-        $timetableRegistry = new TimetableRegistry();
-
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
