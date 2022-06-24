@@ -9,6 +9,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mail\EmailFactory;
+
 abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Notice
 {
     protected ?\Schoolbox\Mail\TwigEmail $email = null;
@@ -22,8 +27,8 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
     {
         $subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory(\Schoolbox\Config\Loader::getInstance());
-        $email = $twigEmailFactory->build($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
+        $twigEmailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $twigEmailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
         $context = [
             'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),

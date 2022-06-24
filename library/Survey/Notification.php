@@ -63,9 +63,9 @@ class Survey_Notification
         }
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
-        $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory(\Schoolbox\Config\Loader::getInstance());
+        $twigEmailFactory = new \Schoolbox\Mail\EmailFactory(\Schoolbox\Config\Loader::getInstance(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
         $baseUrl          = (new UrlFactory($this->config))->buildFullyQualified();
-        $email            = $twigEmailFactory->build('instantmail.twig', $subject, $author->getEmail());
+        $email            = $twigEmailFactory->buildTwigEmail('instantmail.twig', $subject, $author->getEmail());
         $email->setContext(
             [
                 'hideUnsubscribe' => true,

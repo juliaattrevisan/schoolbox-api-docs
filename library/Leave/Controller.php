@@ -11,6 +11,9 @@
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mail\EmailFactory;
 
 class Leave_Controller extends Controller
 {
@@ -1671,8 +1674,8 @@ class Leave_Controller extends Controller
      */
     public function executeEmailTest()
     {
-        $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory(\Schoolbox\Config\Loader::getInstance());
-        $email = $twigEmailFactory->build('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
+        $twigEmailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $twigEmailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
 
         $email->setFrom(Config::get('mail_from_address'), 'Test Schoolbox');
         $email->send();

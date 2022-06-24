@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Mail;
 
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
+use Schoolbox\Admin\EmailDKIM\Mapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Symfony\Component\Mime\Address;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
@@ -21,7 +23,7 @@ use Alaress\Html\ToText as Html2Text;
  *
  * @package Schoolbox\Mail
  */
-class TwigEmail extends AbstractMailer
+class TwigEmail extends Mailer
 {
 
     /**
@@ -34,8 +36,8 @@ class TwigEmail extends AbstractMailer
      */
     protected CssToInlineStyles $cssInliner;
 
-    /** @var Environment */
-    protected Environment $twig;
+    /** @var Environment|null */
+    protected ?Environment $twig = null;
 
     /** @var array */
     protected array $context = [];
@@ -50,13 +52,15 @@ class TwigEmail extends AbstractMailer
      * DO NOT DIRECTLY INSTANTIATE THIS - use TwigEmailFactory instead
      * Prepares the email by importing various configurations from the system
      *
-     * @param string $template - filename of the Twig template, relative to 'templates/[core|site]/email'
-     * @param string $subject  - the default email subject, can be changed after construction
-     * @param string|array|Address|User  $to       - the defailt recipient, can be changed after construction
+     * @param string                    $template - filename of the Twig template, relative to 'templates/[core|site]/email'
+     * @param string                    $subject  - the default email subject, can be changed after construction
+     * @param string|array|Address|User $to       - the defailt recipient, can be changed after construction
+     * @param IConfigLoader             $config
+     * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $template, string $subject, string|array|Address|User  $to)
+    public function __construct(string $template, string $subject, string|array|Address|User  $to, IConfigLoader $config, Mapper $dkimMapper)
     {
-        parent::__construct($template, $subject, $to);
+        parent::__construct($template, $subject, $to, $config, $dkimMapper);
 
         $this->templateFilename = $template;
 
@@ -129,7 +133,7 @@ class TwigEmail extends AbstractMailer
     /**
      * @param array $coreContext
      */
-    public function setCoreContext($coreContext)
+    public function setCoreContext(array $coreContext)
     {
         $this->coreContext = array_replace_recursive($this->coreContext, $coreContext);
     }
@@ -140,7 +144,7 @@ class TwigEmail extends AbstractMailer
      *
      * @return array
      */
-    public function getCoreContext()
+    public function getCoreContext(): array
     {
         return $this->coreContext;
     }

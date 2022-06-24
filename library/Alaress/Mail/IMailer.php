@@ -9,6 +9,7 @@
 
 namespace Alaress\Mail;
 
+use Schoolbox\Admin\EmailDKIM\Mapper;
 use Schoolbox\IConfigLoader;
 use Psr\Log\LoggerInterface;
 use Schoolbox\User;
@@ -26,17 +27,11 @@ interface IMailer
     public static function getConfiguredTransport($conf, $reinitialise = false);
 
     /**
-     * @param bool $reinitialise
-     * @return TransportInterface
-     */
-    public static function getTransport($reinitialise = false);
-
-    /**
      * @param string $emailAddresses
      *
      * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
      */
-    public static function parseAddressString(string $emailAddresses): array;
+    public static function parseAddressString(string $emailAddresses, string $defaultHost): array;
 
     /**
      * @param string $address
@@ -45,7 +40,7 @@ interface IMailer
      */
     public static function buildAddress($address, $name = '');
 
-    public function __construct(string $template, string $subject, string|array|Address|User $to);
+    public function __construct(string $template, string $subject, string|array|Address|User $to, IConfigLoader $config, Mapper $dkimMapper);
 
     public function setFrom(string $email, string $name = '');
 

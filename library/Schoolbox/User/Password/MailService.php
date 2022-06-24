@@ -10,7 +10,7 @@ namespace Schoolbox\User\Password;
 
 use PDOException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -32,7 +32,7 @@ class MailService
     protected $config;
 
     /**
-     * @var TwigEmailFactory
+     * @var EmailFactory
      */
     private $mailFactory;
 
@@ -48,16 +48,16 @@ class MailService
 
 
     /**
-     * @param IConfigLoader    $config
-     * @param Reset\Mapper     $resetMapper
-     * @param UserMapper       $userMapper
-     * @param TwigEmailFactory $mailFactory
+     * @param IConfigLoader $config
+     * @param Reset\Mapper  $resetMapper
+     * @param UserMapper    $userMapper
+     * @param EmailFactory  $mailFactory
      */
     public function __construct(
         IConfigLoader $config,
         Reset\Mapper $resetMapper,
         UserMapper $userMapper,
-        TwigEmailFactory $mailFactory
+        EmailFactory $mailFactory
     ) {
         $this->config = $config;
         $this->mailFactory = $mailFactory;
@@ -125,9 +125,10 @@ class MailService
         $fromAddress = $this->config->get('password_change_email_from');
         $fromName    = $this->config->get('mail_from_name');
 
-        $email = $this->mailFactory->build(
+        $email = $this->mailFactory->buildTwigEmail(
             'userPasswordReset/welcome/usernameChange.twig',
-            $subject
+            $subject,
+            $user
         );
 
         $email->setFrom($fromAddress, $fromName);
@@ -138,10 +139,7 @@ class MailService
         ]);
 
         try {
-            return $email->send([
-                'name'  => $user->formatName(),
-                'email' => $user->getEmail()
-            ]);
+            return $email->send();
         } catch (TransportExceptionInterface $e) {
             return false;
         }
@@ -173,7 +171,7 @@ class MailService
             // No users to mail to were found.
             // To mitigate timing attacks: craft the email regardless, and send
             // it to the blackhole.
-            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig', $subject, '');
+            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, '');
             $email->sendToBlackhole();
             return $sent;
         }
@@ -226,12 +224,12 @@ class MailService
     {
         $user = $reset->getUser();
         if (!filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
-            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig', $subject, '');
+            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, '');
             $email->sendToBlackhole();
             return true;
         }
 
-        $email = $this->mailFactory->build($template, $subject, new Address($user->getEmail(), $user->formatName()));
+        $email = $this->mailFactory->buildTwigEmail($template, $subject, $user);
         $email->setFrom($fromAddress, $fromName);
         $email->encodeBase64();
         $email->setContext([

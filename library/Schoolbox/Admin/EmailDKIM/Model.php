@@ -24,9 +24,15 @@ class Model implements ISoftDeletable
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
 
-    private string $domain = '';
+    private string $domain  = '';
     private string $private = '';
-    private string $public = '';
+    private string $public  = '';
+
+    public const  SELECTOR         = 'schoolbox';
+    private const DOMAIN_KEY       = '_domainkey';
+    private const VALUE_FORMAT     = 'v=DKIM1;k=rsa;p=%s';
+    private const KEY_HEADER_BEGIN = '-----BEGIN PUBLIC KEY-----';
+    private const KEY_HEADER_END   = '-----END PUBLIC KEY-----';
 
     /**
      * @return string
@@ -80,5 +86,22 @@ class Model implements ISoftDeletable
     {
         $this->public = $public;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDKIMName(): string
+    {
+        return sprintf('%s.%s.%s', self::SELECTOR, self::DOMAIN_KEY, $this->getDomain());
+    }
+
+    /**
+     * @return string
+     */
+    public function getDKIMValue(): string
+    {
+        $public = trim(str_replace(self::KEY_HEADER_END, '', str_replace(self::KEY_HEADER_BEGIN, '', $this->getPublic())));
+        return sprintf(self::VALUE_FORMAT, $public);
     }
 }

@@ -12,8 +12,7 @@ namespace Schoolbox\Realtime\Digest;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\Realtime\WorkNotifier;
@@ -35,10 +34,10 @@ class MailNotifier extends WorkNotifier
     private $userMapper;
 
     /**
-     * @param IListFactory    $factory
-     * @param UserMapper      $userMapper
-     * @param IConfigLoader   $configLoader
-     * @param LoggerInterface $log
+     * @param IListFactory         $factory
+     * @param UserMapper           $userMapper
+     * @param IConfigLoader|null   $configLoader
+     * @param LoggerInterface|null $log
      */
     public function __construct(
         IListFactory $factory,
@@ -52,7 +51,7 @@ class MailNotifier extends WorkNotifier
         $this->userMapper = $userMapper;
 
         // set up a mailer (we forcibly exclude reply-to headers from digest emails)
-        $this->mailer = new Mailer(new TwigEmailFactory($this->conf, $this->log()), $this->log(), $userMapper, false);
+        $this->mailer = new Mailer(new EmailFactory($this->conf, \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(), $this->log()), $this->log(), $userMapper, false);
     }
 
 

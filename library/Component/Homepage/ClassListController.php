@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -212,7 +212,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 $this->setVar(
                     [
                         'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => implode(AbstractMailer::implodeGlue(), $allStudentEmails),
+                        'EMAIL_ALL_STUDENTS' => implode(Mailer::implodeGlue(), $allStudentEmails),
                     ]
                 );
 
@@ -236,7 +236,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                 if (\is_array($allParents) && \count($allParents) > 0) {
                     // Uniqueify, cleanup empty string emails and merge to string
-                    $emailAllParents = implode(AbstractMailer::implodeGlue(), $allParents);
+                    $emailAllParents = implode(Mailer::implodeGlue(), $allParents);
                 }
 
                 $this->setVar(

@@ -11,11 +11,13 @@ namespace Schoolbox\Mail;
 
 use Alaress\Html\ToText as Html2Text;
 use Alaress\Web\Controller\Base;
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Alaress\Mail\Codec;
+use Schoolbox\Admin\EmailDKIM\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 use Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -34,12 +36,16 @@ class Controller extends Base
 
     private \External_UserInterface $externalUser;
 
+    private FilesystemProxy $filesystemProxy;
+
     public function __construct(
         UserMapper $userMapper,
         \External_UserInterface $externalUser,
+        FilesystemProxy $filesystemProxy
     ) {
-        $this->userMapper   = $userMapper;
-        $this->externalUser = $externalUser;
+        $this->userMapper      = $userMapper;
+        $this->externalUser    = $externalUser;
+        $this->filesystemProxy = $filesystemProxy;
     }
 
     /**
@@ -108,28 +114,28 @@ class Controller extends Base
 
         foreach ($addressLists as $type => $request) {
             if (null !== $params->get($type)) {
-                $emailAddresses = AbstractMailer::parseAddressString($params->get($type));
+                $emailAddresses = Mailer::parseAddressString($params->get($type), $this->getDefaultHost());
 
                 /* Remember some invalid emails, if any were found
                  */
-                $invalidEmails[] = $emailAddresses[AbstractMailer::KEY_INVALID];
+                $invalidEmails[] = $emailAddresses[Mailer::KEY_INVALID];
 
                 /* Remember a list of email addresses that were in the To field
                  * There's a sequential dependency here, such that replyto must be processed
                  * before either the cc or bcc structs, as defined by $addressLists initialisation
                  */
                 if ('replyto' === $type) {
-                    $replyToEmailAddresses = array_keys($emailAddresses[AbstractMailer::KEY_VALID]);
+                    $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
                 }
 
-                if (!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
-                    foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $email => $name) {
+                if (!empty($emailAddresses[Mailer::KEY_VALID])) {
+                    foreach ($emailAddresses[Mailer::KEY_VALID] as $email => $name) {
                         /* For the CC and BCC fields, if an email address was already in To field,
                          * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
                          * by the system rather than the human
                          */
                         if ('replyto' === $type || !in_array($email, $replyToEmailAddresses, true)) {
-                            $addressLists[$type][] = AbstractMailer::buildAddress($email, $name);
+                            $addressLists[$type][] = Mailer::buildAddress($email, $name);
                         }
                     }
                 }
@@ -139,7 +145,7 @@ class Controller extends Base
                  * by the system rather than the human
                  */
                 if (!in_array($this->getUser()->getEmail(), $replyToEmailAddresses, true)) {
-                    $addressLists[$type][] = AbstractMailer::buildAddress(
+                    $addressLists[$type][] = Mailer::buildAddress(
                         $this->getUser()->getEmail(),
                         $this->getUser()->getFullName()
                     );
@@ -236,7 +242,9 @@ class Controller extends Base
             $this->sendError('No recipient provided');
         }
         $attachments = $this->request->post->get('attachment') ?? [];
-        $mail        = new SimpleEmail('', $subject, $to);
+        // TODO inject
+        $emailFactory = new EmailFactory($this->getConfigLoader(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
+        $mail = $emailFactory->buildSimpleEmail($subject, '');
 
         //get users email address to use in from field
         $fromEmail = new Email($this->getUser()->getEmail());
@@ -295,7 +303,7 @@ class Controller extends Base
         $files   = $factory->build($attachments)->getAll();
 
         foreach ($files as $storage) {
-            $mail->addFile($storage->readStream(), $storage->getMime(), $storage->getBasename(), false);
+            $mail->addFile($this->filesystemProxy->readStream($storage), $storage->getMime(), $storage->getBasename(), false);
         }
 
         try {
@@ -314,8 +322,13 @@ class Controller extends Base
      */
     private function getParsedAddresses(string $addressString): array
     {
-        $emailAddresses = AbstractMailer::parseAddressString(AbstractMailer::standardiseEmailSeparator($addressString));
-        return $emailAddresses[AbstractMailer::KEY_VALID] ?? [];
+        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($addressString), $this->getDefaultHost());
+        return $emailAddresses[Mailer::KEY_VALID] ?? [];
+    }
+
+    private function getDefaultHost(): string
+    {
+        return trim($this->getConfigLoader()->get('site_hostname')) . '.' . trim($this->getConfigLoader()->get('site_domain'));
     }
 
     /**
@@ -360,19 +373,19 @@ class Controller extends Base
 
                 $key = strtoupper($key);
                 if (is_array($var)) {
-                    $context[$key] = implode(AbstractMailer::implodeGlue(), $var);
+                    $context[$key] = implode(Mailer::implodeGlue(), $var);
                 } else {
                     $context[$key] = $var;
                 }
             }
 
-            $context['NAME'] = $name;
+            $context['NAME']            = $name;
             $context['hideUnsubscribe'] = true;
 
-            $twigEmailFactory = new \Schoolbox\Mail\TwigEmailFactory($this->getConfigLoader());
+            $twigEmailFactory = new \Schoolbox\Mail\EmailFactory($this->getConfigLoader(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
             $subject          = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
             $to               = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
-            $email            = $twigEmailFactory->build('feedback.twig', $subject, $to);
+            $email            = $twigEmailFactory->buildTwigEmail('feedback.twig', $subject, $to);
             $email->setReplyTo($_POST['email'], $name);
             $email->setContext($context);
             $email->send();

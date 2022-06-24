@@ -13,8 +13,7 @@ use Alaress\Authorizer\Rule\IsSchoolboxAdmin;
 use Alaress;
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -67,8 +66,9 @@ class Module extends Alaress\Module\Module
                 $this->getConfig(),
                 $mapperFactory->get(Reset\Mapper::class),
                 $mapperFactory->get(UserMapper::class),
-                new TwigEmailFactory(
+                new EmailFactory(
                     $this->getConfig(),
+                    \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(),
                     new NullLogger()
                 )
             )

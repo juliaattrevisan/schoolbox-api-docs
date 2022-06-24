@@ -54,7 +54,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getEmailDKIMMapper()
-
         );
     }
 

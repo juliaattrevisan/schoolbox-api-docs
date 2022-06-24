@@ -17,6 +17,7 @@ use Schoolbox\Mapper as BaseMapper;
  * @package Schoolbox\Admin\Package
  *
  * @method Model findById($identifierValue)
+ * @method Model findOneByColumn($columnName, $columnValue, $options = [])($identifierValue)
  * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper

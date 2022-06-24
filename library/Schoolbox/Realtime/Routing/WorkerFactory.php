@@ -16,7 +16,7 @@ use React\EventLoop\LoopInterface;
 use Schoolbox;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\MobileApp;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Mailer;
@@ -99,7 +99,7 @@ class WorkerFactory
         );
 
         // factory for configuring instant emails
-        $twigFactory = new TwigEmailFactory($this->conf, $this->log);
+        $twigFactory = new EmailFactory($this->conf, \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(), $this->log);
 
         // responsible for draining a list into an email and sending it (only include reply-to headers if config allows)
         $mailer = new Mailer($twigFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));

@@ -85,8 +85,8 @@ class Module extends BaseModule
                 $this->getConfig(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(UserMapper::class),
-                new Mail\TwigEmailFactory(
-                    $this->getConfig(),
+                new Mail\EmailFactory(
+                    $this->getConfig(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(),
                     new NullLogger(),
                 ),
             ),

@@ -469,6 +469,7 @@ class Kernel extends WebKernelAbstract
                 }
             ),
         );
+        // email
 
 
         return $di;

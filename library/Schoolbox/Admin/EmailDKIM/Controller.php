@@ -91,8 +91,8 @@ class Controller extends Base
     {
         $data[] = [
             'id'           => $emailDKIM->getId(),
-            'domain'       => $emailDKIM->getDomain(),
-            'publicKey'    => $emailDKIM->getPublic(),
+            'domain'       => $emailDKIM->getDKIMName(),
+            'publicKey'    => $emailDKIM->getDKIMValue(),
             'dateModified' => [
                 'timestamp' => $emailDKIM->getUpdatedAt()->getUnixTimeStamp(),
                 'formatted' => $emailDKIM->getUpdatedAt()->getShort(),
