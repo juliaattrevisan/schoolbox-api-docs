@@ -23,7 +23,7 @@ class UploadController extends AbstractController
      * The maximum number of files that can be uploaded when multi-uploads
      * are enabled.
      */
-    private const DEFAULT_MAX_FILES = 32;
+    private const DEFAULT_MAX_FILES = 256;
 
 
     /**
