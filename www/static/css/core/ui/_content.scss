@@ -566,19 +566,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
 }
 
-// Alert anchors/links
-.alert-box {
-    a {
-        &:not(.close) {
-            color: inherit;
-            text-decoration: underline;
-        }
-    }
-}
-
 // gradient 1-10
 @include rotate-color-list;
 
+//a visual display to help indicate progress, see progress bars at: https://vagrant.dev.schoolbox.cloud/pantry
 .progress {
     transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
     position: relative;
