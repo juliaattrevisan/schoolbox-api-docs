@@ -16,6 +16,7 @@ use League\Flysystem\Config;
 use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
@@ -65,21 +66,17 @@ class FilesystemFactory
                 new Local(
                     $config->get('storage_dir'),
                     // Allow group-writable public files and folders
-                    PortableVisibilityConverter::fromArray([
-                        'file' => [
-                            'public'  => 0664,
-                            'private' => 0600,
+                    PortableVisibilityConverter::fromArray(
+                        [
+                            'file' => [Visibility::PUBLIC => 0664,],
+                            'dir'  => [Visibility::PUBLIC => 0775,],
                         ],
-                        'dir' => [
-                            'public'  => 0775,
-                            'private' => 0700,
-                        ],
-                    ]),
+                        Visibility::PUBLIC,
+                    ),
                 ),
-                // Default to public file availability
                 [
-                    Config::OPTION_VISIBILITY           => 'public',
-                    Config::OPTION_DIRECTORY_VISIBILITY => 'public',
+                    Config::OPTION_VISIBILITY           => Visibility::PUBLIC,
+                    Config::OPTION_DIRECTORY_VISIBILITY => Visibility::PUBLIC,
                 ],
             ),
             self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE),
