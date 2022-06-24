@@ -19,7 +19,6 @@ use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
-use League\Flysystem\Visibility;
 use Schoolbox\Resource\FilesystemFactory;
 
 /**
@@ -49,14 +48,18 @@ class FilesystemProxy
     /**
      * Constructor
      *
-     * @param Filesystem    $filesystem     Base filesystem this class proxies.
-     * @param HashGenerator $hashGenerator  Method for generating hashes for storage files.
-     * @param bool          $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
+     * @param Filesystem    $filesystem        Base filesystem this class proxies.
+     * @param HashGenerator $hashGenerator     Method for generating hashes for storage files.
+     * @param bool          $verifyPrevious    Should files uploaded via `accept` or `acceptStream` be verified?
+     * @param string        $defaultVisibility Default visibility for newly uploaded files; should be:
+     *                                         * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
+     *                                         * `\League\Flysystem\Visibility::PRIVATE` for S3
      */
     public function __construct(
         private Filesystem $filesystem,
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
+        private string $defaultVisibility,
     ) {
     }
 
@@ -127,18 +130,18 @@ class FilesystemProxy
 
         $hash = $this->hashGenerator->generateHash($resource);
         $path = self::getPathFromHash($hash);
-        // The file may already exist in the storage backend.
-        // This is fine, because the storage file's contents determine the
-        // file path: we can assume it's the same file.
-        if (!$this->filesystem->fileExists($path)) {
-            $this->filesystem->writeStream($path, $resource, $config);
-        }
 
         // umask setting may prevent group/other-writable files:
         // storage files are supposed to be group-writable though, so switch off
         // the umask and restore it once done.
         $oldUmask = umask(0);
         try {
+            // The file may already exist in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+            if (!$this->filesystem->fileExists($path)) {
+                $this->filesystem->writeStream($path, $resource, $config);
+            }
             $this->updateStorage($storage, $hash, $path);
         } finally {
             umask($oldUmask);
@@ -211,7 +214,7 @@ class FilesystemProxy
             // file's visibility.
             // Need to set the file's permissions to the filesystem's default
             // visibility (public for local, private for s3)
-            $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
+            $this->filesystem->setVisibility($storagePath, $this->defaultVisibility);
 
             // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the

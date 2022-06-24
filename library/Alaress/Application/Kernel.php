@@ -1836,6 +1836,7 @@ abstract class Kernel
                         $storage,
                         new HashGenerator(),
                         $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
+                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
                     );
                 }
             )
