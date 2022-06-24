@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
-use League\Flysystem\Config;
 use League\Flysystem\DirectoryListing;
 use League\Flysystem\FilesystemException;
-//use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\UnableToCheckDirectoryExistence;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
@@ -23,7 +21,6 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use League\Flysystem\Visibility;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
  * A proxy class for providing a `Filesystem`-like facade when dealing
@@ -200,6 +197,9 @@ class FilesystemProxy
             // (public for local, private for s3)
             $this->filesystem->createDirectory(dirname($storagePath));
 
+            // Touch file, let filesystem apply its default visibility
+            $this->filesystem->write($storagePath, '');
+
             // Copy the new file into storage
             $mountManager = new MountManager([
                 FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
@@ -209,12 +209,6 @@ class FilesystemProxy
                 FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
                 FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
             );
-
-            // Moving a file using the mount manager doesn't appropriately set
-            // its visibility permissions.
-            // Need to set the file's permissions to the filesystem's default
-            // visibility (public for local, private for s3)
-            $this->filesystem->setVisibility($storagePath, Visibility::PUBLIC);
 
             // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the
