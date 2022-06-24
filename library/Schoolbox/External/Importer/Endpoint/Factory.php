@@ -210,14 +210,15 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
+                    StorageMapper::getInstance(),
                     /* Timetable pieces
                      */
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
                     ClassPeriodMapper::getInstance(),
-                    StorageMapper::getInstance()
+                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             case self::COMPASS:
