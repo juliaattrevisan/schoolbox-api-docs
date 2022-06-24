@@ -22,7 +22,6 @@ use Schoolbox\Resource\Storage\Mapper;
  */
 class MigrateToStorage
 {
-
     /**
      * @var IDatabase
      */
