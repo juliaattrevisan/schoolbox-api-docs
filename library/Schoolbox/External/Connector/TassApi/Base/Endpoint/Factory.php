@@ -310,20 +310,13 @@ class Factory
             $api[$module] = new Api($this->host, $this->key, $module);
         }
 
-//        /* Timetable Registry
-//         *
-//         * This registry contains all the timetables we iteratively shanked from an endpoint
-//         * so we can trade space for time
-//         */
-//        $timetableRegistry = new TimetableRegistry();
-//
-//        /* Cycle Registry
-//         *
-//         * This registry contains all the cycles we mined from the Timetables we iteratively
-//         * shanked from an endpoint so we can trade space for time
-//         */
-//        $cycleRegistry = new TimetableRegistry();
-//
+        /* Timetable Registry
+         *
+         * This registry contains all the timetables we iteratively shanked from an endpoint
+         * so we can trade space for time
+         */
+        $timetableRegistry = new TimetableRegistry();
+
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
@@ -368,44 +361,30 @@ class Factory
 //                $this->staffProfileMapper,
 //                $this->relationshipMapper
 //            ))
-            ->add(new TimetableCalendar\Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper,
-            ))
-//            ->add(new Timetable\Definition(
+//            ->add(new TimetableCalendar\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->eventMapper,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper,
+//                $this->periodMapper,
+//                $this->overridesMapper,
+//            ))
+//            ->add(new TimetableCalendar\AdditionalSubjects(
 //                $this->log,
 //                $this->perform,
 //                $api,
-//                $this->dateLocalFormat,
 //                $lookup,
-//                $timetableRegistry,
-//                $cycleRegistry,
-//                $this->timetableCycleMapper,
-//                $this->timetablePeriodMapper
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper
 //            ))
-            ->add(new TimetableCalendar\AdditionalSubjects(
+            ->add(new TimetableCalendar\Classes(
                 $this->log,
                 $this->perform,
                 $api,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper
+                $lookup
             ))
-//            ->add(new Timetable\Classes(
-//                $this->log,
-//                $this->perform,
-//                $lookup,
-//                $timetableRegistry,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
