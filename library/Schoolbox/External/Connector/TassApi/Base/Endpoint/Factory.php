@@ -361,24 +361,24 @@ class Factory
 //                $this->staffProfileMapper,
 //                $this->relationshipMapper
 //            ))
-//            ->add(new TimetableCalendar\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->eventMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper,
-//                $this->periodMapper,
-//                $this->overridesMapper,
-//            ))
-//            ->add(new TimetableCalendar\AdditionalSubjects(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper
-//            ))
+            ->add(new TimetableCalendar\Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper,
+            ))
+            ->add(new TimetableCalendar\AdditionalSubjects(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
             ->add(new TimetableCalendar\Classes(
                 $this->log,
                 $this->perform,

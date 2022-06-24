@@ -23,6 +23,27 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Classes implements IStrategy
 {
     /**
+     * Number of days into the future whose timetable subject we import,
+     * used to prevent importing billions of events from a distant future
+     * that might not really have much relevance to today
+     *
+     * Defaults to 6 months but we can tune that later.
+     */
+    private const FUTURE_THRESHOLD = 30 * 12;
+
+
+    /**
+     * Number of days into the past whose timetable subject we import.
+     * This is used to import past events so you can see what you did last week.
+     *
+     * Otherwise at the end of the current day you wouldn't be able to see the
+     * events of that day if UPS ran and deleted those events because they were
+     * just "in the past"
+     */
+    private const PAST_THRESHOLD = 7;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -124,6 +145,9 @@ class Classes implements IStrategy
      * Import all timetables for everyone
      *
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
@@ -135,6 +159,9 @@ class Classes implements IStrategy
      * Import all student timetables.
      *
      * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function importStudentTimetables(): void
     {
@@ -268,6 +295,8 @@ class Classes implements IStrategy
      */
     private function process(array $person, array $timetable): void
     {
+        $now = \Alaress_Date_Format::now();
+
         /* Timetable Calendar gives us a list of Days and Dates
          * Each entry in there represents a day in the timetable,
          * which contains multiple periods
@@ -320,6 +349,30 @@ class Classes implements IStrategy
                     $period = trim((string)$periodData['PRD_CODE']);
                     $type = '';
                     $guid = '';
+
+                    /* Fetch PAST_THRESHOLD days into the past, so people can see where they've been
+                     */
+                    if ($startAt->isPast() && $startAt->diffInDays($now) > self::PAST_THRESHOLD) {
+                        $this->log->debug(sprintf(
+                            '%s on %s is too far in the past; skipping',
+                            $title,
+                            $startAt->getDatabaseDate()
+                        ));
+
+                        continue;
+                    }
+
+                    /* Don't fetch too many from the future
+                     */
+                    if ($startAt->isFuture() && $startAt->diffInDays($now) > self::FUTURE_THRESHOLD) {
+                        $this->log->debug(sprintf(
+                            '%s on %s is too far into the future; skipping',
+                            $title,
+                            $startAt->getDatabaseDate()
+                        ));
+
+                        continue;
+                    }
 
                     /* Cram in everything else
                      */
