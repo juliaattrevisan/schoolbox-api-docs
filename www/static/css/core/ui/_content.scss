@@ -311,25 +311,22 @@ nav {
  * Uses .expander, .selector or .grip
  * Use %placeholders to prevent the same CSS getting spat out over and over again.
  */
-$selector-width: 2.25rem;
-
 %interaction-li {
     display: flex;
     align-items: center;
 }
 %interaction-selector {
     padding: 0 0.75rem;
-    flex: 1 $selector-width;
+    flex: 1 2.25rem;
     &:before {
         padding: 0;
     }
 }
-@mixin list-interaction($selector, $cursor, $icon: "", $color: $content-ui-foreground) {
+@mixin list-interaction ($selector, $cursor, $icon: "", $color: $content-ui-foreground) {
     > li {
         > div:first-of-type {
             @extend %interaction-li;
         }
-
         ul.information-list {
             flex: 1 100%;
         }
@@ -353,6 +350,7 @@ $selector-width: 2.25rem;
     padding: 0;
     clear: both;
 }
+
 %information-li {
     @include grid-row(
         $behavior: nest
@@ -364,15 +362,18 @@ $selector-width: 2.25rem;
     list-style: none;
     transition: background-color 0.3s ease-in;
 }
+
 %card-article {
     padding: 1rem;
     clear: both;
     word-wrap: break-word;
 }
+
 %ui-sortable-helper {
     border-bottom: none;
     background-color: $row-action-hover-background;
 }
+
 @mixin information-list() {
     @extend %information-list;
     &.expandable,
@@ -590,37 +591,6 @@ $selector-width: 2.25rem;
         background-color: $content-ui-submit-background;
         a {
             color: $content-ui-submit-foreground;
-        }
-    }
-}
-
-@mixin hide-n ($size, $media-down, $media-up, $count: $total-columns) {
-    @for $i from 1 through $count {
-        &.#{$size}-#{$i} {
-            > li {
-                @media #{$media-down} {
-                    // Any button after $i not an overflow gets hidden
-                    // Say i=4: any button in position 5+ gets hidden
-                    &:nth-child(n + #{$i + 1}):not(.overflow) {
-                        @content;
-                    }
-                    // Any overflow after $i gets hidden
-                    // Say i=4: any overflow in position 5- gets hidden
-                    &:nth-child(-n + #{$i + 1}).overflow {
-                        @content;
-                    }
-                }
-
-                @media #{$media-up} {
-                    // In the overflow: any button before $i gets hidden
-                    // Say i=4: any button in position 4- gets hidden
-                    &.overflow > ul.f-dropdown {
-                        li:nth-child(-n + #{$i}) {
-                            @content;
-                        }
-                    }
-                }
-            }
         }
     }
 }
@@ -1166,13 +1136,13 @@ dl {
     }
 }
 
+//To show visual progress through multi-step forms: https://vagrant.dev.schoolbox.cloud/pantry/form-progressive
 $train-line-segment-maxlength: 15rem;
 $train-line-stop-size: 2rem;
 $train-line-segment-width: 0.25rem;
 $train-line-visited-color: $content-ui-foreground;
 $train-line-visited-glow-blur: 0.5rem;
 $train-line-unvisited-color: $content-ui-background;
-
 .train-line {
     display: flex;
     justify-content: center;
