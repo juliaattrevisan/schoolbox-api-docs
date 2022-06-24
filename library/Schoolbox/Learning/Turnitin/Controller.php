@@ -258,11 +258,13 @@ class Controller extends Base
             $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
         } catch (\Schoolbox\Mapper\Exception\Deleted $deleted) {
             $model = $deleted->getDeletedObject();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new Turnitin\Exception\Exception(sprintf(
+        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+            $e->setMessage(sprintf(
                 'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
                 $turnitinSubmissionId
             ));
+
+            throw $e;
         }
 
         return [
