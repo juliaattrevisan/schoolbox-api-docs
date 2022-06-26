@@ -160,10 +160,7 @@ class DisasterRecovery extends CliTool\App
         /** @var SplFileInfo $fileInfo */
         foreach ($itr as $fileInfo) {
             $localPath = $fileInfo->getPathname();
-
-            $s3Path = str_replace($backupDirLocal, $dailyBackupDir, $localPath);
-
-            // TODO rewrite to not use v1 API
+            $s3Path    = str_replace($backupDirLocal, $dailyBackupDir, $localPath);
             if ($fileSystemAwsS3Backups->fileExists($s3Path)) {
                 if ($fileSystemAwsS3Backups->fileSize($s3Path) === filesize($localPath)) {
                     $this->getLogger()->info("File already in S3 and size matches: '$s3Path'");
@@ -234,13 +231,9 @@ class DisasterRecovery extends CliTool\App
      */
     private function getBackupsInS3(Filesystem $fileSystemAwsS3Backups): array
     {
-        $backups = [];
-        foreach ($fileSystemAwsS3Backups->listContents('/') as $content) {
-            if ($content['type'] === 'dir') {
-                $backups[] = $content['basename'];
-            }
-        }
-
-        return $backups;
+        return $fileSystemAwsS3Backups->listContents('/')
+            ->filter(fn (Flysystem\StorageAttributes $attributes) => $attributes->isDir())
+            ->map(fn (Flysystem\StorageAttributes $attributes) => $attributes->path())
+            ->toArray();
     }
 }
