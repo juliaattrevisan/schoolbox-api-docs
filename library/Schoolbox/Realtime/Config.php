@@ -191,7 +191,7 @@ class Config
 
         // TODO move this to a mapper
         $stmt = \Database::getInstance()->query("
-            SELECT n.id namespace_id, s.id source_id, s.description source_description,
+            SELECT n.id namespace_id, s.id source_id, s.key source_key, s.description source_description,
               r.id role_id, COALESCE(rp.mask, 'MU') mask, COALESCE(rp.role_default, 'MU') def
             FROM msg_namespace n
             LEFT JOIN msg_source s ON n.id = s.namespace
@@ -207,15 +207,16 @@ class Config
         $config = [];
 
         while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
-            list($namespaceId, $sourceId, $sDescription, $roleId, $mask, $default) = $r;
+            [$namespaceId, $sourceId, $sourceKey, $sDescription, $roleId, $mask, $default] = $r;
 
             $config[$namespaceId]['id']                           = $namespaceId;
             $config[$namespaceId]['sources'][$sDescription]['id'] = $sourceId;
 
             $config[$namespaceId]['sources'][$sDescription]['roles'][$roleId] = [
-                'id'      => $roleId,
-                'mask'    => explode(',', $mask),
-                'default' => explode(',', $default)
+                'id'        => $roleId,
+                'mask'      => explode(',', $mask),
+                'default'   => explode(',', $default),
+                'sourceKey' => $sourceKey,
             ];
         }
 

@@ -161,11 +161,9 @@
 
             $.each(sources, function (source, roles) {
 
-                var $src = $ns.find('[data-source=' + source + ']');
-
                 $.each(roles, function (role, config) {
 
-                    var $role = $src.find('[data-role=' + role + ']'),
+                    var $role = $ns.find('[data-role=' + role + '][data-source=' + source + ']'),
                         options,
                         inDefault = function () {
                             var p = $(this).data('perm');
