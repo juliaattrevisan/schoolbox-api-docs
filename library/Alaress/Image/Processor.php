@@ -137,7 +137,7 @@ class Processor
                 return new StreamableFile(
                     true,
                     $mimetype,
-                    $transformModel->getSize(),
+                    $this->pathFilesystem->fileSize($transformPath),
                     $this->pathFilesystem->readStream($transformPath),
                 );
             } catch (Flysystem\FilesystemException $e) {
@@ -233,7 +233,7 @@ class Processor
         return new StreamableFile(
             false,
             $mimetype,
-            $transformModel->getSize(),
+            $transformSize,
             $this->pathFilesystem->readStream($transformPath),
         );
     }
