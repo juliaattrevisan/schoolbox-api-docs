@@ -1,37 +1,36 @@
 <table data-tablesorter class="stack-for-small-down">
     <thead>
     <tr>
-        {% for th, td in logs|first %}
-            <th>{{ th }}</th>
-        {% endfor %}
+        <th>Timestamp</th>
+        <th>Role Type</th>
+        <th>Dry Run</th>
+        <th>Created</th>
+        <th>Updated</th>
+        <th>Skipped</th>
     </tr>
     </thead>
     <tbody>
     {% for id, log in logs %}
+        {% set route = routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) %}
         <tr>
-            {% for th, td in log %}
-                <td title="{{ th }}">
-                    {% if td is iterable %}
-                        <ul>
-                            {% for li in td %}
-                                <li>{{ li }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% elseif td is same as(false) %}
-                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
-                       target="_blank"
-                       title="View log">No</a>
-                    {% elseif td is same as(true) %}
-                        <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
-                           target="_blank"
-                           title="View log">Yes</a>
-                    {% else %}
-                    <a href="{{ routeLookup('upsRuleset.logFormat', { logId: id, format: 'html' }) }}"
-                       target="_blank"
-                       title="View log">{{ td }}</a>
-                    {% endif %}
-                </td>
-            {% endfor %}
+            <td data-order="{{ log['Timestamp'].unixTimestamp }}">
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Timestamp'].short }} </a>
+            </td>
+            <td>
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Role Type'] }}</a>
+            </td>
+            <td>
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Dry Run'] ? 'Yes': 'No' }}</a>
+            </td>
+            <td>
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Created'] }}</a>
+            </td>
+            <td>
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Updated'] }}</a>
+            </td>
+            <td>
+                <a href="{{ route }}" target="_blank" title="View log">{{ log['Skipped'] }}</a>
+            </td>
         </tr>
     {% endfor %}
     </tbody>

@@ -164,7 +164,7 @@ class Controller extends Base
 
         foreach ($logs as $log) {
             $logdata[$log->getId()] = [
-                'Timestamp' => $log->getStorage()->getCreatedAt()->getShort(),
+                'Timestamp' => $log->getStorage()->getCreatedAt(),
                 'Role Type' => ucfirst($log->getRoleType()),
                 'Dry Run'   => $log->isDry(),
                 'Created'   => $log->getUsersCreated(),
