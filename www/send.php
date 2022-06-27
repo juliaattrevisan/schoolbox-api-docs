@@ -108,7 +108,7 @@ if (is_numeric($_GET['id'])) {
     header("Cache-control: private");
     header("Content-Ranges: none");
     header("Content-Disposition: $disposition; filename=\"$basename\"");
-    header("Content-Length: {$file->getSize()}");
+    header("Content-Length: {$filesystemProxy->fileSize($file)}");
     fpassthru($filesystemProxy->readStream($file));
     exit;
 }

@@ -79,7 +79,7 @@ try {
         header("Cache-control: private");
         header("Content-Ranges: none");
         header("Content-Disposition: $disposition; filename=\"$basename\"");
-        header("Content-Length: " . $resource->getSize());
+        header("Content-Length: " . $filesystemProxy->fileSize($resource));
         fpassthru($filesystemProxy->readStream($resource));
         exit;
     }

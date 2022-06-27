@@ -1361,7 +1361,7 @@ class Controller extends Base
         header("Cache-control: private");
         header("Content-Ranges: none");
         header("Content-Disposition: $attach filename=\"$basename\"");
-        header("Content-Length: " . $attachment->getStorage()->getSize());
+        header("Content-Length: " . $this->filesystemProxy->fileSize($attachment->getStorage()));
         fpassthru($this->filesystemProxy->readStream($attachment->getStorage()));
 
         exit;
