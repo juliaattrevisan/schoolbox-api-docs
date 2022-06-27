@@ -70,6 +70,15 @@ class Classes implements IStrategy
 
 
     /**
+     * This is the config setting for date_local
+     * It's used by the Nat Picker in the optional TASS Academic Periods area
+     *
+     * @var string
+     */
+    private string $dateLocalFormat;
+
+
+    /**
      * @var \Schoolbox\External\Event\Mapper
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
@@ -128,6 +137,7 @@ class Classes implements IStrategy
      * @param bool                             $perform
      * @param array                            $api
      * @param Lookup                           $lookup
+     * @param string                           $dateLocalFormat
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper                 $classEntryMapper
      * @param ClassInvolvementMapper           $classInvolvementMapper
@@ -137,6 +147,7 @@ class Classes implements IStrategy
         bool $perform,
         array $api,
         Lookup $lookup,
+        string $dateLocalFormat,
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper
@@ -145,6 +156,7 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->lookup = $lookup;
+        $this->dateLocalFormat = $dateLocalFormat;
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -161,7 +173,8 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentTimetables();
+//        $this->importStudentTimetables();
+        $this->importStaffTimetables();
     }
 
 
@@ -180,11 +193,6 @@ class Classes implements IStrategy
          */
         $students = $this->lookup->getStudents();
 
-        /* Inspect every student's timetable to find the largest quantity of Periods per Day
-         * This will inform schoolbox's classic idea of a Timetable Definition which must be
-         * rectangular; every day will have the maximum number of periods in it, even if the
-         * student's timetable doesn't use it
-         */
         foreach ($students as $externalId => $person) {
             /* Hit That Api to find every student's timetable and cache it somewhere
              * We'll need to operate on it all again later anyway
@@ -291,6 +299,132 @@ class Classes implements IStrategy
 
 
     /**
+     * Import all student timetables.
+     *
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importStaffTimetables(): void
+    {
+        /* Staff
+         * Find all the external ids
+         */
+        $staff = $this->lookup->getStaff();
+
+        /* Make a naive guess as to what year and semester we are in
+         * The getTeacherTimetable endpoint is different to students' version
+         * because reasons - why the students endpoint doesn't need this is beyond me
+         */
+        $year = date('Y');
+
+        $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
+
+        foreach ($staff as $externalId => $person) {
+            /* Hit That Api to find every student's timetable and cache it somewhere
+             * We'll need to operate on it all again later anyway
+             */
+            $data = $this->api[DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
+                'teacher_code' => $externalId,
+                'year_num' => $year,
+                'semester' => $semester
+            ]);
+
+            /* Check that the given $externalId had any timetable data at all
+             */
+            if (!(isset($data['teacher_timetable']) && \count($data['teacher_timetable']))) {
+                $this->log->warning(sprintf(
+                    'Timetable not found for %s (%s).',
+                    trim("{$person['firstname']} {$person['lastname']}"),
+                    $externalId
+                ));
+
+                continue;
+            }
+
+            /* Otherwise, continue on with the first timetable element
+             * (Not sure how many they can actually have in production)
+             */
+            $timetable = $data['teacher_timetable'][0];
+
+            /* Example timetable extract
+
+                Array
+                (
+                    [DESC_TEXT] => Primary School Timetable 2022/1
+                    [DAYS] => Array
+                        (
+                            [1] => Array
+                                (
+                                    [PERIODS] => Array
+                                        (
+                                            [1] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 5130
+                                                                    [SUB_SHORT] => Y1Roll
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => GBH
+                                                                    [TCH_CODE] => ABR
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 1
+                                                                    [CLASS] => A
+                                                                    [YEAR_GRP] =>
+                                                                    [SUB_DESC] => Primary Y1 Rollcall
+                                                                    [SUB_ABREV] =>
+                                                                    [LINE_CODE] =>
+                                                                    [SUBTAB_YEAR_GRP] => 1
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 08:49:00.0
+                                                    [PRD_CODE] => 1
+                                                    [PRD_START] => 1900-01-01 08:00:00.0
+                                                    [PRD_DESC] => Rollcall
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 5130
+                                                                    [SUB_SHORT] => Y1Roll
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => GBH
+                                                                    [TCH_CODE] => ABR
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 1
+                                                                    [CLASS] => A
+                                                                    [YEAR_GRP] =>
+                                                                    [SUB_DESC] => Primary Y1 Rollcall
+                                                                    [SUB_ABREV] =>
+                                                                    [LINE_CODE] =>
+                                                                    [SUBTAB_YEAR_GRP] => 1
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 13:44:00.0
+                                                    [PRD_CODE] => 9
+                                                    [PRD_START] => 1900-01-01 13:17:00.0
+                                                    [PRD_DESC] => Lunch Play
+                                                )
+
+                                        )
+
+                                )
+            */
+            $this->process($person, $timetable);
+        }
+    }
+
+
+    /**
      * Create individual SUDS Timetable events out of each element
      * inside this person's $timetable
      *
@@ -357,6 +491,12 @@ class Classes implements IStrategy
                     $dateCheck->getDatabaseDate()
                 ));
 
+                continue;
+            }
+
+            /* This timetable didn't have any classes on a particular day
+             */
+            if (!isset($timetable['DAYS'][$dayNumber])) {
                 continue;
             }
 

@@ -89,12 +89,7 @@ class Preloader
             $this->preloadTimetable((string)$externalId, $person, $data, 'student_timetable');
         }
 
-        /* Make a naive guess as to what year and semester we are in
-         * The getTeacherTimetable endpoint is different to students' version
-         */
-        $year = date('Y');
 
-        $semester = $this->detectSemester($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
         /* Inspect every staff's timetable
          */

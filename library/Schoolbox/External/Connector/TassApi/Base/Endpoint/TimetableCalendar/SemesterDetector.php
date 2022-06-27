@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\TimetableCalendar;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 
@@ -56,7 +56,7 @@ class SemesterDetector
      * @param LoggerInterface $log
      * @param string          $dateLocalFormat
      */
-    public function __construct(LoggerInterface $log, string $dateLocalFormat,)
+    public function __construct(LoggerInterface $log, string $dateLocalFormat)
     {
         $this->log = $log;
         $this->dateLocalFormat = $dateLocalFormat;
