@@ -32,12 +32,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('sis_event_user_overrides');
         $this->hasModel(Model::class);
         $this->uses('event_id', self::TYPE_INTEGER);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('action', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-
-        $this->joins('external_id', \Schoolbox\UserMapper::class, 'synergy_id', null, null, 'user', 'externalId');
     }
 
 
@@ -52,14 +51,17 @@ class Mapper extends \Schoolbox\Mapper
         $staff = \Schoolbox\Role::STAFF;
         $student = \Schoolbox\Role::STUDENT;
 
+        $uColumnString = \Schoolbox\UserMapper::getInstance()->getColumnString('u');
+        $rColumnString = \Schoolbox\RoleMapper::getInstance()->getColumnString('r');
+
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('externalId', 'u')},
-                {$this->getJoinColumnString('externalId.role', 'r')}
+                {$uColumnString},
+                {$rColumnString}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('externalId', '', 'u')}
-            LEFT JOIN {$this->getJoinSql('externalId.role', 'u', 'r')} 
+            LEFT JOIN `user` u ON external_id = u.synergy_id
+            LEFT JOIN `groups` r ON u.group_id = r.id 
                 AND r.group_type IN ('{$staff}', '{$student}')
         ";
     }
@@ -76,6 +78,8 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $stack = $this->createCollection();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $roleMapper = \Schoolbox\RoleMapper::getInstance();
 
         foreach ($statement as $row) {
             $override = $this->hydrate($row);
@@ -97,10 +101,10 @@ class Mapper extends \Schoolbox\Mapper
              */
             if ($row['r.id']) {
                 /** @var \Schoolbox\User|null $user */
-                $user = $this->hydrateJoin($row, 'externalId', 'u');
+                $user = $userMapper->hydrate($row, 'u');
 
                 /** @var \Schoolbox\Role|null $role */
-                $role = $this->hydrateJoin($row, 'externalId.role', 'r');
+                $role = $roleMapper->hydrate($row, 'r');
 
                 if ($user && $role) {
                     $user->setRole($role);

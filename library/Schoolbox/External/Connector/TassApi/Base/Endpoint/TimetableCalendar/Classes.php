@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Event\Overrides\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
@@ -46,7 +47,7 @@ class Classes implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = ['CAU', 'BRO'];
+    private const WATCHLIST = null;
 
 
     /**
@@ -103,6 +104,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * A list of timetable calendar entries, which is a list of days
      *
      * @var array
@@ -136,18 +143,28 @@ class Classes implements IStrategy
     private array $eventEntries = [];
 
 
+    /**
+     * A caching mechanism to prevent dupe CLEAR overrides actions
+     *
+     * $eventEntries[$classCode][$startDate][$finishDate] = true
+     *
+     * @var array
+     */
+    private array $overridesEntries = [];
+
 
     /**
      * Constructor
      *
-     * @param LoggerInterface                  $log
-     * @param bool                             $perform
-     * @param array                            $api
-     * @param Lookup                           $lookup
-     * @param string                           $dateLocalFormat
-     * @param \Schoolbox\External\Event\Mapper $eventMapper
-     * @param ClassEntryMapper                 $classEntryMapper
-     * @param ClassInvolvementMapper           $classInvolvementMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param array                                      $api
+     * @param Lookup                                     $lookup
+     * @param string                                     $dateLocalFormat
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -157,7 +174,8 @@ class Classes implements IStrategy
         string $dateLocalFormat,
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        ClassInvolvementMapper $classInvolvementMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -167,6 +185,7 @@ class Classes implements IStrategy
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -181,7 +200,7 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-//        $this->importStudentTimetables(self::WATCHLIST);
+        $this->importStudentTimetables(self::WATCHLIST);
         $this->importStaffTimetables(self::WATCHLIST);
     }
 
@@ -394,11 +413,11 @@ class Classes implements IStrategy
              * (Not sure how many they can actually have in production)
              */
             foreach ($data['teacher_timetable'] as $timetable) {
-                /* Only import data for externalIds in $watchlist, if provided
-                 */
-                if ($this->isOnWatchlist($externalId, $watchlist)) {
-                    print_r($timetable);
-                }
+//                /* Only import data for externalIds in $watchlist, if provided
+//                 */
+//                if ($this->isOnWatchlist($externalId, $watchlist)) {
+//                    print_r($timetable);
+//                }
 
                 $this->process($person, $timetable);
             }
@@ -659,6 +678,21 @@ class Classes implements IStrategy
                         }
                     }
 
+                    /* FIXME SPECULATIVE PROGRAMMING
+                     *
+                     * If this event is a Duty (identified by room code DUT)
+                     * and we haven't set up Overrides yet,
+                     *     - add a CLEAR override action
+                     *     - add an ADD override action for this (eventId, externalId) combo
+                     *     - remember that we did this
+                     *
+                     * if we have already set up a CLEAR override action,
+                     *     - create a new ADD override and put $externalId in
+                     */
+                    if ($this->isDuty($event)) {
+                        $this->deconflictDuties($person, $event);
+                    }
+
                     /* Save sis_class record
                      */
                     $classEntry = $this->createClassEntry($event);
@@ -669,6 +703,84 @@ class Classes implements IStrategy
                     $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
                 }
             }
+        }
+    }
+
+
+    /**
+     * FIXME SPECULATIVE PROGRAMMING
+     *
+     * Decide if $event is one of those communal Duty events
+     * Clear everyone's involvement then add specific people for a given date
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @return bool
+     */
+    private function isDuty(\Schoolbox\External\Event\Model $event): bool
+    {
+        /* If the location is DUT, it's a duty
+         */
+        return 'DUT' === $event->getLocation();
+    }
+
+
+    /**
+     * FIXME SPECULATIVE PROGRAMMING
+     *
+     * For each duty, clear everyone's calculated involvement
+     * and only add the guys specific to this $event
+     *
+     * @param array                           $person
+     * @param \Schoolbox\External\Event\Model $event
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function deconflictDuties(array $person, \Schoolbox\External\Event\Model $event): void
+    {
+        $classCode = $event->getCode();
+        $startAt = $event->getStartAt()->getDatabase();
+        $finishAt = $event->getFinishAt()->getDatabase();
+
+        $this->log->debug(sprintf(
+            'Establishing overrides for %s in %s',
+            $person['external_id'],
+            $event->getTitle()
+        ));
+
+        /* Set up a CLEAR action, with a hardcoded sequence 1
+         * This must always happen first
+         */
+        if (!isset($this->overridesEntries[$classCode][$startAt][$finishAt])) {
+            $this->log->debug('Setting up CLEAR override');
+
+            $overrideClear = $this->overridesMapper->createModel()
+                ->setEventId($event->getId())
+                ->setExternalId($person['external_id'])
+                ->setAction(Model::CLEAR)
+                ->setSequence(1);
+
+            if ($this->perform) {
+                $this->overridesMapper->save($overrideClear);
+            }
+
+            /* Remember we did this
+             */
+            $this->overridesEntries[$classCode][$startAt][$finishAt] = true;
+        }
+
+        /* Add a guy (doesn't matter what ordering these happen;
+         * just hardcode it to 2 for now)
+         */
+        $overrideAdd = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($person['external_id'])
+            ->setAction(Model::ADD)
+            ->setSequence(2);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($overrideAdd);
         }
     }
 
