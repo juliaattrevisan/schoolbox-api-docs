@@ -5,7 +5,7 @@
     more relevant sass file
 */
 
-// Empty States
+// usually used for when a component has been added to a home page and nothing has been added to it yet
 .empty-state {
     background-color: $gainsboro;
     color: $aluminum;
@@ -40,7 +40,7 @@
     }
 }
 
-// A general error display
+// a general error display notifying something couldn't be processed
 .error-state section {
     background-color: transparent;
     color: $jet;
@@ -66,7 +66,7 @@
     }
 }
 
-//an error stack trace
+// an error stack trace to help identify where an error occurred
 .error-stack-trace {
     pre {
         display: inline;
@@ -82,20 +82,6 @@
 .component-container .empty-state,
 .information-list .empty-state {
     margin-bottom: 0;
-}
-
-// Deleting Components
-.delete-it {
-    background-color: tint($warning-color, 74%);
-    padding: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-    &.show {
-        max-height: 700px;
-        padding: rem-calc(($base-font-size - 2));
-        transition: max-height 0.3s ease-in;
-    }
 }
 
 // Make a list vertically scrollable if too much content
@@ -142,13 +128,12 @@ $container-bg: white;
             padding: 0.25rem 0;
         }
     }
-
     label.error {
         margin-bottom: 1rem;
     }
 }
 
-// Labels, see Labels at: https://vagrant.dev.schoolbox.cloud/pantry
+// see Labels at: https://vagrant.dev.schoolbox.cloud/pantry
 .label {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -200,7 +185,7 @@ $container-bg: white;
     }
 }
 
-//For individual student learning plan notes
+// For individual student learning plan notes
 .individualisation {
     background-color: #9a9a9a;
     display: inline-block;
@@ -259,7 +244,7 @@ $container-bg: white;
     }
 }
 
-// Collapsible content
+// Collapsible content using jquery.collapsable, see: https://vagrant.dev.schoolbox.cloud/pantry/form
 .collapsible {
     overflow: auto;
     .information-list {
@@ -328,7 +313,6 @@ nav {
     .txt {
         flex: 0 auto;
         padding: 0 1rem;
-
         p {
             margin-bottom: 0;
         }
