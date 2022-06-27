@@ -200,7 +200,7 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentTimetables(self::WATCHLIST);
+//        $this->importStudentTimetables(self::WATCHLIST);
         $this->importStaffTimetables(self::WATCHLIST);
     }
 
@@ -280,7 +280,7 @@ class Classes implements IStrategy
 //                    print_r($timetable);
 //                }
 
-                $this->process($person, $timetable);
+                $this->process($person, $timetable, false);
             }
 
             /* Example $timetable extract
@@ -425,7 +425,7 @@ class Classes implements IStrategy
 //                    print_r($timetable);
 //                }
 
-                $this->process($person, $timetable);
+                $this->process($person, $timetable, true);
             }
 
             /* Example $timetable extract
@@ -507,15 +507,20 @@ class Classes implements IStrategy
      * Create individual SUDS Timetable events out of each element
      * inside this person's $timetable
      *
+     * $deconflictAll treats every class in this timetable as one that needs
+     * a specific set of participating people - yard duties, shared classes,
+     * etc. all need deconflicting
+     *
      * @param array $person
      * @param array $timetable
+     * @param bool  $deconflictAll
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function process(array $person, array $timetable): void
+    private function process(array $person, array $timetable, bool $deconflictAll): void
     {
         $now = \Alaress_Date_Format::now();
 
@@ -684,29 +689,31 @@ class Classes implements IStrategy
                         }
                     }
 
-                    /* FIXME SPECULATIVE PROGRAMMING
-                     *
-                     * If this event is a Duty (identified by room code DUT)
-                     * and we haven't set up Overrides yet,
-                     *     - add a CLEAR override action
-                     *     - add an ADD override action for this (eventId, externalId) combo
-                     *     - remember that we did this
-                     *
-                     * if we have already set up a CLEAR override action,
-                     *     - create a new ADD override and put $externalId in
-                     */
-                    if ($this->isDuty($event)) {
-                        $this->deconflictDuties($person, $event);
-                    }
-
                     /* Save sis_class record
                      */
                     $classEntry = $this->createClassEntry($event);
 
-                    /* Create a new involvement for this event if one doesn't already exist
-                     * (This superpositions on top of Additional Subjects)
+                    /* Decide how involved humans are saved
                      */
-                    $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
+                    if ($deconflictAll) {
+                        /* FIXME SPECULATIVE PROGRAMMING
+                         *
+                         * If this event is a Duty (identified by room code DUT)
+                         * and we haven't set up Overrides yet,
+                         *     - add a CLEAR override action
+                         *     - add an ADD override action for this (eventId, externalId) combo
+                         *     - remember that we did this
+                         *
+                         * if we have already set up a CLEAR override action,
+                         *     - create a new ADD override and put $externalId in
+                         */
+                        $this->deconflict($person, $event);
+                    } else {
+                        /* Create a new involvement for this event if one doesn't already exist
+                         * (This superpositions on top of Additional Subjects)
+                         */
+                        $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
+                    }
                 }
             }
         }
@@ -743,7 +750,7 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function deconflictDuties(array $person, \Schoolbox\External\Event\Model $event): void
+    private function deconflict(array $person, \Schoolbox\External\Event\Model $event): void
     {
         $classCode = $event->getCode();
         $startAt = $event->getStartAt()->getDatabase();
