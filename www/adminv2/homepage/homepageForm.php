@@ -74,7 +74,11 @@ if ($action == 'delete') {
     $homepageTemplate = $homepageTemplateMapper->findById($templateID);
     $homepageTemplate->setName($name);
 
-    $homepageTemplateMapper->save($homepageTemplate);
+    try {
+        $homepageTemplateMapper->save($homepageTemplate);
+    } catch (UnexpectedValueException $e) {
+        throw new SchoolboxException($e->getMessage(), 0, $e);
+    }
 } else {
     $homepageTemplate = new \Schoolbox\Resource\HomepageTemplate();
     $homepageTemplate->setName($name)->setLeftColumnWidth(69.5)->setRightColumnWidth(29.5);
