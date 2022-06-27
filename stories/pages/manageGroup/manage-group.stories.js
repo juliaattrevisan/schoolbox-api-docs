@@ -16,7 +16,11 @@ export default {
     },
     decorators: [() => ({ 
     template: `
-        <story />
+        <div id="container">
+            <div id="content">
+                <story />
+            </div>
+        </div>
     `
     })],
 };

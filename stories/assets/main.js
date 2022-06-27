@@ -5,7 +5,7 @@
  * So all the features found in the Pantry can also exist in Stroybook when required. 
  * 
  * NOTE that the dayjs and immersive reader modules are not included, as these use the import module feature,
- * and we shouldn't really need these in a Storybook context anyhow 
+ * and we shouldn't really need these in a Storybook context anyhow
  * 
  */
 
@@ -38352,3 +38352,5 @@ $(function () {
         return window.location.protocol+'//'+window.location.host+'/calendar/export.php?'+$.param(values);
     };
 }(jQuery));
+
+Foundation.global.namespace = '';
