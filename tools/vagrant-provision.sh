@@ -239,10 +239,19 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
 --config amqp_vhost "'/'" \
+--config debug_show_stack_trace "'1'" \
+--config debug_templates "'1'" \
 --config external_type "'$external_db'" \
---config external_db_host "'$external_db_host'" \
 --config external_db_db "'$external_db_db'" \
+--config external_db_host "'$external_db_host'" \
+--config external_db_user "'schoolbox'" \
+--config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
+--config gotenberg_host "'http://localhost:3000'" \
 --config instance_registry_url "'$instance_registry_url'" \
+--config ldap_enable "'0'" \
+--config mail_enable "'1'" \
+--config mail_smtp_host "'127.0.0.1'" \
+--config mail_smtp_port "'1025'" \
 --config redis_url "'tcp://127.0.0.1:6379'" \
 --config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
 --config site_domain "'dev.schoolbox.cloud'" \
@@ -250,6 +259,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config site_school_code "'vagrant'" \
 --config site_environment "'client-hosted'" \
 --config site_type "'dev'" \
+--config strict_templates "'1'" \
 --config title "'Schoolbox [vagrant]'"; then
   error "Unable to install instance. Exiting."
   exit 1
