@@ -239,37 +239,37 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
 --config amqp_vhost "'/'" \
---config boarder_leave_enabled "'1" \
+--config boarder_leave_enabled "'1'" \
 --config debug_show_stack_trace "'1'" \
 --config debug_templates "'1'" \
---config eotc_enabled "'1" \
+--config eotc_enabled "'1'" \
 --config external_type "'$external_db'" \
 --config external_db_db "'$external_db_db'" \
 --config external_db_host "'$external_db_host'" \
 --config external_db_user "'schoolbox'" \
 --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
---config fixtures_enabled "'1" \
+--config fixtures_enabled "'1'" \
 --config gotenberg_host "'http://localhost:3000'" \
 --config instance_registry_url "'$instance_registry_url'" \
 --config ldap_enable "'0'" \
 --config mail_enable "'1'" \
 --config mail_smtp_host "'127.0.0.1'" \
 --config mail_smtp_port "'1025'" \
---config pastoral_enabled "'1" \
---config push_notifications_enabled "'1" \
---config qr_login_enabled "'1" \
+--config pastoral_enabled "'1'" \
+--config push_notifications_enabled "'1'" \
+--config qr_login_enabled "'1'" \
 --config redis_url "'tcp://127.0.0.1:6379'" \
 --config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
---config resource_booking_enabled "'1" \
+--config resource_booking_enabled "'1'" \
 --config site_domain "'dev.schoolbox.cloud'" \
 --config site_hostname "'vagrant'" \
 --config site_school_code "'vagrant'" \
 --config site_environment "'client-hosted'" \
 --config site_type "'dev'" \
 --config strict_templates "'1'" \
---config summative_report_enabled "'1" \
+--config summative_report_enabled "'1'" \
 --config title "'Schoolbox [vagrant]'" \
---config ups_groups_enabled "'1"; then
+--config ups_groups_enabled "'1'"; then
   error "Unable to install instance. Exiting."
   exit 1
 fi
