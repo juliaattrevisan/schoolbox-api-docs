@@ -185,6 +185,17 @@ $(function () {
                     }
                 });
         }
+
+        /* Remove the height:100% css attribute
+         *
+         * This lets you scroll to see the rest of your file uploads
+         * if you added more than your modal permits
+         *
+         * Otherwise you have to zoom out with your browser to see it
+         */
+        abUpload.css({
+            'height': 'auto'
+        });
     }
 
 
