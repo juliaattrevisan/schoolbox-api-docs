@@ -138,9 +138,9 @@ class Processor
                     true,
                     $mimetype,
                     $transformModel->getSize(),
-                    $this->readStream($transformPath),
+                    $this->pathFilesystem->readStream($transformPath),
                 );
-            } catch (Flysystem\UnableToReadFile $e) {
+            } catch (Flysystem\FilesystemException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
                 $basePath = Storage\FilesystemProxy::getPathFromHash($hash);
                 $state    = $this->storageFilesystem->has($basePath)
@@ -167,7 +167,7 @@ class Processor
                 true,
                 $mimetype,
                 $transformSize,
-                $this->readStream($transformPath),
+                $this->pathFilesystem->readStream($transformPath),
             );
         }
 
@@ -234,7 +234,7 @@ class Processor
             false,
             $mimetype,
             $transformModel->getSize(),
-            $this->readStream($transformPath),
+            $this->pathFilesystem->readStream($transformPath),
         );
     }
 
@@ -396,32 +396,5 @@ class Processor
             default:
                 throw new DomainException("Unknown image type '$mime'");
         }
-    }
-
-    /**
-     * Fetch a file stream for `$path` out of `$fileSystem`, bypassing
-     * Flysystem's `disable_asserts` configuration setting.
-     *
-     * If `config.otfs_verify_previous_file` is on, Flysystem `disable_asserts`
-     * will be on, and `readStream` won't raise an exception if the file
-     * doesn't exist: it will simply return false.
-     *
-     * This method will re-raise the exception that would've been raised if that
-     * config was off.
-     *
-     * TODO remove once Flysystem3 migration is done?
-     *      I don't think it returns false on file not found.
-     *
-     * @param string $path
-     * @return resource
-     * @throws Flysystem\UnableToReadFile if the stream was not found
-     */
-    private function readStream(string $path)
-    {
-        $stream = $this->storageFilesystem->readStream($path);
-        if (!is_resource($stream)) {
-            throw new Flysystem\UnableToReadFile($path);
-        }
-        return $stream;
     }
 }
