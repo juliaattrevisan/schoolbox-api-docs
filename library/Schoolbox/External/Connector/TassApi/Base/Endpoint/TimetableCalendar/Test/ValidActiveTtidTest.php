@@ -13,15 +13,15 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\Test;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\ValidActiveTtid;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar\ValidActiveTtid;
 
 /**
  * Class ValidActiveTtidTest
  *
- * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar
  */
 class ValidActiveTtidTest extends TestCase
 {

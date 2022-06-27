@@ -173,8 +173,8 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-//        $this->importStudentTimetables();
-        $this->importStaffTimetables();
+        $this->importStudentTimetables();
+//        $this->importStaffTimetables();
     }
 
 
@@ -213,12 +213,17 @@ class Classes implements IStrategy
                 continue;
             }
 
-            /* Otherwise, continue on with the first timetable element
-             * (Not sure how many they can actually have in production)
+            /* Otherwise, find the timetables in which $now occurs
+             * If $now isn't in the $timetable, skip it entirely (it's not relevant)
+             *
+             * The timetable endpoint getStudentTimetable havs the potential to return
+             * multiple timetables - you have to find the one which contains $now
              */
-            $timetable = $data['student_timetable'][0];
+            foreach ($data['student_timetable'] as $timetable) {
+                $this->process($person, $timetable);
+            }
 
-            /* Example timetable extract
+            /* Example $timetable extract
 
                 Array
                 (
@@ -293,7 +298,6 @@ class Classes implements IStrategy
                                                     [PRD_DESC] => Form Assembly
                                                 )
             */
-            $this->process($person, $timetable);
         }
     }
 
@@ -302,6 +306,7 @@ class Classes implements IStrategy
      * Import all student timetables.
      *
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -346,9 +351,11 @@ class Classes implements IStrategy
             /* Otherwise, continue on with the first timetable element
              * (Not sure how many they can actually have in production)
              */
-            $timetable = $data['teacher_timetable'][0];
+            foreach ($data['teacher_timetable'] as $timetable) {
+                $this->process($person, $timetable);
+            }
 
-            /* Example timetable extract
+            /* Example $timetable extract
 
                 Array
                 (
@@ -419,7 +426,6 @@ class Classes implements IStrategy
 
                                 )
             */
-            $this->process($person, $timetable);
         }
     }
 
@@ -445,6 +451,20 @@ class Classes implements IStrategy
          * which contains multiple periods
          */
         $timetableCalendar = $this->fetchTimetableCalendar($timetable['TT_ID']);
+
+        /* Decide if $timetableCalendar is one that's relevant to $now
+         *
+         * The endpoints getStudentTimetable/getTeacherTimetable have the potential to
+         * return multiple elements, only some of which are appropriate to $now
+         */
+        if ((new ValidActiveTtid($timetableCalendar))->isActive()) {
+            $this->log->debug(sprintf(
+                'timetableCalendar %s is not relevant to today; skipping',
+                $timetable['TT_ID']
+            ));
+
+            return;
+        }
 
         /* For each entry in Timetable Calendar, set up a series of SUDS Timetable records
          * You can get a date here, but you'll need to make multiple records.
