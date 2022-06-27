@@ -137,8 +137,8 @@ class Processor
                 return new StreamableFile(
                     true,
                     $mimetype,
-                    $this->pathFilesystem->fileSize($transformPath),
-                    $this->pathFilesystem->readStream($transformPath),
+                    $this->storageFilesystem->fileSize($transformPath),
+                    $this->storageFilesystem->readStream($transformPath),
                 );
             } catch (Flysystem\FilesystemException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
@@ -167,7 +167,7 @@ class Processor
                 true,
                 $mimetype,
                 $transformSize,
-                $this->pathFilesystem->readStream($transformPath),
+                $this->storageFilesystem->readStream($transformPath),
             );
         }
 
@@ -202,7 +202,6 @@ class Processor
             $transformSize = $this->generateTransformation(
                 $maxAttempts,
                 $fileFormat,
-                $this->storageFilesystem,
                 $transformPath,
             );
         } catch (
@@ -234,7 +233,7 @@ class Processor
             false,
             $mimetype,
             $transformSize,
-            $this->pathFilesystem->readStream($transformPath),
+            $this->storageFilesystem->readStream($transformPath),
         );
     }
 
@@ -242,10 +241,9 @@ class Processor
     /**
      * Transforms the image, writes it to disk, and return the transformed file's size
      *
-     * @param int        $maxAttempts How many times should we attempt to read the original file into memory
-     * @param string     $fileFormat
-     * @param Filesystem $fileSystem
-     * @param string     $transformPath
+     * @param int    $maxAttempts How many times should we attempt to read the original file into memory
+     * @param string $fileFormat
+     * @param string $transformPath
      * @return int
      * @throws CorruptImageException
      * @throws UnableToReadFile If original storage file not found on disk
@@ -255,7 +253,7 @@ class Processor
      * @throws LayeredNonGifException
      * @throws OverflowException
      */
-    private function generateTransformation(int $maxAttempts, string $fileFormat, Filesystem $fileSystem, string $transformPath): int
+    private function generateTransformation(int $maxAttempts, string $fileFormat, string $transformPath): int
     {
         $image = $this->loadImageFromFile($maxAttempts);
         $image = (new RotateOrientation())->manipulate($image);
@@ -270,7 +268,7 @@ class Processor
             $options['animated.loops'] = 0;
         }
         $imageContents = $image->get($fileFormat, $options);
-        $fileSystem->write($transformPath, $imageContents);
+        $this->storageFilesystem->write($transformPath, $imageContents);
         return strlen($imageContents);
     }
 
