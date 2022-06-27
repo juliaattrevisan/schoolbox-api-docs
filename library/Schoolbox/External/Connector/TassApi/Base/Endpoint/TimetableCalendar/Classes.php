@@ -468,6 +468,16 @@ class Classes implements IStrategy
             return;
         }
 
+        /* For logging
+         */
+        $name = trim("{$person['firstname']} {$person['lastname']}");
+
+        $this->log->info(sprintf(
+            'Processing timetable for %s (%s)',
+            $name,
+            $person['external_id']
+        ));
+
         /* For each entry in Timetable Calendar, set up a series of SUDS Timetable records
          * You can get a date here, but you'll need to make multiple records.
          *
@@ -610,8 +620,6 @@ class Classes implements IStrategy
                     /* Create a new involvement for this event if one doesn't already exist
                      * (This superpositions on top of Additional Subjects)
                      */
-                    $name = trim("{$person['firstname']} {$person['lastname']}");
-
                     $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
                 }
             }
