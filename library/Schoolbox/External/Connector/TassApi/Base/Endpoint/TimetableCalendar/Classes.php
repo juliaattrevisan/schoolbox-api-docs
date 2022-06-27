@@ -27,7 +27,7 @@ class Classes implements IStrategy
      * used to prevent importing billions of events from a distant future
      * that might not really have much relevance to today
      *
-     * Defaults to 6 months but we can tune that later.
+     * Defaults to 12 months but we can tune that later.
      */
     private const FUTURE_THRESHOLD = 30 * 12;
 
@@ -167,6 +167,7 @@ class Classes implements IStrategy
      * Import all timetables for everyone
      *
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -174,7 +175,7 @@ class Classes implements IStrategy
     public function import(): void
     {
         $this->importStudentTimetables();
-//        $this->importStaffTimetables();
+        $this->importStaffTimetables();
     }
 
 
@@ -182,6 +183,7 @@ class Classes implements IStrategy
      * Import all student timetables.
      *
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
