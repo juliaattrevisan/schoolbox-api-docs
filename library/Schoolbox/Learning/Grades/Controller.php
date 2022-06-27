@@ -423,9 +423,11 @@ class Controller extends Base
          * These markbook instances provide the five-point summary for the graphs
          */
         $graph = [];
+        $isCohort = false;
 
         if ($canSeeGraph) {
             if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $subject)) {
+                $isCohort = true;
                 $graph = (new ClassResults(
                     $this->getConfigLoader()->get('grade_gradient_enable'),
                     $this->assessmentMapperProxy,
@@ -452,7 +454,7 @@ class Controller extends Base
         $tabs = [];
 
         if ($canSeeGraph) {
-            $tabs['graph'] = ['label' => 'Class Results'];
+            $tabs['graph'] = ['label' => $isCohort ? 'Cohort Results' : 'Class Results'];
         }
 
         $showRubricPoints = false;
