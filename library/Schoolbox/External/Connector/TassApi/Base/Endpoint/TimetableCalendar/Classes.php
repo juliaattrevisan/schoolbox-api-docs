@@ -274,11 +274,11 @@ class Classes implements IStrategy
              * multiple timetables - you have to find the one which contains $now
              */
             foreach ($data['student_timetable'] as $timetable) {
-                /* Only import data for externalIds in $watchlist, if provided
-                 */
-                if ($this->isOnWatchlist($externalId, $watchlist)) {
-                    print_r($timetable);
-                }
+//                /* Only import data for externalIds in $watchlist, if provided
+//                 */
+//                if ($this->isOnWatchlist($externalId, $watchlist)) {
+//                    print_r($timetable);
+//                }
 
                 $this->process($person, $timetable);
             }
