@@ -112,6 +112,16 @@ class Classes implements IStrategy
 
 
     /**
+     * A caching mechanism to prevent dupe events
+     *
+     * $eventEntries[$classCode][$startDate][$finishDate] = $event
+     *
+     * @var array
+     */
+    private array $eventEntries = [];
+
+
+    /**
      * Constructor
      *
      * @param LoggerInterface                  $log
@@ -169,7 +179,7 @@ class Classes implements IStrategy
          * Find all the external ids
          */
         $students = $this->lookup->getStudents();
-$i = 0;
+
         /* Inspect every student's timetable to find the largest quantity of Periods per Day
          * This will inform schoolbox's classic idea of a Timetable Definition which must be
          * rectangular; every day will have the maximum number of periods in it, even if the
@@ -276,11 +286,6 @@ $i = 0;
                                                 )
             */
             $this->process($person, $timetable);
-
-$i++;
-if ($i === 1) {
-return;
-}
         }
     }
 
@@ -381,35 +386,59 @@ return;
                     $type = '';
                     $guid = '';
 
-                    /* Cram in everything else
+                    /* Try to find an event that already exists
+                     * If it already exists, just continue; it's already been made
+                     * Otherwise create a new one
+                     *
+                     * (Since we are processing each student sequentially there is
+                     * potential for dupe events to spawn unnecessarily)
                      */
-                    $event = $this->eventMapper->createModel()
-                        ->setTitle($title)
-                        ->setDetail($detail)
-                        ->setLocation($room)
-                        ->setCode($classCode)
-                        ->setDay($day)
-                        ->setPeriod($period)
-                        ->setStartAt($startAt)
-                        ->setFinishAt($finishAt)
-                        ->setType($type)
-                        ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                        ->setGuid($guid)
-                        ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+                    if (isset($this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()])) {
+                        $this->log->debug(sprintf(
+                            'Reusing existing timetable event %s on %s %s (%s-%s)',
+                            $title,
+                            $day,
+                            $period,
+                            $startAt->getDatabase(),
+                            $finishAt->getDatabase()
+                        ));
 
-                    /* Save it and remember what we saw in case we need to reuse this later
-                     */
-                    $this->log->debug(sprintf(
-                        'Creating new timetable event %s - %s, %s, %s-%s',
-                        $event->getTitle(),
-                        $event->getDay(),
-                        $event->getPeriod(),
-                        $event->getStartAt()->getDatabase(),
-                        $event->getFinishAt()->getDatabase()
-                    ));
+                        $event = $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()];
+                    } else {
+                        /* Cram in everything else
+                         */
+                        $event = $this->eventMapper->createModel()
+                            ->setTitle($title)
+                            ->setDetail($detail)
+                            ->setLocation($room)
+                            ->setCode($classCode)
+                            ->setDay($day)
+                            ->setPeriod($period)
+                            ->setStartAt($startAt)
+                            ->setFinishAt($finishAt)
+                            ->setType($type)
+                            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                            ->setGuid($guid)
+                            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
 
-                    if ($this->perform) {
-                        $this->eventMapper->save($event);
+                        /* Save it and remember what we saw in case we need to reuse this later
+                         */
+                        $this->log->debug(sprintf(
+                            'Creating new timetable event %s - %s, %s, %s-%s',
+                            $event->getTitle(),
+                            $event->getDay(),
+                            $event->getPeriod(),
+                            $event->getStartAt()->getDatabase(),
+                            $event->getFinishAt()->getDatabase()
+                        ));
+
+                        /* Remember we did this
+                         */
+                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
+
+                        if ($this->perform) {
+                            $this->eventMapper->save($event);
+                        }
                     }
 
                     /* Save sis_class record
