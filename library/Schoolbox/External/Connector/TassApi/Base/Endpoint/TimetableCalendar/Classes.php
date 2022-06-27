@@ -44,6 +44,12 @@ class Classes implements IStrategy
 
 
     /**
+     * Filter to specific people; set to null to disable filtering
+     */
+    private const WATCHLIST = ['CAU', 'BRO'];
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -130,6 +136,7 @@ class Classes implements IStrategy
     private array $eventEntries = [];
 
 
+
     /**
      * Constructor
      *
@@ -174,12 +181,8 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        /* Filter to specific people; set to null to disable filterign
-         */
-        $watchlist = ['CAU', 'BRO'];
-
-//        $this->importStudentTimetables($watchlist);
-        $this->importStaffTimetables($watchlist);
+//        $this->importStudentTimetables(self::WATCHLIST);
+        $this->importStaffTimetables(self::WATCHLIST);
     }
 
 
