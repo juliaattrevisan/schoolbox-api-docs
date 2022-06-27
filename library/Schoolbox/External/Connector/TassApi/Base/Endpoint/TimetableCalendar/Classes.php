@@ -169,7 +169,7 @@ class Classes implements IStrategy
          * Find all the external ids
          */
         $students = $this->lookup->getStudents();
-
+$i = 0;
         /* Inspect every student's timetable to find the largest quantity of Periods per Day
          * This will inform schoolbox's classic idea of a Timetable Definition which must be
          * rectangular; every day will have the maximum number of periods in it, even if the
@@ -236,7 +236,6 @@ class Classes implements IStrategy
                                                                     [SUBTAB_YEAR_GRP] => 12
                                                                     [DATE_RANGE] =>
                                                                 )
-
                                                         )
 
                                                     [PRD_END] => 1900-01-01 15:30:00.0
@@ -268,7 +267,6 @@ class Classes implements IStrategy
                                                                     [SUBTAB_YEAR_GRP] => 12
                                                                     [DATE_RANGE] =>
                                                                 )
-
                                                         )
 
                                                     [PRD_END] => 1900-01-01 08:59:00.0
@@ -278,6 +276,11 @@ class Classes implements IStrategy
                                                 )
             */
             $this->process($person, $timetable);
+
+$i++;
+if ($i === 1) {
+return;
+}
         }
     }
 
@@ -314,7 +317,7 @@ class Classes implements IStrategy
          * and their times
          */
         foreach ($timetableCalendar as $dayDefinition) {
-            $day = trim((string)$dayDefinition['DAY_CODE']);
+            $dayNumber = trim((string)$dayDefinition['DAY_CODE']);
 
             /* This is a day in the calendar where there isn't a Day Code
              * There is no roster of periods to assign to this date
@@ -322,7 +325,7 @@ class Classes implements IStrategy
              *
              * Skip it
              */
-            if ('' === $day) {
+            if ('' === $dayNumber) {
                 continue;
             }
 
@@ -354,7 +357,7 @@ class Classes implements IStrategy
 
             /* Process relevant dates
              */
-            foreach ($timetable['DAYS'][$day]['PERIODS'] as $periodData) {
+            foreach ($timetable['DAYS'][$dayNumber]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
                 $startTime = substr($periodData['PRD_START'], 11, 8);
@@ -371,9 +374,10 @@ class Classes implements IStrategy
 
                     $title = trim((string)$subject['SUB_DESC']);
                     $detail = '';
+                    $day = "Day {$dayNumber}";
                     $room = trim((string)$subject['ROOM_CODE']);
                     $classCode = (new Code())->encode((string)$subject['SUBTAB_YEAR_GRP'], (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
-                    $period = trim((string)$periodData['PRD_CODE']);
+                    $period = "Period {$periodData['PRD_CODE']}";
                     $type = '';
                     $guid = '';
 
