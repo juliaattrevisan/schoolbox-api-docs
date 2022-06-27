@@ -20,14 +20,11 @@ use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
-use UnderflowException;
 
 class Config
 {
-
     /** @var RoleMapper */
     protected $roleMapper;
 
