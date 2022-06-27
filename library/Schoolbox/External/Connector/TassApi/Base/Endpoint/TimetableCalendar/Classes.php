@@ -174,21 +174,39 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentTimetables();
-        $this->importStaffTimetables();
+        /* Filter to specific people; set to null to disable filterign
+         */
+        $watchlist = ['CAU', 'BRO'];
+
+//        $this->importStudentTimetables($watchlist);
+        $this->importStaffTimetables($watchlist);
+    }
+
+
+    /**
+     * Decide if $externalId is in the set of externalids, $watchlist
+     *
+     * @param            $externalId
+     * @param array|null $watchlist
+     * @return bool
+     */
+    private function isOnWatchlist($externalId, ?array $watchlist): bool
+    {
+        return $watchlist && in_array($externalId, $watchlist, false);
     }
 
 
     /**
      * Import all student timetables.
      *
+     * @param array|null $watchlist
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentTimetables(): void
+    private function importStudentTimetables(?array $watchlist = null): void
     {
         /* Students
          * Find all the external ids
@@ -196,6 +214,12 @@ class Classes implements IStrategy
         $students = $this->lookup->getStudents();
 
         foreach ($students as $externalId => $person) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist($externalId, $watchlist)) {
+                continue;
+            }
+
             /* Hit That Api to find every student's timetable and cache it somewhere
              * We'll need to operate on it all again later anyway
              */
@@ -222,6 +246,12 @@ class Classes implements IStrategy
              * multiple timetables - you have to find the one which contains $now
              */
             foreach ($data['student_timetable'] as $timetable) {
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if ($this->isOnWatchlist($externalId, $watchlist)) {
+                    print_r($timetable);
+                }
+
                 $this->process($person, $timetable);
             }
 
@@ -307,13 +337,14 @@ class Classes implements IStrategy
     /**
      * Import all student timetables.
      *
+     * @param array|null $watchlist
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffTimetables(): void
+    private function importStaffTimetables(?array $watchlist = null): void
     {
         /* Staff
          * Find all the external ids
@@ -329,6 +360,12 @@ class Classes implements IStrategy
         $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
         foreach ($staff as $externalId => $person) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist($externalId, $watchlist)) {
+                continue;
+            }
+
             /* Hit That Api to find every student's timetable and cache it somewhere
              * We'll need to operate on it all again later anyway
              */
@@ -354,6 +391,12 @@ class Classes implements IStrategy
              * (Not sure how many they can actually have in production)
              */
             foreach ($data['teacher_timetable'] as $timetable) {
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if ($this->isOnWatchlist($externalId, $watchlist)) {
+                    print_r($timetable);
+                }
+
                 $this->process($person, $timetable);
             }
 
