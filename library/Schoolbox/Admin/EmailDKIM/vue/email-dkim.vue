@@ -6,12 +6,14 @@
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI.js';
+import ClipboardJs from 'clipboard/dist/clipboard';
 
 export default {
 
     components: {
         Toast,
-        RevealModal
+        RevealModal,
+        ClipboardJs
     },
 
     mixins: [
@@ -37,10 +39,24 @@ export default {
             hasDataLoaded: false, //show loading display until true
             hasLoadError: false, //display load error
             rows: [],
-            selectedDkimId: 0,
-            selectedDomain: '',
+            emptyDomain: {
+                id: 0,
+                domain: '',
+                dkimUrl: '',
+                deleteUrl: '',
+            },
+            selectedDomain: {
+                id: 0,
+                domain: '',
+                dkimUrl: '',
+                deleteUrl: '',
+            },
+            // values for dkim modal
+            domainName: '',
             dkimName: '',
             dkimValue: '',
+            dkimValueSplit0: '',
+            dkimValueSplit1: '',
             tableColumns: ['domain', 'dateModified.formatted', 'edit'],
             tableOptions: {
                 debounce: 100, //faster debounce as data is stored on the client side,
@@ -86,11 +102,34 @@ export default {
         }
     },
     mounted () {
+        new ClipboardJs(
+            this.$refs.copyValueButton,
+            {
+                target: () => this.$refs.dkimValue,
+            }
+        );
+        new ClipboardJs(
+            this.$refs.copyNameButton,
+            {
+                target: () => this.$refs.dkimName,
+            }
+        );
+        new ClipboardJs(
+            this.$refs.copyValueSplit0Button,
+            {
+                target: () => this.$refs.dkimValueSplit0,
+            }
+        );
+        new ClipboardJs(
+            this.$refs.copyValueSplit1Button,
+            {
+                target: () => this.$refs.dkimValueSplit1,
+            }
+        );
         this.loadRows();
     },
 
     methods: {
-
         /**
          * Load domains
          */
@@ -105,9 +144,11 @@ export default {
                 console.log(error);
                 this.hasLoadError = true; //display error note in the DOM
             } finally {
+                this.selectedDomain = Object.assign({}, this.emptyDomain);
                 this.hasDataLoaded = true; //update the display to show the list
             }
         },
+
         /**
          * To update the table to show the UI in the footer
          */
@@ -121,55 +162,137 @@ export default {
         onUpdated () {
             this.loadRows(); //refresh the data
         },
-        onClickAddDomain (toggledDkim) {
+
+        /**
+         * Open new domain modal
+         */
+        onClickAddDomain () {
+            this.selectedDomain = Object.assign({}, this.emptyDomain);
             this.$refs.domainModal.open();
         },
+
+        /**
+         * Open modify domain modal
+         * @param toggledDkim
+         */
+        onClickModifyDomain (toggledDkim) {
+            this.selectedDomain = toggledDkim;
+            this.$refs.domainModal.open();
+        },
+
+        /**
+         * Canceled add/modify domain modal
+         */
         onCancelAddDomain () {
             this.$refs.domainModal.close();
+            this.selectedDomain = Object.assign({}, this.emptyDomain);
         },
+
+        /**
+         * Creating/updating domain
+         * @returns {Promise<void>}
+         */
         async onAddDomain () {
-            this.$refs.toast.activate('Adding...');
+            this.$refs.toast.activate('Saving...');
             try {
-                await fetch(this.srcAddDomain, {
+                const response = await fetch(this.srcAddDomain, {
                     method: 'POST',
                     body: this.getFormData(),
                 });
-                this.$refs.toast.timeout('Added', true, 2000);
+                if (response.ok) {
+                    const responseDat = await response.json();
+                    this.$refs.toast.timeout('Success', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Failed - Invalid domain name', true, 2000);
+                }
                 this.$refs.domainModal.close();
-                this.rows = this.loadRows();
+                await this.loadRows();
             } catch (error) {
-                this.$refs.toast.timeout('Failed to add', false, 2000);
+                console.log(error);
+                this.$refs.toast.timeout('Failed', false, 2000);
+            } finally {
+                this.selectedDomain = Object.assign({}, this.emptyDomain);
             }
         },
+
         /**
-         * Set up a deleted users array to POST
+         * Open delete domain modal
+         * @param toggledDkim
+         */
+        onClickDeleteDomain (toggledDkim) {
+            this.selectedDomain = toggledDkim;
+            this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Cancel delete modal
+         */
+        onCancelDeleteDomain () {
+            this.$refs.deleteModal.close();
+            this.selectedDomain = Object.assign({}, this.emptyDomain);
+        },
+
+        /**
+         * Delete domain
+         * @returns {Promise<void>}
+         */
+        async onDeleteDomain () {
+            this.$refs.toast.activate('Deleting...');
+            try {
+                const response = await fetch(this.selectedDomain.deleteUrl, {
+                    method: 'DELETE'
+                });
+                const responseData = await response.json();
+                this.$refs.toast.timeout('Deleted', true, 2000);
+                this.$refs.deleteModal.close();
+                await this.loadRows();
+            } catch (error) {
+                this.$refs.toast.timeout('Failed', false, 2000);
+                console.log(error);
+            } finally {
+                this.selectedDomain = Object.assign({}, this.emptyDomain);
+            }
+        },
+
+        /**
+         * Set up domain array to POST
          *
          * @returns {FormData}
          */
         getFormData () {
             const formData = new FormData();
-            formData.append('domain', this.selectedDomain);
-            formData.append('dkimId', this.selectedDkimId);
+            formData.append('domain', this.selectedDomain.domain);
+            formData.append('id', this.selectedDomain.id);
             return formData;
         },
 
-        async onClickGetKey (row) {
+        /**
+         * Get DKIM data
+         * @param toggledDkim
+         * @returns {Promise<void>}
+         */
+        async onClickGetKey (toggledDkim) {
             try {
-                const response = await fetch(row.dkimUrl, {
+                const response = await fetch(toggledDkim.dkimUrl, {
                     method: 'GET',
                     responseType: 'json'
                 });
                 let dkimData = await response.json();
-                this.dkimName = dkimData[0].domain;
-                this.dkimValue = dkimData[0].publicKey;
+                this.domainName = dkimData[0].domain;
+                this.dkimName = dkimData[0].dkimName;
+                this.dkimValue = dkimData[0].dkimValue;
+                // TODO: remove hard coded index
+                this.dkimValueSplit0 = dkimData[0].dkimValueSplit[0];
+                this.dkimValueSplit1 = dkimData[0].dkimValueSplit[1];
                 this.$refs.dkimModal.open();
             } catch (error) {
                 console.log(error);
                 this.hasLoadError = true; //display error note in the DOM
             } finally {
+                this.selectedDomain = Object.assign({}, this.emptyDomain);
                 this.hasDataLoaded = true; //update the display to show the list
             }
-        }
+        },
     },
 }
 </script>
@@ -206,7 +329,8 @@ export default {
             <template #edit="props">
                 <nav class="edit">
                     <a class="icon-eye" @click.prevent="onClickGetKey(props.row)" title="Get key"></a>
-                    <a class="icon-modify" @click.prevent="onClickAddDomain(props.row)" title="Modify domain"></a>
+                    <a class="icon-modify" @click.prevent="onClickModifyDomain(props.row)" title="Modify domain"></a>
+                    <a class="icon-delete" @click.prevent="onClickDeleteDomain(props.row)" title="Delete domain"></a>
                 </nav>
             </template>
             <template #afterTable>
@@ -234,11 +358,15 @@ export default {
     <toast ref="toast"></toast>
     <reveal-modal ref="domainModal">
         <h2>Domain name</h2>
-        <form>
-            <input type="text" placeholder="Domain" v-model="selectedDomain">
+        <form ref="form">
+            <input type="text" placeholder="Domain" v-model="selectedDomain.domain">
+            <input type="hidden" v-model="selectedDomain.id">
             <ul class="flex-list buttons">
                 <li>
-                    <button @click.prevent="onAddDomain" class="button submit">Add</button>
+                    <button @click.prevent="onAddDomain" class="button submit">
+                        <template v-if="selectedDomain.id === 0">Add</template>
+                        <template v-else>Modify</template>
+                    </button>
                 </li>
                 <li>
                     <button @click.prevent="onCancelAddDomain" class="button">Cancel</button>
@@ -247,9 +375,47 @@ export default {
         </form>
     </reveal-modal>
     <reveal-modal ref="dkimModal">
-        <h2>Domain name</h2>
-        <p>Name: <input type="text" v-model="dkimName"></p>
-        <p>Value: <input type="text" v-model="dkimValue"></p>
+        <h2>DKIM for <strong>{{ domainName }}</strong></h2>
+        <h3>Name</h3>
+        <div class="input-group">
+            <div class="small-9"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
+            <div class="small-3">
+                <button ref="copyNameButton" class="icon-copy">Copy</button>
+            </div>
+        </div>
+        <h3>Value (Full)</h3>
+        <div class="input-group">
+            <div class="small-9"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
+            <div class="small-3">
+                <button ref="copyValueButton" class="icon-copy">Copy</button>
+            </div>
+        </div>
+        <h3>Value (Split)</h3>
+        <div class="input-group">
+            <div class="small-9"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
+            <div class="small-3">
+                <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="small-9"><input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1"></div>
+            <div class="small-3">
+                <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
+            </div>
+        </div>
+    </reveal-modal>
+    <reveal-modal ref="deleteModal">
+        <h2>Delete {{ selectedDomain.domain }}</h2>
+        <form>
+            <ul class="flex-list buttons">
+                <li>
+                    <button @click.prevent="onDeleteDomain" class="button submit">Delete</button>
+                </li>
+                <li>
+                    <button @click.prevent="onCancelDeleteDomain" class="button">Cancel</button>
+                </li>
+            </ul>
+        </form>
     </reveal-modal>
 </template>
 

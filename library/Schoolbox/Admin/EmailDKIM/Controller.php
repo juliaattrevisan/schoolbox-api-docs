@@ -9,29 +9,39 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\EmailDKIM;
 
-
 use Alaress\Web\Controller\Base;
+use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Controller
  *
- * Admin report export page
+ * Admin Email DKIM
  *
- * @package Schoolbox\Admin\ReportExport
+ * @package Schoolbox\Admin\EmailDKIM
  */
 class Controller extends Base
 {
     private EmailDKIMMapper $emailDKIMMapper;
 
-
+    /**
+     * Constructor
+     * @param Mapper $emailDKIMMapper
+     */
     public function __construct(
         EmailDKIMMapper $emailDKIMMapper
     ) {
         $this->emailDKIMMapper = $emailDKIMMapper;
     }
 
+    /**
+     * Domain list page
+     *
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
     public function getDomainListPage()
     {
         $this->getResponse()->content->set(
@@ -45,6 +55,12 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Get domain list data
+     *
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
     public function getDomainJsonList()
     {
         $dkims = $this->emailDKIMMapper->findAll();
@@ -54,7 +70,14 @@ class Controller extends Base
             $data[] = [
                 'id'           => $dkim->getId(),
                 'domain'       => $dkim->getDomain(),
-                'dkimUrl'      => $this->router->generate('emailDKIM.getDKIMJson', ['emailDKIM' => $dkim, 'emailDKIMId' => $dkim->getId()]),
+                'dkimUrl'      => $this->router->generate('emailDKIM.getDKIMJson', [
+                    'emailDKIM'   => $dkim,
+                    'emailDKIMId' => $dkim->getId(),
+                ]),
+                'deleteUrl'    => $this->router->generate('emailDKIM.deleteDKIM', [
+                    'emailDKIM'   => $dkim,
+                    'emailDKIMId' => $dkim->getId(),
+                ]),
                 'dateModified' => [
                     'timestamp' => $dkim->getUpdatedAt()->getUnixTimeStamp(),
                     'formatted' => $dkim->getUpdatedAt()->getShort(),
@@ -64,36 +87,59 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
+    /**
+     * Create/update domain
+     *
+     * @return void
+     * @throws InvalidStatusCode
+     */
     public function postDomain()
     {
-        $id     = $this->request->post->get('dkimId');
+        $id     = $this->request->post->get('id');
         $domain = trim($this->request->post->get('domain') ?? '');
-
-        // TODO : validate
-
-        if ($id) {
-            $emailDKIM = $this->emailDKIMMapper->findById($id);
-        } else {
-            $emailDKIM = $this->emailDKIMMapper->createModel();
-            $keyPair   = \Schoolbox\Auth\KeyPairGenerator::generate();
-            $emailDKIM->setCreatedAt(\Alaress_Date_Format::now())
-                      ->setPublic($keyPair['public'])
-                      ->setPrivate($keyPair['private']);
+        if (empty($domain) || (!getmxrr($domain, $temp) && !checkdnsrr($domain, 'ANY'))) {
+            $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid domain name']));
+            $this->getResponse()->status->setCode(404);
+            exit;
         }
-        $emailDKIM->setDomain(trim($this->request->post->get('domain')))
-                  ->setUpdatedAt(\Alaress_Date_Format::now());
 
-        $this->emailDKIMMapper->save($emailDKIM);
+        try {
+            if ($id) {
+                $emailDKIM = $this->emailDKIMMapper->findById($id);
+            } else {
+                $emailDKIM = $this->emailDKIMMapper->createModel();
+                $keyPair   = \Schoolbox\Auth\KeyPairGenerator::generate();
+                $emailDKIM->setCreatedAt(\Alaress_Date_Format::now())
+                          ->setPublic($keyPair['public'])
+                          ->setPrivate($keyPair['private']);
+            }
+            $emailDKIM->setDomain($domain)
+                      ->setUpdatedAt(\Alaress_Date_Format::now());
+
+            $this->emailDKIMMapper->save($emailDKIM);
+        } catch (Exception $e) {
+            $this->getResponse()->content->set($this->buildJsonOutput(['error' => $e->getMessage()]));
+            $this->getResponse()->status->setCode(404);
+            exit;
+        }
         $this->getResponse()->content->set($this->buildJsonOutput([]));
     }
 
+    /**
+     * Get DKIM data for a domain
+     *
+     * @param Model $emailDKIM
+     * @return void
+     */
     public function getDKIMJson(Model $emailDKIM)
     {
         $data[] = [
-            'id'           => $emailDKIM->getId(),
-            'domain'       => $emailDKIM->getDKIMName(),
-            'publicKey'    => $emailDKIM->getDKIMValue(),
-            'dateModified' => [
+            'id'             => $emailDKIM->getId(),
+            'domain'         => $emailDKIM->getDomain(),
+            'dkimName'       => $emailDKIM->getDKIMName(),
+            'dkimValue'      => $emailDKIM->getDKIMValue(),
+            'dkimValueSplit' => $emailDKIM->getDKIMValueSplit(),
+            'dateModified'   => [
                 'timestamp' => $emailDKIM->getUpdatedAt()->getUnixTimeStamp(),
                 'formatted' => $emailDKIM->getUpdatedAt()->getShort(),
             ],
@@ -101,4 +147,16 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
+    /**
+     * Delete domain
+     *
+     * @param Model $emailDKIM
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteDKIM(Model $emailDKIM)
+    {
+        $this->emailDKIMMapper->delete($emailDKIM);
+        $this->getResponse()->content->set($this->buildJsonOutput([]));
+    }
 }

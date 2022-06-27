@@ -93,7 +93,7 @@ class Model implements ISoftDeletable
      */
     public function getDKIMName(): string
     {
-        return sprintf('%s.%s.%s', self::SELECTOR, self::DOMAIN_KEY, $this->getDomain());
+        return sprintf('%s.%s.%s.', self::SELECTOR, self::DOMAIN_KEY, $this->getDomain());
     }
 
     /**
@@ -103,5 +103,13 @@ class Model implements ISoftDeletable
     {
         $public = trim(str_replace(self::KEY_HEADER_END, '', str_replace(self::KEY_HEADER_BEGIN, '', $this->getPublic())));
         return sprintf(self::VALUE_FORMAT, $public);
+    }
+
+    /**
+     * @return array
+     */
+    public function getDKIMValueSplit(): array
+    {
+        return str_split($this->getDKIMValue(), 255);
     }
 }
