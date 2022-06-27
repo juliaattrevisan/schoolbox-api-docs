@@ -208,11 +208,11 @@ class Classes implements IStrategy
     /**
      * Decide if $externalId is in the set of externalids, $watchlist
      *
-     * @param            $externalId
-     * @param array|null $watchlist
+     * @param string|null $externalId
+     * @param array|null  $watchlist
      * @return bool
      */
-    private function isOnWatchlist($externalId, ?array $watchlist): bool
+    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
     {
         /* "Everyone is on the watchlist"
          */
