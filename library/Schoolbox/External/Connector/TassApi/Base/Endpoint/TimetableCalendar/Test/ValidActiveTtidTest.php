@@ -25,7 +25,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar\ValidAc
  */
 class ValidActiveTtidTest extends TestCase
 {
-
     /**
      * Sampled from an actual school
      */

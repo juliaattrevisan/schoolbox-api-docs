@@ -22,7 +22,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
  */
 class ValidActiveTtid
 {
-
     /**
      * A set of tt_calendar array records
      *
