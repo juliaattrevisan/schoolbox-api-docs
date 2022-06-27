@@ -316,42 +316,42 @@ class Factory
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->includePhoto,
-                $this->spousePrefix,
-                $this->addnumFather,
-                $this->addnumMother,
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
-                $this->communicationTypes,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->storageMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->includePhoto,
+//                $this->spousePrefix,
+//                $this->addnumFather,
+//                $this->addnumMother,
+//                $this->fatherAddressDescription,
+//                $this->motherAddressDescription,
+//                $this->communicationTypes,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper,
+//                $this->storageMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,

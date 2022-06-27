@@ -214,6 +214,12 @@ class Classes implements IStrategy
      */
     private function isOnWatchlist($externalId, ?array $watchlist): bool
     {
+        /* "Everyone is on the watchlist"
+         */
+        if (null === $watchlist) {
+            return true;
+        }
+
         return $watchlist && in_array($externalId, $watchlist, false);
     }
 
