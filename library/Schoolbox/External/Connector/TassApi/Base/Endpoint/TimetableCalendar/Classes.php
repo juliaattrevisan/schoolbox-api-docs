@@ -735,7 +735,7 @@ class Classes implements IStrategy
      * So we have to marry the two datasets into SUDS Timetable
      *
      * @param int $ttid
-     * @return mixed
+     * @return array
      */
     private function fetchTimetableCalendar(int $ttid): array
     {
