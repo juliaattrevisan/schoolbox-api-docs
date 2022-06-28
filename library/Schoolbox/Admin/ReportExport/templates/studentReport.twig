@@ -1,22 +1,15 @@
 <style>
-    .text-center, .card.compact [class*=icon-] {
-        text-align: center !important;
-    }
-
-    /* Quarantine zone
-     */
 
     /* Vaguely analogous to A4 dimensions so you can preview in browser
      * otherwise the pdf print wraps in a different place, throwing your judgement
      */
-    .report {
+    .summative-report {
         width: 1000px;
         margin: auto;
     }
 
     /* Typography
      */
-    p,
     h1, h2, h3, h4, h5, h6 {
         color: black;
         margin: 0;
@@ -46,6 +39,18 @@
 
     h6 {
         font-size: 1rem;
+    }
+
+    p {
+        color: black;
+        line-height: 1.5rem;
+    }
+
+    /* Images must be no larger than 100% max-width
+     * otherwise they go off the page
+     */
+    img {
+        max-width: 100%;
     }
 
     /* Make background colours print
@@ -103,37 +108,16 @@
     /* The thing that tells you about students
      */
     .card {
-        width: 100%;
-        clear: both;
-        float: left;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        position: relative;
+        align-items: center;
+        display: flex;
     }
 
-    /* Removes side padding on student card at top when there's no picture
-     */
-    .card.no-pad {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .card .name {
-        margin: 0;
+    .card img {
+        margin-right: 0.75rem;
     }
 
     .card .year {
-        font-size: 1.2rem;
-        margin: 0 0 1rem 0;
-    }
-
-    .compact img {
-        width: 2rem;
-    }
-
-    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
-        float: left;
-        margin-right: 0.75rem;
+        margin: 0;
     }
 
     /* Introductory text
@@ -168,7 +152,7 @@
         color: grey;
         font-size: 0.75rem;
         font-style: italic;
-        margin-top: 0.25rem;
+        margin: 0;
     }
 
     /* A grade value, suitable for Folder Title
@@ -180,6 +164,7 @@
     .grade {
         font-size: 1.5rem;
         font-weight: bold;
+        margin: 0;
         padding-left: 2rem;
         padding-right: 0.75rem;
         min-width: 8rem;
@@ -234,9 +219,16 @@
      */
     .summary .folder-title {
         border-bottom: 1px solid #ccc;
-        margin-top: 2rem;
-        margin-left: 2rem;
-        padding-left: 0;
+        clear: both;
+        margin: 2rem 0 0.5rem 2rem;
+        padding: 0 0 0.5rem 0;
+    }
+
+    /* Reduce the bottom margin in the Summary area
+     * because we don't have the wrapping block here
+     */
+    .summary .grade {
+        margin: 0 0 0.5rem 0;
     }
 
     .summary .feedback-assessment-container {
@@ -256,10 +248,7 @@
      * and layout, but we don't need its excess padding
      */
     .class-page .card.compact {
-        display: flex;
-        align-items: center;
         margin: 0.75rem 0 0 0;
-        padding: 0;
     }
 
     /* Special cosmetic representation of semantic h5
@@ -277,6 +266,12 @@
         width: 100%;
     }
 
+    /* All p elements get squished to fit more aggressively
+     */
+    .rubric-wrap p {
+        line-height: 1rem;
+    }
+
     /* Rubric table
      * This is the only table element we render here
      */
@@ -290,8 +285,8 @@
     /* Headings were oddly grey by intent but black we go
      */
     th p {
-        text-align: left;
         padding-left: 0.25rem;
+        text-align: left;
         word-wrap: break-word;
     }
 
@@ -404,9 +399,11 @@
             page-break-inside: avoid;
         }
     }
+
+    {{ customReportStyle ?? '' }}
 </style>
 
-<div class="report">
+<div class="summative-report">
     <div class="header-content">
         <div class="left">
             <h1>{{ config.report_title }}</h1>
@@ -417,21 +414,25 @@
         {% endif %}
     </div>
 
-    <div class="card {% if not student.portrait %}no-pad{% endif %}">
+    <div class="card">
         {% if student.portrait %}
         <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
         {% endif %}
-        <h3 class="name">{{ student.fullname }}</h3>
+        <div>
+            <h3 class="name">{{ student.fullname }}</h3>
 
-        {# Only show year if it was ever set and meaningful
-         #}
-        {% if student.year and student.year.longName != '' %}
-        <p class="year">{{ student.year.longName }}</p>
-        {% endif %}
-
-        <div class="introduction">
-            {{ config.report_export_introduction | purify }}
+            {# Only show year if it was ever set and meaningful
+             #}
+            {% if student.year and student.year.longName != '' %}
+            <p class="year">{{ student.year.longName }}</p>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="introduction">
+        <article>
+            {{ config.report_export_introduction | purify }}
+        </article>
     </div>
 
     {# Summary #}
