@@ -13,6 +13,7 @@ use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Schoolbox\Application\WebRequest\RequestUriParser;
@@ -260,6 +261,15 @@ class Kernel extends WebKernelAbstract
                 )
             );
         }
+
+        // User token generator
+        $di->set(
+            'user.tokenBuilder',
+            $di->lazyNew(
+                Jwt::class,
+                ['configLoader' => $config]
+            )
+        );
 
         $di->set(
             'templateEngine',
