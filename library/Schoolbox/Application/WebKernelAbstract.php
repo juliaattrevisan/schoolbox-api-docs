@@ -10,19 +10,29 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
+use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Session\Session;
 use Database;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Throwable;
 
 /**
  * Common ancestor for all Web Requests
@@ -91,7 +101,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     public function shutdownSafely($e = null, $stack = null): void
     {
         $isException = false;
-        if ($e instanceof \Throwable) {
+        if ($e instanceof Throwable) {
             $isException = true;
 
             // Special case for oAuth exceptions:
@@ -312,13 +322,13 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     /**
      * Output an error. The format depends on the request type (JSON or HTML).
      *
-     * @param array|\Throwable $e       The throwable that led us here, or the
+     * @param array|Throwable $e        The throwable that led us here, or the
      *                                  stack trace in array form.
-     * @param string           $message A human-friendly message to output.
-     * @param string           $info    More descriptive description of what
+     * @param string          $message  A human-friendly message to output.
+     * @param string          $info     More descriptive description of what
      *                                  happened.
-     * @param array            $error   An array-format stack trace
-     * @param int              $code    A HTTP status code
+     * @param array           $error    An array-format stack trace
+     * @param int             $code     A HTTP status code
      */
     protected function outputError(
         $e,
@@ -365,7 +375,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
                     $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
-                        $problem['trace'] = $e instanceof \Throwable
+                        $problem['trace'] = $e instanceof Throwable
                             ? $e->getTrace()
                             : ($e['trace'] ?? []);
                     }
@@ -422,7 +432,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         if ($args['outputStackTrace']) {
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}") . "</li>";
-            if ($args['stackTrace'] instanceof \Throwable) {
+            if ($args['stackTrace'] instanceof Throwable) {
                 foreach ($args['stackTrace']->getTrace() as $i => $frame) {
                     foreach (['class', 'type', 'function', 'file', 'line'] as $prop) {
                         $frame[$prop] ??= '';
@@ -442,5 +452,120 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         http_response_code($code);
         echo $output;
+    }
+
+
+    /**
+     * Extract a user from the "Authorization" HTTP header, if that header
+     * exists.
+     *
+     * @param string|null $authHeader
+     * @return User|null
+     * @throws Unauthenticated if auth header exists but is invalid
+     * @throws Unauthenticated if auth header is valid, but doesn't point to a
+     *                         valid user
+     */
+    public function extractUserFromAuthHeader(?string $authHeader): ?User
+    {
+        $user = null;
+        if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
+            [, $token] = $matches;
+            /** @var Jwt $tokenValidator */
+            $tokenValidator = $this->get('user.tokenBuilder');
+            try {
+                $claims = $tokenValidator->decode($token);
+            } catch (SignatureInvalidException $e) {
+                throw new Unauthenticated('Token signature is invalid', 0, $e);
+            } catch (BeforeValidException $e) {
+                throw new Unauthenticated('Token is not yet valid', 0, $e);
+            } catch (ExpiredException $e) {
+                throw new Unauthenticated('Token has expired', 0, $e);
+            } catch (Throwable $e) {
+                throw new Unauthenticated('Token could not be parsed', 0, $e);
+            }
+            if (isset($claims[MessagePayloadInterface::CLAIM_SUB])) {
+                // It's valid for the JWT's subject claim to be empty.
+                // In this case, the request will be performed with the context
+                // of an unknown user.
+                // (The request is still subject to authorization rules.)
+                if ($claims[MessagePayloadInterface::CLAIM_SUB] === '') {
+                    return null;
+                }
+                /** @var MapperFactory $mapperFactory */
+                $mapperFactory = $this->di->get('mapperFactory');
+                /** @var UserMapper $userMapper */
+                $userMapper = $mapperFactory->get(UserMapper::class);
+                $user       = $userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
+                if (!$user) {
+                    throw new Unauthenticated('User in token not found');
+                }
+                if ($tokenValidator->issuedBySchoolbox($claims) && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
+                    // if issued by schoolbox and jti is provided, validate the jti
+                    /** @var User\Token\Mapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(User\Token\Mapper::class);
+
+                    try {
+                        /** @var User\Token\Model $token */
+                        $token = $tokenMapper->findOneByColumnList(
+                            [
+                                'user_id' => $user->getId(),
+                                'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
+                            ]
+                        );
+                        if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
+                            throw new Unauthenticated('Token has expired');
+                        }
+                    } catch (MapperException $e) {
+                        throw new Unauthenticated('Invalid JWT ID: ' . $e->getMessage());
+                    }
+                }
+            } else {
+                throw new Unauthenticated('Token does not contain a "sub" claim');
+            }
+        }
+        return $user;
+    }
+
+    /**
+     * Authenticate the user for this request only, storing their data in the
+     * session.
+     *
+     * After this request finishes: restore the original session if somebody was
+     * logged in, or destroy the session completely if nobody was logged in.
+     *
+     * @param User $user
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     */
+    public function authenticateUserForThisRequestOnly(User $user): void
+    {
+        // Determine who was logged in, and preserve their data
+        /** @var \Alaress\Session\Session $sessionDataStore */
+        $sessionDataStore   = $this->di->get('session');
+        $currentSessionData = null;
+        $currentUser        = $sessionDataStore->getAuthUser();
+        if ($currentUser->getId()) {
+            $currentSessionData = $_SESSION;
+        }
+
+        // Now authenticate the given user
+        $sessionHandler = new \Session();
+        $sessionHandler->create($user->getUsername());
+
+        // Also: override the DI user with this user?
+        // Should not be required because the DI user is fetched from the
+        // session, anyway.
+        // (This would die when the container was locked, anyway)
+//        $this->di->set('user', $user);
+
+        // Restore or destroy the session when all is done
+        $this->getShutdownHandler()->registerFunction(
+            function () use ($sessionHandler, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $sessionHandler->destroy();
+                }
+            }
+        );
     }
 }
