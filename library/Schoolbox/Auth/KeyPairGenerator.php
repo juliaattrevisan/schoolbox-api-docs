@@ -11,11 +11,11 @@ namespace Schoolbox\Auth;
 
 class KeyPairGenerator
 {
-    public static function generate(): array
+    public static function generate(string $algorithm = 'SHA512'): array
     {
         // Build key pair
         $res = openssl_pkey_new([
-                                    'digest_alg'       => 'SHA512',
+                                    'digest_alg'       => $algorithm,
                                     'private_key_bits' => 2048,
                                     'private_key_type' => OPENSSL_KEYTYPE_RSA,
                                 ]);

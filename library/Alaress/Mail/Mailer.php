@@ -17,6 +17,7 @@ use Schoolbox\Admin\EmailDKIM\Model as EmailDKIM;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
@@ -29,6 +30,8 @@ use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
+
+use Symfony\Component\Mime\Message;
 
 use function count;
 use function trim;
@@ -243,10 +246,10 @@ class Mailer implements IMailer
 
     /**
      * Add file
-     * @param $file
-     * @param $type
-     * @param $filename
-     * @param $isFile
+     * @param mixed       $file
+     * @param string      $type
+     * @param string|null $filename
+     * @param bool        $isFile
      * @return void
      */
     public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true)
@@ -261,8 +264,8 @@ class Mailer implements IMailer
 
     /**
      * Add image
-     * @param $file
-     * @param $type
+     * @param mixed       $file
+     * @param string|null $type
      * @return Email
      */
     public function addImage($file, $type = 'application/octet')
@@ -371,16 +374,19 @@ class Mailer implements IMailer
             $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
             $this->configureMailer($mailer);
 
+            // get all recipients before signing
+            $recipients = array_merge($this->email->getTo(), $this->email->getCC(), $this->email->getBcc());
+
             foreach ($this->email->getFrom() as $from) {
                 [$email, $domain] = explode('@', $from->getAddress());
                 try {
-                    $dkim = $this->dkimMapper->findOneByColumn('domain', $domain);
-                    $this->sign($dkim->getPrivate(), $dkim->getDomain());
+                    $dkim    = $this->dkimMapper->findOneByColumn('domain', $domain);
+                    $message = $this->getSignedMessage($dkim->getPrivate(), $dkim->getDomain());
                 } catch (Exception $e) {
-                    // noop
+                    $message = $this->email;
                 }
+                $mailer->send($message, new Envelope($from, $recipients));
             }
-            $mailer->send($this->email);
         } catch (TransportExceptionInterface $e) {
             $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
@@ -584,29 +590,23 @@ class Mailer implements IMailer
     }
 
     /**
-     * Sign
+     * Sign - note: bcc will be dropped by signing
+     *        https://github.com/symfony/symfony/issues/44006
      * @param string $privateKey
      * @param string $domain
-     * @return void
+     * @return Message
      */
-    public function sign(string $privateKey, string $domain)
+    private function getSignedMessage(string $privateKey, string $domain): Message
     {
-        $signer  = new DkimSigner($privateKey, $domain, EmailDKIM::SELECTOR);
-        $message = $signer->sign(
-            $this->email,
+        $signer       = new DkimSigner($privateKey, $domain, EmailDKIM::SELECTOR);
+        $emailForSign = new Message($this->email->getPreparedHeaders(), $this->email->getBody());
+        return $signer->sign(
+            $emailForSign,
             (new DkimOptions())
                 ->bodyCanon('relaxed')
                 ->headerCanon('relaxed')
-                ->headersToIgnore(['Message-ID'])
+                ->headersToIgnore(['message-id', 'date', 'mime-version', 'messageid'])
                 ->toArray()
         );
-        // DkimSigner drops BCC header, putting it back
-        // https://github.com/symfony/symfony/issues/44006
-        $bccs = $this->email->getBcc();
-        $this->email->setHeaders($message->getHeaders());
-        foreach ($bccs as $bcc) {
-            $this->email->addBcc($bcc);
-        }
-        $this->email->setBody($message->getBody());
     }
 }

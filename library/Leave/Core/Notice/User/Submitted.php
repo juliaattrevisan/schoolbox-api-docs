@@ -9,14 +9,12 @@
  */
 class Leave_Core_Notice_User_Submitted extends Leave_Core_Notice_User_Abstract
 {
-
     /**
      * Setup
      */
     public function setup()
     {
-
-        /* Common replacements
+         /* Common replacements
          */
         parent::setup();
 

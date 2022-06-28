@@ -9,13 +9,11 @@
  */
 class Leave_Core_Notice_Parent_Authorised extends Leave_Core_Notice_Parent_Abstract
 {
-
     /**
      * Setup
      */
     public function setup()
     {
-
         /* Common replacements
          */
         parent::setup();

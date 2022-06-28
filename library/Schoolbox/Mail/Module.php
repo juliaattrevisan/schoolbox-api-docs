@@ -42,7 +42,6 @@ class Module extends BaseModule
                 }
                 throw new Forbidden('Email is not set');
             })
-
         );
         $this->register(self::METHOD_GET, '/createMail', 'getCreateMail', $perm);
         $this->register(self::METHOD_POST, '/create', 'postCreateMail', $perm);

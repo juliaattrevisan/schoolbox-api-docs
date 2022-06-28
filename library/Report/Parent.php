@@ -12,7 +12,6 @@ use Schoolbox\Error;
  */
 class Report_Parent extends Report_Abstract
 {
-
     /**
      * The name of someone you are searching for
      *

@@ -172,7 +172,8 @@ class Controller extends Base
             '' !== trim($signature)
         ) {
             //build signature, and replace requested tokens
-            $emailBody = "<p>&nbsp;</p><p>---</p>" . $tokenReplacer->replace(
+            $emailBody = "<p>&nbsp;</p><p>---</p>"
+                . $tokenReplacer->replace(
                     $signature,
                     [
                         '[title]'     => $this->getUser()->getTitle(),

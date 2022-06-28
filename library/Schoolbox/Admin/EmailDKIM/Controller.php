@@ -14,6 +14,7 @@ use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Mapper\Exception;
+use Symfony\Component\Mime\Crypto\DkimSigner;
 
 /**
  * Class Controller
@@ -108,7 +109,7 @@ class Controller extends Base
                 $emailDKIM = $this->emailDKIMMapper->findById($id);
             } else {
                 $emailDKIM = $this->emailDKIMMapper->createModel();
-                $keyPair   = \Schoolbox\Auth\KeyPairGenerator::generate();
+                $keyPair   = \Schoolbox\Auth\KeyPairGenerator::generate(DkimSigner::ALGO_SHA256);
                 $emailDKIM->setCreatedAt(\Alaress_Date_Format::now())
                           ->setPublic($keyPair['public'])
                           ->setPrivate($keyPair['private']);
