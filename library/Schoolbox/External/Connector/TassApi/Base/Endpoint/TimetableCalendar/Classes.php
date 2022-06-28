@@ -146,7 +146,7 @@ class Classes implements IStrategy
     /**
      * A caching mechanism to prevent dupe CLEAR overrides actions
      *
-     * $eventEntries[$classCode][$startDate][$finishDate] = true
+     * $overridesEntries[$classCode][$startDate][$finishDate] = true
      *
      * @var array
      */
@@ -206,7 +206,7 @@ class Classes implements IStrategy
 
 
     /**
-     * Decide if $externalId is in the set of externalids, $watchlist
+     * Decide if $externalId is in $watchlist, which is a set of externalIds
      *
      * @param string|null $externalId
      * @param array|null  $watchlist
