@@ -30,7 +30,6 @@ use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
-
 use Symfony\Component\Mime\Message;
 
 use function count;

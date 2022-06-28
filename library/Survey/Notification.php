@@ -32,8 +32,9 @@ class Survey_Notification
     /**
      * Constructor
      *
-     * @param array $survey
-     * @param array $attempt
+     * @param array                        $survey
+     * @param array                        $attempt
+     * @param \Schoolbox\Mail\EmailFactory $emailFactory
      */
     public function __construct(array $survey, array $attempt, \Schoolbox\Mail\EmailFactory $emailFactory)
     {
@@ -71,17 +72,22 @@ class Survey_Notification
         $email->setContext(
             [
                 'hideUnsubscribe' => true,
-                'recipient' => $author->getFullName(),
-                'groups'    => [
+                'recipient'       => $author->getFullName(),
+                'groups'          => [
                     [
                         'rows' => [
                             [
                                 'messages' => [
                                     [
-                                        'icon'  => $baseUrl->setPath('/images/icon.php')->setQuery(['size'=>64, 'icon'=>'report'])->toString(),
+                                        'icon' => $baseUrl->setPath('/images/icon.php')->setQuery(
+                                            [
+                                                'size' => 64,
+                                                'icon' => 'report',
+                                            ]
+                                        )->toString(),
                                         'title' => sprintf('A response was submitted to %s. You may access this response', Scrub::text($this->getSurveyTitle())),
-                                        'href'  => $baseUrl->setPath(sprintf('/survey/review/%d/%d/%d', $this->survey['assess_id'], $firstSection['section_id'], $this->attempt['attempt_id']))->toString(),
-                                        'meta'  => null,
+                                        'href' => $baseUrl->setPath(sprintf('/survey/review/%d/%d/%d', $this->survey['assess_id'], $firstSection['section_id'], $this->attempt['attempt_id']))->toString(),
+                                        'meta' => null,
                                     ],
                                 ],
                             ],

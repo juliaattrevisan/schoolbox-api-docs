@@ -208,10 +208,10 @@ if (!is_numeric($nextSection['section_id'] ?? null) && !is_numeric($prevSection[
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+    * previous button if applicable
+    */
     if (is_numeric($nextSection['section_id'])) {
         $this->setVar(
             array(

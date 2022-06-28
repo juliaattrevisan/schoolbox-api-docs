@@ -47,7 +47,7 @@ class WorkerFactory
     private $client;
 
     /** @var Schoolbox\Instance */
-    private              $instance;
+    private $instance;
 
     private EmailFactory $emailFactory;
 
