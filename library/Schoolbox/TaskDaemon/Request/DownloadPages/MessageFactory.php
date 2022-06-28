@@ -80,7 +80,7 @@ class MessageFactory
      * @param string|null $callbackUrl
      * @return self
      */
-    public function withCallbackUrl(?string $callbackUrl): self
+    public function setCallbackUrl(?string $callbackUrl): self
     {
         $clone = (clone $this);
         $clone->callbackUrl = $callbackUrl;
@@ -99,7 +99,7 @@ class MessageFactory
      * @param array|null $callbackParams
      * @return self
      */
-    public function withCallbackParams(?array $callbackParams): self
+    public function setCallbackParams(?array $callbackParams): self
     {
         $clone = (clone $this);
         $clone->callbackParams = $callbackParams;
@@ -115,9 +115,9 @@ class MessageFactory
      * * the user which is authenticated for the callback URL
      *
      * @param User|null $effector
-     * @return $this
+     * @return self
      */
-    public function withUser(?User $effector): self
+    public function setUser(?User $effector): self
     {
         $clone = (clone $this);
         $clone->effector = $effector;
@@ -130,9 +130,9 @@ class MessageFactory
      * @see https://gotenberg.dev/docs/6.x/html#header-and-footer
      *
      * @param string|null $footer
-     * @return $this
+     * @return self
      */
-    public function withPdfFooter(?string $footer): self
+    public function setPdfFooter(?string $footer): self
     {
         $clone            = (clone $this);
         $clone->pdfFooter = $footer;

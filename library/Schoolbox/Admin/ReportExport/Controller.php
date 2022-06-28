@@ -297,8 +297,8 @@ class Controller extends ConfigController
              * to generate the pdfs. This is the bridge between the systems
              */
             $message = $messageFactory
-                ->withUser($this->getUser())
-                ->withCallbackUrl(
+                ->setUser($this->getUser())
+                ->setCallbackUrl(
                     $urlBase
                         ->setPath(
                             $this->getRouter()->generate(
@@ -309,7 +309,7 @@ class Controller extends ConfigController
                         ->setQuery(null)
                         ->toString()
                 )
-                ->withCallbackParams([
+                ->setCallbackParams([
                     'message' => sprintf(
                         'Your summative report %s is ready to download',
                         $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE),
@@ -317,7 +317,7 @@ class Controller extends ConfigController
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
                 ])
-                ->withPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
                 ->build(mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip');
             $producer->send($message);
         }
