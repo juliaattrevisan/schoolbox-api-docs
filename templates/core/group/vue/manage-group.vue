@@ -4,9 +4,11 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, computed, onMounted  } from 'vue';
+import { ref, computed, nextTick, onMounted  } from 'vue';
 import ManageGroupActions from './manage-group-actions.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
+import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
+
 
 const props = defineProps({
     /**
@@ -95,7 +97,14 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         noResults: 'No matching group members',
     },
 }
+const tableFooterEl = ref(null); 
 
+/**
+ * To update the table to show the UI in the footer
+ */
+async function onLoaded () {
+    updateFooterUI(tableFooterEl);
+}
 
 </script>
 
@@ -112,13 +121,19 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         </div><!-- small-12 island -->
     </div><!-- row  -->
     <div class="row">
-        <div class="small-12 columns">
+        <div class="small-12 island">
+            <h2 class="subheader">View Members</h2>
             <v-client-table
                 ref="table"
                 :data="groupMembers"
                 :columns="tableColumns"
                 :options="tableOptions"
-            />
+                @loaded="onLoaded"
+            >
+                <template #afterTable>
+                    <div class="VueTables__table-footer" ref="tableFooterEl"></div>
+                </template>
+            </v-client-table>
         </div><!-- small-12 island -->
     </div><!-- row  -->
 </template>
