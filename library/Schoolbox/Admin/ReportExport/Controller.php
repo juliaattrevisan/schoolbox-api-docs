@@ -244,6 +244,13 @@ class Controller extends ConfigController
         $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
         $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
         foreach ($reportStudents as $student) {
+            if ($reportParams->getViewAs() === Role::PARENT) {
+                $student->loadParents();
+                if ($student->getParents()->count() === 0) {
+                    $warnings[] = sprintf('Unable to generate report for student id %d. No parents.', $student->getId());
+                    continue;
+                }
+            }
             try {
                 $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
                     'studentId' => $student->getId(),
@@ -428,7 +435,22 @@ class Controller extends ConfigController
         }
 
         // View As
-        $viewer = $this->getUser();
+        switch ($params->getViewAs()) {
+            case Role::STUDENT:
+                $viewer = $student;
+                break;
+            case Role::PARENT:
+                $student->loadParents();
+                $viewer = $student->getParents()->first();
+                if (!$viewer) {
+                    $this->sendError(sprintf('Unable to generate report for student id %d. No parents.', $student->getId()));
+                }
+                break;
+            case Role::STAFF:
+            default:
+                // the current admin
+                $viewer = $this->getUser();
+        }
 
         $summaryWorkTypes = !$params->getSummaryWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getSummaryWorkTypeIds());
         $classWorkTypes   = !$params->getClassWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getClassWorkTypeIds());

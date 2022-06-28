@@ -25,6 +25,7 @@ class Parameters
 
     public const START_DATE               = 'startDate';
     public const END_DATE                 = 'endDate';
+    public const VIEW_AS                  = 'viewAs';
     public const SHOW_SUMMARY             = 'showSummary';
     public const SUMMARY_HEADING          = 'summaryHeading';
     public const WORK_TYPES               = 'workTypes';
@@ -75,6 +76,8 @@ class Parameters
 
     private array $termIds;
 
+    private string $viewAs;
+
     // summary
     private bool $showSummary;
 
@@ -115,6 +118,7 @@ class Parameters
     {
         $this->startDate  = $params[self::START_DATE] ?? null;
         $this->endDate    = $params[self::END_DATE] ?? null;
+        $this->viewAs     = $params[self::VIEW_AS] ?? Role::STAFF;
         $this->termMapper = $termMapper;
         $this->termIds    = (isset($params[self::TERMS]) && $params[self::TERMS] !== null) ? $this->filter($params[self::TERMS]) : [];
         // summary
@@ -162,6 +166,13 @@ class Parameters
         return $this->termIds;
     }
 
+    /**
+     * @return string
+     */
+    public function getViewAs(): string
+    {
+        return $this->viewAs;
+    }
 
     /**
      * @return bool
@@ -340,6 +351,7 @@ class Parameters
         if ($this->endDate) {
             $params[self::END_DATE] = $this->endDate;
         }
+        $params[self::VIEW_AS] = $this->viewAs;
 
         // summary
         $params[self::SHOW_SUMMARY] = $this->showSummary;
