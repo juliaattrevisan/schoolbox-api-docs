@@ -11,11 +11,9 @@ namespace Schoolbox\TaskDaemon\Request\DownloadPages;
 
 use Alaress_Date_Format;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Factory for building download pages taskd requests.

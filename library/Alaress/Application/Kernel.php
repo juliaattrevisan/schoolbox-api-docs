@@ -161,6 +161,7 @@ use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\TaskDaemon\ProducerFactory;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
@@ -451,6 +452,19 @@ abstract class Kernel
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                ],
+            )
+        );
+        $di->set(
+            'taskd.downloadPagesMessageFactory',
+            $di->lazyNew(
+                DownloadPagesMessageFactory::class,
+                [
+                    'instance'            => $di->lazyGet('instance'),
+                    'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
+                    'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                    'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                    'gotenbergHttpHeader' => 'SBAuth',
                 ],
             )
         );
