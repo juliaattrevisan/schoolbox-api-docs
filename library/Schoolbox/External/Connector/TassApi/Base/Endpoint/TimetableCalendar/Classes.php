@@ -784,7 +784,7 @@ class Classes implements IStrategy
 
             $overrideClear = $this->overridesMapper->createModel()
                 ->setEventId($event->getId())
-                ->setExternalId($person['external_id'])
+                ->setExternalId(null)
                 ->setAction(Model::CLEAR)
                 ->setSequence(1);
 
