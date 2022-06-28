@@ -13,6 +13,7 @@ use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use Database;
 use InvalidArgumentException;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -92,9 +93,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if ($e instanceof \Throwable) {
             $isException = true;
 
+            // Special case for oAuth exceptions:
+            // they provide a hint about what might've gone wrong
+            $message = $e->getMessage();
+            if ($e instanceof OAuthServerException) {
+                $message = sprintf('%s (Hint: %s)', $message, $e->getHint());
+            }
             $error = [
                 'file'    => $e->getFile(),
-                'message' => $e->getMessage(),
+                'message' => $message,
                 'line'    => $e->getLine(),
                 'type'    => $e->getCode(),
             ];
@@ -141,6 +148,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $message          = $error['message'];
                     $infoFromLocation = true;
                 } else {
+                    $info             = sprintf('%s %s', $info, $error['message']);
                     $message          = 'Schoolbox has encountered a fatal error.';
                     $infoFromLocation = true;
                 }
@@ -344,10 +352,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
                     $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
-                        $problem['trace'] = array_merge(
-                            [$error],
-                            $e instanceof \Throwable ? $e->getTrace() : $e['trace']
-                        );
+                        $problem['trace'] = $e instanceof \Throwable
+                            ? $e->getTrace()
+                            : ($e['trace'] ?? []);
                     }
 
                     /** @var Output\Json $output */
