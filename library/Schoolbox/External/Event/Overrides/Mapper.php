@@ -50,6 +50,15 @@ class Mapper extends \Schoolbox\Mapper
         $staff = \Schoolbox\Role::STAFF;
         $student = \Schoolbox\Role::STUDENT;
 
+        /* Spoke with Mr Sannang about mappers not really understanding how to save
+         * relational objects via a random column like synergy_id, so the usual trick
+         * ->setUser((new \Schoolbox\User())->setExternalId('BRO')) doesn't work
+         * the way it might have seemed (you can misuse mappers to save it, but that
+         * is pretty dodgy)
+         *
+         * Therefore save external_id as a string and manually handcraft User instances
+         * on their way out
+         */
         $uColumnString = \Schoolbox\UserMapper::getInstance()->getColumnString('u');
         $rColumnString = \Schoolbox\RoleMapper::getInstance()->getColumnString('r');
 
