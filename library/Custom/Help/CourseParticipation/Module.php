@@ -12,8 +12,6 @@ namespace Custom\Help\CourseParticipation;
 use Alaress\Authorizer\Rule\IsSchoolboxAdmin;
 use Alaress;
 use Alaress\Web\Controller\Base;
-use Psr\Log\NullLogger;
-use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Permission\SiteAccess;
 use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -66,11 +64,7 @@ class Module extends Alaress\Module\Module
                 $this->getConfig(),
                 $mapperFactory->get(Reset\Mapper::class),
                 $mapperFactory->get(UserMapper::class),
-                new EmailFactory(
-                    $this->getConfig(),
-                    \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(),
-                    new NullLogger()
-                )
+                $this->injector->get('mail.emailFactory'),
             )
         );
     }

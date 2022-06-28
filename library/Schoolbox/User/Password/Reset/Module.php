@@ -13,8 +13,6 @@ use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
-use Psr\Log\NullLogger;
-use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User\Password\MailService;
 use Schoolbox\UserMapper;
@@ -85,10 +83,7 @@ class Module extends BaseModule
                 $this->getConfig(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(UserMapper::class),
-                new Mail\EmailFactory(
-                    $this->getConfig(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(),
-                    new NullLogger(),
-                ),
+                $this->injector->get('mail.emailFactory'),
             ),
             new PasswordService(),
         );

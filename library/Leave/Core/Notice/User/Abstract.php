@@ -27,8 +27,8 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
     {
         $subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $twigEmailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
-        $email = $twigEmailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
+        $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $emailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
         $context = [
             'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
@@ -41,6 +41,7 @@ abstract class Leave_Core_Notice_User_Abstract extends Leave_Notice_Abstract_Not
             'LEAVE_HOST_PHONE'     => $this->getRequest()->getHostPhone(),
             'LEAVE_STUDENT_PHONE'  => $this->getRequest()->getUserPhone(),
             'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
+            'hideUnsubscribe'      => true,
         ];
 
         $email->setContext($context);

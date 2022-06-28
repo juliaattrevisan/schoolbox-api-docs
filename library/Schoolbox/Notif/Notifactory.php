@@ -21,7 +21,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class Notifactory
 {
-
     /** @var IConfigLoader */
     protected $conf;
 

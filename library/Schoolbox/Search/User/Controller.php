@@ -18,7 +18,6 @@ use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;

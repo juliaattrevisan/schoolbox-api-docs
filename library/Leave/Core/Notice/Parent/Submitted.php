@@ -9,7 +9,6 @@
  */
 class Leave_Core_Notice_Parent_Submitted extends Leave_Core_Notice_Parent_Abstract
 {
-
     /**
      * Setup
      */

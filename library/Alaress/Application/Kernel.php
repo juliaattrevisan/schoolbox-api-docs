@@ -124,6 +124,7 @@ use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\RepositoryFactory as RegistrationRepositoryFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
@@ -1889,6 +1890,22 @@ abstract class Kernel
             ),
         );
 
+        // email
+        $di->set(
+            'mail.emailFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $conf */
+                    $conf = $di->get('config');
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $di->get('mapperFactory');
+                    return new EmailFactory(
+                        $conf,
+                        $mapperFactory->get(\Schoolbox\Admin\EmailDKIM\Mapper::class)
+                    );
+                }
+            )
+        );
 
         return $di;
     }

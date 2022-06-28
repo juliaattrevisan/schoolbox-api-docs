@@ -22,7 +22,6 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Custom\Help\CourseParticipation;
-use InvalidArgumentException;
 
 use function strpos;
 

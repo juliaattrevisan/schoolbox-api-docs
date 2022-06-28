@@ -21,7 +21,6 @@ use Schoolbox\Mapper;
  */
 class ConfigMapper extends Mapper
 {
-
     // Table definition
     public const TABLE_NAME = 'config';
 

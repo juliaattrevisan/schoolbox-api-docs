@@ -31,7 +31,6 @@ use function count;
  */
 class Subnav
 {
-
     /**
      * For access to booleans that determine availability/visibility of certain menu
      * items based on plan, configuration, etc.

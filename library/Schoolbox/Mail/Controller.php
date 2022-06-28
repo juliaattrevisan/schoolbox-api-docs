@@ -13,7 +13,6 @@ use Alaress\Html\ToText as Html2Text;
 use Alaress\Web\Controller\Base;
 use Alaress\Mail\Mailer;
 use Alaress\Mail\Codec;
-use Schoolbox\Admin\EmailDKIM\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -38,14 +37,18 @@ class Controller extends Base
 
     private FilesystemProxy $filesystemProxy;
 
+    private EmailFactory $emailFactory;
+
     public function __construct(
         UserMapper $userMapper,
         \External_UserInterface $externalUser,
-        FilesystemProxy $filesystemProxy
+        FilesystemProxy $filesystemProxy,
+        EmailFactory $emailFactory
     ) {
         $this->userMapper      = $userMapper;
         $this->externalUser    = $externalUser;
         $this->filesystemProxy = $filesystemProxy;
+        $this->emailFactory    = $emailFactory;
     }
 
     /**
@@ -242,9 +245,7 @@ class Controller extends Base
             $this->sendError('No recipient provided');
         }
         $attachments = $this->request->post->get('attachment') ?? [];
-        // TODO inject
-        $emailFactory = new EmailFactory($this->getConfigLoader(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
-        $mail = $emailFactory->buildSimpleEmail($subject, '');
+        $mail        = $this->emailFactory->buildSimpleEmail($subject, '');
 
         //get users email address to use in from field
         $fromEmail = new Email($this->getUser()->getEmail());
@@ -359,11 +360,7 @@ class Controller extends Base
             $this->sendError("The Human Checker (reCAPTCHA) failed.");
         }
 
-        if ($this->getUser()) {
-            $name = $this->getUser()->getFullName();
-        } else {
-            $name = $this->request->post->get('name');
-        }
+        $name = $this->getUser()->getFullName();
 
         if ($this->validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
             foreach ($_POST as $key => $var) {
@@ -382,10 +379,9 @@ class Controller extends Base
             $context['NAME']            = $name;
             $context['hideUnsubscribe'] = true;
 
-            $twigEmailFactory = new \Schoolbox\Mail\EmailFactory($this->getConfigLoader(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
-            $subject          = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
-            $to               = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
-            $email            = $twigEmailFactory->buildTwigEmail('feedback.twig', $subject, $to);
+            $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
+            $to      = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
+            $email   = $this->emailFactory->buildTwigEmail('feedback.twig', $subject, $to);
             $email->setReplyTo($_POST['email'], $name);
             $email->setContext($context);
             $email->send();

@@ -58,7 +58,8 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserMapper::class),
             $this->injector->get('externalUser'),
-            $this->injector->get('filesystem.storageProxy')
+            $this->injector->get('filesystem.storageProxy'),
+            $this->injector->get('mail.emailFactory'),
         );
     }
 

@@ -14,7 +14,6 @@ use Schoolbox\Mail\EmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mime\Address;
 
 /**
  * Class MailService

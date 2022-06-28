@@ -1,4 +1,5 @@
 {% extends 'schoolmail.twig' %}
+{% block content %}
 <div style="font-family: Calibri, 'Trebuchet MS',Arial,Helvetica,sans-serif">
     <p>This is an automated notification regarding the following leave request for <strong>{{ LEAVE_USER_NAME }}</strong>.</p>
 
@@ -29,3 +30,4 @@
     <p><strong>Rejected by</strong> <em>{{ LEAVE_REJECTED_BY }}</em></p>
     {% endif %}
 </div>
+{% endblock %}

@@ -12,12 +12,11 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Role;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
-
+$app = new class extends CliTool\App
+{
     private const OPT_SHORT_HELP  = 'h';
     private const OPT_LONG_HELP   = 'help';
 

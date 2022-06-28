@@ -1674,8 +1674,8 @@ class Leave_Controller extends Controller
      */
     public function executeEmailTest()
     {
-        $twigEmailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
-        $email = $twigEmailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
+        $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $emailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
 
         $email->setFrom(Config::get('mail_from_address'), 'Test Schoolbox');
         $email->send();

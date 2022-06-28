@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\Mailer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -14,7 +13,6 @@ use Schoolbox\UserMapper;
 
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -134,7 +132,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Get all the students belonging to this category code
              */
             $userMapper       = UserMapper::getInstance();
-            $allStudentEmails = [];
             $synergyIds       = [];
 
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
@@ -153,12 +150,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 /* Accumulate this for a giant parent-based bcc
                  */
                 $synergyIds[] = $currentStudent['synergy_id'];
-
-                /* Agglutinate a giant bcc
-                 */
-                if ($user->getEmail()) {
-                    $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
-                }
 
                 $this->setVar(
                     [
@@ -212,7 +203,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 $this->setVar(
                     [
                         'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => implode(Mailer::implodeGlue(), $allStudentEmails),
+                        'EMAIL_ALL_STUDENTS' => implode(',', $synergyIds),
                     ]
                 );
 
@@ -230,19 +221,10 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 && $this->getConfigLoader()->get('mail_enable')
                 && $this->getUser()->hasEmail()
             ) {
-                $externalHandler = new External_User();
-                $allParents      = $externalHandler->getParentEmails($synergyIds);
-                $emailAllParents = '';
-
-                if (\is_array($allParents) && \count($allParents) > 0) {
-                    // Uniqueify, cleanup empty string emails and merge to string
-                    $emailAllParents = implode(Mailer::implodeGlue(), $allParents);
-                }
-
                 $this->setVar(
                     [
                         'REPLY_TO'          => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_PARENTS' => $emailAllParents,
+                        'EMAIL_ALL_PARENTS' => implode(',', $synergyIds),
                     ]
                 );
 

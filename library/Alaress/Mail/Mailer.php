@@ -13,7 +13,7 @@ use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\EmailDKIM\Mapper;
-use Schoolbox\Admin\EmailDKIM\Model;
+use Schoolbox\Admin\EmailDKIM\Model as EmailDKIM;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -72,15 +72,14 @@ class Mailer implements IMailer
     /**
      * Construct the basics of a new Mailer
      *
-     * @param string $template
-     * @param string $subject
+     * @param string                    $subject
      * @param string|array|Address|User $to
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $template, string $subject, string|array|Address|User $to, IConfigLoader $config, Mapper $dkimMapper)
+    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
     {
-        $this->config = $config;
+        $this->config     = $config;
         $this->dkimMapper = $dkimMapper;
 
         $this->email = new Email();
@@ -109,9 +108,13 @@ class Mailer implements IMailer
     }
 
 
-    public function setTo(string|array|Address|User $to)
+    /**
+     * Set To
+     * @param string|array|Address|User $to
+     * @return void
+     */
+    public function setTo(string | array | Address | User $to)
     {
-
         if ($to instanceof User) {
             $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
         } elseif ($to instanceof Address) {
@@ -139,31 +142,58 @@ class Mailer implements IMailer
         }
     }
 
+    /**
+     * Set CC
+     * @param Address $cc
+     * @return void
+     */
     public function setCc(Address $cc)
     {
-     $this->email->addCc($cc);
+        $this->email->addCc($cc);
     }
 
-    public function setBcc(Address $cc)
+    /**
+     * Set BCC
+     * @param Address $bcc
+     * @return void
+     */
+    public function setBcc(Address $bcc)
     {
-        $this->email->addBcc($cc);
+        $this->email->addBcc($bcc);
     }
 
-    public function setSubject($subject)
+    /**
+     * Set subject
+     * @param string $subject
+     * @return void
+     */
+    public function setSubject(string $subject)
     {
         $this->email->subject($subject);
     }
 
+    /**
+     * Set text
+     * @param string $text
+     * @return void
+     */
     public function setText(string $text)
     {
         $this->email->text($text);
     }
 
+    /**
+     * Set html
+     * @param string $html
+     * @return void
+     */
     public function setHtml(string $html)
     {
         $this->email->html($html);
     }
+
     /**
+     * Set from
      * @param string $email
      * @param string $name
      */
@@ -172,7 +202,6 @@ class Mailer implements IMailer
         $this->email->from(new Address($email, $name));
         $this->email->returnPath($email);
     }
-
 
     /**
      * Set the reply-to header
@@ -212,7 +241,14 @@ class Mailer implements IMailer
         return $this;
     }
 
-
+    /**
+     * Add file
+     * @param $file
+     * @param $type
+     * @param $filename
+     * @param $isFile
+     * @return void
+     */
     public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true)
     {
         // add attachment to email
@@ -223,7 +259,12 @@ class Mailer implements IMailer
         }
     }
 
-
+    /**
+     * Add image
+     * @param $file
+     * @param $type
+     * @return Email
+     */
     public function addImage($file, $type = 'application/octet')
     {
         //add inline image to email
@@ -231,12 +272,17 @@ class Mailer implements IMailer
         return $this->email->embed($file, null, $type);
     }
 
-
+    /**
+     * @return string
+     */
     protected function composeHTML()
     {
         return (string)$this->email->getHtmlBody();
     }
 
+    /**
+     * @return string
+     */
     protected function composePlain()
     {
         return (string)$this->email->getTextBody();
@@ -260,12 +306,11 @@ class Mailer implements IMailer
      * Attempts to send the email constructed by this class. Returns mailing success or failure.
      *
      * @param string $to
-     * @throws TransportExceptionInterface
      * @return bool
+     * @throws TransportExceptionInterface
      */
     public function send($to = '')
     {
-
         if (!empty($to)) {
             $this->setTo($to);
         }
@@ -330,16 +375,7 @@ class Mailer implements IMailer
                 [$email, $domain] = explode('@', $from->getAddress());
                 try {
                     $dkim = $this->dkimMapper->findOneByColumn('domain', $domain);
-                    $signer = new DkimSigner($dkim->getPrivate(), $domain, Model::SELECTOR);
-                    $message = $signer->sign($this->email,
-                                  (new DkimOptions())
-                                      ->bodyCanon('relaxed')
-                                      ->headerCanon('relaxed')
-                                      ->headersToIgnore(['Message-ID'])
-                                      ->toArray()
-                    );
-                    $this->email->setHeaders($message->getHeaders());
-                    $this->email->setBody($message->getBody());
+                    $this->sign($dkim->getPrivate(), $dkim->getDomain());
                 } catch (Exception $e) {
                     // noop
                 }
@@ -547,10 +583,30 @@ class Mailer implements IMailer
         return \chr(self::EMAIL_SEPARATOR_CODE);
     }
 
-
-    public function sign($privateKey, $domain)
+    /**
+     * Sign
+     * @param string $privateKey
+     * @param string $domain
+     * @return void
+     */
+    public function sign(string $privateKey, string $domain)
     {
-        $signer = new DkimSigner($privateKey, $domain, 'schoolbox');
-        $signer->sign($this->email);
+        $signer  = new DkimSigner($privateKey, $domain, EmailDKIM::SELECTOR);
+        $message = $signer->sign(
+            $this->email,
+            (new DkimOptions())
+                ->bodyCanon('relaxed')
+                ->headerCanon('relaxed')
+                ->headersToIgnore(['Message-ID'])
+                ->toArray()
+        );
+        // DkimSigner drops BCC header, putting it back
+        // https://github.com/symfony/symfony/issues/44006
+        $bccs = $this->email->getBcc();
+        $this->email->setHeaders($message->getHeaders());
+        foreach ($bccs as $bcc) {
+            $this->email->addBcc($bcc);
+        }
+        $this->email->setBody($message->getBody());
     }
 }

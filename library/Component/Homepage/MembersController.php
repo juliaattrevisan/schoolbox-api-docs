@@ -17,7 +17,6 @@ use Schoolbox\Profile\ValidEmailVisible;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Maximum number of members to display
      * If the collection exceeds this it will truncate the list and leave a message

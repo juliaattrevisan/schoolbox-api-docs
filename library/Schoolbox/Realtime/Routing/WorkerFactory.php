@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\EmailFactory;
 use Schoolbox\MobileApp;
 use Schoolbox\MobileApp\RegistryMapper;
@@ -48,7 +47,9 @@ class WorkerFactory
     private $client;
 
     /** @var Schoolbox\Instance */
-    private $instance;
+    private              $instance;
+
+    private EmailFactory $emailFactory;
 
 
     /**
@@ -60,6 +61,7 @@ class WorkerFactory
      * @param RoutePermissionMapper $routePermMapper
      * @param \Schoolbox\Instance   $instance
      * @param FilesystemProxy       $filesystemProxy
+     * @param EmailFactory          $emailFactory
      */
     public function __construct(
         IConfigLoader $conf,
@@ -69,7 +71,8 @@ class WorkerFactory
         UserMapper $userMapper,
         RoutePermissionMapper $routePermMapper,
         Schoolbox\Instance $instance,
-        private FilesystemProxy $filesystemProxy
+        private FilesystemProxy $filesystemProxy,
+        EmailFactory $emailFactory
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -78,6 +81,7 @@ class WorkerFactory
         $this->userMapper = $userMapper;
         $this->routePermMapper = $routePermMapper;
         $this->instance = $instance;
+        $this->emailFactory = $emailFactory;
     }
 
 
@@ -98,11 +102,8 @@ class WorkerFactory
             MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
-        // factory for configuring instant emails
-        $twigFactory = new EmailFactory($this->conf, \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(), $this->log);
-
         // responsible for draining a list into an email and sending it (only include reply-to headers if config allows)
-        $mailer = new Mailer($twigFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
+        $mailer = new Mailer($this->emailFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
 
         // build a list factory
         $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);

@@ -5,6 +5,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Mail;
@@ -25,7 +26,6 @@ use Alaress\Html\ToText as Html2Text;
  */
 class TwigEmail extends Mailer
 {
-
     /**
      * @var array
      */
@@ -49,24 +49,34 @@ class TwigEmail extends Mailer
     protected string $rendercache = '';
 
     /**
-     * DO NOT DIRECTLY INSTANTIATE THIS - use TwigEmailFactory instead
+     * DO NOT DIRECTLY INSTANTIATE THIS - use EmailFactory (di->get('mail.emailFactory')) instead
      * Prepares the email by importing various configurations from the system
      *
-     * @param string                    $template - filename of the Twig template, relative to 'templates/[core|site]/email'
-     * @param string                    $subject  - the default email subject, can be changed after construction
-     * @param string|array|Address|User $to       - the defailt recipient, can be changed after construction
+     * @param string                    $subject - the default email subject, can be changed after construction
+     * @param string|array|Address|User $to      - the defailt recipient, can be changed after construction
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $template, string $subject, string|array|Address|User  $to, IConfigLoader $config, Mapper $dkimMapper)
+    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
     {
-        parent::__construct($template, $subject, $to, $config, $dkimMapper);
-
-        $this->templateFilename = $template;
+        parent::__construct($subject, $to, $config, $dkimMapper);
 
         $this->cssInliner = new CssToInlineStyles();
     }
 
+    /**
+     * @param string $template
+     * @return void
+     */
+    public function setTemplate(string $template)
+    {
+        $this->templateFilename = $template;
+    }
+
+    /**
+     * @param Environment $twig
+     * @return void
+     */
     public function setTwig(Environment $twig)
     {
         $this->twig = $twig;
@@ -76,7 +86,7 @@ class TwigEmail extends Mailer
      * @param array $context
      * @return self
      */
-    public function setContext($context)
+    public function setContext(array $context): self
     {
         if ($context) {
             $this->context = array_merge_recursive($this->context, $context);
@@ -89,7 +99,7 @@ class TwigEmail extends Mailer
     /**
      * @return array
      */
-    public function getContext()
+    public function getContext(): array
     {
         return $this->context;
     }
@@ -103,7 +113,7 @@ class TwigEmail extends Mailer
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function composeHTML()
+    public function composeHTML(): string
     {
         $preformat         = $this->twig->render(
             $this->templateFilename,
@@ -120,7 +130,7 @@ class TwigEmail extends Mailer
      *
      * @return string
      */
-    protected function composePlain()
+    protected function composePlain(): string
     {
         if ($this->rendercache) {
             $converter = new Html2Text($this->rendercache);
@@ -155,7 +165,7 @@ class TwigEmail extends Mailer
      *
      * @param string $subject
      */
-    public function setSubject($subject)
+    public function setSubject(string $subject)
     {
         parent::setSubject($subject);
         $this->setCoreContext(['config' => ['subject' => $subject]]);

@@ -13,7 +13,6 @@ use Schoolbox\UserMapper;
 
 class Survey_Notification
 {
-
     /** @var \Schoolbox\Mail\TwigEmail|null */
     protected ?\Schoolbox\Mail\TwigEmail $email = null;
 
@@ -28,18 +27,22 @@ class Survey_Notification
 
     private \Schoolbox\Config\Loader $config;
 
+    private \Schoolbox\Mail\EmailFactory $emailFactory;
+
     /**
      * Constructor
      *
      * @param array $survey
      * @param array $attempt
      */
-    public function __construct(array $survey, array $attempt)
+    public function __construct(array $survey, array $attempt, \Schoolbox\Mail\EmailFactory $emailFactory)
     {
         $this->survey     = $survey;
         $this->attempt    = $attempt;
         $this->userMapper = UserMapper::getInstance();
         $this->config     = \Schoolbox\Config\Loader::getInstance();
+
+        $this->emailFactory = $emailFactory;
 
         $this->setup();
     }
@@ -63,9 +66,8 @@ class Survey_Notification
         }
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
-        $twigEmailFactory = new \Schoolbox\Mail\EmailFactory(\Schoolbox\Config\Loader::getInstance(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance());
-        $baseUrl          = (new UrlFactory($this->config))->buildFullyQualified();
-        $email            = $twigEmailFactory->buildTwigEmail('instantmail.twig', $subject, $author->getEmail());
+        $baseUrl = (new UrlFactory($this->config))->buildFullyQualified();
+        $email   = $this->emailFactory->buildTwigEmail('instantmail.twig', $subject, $author->getEmail());
         $email->setContext(
             [
                 'hideUnsubscribe' => true,

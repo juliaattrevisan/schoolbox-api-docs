@@ -6,14 +6,15 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Mail;
 
 use Alaress\Lumberjack\Logger;
 use Alaress\Mail\Mailer;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Admin\EmailDKIM\Mapper;
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Scrub;
@@ -42,46 +43,47 @@ class EmailFactory
 
     private ?Environment $twig = null;
 
-    private Loader $config;
-    private Mapper $dkimMapper;
+    private IConfigLoader $config;
+
+    private DKIMMapper $dkimMapper;
 
     /**
      * Constructor
      *
      * @param IConfigLoader        $config
-     * @param Mapper               $dkimMapper
+     * @param DKIMMapper           $dkimMapper
      * @param LoggerInterface|null $log
      */
-    public function __construct(IConfigLoader $config, Mapper $dkimMapper, ?LoggerInterface $log = null)
+    public function __construct(IConfigLoader $config, DKIMMapper $dkimMapper, ?LoggerInterface $log = null)
     {
-        $this->config = $config;
-        $this->log = $log ?? new Logger(null);
+        $this->config     = $config;
+        $this->log        = $log ?? new Logger(null);
         $this->dkimMapper = $dkimMapper;
     }
 
     /**
      * Builder
      *
-     * @see TwigEmail::__construct()
-     *
-     * @param string $template
-     * @param string $subject
+     * @param string                    $template
+     * @param string                    $subject
      * @param string|array|Address|User $to
      * @return TwigEmail
+     * @see TwigEmail::__construct()
+     *
      */
-    public function buildTwigEmail(string $template, string $subject, string|array|Address|User $to): TwigEmail
+    public function buildTwigEmail(string $template, string $subject, string | array | Address | User $to): TwigEmail
     {
-        $twigEmail = new TwigEmail($template, $subject, $to, $this->config, $this->dkimMapper);
+        $twigEmail = new TwigEmail($subject, $to, $this->config, $this->dkimMapper);
+        $twigEmail->setTemplate($template);
         $twigEmail->setTwig($this->getTwig());
         $twigEmail->setLogger($this->log);
         $twigEmail->setCoreContext($this->context->getContext());
-//        $twigEmail->sign();
         return $twigEmail;
     }
 
-    public function buildSimpleEmail(string $subject, string|array|Address|User $to): Mailer
+    public function buildSimpleEmail(string $subject, string | array | Address | User $to): Mailer
     {
-        $email = new Mailer('', $subject, $to, $this->config, $this->dkimMapper);
+        $email = new Mailer($subject, $to, $this->config, $this->dkimMapper);
         $email->setLogger($this->log);
         return $email;
     }
@@ -89,11 +91,14 @@ class EmailFactory
     /**
      * @return array
      */
-    public function getCoreContext()
+    public function getCoreContext(): array
     {
         return $this->context->getContext();
     }
 
+    /**
+     * @return Environment
+     */
     private function getTwig(): Environment
     {
         if ($this->twig) {
@@ -102,7 +107,7 @@ class EmailFactory
         $this->context = new CoreContext($this->config);
 
         // load up paths in order of preference (start with school-specific)
-        $paths  = [];
+        $paths = [];
         if (is_dir(($custom = SITE_root . '/templates/' . strtolower($this->config->get('site_school_code')) . '/email'))) {
             $paths[] = $custom;
         }

@@ -18,7 +18,6 @@ use Symfony\Component\Mime\Address;
 
 interface IMailer
 {
-
     /**
      * @param IConfigLoader $conf
      * @param bool $reinitialise
@@ -40,7 +39,7 @@ interface IMailer
      */
     public static function buildAddress($address, $name = '');
 
-    public function __construct(string $template, string $subject, string|array|Address|User $to, IConfigLoader $config, Mapper $dkimMapper);
+    public function __construct(string $subject, string|array|Address|User $to, IConfigLoader $config, Mapper $dkimMapper);
 
     public function setFrom(string $email, string $name = '');
 
@@ -50,7 +49,7 @@ interface IMailer
 
     public function setTo(string|array|Address|User $to);
 
-    public function setSubject($subject);
+    public function setSubject(string $subject);
 
     public function addFile($file, $mime = 'text/plain', $filename = '', $isFile = true);
 

@@ -33,10 +33,9 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         $this->externalUser = new External_User();
 
         $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
-        $subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
-        $twigEmailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
-        $email = $twigEmailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
+        $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $emailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
         $context = [
             'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
@@ -54,6 +53,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
             'LEAVE_RETURNER_NAME'  => $this->getRequest()->getReturnerName(),
             'LEAVE_REASON'         => $this->getRequest()->getReason(),
             'TERMS_AND_CONDITIONS' => Config::get('terms_and_conditions'),
+            'hideUnsubscribe'      => true,
         ];
 
         $email->setContext($context);

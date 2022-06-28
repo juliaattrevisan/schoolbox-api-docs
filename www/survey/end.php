@@ -104,7 +104,9 @@ if (!$attempt['finish']) {
     /* Notify the survey author when someone completes this
      */
     if ($survey['notify_author']) {
-        $notification = new Survey_Notification($survey, $attempt);
+        /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
+        $emailFactory = $this->di->get('mail.emailFactory');
+        $notification = new Survey_Notification($survey, $attempt, $emailFactory);
         $notification->send();
     }
 } else {

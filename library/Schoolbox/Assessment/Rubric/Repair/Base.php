@@ -384,8 +384,8 @@ abstract class Base extends CliTool\App
     {
         $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
         if ($mailto) {
-            $twigEmailFactory = new EmailFactory($this->getConfig(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(), $this->log);
-            $mailer = $twigEmailFactory->buildTwigEmail($template, $subject, $mailto);
+            $emailFactory = new EmailFactory($this->getConfig(), \Schoolbox\Admin\EmailDKIM\Mapper::getInstance(), $this->log);
+            $mailer = $emailFactory->buildTwigEmail($template, $subject, $mailto);
             $mailer->setContext($context);
             try {
                 $mailer->send();

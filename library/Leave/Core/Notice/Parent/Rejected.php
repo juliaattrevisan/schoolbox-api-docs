@@ -9,7 +9,6 @@
  */
 class Leave_Core_Notice_Parent_Rejected extends Leave_Core_Notice_Parent_Abstract
 {
-
     /**
      * Setup
      */
@@ -22,12 +21,10 @@ class Leave_Core_Notice_Parent_Rejected extends Leave_Core_Notice_Parent_Abstrac
 
         /* Custom replacements
          */
-        $this->getEmail()->setVar(array(
+        $context = [
             'LEAVE_REJECTED_BY' => $this->getRequest()->getAuthorisationUser()->formatName(),
-        ));
+        ];
 
-        $this->getEmail()->setVar('submitted_by_block', '');
-        $this->getEmail()->setVar('authorised_by_block', '');
-        $this->getEmail()->parse('rejected_by_block', 'rejected_by');
+        $this->email->setContext($context);
     }
 }
