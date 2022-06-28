@@ -35,6 +35,24 @@ const isLoading = ref(true); //to display loading note
 const hasLoadError = ref(false); //to display loading error
 const groupMembers = ref([]); //all the group members
 
+/**
+ * When the table is ready and able to be displayed with group members
+ * 
+ * @returns { Boolean } 
+ */
+const hasGroupMembers = computed(() => {
+    return !isLoading.value && !hasLoadError.value && groupMembers.value.length > 0;
+});
+
+/**
+ * When we've loaded the group members but there's none in the group yet
+ * 
+ * @returns { Boolean } 
+ */
+const hasNoGroupMembers = computed(() => {
+    return !isLoading.value && !hasLoadError.value && groupMembers.value.length === 0;
+});
+
 onMounted(() => {
     loadGroupMembers();
 });
@@ -46,10 +64,10 @@ async function loadGroupMembers () {
     try {
         const response = await fetch(props.endpoint);
         const responseJson = await response.json();
-        groupMembers.value = responseJson;
-        groupMembers.value.forEach((groupMember) => { //to highlight new members just added
-            groupMember = { ...groupMember, isNew: false };
-        });
+        // groupMembers.value = responseJson;
+        // groupMembers.value.forEach((groupMember) => { //to highlight new members just added
+        //     groupMember = { ...groupMember, isNew: false };
+        // });
     } catch (error) {
         console.warn(error);
         isLoading.value = false;
@@ -66,7 +84,7 @@ async function loadGroupMembers () {
  * 
  ****************************************************************/
 
-const tableColumns = ['name']
+const tableColumns = ['name', 'access']
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     // columnsClasses: {
     //     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
@@ -75,21 +93,16 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     debounce: 100, //shorter debounce time as data is stored locally
     headings: {
         name: 'Name',
+        access: 'Access',
         // ['dateModified.formatted']: 'Date modified',
     },
-    perPage: 100,
-    perPageValues: [100, 200, 300],
+    perPage: 50,
+    perPageValues: [50, 100, 200],
     resizableColumns: false,
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
     },
-    sortable: ['name'], //the edit column doesn't need to be sortable
-    sortIcon: {
-        is: 'glyphicon-sort',
-        base: 'glyphicon',
-        up: 'glyphicon-chevron-up',
-        down: 'glyphicon-chevron-down'
-    },
+    sortable: ['name', 'access'], //the edit column doesn't need to be sortable
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
@@ -121,9 +134,9 @@ async function onLoaded () {
     </div><!-- row  -->
     <div class="row">
         <div class="small-12 island">
-            <h2 class="subheader">View Members</h2>
+            <h2 class="subheader">Current Members</h2>
             <v-client-table
-                ref="table"
+                v-if="hasGroupMembers"
                 :data="groupMembers"
                 :columns="tableColumns"
                 :options="tableOptions"
@@ -133,6 +146,34 @@ async function onLoaded () {
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
                 </template>
             </v-client-table>
+            <div v-else-if="hasNoGroupMembers" class="empty-state">
+                <i class="icon-group"></i>
+                <p>This group currently has no members.<br>Once members have been added they will appear here.</p>
+            </div>
+            <div v-else-if="hasLoadError">
+                <section class="content">
+                    <div tableData-alert class="alert-box alert">
+                        Sorry, we are currently unable to load the group members. Please contact your support it the problem persists.
+                    </div>
+                </section>
+            </div>
+            <div v-else-if="isLoading">
+                <table class="skeleton">
+                    <thead>
+                        <tr>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div><!-- small-12 island -->
     </div><!-- row  -->
 </template>
