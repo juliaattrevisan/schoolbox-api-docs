@@ -653,21 +653,35 @@ class Classes implements IStrategy
 
                         $event = $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()];
                     } else {
-                        /* Cram in everything else
+                        /* Try to get an event corresponding to this lesson's (code/start/finish) tuple
+                         * in an attempt to recycle an existing event, slowing the propagation of
+                         * autoincrementing ids - if it exists, update it and save it
                          */
-                        $event = $this->eventMapper->createModel()
-                            ->setTitle($title)
-                            ->setDetail($detail)
-                            ->setLocation($room)
-                            ->setCode($classCode)
-                            ->setDay($day)
-                            ->setPeriod($period)
-                            ->setStartAt($startAt)
-                            ->setFinishAt($finishAt)
-                            ->setType($type)
-                            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                            ->setGuid($guid)
-                            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+                        try {
+                            $event = $this->eventMapper->findOneByColumnList([
+                                'code' => $classCode,
+                                'start_at' => $startAt->getDatabase(),
+                                'finish_at' => $finishAt->getDatabase(),
+                                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                                'source' => \Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME
+                            ]);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            /* Cram in everything else into a new instance
+                             */
+                            $event = $this->eventMapper->createModel()
+                                ->setTitle($title)
+                                ->setDetail($detail)
+                                ->setLocation($room)
+                                ->setCode($classCode)
+                                ->setDay($day)
+                                ->setPeriod($period)
+                                ->setStartAt($startAt)
+                                ->setFinishAt($finishAt)
+                                ->setType($type)
+                                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                                ->setGuid($guid)
+                                ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
+                        }
 
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
