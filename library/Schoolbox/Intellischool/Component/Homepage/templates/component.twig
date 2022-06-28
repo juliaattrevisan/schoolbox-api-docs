@@ -43,5 +43,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('iframeForm').submit();
         });
+        if ('complete' === window.document.readyState) {
+            document.getElementById('iframeForm').submit();
+        }
     </script>
 {% endif %}
