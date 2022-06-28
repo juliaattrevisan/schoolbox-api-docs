@@ -97,13 +97,12 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         noResults: 'No matching group members',
     },
 }
-const tableFooterEl = ref(null); 
 
 /**
  * To update the table to show the UI in the footer
  */
 async function onLoaded () {
-    updateFooterUI(tableFooterEl);
+    updateFooterUI();
 }
 
 </script>
@@ -131,7 +130,7 @@ async function onLoaded () {
                 @loaded="onLoaded"
             >
                 <template #afterTable>
-                    <div class="VueTables__table-footer" ref="tableFooterEl"></div>
+                    <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
                 </template>
             </v-client-table>
         </div><!-- small-12 island -->

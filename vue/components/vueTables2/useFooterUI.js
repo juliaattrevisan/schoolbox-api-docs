@@ -1,17 +1,21 @@
 /**
  * For a vue-table-2 to show the UI at the bottom right of the table
  * 
+ * @TODO - we currently assume that there is only ever one vue-table on the page
+ *         for now this is a safe assumption, but it could cause issues in the future
+ *         if we ever put more than one vue-table on a page
+ * 
  */
 
- import { nextTick  } from 'vue';
+ import { nextTick } from 'vue';
 
  /**
   * To adjust the UI display, 
   * putting everything down the bottom right
   */
-export async function updateFooterUI (tableFooterEl) {
-    await nextTick();
-    pushUIIntoFooterSlot(tableFooterEl);
+export async function updateFooterUI () {
+    await nextTick(); //to ensure the footer is available in the DOM
+    pushUIIntoFooterSlot();
     onlyShowNextPrevPagination();
 }
 
@@ -19,15 +23,16 @@ export async function updateFooterUI (tableFooterEl) {
  * Move all the existing UI into the supplied 'afterTable' slot,
  * placing in order of display
  */
-function pushUIIntoFooterSlot (tableFooterEl) {
+function pushUIIntoFooterSlot () {
     const perPageControls = document.querySelector('.VueTables__limit');
+    const tableFooter = document.querySelector('[data-table-footer]');
     if (perPageControls) { //may not exist depending on how many results are currently available / filtered
-        tableFooterEl.value.appendChild(perPageControls);
+        tableFooter.appendChild(perPageControls);
     }
     const paginationCount = document.querySelector('.VuePagination__count');
-    tableFooterEl.value.appendChild(paginationCount);
+    tableFooter.appendChild(paginationCount);
     const paginationControls = document.querySelector('.VuePagination');
-    tableFooterEl.value.appendChild(paginationControls);
+    tableFooter.appendChild(paginationControls);
 }
 
 /**
