@@ -585,7 +585,7 @@ class Controller extends Base
          * contents from the storage instance
          */
         $data = [
-            'html' => $plagscan->getStorage()->read(),
+            'html' => $this->filesystemProxy->read($plagscan->getStorage()),
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
