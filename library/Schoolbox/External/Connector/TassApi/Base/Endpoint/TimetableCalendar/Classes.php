@@ -743,12 +743,12 @@ class Classes implements IStrategy
      * @param \Schoolbox\External\Event\Model $event
      * @return bool
      */
-    private function isDuty(\Schoolbox\External\Event\Model $event): bool
-    {
-        /* If the location is DUT, it's a duty
-         */
-        return 'DUT' === $event->getLocation();
-    }
+//    private function isDuty(\Schoolbox\External\Event\Model $event): bool
+//    {
+//        /* If the location is DUT, it's a duty
+//         */
+//        return 'DUT' === $event->getLocation();
+//    }
 
 
     /**
