@@ -53,20 +53,28 @@ class MessageFactory
      */
     private array $content = [];
 
-    private ?string $gotenbergUrl = null;
-    private ?string $gotenbergKey = null;
-    private ?string $gotenbergHttpHeader = null;
+    /**
+     * @var string|null
+     */
     private ?string $gotenbergFooter = null;
 
     /**
      * Constructor
      *
-     * @param Instance $instance     Information about the Schoolbox instance.
-     * @param Jwt      $tokenBuilder Used to generate a JWT for use in the auth header when calling the callback.
+     * @param Instance    $instance            Information about the Schoolbox instance.
+     * @param Jwt         $tokenBuilder        Used to generate a JWT for use by taskd when:
+     *                                         * calling the callback URL
+     *                                         * initiating a session for Gotenberg when generating PDFs from Schoolbox
+     * @param string|null $gotenbergUrl        The URL of the Gotenberg container.
+     * @param string|null $gotenbergKey        The API key which the Gotenberg container requires, if any.
+     * @param string|null $gotenbergHttpHeader The header in which `$gotenbergKey` will be passed.
      */
     public function __construct(
         private Instance $instance,
         private Jwt $tokenBuilder,
+        private ?string $gotenbergUrl,
+        private ?string $gotenbergKey,
+        private ?string $gotenbergHttpHeader,
     ) {
     }
 
@@ -88,31 +96,6 @@ class MessageFactory
     {
         $clone = (clone $this);
         $clone->effector = $effector;
-        return $clone;
-    }
-
-    public function withoutGotenberg(): self
-    {
-        $clone = (clone $this);
-        $clone->gotenbergUrl = null;
-        $clone->gotenbergKey = null;
-        $clone->gotenbergHttpHeader = null;
-        $clone->gotenbergFooter = null;
-        return $clone;
-    }
-
-    public function withGotenbergUrl(?string $url): self
-    {
-        $clone = (clone $this);
-        $clone->gotenbergUrl = $url;
-        return $clone;
-    }
-
-    public function withGotenbergKey(?string $key, ?string $httpHeader): self
-    {
-        $clone = (clone $this);
-        $clone->gotenbergKey = $key;
-        $clone->gotenbergHttpHeader = $httpHeader;
         return $clone;
     }
 
