@@ -112,9 +112,6 @@ class Module extends BaseModule
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
 
-        $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
-        $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
-
         // For now, same auth rules as crocodoc.
         $canAccessKami = new Rule\All(
             $hasKamiAccess,
