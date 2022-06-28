@@ -6,8 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -43,7 +42,7 @@ $app = new class extends CliTool\App {
         $storageMapper = new StorageMapper();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
 
-        /** @var FilesystemInterface $storageFilesystem */
+        /** @var Filesystem $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
         /** @var Sanitizer\ISanitizer $sanitizer */
@@ -62,11 +61,7 @@ $app = new class extends CliTool\App {
                     // path should match its hash, but it's the only viable way
                     // so far to ensure the sanitised content is accessible via
                     // its original hash.
-                    try {
-                        $storageFilesystem->write($path, $result);
-                    } catch (FileExistsException $e) {
-                        $storageFilesystem->update($path, $result);
-                    }
+                    $storageFilesystem->write($path, $result);
                 }
             } else {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());

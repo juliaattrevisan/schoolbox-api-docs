@@ -317,13 +317,7 @@ HELP;
         // Attachment
         $filename = !empty($row['FileAttachment']) ? trim($row['FileAttachment']) : null;
         if (!empty($filename) && file_exists($this->dirName . '/' . $filename)) {
-            try {
-                $attachment = $this->storageMapper->acceptStream($filename, file_get_contents($this->dirName . '/' . $filename), true);
-            } catch (\League\Flysystem\FileExistsException $e) {
-                $bits       = explode('/', $e->getPath());
-                $hash       = array_pop($bits);
-                $attachment = $this->storageMapper->findByHash($hash);
-            }
+            $attachment = $this->storageMapper->acceptStream($filename, file_get_contents($this->dirName . '/' . $filename), true);
 
             /* Assign the storage file to the pastoral record
              */

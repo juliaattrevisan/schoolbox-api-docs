@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
@@ -90,6 +91,7 @@ if (isset($type, $id)) {
                 $imageFilename = $videoQueue->getThumbnailPath();
             }
 
+            /** @var Filesystem $filesystem */
             $filesystem = $kernel->get('filesystem.storage');
 
             /** @var IConfigLoader $config */
@@ -115,9 +117,13 @@ if (isset($type, $id)) {
 
                 // Insert video thumbnail transforms on-demand if it exists on disk but not in storage_transform table yet.
                 if ($filesystem->has($imageFilename)) {
-                    $image = $filesystem->get($imageFilename);
-                    [$hash, $cacheKey] = explode('-', basename($image->getPath()));
-                    Transform\Mapper::getInstance()->createRecord($hash, $cacheKey, $image->getSize(), Transform\Model::STATE_DONE);
+                    [$hash, $cacheKey] = explode('-', basename($imageFilename));
+                    Transform\Mapper::getInstance()->createRecord(
+                        $hash,
+                        $cacheKey,
+                        $filesystem->fileSize($imageFilename),
+                        Transform\Model::STATE_DONE,
+                    );
                 }
                 $preSignedUrlService->download($preSignedUrlDataObject);
             }
@@ -125,7 +131,7 @@ if (isset($type, $id)) {
             if ($filesystem->has($imageFilename)) {
                 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
                 header("Content-Type: $mimeType");
-                header("Content-Length: {$filesystem->getSize($imageFilename)}");
+                header("Content-Length: {$filesystem->fileSize($imageFilename)}");
                 fpassthru($filesystem->readStream($imageFilename));
                 exit;
             }

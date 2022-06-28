@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Resource\Storage\GC;
 
-use League\Flysystem\Exception as FlysystemException;
+use League\Flysystem\FilesystemException as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
@@ -163,6 +163,8 @@ class GarbageCollector
     /**
      * @param string $hash
      * @throws MapperException
+     * @throws FlysystemException if the storage file can't be deleted from the
+     *                            filesystem.
      */
     protected function removeFromStorage($hash)
     {

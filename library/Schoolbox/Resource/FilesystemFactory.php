@@ -11,13 +11,14 @@ namespace Schoolbox\Resource;
 
 use Aws\S3\S3Client;
 use GuzzleHttp;
-use InvalidArgumentException;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
+use League\Flysystem\Config;
+use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
-use League\Flysystem\MountManager;
-use LogicException;
+use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
+use League\Flysystem\Visibility;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
@@ -51,49 +52,32 @@ class FilesystemFactory
      */
     private const S3_CONNECT_TIMEOUT_WEB = 5;
 
-
     /**
-     * @param string $storageDir
-     * @return MountManager
+     * Build the storage filesystem, as defined by config.
+     *
+     * @param IConfigLoader $config
+     * @return Filesystem
      */
-    public function build($storageDir)
+    public function buildStorage(IConfigLoader $config): Filesystem
     {
-        return $this->buildSpecific($storageDir, sys_get_temp_dir());
+        $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+        return match ($adapter) {
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => $this->buildLocalFileSystem($config),
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE),
+            default                          => throw new UnexpectedValueException(
+                "Unrecognised filesystem adapter: '$adapter'",
+            ),
+        };
     }
 
-
     /**
-     * @param string $storageDir
-     * @param string $tempDir
-     * @return MountManager
-     * @throws UnexpectedValueException If configured filesystem adapter is not recognised
-     * @throws LogicException           If root path to local filesystem is not readable
+     * Return a temp filesystem.
+     *
+     * @return Filesystem
      */
-    public function buildSpecific($storageDir, $tempDir)
+    public function buildTemp(): Filesystem
     {
-        // TODO SA-8354: inject this
-        $config = new \Schoolbox\Config\Loader();
-
-        $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
-        $enableReUpload = $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE);
-        $fsConfig = $enableReUpload ? ['disable_asserts' => true] : null;
-        switch ($adapter) {
-            case self::FILE_SYSTEM_ADAPTER_LOCAL:
-                // Use local storage
-                $fs_storage = new Filesystem(new Local($storageDir), $fsConfig);
-                break;
-            case self::FILE_SYSTEM_ADAPTER_AWS_S3:
-                // Use AWS S3 for storage
-                $fs_storage = $this->buildAwsS3FileSystem($fsConfig, self::PREFIX_STORAGE);
-                break;
-            default:
-                throw new UnexpectedValueException("Unrecognised filesystem adapter: '$adapter'");
-        }
-
-        return new MountManager([
-            self::FILE_SYSTEM_TEMP    => new Filesystem(new Local($tempDir)),
-            self::FILE_SYSTEM_STORAGE => $fs_storage
-        ]);
+        return new Filesystem(new Local(sys_get_temp_dir()));
     }
 
     /**
@@ -109,18 +93,43 @@ class FilesystemFactory
         return PHP_SAPI === 'cli' ? 0 : self::S3_CONNECT_TIMEOUT_WEB;
     }
 
+    /**
+     * Build a local file system.
+     *
+     * @param IConfigLoader $config
+     * @return Filesystem
+     */
+    public function buildLocalFileSystem(IConfigLoader $config): Filesystem
+    {
+        $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_LOCAL);
+        return new Filesystem(
+            new Local(
+                $config->get('storage_dir'),
+                // Allow group-writable public files and folders
+                PortableVisibilityConverter::fromArray(
+                    [
+                        'file' => [Visibility::PUBLIC => 0664,],
+                        'dir'  => [Visibility::PUBLIC => 0775,],
+                    ],
+                    $visibility,
+                ),
+            ),
+            [
+                Config::OPTION_VISIBILITY           => $visibility,
+                Config::OPTION_DIRECTORY_VISIBILITY => $visibility,
+            ],
+        );
+    }
 
     /**
      * Returns an AWS S3 file system, optionally with root set to $prefix
      *
-     * @param array|null $fsConfig
-     * @param string     $prefix
+     * @param IConfigLoader $config
+     * @param string        $prefix
      * @return Filesystem
-     * @throws InvalidArgumentException
      */
-    public function buildAwsS3FileSystem(array $fsConfig = null, string $prefix = ''): Filesystem
+    public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = ''): Filesystem
     {
-        $config              = new \Schoolbox\Config\Loader();
         $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
         $otfs_s3_cred_secret = trim($config->get('otfs_s3_cred_secret') ?? "");
         $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
@@ -143,9 +152,33 @@ class FilesystemFactory
         // may use it
         $client->registerStreamWrapper();
 
+        $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
         return new Filesystem(
-            new Adapter(new AwsS3Adapter($client, $otfs_s3_bucket, $prefix)),
-            $fsConfig
+            new Adapter(
+                new AwsS3Adapter($client, $otfs_s3_bucket, $prefix),
+                $otfs_s3_bucket,
+            ),
+            [
+                Config::OPTION_VISIBILITY           => $visibility,
+                Config::OPTION_DIRECTORY_VISIBILITY => $visibility,
+            ],
         );
+    }
+
+    /**
+     * Helper for determining a filesystem type's default visibility.
+     *
+     * @param string $adapter
+     * @return string
+     */
+    public static function buildDefaultVisibility(string $adapter): string
+    {
+        return match ($adapter) {
+            self::FILE_SYSTEM_ADAPTER_LOCAL  => Visibility::PUBLIC,
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => Visibility::PRIVATE,
+            default                          => throw new UnexpectedValueException(
+                "Unrecognised filesystem adapter: '$adapter'",
+            ),
+        };
     }
 }

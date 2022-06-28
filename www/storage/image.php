@@ -15,6 +15,7 @@ use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -30,10 +31,9 @@ try {
         $filesystemProxy = $kernel->get('filesystem.storageProxy');
         $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $transforms      = new Transformation\Storage();
-        if ($filesystemProxy->usesS3Adapter()) {
-            /** @var IConfigLoader $config */
-            $config = $kernel->get('config');
-
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+        if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
             if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService    = new PreSignedUrlService($config);
                 $preSignedUrlDataObject = $preSignedUrlService->generate(

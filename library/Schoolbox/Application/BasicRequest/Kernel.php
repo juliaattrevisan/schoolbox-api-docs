@@ -11,7 +11,7 @@ namespace Schoolbox\Application\BasicRequest;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
@@ -414,20 +414,10 @@ class Kernel extends WebKernelAbstract
 
         // Filesystems
         $di->set(
-            'filesystem.mountManager',
-            $di->lazy(
-                function () use ($config) {
-                    return (new FilesystemFactory())->build($config->get('storage_dir'));
-                }
-            )
-        );
-        $di->set(
             'filesystem.storage',
             $di->lazy(
-                function () use ($di) {
-                    /** @var MountManager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_STORAGE);
+                function () use ($config) {
+                    return (new FilesystemFactory())->buildStorage($config);
                 }
             )
         );
@@ -435,12 +425,13 @@ class Kernel extends WebKernelAbstract
             'filesystem.storageProxy',
             $di->lazy(
                 function () use ($di, $config) {
-                    /** @var FilesystemInterface $storage */
+                    /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
                     return new FilesystemProxy(
                         $storage,
                         new HashGenerator(),
                         $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
+                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
                     );
                 }
             )
@@ -463,10 +454,8 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'filesystem.temp',
             $di->lazy(
-                function () use ($di) {
-                    /** @var MountManager $mountManager */
-                    $mountManager = $di->get('filesystem.mountManager');
-                    return $mountManager->getFilesystem(FilesystemFactory::FILE_SYSTEM_TEMP);
+                function () {
+                    return (new FilesystemFactory())->buildTemp();
                 }
             )
         );
@@ -474,7 +463,7 @@ class Kernel extends WebKernelAbstract
             'filesystem.imageProcessorFactory',
             $di->lazy(
                 function () use ($di) {
-                    /** @var FilesystemInterface $storage */
+                    /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
                     return new ProcessorFactory($storage, new HashGenerator());
                 }

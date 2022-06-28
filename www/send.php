@@ -18,6 +18,7 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -78,12 +79,9 @@ if (is_numeric($_GET['id'])) {
     $storage      = $file->getStorage();
     $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-    if ($filesystemProxy->usesS3Adapter()) {
-        /** @var IConfigLoader $config */
-        $config = $kernel->get('config');
-
+    /** @var IConfigLoader $config */
+    $config = $kernel->get('config');
+    if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
         if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
             try {
@@ -103,12 +101,14 @@ if (is_numeric($_GET['id'])) {
     }
 
     //send headers
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
     header("Content-Type: $contentType");
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
     header("Content-Disposition: $disposition; filename=\"$basename\"");
-    header("Content-Length: {$file->getSize()}");
+    header("Content-Length: {$filesystemProxy->fileSize($file)}");
     fpassthru($filesystemProxy->readStream($file));
     exit;
 }

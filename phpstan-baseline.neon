@@ -7051,11 +7051,6 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/GC/Check/SoftLinks.php
 
 		-
-			message: "#^Dead catch \\- League\\\\Flysystem\\\\Exception is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
-
-		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 2
 			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
@@ -7069,11 +7064,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:setBasename\\(\\) should return \\$this\\(Schoolbox\\\\Resource\\\\Storage\\\\Model\\) but returns Schoolbox\\\\Resource\\\\Storage\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
-			message: "#^Dead catch \\- Aws\\\\S3\\\\Exception\\\\S3Exception is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/S3/Migration.php
 
 		-
 			message: "#^If condition is always true\\.$#"

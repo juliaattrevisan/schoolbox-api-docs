@@ -9,86 +9,99 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\DirectoryListing;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToCheckDirectoryExistence;
+use League\Flysystem\UnableToCopyFile;
+use League\Flysystem\UnableToCreateDirectory;
+use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToMoveFile;
+use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
-use League\Flysystem\NotSupportedException;
 use Schoolbox\Resource\FilesystemFactory;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 
 /**
- * A proxy class for providing a `FilesystemInterface`-like facade when dealing
+ * A proxy class for providing a `Filesystem`-like facade when dealing
  * with `IStorage` objects, instead of paths.
- *
- * This provides a Flysystem v3-like proxy, even though currently it wraps a
- * v1 Flysystem object. Where the two interfaces differ, v3 will be used.
  *
  * Directory-specific methods are not proxied, because directories are not
  * relevant for `IStorage` objects. All of these methods raise a
- * `NotSupportedException`.
+ * directory-related exception.
  *
  * Location-specific methods are not proxied, because an `IStorage` object's
  * location is determined by its hash. All of these methods raise a
- * `NotSupportedException`.
+ * copy or move related exception.
  */
 class FilesystemProxy
 {
     /**
+     * Generic exception for non-supported directory operations.
+     */
+    private const ERROR_DIRECTORY_SPECIFIC_METHOD = __CLASS__ . ' does not support directory methods';
+
+    /**
+     * Generic exception for non-supported location operations.
+     */
+    private const ERROR_LOCATION_SPECIFIC_METHOD = __CLASS__ . ' does not support location methods';
+
+    /**
      * Constructor
      *
-     * @param FilesystemInterface $filesystem     Base filesystem this class proxies.
-     * @param HashGenerator       $hashGenerator  Method for generating hashes for storage files.
-     * @param bool                $verifyPrevious Should files uploaded via `accept` or `acceptStream` be
+     * @param Filesystem    $filesystem        Base filesystem this class proxies.
+     * @param HashGenerator $hashGenerator     Method for generating hashes for storage files.
+     * @param bool          $verifyPrevious    Should files uploaded via `accept` or `acceptStream` be verified?
+     * @param string        $defaultVisibility Default visibility for newly uploaded files; should be:
+     *                                         * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
+     *                                         * `\League\Flysystem\Visibility::PRIVATE` for S3
      */
     public function __construct(
-        private FilesystemInterface $filesystem,
+        private Filesystem $filesystem,
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
+        private string $defaultVisibility,
     ) {
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::has` (with file name)
-     * * v3 `FilesystemAdapter::fileExists`
+     * * v3 `Filesystem::fileExists`
      *
      * @param IStorage $storage
      * @return bool
+     * @throws FilesystemException
      */
     public function fileExists(IStorage $storage): bool
     {
-        return $this->filesystem->has(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->fileExists(self::getPathFromHash($storage->getHash()));
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::has` (with folder name)
-     * * v3 `FilesystemAdapter::directoryExists`
+     * * v3 `Filesystem::directoryExists`
      *
      * @param IStorage $storage
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCheckDirectoryExistence
      * @noinspection PhpUnusedParameterInspection
      */
     public function directoryExists(IStorage $storage): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCheckDirectoryExistence(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::write`
-     * * v3 `FilesystemAdapter::write`
+     * * v3 `Filesystem::write`
      *
      * @param IStorage $storage
      * @param string   $contents
      * @param array    $config
      * @return void
-     * @throws FileNotFoundException if somehow the file wasn't found after it
-     *                               was written
+     * @throws FilesystemException
      */
     public function write(IStorage $storage, string $contents, array $config = [])
     {
@@ -101,14 +114,13 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::writeStream`
-     * * v3 `FilesystemAdapter::writeStream`
+     * * v3 `Filesystem::writeStream`
      *
      * @param IStorage $storage
      * @param resource $resource
      * @param array    $config
      * @return void
-     * @throws FileNotFoundException if somehow the file wasn't found after it
-     *                               was written
+     * @throws FilesystemException
      */
     public function writeStream(IStorage $storage, $resource, array $config = [])
     {
@@ -118,17 +130,22 @@ class FilesystemProxy
 
         $hash = $this->hashGenerator->generateHash($resource);
         $path = self::getPathFromHash($hash);
+
+        // umask setting may prevent group/other-writable files:
+        // storage files are supposed to be group-writable though, so switch off
+        // the umask and restore it once done.
+        $oldUmask = umask(0);
         try {
-            $this->filesystem->writeStream($path, $resource, $config);
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
+            // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
+            if (!$this->filesystem->fileExists($path)) {
+                $this->filesystem->writeStream($path, $resource, $config);
+            }
+            $this->updateStorage($storage, $hash, $path);
+        } finally {
+            umask($oldUmask);
         }
-
-        // Put it in the filesystem, and also the storage
-        // (IStorage doesn't have setHash? Maybe only if $storage is a storage model, then set it?)
-        $this->updateStorage($storage, $hash, $path);
     }
 
     /**
@@ -137,15 +154,15 @@ class FilesystemProxy
      * Detects if `$this->filesystem` and the source filesystem are the same,
      * and if so performs a rename instead of a move.
      *
-     * @param IStorage            $storage
-     * @param FilesystemInterface $tempFilesystem
-     * @param string              $tempPath
+     * @param IStorage   $storage
+     * @param Filesystem $tempFilesystem
+     * @param string     $tempPath
      * @return void
-     * @throws FileNotFoundException if somehow the file doesn't exist in temp?
+     * @throws FilesystemException
      */
     public function writeFromFilesystemAndLocation(
         IStorage $storage,
-        FilesystemInterface $tempFilesystem,
+        Filesystem $tempFilesystem,
         string $tempPath
     ) {
         if ($this->shortCircuit($storage)) {
@@ -155,28 +172,16 @@ class FilesystemProxy
         $hash        = $this->hashGenerator->generateHash($tempFilesystem->readStream($tempPath));
         $storagePath = self::getPathFromHash($hash);
 
-        // Are they both local? Attempt to move, rather than copy if so
-        if ($tempFilesystem instanceof Filesystem && $this->filesystem instanceof Filesystem) {
-            $adapterFrom = $tempFilesystem->getAdapter();
-            $adapterTo   = $this->filesystem->getAdapter();
-            if ($adapterFrom instanceof Local && $adapterTo instanceof Local) {
-                if ($adapterTo->createDir(dirname($storagePath), $this->filesystem->getConfig()) === false) {
-                    // TODO is this an error?
-                    return;
-                }
-
-                chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath, 0664);
-                rename(
-                    rtrim($adapterFrom->getPathPrefix(), '/') . $tempPath,
-                    $adapterTo->getPathPrefix() . $storagePath
-                );
-                $this->updateStorage($storage, $hash, $storagePath);
-                return;
-            }
-        }
-
-        // Otherwise, copy the new file into storage
+        // umask setting may prevent group/other-writable files:
+        // storage files are supposed to be group-writable though, so switch off
+        // the umask and restore it once done.
+        $oldUmask = umask(0);
         try {
+            // Create the new folder with the filesystem's default visibility
+            // (public for local, private for s3)
+            $this->filesystem->createDirectory(dirname($storagePath));
+
+            // Copy the new file into storage
             $mountManager = new MountManager([
                 FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
                 FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
@@ -185,28 +190,30 @@ class FilesystemProxy
                 FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
                 FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
             );
-            // @phpstan-ignore-next-line: move() can throw this exception
-        } catch (FileExistsException $e) {
-            // The file already exists in the storage backend.
+
+            // Moving a file using the mount manager overrides any existing
+            // file's visibility.
+            // Need to set the file's permissions to the filesystem's default
+            // visibility (public for local, private for s3)
+            $this->filesystem->setVisibility($storagePath, $this->defaultVisibility);
+
+            // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
-            try {
-                $tempFilesystem->delete($tempPath);
-            } catch (FileNotFoundException $e2) {
-                // The temp file didn't exist after all: that's fine too
-            }
+            $this->updateStorage($storage, $hash, $storagePath);
+        } finally {
+            umask($oldUmask);
         }
-        $this->updateStorage($storage, $hash, $storagePath);
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::read`
-     * * v3 `FilesystemAdapter::read`
+     * * v3 `Filesystem::read`
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException if the file wasn't found
+     * @throws FilesystemException
      */
     public function read(IStorage $storage): string
     {
@@ -216,11 +223,11 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::readStream`
-     * * v3 `FilesystemAdapter::readStream`
+     * * v3 `Filesystem::readStream`
      *
      * @param IStorage $storage
      * @return resource
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     public function readStream(IStorage $storage)
     {
@@ -231,14 +238,15 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::delete` (with file name)
-     * * v3 `FilesystemAdapter::delete`
+     * * v3 `Filesystem::delete`
      *
      * @param IStorage $storage
+     * @throws FilesystemException
      */
     public function delete(IStorage $storage): void
     {
         // Deleting the parent folder of the file deletes all of its transforms
-        $this->filesystem->deleteDir(dirname(self::getPathFromHash($storage->getHash())));
+        $this->filesystem->delete(dirname(self::getPathFromHash($storage->getHash())));
 
         // Do not delete storage record here
     }
@@ -246,42 +254,42 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::delete` (with folder name)
-     * * v3 `FilesystemAdapter::deleteDirectory`
+     * * v3 `Filesystem::deleteDirectory`
      *
      * @param IStorage $storage
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToDeleteDirectory
      * @noinspection PhpUnusedParameterInspection
      */
     public function deleteDirectory(IStorage $storage): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToDeleteDirectory(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::createDir` (with folder name)
-     * * v3 `FilesystemAdapter::createDirectory`
+     * * v3 `Filesystem::createDirectory`
      *
      * @param IStorage $storage
      * @param array    $config
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCreateDirectory
      * @noinspection PhpUnusedParameterInspection
      */
     public function createDirectory(IStorage $storage, array $config = []): void
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCreateDirectory(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::setVisibility`
-     * * v3 `FilesystemAdapter::setVisibility`
+     * * v3 `Filesystem::setVisibility`
      *
      * @param IStorage $storage
      * @param string   $visibility
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     public function setVisibility(IStorage $storage, string $visibility): void
     {
@@ -291,106 +299,105 @@ class FilesystemProxy
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::setVisibility`
-     * * v3 `FilesystemAdapter::visibility`
+     * * v3 `Filesystem::visibility`
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     public function visibility(IStorage $storage): string
     {
-        return $this->filesystem->getVisibility(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->visibility(self::getPathFromHash($storage->getHash()));
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getMimetype`
-     * * v3 `FilesystemAdapter::mimeType`
+     * * v3 `Filesystem::mimeType`
      *
      * @param IStorage $storage
      * @return string
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     public function mimeType(IStorage $storage): string
     {
-        return $this->filesystem->getMimetype(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->mimeType(self::getPathFromHash($storage->getHash()));
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getTimestamp`
-     * * v3 `FilesystemAdapter::lastModified`
+     * * v3 `Filesystem::lastModified`
      *
      * @param IStorage $storage
      * @return int
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     public function lastModified(IStorage $storage): int
     {
-        return $this->filesystem->getTimestamp(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->lastModified(self::getPathFromHash($storage->getHash()));
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::getSize`
-     * * v3 `FilesystemAdapter::fileSize`
+     * * v3 `Filesystem::fileSize`
      *
      * @param IStorage $storage
      * @return int
-     * @throws FileNotFoundException
+     * @throws UnableToReadFile
      */
     public function fileSize(IStorage $storage): int
     {
-        return $this->filesystem->getSize(self::getPathFromHash($storage->getHash()));
+        return $this->filesystem->fileSize(self::getPathFromHash($storage->getHash()));
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::listContents`.
-     * * v3 `FilesystemAdapter::listContents`
+     * * v3 `Filesystem::listContents`
      *
      * @param IStorage $storage
      * @param bool     $recursive
-     * @return never-return
-     * @throws NotSupportedException
+     * @return DirectoryListing
+     * @throws UnableToCheckDirectoryExistence
      * @noinspection PhpUnusedParameterInspection
      */
-    public function listContents(IStorage $storage, bool $recursive = false)
+    public function listContents(IStorage $storage, bool $recursive = false): DirectoryListing
     {
-        throw self::generateDirectorySpecificMethodException();
+        throw new UnableToCheckDirectoryExistence(self::ERROR_DIRECTORY_SPECIFIC_METHOD);
     }
-
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::rename`
-     * * v3 `FilesystemAdapter::move`
+     * * v3 `Filesystem::move`
      *
      * @param IStorage $source
      * @param IStorage $destination
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToMoveFile
      * @noinspection PhpUnusedParameterInspection
      */
     public function move(IStorage $source, IStorage $destination): void
     {
-        throw self::generateLocationSpecificMethodException();
+        throw new UnableToMoveFile(self::ERROR_LOCATION_SPECIFIC_METHOD);
     }
 
     /**
      * Proxy for:
      * * v1 `FilesystemInterface::copy`
-     * * v3 `FilesystemAdapter::copy`
+     * * v3 `Filesystem::copy`
      *
      * @param IStorage $source
      * @param IStorage $destination
      * @return never-return
-     * @throws NotSupportedException
+     * @throws UnableToCopyFile
      * @noinspection PhpUnusedParameterInspection
      */
     public function copy(IStorage $source, IStorage $destination): void
     {
-        throw self::generateLocationSpecificMethodException();
+        throw new UnableToCopyFile(self::ERROR_LOCATION_SPECIFIC_METHOD);
     }
 
     /**
@@ -417,40 +424,6 @@ class FilesystemProxy
     }
 
     /**
-     * Helper function for determining whether this filesystem uses the S3
-     * adapter.
-     *
-     * @return bool
-     */
-    public function usesS3Adapter(): bool
-    {
-        return $this->filesystem instanceof Filesystem
-            && $this->filesystem->getAdapter() instanceof S3Adapter;
-    }
-
-    /**
-     * Generate generic exception for non-supported directory operations
-     * (e.g. `createDirectory`, `directoryExists`).
-     *
-     * @return NotSupportedException
-     */
-    private static function generateDirectorySpecificMethodException(): NotSupportedException
-    {
-        throw new NotSupportedException(sprintf('%s does not support directory methods', __CLASS__));
-    }
-
-    /**
-     * Generate generic exception for non-supported location operations
-     * (e.g. `copy`, `move`).
-     *
-     * @return NotSupportedException
-     */
-    private static function generateLocationSpecificMethodException(): NotSupportedException
-    {
-        throw new NotSupportedException(sprintf('%s does not support location methods', __CLASS__));
-    }
-
-    /**
      * Should file upload be short-circuited?
      *
      * Short-circuit if `$storage` already has a hash, and either:
@@ -461,6 +434,7 @@ class FilesystemProxy
      *
      * @param IStorage $storage
      * @return bool
+     * @throws FilesystemException
      */
     private function shortCircuit(IStorage $storage): bool
     {
@@ -472,7 +446,7 @@ class FilesystemProxy
             $previousPath = self::getPathFromHash($previousHash);
             if (
                 $this->filesystem->has($previousPath)
-                && $storage->getSize() === $this->filesystem->getSize($previousPath)
+                && $storage->getSize() === $this->filesystem->fileSize($previousPath)
             ) {
                 return true;
             }
@@ -487,14 +461,14 @@ class FilesystemProxy
      * @param string   $hash
      * @param string   $path
      * @return void
-     * @throws FileNotFoundException
+     * @throws FilesystemException
      */
     private function updateStorage(IStorage $storage, string $hash, string $path): void
     {
         if ($storage instanceof Model) {
             $storage
                 ->setHash($hash)
-                ->setSize($this->filesystem->getSize($path));
+                ->setSize($this->filesystem->fileSize($path));
         }
     }
 }

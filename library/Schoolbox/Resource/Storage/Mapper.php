@@ -274,7 +274,7 @@ class Mapper extends BaseMapper implements IReceiver
      * (Look, it's not wonderful but it IS better than having the filesystem in
      * the model!)
      *
-     * @deprecated The proxy filesystem from DI (filesystem.mountManager) should
+     * @deprecated The proxy filesystem from DI (filesystem.storageProxy) should
      *             be used instead, and injected where necessary.
      *
      * @return FilesystemProxy

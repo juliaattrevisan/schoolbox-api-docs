@@ -11,8 +11,8 @@ namespace Schoolbox\Video\CommandLineTool;
 
 use Alaress_Byte_Format;
 use Exception;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\Filesystem;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
@@ -111,7 +111,7 @@ class Processor extends CliTool\App
         $failed       = 0;
         $success      = 0;
 
-        /** @var FilesystemInterface $storageFilesystem */
+        /** @var Filesystem $storageFilesystem */
         $storageFilesystem = $this->getDi()->get('filesystem.storage');
 
         /** @var Queue $mediaCurrent */
@@ -235,7 +235,7 @@ class Processor extends CliTool\App
     {
         try {
             $fileSize = $storage->getSize();
-        } catch (FileNotFoundException $e) {
+        } catch (UnableToReadFile $e) {
             return "";
         }
 

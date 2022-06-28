@@ -8,7 +8,7 @@
  */
 
 use Alaress\Mail\AbstractMailer;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -126,7 +126,7 @@ function sendMail(
         foreach ($files as $storage) {
             $mail->attach($filesystemProxy->readStream($storage), $storage->getBasename(), $storage->getMime());
         }
-    } catch (\Schoolbox\Mapper\Exception | FileNotFoundException $e) {
+    } catch (\Schoolbox\Mapper\Exception | UnableToReadFile $e) {
         error(41);
         exit; // shut UP, storm.
     } catch (\InvalidArgumentException $e) {

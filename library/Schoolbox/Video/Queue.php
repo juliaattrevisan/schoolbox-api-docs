@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Video;
 
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -101,16 +101,15 @@ class Queue extends ResourceVideo
     /**
      * Determines if file is audio or video and does corresponding processing
      *
-     * @param FilesystemInterface  $filesystem Filesystem to write transcodes to
+     * @param Filesystem           $filesystem Filesystem to write transcodes to
      * @param LoggerInterface|null $logger     Optional logger for debugging purposes
      *
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function process(FilesystemInterface $filesystem, LoggerInterface $logger = null)
+    public function process(Filesystem $filesystem, LoggerInterface $logger = null)
     {
         // Grab transcoding configuration
 
@@ -184,13 +183,13 @@ class Queue extends ResourceVideo
     /**
      * Take audio file and transcode into MP3 for playback via HTML5 <audio> tag
      *
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processAudio(FilesystemInterface $filesystem)
+    public function processAudio(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -250,14 +249,13 @@ class Queue extends ResourceVideo
     /**
      * Takes existing file and transcode into web format and creates thumbnail
      *
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processVideo(FilesystemInterface $filesystem)
+    public function processVideo(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -407,13 +405,13 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * @param FilesystemInterface $filesystem Filesystem to write transcodes to
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @param string $filename
      */
-    private function uploadTranscode(FilesystemInterface $filesystem, $filename)
+    private function uploadTranscode(Filesystem $filesystem, $filename)
     {
         $this->log('Saving transcode to storage');
-        $filesystem->put($this->getTranscodePath(), file_get_contents($filename));
+        $filesystem->write($this->getTranscodePath(), file_get_contents($filename));
 
         $this->log('Deleting local transcode file');
         unlink($filename);
@@ -480,26 +478,19 @@ class Queue extends ResourceVideo
     /**
      * Upload preview image to storage
      *
-     * @param FilesystemInterface $filesystem      Filesystem to write transcodes to
-     * @param string              $fileName        Local filename to be uploaded
-     * @param string              $destinationPath Destination to which the image should be uploaded
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @param Filesystem        $filesystem      Filesystem to write transcodes to
+     * @param string            $fileName        Local filename to be uploaded
+     * @param string            $destinationPath Destination to which the image should be uploaded
+     * @throws \League\Flysystem\UnableToReadFile
      * @throws MapperException
      */
     private function uploadPreviewImage(
-        FilesystemInterface $filesystem,
+        Filesystem $filesystem,
         string $fileName,
         string $destinationPath
     ): void {
-
         // If it already exists we have to update, otherwise write
-
-        if ($filesystem->has($destinationPath)) {
-            $filesystem->update($destinationPath, file_get_contents($fileName));
-        } else {
-            $filesystem->write($destinationPath, file_get_contents($fileName));
-        }
+        $filesystem->write($destinationPath, file_get_contents($fileName));
 
         $this->createStorageTransform($destinationPath, filesize($fileName));
         // Remove the thumbnail

@@ -22,9 +22,8 @@ use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
-use League\Flysystem\FileExistsException;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\UnableToReadFile;
+use League\Flysystem\Filesystem;
 use OverflowException;
 use PDOException;
 use Schoolbox\Mapper;
@@ -55,8 +54,8 @@ class Processor
      * @param string                $path               Path to the file in the filesystem
      * @param string|null           $mimetype           If provided: the file's mimetype.
      *                                                  If not provided: will attempt to determine from `$path`.
-     * @param FilesystemInterface   $pathFilesystem     The filesystem on which `$path` is stored
-     * @param FilesystemInterface   $storageFilesystem  The filesystem on which storage transforms are stored.
+     * @param Filesystem            $pathFilesystem     The filesystem on which `$path` is stored
+     * @param Filesystem            $storageFilesystem  The filesystem on which storage transforms are stored.
      *                                                  This may be a different filesystem to `$pathFilesystem`.
      * @param Storage\HashGenerator $hashGenerator      Helper for generating a storage hash out of `$path`
      * @param string                $cacheKey           Uniquely associate a cached image with a particular series of
@@ -76,8 +75,8 @@ class Processor
     public function __construct(
         private string $path,
         private ?string $mimetype,
-        private FilesystemInterface $pathFilesystem,
-        private FilesystemInterface $storageFilesystem,
+        private Filesystem $pathFilesystem,
+        private Filesystem $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
         private string $cacheKey,
         private ITransform $transform,
@@ -96,8 +95,7 @@ class Processor
      * @param bool     $permFail   should we set the file to do NOT try again? should try on the front end, and once in cli, then fail.
      * @return StreamableFile
      * @throws DomainException
-     * @throws Flysystem\FileNotFoundException
-     * @throws Flysystem\FilesystemNotFoundException
+     * @throws Flysystem\FilesystemException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
      * @throws InsufficientHydrationException
@@ -107,12 +105,11 @@ class Processor
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws ConcurrentTransformationException
-     * @throws FileExistsException
      */
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
-        $mimetype   = $this->mimetype ?? $this->pathFilesystem->getMimetype($this->path);
+        $mimetype   = $this->mimetype ?? $this->pathFilesystem->mimeType($this->path);
         $fileFormat = $this->getFormatFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
@@ -121,7 +118,7 @@ class Processor
             return new StreamableFile(
                 true,
                 $mimetype,
-                $this->pathFilesystem->getSize($this->path),
+                $this->pathFilesystem->fileSize($this->path),
                 $this->pathFilesystem->readStream($this->path),
             );
         }
@@ -140,10 +137,10 @@ class Processor
                 return new StreamableFile(
                     true,
                     $mimetype,
-                    $transformModel->getSize(),
-                    $this->readStream($transformPath),
+                    $this->storageFilesystem->fileSize($transformPath),
+                    $this->storageFilesystem->readStream($transformPath),
                 );
-            } catch (Flysystem\FileNotFoundException $e) {
+            } catch (Flysystem\FilesystemException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
                 $basePath = Storage\FilesystemProxy::getPathFromHash($hash);
                 $state    = $this->storageFilesystem->has($basePath)
@@ -160,7 +157,7 @@ class Processor
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
         if ($this->storageFilesystem->has($transformPath)) {
-            $transformSize = $this->storageFilesystem->getSize($transformPath);
+            $transformSize = $this->storageFilesystem->fileSize($transformPath);
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
@@ -170,7 +167,7 @@ class Processor
                 true,
                 $mimetype,
                 $transformSize,
-                $this->readStream($transformPath),
+                $this->storageFilesystem->readStream($transformPath),
             );
         }
 
@@ -205,12 +202,10 @@ class Processor
             $transformSize = $this->generateTransformation(
                 $maxAttempts,
                 $fileFormat,
-                $this->storageFilesystem,
                 $transformPath,
             );
         } catch (
-            FileNotFoundException
-            | FileExistsException
+            UnableToReadFile
             | ImagineException\OutOfBoundsException
             | ImagineException\RuntimeException
             | OverflowException
@@ -237,8 +232,8 @@ class Processor
         return new StreamableFile(
             false,
             $mimetype,
-            $transformModel->getSize(),
-            $this->readStream($transformPath),
+            $transformSize,
+            $this->storageFilesystem->readStream($transformPath),
         );
     }
 
@@ -246,21 +241,19 @@ class Processor
     /**
      * Transforms the image, writes it to disk, and return the transformed file's size
      *
-     * @param int                 $maxAttempts How many times should we attempt to read the original file into memory
-     * @param string              $fileFormat
-     * @param FilesystemInterface $fileSystem
-     * @param string              $transformPath
+     * @param int    $maxAttempts How many times should we attempt to read the original file into memory
+     * @param string $fileFormat
+     * @param string $transformPath
      * @return int
      * @throws CorruptImageException
-     * @throws FileExistsException
-     * @throws FileNotFoundException If original storage file not found on disk
+     * @throws UnableToReadFile If original storage file not found on disk
      * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
      * @throws LayeredNonGifException
      * @throws OverflowException
      */
-    private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
+    private function generateTransformation(int $maxAttempts, string $fileFormat, string $transformPath): int
     {
         $image = $this->loadImageFromFile($maxAttempts);
         $image = (new RotateOrientation())->manipulate($image);
@@ -275,7 +268,7 @@ class Processor
             $options['animated.loops'] = 0;
         }
         $imageContents = $image->get($fileFormat, $options);
-        $fileSystem->write($transformPath, $imageContents);
+        $this->storageFilesystem->write($transformPath, $imageContents);
         return strlen($imageContents);
     }
 
@@ -289,7 +282,7 @@ class Processor
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
-     * @throws FileNotFoundException If original storage file not found on disk
+     * @throws UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
      * @throws ImagickException If we can't set the Imagick processing timeout
      */
@@ -300,7 +293,7 @@ class Processor
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
         if (!$this->pathFilesystem->has($this->path)) {
-            throw new FileNotFoundException("File not found");
+            throw new UnableToReadFile("File not found");
         }
 
         // Die extremely early if this is corrupted or giant
@@ -401,32 +394,5 @@ class Processor
             default:
                 throw new DomainException("Unknown image type '$mime'");
         }
-    }
-
-    /**
-     * Fetch a file stream for `$path` out of `$fileSystem`, bypassing
-     * Flysystem's `disable_asserts` configuration setting.
-     *
-     * If `config.otfs_verify_previous_file` is on, Flysystem `disable_asserts`
-     * will be on, and `readStream` won't raise an exception if the file
-     * doesn't exist: it will simply return false.
-     *
-     * This method will re-raise the exception that would've been raised if that
-     * config was off.
-     *
-     * TODO remove once Flysystem3 migration is done?
-     *      I don't think it returns false on file not found.
-     *
-     * @param string $path
-     * @return resource
-     * @throws Flysystem\FileNotFoundException if the stream was not found
-     */
-    private function readStream(string $path)
-    {
-        $stream = $this->storageFilesystem->readStream($path);
-        if (!is_resource($stream)) {
-            throw new Flysystem\FileNotFoundException($path);
-        }
-        return $stream;
     }
 }

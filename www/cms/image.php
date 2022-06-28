@@ -18,6 +18,7 @@ use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -56,14 +57,13 @@ $cacheKey = $myImage->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
     /** @var Schoolbox\Resource\Storage\Model $resource */
-    $resource   = $file->getStorage();
+    $resource = $file->getStorage();
     /** @var IConfigLoader $config */
-    $config     = $kernel->getDependencyInjector()->get('config');
-
-    /** @var FilesystemProxy $filesystemProxy */
-    $filesystemProxy = $kernel->get('filesystem.storageProxy');
-
-    if ($filesystemProxy->usesS3Adapter() && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
+    $config = $kernel->getDependencyInjector()->get('config');
+    if (
+        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+    ) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
         $resourcePath = FilesystemProxy::getPathFromHash($resource->getHash());

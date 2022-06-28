@@ -79,7 +79,7 @@ if (is_numeric($_GET['id'])) {
     header("Cache-control: private");
     header("Content-Ranges: none");
     header("Content-Disposition: $attach filename=\"" . $file->getBasename() . "\"");
-    header("Content-Length: {$file->getSize()}");
+    header("Content-Length: {$filesystemProxy->fileSize($file)}");
     fpassthru($filesystemProxy->readStream($file));
     exit;
 } else {

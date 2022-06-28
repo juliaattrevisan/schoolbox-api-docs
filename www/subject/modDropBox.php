@@ -53,7 +53,7 @@ if (is_numeric($_GET['delete'] ?? false)) {
         header("Content-Ranges: none");
         header("Content-Type: {$file->getStorage()->getMimetype()->getMime()}");
         header("Content-Disposition: $attach filename=\"" . $file->getStorage()->getBasename() . "\"");
-        header("Content-Length: " . $file->getStorage()->getSize());
+        header("Content-Length: " . $filesystemProxy->fileSize($file->getStorage()));
         fpassthru($filesystemProxy->readStream($file->getStorage()));
         exit;
     } catch (Schoolbox\Mapper\Exception $e) {

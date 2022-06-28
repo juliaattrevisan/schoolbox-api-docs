@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace Alaress\Image;
 
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter as Local;
 use League\Flysystem\Filesystem;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\IStorage;
@@ -25,14 +24,14 @@ class ProcessorFactory
     /**
      * Constructor
      *
-     * @param FilesystemInterface $storageFilesystem The storage file system, required when processing both local and
-     *                                               storage files (as transforms are stored in storage regardless of
-     *                                               whether the base file is).
-     * @param HashGenerator       $hashGenerator     The hash generator, required for converting a storage file to a
-     *                                               path.
+     * @param Filesystem    $storageFilesystem The storage file system, required when processing both local and
+     *                                         storage files (as transforms are stored in storage regardless of
+     *                                         whether the base file is).
+     * @param HashGenerator $hashGenerator     The hash generator, required for converting a storage file to a
+     *                                         path.
      */
     public function __construct(
-        private FilesystemInterface $storageFilesystem,
+        private Filesystem $storageFilesystem,
         private HashGenerator $hashGenerator,
     ) {
     }

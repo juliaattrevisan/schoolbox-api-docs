@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 use Alaress\Image\Transformation;
 use Alaress\Image\Transformation\ITransformFactory;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\CliTool\AwsS3AppTrait;
@@ -171,7 +171,7 @@ HELP;
                 continue;
             }
             $this->deleteRecordFromStorageTransformTable($fileName);
-            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->getSize($path));
+            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->fileSize($path));
         }
     }
 

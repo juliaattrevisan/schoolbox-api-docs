@@ -13,7 +13,7 @@ use Alaress_Byte_Format;
 use Alaress\Database as AlaressDatabase;
 use Aws\S3\Exception\S3Exception;
 use InvalidArgumentException;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem;
 use League\Flysystem\Filesystem;
 use Monolog\Logger;
@@ -94,7 +94,6 @@ class Migration extends CliTool\App
     /**
      * @inheritDoc
      * @throws AlaressDatabase\Exception
-     * @throws Flysystem\FileExistsException
      * @throws InvalidArgumentException
      * @throws \Psr\Log\InvalidArgumentException
      */
@@ -126,7 +125,6 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
-     * @throws Flysystem\FileExistsException
      * @throws AlaressDatabase\Exception
      * @throws \Psr\Log\InvalidArgumentException
      */
@@ -252,7 +250,6 @@ class Migration extends CliTool\App
      *
      * @param string $hash
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
-     * @throws Flysystem\FileExistsException
      */
     private function migrateFile(string $hash): bool
     {
@@ -298,7 +295,6 @@ class Migration extends CliTool\App
      *
      * @param string $filepathLocalAbsolute
      * @return bool Whether the move was successful
-     * @throws Flysystem\FileExistsException
      */
     private function moveFileToS3(string $filepathLocalAbsolute): bool
     {
@@ -325,8 +321,9 @@ class Migration extends CliTool\App
                 $countUploadAttempts = 0;
                 while (!$writeSucceeded && $countUploadAttempts < $this->maxUploadAttempts) {
                     try {
-                        $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
-                    } catch (S3Exception $e) {
+                        $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+                        $writeSucceeded = true;
+                    } catch (Flysystem\FilesystemException $e) {
                         $sleep = 2 ** $countUploadAttempts;
                         $countUploadAttempts++;
                         $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");
@@ -404,9 +401,10 @@ class Migration extends CliTool\App
 
             $transcodeFilePath = $dirName . DIRECTORY_SEPARATOR . $entry;
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
-            $transcodeFile     = new Flysystem\File($this->fileSystemAwsS3, $filepath);
-
-            $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $transcodeFile->getPath(), $this->filesInS3);
+            $foundInS3         = array_key_exists(
+                FilesystemFactory::PREFIX_STORAGE . $filepath,
+                $this->filesInS3,
+            );
             if ($foundInS3) {
                 $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
 

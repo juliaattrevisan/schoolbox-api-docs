@@ -15,11 +15,11 @@ use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\ResourceLimitExceededHandler;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\UserMapper;
@@ -84,24 +84,22 @@ try {
         0
     );
 
-    $fileSystem = $storageModel->getFilesystem();
 
     $portrait  = new Image\Transformation\Portrait();
     $cacheKey  = $portrait->getCacheKey(TRANSFORM_KEY);
-
     if (
-        $fileSystem instanceof Filesystem &&
-        $fileSystem->getAdapter() instanceof S3Adapter &&
-        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
-
-        $portraitPath = $storageModel->getPath();
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-            $portrait->getTranscodePath($portraitPath, $cacheKey)
+            $portrait->getTranscodePath(
+                FilesystemProxy::getPathFromHash($storageModel->getHash()),
+                $cacheKey,
+            ),
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
