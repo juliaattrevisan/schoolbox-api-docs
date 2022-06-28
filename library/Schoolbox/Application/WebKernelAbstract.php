@@ -148,6 +148,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $message          = $error['message'];
                     $infoFromLocation = true;
                 } else {
+                    $info             = sprintf('%s %s', $info, $error['message']);
                     $message          = 'Schoolbox has encountered a fatal error.';
                     $infoFromLocation = true;
                 }
