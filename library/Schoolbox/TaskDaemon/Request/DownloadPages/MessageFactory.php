@@ -11,9 +11,11 @@ namespace Schoolbox\TaskDaemon\Request\DownloadPages;
 
 use Alaress_Date_Format;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Factory for building download pages taskd requests.
@@ -24,6 +26,10 @@ class MessageFactory
      * The identifier for this task.
      */
     private const TASK = 'download-pages';
+
+    public const CONTENT_TYPE_SOURCE = 'source';
+
+    public const CONTENT_TYPE_URL = 'url';
 
     /**
      * Callback URL, if this task invocation has one.
@@ -40,7 +46,17 @@ class MessageFactory
      */
     private ?User $effector = null;
 
-    private array $params = [];
+    /**
+     * Content to use to generate the report.
+     *
+     * @var array<array{filename: string, urls?: string[], source?: string}>
+     */
+    private array $content = [];
+
+    private ?string $gotenbergUrl = null;
+    private ?string $gotenbergKey = null;
+    private ?string $gotenbergHttpHeader = null;
+    private ?string $gotenbergFooter = null;
 
     /**
      * Constructor
@@ -75,13 +91,71 @@ class MessageFactory
         return $clone;
     }
 
+    public function withoutGotenberg(): self
+    {
+        $clone = (clone $this);
+        $clone->gotenbergUrl = null;
+        $clone->gotenbergKey = null;
+        $clone->gotenbergHttpHeader = null;
+        $clone->gotenbergFooter = null;
+        return $clone;
+    }
+
+    public function withGotenbergUrl(?string $url): self
+    {
+        $clone = (clone $this);
+        $clone->gotenbergUrl = $url;
+        return $clone;
+    }
+
+    public function withGotenbergKey(?string $key, ?string $httpHeader): self
+    {
+        $clone = (clone $this);
+        $clone->gotenbergKey = $key;
+        $clone->gotenbergHttpHeader = $httpHeader;
+        return $clone;
+    }
+
+    public function withGotenbergFooter(?string $footer): self
+    {
+        $clone = (clone $this);
+        $clone->gotenbergFooter = $footer;
+        return $clone;
+    }
+
+    public function withContent(string $filename, string $contentType, string ...$urls): self
+    {
+        $clone = (clone $this);
+        $clone->content = [$this->buildContent($filename, $contentType, ...$urls)];
+        return $clone;
+    }
+
+    public function withAddedContent(string $filename, string $contentType, string ...$urls): self
+    {
+        $clone = (clone $this);
+        $clone->content[] = $this->buildContent($filename, $contentType, ...$urls);
+        return $clone;
+    }
+
     public function build(string $outfile): Message
     {
         $params = [
             'outfile' => $outfile,
+            'content' => $this->content,
+            'gotenberg' => null,
         ];
         $token = $this->effector ? $this->tokenBuilder->generate($this->effector) : null;
         if (isset($token)) {
+            $params['token'] = $token;
+        }
+        if (isset($this->gotenbergUrl)) {
+            $params['gotenberg'] = [
+                'url'  => $this->gotenbergUrl,
+                'auth' => isset($this->gotenbergKey, $this->gotenbergHttpHeader)
+                    ? ['key' => $this->gotenbergKey, 'header' => $this->gotenbergHttpHeader]
+                    : null,
+                'footer' => $this->gotenbergFooter,
+            ];
         }
         return new Message(
             self::TASK,
@@ -97,5 +171,26 @@ class MessageFactory
             $this->callbackParams,
             $token,
         );
+    }
+
+
+    /**
+     * Helper for building content.
+     *
+     * @param string $filename
+     * @param string $contentType
+     * @param string ...$urls
+     * @return array{filename: string, urls?: string[], source?: string}
+     */
+    private function buildContent(string $filename, string $contentType, string ...$urls): array
+    {
+        switch ($contentType) {
+            case self::CONTENT_TYPE_SOURCE:
+                return ['filename' => $filename, 'source' => $urls[0]];
+            case self::CONTENT_TYPE_URL:
+                return ['filename' => $filename, 'urls' => $urls];
+            default:
+                throw new UnexpectedValueException(sprintf('Content type "%s" not recognised', $contentType));
+        }
     }
 }
