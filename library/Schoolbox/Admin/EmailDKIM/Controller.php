@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Auth\KeyPairGenerator;
+use Schoolbox\Mapper\Exception as MapperException;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 
 /**
@@ -41,7 +43,7 @@ class Controller extends Base
      * Domain list page
      *
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getDomainListPage()
     {
@@ -60,7 +62,7 @@ class Controller extends Base
      * Get domain list data
      *
      * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getDomainJsonList()
     {
@@ -101,7 +103,7 @@ class Controller extends Base
         if (empty($domain) || (!getmxrr($domain, $temp) && !checkdnsrr($domain, 'ANY'))) {
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid domain name']));
             $this->getResponse()->status->setCode(404);
-            exit;
+            return;
         }
 
         try {
@@ -109,7 +111,7 @@ class Controller extends Base
                 $emailDKIM = $this->emailDKIMMapper->findById($id);
             } else {
                 $emailDKIM = $this->emailDKIMMapper->createModel();
-                $keyPair   = \Schoolbox\Auth\KeyPairGenerator::generate(DkimSigner::ALGO_SHA256);
+                $keyPair   = KeyPairGenerator::generate(DkimSigner::ALGO_SHA256);
                 $emailDKIM->setCreatedAt(\Alaress_Date_Format::now())
                           ->setPublic($keyPair['public'])
                           ->setPrivate($keyPair['private']);
@@ -117,11 +119,17 @@ class Controller extends Base
             $emailDKIM->setDomain($domain)
                       ->setUpdatedAt(\Alaress_Date_Format::now());
 
+            if (!$this->emailDKIMMapper->isUnique(['domain' => $emailDKIM->getDomain()], $emailDKIM->getId())) {
+                $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'The domain already exists']));
+                $this->getResponse()->status->setCode(404);
+                return;
+            }
+
             $this->emailDKIMMapper->save($emailDKIM);
-        } catch (Exception $e) {
+        } catch (MapperException $e) {
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => $e->getMessage()]));
             $this->getResponse()->status->setCode(404);
-            exit;
+            return;
         }
         $this->getResponse()->content->set($this->buildJsonOutput([]));
     }
@@ -153,7 +161,7 @@ class Controller extends Base
      *
      * @param Model $emailDKIM
      * @return void
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function deleteDKIM(Model $emailDKIM)
     {

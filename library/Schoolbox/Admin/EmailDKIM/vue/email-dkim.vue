@@ -199,11 +199,11 @@ export default {
                     method: 'POST',
                     body: this.getFormData(),
                 });
+                const responseDat = await response.json();
                 if (response.ok) {
-                    const responseDat = await response.json();
                     this.$refs.toast.timeout('Success', true, 2000);
                 } else {
-                    this.$refs.toast.timeout('Failed - Invalid domain name', true, 2000);
+                    this.$refs.toast.timeout('Failed - ' + responseDat.error, false, 2000);
                 }
                 this.$refs.domainModal.close();
                 await this.loadRows();
@@ -378,28 +378,28 @@ export default {
         <h2>DKIM for <strong>{{ domainName }}</strong></h2>
         <h3>Name</h3>
         <div class="input-group">
-            <div class="small-9"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
-            <div class="small-3">
+            <div class="small-12"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
+            <div>
                 <button ref="copyNameButton" class="icon-copy">Copy</button>
             </div>
         </div>
         <h3>Value (Full)</h3>
         <div class="input-group">
-            <div class="small-9"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
-            <div class="small-3">
+            <div class="small-12"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
+            <div>
                 <button ref="copyValueButton" class="icon-copy">Copy</button>
             </div>
         </div>
         <h3>Value (Split)</h3>
         <div class="input-group">
-            <div class="small-9"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
-            <div class="small-3">
+            <div class="small-12"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
+            <div>
                 <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
             </div>
         </div>
         <div class="input-group">
-            <div class="small-9"><input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1"></div>
-            <div class="small-3">
+            <div class="small-12"><input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1"></div>
+            <div>
                 <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
             </div>
         </div>
