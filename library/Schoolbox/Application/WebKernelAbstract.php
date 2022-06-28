@@ -13,6 +13,7 @@ use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use Database;
 use InvalidArgumentException;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -92,9 +93,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if ($e instanceof \Throwable) {
             $isException = true;
 
+            // Special case for oAuth exceptions:
+            // they provide a hint about what might've gone wrong
+            $message = $e->getMessage();
+            if ($e instanceof OAuthServerException) {
+                $message = sprintf('%s (Hint: %s)', $message, $e->getHint());
+            }
             $error = [
                 'file'    => $e->getFile(),
-                'message' => $e->getMessage(),
+                'message' => $message,
                 'line'    => $e->getLine(),
                 'type'    => $e->getCode(),
             ];
