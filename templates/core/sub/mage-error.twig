@@ -21,9 +21,9 @@
 #}
 
 {# display nothing if there are no errors -#}
-{% if error.problem | length > 0 -%}
+{% if (error.problem ?? '') | length > 0 -%}
     {{- error.problem -}}
-    {%- if error.reasons | length > 0 -%}
+    {%- if (error.reasons ?? []) | length > 0 -%}
         {% if error.reasons | length == 1 %}
             {{ error.reasons[0] | purify -}}.
         {%- else -%}
@@ -35,4 +35,3 @@
         {%- endif -%}
     {%- endif -%}
 {%- endif -%}
-

@@ -208,7 +208,7 @@ class Bridge
 
             // Build the response, organising to get the next page if required.
             $decoded = json_decode($response->getBody()->getContents(), true);
-            if ($currentPage < $decoded['page']['last_page']) {
+            if ($currentPage < ($decoded['page']['last_page'] ?? 0)) {
                 // Make a new request for the next page
                 [$uri, $params] = $requests[$requestName];
                 $params['query']['page']        = $currentPage + 1;
@@ -216,7 +216,7 @@ class Bridge
             }
 
             // Assign the data; we're done
-            $result[$requestName] = $decoded['data'];
+            $result[$requestName] = $decoded['data'] ?? [];
         }
 
         // Recursively run any next page requests;
