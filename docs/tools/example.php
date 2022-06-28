@@ -25,7 +25,6 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
@@ -98,13 +97,13 @@ HELP;
 
         /* Decide how loudly to announce lock acquisition failure
          *
-         * Simply using $lock = $this->>acquireLock() will keep you safe, even if you don't
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
          * specifically check for acquisition
          */
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit();
+            exit;
         }
 
         /* FIXME Main algorithm goes here
