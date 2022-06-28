@@ -17,6 +17,9 @@ use Schoolbox\User;
 
 /**
  * Factory for building download pages taskd requests.
+ *
+ * This class is designed to be immutable: all `set`/`add`/`clear` methods will
+ * return a new instance of this object with only the relevant field changed.
  */
 class MessageFactory
 {
@@ -82,7 +85,7 @@ class MessageFactory
      */
     public function setCallbackUrl(?string $callbackUrl): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->callbackUrl = $callbackUrl;
         return $clone;
     }
@@ -101,7 +104,7 @@ class MessageFactory
      */
     public function setCallbackParams(?array $callbackParams): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->callbackParams = $callbackParams;
         return $clone;
     }
@@ -119,7 +122,7 @@ class MessageFactory
      */
     public function setUser(?User $effector): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->effector = $effector;
         return $clone;
     }
@@ -134,7 +137,7 @@ class MessageFactory
      */
     public function setPdfFooter(?string $footer): self
     {
-        $clone            = (clone $this);
+        $clone            = clone $this;
         $clone->pdfFooter = $footer;
         return $clone;
     }
@@ -153,7 +156,7 @@ class MessageFactory
      */
     public function addPdfContent(string $filename, string ...$urls): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->content[] = ['filename' => $filename, 'urls' => $urls];
         return $clone;
     }
@@ -168,7 +171,7 @@ class MessageFactory
      */
     public function addFileContent(string $filename, string $url): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->content[] = ['filename' => $filename, 'source' => $url];
         return $clone;
     }
@@ -180,7 +183,7 @@ class MessageFactory
      */
     public function clearContent(): self
     {
-        $clone = (clone $this);
+        $clone = clone $this;
         $clone->content = [];
         return $clone;
     }
