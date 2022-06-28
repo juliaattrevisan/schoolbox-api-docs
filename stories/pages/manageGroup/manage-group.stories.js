@@ -14,15 +14,17 @@ export default {
             },
         },
     },
-    decorators: [() => ({ 
-    template: `
-        <div id="container">
-            <div id="content">
-                <story />
-            </div>
-        </div>
-    `
-    })],
+    decorators: [
+        () => ({ 
+            template: `
+                <div id="container">
+                    <div id="content">
+                        <story />
+                    </div>
+                </div>
+            `
+        })
+    ],
 };
 
 

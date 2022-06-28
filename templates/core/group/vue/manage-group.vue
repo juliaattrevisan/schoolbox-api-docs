@@ -22,6 +22,81 @@ onMounted(() => {
     $(document).foundation(); //to enable the Foundation features such as the drop down in -actions and tabs in -add-members
 });
 
+
+/*****************************************************************
+ * 
+ * Load the group members
+ * 
+ ****************************************************************/
+
+const isLoading = ref(true); //to display loading note
+const hasLoadError = ref(false); //to display loading error
+const groupMembers = ref([]); //all the group members
+
+onMounted(() => {
+    loadGroupMembers();
+});
+
+/**
+ * load all the group members for tabular display
+ */
+async function loadGroupMembers () {
+    try {
+        const response = await fetch(props.endpoint);
+        const responseJson = await response.json();
+        groupMembers.value = responseJson;
+        groupMembers.value.forEach((groupMember) => { //to highlight new members just added
+            groupMember = { ...groupMember, isNew: false };
+        });
+    } catch (error) {
+        console.warn(error);
+        isLoading.value = false;
+        hasLoadError.value = true; //hide search bar in the dom
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+
+/*****************************************************************
+ * 
+ * Display the group members in a table
+ * 
+ ****************************************************************/
+
+const tableColumns = ['name']
+const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+    // columnsClasses: {
+    //     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
+    //     edit: 'edit-td ', //to specify a width
+    // },
+    debounce: 100, //shorter debounce time as data is stored locally
+    headings: {
+        name: 'Name',
+        // ['dateModified.formatted']: 'Date modified',
+    },
+    perPage: 100,
+    perPageValues: [100, 200, 300],
+    resizableColumns: false,
+    selectable: {
+        mode: 'multiple' //to enable multi-select for those with permission
+    },
+    sortable: ['name'], //the edit column doesn't need to be sortable
+    sortIcon: {
+        is: 'glyphicon-sort',
+        base: 'glyphicon',
+        up: 'glyphicon-chevron-up',
+        down: 'glyphicon-chevron-down'
+    },
+    tabbable: false,
+    texts: {
+        count: '{from}-{to} of {count} members|{count} members|1 member',
+        filterPlaceholder: 'Search group members',
+        noResults: 'No matching group members',
+    },
+}
+
+
 </script>
 
 <template>
@@ -36,6 +111,12 @@ onMounted(() => {
             <manage-group-add-members />
             <h2 class="subheader">Current Members</h2>
             <section>
+                <v-client-table
+                    ref="table"
+                    :data="groupMembers"
+                    :columns="tableColumns"
+                    :options="tableOptions"
+                />
             </section>
         </div><!-- row -->
     </div><!-- small-12 island -->
