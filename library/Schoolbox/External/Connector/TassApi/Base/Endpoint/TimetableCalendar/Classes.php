@@ -200,7 +200,7 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-//        $this->importStudentTimetables(self::WATCHLIST);
+        $this->importStudentTimetables(self::WATCHLIST);
         $this->importStaffTimetables(self::WATCHLIST);
     }
 
