@@ -27,12 +27,6 @@ use Schoolbox\External\TimetablePeriodMapper;
 class Prepare implements IStrategy
 {
     /**
-     * An arbitrarily-chosen string to denote where these events came from
-     */
-    public const EVENT_IMPORT_IDENTIFIER = 'suds_tass';
-
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -124,9 +118,21 @@ class Prepare implements IStrategy
             $this->overridesMapper->truncate();
             $this->log->debug('Purged timetable event overrides');
 
-            /* Delete existing timetable events
+            /* Stage existing timetable events for later deletion if they were
+             * never touched during the import
              */
-            $this->eventMapper->deleteByColumn('classification', \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE);
+            $statement = $this->eventMapper->getDatabase()->prepare("
+                UPDATE {$this->eventMapper->getTable()}
+                SET updated_at = '0000-00-00 00:00:00'
+                WHERE classification = :classification
+                AND source = :source
+            ");
+
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => \Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME
+            ]);
+
             $this->log->debug(sprintf(
                 'Purged timetable events classified as %s',
                 \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE

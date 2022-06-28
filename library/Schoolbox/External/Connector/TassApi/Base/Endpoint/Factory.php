@@ -33,6 +33,12 @@ use UnexpectedValueException;
 class Factory
 {
     /**
+     * An arbitrarily-chosen string to denote where these events came from
+     */
+    public const SOURCE_NAME = 'suds_tass';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -380,6 +386,11 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->overridesMapper
+            ))
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
             ))
             ->add(new ApiCertification(
                 $this->log,
