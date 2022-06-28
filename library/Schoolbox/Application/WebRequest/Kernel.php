@@ -604,7 +604,7 @@ class Kernel extends WebKernelAbstract
      * @throws JwtParser\Exception\Base if a header exists and is recognised,
      *                                  but is rejected for whatever reason
      */
-    private function extractUserFromAuthHeader(?string $authHeader): ?User
+    public function extractUserFromAuthHeader(?string $authHeader): ?User
     {
         if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
@@ -629,7 +629,7 @@ class Kernel extends WebKernelAbstract
      * @param User $user
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    private function authenticateUserForThisRequestOnly(User $user): void
+    public function authenticateUserForThisRequestOnly(User $user): void
     {
         // Determine who was logged in, and preserve their data
         /** @var \Alaress\Session\Session $sessionDataStore */
