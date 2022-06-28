@@ -24,6 +24,22 @@ use Schoolbox\GenericCollection;
 class Mapper extends \Schoolbox\Mapper
 {
     /**
+     * This is used to spawn User instances when a Overrides Model id hydrated
+     *
+     * @var \Schoolbox\UserMapper
+     */
+    protected \Schoolbox\UserMapper $userMapper;
+
+
+    /**
+     * This is used to spawn User instances' Roles when a Overrides Model id hydrated
+     *
+     * @var \Schoolbox\RoleMapper
+     */
+    protected \Schoolbox\RoleMapper $roleMapper;
+
+
+    /**
      * @inheritDoc
      */
     protected function mapping(): void
@@ -40,6 +56,27 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Mappers that are used to manufacture joins in this particular usage
+     *
+     * @return void
+     */
+    protected function setup()
+    {
+        /* Spoke with Mr Sannang about mappers not really understanding how to save
+         * relational objects via a random column like synergy_id, so the usual trick
+         * ->setUser((new \Schoolbox\User())->setExternalId('BRO')) doesn't work
+         * the way it might have seemed (you can misuse mappers to save it, but that
+         * is pretty dodgy)
+         *
+         * Therefore save external_id as a string and manually handcraft User instances
+         * on their way out
+         */
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
+        $this->roleMapper = \Schoolbox\RoleMapper::getInstance();
+    }
+
+
+    /**
      * @inheritDoc
      *
      * @return string
@@ -50,17 +87,8 @@ class Mapper extends \Schoolbox\Mapper
         $staff = \Schoolbox\Role::STAFF;
         $student = \Schoolbox\Role::STUDENT;
 
-        /* Spoke with Mr Sannang about mappers not really understanding how to save
-         * relational objects via a random column like synergy_id, so the usual trick
-         * ->setUser((new \Schoolbox\User())->setExternalId('BRO')) doesn't work
-         * the way it might have seemed (you can misuse mappers to save it, but that
-         * is pretty dodgy)
-         *
-         * Therefore save external_id as a string and manually handcraft User instances
-         * on their way out
-         */
-        $uColumnString = \Schoolbox\UserMapper::getInstance()->getColumnString('u');
-        $rColumnString = \Schoolbox\RoleMapper::getInstance()->getColumnString('r');
+        $uColumnString = $this->userMapper->getColumnString('u');
+        $rColumnString = $this->roleMapper->getColumnString('r');
 
         return "
             SELECT
@@ -86,8 +114,6 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $stack = $this->createCollection();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-        $roleMapper = \Schoolbox\RoleMapper::getInstance();
 
         foreach ($statement as $row) {
             $override = $this->hydrate($row);
@@ -109,10 +135,10 @@ class Mapper extends \Schoolbox\Mapper
              */
             if ($row['r.id']) {
                 /** @var \Schoolbox\User|null $user */
-                $user = $userMapper->hydrate($row, 'u');
+                $user = $this->userMapper->hydrate($row, 'u');
 
                 /** @var \Schoolbox\Role|null $role */
-                $role = $roleMapper->hydrate($row, 'r');
+                $role = $this->roleMapper->hydrate($row, 'r');
 
                 if ($user && $role) {
                     $user->setRole($role);
