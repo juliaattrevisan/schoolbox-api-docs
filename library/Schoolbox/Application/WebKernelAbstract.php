@@ -344,10 +344,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
                     $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
-                        $problem['trace'] = array_merge(
-                            [$error],
-                            $e instanceof \Throwable ? $e->getTrace() : $e['trace']
-                        );
+                        $problem['trace'] = $e instanceof \Throwable
+                            ? $e->getTrace()
+                            : ($e['trace'] ?? []);
                     }
 
                     /** @var Output\Json $output */
