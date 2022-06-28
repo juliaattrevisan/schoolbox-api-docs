@@ -245,6 +245,7 @@ class Controller extends ConfigController
 
         /** @var MessageFactory $messageFactory */
         $messageFactory = $this->getDi()->get('taskd.downloadPagesMessageFactory');
+        $reportCount    = 0;
 
         foreach ($reportStudents as $student) {
             if ($reportParams->getViewAs() === Role::PARENT) {
@@ -273,13 +274,13 @@ class Controller extends ConfigController
                         ),
                         $urlBase->setPath($reportPath)->setQuery($params)->toString(),
                     );
+                    $reportCount++;
                 }
             } catch (RouteNotFound $e) {
                 // noop
             }
         }
 
-        $reportCount = $messageFactory->contentCount();
         if ($reportCount > 0) {
             // Get the taskd context, and send
             /** @var Producer $producer */

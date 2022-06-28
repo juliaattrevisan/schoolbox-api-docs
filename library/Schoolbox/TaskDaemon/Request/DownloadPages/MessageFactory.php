@@ -226,14 +226,4 @@ class MessageFactory
             $token,
         );
     }
-
-    /**
-     * How many content files have been added to this message factory?
-     *
-     * @return int
-     */
-    public function contentCount(): int
-    {
-        return count($this->content);
-    }
 }
