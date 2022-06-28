@@ -92,7 +92,11 @@ class MessageFactory
     /**
      * Set parameters to the callback URL for this call to taskd.
      *
-     * These parameters will be added to the call to taskd.
+     * These parameters will be added to the call to the callback URL when taskd
+     * completes.
+     *
+     * In addition: taskd adds a download link to the uploaded generated ZIP
+     * (relative to this Schoolbox instance) in the `href` parameter.
      *
      * @param array|null $callbackParams
      * @return self
