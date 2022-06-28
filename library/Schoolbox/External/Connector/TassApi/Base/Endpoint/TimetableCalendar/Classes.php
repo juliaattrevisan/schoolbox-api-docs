@@ -685,7 +685,7 @@ class Classes implements IStrategy
 
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
-                        $this->log->debug(sprintf(
+                        $this->log->info(sprintf(
                             'Creating new timetable event %s - %s, %s, %s-%s',
                             $event->getTitle(),
                             $event->getDay(),
