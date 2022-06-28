@@ -29,12 +29,13 @@ module.exports = {
     
         // Make whatever fine-grained changes you need
         config.module.rules.push({
-          test: /\.scss$/,
-          use: ['style-loader', 'css-loader', 'sass-loader'],
-          include: path.resolve(__dirname, '../'),
+            test: /\.scss$/,
+            use: ['style-loader', 'css-loader', 'sass-loader'],
+            include: path.resolve(__dirname, '../'),
         });
 
         config.resolve.alias['@js'] = path.resolve(__dirname, '../www/static/js');
+        config.resolve.alias['@schoolboxVue'] = path.resolve(__dirname, '../vue');
     
         // Return the altered config
         return config;

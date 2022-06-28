@@ -109,19 +109,22 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     <div class="row">
         <div class="small-12 island">
             <manage-group-add-members />
-            <h2 class="subheader">Current Members</h2>
-            <section>
-                <v-client-table
-                    ref="table"
-                    :data="groupMembers"
-                    :columns="tableColumns"
-                    :options="tableOptions"
-                />
-            </section>
-        </div><!-- row -->
-    </div><!-- small-12 island -->
+        </div><!-- small-12 island -->
+    </div><!-- row  -->
+    <div class="row">
+        <div class="small-12 columns">
+            <v-client-table
+                ref="table"
+                :data="groupMembers"
+                :columns="tableColumns"
+                :options="tableOptions"
+            />
+        </div><!-- small-12 island -->
+    </div><!-- row  -->
 </template>
 
-<style scoped>
+<style lang="scss">
+
+@import '@schoolboxVue/components/vueTables2/vueTables2';
     
-</style>/
+</style>
