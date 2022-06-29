@@ -9,8 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token;
 
+use Firebase\JWT as JwtLibrary;
 use Schoolbox\API\Token\JwtParser\IParser;
+use Schoolbox\Application\Exception;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Helper class for identifying a user from a JWT.
@@ -34,10 +37,14 @@ class JwtParser
      * Determine a user from a JWT.
      *
      * @param string $jwt
-     * @return User|null The user identified by the JWT, or null if no user was
-     *                   able to be identified.
+     * @return User The user identified by the JWT
+     * @throws JwtLibrary\BeforeValidException      if the JWT isn't yet valid
+     * @throws JwtLibrary\ExpiredException          if the JWT is expired
+     * @throws JwtLibrary\SignatureInvalidException if the JWT's signature is invalid
+     * @throws UnexpectedValueException             if something else went wrong when decoding the JWT
+     * @throws Exception\NotFound                   if the JWT is valid, but identifies a user which does not exist
      */
-    public function determineUserFromJwt(string $jwt): ?User
+    public function determineUserFromJwt(string $jwt): User
     {
         // Need to know what's in the JWT first,
         // before attempting to determine a user
