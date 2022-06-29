@@ -42,7 +42,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RegistryMapper::class),
             $this->getMapperFactory()->get(ServiceMapper::class),
             $this->getMapperFactory()->get(TokenMapper::class),
-            $this->injector->get('user.tokenBuilder'),
+            $this->injector->get('user.jwtParser'),
         );
     }
 }
