@@ -20,6 +20,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Class JwtParser
@@ -32,23 +33,39 @@ class JwtParser
      */
     private const SESSION_LENGTH_DEFAULT = 1800;
 
-    private Jwt $tokenBuilder;
-    private UserMapper $userMapper;
-    private User\Token\Mapper $tokenMapper;
-    private IConfigLoader $config;
+    /**
+     * Key for the email JWT claim. This is a public claim, so it doesn't need
+     * a prefix.
+     */
+    private const CLAIM_EMAIL = 'email';
 
+    /**
+     * Key for the instance ID custom JWT claim.
+     */
+    private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
+
+    /**
+     * Constructor
+     *
+     * @param Jwt               $tokenBuilder The token builder, used for decoding JWTs.
+     * @param UserMapper        $userMapper   Mapper for retrieving users once a user has been identified.
+     * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
+     * @param IConfigLoader     $config       Configuration
+     */
     public function __construct(
-        Jwt $tokenBuilder,
-        UserMapper $userMapper,
-        User\Token\Mapper $tokenMapper,
-        IConfigLoader $config
+        private Jwt $tokenBuilder,
+        private UserMapper $userMapper,
+        private User\Token\Mapper $tokenMapper,
+        private IConfigLoader $config,
     ) {
-        $this->tokenBuilder = $tokenBuilder;
-        $this->userMapper = $userMapper;
-        $this->tokenMapper = $tokenMapper;
-        $this->config = $config;
     }
 
+    /**
+     * Determine a user from a JWT.
+     *
+     * @param string $jwt
+     * @return User|null
+     */
     public function determineUserFromJwt(string $jwt): ?User
     {
         // Need to know what's in the JWT first,
@@ -67,12 +84,15 @@ class JwtParser
         }
 
         // Was this issued by another Schoolbox instance?
-
-        return null;
+        $instanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
+        if (!isset($instanceId)) {
+            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
+        }
+        return $this->determineUserFromOtherInstanceIssuedJwt($jwt, $instanceId);
     }
 
     /**
-     * Determine the issuer from a JWT issued by this instance.
+     * Determine a user from a JWT issued by this instance.
      *
      * @param string $jwt
      * @return User
@@ -111,7 +131,7 @@ class JwtParser
     }
 
     /**
-     * Determine the issuer from a JWT issued by this instance's oAuth provider.
+     * Determine a user from a JWT issued by this instance's oAuth provider.
      *
      * @param string $jwt
      * @return User
@@ -142,5 +162,36 @@ class JwtParser
         return $tokenParser->findUserFromToken($jwt);
     }
 
+    /**
+     * Determine a user from a JWT issued by some other instance.
+     *
+     * @param string      $jwt
+     * @param string|null $instanceId
+     * @return User
+     */
+    private function determineUserFromOtherInstanceIssuedJwt(string $jwt, ?string $instanceId): User
+    {
+        // Now we know the instance:
+        // Look it up in the registry table, and get the public key stored there
+        // so that the JWT can be verified
+        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId((string)$instanceId);
 
+        // Verify the payload
+        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
+
+        // Now the JWT is decoded and verified:
+        // create a session for the user matching the email address in the JWT
+        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
+        if (!isset($email)) {
+            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
+        }
+
+        // The email must be valid too, or at least not blank
+        $email = (string)$email;
+        if (trim($email) === '') {
+            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
+        }
+        // Return the user identified by this session instead
+        return $this->userMapper->findByUsername($email);
+    }
 }
