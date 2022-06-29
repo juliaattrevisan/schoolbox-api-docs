@@ -66,9 +66,9 @@ class JwtParser
      * Determine a user from a JWT.
      *
      * @param string $jwt
-     * @return User
+     * @return User|null
      */
-    public function determineUserFromJwt(string $jwt): User
+    public function determineUserFromJwt(string $jwt): ?User
     {
         // Need to know what's in the JWT first,
         // before attempting to determine a user
@@ -92,10 +92,10 @@ class JwtParser
 
         // Was this issued by another Schoolbox instance?
         $instanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
-        if (!isset($instanceId)) {
-            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
+        if (isset($instanceId)) {
+            return $this->determineUserFromOtherInstanceIssuedJwt($jwt, $instanceId);
         }
-        return $this->determineUserFromOtherInstanceIssuedJwt($jwt, $instanceId);
+        return null;
     }
 
     /**
