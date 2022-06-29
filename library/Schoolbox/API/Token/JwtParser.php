@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -101,6 +102,7 @@ class JwtParser
      * @param string $jwt
      * @return User
      * @throws SchoolboxNotFoundException if no user was found
+     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
      * @throws ExpiredException           if the JWT has a JWT ID, and the
      *                                    matching token is expired
      * @throws SignatureInvalidException  if the JWT has a JWT ID, and there is
@@ -140,6 +142,7 @@ class JwtParser
      * @param string $jwt
      * @return User
      * @throws SchoolboxNotFoundException if no user was found
+     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
      */
     private function determineUserFromOauthProviderIssuedJwt(string $jwt): User
     {
@@ -169,16 +172,25 @@ class JwtParser
     /**
      * Determine a user from a JWT issued by some other instance.
      *
-     * @param string      $jwt
-     * @param string|null $instanceId
+     * @param string $jwt
+     * @param string $instanceId
      * @return User
+     * @throws SchoolboxNotFoundException if no user was found
+     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
+     * @throws UnexpectedValueException   if instance `$instanceId` isn't
+     *                                    registered
+     * @throws UnexpectedValueException   if JWT has a null or empty
+     *                                    `self::CLAIM_EMAIL` claim
      */
-    private function determineUserFromOtherInstanceIssuedJwt(string $jwt, ?string $instanceId): User
+    private function determineUserFromOtherInstanceIssuedJwt(string $jwt, string $instanceId): User
     {
-        // Now we know the instance:
-        // Look it up in the registry table, and get the public key stored there
-        // so that the JWT can be verified
-        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId((string)$instanceId);
+        // Look up the instance in the registry, and get its public key so that
+        // the JWT can be verified
+        try {
+            $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
+        } catch (MapperException $e) {
+            throw new UnexpectedValueException(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
+        }
 
         // Verify the payload
         $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
@@ -195,7 +207,6 @@ class JwtParser
         if (trim($email) === '') {
             throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
         }
-        // Return the user identified by this session instead
-        return $this->userMapper->findByUsername($email);
+        return $this->userMapper->findByUsername($email) ?? throw new SchoolboxNotFoundException();
     }
 }
