@@ -1749,9 +1749,9 @@ abstract class Kernel
                     return new JwtParser(
                         $tokenBuilder,
                         new JwtParser\Composite(
+                            new JwtParser\OtherInstanceIssued($tokenBuilder, $userMapper, $instanceRegistryMapper),
                             new JwtParser\InstanceIssued($tokenBuilder, $userMapper, $tokenMapper, $config),
                             new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
-                            new JwtParser\OtherInstanceIssued($tokenBuilder, $userMapper, $instanceRegistryMapper),
                         ),
                     );
                 }
