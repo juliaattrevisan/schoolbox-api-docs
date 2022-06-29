@@ -54,6 +54,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\Http\Client\ClientInterface;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
@@ -1740,6 +1741,8 @@ abstract class Kernel
                 function () use ($di, $config, $mapperFactory) {
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder           = $di->get('user.tokenBuilder');
+                    /** @var ClientInterface $httpClient */
+                    $httpClient             = $di->get('httpClient');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
@@ -1747,7 +1750,7 @@ abstract class Kernel
                         $tokenBuilder,
                         new JwtParser\Composite(
                             new JwtParser\InstanceIssued($tokenBuilder, $userMapper, $tokenMapper, $config),
-                            new JwtParser\OauthProviderIssued($userMapper, $config),
+                            new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
                             new JwtParser\OtherInstanceIssued($tokenBuilder, $userMapper, $instanceRegistryMapper),
                         ),
                     );

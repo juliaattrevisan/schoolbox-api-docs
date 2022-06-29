@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use Psr\Http\Client\ClientInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -32,12 +33,14 @@ class OauthProviderIssued implements IParser
     /**
      * Constructor
      *
-     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader $config     Standard configuration store.
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param ClientInterface $httpClient HTTP client: required for retrieving JWKS from oAuth provider
      */
     public function __construct(
         private UserMapper $userMapper,
         private IConfigLoader $config,
+        private ClientInterface $httpClient,
     ) {
     }
 
@@ -65,11 +68,9 @@ class OauthProviderIssued implements IParser
         $oidcConfigUri = $oauthIdp . '/.well-known/openid-configuration';
         $algs          = ['RS256'];
 
-        // TODO inject HTTP client for fetching JWKS URI
-        $httpClient        = new Client();
-        $oidcConfigRequest = $httpClient->get($oidcConfigUri);
+        $oidcConfigRequest = $this->httpClient->get($oidcConfigUri);
         $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-        $jwksRequest       = $httpClient->get($oidcConfig['jwks_uri']);
+        $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
         $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
 
         // Verify the JWT
