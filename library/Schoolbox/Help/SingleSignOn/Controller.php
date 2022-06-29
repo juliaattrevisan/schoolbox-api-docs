@@ -163,6 +163,7 @@ class Controller extends Base
         try {
             $this->authenticateUserFromToken();
             $this->response->redirect->seeOther($page);
+            return;
         } catch (
             UnexpectedValueException
             | DomainException
@@ -172,12 +173,13 @@ class Controller extends Base
             | ExpiredException
             | NotAuthenticated $e
         ) {
-            // For now: just redirect to login page
-            // Later: show a more useful message
-            $loginUrl = (new Uri($this->router->generate('login.getLogin')))
-                ->setQuery(['page' => $page]);
-            $this->response->redirect->seeOther($loginUrl->toString());
+            // noop: fall through to the login page case
         }
+        // For now: just redirect to login page
+        // Later: show a more useful message
+        $loginUrl = (new Uri($this->router->generate('login.getLogin')))
+            ->setQuery(['page' => $page]);
+        $this->response->redirect->seeOther($loginUrl->toString());
     }
 
     /**
