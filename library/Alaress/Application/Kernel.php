@@ -464,7 +464,7 @@ abstract class Kernel
                     'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
                     'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                     'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                    'gotenbergHttpHeader' => 'SBAuth',
+                    'gotenbergHttpHeader' => RequestFactory::AUTH_HTTP_HEADER,
                 ],
             )
         );
