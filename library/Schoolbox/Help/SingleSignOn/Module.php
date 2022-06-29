@@ -40,6 +40,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('user.tokenBuilder'),
+            $this->injector->get('user.jwtParser'),
             new Authenticator(),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(InstanceRegistryMapper::class),
