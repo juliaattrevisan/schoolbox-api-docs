@@ -13,6 +13,32 @@
 
     <div class="admin-content">
         {% if reports|length %}
+            <div class="small-12 island">
+                <section>
+                    <ul class="information-list">
+                        {% for report in reports %}
+                        <li class="actions-small-4">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="#">
+                                        <h3>{{ report.title }}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        Last modified by {{ report.updatedBy.fullname }} on {{ report.updatedAt.local }}
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-download" href="#" title="Generate"></a>
+                                <a class="icon-modify" href="#" title="Modify"></a>
+                                <a class="icon-copy" href="#" title="Duplicate"></a>
+                                <a class="icon-delete" href="#" title="Delete"></a>
+                            </nav>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
         {% else %}
             <div class="empty-state">
                 <i class="icon-progress"></i>
@@ -22,3 +48,5 @@
         {% endif %}
     </div>
 </div>
+
+
