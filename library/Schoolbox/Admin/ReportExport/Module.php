@@ -36,46 +36,73 @@ class Module extends BaseModule
 {
     protected $basename = 'adminReportExport';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $this->addGetRoute($router, 'getIndex', $basePath, '');
-        $this->addGetRoute($router, 'getTerms', $basePath, '/getTerms');
-        $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
-        $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
-        $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
-        $this->addPostRoute($router, 'postReport', $basePath, '/postReport');
-        $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
-        $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initRoutes(Router $router, $basePath)
+//    {
+//        $this->addGetRoute($router, 'getIndex', $basePath, '');
+//        $this->addGetRoute($router, 'getTerms', $basePath, '/getTerms');
+//        $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
+//        $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
+//        $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
+//        $this->addPostRoute($router, 'postReport', $basePath, '/postReport');
+//        $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
+//        $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
+//    }
+
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function initRoutePermissions(Authorizer $authorizer)
+//    {
+//        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+//             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+//    }
+//
+//    /**
+//     * @param PathMatcher $matcher
+//     */
+//    public function initRoutePreloads(PathMatcher $matcher)
+//    {
+//        $this->addRoutePreload($matcher, '.*', function ($params) {
+//            $preloads = [];
+//            if (isset($params['student']) && $params['student'] instanceof User) {
+//                $preloads['student'] = $params['student'];
+//            }
+//            if (isset($params['studentId'])) {
+//                $preloads['student'] = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
+//            }
+//            return $preloads;
+//        });
+//    }
 
     /**
-     * {@inheritdoc}
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
      */
-    public function initRoutePermissions(Authorizer $authorizer)
+    protected function registerRoutes()
     {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        /* Any staff can see the form
+         */
+        $getPerms = $postPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser()
+                /* Presumably this will one day include a special subset of stuff
+                 * whose duty will be to manufacture these reports. This staff
+                 * member(s) might not be superusers, nor teachers; their ability
+                 * to be here wil be based on a Service Permission that might
+                 * not currently exist
+                 */
+                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+            )
+        );
+
+        $this->register('GET', '', 'getIndex', $getPerms);
     }
 
-    /**
-     * @param PathMatcher $matcher
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload($matcher, '.*', function ($params) {
-            $preloads = [];
-            if (isset($params['student']) && $params['student'] instanceof User) {
-                $preloads['student'] = $params['student'];
-            }
-            if (isset($params['studentId'])) {
-                $preloads['student'] = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
-            }
-            return $preloads;
-        });
-    }
 
     /**
      * @inheritdoc
