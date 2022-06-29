@@ -62,7 +62,7 @@ class OtherInstanceIssued implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): ?User
+    public function determineUser(string $jwt, array $claims): User
     {
         // Look up the instance in the registry, and get its public key so that
         // the JWT can be verified.

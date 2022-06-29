@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\User;
 
 /**
@@ -51,13 +52,13 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): ?User
+    public function determineUser(string $jwt, array $claims): User
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($claims)) {
                 return $parser->determineUser($jwt, $claims);
             }
         }
-        return null;
+        throw new NotFound();
     }
 }

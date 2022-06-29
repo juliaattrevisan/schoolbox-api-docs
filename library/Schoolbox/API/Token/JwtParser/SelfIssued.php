@@ -52,7 +52,7 @@ class SelfIssued implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): ?User
+    public function determineUser(string $jwt, array $claims): User
     {
         $claims = $this->tokenBuilder->decode($jwt);
         $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);

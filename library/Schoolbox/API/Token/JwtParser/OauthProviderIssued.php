@@ -57,7 +57,7 @@ class OauthProviderIssued implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): ?User
+    public function determineUser(string $jwt, array $claims): User
     {
         // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
