@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT as JwtLibrary;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
@@ -74,7 +75,7 @@ class InstanceIssued implements IParser
                 throw new JwtLibrary\SignatureInvalidException($e->getMessage(), 0, $e);
             }
         }
-        return $user;
+        return $user ?? throw new SchoolboxNotFoundException();
     }
 
     /**

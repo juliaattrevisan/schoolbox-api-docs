@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -11,7 +12,6 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
