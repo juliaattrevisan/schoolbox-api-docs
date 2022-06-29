@@ -84,6 +84,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+
         /* Any staff can see the form
          */
         $getPerms = $postPerms = new Rule\All(
@@ -100,7 +101,7 @@ class Module extends BaseModule
             )
         );
 
-        $this->register('GET', '', 'getIndex', $getPerms);
+        $this->register('GET', '', 'getList', $getPerms);
     }
 
 
@@ -110,6 +111,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(YearLevelMapper::class),

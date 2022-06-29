@@ -68,6 +68,8 @@ class Controller extends ConfigController
     private const FOOTER_HTML = '/templates/footer.html';
 
 
+    private Mapper $reportMapper;
+
     private UserMapper $userMapper;
 
     private TermMapper $termMapper;
@@ -93,6 +95,7 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
+     * @param Mapper                $reportMapper
      * @param UserMapper            $userMapper
      * @param TermMapper            $termMapper
      * @param YearLevelMapper       $yearLevelMapper
@@ -109,6 +112,7 @@ class Controller extends ConfigController
      * @param Rebuilder             $rebuilder
      */
     public function __construct(
+        Mapper $reportMapper,
         UserMapper $userMapper,
         TermMapper $termMapper,
         YearLevelMapper $yearLevelMapper,
@@ -125,6 +129,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        $this->reportMapper          = $reportMapper;
         $this->userMapper            = $userMapper;
         $this->termMapper            = $termMapper;
         $this->yearLevelMapper       = $yearLevelMapper;
@@ -137,6 +142,38 @@ class Controller extends ConfigController
         $this->userBulkMapper        = $userBulkMapper;
         $this->roleMapper            = $roleMapper;
     }
+
+
+    /**
+     * A list of summative reports
+     *
+     * @return void
+     * @throws RouteNotFound
+     * @api GET /adminv2/report-export
+     */
+    public function getList(): void
+    {
+        /* Get a list of all the available reports,
+         * ordered alphabetically ascending
+         */
+        $reports = $this->reportMapper->findAll([
+            'order' => [
+                'title' => 'ASC'
+            ]
+        ]);
+
+        $this->getResponse()->content->set(
+            [
+                'template' => '@adminReportExport/list.twig',
+                'data' => [
+                    'pageCurrent' => $this->router->generate('adminReportExport.getList'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                    'reports' => $reports
+                ]
+            ]
+        );
+    }
+
 
     /**
      * Landing page

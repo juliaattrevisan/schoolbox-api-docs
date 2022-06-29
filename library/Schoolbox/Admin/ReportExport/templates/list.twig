@@ -1,0 +1,24 @@
+{##
+ # List of Summative Reports
+ #
+ # @param GenericCollection $reports  A list of ReportExport/Model instances
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        {% if reports|length %}
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                <p>There aren't any summative reports yet.</p>
+                <p><a href="#">Create one</a> so you can generate the reports later.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
