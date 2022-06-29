@@ -69,9 +69,9 @@ class JwtParser
      * Determine a user from a JWT.
      *
      * @param string $jwt
-     * @return User|null
+     * @return User
      */
-    public function determineUserFromJwt(string $jwt): ?User
+    public function determineUserFromJwt(string $jwt): User
     {
         // Need to know what's in the JWT first,
         // before attempting to determine a user
