@@ -9,12 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token;
 
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
+use Firebase\JWT as JwtLibrary;
+use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Auth\JwtVerifierFactory\Configured;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
@@ -82,8 +80,13 @@ class JwtParser
         }
 
         // Was this issued by the oAuth provider?
-        // (need to ensure that the issuer sort-of matches)
-        if ($claims[MessagePayloadInterface::CLAIM_ISS] === $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER)) {
+        // (need to ensure that the issuer sort-of matches: trim trailing /)
+        $jwtIssuer   = $claims[MessagePayloadInterface::CLAIM_ISS] ?? null;
+        $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
+        if (
+            isset($jwtIssuer, $oauthIssuer)
+            && trim($jwtIssuer, '/') === trim($oauthIssuer, '/')
+        ) {
             return $this->determineUserFromOauthProviderIssuedJwt($jwt);
         }
 
@@ -100,12 +103,10 @@ class JwtParser
      *
      * @param string $jwt
      * @return User
-     * @throws SchoolboxNotFoundException if no user was found
-     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
-     * @throws ExpiredException           if the JWT has a JWT ID, and the
-     *                                    matching token is expired
-     * @throws SignatureInvalidException  if the JWT has a JWT ID, and there is
-     *                                    no matching token
+     * @throws SchoolboxNotFoundException           if no user was found
+     * @throws UnexpectedValueException             if JWT is invalid for whatever reason
+     * @throws JwtLibrary\ExpiredException          if the JWT has a JWT ID, and the matching token is expired
+     * @throws JwtLibrary\SignatureInvalidException if the JWT has a JWT ID, and there is no matching token
      */
     private function determineUserFromInstanceIssuedJwt(string $jwt): User
     {
@@ -122,11 +123,11 @@ class JwtParser
                     ]
                 );
                 if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
-                    throw new ExpiredException();
+                    throw new JwtLibrary\ExpiredException();
                 }
             } catch (MapperException $e) {
                 // could not find a token with user id and jwt id
-                throw new SignatureInvalidException($e->getMessage(), 0, $e);
+                throw new JwtLibrary\SignatureInvalidException($e->getMessage(), 0, $e);
             }
         }
         if ($user) {
@@ -150,25 +151,71 @@ class JwtParser
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
 
-        $jwtVerifierFactory = new Configured(
-            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE),
-            new FirebasePhpJwt(null, $sessionLength)
-        );
 
-        $jwtVerifier = $jwtVerifierFactory->build(
-            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
-            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
-            $sessionLength,
-        );
-
+        // In order to remove the Okta JWT verifier, I need to be able to:
+        // * determine the JWKS URI (all known use OIDC discovery well-known)
+        // * once decoded, verify the JWT's aud claim matches the configured
+        //   client ID
+        $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
+        $oauthClientId   = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
 
-        // Parse the token and extract a user from it
-        // This line is squelched due to an unfixed warning in 3rd party method
-        // `JwtVerifier::validateClientId`: the eventual solution is to remove
-        // `okta/jwt-verifier` completely, but for now just ignore the warning.
-        $decodedToken = @$jwtVerifier->verify($jwt);
-        $claims       = $decodedToken->getClaims();
+        // TODO allow these to be configurable
+        $oidcConfigUri = $oauthIdp . '/.well-known/openid-configuration';
+        $algs          = ['RS256'];
+
+        // TODO inject HTTP client for fetching JWKS URI
+        $httpClient        = new Client();
+        $oidcConfigRequest = $httpClient->get($oidcConfigUri);
+        $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
+        $jwksRequest       = $httpClient->get($oidcConfig['jwks_uri']);
+        $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
+
+        JwtLibrary\JWT::$leeway = $sessionLength;
+        $decodedToken = JwtLibrary\JWT::decode(
+            $jwt,
+            JwtLibrary\JWK::parseKeySet($jwks),
+            $algs,
+        );
+
+
+        // Validate audience
+        $validAudience = false;
+        $audiences     = (array)$decodedToken->aud;
+        foreach ($audiences as $audience) {
+            if ($audience === $oauthClientId) {
+                $validAudience = true;
+                break;
+            }
+        }
+        if (!$validAudience) {
+            // throw something
+            throw new JwtLibrary\SignatureInvalidException('JWT audience does not match configured client ID');
+        }
+
+
+
+
+//        $claims        = json_decode(json_encode($decodedToken), true);
+
+
+//        $jwtVerifierFactory = new Configured(
+//            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE),
+//            new FirebasePhpJwt(null, $sessionLength)
+//        );
+//
+//        $jwtVerifier = $jwtVerifierFactory->build(
+//            $oauthIdp,
+//            $oauthClientId,
+//            $sessionLength,
+//        );
+//
+//        // Parse the token and extract a user from it
+//        // This line is squelched due to an unfixed warning in 3rd party method
+//        // `JwtVerifier::validateClientId`: the eventual solution is to remove
+//        // `okta/jwt-verifier` completely, but for now just ignore the warning.
+//        $decodedToken = @$jwtVerifier->verify($jwt);
+//        $claims       = $decodedToken->getClaims();
 
         // The identification in the token seems to be in one of two claims:
         // * "preferred_username" matches a Schoolbox username
@@ -177,8 +224,8 @@ class JwtParser
         $messages = [];
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
-            if (isset($claims[$candidateClaim])) {
-                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
+            if (isset($decodedToken->$candidateClaim)) {
+                $user = $this->userMapper->findByUsername($decodedToken->$candidateClaim);
                 if ($user) {
                     return $user;
                 }
