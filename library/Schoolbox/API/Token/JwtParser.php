@@ -9,41 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token;
 
-use Firebase\JWT as JwtLibrary;
-use GuzzleHttp\Client;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\API\Token\JwtParser\IParser;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
- * Class JwtParser
+ * Helper class for identifying a user from a JWT.
  */
 class JwtParser
 {
-    /**
-     * Default session length, in seconds: used as the default leeway for the
-     * JWT verifier.
-     */
-    private const SESSION_LENGTH_DEFAULT = 1800;
-
-    /**
-     * Key for the email JWT claim. This is a public claim, so it doesn't need
-     * a prefix.
-     */
-    private const CLAIM_EMAIL = 'email';
-
-    /**
-     * Key for the instance ID custom JWT claim.
-     */
-    private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
-
     /**
      * Constructor
      *
@@ -61,7 +34,8 @@ class JwtParser
      * Determine a user from a JWT.
      *
      * @param string $jwt
-     * @return User|null
+     * @return User|null The user identified by the JWT, or null if no user was
+     *                   able to be identified.
      */
     public function determineUserFromJwt(string $jwt): ?User
     {
@@ -69,194 +43,5 @@ class JwtParser
         // before attempting to determine a user
         $claims = $this->tokenBuilder->decodeWithoutVerification($jwt);
         return $this->parser->determineUser($jwt, $claims);
-
-//        // Is the issuer this instance?
-//        if ($this->tokenBuilder->issuedBySchoolbox($claims)) {
-//            return $this->determineUserFromInstanceIssuedJwt($jwt);
-//        }
-//
-//        // Was this issued by the oAuth provider?
-//        // (need to ensure that the issuer sort-of matches: trim trailing /)
-//        $jwtIssuer   = $claims[MessagePayloadInterface::CLAIM_ISS] ?? null;
-//        $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
-//        if (
-//            isset($jwtIssuer, $oauthIssuer)
-//            && trim($jwtIssuer, '/') === trim($oauthIssuer, '/')
-//        ) {
-//            return $this->determineUserFromOauthProviderIssuedJwt($jwt);
-//        }
-//
-//        // Was this issued by another Schoolbox instance?
-//        $instanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
-//        if (isset($instanceId)) {
-//            return $this->determineUserFromOtherInstanceIssuedJwt($jwt, $instanceId);
-//        }
-//        return null;
     }
-//
-//    /**
-//     * Determine a user from a JWT issued by this instance.
-//     *
-//     * @param string $jwt
-//     * @return User
-//     * @throws SchoolboxNotFoundException           if no user was found
-//     * @throws UnexpectedValueException             if JWT is invalid for whatever reason
-//     * @throws JwtLibrary\ExpiredException          if the JWT has a JWT ID, and the matching token is expired
-//     * @throws JwtLibrary\SignatureInvalidException if the JWT has a JWT ID, and there is no matching token
-//     */
-//    private function determineUserFromInstanceIssuedJwt(string $jwt): User
-//    {
-//        $claims = $this->tokenBuilder->decode($jwt);
-//        $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
-//        if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
-//            // if issued by schoolbox and jti is provided, validate the jti
-//            try {
-//                /** @var User\Token\Model $token */
-//                $token = $this->tokenMapper->findOneByColumnList(
-//                    [
-//                        'user_id' => $user->getId(),
-//                        'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
-//                    ]
-//                );
-//                if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
-//                    throw new JwtLibrary\ExpiredException();
-//                }
-//            } catch (MapperException $e) {
-//                // could not find a token with user id and jwt id
-//                throw new JwtLibrary\SignatureInvalidException($e->getMessage(), 0, $e);
-//            }
-//        }
-//        if ($user) {
-//            return $user;
-//        }
-//        throw new SchoolboxNotFoundException();
-//    }
-//
-//    /**
-//     * Determine a user from a JWT issued by this instance's oAuth provider.
-//     *
-//     * @param string $jwt
-//     * @return User
-//     * @throws SchoolboxNotFoundException if no user was found
-//     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
-//     */
-//    private function determineUserFromOauthProviderIssuedJwt(string $jwt): User
-//    {
-//        // Determine JWKS for this provider
-//        $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
-//        $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
-//
-//        // TODO allow these to be configurable
-//        $oidcConfigUri = $oauthIdp . '/.well-known/openid-configuration';
-//        $algs          = ['RS256'];
-//
-//        // TODO inject HTTP client for fetching JWKS URI
-//        $httpClient        = new Client();
-//        $oidcConfigRequest = $httpClient->get($oidcConfigUri);
-//        $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
-//        $jwksRequest       = $httpClient->get($oidcConfig['jwks_uri']);
-//        $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
-//
-//        // Verify the JWT
-//        $sessionLength  = (int)$this->config->get('session_length');
-//        if ($sessionLength <= 0) {
-//            $sessionLength = self::SESSION_LENGTH_DEFAULT;
-//        }
-//        $originalLeeway = JwtLibrary\JWT::$leeway;
-//        JwtLibrary\JWT::$leeway = $sessionLength;
-//        try {
-//            $decodedToken = JwtLibrary\JWT::decode(
-//                $jwt,
-//                JwtLibrary\JWK::parseKeySet($jwks),
-//                $algs,
-//            );
-//        } finally {
-//            JwtLibrary\JWT::$leeway = $originalLeeway;
-//        }
-//
-//        // Validate audience
-//        $validAudience = false;
-//        $audiences     = (array)$decodedToken->aud;
-//        $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
-//        foreach ($audiences as $audience) {
-//            if ($audience === $oauthClientId) {
-//                $validAudience = true;
-//                break;
-//            }
-//        }
-//        if (!$validAudience) {
-//            throw new JwtLibrary\SignatureInvalidException('JWT audience does not match configured client ID');
-//        }
-//
-//        // The identification in the token seems to be in one of two claims:
-//        // * "preferred_username" matches a Schoolbox username
-//        // * "https://cloudwork.id/claims/sis_id" matches an external ID
-//        // We'll just use the preferred username until I hear otherwise.
-//        $messages = [];
-//        foreach ($candidateClaims as $candidateClaim) {
-//            $candidateClaim = trim($candidateClaim);
-//            if (isset($decodedToken->$candidateClaim)) {
-//                $user = $this->userMapper->findByUsername($decodedToken->$candidateClaim);
-//                if ($user) {
-//                    return $user;
-//                }
-//                $failureMessage = sprintf(
-//                    'The token contained a "%s" claim, but its value did not match a Schoolbox user',
-//                    $candidateClaim
-//                );
-//            } else {
-//                $failureMessage = sprintf(
-//                    'The token did not contain a "%s" claim',
-//                    $candidateClaim
-//                );
-//            }
-//            $messages[] = $failureMessage;
-//        }
-//
-//        // Candidate claims found no user: can't use it
-//        throw new SchoolboxNotFoundException(
-//            sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
-//        );
-//    }
-//
-//    /**
-//     * Determine a user from a JWT issued by some other instance.
-//     *
-//     * @param string $jwt
-//     * @param string $instanceId
-//     * @return User
-//     * @throws SchoolboxNotFoundException if no user was found
-//     * @throws UnexpectedValueException   if JWT is invalid for whatever reason
-//     * @throws UnexpectedValueException   if instance `$instanceId` isn't
-//     *                                    registered
-//     * @throws UnexpectedValueException   if JWT has a null or empty
-//     *                                    `self::CLAIM_EMAIL` claim
-//     */
-//    private function determineUserFromOtherInstanceIssuedJwt(string $jwt, string $instanceId): User
-//    {
-//        // Look up the instance in the registry, and get its public key so that
-//        // the JWT can be verified
-//        try {
-//            $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
-//        } catch (MapperException $e) {
-//            throw new UnexpectedValueException(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
-//        }
-//
-//        // Verify the payload
-//        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
-//
-//        // Now the JWT is decoded and verified:
-//        // create a session for the user matching the email address in the JWT
-//        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
-//        if (!isset($email)) {
-//            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
-//        }
-//
-//        // The email must be valid too, or at least not blank
-//        $email = (string)$email;
-//        if (trim($email) === '') {
-//            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
-//        }
-//        return $this->userMapper->findByUsername($email) ?? throw new SchoolboxNotFoundException();
-//    }
 }
