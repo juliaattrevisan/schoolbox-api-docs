@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
-use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Psr\Http\Client\ClientInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;

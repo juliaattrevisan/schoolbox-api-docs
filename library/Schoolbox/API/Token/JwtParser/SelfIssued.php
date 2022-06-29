@@ -20,18 +20,17 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * Parser for instance-issued JWTs.
+ * Parser for JWTs issued by this instance.
  */
-class InstanceIssued implements IParser
+class SelfIssued implements IParser
 {
     /**
      * Constructor
      *
-     * @param Jwt               $tokenBuilder           The token builder, used for decoding JWTs.
-     * @param UserMapper        $userMapper             Mapper for retrieving users once the user in the JWT is
-     *                                                  identified.
-     * @param User\Token\Mapper $tokenMapper            Mapper for retrieving user tokens.
-     * @param IConfigLoader     $config                 Standard configuration store.
+     * @param Jwt               $tokenBuilder The token builder, used for decoding JWTs.
+     * @param UserMapper        $userMapper   Mapper for retrieving users once the user in the JWT is identified.
+     * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
+     * @param IConfigLoader     $config       Standard configuration store.
      */
     public function __construct(
         private Jwt $tokenBuilder,
