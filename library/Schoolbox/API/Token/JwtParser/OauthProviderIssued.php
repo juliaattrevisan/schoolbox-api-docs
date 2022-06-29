@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
+use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use Psr\Http\Client\ClientInterface;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -34,12 +34,12 @@ class OauthProviderIssued implements IParser
      *
      * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
      * @param IConfigLoader   $config     Standard configuration store.
-     * @param ClientInterface $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
      */
     public function __construct(
         private UserMapper $userMapper,
         private IConfigLoader $config,
-        private ClientInterface $httpClient,
+        private Client $httpClient,
     ) {
     }
 
