@@ -17,7 +17,7 @@ use Schoolbox\UserMapper;
 /**
  * Class for parsing a Schoolbox user out of a JWT token.
  *
- * @todo convert to a PSR-15 compatible middleware
+ * TODO remove and replace with `\Schoolbox\API\Token\JwtParser`
  */
 class TokenParser
 {

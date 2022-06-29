@@ -156,17 +156,62 @@ class JwtParser
             new FirebasePhpJwt(null, $sessionLength)
         );
 
-        $tokenParser = new TokenParser(
-            $this->userMapper,
-            $jwtVerifierFactory->build(
-                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
-                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
-                $sessionLength,
-            ),
-            explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS)),
+        $jwtVerifier = $jwtVerifierFactory->build(
+            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
+            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
+            $sessionLength,
         );
 
-        return $tokenParser->findUserFromToken($jwt);
+        $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
+
+        // Parse the token and extract a user from it
+        // This line is squelched due to an unfixed warning in 3rd party method
+        // `JwtVerifier::validateClientId`: the eventual solution is to remove
+        // `okta/jwt-verifier` completely, but for now just ignore the warning.
+        $decodedToken = @$jwtVerifier->verify($jwt);
+        $claims       = $decodedToken->getClaims();
+
+        // The identification in the token seems to be in one of two claims:
+        // * "preferred_username" matches a Schoolbox username
+        // * "https://cloudwork.id/claims/sis_id" matches an external ID
+        // We'll just use the preferred username until I hear otherwise.
+        $messages = [];
+        foreach ($candidateClaims as $candidateClaim) {
+            $candidateClaim = trim($candidateClaim);
+            if (isset($claims[$candidateClaim])) {
+                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
+                if ($user) {
+                    return $user;
+                }
+                $failureMessage = sprintf(
+                    'The token contained a "%s" claim, but its value did not match a Schoolbox user',
+                    $candidateClaim
+                );
+            } else {
+                $failureMessage = sprintf(
+                    'The token did not contain a "%s" claim',
+                    $candidateClaim
+                );
+            }
+            $messages[] = $failureMessage;
+        }
+
+        // Candidate claims found no user: can't use it
+        throw new SchoolboxNotFoundException(
+            sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
+        );
+
+//        $tokenParser = new TokenParser(
+//            $this->userMapper,
+//            $jwtVerifierFactory->build(
+//                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
+//                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
+//                $sessionLength,
+//            ),
+//            explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS)),
+//        );
+//
+//        return $tokenParser->findUserFromToken($jwt);
     }
 
     /**
