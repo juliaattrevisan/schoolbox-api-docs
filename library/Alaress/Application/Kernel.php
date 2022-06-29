@@ -1739,7 +1739,7 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var Jwt $tokenBuilder */
-                    $tokenBuilder           = $di->lazyGet('user.tokenBuilder');
+                    $tokenBuilder           = $di->get('user.tokenBuilder');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
