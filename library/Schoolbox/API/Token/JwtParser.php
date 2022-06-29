@@ -15,7 +15,6 @@ use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Auth\JwtVerifierFactory\Configured;
-use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
@@ -200,18 +199,6 @@ class JwtParser
         throw new SchoolboxNotFoundException(
             sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
         );
-
-//        $tokenParser = new TokenParser(
-//            $this->userMapper,
-//            $jwtVerifierFactory->build(
-//                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
-//                $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
-//                $sessionLength,
-//            ),
-//            explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS)),
-//        );
-//
-//        return $tokenParser->findUserFromToken($jwt);
     }
 
     /**
