@@ -187,59 +187,59 @@ class Controller extends Base
     }
 
 
-    /**
-     * @throws UnexpectedValueException  if no "jwt" query string param exists
-     * @throws UnexpectedValueException  if JWT is incorrectly formed
-     * @throws DomainException           if JWT payload is invalid JSON
-     * @throws UnexpectedValueException  if JWT contains no instance ID claim
-     * @throws MapperException           if instance ID matches no instance
-     * @throws SignatureInvalidException if JWT signature invalid
-     * @throws BeforeValidException      if JWT is not yet valid or issued
-     * @throws ExpiredException          if JWT has since expired
-     * @throws NotAuthenticated          if user identified in JWT cannot be
-     *                                   authenticated (because they don't exist
-     *                                   or their account is inactive)
-     */
-    private function authenticateUserFromToken(): void
-    {
-        // Find the JWT
-        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
-        if (!isset($jwt)) {
-            throw new UnexpectedValueException(
-                sprintf('"%s" query string parameter must be provided', self::QUERY_STRING_JWT)
-            );
-        }
-
-        // Decode the JWT _without_ verifying it,
-        // in order to determine the instance whence it came
-        $payload = $this->tokenBuilder->decodeWithoutVerification($jwt);
-
-        // Now we know the instance:
-        // Look it up in the registry table, and get the public key stored there
-        // so that the JWT can be verified
-        $instanceId = $payload[self::CLAIM_INSTANCE_ID] ?? null;
-        if (!isset($instanceId)) {
-            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
-        }
-        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId((string)$instanceId);
-
-        // Verify the payload
-        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
-
-        // Now the JWT is decoded and verified:
-        // create a session for the user matching the email address in the JWT
-        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
-        if (!isset($email)) {
-            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
-        }
-
-        // The email must be valid too, or at least not blank
-        $email = (string)$email;
-        if (trim($email) === '') {
-            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
-        }
-        $this->auth->createSession($email);
-    }
+//    /**
+//     * @throws UnexpectedValueException  if no "jwt" query string param exists
+//     * @throws UnexpectedValueException  if JWT is incorrectly formed
+//     * @throws DomainException           if JWT payload is invalid JSON
+//     * @throws UnexpectedValueException  if JWT contains no instance ID claim
+//     * @throws MapperException           if instance ID matches no instance
+//     * @throws SignatureInvalidException if JWT signature invalid
+//     * @throws BeforeValidException      if JWT is not yet valid or issued
+//     * @throws ExpiredException          if JWT has since expired
+//     * @throws NotAuthenticated          if user identified in JWT cannot be
+//     *                                   authenticated (because they don't exist
+//     *                                   or their account is inactive)
+//     */
+//    private function authenticateUserFromToken(): void
+//    {
+//        // Find the JWT
+//        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
+//        if (!isset($jwt)) {
+//            throw new UnexpectedValueException(
+//                sprintf('"%s" query string parameter must be provided', self::QUERY_STRING_JWT)
+//            );
+//        }
+//
+//        // Decode the JWT _without_ verifying it,
+//        // in order to determine the instance whence it came
+//        $payload = $this->tokenBuilder->decodeWithoutVerification($jwt);
+//
+//        // Now we know the instance:
+//        // Look it up in the registry table, and get the public key stored there
+//        // so that the JWT can be verified
+//        $instanceId = $payload[self::CLAIM_INSTANCE_ID] ?? null;
+//        if (!isset($instanceId)) {
+//            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
+//        }
+//        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId((string)$instanceId);
+//
+//        // Verify the payload
+//        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
+//
+//        // Now the JWT is decoded and verified:
+//        // create a session for the user matching the email address in the JWT
+//        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
+//        if (!isset($email)) {
+//            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
+//        }
+//
+//        // The email must be valid too, or at least not blank
+//        $email = (string)$email;
+//        if (trim($email) === '') {
+//            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
+//        }
+//        $this->auth->createSession($email);
+//    }
 
     /**
      * Determine what URL should be redirected to after the JWT is received.
