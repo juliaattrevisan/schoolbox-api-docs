@@ -30,6 +30,7 @@ use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -162,16 +163,49 @@ class Controller extends ConfigController
             ]
         ]);
 
-        $this->getResponse()->content->set(
-            [
-                'template' => '@adminReportExport/list.twig',
-                'data' => [
-                    'pageCurrent' => $this->router->generate('adminReportExport.getList'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
-                    'reports' => $reports
-                ]
+        $this->getResponse()->content->set([
+            'template' => '@adminReportExport/list.twig',
+            'data' => [
+                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'reports' => $reports
             ]
-        );
+        ]);
+    }
+
+
+    /**
+     * The form you use to update a report
+     *
+     * @param Model $report
+     * @return void
+     * @throws \DebugBar\DebugBarException
+     * @api GET /adminv2/report-export/{reportId}/update
+     */
+    public function getUpdate(Model $report): void
+    {
+        /* Feature image
+         */
+        $logoZone = (new Zone('logo'))
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a logo image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*')
+            ->setFilesystemContext('images');
+
+        if ($report->getLogo()) {
+            $logoZone->attachFiles([$report->getLogo()]);
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@adminReportExport/create.twig',
+            'data' => [
+                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'report' => $report,
+                'logoZone' => $logoZone->getTwigContext()
+            ]
+        ]);
     }
 
 

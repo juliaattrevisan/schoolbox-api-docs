@@ -24,6 +24,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -101,7 +102,38 @@ class Module extends BaseModule
             )
         );
 
+        $preloadReport = function ($params) {
+            return $this->preloadReport($params);
+        };
+
         $this->register('GET', '', 'getList', $getPerms);
+        $this->register('GET', '/{reportId}/update', 'getUpdate', $getPerms, $preloadReport);
+    }
+
+
+    /**
+     * Preload a summative report
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     * @throws \InvalidArgumentException
+     */
+    private function preloadReport(array $params): array
+    {
+        if (\array_key_exists('report', $params)) {
+            $report = $params['report'];
+        } else {
+            try {
+                $report = $this->getMapperFactory()->get(Mapper::class)->findById($params['reportId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Unknown summative report.', 0, $e);
+            }
+        }
+
+        return [
+            'report' => $report
+        ];
     }
 
 

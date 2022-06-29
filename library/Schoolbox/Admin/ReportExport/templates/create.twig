@@ -1,0 +1,49 @@
+{##
+ # Create/Update a Summative Report
+ #
+ # @param ReportExport\Model $report  A of ReportExport/Model instance
+#}
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+        $.fn.alaressEditor({
+            targetElements: $('#report-introduction')
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <form>
+            <div class="small-12 island">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-title" class="required">Title</label>
+                            <input type="text" id="report-title" name="title" value="{{ report.title ?? '' }}" />
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-logo" class="required">School Logo</label>
+                            <p class="meta">Optionally add your school logo.</p>
+                            {% include 'sub/attachzone.twig' with { attachzone: logoZone } %}
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-introduction">Introductory Message</label>
+                            <textarea id="report-introduction" name="introduction">{{ report.introduction ?? '' }}</textarea>
+                        </div>
+                    </fieldset>
+                </section>
+            </div>
+        </form>
+    </div>
+</div>

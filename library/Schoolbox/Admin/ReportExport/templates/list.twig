@@ -30,7 +30,12 @@
                             </div>
                             <nav>
                                 <a class="icon-download" href="#" title="Generate"></a>
-                                <a class="icon-modify" href="#" title="Modify"></a>
+
+                                {% set updateRoute = routeLookupIfAuthorized('adminReportExport.getUpdate', {reportId: report.id}) %}
+                                {% if updateRoute %}
+                                    <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
+                                {% endif %}
+
                                 <a class="icon-copy" href="#" title="Duplicate"></a>
                                 <a class="icon-delete" href="#" title="Delete"></a>
                             </nav>
