@@ -19,6 +19,7 @@ use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\NotAuthenticated;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -171,6 +172,7 @@ class Controller extends Base
             | SignatureInvalidException
             | BeforeValidException
             | ExpiredException
+            | NotFound
             | NotAuthenticated $e
         ) {
             // noop: fall through to the login page case
@@ -191,6 +193,8 @@ class Controller extends Base
      * @throws SignatureInvalidException if JWT signature invalid
      * @throws BeforeValidException      if JWT is not yet valid or issued
      * @throws ExpiredException          if JWT has since expired
+     * @throws NotFound                  if JWT identifies a user which cannot
+     *                                   be found
      * @throws NotAuthenticated          if user identified in JWT cannot be
      *                                   authenticated (because they don't exist
      *                                   or their account is inactive)
@@ -206,39 +210,7 @@ class Controller extends Base
         }
 
         $user = $this->jwtParser->determineUserFromJwt($jwt);
-        if ($user) {
-            $this->auth->createSession($user->getUsername());
-        }
-
-//        // Decode the JWT _without_ verifying it,
-//        // in order to determine the instance whence it came
-//        $payload = $this->tokenBuilder->decodeWithoutVerification($jwt);
-//
-//        // Now we know the instance:
-//        // Look it up in the registry table, and get the public key stored there
-//        // so that the JWT can be verified
-//        $instanceId = $payload[self::CLAIM_INSTANCE_ID] ?? null;
-//        if (!isset($instanceId)) {
-//            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
-//        }
-//        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId((string)$instanceId);
-//
-//        // Verify the payload
-//        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
-//
-//        // Now the JWT is decoded and verified:
-//        // create a session for the user matching the email address in the JWT
-//        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
-//        if (!isset($email)) {
-//            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
-//        }
-//
-//        // The email must be valid too, or at least not blank
-//        $email = (string)$email;
-//        if (trim($email) === '') {
-//            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
-//        }
-//        $this->auth->createSession($email);
+        $this->auth->createSession($user->getUsername());
     }
 
     /**
