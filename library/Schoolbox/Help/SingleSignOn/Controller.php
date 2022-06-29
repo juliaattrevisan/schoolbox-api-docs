@@ -138,7 +138,9 @@ class Controller extends Base
      * Receive a JWT (in the "jwt" query string parameter), and use it to
      * identify and authenticate a user.
      *
-     * Once
+     * @deprecated URLs which point here should instead point to
+     *             `\Schoolbox\API\Controller::initSessionFromQueryString`:
+     *             its JWT parser may now parse JWTs from other instances.
      *
      * @api GET /help/sso/receive
      * @since 21.0
@@ -154,24 +156,33 @@ class Controller extends Base
             return;
         }
 
-        try {
-            $this->authenticateUserFromToken();
-            $this->response->redirect->seeOther($page);
-        } catch (
-            UnexpectedValueException
-            | DomainException
-            | MapperException
-            | SignatureInvalidException
-            | BeforeValidException
-            | ExpiredException
-            | NotAuthenticated $e
-        ) {
-            // For now: just redirect to login page
-            // Later: show a more useful message
-            $loginUrl = (new Uri($this->router->generate('login.getLogin')))
-                ->setQuery(['page' => $page]);
-            $this->response->redirect->seeOther($loginUrl->toString());
-        }
+        $this->response->redirect->permanentRedirect(
+            (new Uri())
+                ->setPath($this->router->generate('api.initSessionFromQueryString'))
+                ->setQuery([
+                    'jwt'      => $this->request->query->get(self::QUERY_STRING_JWT),
+                    'redirect' => $page,
+                ])
+        );
+//
+//        try {
+//            $this->authenticateUserFromToken();
+//            $this->response->redirect->seeOther($page);
+//        } catch (
+//            UnexpectedValueException
+//            | DomainException
+//            | MapperException
+//            | SignatureInvalidException
+//            | BeforeValidException
+//            | ExpiredException
+//            | NotAuthenticated $e
+//        ) {
+//            // For now: just redirect to login page
+//            // Later: show a more useful message
+//            $loginUrl = (new Uri($this->router->generate('login.getLogin')))
+//                ->setQuery(['page' => $page]);
+//            $this->response->redirect->seeOther($loginUrl->toString());
+//        }
     }
 
 
