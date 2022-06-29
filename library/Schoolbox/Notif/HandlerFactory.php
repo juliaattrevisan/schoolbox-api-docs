@@ -17,13 +17,13 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use RuntimeException;
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\Handler\SymfonyMailerHandler;
-use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class HandlerFactory
@@ -208,27 +208,32 @@ class HandlerFactory
             $this->conf->get('mail_from_name')
         ];
 
-        $mail = new Email();
-        $mail->subject($title);
+        $mailFactory = new EmailFactory(
+            $this->conf,
+            DKIMMapper::getInstance(),
+            $this->log
+        );
 
         try {
-            $mail->to(new Address($to));
+            $toAddress = new Address($to);
         } catch (RfcComplianceException $e) {
-            $mail->to(new Address(self::FALLBACK_EMAIL));
+            $toAddress = new Address(self::FALLBACK_EMAIL);
         }
+
+        $mail = $mailFactory->buildSimpleEmail($title, $toAddress);
 
         try {
             if (is_array($from)) {
-                $mail->from(new Address($from[0], $from[1] ?? ''));
+                $from = new Address($from[0], $from[1] ?? '');
             } else {
-                $mail->from(new Address($from));
+                $from = new Address($from);
             }
         } catch (RfcComplianceException $e) {
-            $mail->from(new Address(self::FALLBACK_EMAIL));
+            $from = new Address(self::FALLBACK_EMAIL);
         }
+        $mail->setFrom($from->getAddress(), $from->getName());
 
         return new SymfonyMailerHandler(
-            new Mailer($this->transport),
             $mail,
             $severity,
             $bubble

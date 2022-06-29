@@ -45,8 +45,6 @@ interface IMailer
 
     public function setReplyTo($email, string $name = '');
 
-    public function setFromAsCurrentUser();
-
     public function setTo(string|array|Address|User $to);
 
     public function setSubject(string $subject);

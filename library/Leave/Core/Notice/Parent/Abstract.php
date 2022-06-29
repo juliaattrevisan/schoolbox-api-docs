@@ -91,12 +91,6 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
                 /* Only send if the email is valid
                  */
                 if ($email->isValid()) {
-                    // Ensure the current user has a valid email too
-                    try {
-                        $this->email->setFromAsCurrentUser();
-                    } catch (RfcComplianceException $e) {
-                        // noop - falls back to whatever the default address is
-                    }
                     $this->email->send($email->getEmail());
                 }
             }

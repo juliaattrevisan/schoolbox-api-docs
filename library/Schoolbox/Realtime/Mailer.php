@@ -87,7 +87,7 @@ class Mailer
 
         // build the email object
         $email = $this->emailFactory->buildTwigEmail($template, $subject, new Address($address, $recipient->formatName()));
-        $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
+        $context = $decorator->renderAsTwigContext($email->getCoreContext(), 0, $sortDir);
         $context['recipient'] = $recipient->getFirstname();
         $email->setContext($context);
 

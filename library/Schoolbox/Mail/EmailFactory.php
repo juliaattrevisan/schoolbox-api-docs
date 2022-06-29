@@ -34,9 +34,9 @@ class EmailFactory
     /**
      * Context used for building emails
      *
-     * @var CoreContext
+     * @var null|CoreContext
      */
-    private CoreContext $context;
+    private ?CoreContext $context = null;
 
     /** @var LoggerInterface */
     private LoggerInterface $log;
@@ -62,7 +62,7 @@ class EmailFactory
     }
 
     /**
-     * Builder
+     * TwigEmail Builder
      *
      * @param string                    $template
      * @param string                    $subject
@@ -77,10 +77,17 @@ class EmailFactory
         $twigEmail->setTemplate($template);
         $twigEmail->setTwig($this->getTwig());
         $twigEmail->setLogger($this->log);
-        $twigEmail->setCoreContext($this->context->getContext());
+        $twigEmail->setCoreContext($this->getCoreContext());
         return $twigEmail;
     }
 
+    /**
+     * Non-twig email builder
+     *
+     * @param string                    $subject
+     * @param string|array|Address|User $to
+     * @return Mailer
+     */
     public function buildSimpleEmail(string $subject, string | array | Address | User $to): Mailer
     {
         $email = new Mailer($subject, $to, $this->config, $this->dkimMapper);
@@ -91,8 +98,11 @@ class EmailFactory
     /**
      * @return array
      */
-    public function getCoreContext(): array
+    private function getCoreContext(): array
     {
+        if (!$this->context) {
+            $this->context = new CoreContext($this->config);
+        }
         return $this->context->getContext();
     }
 
@@ -104,7 +114,6 @@ class EmailFactory
         if ($this->twig) {
             return $this->twig;
         }
-        $this->context = new CoreContext($this->config);
 
         // load up paths in order of preference (start with school-specific)
         $paths = [];

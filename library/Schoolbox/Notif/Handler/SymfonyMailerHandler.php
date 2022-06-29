@@ -9,13 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Notif\Handler;
 
+use Alaress\Mail\Mailer as SimpleEmail;
 use DateTimeImmutable;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\MailHandler;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 
 /**
  * Symfony mailer handler.
@@ -25,27 +24,20 @@ use Symfony\Component\Mime\Email;
 class SymfonyMailerHandler extends MailHandler
 {
     /**
-     * The Symfony mailer instance.
-     */
-    private MailerInterface $mailer;
-
-    /**
      * The base email to send.
      */
-    private Email $email;
+    private SimpleEmail $email;
 
     /**
      * Constructor
      *
-     * @param MailerInterface $mailer
-     * @param Email           $email
-     * @param int             $level
-     * @param bool            $bubble
+     * @param SimpleEmail $email
+     * @param int         $level
+     * @param bool        $bubble
      */
-    public function __construct(MailerInterface $mailer, Email $email, $level = Logger::DEBUG, $bubble = true)
+    public function __construct(SimpleEmail $email, $level = Logger::DEBUG, $bubble = true)
     {
         parent::__construct($level, $bubble);
-        $this->mailer = $mailer;
         $this->email  = $email;
     }
 
@@ -62,16 +54,16 @@ class SymfonyMailerHandler extends MailHandler
 
         if ($records) {
             $subjectFormatter = new LineFormatter($email->getSubject());
-            $email->subject($subjectFormatter->format($this->getHighestRecord($records)));
+            $email->setSubject($subjectFormatter->format($this->getHighestRecord($records)));
         }
 
         if ($this->isHtmlBody($content)) {
-            $email->html($content);
+            $email->setHtml($content);
         } else {
-            $email->text($content);
+            $email->setText($content);
         }
-        $email->date(new DateTimeImmutable());
+        $email->setDate(new DateTimeImmutable());
 
-        $this->mailer->send($email);
+        $email->send();
     }
 }

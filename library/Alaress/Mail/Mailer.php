@@ -31,6 +31,8 @@ use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\TextPart;
 
 use function count;
 use function trim;
@@ -70,6 +72,11 @@ class Mailer implements IMailer
     protected IConfigLoader $config;
 
     protected Mapper $dkimMapper;
+
+    /**
+     * Whether to use base64 rather than quoted printable
+     */
+    private bool $encodeBase64 = false;
 
     /**
      * Construct the basics of a new Mailer
@@ -175,6 +182,15 @@ class Mailer implements IMailer
     }
 
     /**
+     * Get subject
+     * @return string|null
+     */
+    public function getSubject(): ?string
+    {
+        return $this->email->getSubject();
+    }
+
+    /**
      * Set text
      * @param string $text
      * @return void
@@ -225,22 +241,14 @@ class Mailer implements IMailer
         }
     }
 
-
     /**
-     * Convenience method for setting this mailer's From address as the currently logged in user.
-     *
-     * @param array $sessionData
-     * @return $this
+     * Set date
+     * @param $date
+     * @return void
      */
-    public function setFromAsCurrentUser($sessionData = null)
+    public function setDate($date)
     {
-        $sessionData = $sessionData ?: $_SESSION;
-
-        /** @var User $user */
-        $user = $sessionData['user'];
-        $this->setFrom($user->getEmail() ?? '', $user->formatName());
-
-        return $this;
+        $this->email->date($date);
     }
 
     /**
@@ -292,16 +300,36 @@ class Mailer implements IMailer
 
     /**
      * Encodes email in base64 rather than quoted printable.
-     *
-     * @deprecated this does nothing with the migration to Symfony mailer:
-     *             whilst `\Symfony\Component\Mime\Encoder\Base64ContentEncoder`
-     *             exists, I don't know how to set it as an email's encoding
-     *             method.
      */
-    public function encodeBase64()
+    public function encodeBase64() {
+        $this->encodeBase64 = true;
+    }
+
+    /**
+     * Encode with base64, if specified
+     * @return void
+     */
+    private function encode()
     {
-//        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
-//        $this->email->setEncoder($encoder);
+        if (!$this->encodeBase64) {
+            return;
+        }
+        $this->email->setBody(
+            new AlternativePart(
+                new TextPart(
+                    $this->email->getTextBody(),
+                    $this->email->getTextCharset(),
+                    'plain',
+                    'base64'
+                ),
+                new TextPart(
+                    $this->email->getHtmlBody(),
+                    $this->email->getHtmlCharset(),
+                    'html',
+                    'base64'
+                )
+            )
+        );
     }
 
     /**
@@ -320,6 +348,7 @@ class Mailer implements IMailer
         // construct body and set headers
         $this->email->text($this->composePlain());
         $this->email->html($this->composeHTML());
+        $this->encode();
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
         }
