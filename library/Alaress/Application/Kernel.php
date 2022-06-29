@@ -57,6 +57,7 @@ use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -80,6 +81,7 @@ use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
@@ -166,6 +168,7 @@ use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMe
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Scrub;
 use SitePage;
@@ -1730,6 +1733,20 @@ abstract class Kernel
             )
         );
 
+        // JWT parser
+        $di->set(
+            'user.jwtParser',
+            $di->lazyNew(
+                JwtParser::class,
+                [
+                    'tokenBuilder'           => $di->lazyGet('user.tokenBuilder'),
+                    'userMapper'             => $mapperFactory->getLazy(UserMapper::class),
+                    'tokenMapper'            => $mapperFactory->getLazy(TokenMapper::class),
+                    'instanceRegistryMapper' => $mapperFactory->getLazy(InstanceRegistryMapper::class),
+                    'config'                 => $config,
+                ],
+            )
+        );
 
         // Lock factory
         // TODO inject this everywhere a lock is used
