@@ -243,10 +243,10 @@ class Mailer implements IMailer
 
     /**
      * Set date
-     * @param $date
+     * @param \DateTimeInterface $date
      * @return void
      */
-    public function setDate($date)
+    public function setDate(\DateTimeInterface $date)
     {
         $this->email->date($date);
     }
@@ -301,7 +301,8 @@ class Mailer implements IMailer
     /**
      * Encodes email in base64 rather than quoted printable.
      */
-    public function encodeBase64() {
+    public function encodeBase64()
+    {
         $this->encodeBase64 = true;
     }
 

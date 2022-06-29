@@ -38,9 +38,6 @@ class EmailFactory
      */
     private ?CoreContext $context = null;
 
-    /** @var LoggerInterface */
-    private LoggerInterface $log;
-
     private ?Environment $twig = null;
 
     private IConfigLoader $config;
@@ -52,12 +49,10 @@ class EmailFactory
      *
      * @param IConfigLoader        $config
      * @param DKIMMapper           $dkimMapper
-     * @param LoggerInterface|null $log
      */
-    public function __construct(IConfigLoader $config, DKIMMapper $dkimMapper, ?LoggerInterface $log = null)
+    public function __construct(IConfigLoader $config, DKIMMapper $dkimMapper)
     {
         $this->config     = $config;
-        $this->log        = $log ?? new Logger(null);
         $this->dkimMapper = $dkimMapper;
     }
 
@@ -76,7 +71,6 @@ class EmailFactory
         $twigEmail = new TwigEmail($subject, $to, $this->config, $this->dkimMapper);
         $twigEmail->setTemplate($template);
         $twigEmail->setTwig($this->getTwig());
-        $twigEmail->setLogger($this->log);
         $twigEmail->setCoreContext($this->getCoreContext());
         return $twigEmail;
     }
@@ -90,9 +84,7 @@ class EmailFactory
      */
     public function buildSimpleEmail(string $subject, string | array | Address | User $to): Mailer
     {
-        $email = new Mailer($subject, $to, $this->config, $this->dkimMapper);
-        $email->setLogger($this->log);
-        return $email;
+        return new Mailer($subject, $to, $this->config, $this->dkimMapper);
     }
 
     /**

@@ -387,6 +387,7 @@ abstract class Base extends CliTool\App
             /** @var EmailFactory $emailFactory */
             $emailFactory = $this->getDi()->get('mail.emailFactory');
             $mailer = $emailFactory->buildTwigEmail($template, $subject, $mailto);
+            $mailer->setLogger($this->log);
             $mailer->setContext($context);
             try {
                 $mailer->send();

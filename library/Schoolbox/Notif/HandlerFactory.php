@@ -211,7 +211,6 @@ class HandlerFactory
         $mailFactory = new EmailFactory(
             $this->conf,
             DKIMMapper::getInstance(),
-            $this->log
         );
 
         try {
@@ -221,6 +220,7 @@ class HandlerFactory
         }
 
         $mail = $mailFactory->buildSimpleEmail($title, $toAddress);
+        $mail->setLogger($this->log);
 
         try {
             if (is_array($from)) {
