@@ -110,8 +110,14 @@ class JwtParser
         throw new SchoolboxNotFoundException();
     }
 
-
-    private function determineUserFromOauthProviderIssuedJwt(string $jwt): ?User
+    /**
+     * Determine the issuer from a JWT issued by this instance's oAuth provider.
+     *
+     * @param string $jwt
+     * @return User
+     * @throws SchoolboxNotFoundException if no user was found
+     */
+    private function determineUserFromOauthProviderIssuedJwt(string $jwt): User
     {
         $sessionLength = (int)$this->config->get('session_length');
         if ($sessionLength <= 0) {
