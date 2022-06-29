@@ -146,18 +146,8 @@ class JwtParser
      */
     private function determineUserFromOauthProviderIssuedJwt(string $jwt): User
     {
-        $sessionLength = (int)$this->config->get('session_length');
-        if ($sessionLength <= 0) {
-            $sessionLength = self::SESSION_LENGTH_DEFAULT;
-        }
-
-
-        // In order to remove the Okta JWT verifier, I need to be able to:
-        // * determine the JWKS URI (all known use OIDC discovery well-known)
-        // * once decoded, verify the JWT's aud claim matches the configured
-        //   client ID
+        // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
-        $oauthClientId   = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
 
         // TODO allow these to be configurable
@@ -171,17 +161,27 @@ class JwtParser
         $jwksRequest       = $httpClient->get($oidcConfig['jwks_uri']);
         $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
 
+        // Verify the JWT
+        $sessionLength  = (int)$this->config->get('session_length');
+        if ($sessionLength <= 0) {
+            $sessionLength = self::SESSION_LENGTH_DEFAULT;
+        }
+        $originalLeeway = JwtLibrary\JWT::$leeway;
         JwtLibrary\JWT::$leeway = $sessionLength;
-        $decodedToken = JwtLibrary\JWT::decode(
-            $jwt,
-            JwtLibrary\JWK::parseKeySet($jwks),
-            $algs,
-        );
-
+        try {
+            $decodedToken = JwtLibrary\JWT::decode(
+                $jwt,
+                JwtLibrary\JWK::parseKeySet($jwks),
+                $algs,
+            );
+        } finally {
+            JwtLibrary\JWT::$leeway = $originalLeeway;
+        }
 
         // Validate audience
         $validAudience = false;
         $audiences     = (array)$decodedToken->aud;
+        $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         foreach ($audiences as $audience) {
             if ($audience === $oauthClientId) {
                 $validAudience = true;
@@ -189,33 +189,8 @@ class JwtParser
             }
         }
         if (!$validAudience) {
-            // throw something
             throw new JwtLibrary\SignatureInvalidException('JWT audience does not match configured client ID');
         }
-
-
-
-
-//        $claims        = json_decode(json_encode($decodedToken), true);
-
-
-//        $jwtVerifierFactory = new Configured(
-//            $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE),
-//            new FirebasePhpJwt(null, $sessionLength)
-//        );
-//
-//        $jwtVerifier = $jwtVerifierFactory->build(
-//            $oauthIdp,
-//            $oauthClientId,
-//            $sessionLength,
-//        );
-//
-//        // Parse the token and extract a user from it
-//        // This line is squelched due to an unfixed warning in 3rd party method
-//        // `JwtVerifier::validateClientId`: the eventual solution is to remove
-//        // `okta/jwt-verifier` completely, but for now just ignore the warning.
-//        $decodedToken = @$jwtVerifier->verify($jwt);
-//        $claims       = $decodedToken->getClaims();
 
         // The identification in the token seems to be in one of two claims:
         // * "preferred_username" matches a Schoolbox username
