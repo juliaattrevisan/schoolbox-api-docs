@@ -1736,15 +1736,22 @@ abstract class Kernel
         // JWT parser
         $di->set(
             'user.jwtParser',
-            $di->lazyNew(
-                JwtParser::class,
-                [
-                    'tokenBuilder'           => $di->lazyGet('user.tokenBuilder'),
-                    'userMapper'             => $mapperFactory->getLazy(UserMapper::class),
-                    'tokenMapper'            => $mapperFactory->getLazy(TokenMapper::class),
-                    'instanceRegistryMapper' => $mapperFactory->getLazy(InstanceRegistryMapper::class),
-                    'config'                 => $config,
-                ],
+            $di->lazy(
+                function () use ($di, $config, $mapperFactory) {
+                    /** @var Jwt $tokenBuilder */
+                    $tokenBuilder           = $di->lazyGet('user.tokenBuilder');
+                    $userMapper             = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
+                    $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
+                    return new JwtParser(
+                        $tokenBuilder,
+                        new JwtParser\Composite(
+                            new JwtParser\InstanceIssued($tokenBuilder, $userMapper, $tokenMapper, $config),
+                            new JwtParser\OauthProviderIssued($userMapper, $config),
+                            new JwtParser\OtherInstanceIssued($tokenBuilder, $userMapper, $instanceRegistryMapper),
+                        ),
+                    );
+                }
             )
         );
 
