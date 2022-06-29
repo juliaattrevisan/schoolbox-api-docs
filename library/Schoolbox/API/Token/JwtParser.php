@@ -16,6 +16,7 @@ use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Auth\JwtVerifierFactory\Configured;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -47,15 +48,18 @@ class JwtParser
     /**
      * Constructor
      *
-     * @param Jwt               $tokenBuilder The token builder, used for decoding JWTs.
-     * @param UserMapper        $userMapper   Mapper for retrieving users once a user has been identified.
-     * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
-     * @param IConfigLoader     $config       Configuration
+     * @param Jwt                    $tokenBuilder           The token builder, used for decoding JWTs.
+     * @param UserMapper             $userMapper             Mapper for retrieving users once the user in the JWT is
+     *                                                       identified.
+     * @param User\Token\Mapper      $tokenMapper            Mapper for retrieving user tokens.
+     * @param InstanceRegistryMapper $instanceRegistryMapper Mapper for retrieving an instance's JWT public key.
+     * @param IConfigLoader          $config                 Standard configuration store.
      */
     public function __construct(
         private Jwt $tokenBuilder,
         private UserMapper $userMapper,
         private User\Token\Mapper $tokenMapper,
+        private InstanceRegistryMapper $instanceRegistryMapper,
         private IConfigLoader $config,
     ) {
     }

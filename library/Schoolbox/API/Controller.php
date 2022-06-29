@@ -23,6 +23,7 @@ use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredE
 use Schoolbox\Auth\JwtVerifierFactory;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
@@ -343,7 +344,13 @@ class Controller extends Base
         // This should look something like:
         // $user = $jwtParser->determineUserFromJwt($jwt);
 
-        $jwtParser = new JwtParser($this->tokenValidator, $this->userMapper, $this->tokenMapper, $config);
+        $jwtParser = new JwtParser(
+            $this->tokenValidator,
+            $this->userMapper,
+            $this->tokenMapper,
+            InstanceRegistryMapper::getInstance(),
+            $config,
+        );
         $jwtParser->determineUserFromJwt($jwt);
 
 
