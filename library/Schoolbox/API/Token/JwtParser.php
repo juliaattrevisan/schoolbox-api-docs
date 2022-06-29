@@ -51,12 +51,11 @@ class JwtParser
 
     public function determineUserFromJwt(string $jwt): ?User
     {
-        // Need to know what's in the JWT first
+        // Need to know what's in the JWT first,
+        // before attempting to determine a user
         $claims = $this->tokenBuilder->decodeWithoutVerification($jwt);
 
-        // Parse differently based on whom made the claim
         // Is the issuer this instance?
-        // If so use the Schoolbox decoder
         if ($this->tokenBuilder->issuedBySchoolbox($claims)) {
             return $this->determineUserFromInstanceIssuedJwt($jwt);
         }
@@ -67,16 +66,23 @@ class JwtParser
             return $this->determineUserFromOauthProviderIssuedJwt($jwt);
         }
 
-
-        // Was this issued by another instance?
-
-
+        // Was this issued by another Schoolbox instance?
 
         return null;
     }
 
-
-    private function determineUserFromInstanceIssuedJwt(string $jwt): ?User
+    /**
+     * Determine the issuer from a JWT issued by this instance.
+     *
+     * @param string $jwt
+     * @return User
+     * @throws SchoolboxNotFoundException if no user was found
+     * @throws ExpiredException           if the JWT has a JWT ID, and the
+     *                                    matching token is expired
+     * @throws SignatureInvalidException  if the JWT has a JWT ID, and there is
+     *                                    no matching token
+     */
+    private function determineUserFromInstanceIssuedJwt(string $jwt): User
     {
         $claims = $this->tokenBuilder->decode($jwt);
         $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
@@ -95,7 +101,7 @@ class JwtParser
                 }
             } catch (MapperException $e) {
                 // could not find a token with user id and jwt id
-                throw new SignatureInvalidException($e);
+                throw new SignatureInvalidException($e->getMessage(), 0, $e);
             }
         }
         if ($user) {
