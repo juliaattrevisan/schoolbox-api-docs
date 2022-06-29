@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Authenticator;
 use DomainException;
 use Firebase\JWT\BeforeValidException;
@@ -115,7 +116,7 @@ class Controller extends Base
         // Generate a JWT
         $jwt = $this->tokenBuilder->generate(
             $this->getUser(),
-            \Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
+            Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             null,
             [
                 self::CLAIM_EMAIL       => $this->getUser()->getEmail(),
@@ -164,7 +165,7 @@ class Controller extends Base
                     'redirect' => $page,
                 ])
         );
-//
+
 //        try {
 //            $this->authenticateUserFromToken();
 //            $this->response->redirect->seeOther($page);
