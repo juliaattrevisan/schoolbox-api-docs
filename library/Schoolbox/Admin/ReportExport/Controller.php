@@ -261,6 +261,29 @@ class Controller extends ConfigController
 
 
     /**
+     * Get year levels for selectize
+     *
+     * @return void
+     * @api GET /adminv2/report-export/yearlevels
+     */
+    public function getYearLevels(): void
+    {
+        $output     = [['id' => 0, 'name' => 'No Year Level']];
+
+        $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
+
+        foreach ($yearLevels as $yearLevel) {
+            $output[] = [
+                'id'   => $yearLevel->getId(),
+                'name' => $yearLevel->getName(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+
+    /**
      * Get work types for selectize
      * @return void
      * @api GET /adminv2/report-export/worktypes
@@ -476,23 +499,6 @@ class Controller extends ConfigController
 
 
 
-    /**
-     * Get year levels for selectize
-     * @return void
-     * @api GET /adminv2/report-export/getYearLevels
-     */
-    public function getYearLevels(): void
-    {
-        $output     = [['id' => 0, 'name' => 'No Year Level']];
-        $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
-        foreach ($yearLevels as $yearLevel) {
-            $output[] = [
-                'id'   => $yearLevel->getId(),
-                'name' => $yearLevel->getName(),
-            ];
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
-    }
 
     /**
      * Get campuses for selectize

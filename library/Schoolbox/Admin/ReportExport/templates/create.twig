@@ -58,6 +58,29 @@
                 }
             },
         });
+
+        $('#report-year-levels').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                placeholder: 'Search year levels',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getYearLevels') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
     });
 </script>
 
@@ -101,7 +124,7 @@
                     <fieldset class="content">
                         <div class="small-12 large-4 columns">
                             <label for="report-year-levels">Year Levels</label>
-                            <input type="text" />
+                            <input type="text" id="report-year-levels" name="yearLevels" />
                         </div>
                         <div class="small-12 large-4 columns">
                             <label for="report-campuses">Campuses</label>
