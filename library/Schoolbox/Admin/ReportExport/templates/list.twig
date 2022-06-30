@@ -24,7 +24,9 @@
                                         <h3>{{ report.title }}</h3>
                                     </a>
                                     <p class="meta">
-                                        Last modified by {{ report.updatedBy.fullname }} on {{ report.updatedAt.local }}
+                                        Last modified by
+                                        <a href="/search/user/{{ report.updatedBy.id }}" title="{{ report.updatedBy.fullname }}">{{ report.updatedBy.fullname }}</a>
+                                        on {{ report.updatedAt.local }}
                                     </p>
                                 </div>
                             </div>
