@@ -45,10 +45,14 @@
                 </section>
             </div>
         {% else %}
+            {% set createRoute = routeLookupIfAuthorized('adminReportExport.getCreate') %}
+
             <div class="empty-state">
                 <i class="icon-progress"></i>
                 <p>There aren't any summative reports yet.</p>
-                <p><a href="#">Create one</a> so you can generate the reports later.</p>
+                {% if createRoute %}
+                <p><a href="{{ createRoute }}">Create one</a> so you can generate the reports later.</p>
+                {% endif %}
             </div>
         {% endif %}
     </div>

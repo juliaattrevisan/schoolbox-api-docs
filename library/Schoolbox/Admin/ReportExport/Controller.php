@@ -175,6 +175,35 @@ class Controller extends ConfigController
 
 
     /**
+     * The form you use to create a report
+     *
+     * @return void
+     * @throws RouteNotFound
+     * @api GET /adminv2/report-export/create
+     */
+    public function getCreate(): void
+    {
+        /* Feature image
+         */
+        $logoZone = (new Zone('logo'))
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a logo image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*')
+            ->setFilesystemContext('images');
+
+        $this->getResponse()->content->set([
+            'template' => '@adminReportExport/create.twig',
+            'data' => [
+                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'report' => null,
+                'logoZone' => $logoZone->getTwigContext()
+            ]
+        ]);
+    }
+
+    /**
      * The form you use to update a report
      *
      * @param Model $report

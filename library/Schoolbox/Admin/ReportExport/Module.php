@@ -107,6 +107,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getList', $getPerms);
+        $this->register('GET', '/create', 'getCreate', $getPerms);
         $this->register('GET', '/{reportId}/update', 'getUpdate', $getPerms, $preloadReport);
     }
 
