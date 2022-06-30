@@ -244,7 +244,7 @@ class Classes implements IStrategy
         foreach ($students as $externalId => $person) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist($externalId, $watchlist)) {
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
                 continue;
             }
 
@@ -276,7 +276,7 @@ class Classes implements IStrategy
             foreach ($data['student_timetable'] as $timetable) {
 //                /* Only import data for externalIds in $watchlist, if provided
 //                 */
-//                if ($this->isOnWatchlist($externalId, $watchlist)) {
+//                if ($this->isOnWatchlist((string)$externalId, $watchlist)) {
 //                    print_r($timetable);
 //                }
 
@@ -390,7 +390,7 @@ class Classes implements IStrategy
         foreach ($staff as $externalId => $person) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist($externalId, $watchlist)) {
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
                 continue;
             }
 
@@ -421,7 +421,7 @@ class Classes implements IStrategy
             foreach ($data['teacher_timetable'] as $timetable) {
 //                /* Only import data for externalIds in $watchlist, if provided
 //                 */
-//                if ($this->isOnWatchlist($externalId, $watchlist)) {
+//                if ($this->isOnWatchlist((string)$externalId, $watchlist)) {
 //                    print_r($timetable);
 //                }
 
