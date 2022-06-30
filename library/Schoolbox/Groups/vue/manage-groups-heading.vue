@@ -86,7 +86,7 @@ export default {
             if (this.query.length <= 2) {
                 return this.currentGroups;
             } else {
-                return this.currentGroups.filter((group) => group.name.toLowerCase().includes(this.query));
+                return this.currentGroups.filter((group) => group.name.toLowerCase().includes(this.query.toLowerCase()));
             }
         },
 
