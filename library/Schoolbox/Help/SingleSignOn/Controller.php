@@ -86,8 +86,8 @@ class Controller extends Base
         private JwtParser $jwtParser,
         Authenticator $auth,
     ) {
-        $this->tokenBuilder           = $tokenBuilder;
-        $this->auth                   = $auth;
+        $this->tokenBuilder = $tokenBuilder;
+        $this->auth         = $auth;
     }
 
     /**
