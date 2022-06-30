@@ -621,7 +621,7 @@ class Kernel extends WebKernelAbstract
             [, $token] = $matches;
 
             /** @var JwtParser $tokenParser */
-            $tokenParser = $this->get('user.tokenParser');
+            $tokenParser = $this->get('user.jwtParser');
 
             if ($tokenParser->accepts($token)) {
                 return $tokenParser->determineUser($token);
