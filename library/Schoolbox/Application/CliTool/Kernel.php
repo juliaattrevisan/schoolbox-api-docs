@@ -110,7 +110,8 @@ class Kernel extends CliKernelAbstract
             if ($requiredUser !== $actualUser) {
                 $this->logger()->error("Invalid process user. Required '$requiredUser', Actual: '$actualUser'");
                 $scriptAndArgs = implode(' ', array_merge([$this->app->getToolFilenameAbsolute()], $this->app->getToolArguments()));
-                $this->logger()->notice("Maybe try something like:\n\tsu -s /bin/bash -c 'php $scriptAndArgs' $requiredUser");
+                $i = INSTANCE_ID;
+                $this->logger()->notice("Maybe try something like:\n\tsudo -u $requiredUser INSTANCE_ID=$i $scriptAndArgs");
                 exit(self::EXIT_STATUS_KERNEL_ERROR);
             }
         }
