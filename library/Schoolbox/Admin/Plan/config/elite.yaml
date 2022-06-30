@@ -109,9 +109,6 @@ config:
   cyberhound_api_shared_key: { hide: false }
   cyberhound_whitelist: { hide: false }
   clickview_school_id: {hide: false}
-  plagscan_client_id: {hide: false}
-  plagscan_api_key: {hide: false }
-  plagscan_username: {hide: false }
   kami_api_key: { hide: true }
   rubicon_atlas_api_token: { hide: false }
   canvas_data_api_key: {hide: false}

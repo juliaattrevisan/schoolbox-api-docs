@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -259,7 +258,6 @@ class Controller extends Base
 
             /* Similarity Check status
              */
-            'plagscanApiEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'turnitinApiEnabled' => (new Turnitin\Helper($this->getConfigLoader()))->isEnabled($this->getUser()),
             'interactionLocked' => $isInteractionLocked,
             'studentView' => false,
@@ -553,7 +551,6 @@ class Controller extends Base
          */
     }
 
-
     /**
      * Dump out a plagscan report
      *
@@ -564,32 +561,12 @@ class Controller extends Base
      */
     public function getPlagscanReport(IAssessable $assessment, IResponse $response, Plagscan $plagscan, Participant $participant)
     {
-        $interactiveAvailable = false;
-
-        /* If there is a known interactive report url, try to
-         * use it - otherwise use the old crappy version
-         *
-         * Find out if plagscan is up
-         */
-        try {
-            $mapper = PlagscanMapper::getInstance();
-            $interactiveUrl = $mapper->getConnector()->fetchInteractiveReportUrl($plagscan->getPlagscanId());
-            if (strlen($interactiveUrl)) {
-                $plagscan->setInteractiveUrl($interactiveUrl);
-                $interactiveAvailable = true;
-            }
-        } catch (\LogicException $e) {
-            //Api failed to return a valid response - Fall back to old report
-        } catch (\RuntimeException $e) {
-            //could not connect - Fall back to old report
-        }
-
         $data = [
             'plagscan' => $plagscan,
             'assessment' => $assessment,
             'response' => $response,
             'participant' => $participant,
-            'interactiveAvailable' => $interactiveAvailable
+            'interactiveAvailable' => false
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/plagscan/iframe.twig', $data));

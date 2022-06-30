@@ -58,7 +58,6 @@ Example ordering of script execution within a version number folder:
     notifications/500-transfer-queues-to-lists.php
     pastoral/01-migrate_tags.sql
     pastoral/02-pastoral_refactor.sql
-    plagscan/01_api3.sql
     removeFileIDVideoQueue.sql
     removeSkinBuilderConfig.sql
     testFunction.sql

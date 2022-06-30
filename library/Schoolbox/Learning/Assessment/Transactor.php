@@ -216,12 +216,9 @@ class Transactor
                 /** @var DueWork\Model $assessment */
                 if ($assessment->getSimilarityCheckEnabled()) {
                     /* If turnitin is enabled, retrofit any old submissions' documents
-                     * Otherwise do the original behaviour (retrofit to plag)
                      */
                     if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
                         (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper))->retrofit($this->assessment->getId());
-                    } else {
-                        (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
                     }
                 }
             }

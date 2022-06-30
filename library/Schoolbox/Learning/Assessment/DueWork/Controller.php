@@ -395,7 +395,6 @@ class Controller extends Assessment\Controller
 
             /* Similarity Check status
              */
-            'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'turnitinApiEnabled'     => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
@@ -904,7 +903,6 @@ class Controller extends Assessment\Controller
              */
             'errors' => [],
 
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'reviewRoute'       => $reviewRoute,
             'studentView'       => true,
             'student'        => $student,
@@ -1271,60 +1269,6 @@ class Controller extends Assessment\Controller
                         $processor->process($model);
                     }
                 };
-            } else {
-                /* This is the original behaviour. Note that the Plagscan Mapper itself can
-                 * figure out if plagscan is enabled or not so we don't need to do it here
-                 *
-                 * This is only a temporary setup - eventually plagscan goes away entirely,
-                 * halving the logic established here
-                 */
-
-                /* Save stubble record and send each file in the Submission to Plagscan
-                 * if the Submission was saved successfully
-                 *
-                 * Only plagscan when actually submitting final
-                 * Only plagscan non-online-submission files (for some reason, plag won't do html files)
-                 */
-                $plagscanMapper = PlagscanMapper::getInstance();
-
-                /* Plagscans should only spawn upon saving a Submitted IResponse instance
-                 * This screen is shared between self-reflection and non-self-reflection steps
-                 * Self-reflection's plagscan stubs saving .......happens elsewhere
-                 * Similarity Check must be enabled
-                 */
-                if (
-                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
-                    && $response->getId()
-                ) {
-                    foreach ($response->getAllFiles() as $currentFile) {
-                        if (!$currentFile->getEditableInline()) {
-                            $plagscanMapper->saveNewPlagscanStub($currentFile);
-                        }
-                    }
-                }
-
-                /* Asynchronously shove it into plagscan so we don't make the user wait ages
-                 * for it to read 1 byte at a time >_<
-                 */
-                $this->getResponse()->content->set(
-                    [
-                        'format' => 'noContent',
-                        'postOutput' => [
-                            function () use ($plagscanMapper, $reviewRoute, $response) {
-                                if (
-                                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
-                                    && $response->getId()
-                                ) {
-                                    foreach ($response->getAllFiles() as $currentFile) {
-                                        $filename = $plagscanMapper->plagscanFilename($currentFile);
-
-                                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                                    }
-                                }
-                            },
-                        ],
-                    ]
-                );
             }
         }
 
