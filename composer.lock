@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7a83dd074484c29acd72ea46f00499df",
+    "content-hash": "3aeaf2e507c7c9f1f2b0c68ab9c80e0e",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -500,43 +500,6 @@
                 "source": "https://github.com/aws/aws-sdk-php/tree/3.224.4"
             },
             "time": "2022-06-06T18:32:10+00:00"
-        },
-        {
-            "name": "bretterer/iso_duration_converter",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/bretterer/iso_duration_converter.git",
-                "reference": "1fa460fd9aec9853db812369a120cecfaf3d9c7b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/bretterer/iso_duration_converter/zipball/1fa460fd9aec9853db812369a120cecfaf3d9c7b",
-                "reference": "1fa460fd9aec9853db812369a120cecfaf3d9c7b",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Bretterer\\IsoDurationConverter\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Brian Retterer",
-                    "email": "bretterer@gmail.com"
-                }
-            ],
-            "description": "Easily convert ISO_8601 Duration time format to seconds and convert seconds to ISO-8601 Duration",
-            "support": {
-                "issues": "https://github.com/bretterer/iso_duration_converter/issues",
-                "source": "https://github.com/bretterer/iso_duration_converter/tree/master"
-            },
-            "time": "2016-02-11T16:37:19+00:00"
         },
         {
             "name": "brick/math",
@@ -5333,62 +5296,6 @@
             "time": "2021-07-28T08:36:05+00:00"
         },
         {
-            "name": "okta/jwt-verifier",
-            "version": "1.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/okta/okta-jwt-verifier-php.git",
-                "reference": "58e55ec0743f09dea1039954bab0fa28f738aa49"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/okta/okta-jwt-verifier-php/zipball/58e55ec0743f09dea1039954bab0fa28f738aa49",
-                "reference": "58e55ec0743f09dea1039954bab0fa28f738aa49",
-                "shasum": ""
-            },
-            "require": {
-                "bretterer/iso_duration_converter": "^0.1.0",
-                "nesbot/carbon": "^2.0",
-                "php": "^7.4 || ^8.0",
-                "php-http/client-common": "^2.3",
-                "php-http/curl-client": "^2.1",
-                "php-http/discovery": "^1.9",
-                "php-http/httplug": "^2.2",
-                "php-http/message": "^1.8",
-                "psr/http-message": "^1.0"
-            },
-            "require-dev": {
-                "firebase/php-jwt": "^5.2",
-                "guzzlehttp/psr7": "~2.0.0",
-                "php-http/mock-client": "^1.4",
-                "phpunit/phpunit": "^9.0 ",
-                "squizlabs/php_codesniffer": "^3.5",
-                "symfony/var-dumper": "^5.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Okta\\JwtVerifier\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Brian Retterer",
-                    "email": "brian.retterer@okta.com"
-                }
-            ],
-            "description": "A verifier library for working with Okta JWT's",
-            "support": {
-                "issues": "https://github.com/okta/okta-jwt-verifier-php/issues",
-                "source": "https://github.com/okta/okta-jwt-verifier-php/tree/1.3.0"
-            },
-            "time": "2022-01-05T17:13:03+00:00"
-        },
-        {
             "name": "onelogin/php-saml",
             "version": "4.0.0",
             "source": {
@@ -5691,75 +5598,6 @@
                 "source": "https://github.com/php-http/client-common/tree/2.5.0"
             },
             "time": "2021-11-26T15:01:24+00:00"
-        },
-        {
-            "name": "php-http/curl-client",
-            "version": "2.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-http/curl-client.git",
-                "reference": "2ed4245a817d859dd0c1d51c7078cdb343cf5233"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-http/curl-client/zipball/2ed4245a817d859dd0c1d51c7078cdb343cf5233",
-                "reference": "2ed4245a817d859dd0c1d51c7078cdb343cf5233",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "php": "^7.1 || ^8.0",
-                "php-http/discovery": "^1.6",
-                "php-http/httplug": "^2.0",
-                "php-http/message": "^1.2",
-                "psr/http-client": "^1.0",
-                "psr/http-factory": "^1.0",
-                "symfony/options-resolver": "^3.4 || ^4.0 || ^5.0 || ^6.0"
-            },
-            "provide": {
-                "php-http/async-client-implementation": "1.0",
-                "php-http/client-implementation": "1.0",
-                "psr/http-client-implementation": "1.0"
-            },
-            "require-dev": {
-                "guzzlehttp/psr7": "^1.0",
-                "laminas/laminas-diactoros": "^2.0",
-                "php-http/client-integration-tests": "^3.0",
-                "phpunit/phpunit": "^7.5 || ^9.4"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Http\\Client\\Curl\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Михаил Красильников",
-                    "email": "m.krasilnikov@yandex.ru"
-                }
-            ],
-            "description": "PSR-18 and HTTPlug Async client with cURL",
-            "homepage": "http://php-http.org",
-            "keywords": [
-                "curl",
-                "http",
-                "psr-18"
-            ],
-            "support": {
-                "issues": "https://github.com/php-http/curl-client/issues",
-                "source": "https://github.com/php-http/curl-client/tree/2.2.1"
-            },
-            "time": "2021-12-10T18:02:07+00:00"
         },
         {
             "name": "php-http/discovery",
