@@ -333,6 +333,10 @@ class Controller extends ConfigController
          */
         $options['class'] = $optionPayload['class'];
 
+        /* Clear these stacks (we fill them with selectize tuples)
+         */
+        unset($options['summary']['workType'], $options['class']['workType']);
+
         /* Squish out the Terms
          */
         $terms = $this->termMapper->findByColumn('id', explode(',', $optionPayload['terms']));
