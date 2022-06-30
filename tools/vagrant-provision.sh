@@ -3,13 +3,8 @@
 # * Executed after puppet provisioner has set up host
 # * Installs the vagrantx instance into this host, then invokes puppet again to configure the host for this instance
 
-# Global constants
-readonly SITE_ROOT=/usr/share/schoolbox # Cannot derive this, because it is copied by vagrant to /tmp in guest
-readonly LOG=/usr/bin/alaress-logger
-readonly L_INFO=200;
-readonly L_WARN=300;
-readonly L_ERROR=400;
-readonly cachedir="$SITE_ROOT"/vagrantcache;
+# Global constants and functions
+source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
 
 # Global vars
 # Defaults
@@ -22,16 +17,6 @@ instance_registry_url="https://manage.schoolbox.cloud"
 declare phpversion_supported                                # Must be specified via script arg
 declare aws_iam_key
 declare aws_iam_secret
-
-function log(){
-  $LOG $L_INFO "$1"
-}
-function warn(){
-  $LOG $L_WARN "$1"
-}
-function error(){
-  $LOG $L_ERROR "$1"
-}
 
 if [[ $# -ne 14 ]]; then
   error "Script requires 14 params, found $#"
@@ -92,14 +77,6 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
-
-# Function to fetch value from .env file by key
-# Usage: value=$(read_var $key)
-read_var() {
-    VAR=$(grep -E "^\s*$1" "$SITE_ROOT"/.env | xargs)
-    IFS="=" read -ra VAR <<< "$VAR"
-    echo "${VAR[1]}"
-}
 
 s3Referer=$(read_var AWS_S3_REFERER)
 if [[ -z $s3Referer ]]; then
@@ -466,33 +443,10 @@ else
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-service schoolbox-epl restart;
-eval "service php${phpversion_supported}-fpm restart"
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 "$SITE_ROOT"/tools/maintenance/site_up.sh;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Gotenberg service";
-gotenberg_container_ids="$(docker ps -f ancestor=thecodingmachine/gotenberg:6 -q)"
-if [[ -n $gotenberg_container_ids ]]; then
-  echo -e "$gotenberg_container_ids" | xargs docker stop
-fi
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
-docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
-
-
-# Rebuild & restart task daemon
-# if `taskd_build_from_local` then build from the mounted taskd dir
-declare taskd_args=()
-if [ "$taskd_build_from_local" == 1 ]; then
-  taskd_args+=(--local)
-fi;
-if ! "$SITE_ROOT"/tools/taskd/rebuild.sh "${taskd_args[@]}"; then
-  exit 1
-fi
-
 
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];
