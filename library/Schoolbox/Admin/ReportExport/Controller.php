@@ -239,6 +239,27 @@ class Controller extends ConfigController
 
 
     /**
+     * Get work types for selectize
+     * @return void
+     * @api GET /adminv2/report-export/worktypes
+     */
+    public function getWorkTypes(): void
+    {
+        $output    = [];
+        $workTypes = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC');
+
+        foreach ($workTypes as $workType) {
+            $output[] = [
+                'id'   => $workType->getId(),
+                'name' => $workType->getName(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+
+    /**
      * Landing page
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -485,23 +506,7 @@ class Controller extends ConfigController
         $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
 
-    /**
-     * Get work types for selectize
-     * @return void
-     * @api GET /adminv2/report-export/getWorkTypes
-     */
-    public function getWorkTypes(): void
-    {
-        $output    = [];
-        $workTypes = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC');
-        foreach ($workTypes as $workType) {
-            $output[] = [
-                'id'   => $workType->getId(),
-                'name' => $workType->getName(),
-            ];
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
-    }
+
 
     /**
      * Generates report
