@@ -143,9 +143,13 @@ class Controller extends Base
      * Receive a JWT (in the "jwt" query string parameter), and use it to
      * identify and authenticate a user.
      *
-     * @deprecated URLs which point here should instead point to
-     *             `\Schoolbox\API\Controller::initSessionFromQueryString`:
-     *             its JWT parser may now parse JWTs from other instances.
+     * URLs which point here should instead point to
+     * `\Schoolbox\API\Controller::initSessionFromQueryString`, as its JWT
+     * parser may now parse JWTs from other instances. This endpoint remains for
+     * now though, as it works slightly differently:
+     * * it doesn't create a new session if a user is already logged in
+     * * if JWT login fails for any reasonable reason, it falls back to the
+     *   standard login page instead of showing an error
      *
      * @api GET /help/sso/receive
      * @since 21.0
