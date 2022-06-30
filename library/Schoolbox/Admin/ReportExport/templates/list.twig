@@ -11,9 +11,21 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
+    {% set createRoute = routeLookupIfAuthorized('adminReportExport.getCreate') %}
+
     <div class="admin-content">
         {% if reports|length %}
             <div class="small-12 island">
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 island">
+                            <h2 class="subheader">Summative Report List</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="{{ createRoute }}" class="icon-add" title="Add a summative report"></a>
+                    </nav>
+                </div>
                 <section>
                     <ul class="information-list">
                         {% for report in reports %}
@@ -47,8 +59,6 @@
                 </section>
             </div>
         {% else %}
-            {% set createRoute = routeLookupIfAuthorized('adminReportExport.getCreate') %}
-
             <div class="empty-state">
                 <i class="icon-progress"></i>
                 <p>There aren't any summative reports yet.</p>
