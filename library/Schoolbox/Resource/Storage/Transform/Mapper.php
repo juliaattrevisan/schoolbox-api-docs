@@ -21,7 +21,6 @@ use UnexpectedValueException;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     // Table definition
     public const TABLE_NAME       = 'storage_transform';
     public const FIELD_HASH       = 'hash';
