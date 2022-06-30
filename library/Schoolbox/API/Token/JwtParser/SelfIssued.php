@@ -46,7 +46,7 @@ class SelfIssued implements IParser
     public function accepts(array $claims): bool
     {
         return isset($claims[MessagePayloadInterface::CLAIM_ISS])
-            && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->getSchoolboxIssuer();
+            && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->determineThisInstanceIssuer();
     }
 
     /**
@@ -78,9 +78,11 @@ class SelfIssued implements IParser
     }
 
     /**
+     * Determine what this instance's issuer value is.
+     *
      * @return string|null
      */
-    private function getSchoolboxIssuer(): ?string
+    private function determineThisInstanceIssuer(): ?string
     {
         return (new Factory($this->config))->buildFullyQualified()->getHost();
     }
