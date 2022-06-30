@@ -320,6 +320,16 @@ class Controller extends ConfigController
         $options = [];
         $optionPayload = json_decode($report->getOptions(), true);
 
+        /* Extract the optional summary heading string
+         * Extract the checkbox settings
+         */
+        $options['summary'] = $optionPayload['summary'];
+
+        /* Extract the optional class checkboxes
+         * Extract the checkbox settings
+         */
+        $options['class'] = $optionPayload['class'];
+
         /* Squish out the Terms
          */
         $terms = $this->termMapper->findByColumn('id', explode(',', $optionPayload['terms']));
