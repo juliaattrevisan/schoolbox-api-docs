@@ -5,7 +5,6 @@
  */
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI.js';
 import ClipboardJs from 'clipboard/dist/clipboard';
 
 export default {
@@ -15,10 +14,6 @@ export default {
         RevealModal,
         ClipboardJs
     },
-
-    mixins: [
-        footerUI //to place and keep the tables UI in the footer
-    ],
 
     props: {
         srcDomainList: {
@@ -65,34 +60,25 @@ export default {
                     ['dateModified.formatted']: 'Date modified',
                     edit: ''
                 },
-                customSorting: {
-                    ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
-                        return (a, b) => {
-                            if (ascending) {
-                                return a.dateModified.timestamp >= b.dateModified.timestamp ? 1 : -1;
-                            }
-                            return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
-                        }
-                    },
-                },
-                orderBy: {
-                    ascending: true,
-                    column: 'domain'
-                },
-                perPage: 25,
-                perPageValues: [25, 50, 100, 150, 200],
                 resizableColumns: false,
+                columnsClasses: {
+                    ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
+                    edit: 'edit-td ', //to specify a width
+                },
                 selectable: {
                     mode: '',
                 },
                 filterable: false,
                 filterByColumn: false,
-                sortable: ['domain', 'dateModified.formatted'], //the edit column doesn't need to be sortable
+                sortable: [], //the edit column doesn't need to be sortable
                 sortIcon: {
                     is: 'glyphicon-sort',
                     base: 'glyphicon',
                     up: 'glyphicon-chevron-up',
                     down: 'glyphicon-chevron-down'
+                },
+                texts: {
+                    count: ''
                 },
                 tabbable: false,
             },
@@ -147,13 +133,6 @@ export default {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
                 this.hasDataLoaded = true; //update the display to show the list
             }
-        },
-
-        /**
-         * To update the table to show the UI in the footer
-         */
-        onLoaded () {
-            this.$nextTick(() => this.footerUI_update());
         },
 
         /**
@@ -316,6 +295,16 @@ export default {
                 </div>
             </section>
         </div>
+        <template v-if="rows.length === 0">
+            <div id="listEmptyState" class="empty-state">
+                <i class="icon-email"></i>
+                <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
+                <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
+                    valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
+                    users send email from you must setup a DKIM key and add then add the appropriate records to your DNS
+                    zone.</p>
+            </div>
+        </template>
         <v-client-table
             v-else-if="hasDataLoaded"
             ref="table"
@@ -326,15 +315,15 @@ export default {
         >
             <template #beforeTable>
             </template>
+            <template #domain="props">
+                <a @click.prevent="onClickGetKey(props.row)" title="View DKIM TXT Record">{{ props.row.domain }}</a>
+            </template>
             <template #edit="props">
                 <nav class="edit">
-                    <a class="icon-eye" @click.prevent="onClickGetKey(props.row)" title="Get key"></a>
+                    <a class="icon-eye" @click.prevent="onClickGetKey(props.row)" title="View DKIM TXT Record"></a>
                     <a class="icon-modify" @click.prevent="onClickModifyDomain(props.row)" title="Modify domain"></a>
                     <a class="icon-delete" @click.prevent="onClickDeleteDomain(props.row)" title="Delete domain"></a>
                 </nav>
-            </template>
-            <template #afterTable>
-                <div class="VueTables__table-footer" ref="tableFooter"></div>
             </template>
         </v-client-table>
         <div v-else>
@@ -375,22 +364,22 @@ export default {
         </form>
     </reveal-modal>
     <reveal-modal ref="dkimModal">
-        <h2>DKIM for <strong>{{ domainName }}</strong></h2>
-        <h3>Name</h3>
+        <h2>DKIM TXT Record for <strong>{{ domainName }}</strong></h2>
+        <h3>TXT Record Name</h3>
         <div class="input-group">
             <div class="small-12"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
             <div>
                 <button ref="copyNameButton" class="icon-copy">Copy</button>
             </div>
         </div>
-        <h3>Value (Full)</h3>
+        <h3>TXT Record Value</h3>
         <div class="input-group">
             <div class="small-12"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
             <div>
                 <button ref="copyValueButton" class="icon-copy">Copy</button>
             </div>
         </div>
-        <h3>Value (Split)</h3>
+        <h3>TXT Record Value (split to 255 character parts)</h3>
         <div class="input-group">
             <div class="small-12"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
             <div>
@@ -405,7 +394,9 @@ export default {
         </div>
     </reveal-modal>
     <reveal-modal ref="deleteModal">
-        <h2>Delete {{ selectedDomain.domain }}</h2>
+        <h2>Please Confirm</h2>
+        <p>You are about to delete the DKIM keys for <b>{{ selectedDomain.domain }}</b>, are you sure you want to
+            proceed?</p>
         <form>
             <ul class="flex-list buttons">
                 <li>
@@ -421,6 +412,48 @@ export default {
 
 <style lang="scss">
 
+@import 'www/static/css/core/utils/_colors.scss';
 @import '@schoolboxVue/components/vueTables2/vueTables2';
+
+.VueTables table {
+    table-layout: fixed;
+}
+
+.VueTables__table td {
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    vertical-align: middle;
+    @media (max-width: 700px) {
+        padding: 0.5rem 0.5rem 0 0;
+    }
+}
+
+.VueTables__table .edit-td {
+    padding-left: 0; //bring it inline with the right side border
+    width: 7rem; //keep the edit icon on the right side
+}
+
+.edit {
+    display: flex;
+    height: 2.5rem;
+    width: 7rem;
+}
+
+.edit a {
+    color: var(--content-ui-foreground);
+    line-height: 2.5;
+    opacity: 0.7;
+    padding-left: 8px; //move the pencil into the centre
+}
+
+.date-modified-td {
+    width: 15.625rem; //keep on the right hand side, and don't alter width when filtering changes
+    @media (max-width: 1000px) {
+        width: 9.375rem;
+    }
+    @media (max-width: 700px) {
+        display: none; //hide on mobile, as the date will then be shown within view-all-files-name.vue
+    }
+}
+
 
 </style>
