@@ -49,7 +49,6 @@ use Twig\Environment;
  */
 class Controller extends BaseController
 {
-
     /**
      * UserMapper
      */
