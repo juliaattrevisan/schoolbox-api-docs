@@ -293,6 +293,20 @@ $last-child-float: $opposite-direction !default;
   }
 }
 
+// Block Grid
+.grid {
+    > li {  
+        padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
+        //shadow trick to have a 1px 'border' around child items without them becoming 
+        //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938 
+        box-shadow: 
+            1px 0 0 0 $body-bg, 
+            0 1px 0 0 $body-bg, 
+            1px 1px 0 0 $body-bg,
+            1px 0 0 0 $body-bg inset, 
+            0 1px 0 0 $body-bg inset; 
+    }
+}
 
 // BLOCK GRID
 //

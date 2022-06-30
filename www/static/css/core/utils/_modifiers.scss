@@ -1,0 +1,35 @@
+/*
+    Miscellaneous useful HTML classes
+*/
+
+.left { 
+    float: left !important; 
+}
+
+.right { 
+    float: right !important; 
+}
+
+.clearfix { 
+    @include clearfix;
+}
+
+.align-middle {
+    vertical-align: middle;
+}
+
+.align-bottom {
+    vertical-align: bottom;
+}
+
+.border-none {
+    border: none !important;
+}
+
+// ensure an element is scrollable
+.scrollable {
+    overflow: auto;
+    table {
+        margin-bottom: 0;
+    }
+}

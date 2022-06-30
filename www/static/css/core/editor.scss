@@ -1,21 +1,30 @@
 $cdn-prefix: '../../';
 
-//@import "utils/skin";
-@import "utils/colors";
-@import "utils/variables";
-@import "utils/mixins";
-@import "utils/functions";
+@import "base/colors";
+@import "base/variables";
+@import "base/mixins";
+@import "base/functions";
+@import "base/settings";
 
-@import "utils/settings";
-@import "ui/icons";
+@import "utils/meta";
+@import "utils/modifiers";
+@import "utils/visibility";
 
 @import "base/global";
 @import "base/typography";
+
+@import "layout/grid";
+
+@import "ui/icons";
+@import "ui/lists";
+@import "ui/forms/labels";
+@import "ui/progress-bars";
+@import "ui/reveal";
+@import "ui/thumbs";
 @import "ui/content";
 @import "ui/iframe";
 @import "components/editor/custom-styles.scss";
 
-//@import "utils/custom";
 
 html, body {
     height: 100%;

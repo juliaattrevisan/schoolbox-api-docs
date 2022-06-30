@@ -1,3 +1,9 @@
+/*
+    The Sass file where all other Sass files are born
+    Essentially just imports all required files so can can reference 
+    the compiled core.css 
+*/
+
 @charset "UTF-8";
 
 // CDN prefix:
@@ -6,21 +12,36 @@
 // (currently CDN_PREFIX + '/css/core/main.css')
 $cdn-prefix: "../..";
 
-// Utils
-@import "utils/colors";
-@import "utils/font-faces";
-@import "utils/variables";
-@import "utils/mixins";
-@import "utils/functions";
-@import "utils/settings";
-
 // Base
+@import "base/colors";
+@import "base/font-faces";
+@import "base/variables";
+@import "base/mixins";
+@import "base/functions";
+@import "base/settings";
 @import "base/global";
 @import "base/typography";
 
-// General
+//Utils
+@import "utils/meta";
+@import "utils/modifiers";
+@import "utils/visibility";
+
+// Layout
+@import "layout/footer";
+@import "layout/grid";
+@import "layout/container";
+@import "layout/login";
+@import "layout/flex";
+
+// Shared user interface
 @import "ui/icons";
 @import "ui/skeleton";
+@import "ui/lists";
+@import "ui/forms/labels";
+@import "ui/progress-bars";
+@import "ui/reveal";
+@import "ui/thumbs";
 @import "ui/content";
 @import "ui/accordion";
 
@@ -61,14 +82,6 @@ $cdn-prefix: "../..";
 @import "ui/iframe";
 @import "ui/cards";
 @import "ui/highcharts";
-
-// Layout
-@import "layout/footer";
-@import "layout/grid";
-@import "layout/header";
-@import "layout/container";
-@import "layout/login";
-@import "layout/flex";
 
 // Schoolbox Areas
 @import "components/evaluation/evaluation";

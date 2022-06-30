@@ -2,10 +2,6 @@
     Foundation specific $settings 
 */
 
-// Foundation by ZURB
-// foundation.zurb.com
-// Licensed under MIT Open Source
-
 //
 // FOUNDATION SETTINGS
 //
@@ -52,9 +48,6 @@ $font-weight-bold: 700;
 $body-font-weight: $font-weight-normal;
 $body-font-style: normal;
 
-// We use this to control font-smoothing
-$font-smoothing: antialiased;
-
 // We use these to control text direction settings
 $text-direction: ltr;
 $opposite-direction: right;
@@ -71,11 +64,6 @@ $last-child-float: $default-float;
 // We use these to make sure border radius matches unless we want it different.
 $global-radius: 0.5rem;
 $global-rounded: 1000px;
-
-// We use these to control inset shadow shiny edges and depressions.
-$shiny-edge-size: 0 1px 0;
-$shiny-edge-color: rgba($white, 0.5);
-$shiny-edge-active-color: rgba($black, 0.2);
 
 // Skeleton screen loaders
 $skeleton-background: $vapor;
@@ -132,12 +120,10 @@ $large: $large-up;
 
 // We use this as cursors values for enabling the option of having custom cursors in the whole site's stylesheet
 $cursor-auto-value: auto !default;
-$cursor-crosshair-value: crosshair;
 $cursor-default-value: default;
 $cursor-disabled-value: not-allowed !default;
 $cursor-pointer-value: pointer;
 $cursor-help-value: help;
-$cursor-text-value: text;
 
 //
 // VISIBILITY CLASSES

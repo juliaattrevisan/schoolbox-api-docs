@@ -138,9 +138,14 @@ $alert-default-background: css-darken($body-bg, 10%);
 .alert-box {
     background-color: $alert-default-background;
     color: $body-bg-contrast;
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
-
+    print-color-adjust: exact;
+    a {
+        &:not(.close) {
+            color: inherit;
+            text-decoration: underline;
+        }
+    }
     .close {
         &:hover {
             text-decoration: none;
