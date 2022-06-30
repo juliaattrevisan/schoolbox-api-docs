@@ -359,9 +359,9 @@ class CourseCest
         $i->sendRequest($unitSpecPayload);
         $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
         $unit_folder = $i->grabFirstFolderByTitle($unit_name);
-        $unitSpecId1 = $unitSpec->getId();
+        $unitSpecId2 = $unitSpec->getId();
         $unit_folderId = $unit_folder->getId();
-        $this->createAssessment($i,$unitSpecId1,$unit_folderId,'due work 1',AssessmentType::TYPE_DUE_WORK);
+        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'due work 1',AssessmentType::TYPE_DUE_WORK);
         $modifyCourse = new Payload\Course\Specification\Update($course_spec);
         $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
         $i->amGoingTo('Send save request for the newly created course');
@@ -376,30 +376,86 @@ class CourseCest
         $i->sendRequest($unitSpecPayload);
         $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
         $unit_folder = $i->grabFirstFolderByTitle($unit_name);
-        $unitSpecId2 = $unitSpec->getId();
+        $unitSpecId3 = $unitSpec->getId();
         $unit_folderId = $unit_folder->getId();
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'due work 1',AssessmentType::TYPE_DUE_WORK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'due work 2',AssessmentType::TYPE_DUE_WORK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'due work 3',AssessmentType::TYPE_DUE_WORK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'due work 4',AssessmentType::TYPE_DUE_WORK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'task 1',AssessmentType::TYPE_TASK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'task 2',AssessmentType::TYPE_TASK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'task 3',AssessmentType::TYPE_TASK);
-        $this->createAssessment($i,$unitSpecId2,$unit_folderId,'task 4',AssessmentType::TYPE_TASK);
+        $dueWorkUnitSpec1 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'due work 1',AssessmentType::TYPE_DUE_WORK);
+        $dueWorkUnitSpec2 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'due work 2',AssessmentType::TYPE_DUE_WORK);
+        $dueWorkUnitSpec3 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'due work 3',AssessmentType::TYPE_DUE_WORK);
+        $dueWorkUnitSpec4 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'due work 4',AssessmentType::TYPE_DUE_WORK);
+        $taskUnitSpec1 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'task 1',AssessmentType::TYPE_TASK);
+        $taskUnitSpec2 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'task 2',AssessmentType::TYPE_TASK);
+        $taskUnitSpec3 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'task 3',AssessmentType::TYPE_TASK);
+        $taskUnitSpec4 = $this->createAssessment($i,$unitSpecId3,$unit_folderId,'task 4',AssessmentType::TYPE_TASK);
         $modifyCourse = new Payload\Course\Specification\Update($course_spec);
         $modifyCourse->addUnitSpec($unitSpec->getId(), $unit_name);
         $i->amGoingTo('Send save request for the newly created course');
         $i->sendRequest($modifyCourse);
         #THEN
         $i->seeResponseCodeIs(303);
-        # WHEN
-        var_dump($course_spec->getId(),$unitSpecId1);
-        $unitPayloadDelete = new Payload\Course\Unit\Specification\Delete($course_spec->getId(),$unitSpecId1);
-        $i->amGoingTo('Send request to delete unit 1');
+
+        # WHEN removes one of the units just added (not yet imported to the class)
+        $unitPayloadDelete = new Payload\Course\Unit\Specification\Delete($course_spec->getId(),$unitSpecId2);
+        $i->amGoingTo('Send request to delete unit 1 - unit not yet imported');
         $i->sendRequest($unitPayloadDelete);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #WHEN export 2 due works and 2 tasks from the last unit created to the class
+        $importCourseSpecPayload = new Payload\Course\Import\Part1($course_spec->getId(), $groupFolder->getId(), 0, '');
+        $i->amGoingTo('Send import Step 1. course spec to class page #' . $groupFolder->getId());
+        $i->sendRequest($importCourseSpecPayload);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $part2 = new Payload\Course\Import\Part2($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null);
+        $unitOpen = strtotime('- 5 day');
+        $unitClose = strtotime('+ 35 day');
+        $part2->setUnitImport(3, $unitSpecId3, null, true, $unitOpen, $unitClose);
+        $i->amGoingTo('Send import Step 2. unit specs to group page course, group page #' . $groupFolder->getId());
+        $i->sendRequest($part2);
 
         #THEN
         $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $selectedUnits = [
+            [
+                'spec_id' => $unitSpecId3,
+                'impl_id' => '',
+                'open'    => date('d/m/Y', strtotime('- 5 day')),
+                'close'   => date('d/m/Y', strtotime('+ 35 day')),
+            ],
+        ];
+        $part3 = new Payload\Course\Import\Part3($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null, $selectedUnits);
+        $part3->setAssessmentImport($unitSpecId3, $dueWorkUnitSpec1->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $part3->setAssessmentImport($unitSpecId3, $dueWorkUnitSpec2->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $part3->setAssessmentImport($unitSpecId3, $taskUnitSpec1->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $part3->setAssessmentImport($unitSpecId3, $taskUnitSpec2->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+
+        $i->amGoingTo('Send import Step 3. assessments to class page course unit spec, class page #' . $groupFolder->getId());
+        $i->sendRequest($part3);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #WHEN removes 1 due work already exported to the class
+        $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$dueWorkUnitSpec1->getId());
+        $i->amGoingTo('Send request to delete due work 1 - due work already exported to a class');
+        $i->sendRequest($assessmentPayloadDelete);
+        #THEN
+        $i->seeResponseCodeIs(303);
+        #WHEN removes 1 task already exported to the class
+        $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$taskUnitSpec1->getId());
+        $i->amGoingTo('Send request to delete task 1 - task already exported to a class');
+        $i->sendRequest($assessmentPayloadDelete);
+        #THEN
+        $i->seeResponseCodeIs(303);
+        $i->amGoingTo("check that the task and due work removed from the course are still presented in the class page");
+        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' => $dueWorkUnitSpec1->getId()]);
+        var_dump($folderId);
+        var_dump($groupFolder->getId());
+        $i->assertEquals($folderId,$groupFolder->getId());
     }
 
     /** Convenience helper to create assessments
