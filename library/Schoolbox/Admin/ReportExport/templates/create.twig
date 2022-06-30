@@ -221,7 +221,7 @@
                         <span class="switch inline" data-ruleset-enabled="">
                             <input type="hidden" name="summary[active]" value="0" />
 
-                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" />
+                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" {% if options.summary.active %}checked="checked"{% endif %} />
                             <label for="report-include-summary">
                                 <span>On</span>
                                 <span>Off</span>
@@ -273,7 +273,7 @@
                         <span class="switch inline" data-ruleset-enabled="">
                             <input type="hidden" name="class[active]" value="0" />
 
-                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" />
+                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" {% if options.class.active %}checked="checked"{% endif %} />
                             <label for="report-include-class">
                                 <span>On</span>
                                 <span>Off</span>
