@@ -81,6 +81,29 @@
                 }
             },
         });
+
+        $('#report-campuses').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                placeholder: 'Search campuses',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getCampuses') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
     });
 </script>
 
@@ -128,7 +151,7 @@
                         </div>
                         <div class="small-12 large-4 columns">
                             <label for="report-campuses">Campuses</label>
-                            <input type="text" />
+                            <input type="text" id="report-campuses" name="campuses" />
                         </div>
                         <div class="small-12 large-4 columns">
                             <label for="report-students">Students</label>

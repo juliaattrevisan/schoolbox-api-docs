@@ -305,6 +305,32 @@ class Controller extends ConfigController
 
 
     /**
+     * Get campuses for selectize
+     *
+     * @return void
+     * @api GET /adminv2/report-export/campuses
+     */
+    public function getCampuses(): void
+    {
+        $output   = [];
+        $campuses = $this->campusMapper->findAll()->sortBy('sequence', 'ASC');
+
+        foreach ($campuses as $campus) {
+            $output[] = [
+                'id'   => $campus->getId(),
+                'name' => $campus->getName(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+
+
+
+
+
+    /**
      * Landing page
      * @return void
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -500,23 +526,7 @@ class Controller extends ConfigController
 
 
 
-    /**
-     * Get campuses for selectize
-     * @return void
-     * @api GET /adminv2/report-export/getCampuses
-     */
-    public function getCampuses(): void
-    {
-        $output   = [];
-        $campuses = $this->campusMapper->findAll()->sortBy('sequence', 'ASC');
-        foreach ($campuses as $campus) {
-            $output[] = [
-                'id'   => $campus->getId(),
-                'name' => $campus->getName(),
-            ];
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
-    }
+
 
 
 
