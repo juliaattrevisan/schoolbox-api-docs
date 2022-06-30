@@ -412,7 +412,7 @@ export default {
 
 <style lang="scss">
 
-@import 'www/static/css/core/utils/_colors.scss';
+@import 'www/static/css/core/base/_colors.scss';
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
