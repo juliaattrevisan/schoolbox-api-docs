@@ -66,6 +66,11 @@ $font-family-icon: 'schoolbox';
     content: '\e621';
 }
 
+.VueTables__select-all,
+.VueTables__select-single {
+    width: 3rem; //it only contains a checkbox, so we don't need it to stretch too far
+}
+
 .VueTables__table-footer {
     //container for the table controls, rows per page, current count, and next/prev pagination
     width: 100%;

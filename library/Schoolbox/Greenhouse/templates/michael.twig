@@ -1,13 +1,6 @@
-<div id="pastoral-record-comments-container">
-    <pastoral-record-comments
-        cdn-prefix="{{ CDN_PREFIX }}"
-        {# :comments="{{ comments|json_encode }}" #}
-        {# comment-delete-route="{{ commentDeleteRoute }}" #}
-        {# comment-heading="{{ commentHeading }}" #}
-        {# comment-insert-route="{{ commentInsertRoute }}" #}
-        {# :record="{{ record|json_encode }}" #}
-        {# record-type="{{ recordType }}" #}
-        site-version="{{ config.site_version }}"
+<div id="manage-group-container">
+    <manage-group
+        endpoint="blah"
     />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/pastoralRecordComments.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/manageGroup.js?v={{ config.site_version }}"></script>

@@ -4,10 +4,14 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, computed, nextTick, onMounted  } from 'vue';
-import ManageGroupActions from './manage-group-actions.vue';
+import { ref, computed, onMounted  } from 'vue';
+import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
+import ManageGroupFilters from './manage-group-filters.vue';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
+import FilterEvents from './manageGroupFilterEvents';
+
+import { data } from '../../../../stories/pages/manageGroup/dataManageGroup';
 
 
 const props = defineProps({
@@ -20,9 +24,9 @@ const props = defineProps({
     },
 });
 
-onMounted(() => {
-    $(document).foundation(); //to enable the Foundation features such as the drop down in -actions and tabs in -add-members
-});
+// onMounted(() => {
+//     $(document).foundation(); //to enable the Foundation features such as the drop down in -header and tabs in -add-members
+// });
 
 
 /*****************************************************************
@@ -62,16 +66,16 @@ onMounted(() => {
  */
 async function loadGroupMembers () {
     try {
-        const response = await fetch(props.endpoint);
-        const responseJson = await response.json();
+        // const response = await fetch(props.endpoint);
+        // const responseJson = await response.json();
         // groupMembers.value = responseJson;
-        // groupMembers.value.forEach((groupMember) => { //to highlight new members just added
-        //     groupMember = { ...groupMember, isNew: false };
-        // });
+        groupMembers.value = data;
+        groupMembers.value.forEach((groupMember) => { //to highlight new members just added
+            groupMember = { ...groupMember, isNew: false };
+        });
     } catch (error) {
         console.warn(error);
-        isLoading.value = false;
-        hasLoadError.value = true; //hide search bar in the dom
+        hasLoadError.value = true; //show the load error display state 
     } finally {
         isLoading.value = false;
     }
@@ -90,6 +94,27 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     //     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
     //     edit: 'edit-td ', //to specify a width
     // },
+    customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+        {
+            name: FilterEvents.SHOW_READ_ACCESS,
+            callback: (row, query) => {
+                console.warn('eh');
+                return row.access !== query;
+            }
+        },
+        {
+            name: FilterEvents.SHOW_WRITE_ACCESS,
+            callback: (row, query) => {
+                return row.access !== query;
+            }
+        },
+        {
+            name: FilterEvents.SHOW_ADMIN_ACCESS,
+            callback: (row, query) => {
+                return row.access !== query;
+            }
+        },
+    ],
     debounce: 100, //shorter debounce time as data is stored locally
     headings: {
         name: 'Name',
@@ -102,7 +127,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
     },
-    sortable: ['name', 'access'], //the edit column doesn't need to be sortable
+    // sortable: ['name', 'access'], //the edit column doesn't need to be sortable
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
@@ -118,20 +143,52 @@ async function onLoaded () {
     updateFooterUI();
 }
 
+/**
+ * To update a group members access
+ * 
+ * @param { Object } related row 
+ */
+function onMemberAccessChange (row) {
+    console.warn('onMemberAccessChange - ' + row.name);
+}
+
+
+
+/*****************************************************************
+ * 
+ * Filter the group members
+ * 
+ ****************************************************************/
+
+onMounted(() => {
+    initFilterListeners();
+});
+
+/**
+ * So we can ensure that rows that are removed through filters are also removed from the selected rows
+ */
+function initFilterListeners () {
+    document.addEventListener(FilterEvents.SHOW_READ_ACCESS, () => onFilterChanged());
+    document.addEventListener(FilterEvents.SHOW_WRITE_ACCESS, () => onFilterChanged());
+    document.addEventListener(FilterEvents.SHOW_ADMIN_ACCESS, () => onFilterChanged());
+}
+
+/**
+ * Pull any rows that are no longer visible out of the selected rows
+ */
+function onFilterChanged () {
+    // const filteredRowsIds = this.$refs.table.allFilteredData.map((filteredRow) => filteredRow.id); //is the currently visible list of rows, mapped to just the ids
+    // const selectedRowsIds = this.selectedRows.map((selectedRow) => selectedRow.id);
+    // const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
+    // this.$refs.table.unselectRows(rowsToUnselect);
+    // this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
+}
+
 </script>
 
 <template>
-    <div class="row actions-small-1">
-        <div class="list-item small-12 columns">
-            <h1>Manage Group</h1>
-        </div>
-        <manage-group-actions />
-    </div><!-- row actions-small-1 -->
-    <div class="row">
-        <div class="small-12 island">
-            <manage-group-add-members />
-        </div><!-- small-12 island -->
-    </div><!-- row  -->
+    <manage-group-heading />
+    <manage-group-add-members />
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Current Members</h2>
@@ -142,6 +199,20 @@ async function onLoaded () {
                 :options="tableOptions"
                 @loaded="onLoaded"
             >
+                <template #beforeTable>
+                    <manage-group-filters />
+                </template>
+                <template #access="props">
+                    <!-- <nav class="edit">
+                        <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view-hollow' : 'icon-view' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
+                        <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
+                    </nav> -->
+                    <select id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
+                        <option value="read">Read Access</option>
+                        <option value="write">Write Access</option>
+                        <option value="admin">Group Admin</option>
+                    </select>
+                </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
                 </template>
