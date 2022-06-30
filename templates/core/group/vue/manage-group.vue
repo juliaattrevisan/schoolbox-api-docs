@@ -98,7 +98,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         {
             name: FilterEvents.SHOW_READ_ACCESS,
             callback: (row, query) => {
-                console.warn('eh');
                 return row.access !== query;
             }
         },

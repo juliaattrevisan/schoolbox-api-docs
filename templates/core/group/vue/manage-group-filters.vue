@@ -37,10 +37,12 @@ function initResetFiltersListener () {
  * rows with access 'read' will be hidden
  */
 async function onShowReadAccessChange () {
-    const filterParam = isShowReadAccessChecked ? '' : 'read'; 
+    const filterParam = isShowReadAccessChecked.value ? 'read' : ''; 
+    console.warn(filterParam);
     EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_READ_ACCESS}`, filterParam); //picked up by manage-group.vue 
     await nextTick();
     document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_READ_ACCESS)); //picked up by manage-group.vue 
+    isShowReadAccessChecked.value = !isShowReadAccessChecked.value;
 }
 
 /**
@@ -76,7 +78,7 @@ async function onShowAdminAccessChange () {
                 <label>Access</label>
                 <ul class="option-list">
                     <li>
-                        <input type="checkbox" id="read-access" v-model="isShowReadAccessChecked" @change="onShowReadAccessChange()">
+                        <input type="checkbox" id="read-access" :checked="isShowReadAccessChecked" @change="onShowReadAccessChange()">
                         <label for="read-access">Read</label>
                     </li>
                     <li>
