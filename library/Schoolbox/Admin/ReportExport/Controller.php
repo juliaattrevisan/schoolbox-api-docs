@@ -30,6 +30,7 @@ use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -261,13 +262,48 @@ class Controller extends ConfigController
      * @param Model $report
      * @return void
      * @throws \DebugBar\DebugBarException
+     * @throws \JsonException
      * @api POST /report-export/{reportId}/update
      */
     public function postUpdate(Model $report): void
     {
-        $data = $this->getRequest()->post->getArrayCopy();
+        $postData = $this->getRequest()->post->getArrayCopy();
 
-        new \Alaress_Probe($data);
+        /* This is the json-encoded payload we persist in the db
+         * To avoid making millions of schema we can just serialize it
+         */
+        $payloadKeys = [
+            'terms' => true,
+            'yearLevels' => true,
+            'campuses' => true,
+            'students' => true,
+            'summary' => true,
+            'class' => true,
+        ];
+
+        $options = json_encode(array_intersect_key($postData, $payloadKeys), JSON_THROW_ON_ERROR);
+
+        /* Cram in all the data
+         */
+        $report->setTitle($postData['title'])
+            ->setIntroduction($postData['introduction'])
+            ->setOptions($options)
+            ->setUpdatedBy($this->getUser());
+
+        /* If any Logo was provided, remember it
+         * Otherwise clear it
+         */
+        if (\is_array($postData['attachment'] ?? null)) {
+            /** @var \Schoolbox\Resource\Storage\Model $logo */
+            $logo = (new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst();
+            $report->setLogo($logo);
+        } else {
+            $report->setLogo(null);
+        }
+
+        $this->reportMapper->save($report);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
     }
 
 
