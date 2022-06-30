@@ -157,16 +157,6 @@ class Jwt
     }
 
     /**
-     * @param array $claims
-     * @return bool
-     */
-    public function issuedBySchoolbox(array $claims): bool
-    {
-        return isset($claims[MessagePayloadInterface::CLAIM_ISS])
-            && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->getSchoolboxIssuer();
-    }
-
-    /**
      * @return string|null
      */
     private function getSchoolboxIssuer(): ?string
