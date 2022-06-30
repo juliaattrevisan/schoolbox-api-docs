@@ -315,37 +315,38 @@ class Processor
             },
             E_WARNING
         );
-        if ('image/heic' !== $this->mimetype) {
-            /**
-             * HEIC fails with the PHP `getimagesizefromstring`, so lets just step past this step for this format
-             * and trust the system will not crash / die / fail
-             */
-            $imageSize = getimagesizefromstring($this->pathFilesystem->read($this->path));
-            set_error_handler($oldErrorHandler);
-            error_reporting($oldErrorLevel);
-            if ($imageSize === false) {
-                throw new CorruptImageException("Unable to derive image size");
-            }
-            [$width, $height] = $imageSize;
+        /**
+         * load the image into imagick and pick the metadata out of the header using
+         * https://www.php.net/manual/en/imagick.pingimageblob.php
+         */
+        try {
+            $imagick = new Imagick();
+            $imagick->pingImageBlob($this->pathFilesystem->read($this->path));
+        } catch (ImagickException $e) {
+            throw new CorruptImageException("Unable to derive image size");
+        }
+        $width = $imagick->getImageWidth();
+        $height = $imagick->getImageHeight();
+        set_error_handler($oldErrorHandler);
+        error_reporting($oldErrorLevel);
 
-            // Check host's image magick limits (these are controlled by Puppet)
-            $resourceLimitMap = $this->parseImageMagickResourceLimits();
+        // Check host's image magick limits (these are controlled by Puppet)
+        $resourceLimitMap = $this->parseImageMagickResourceLimits();
 
-            foreach ($resourceLimitMap as $name => $value) {
-                switch ($name) {
-                    case 'width':
-                        $widthLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                        if ($width > $widthLimit) {
-                            throw new OverflowException("File width ($width) > limit ($widthLimit) - aborting");
-                        }
-                        break;
-                    case 'height':
-                        $heightLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                        if ($height > $heightLimit) {
-                            throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
-                        }
-                        break;
-                }
+        foreach ($resourceLimitMap as $name => $value) {
+            switch ($name) {
+                case 'width':
+                    $widthLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
+                    if ($width > $widthLimit) {
+                        throw new OverflowException("File width ($width) > limit ($widthLimit) - aborting");
+                    }
+                    break;
+                case 'height':
+                    $heightLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
+                    if ($height > $heightLimit) {
+                        throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
+                    }
+                    break;
             }
         }
 
