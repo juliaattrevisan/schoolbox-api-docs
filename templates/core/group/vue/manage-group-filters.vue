@@ -24,6 +24,10 @@ const emit = defineEmits(['on-filter-change']);
 //     initResetFiltersListener();
 // });
       
+const isShowWaitingListChecked = computed(() => {
+    return props.selectedFilters.includes('waiting');
+});
+
 const isShowReadAccessChecked = computed(() => {
     return props.selectedFilters.includes('read');
 });
@@ -97,56 +101,68 @@ function onFilterChange (accessType) {
 
 <template>
     <div class="filters">
-        <div class="filters__column">
-            <div class="checklist">
-                <label>Access</label>
-                <ul class="option-list">
-                    <li>
-                        <input type="checkbox" id="read-access" :checked="isShowReadAccessChecked" @change="onFilterChange('read')">
-                        <label for="read-access">Read</label>
-                    </li>
-                    <li>
-                        <input type="checkbox" id="write-access" :checked="isShowWriteAccessChecked" @change="onFilterChange('write')">
-                        <label for="write-access">Write</label>
-                    </li>
-                    <li>
-                        <input type="checkbox" id="admin-access" :checked="isShowAdminAccessChecked" @change="onFilterChange('admin')">
-                        <label for="admin-access">Admin</label>
-                    </li>
-                </ul>
-            </div>
+        <div class="checklist">
+            <label class="title">Filter:</label>
+            <ul class="option-list">
+                <li>
+                    <input type="checkbox" id="waiting-list" :checked="isShowWaitingListChecked" @change="onFilterChange('waiting')">
+                    <label for="waiting-list">Waiting List</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="admin-access" :checked="isShowAdminAccessChecked" @change="onFilterChange('admin')">
+                    <label for="admin-access">Group Admin</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="write-access" :checked="isShowWriteAccessChecked" @change="onFilterChange('write')">
+                    <label for="write-access">Write Access</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="read-access" :checked="isShowReadAccessChecked" @change="onFilterChange('read')">
+                    <label for="read-access">Read Access</label>
+                </li>
+            </ul>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 
-// @import './similarity-report';
-
 .filters {
     background: white;
     display: flex;
-    padding: 1rem 0;
-    // @media (max-width: $tableToSingleColumn) {
-    //     flex-direction: column;
-    // }
+    padding: 0 1rem;
 }
 
-    .filters__column { 
-        flex: 1 1 0; //keep both sides equal
-        margin: 0 1rem;
-    }
+.title,
+.option-list,
+.option-list li {
+    display: inline-block; //line up along the bottom of the search field input
+}
 
-legend { 
-    margin-bottom: 0.5rem; //extra gap between it and the form element below
+.title,
+label {
+    font-size: 0.8125rem;
+}
+
+.title {
+    margin-bottom: 0.5rem;
+    margin-right: 1rem;    
+}
+
+.title,
+.option-list {
+    @media (max-width: 700px) { //shift things down now as horizontal space is getting tight
+        display: block;
+    }
 }
 
 .option-list li {
-    display: inline-block; //rather than block, to line up with similarity score filter better
     margin-right: 2rem;
-    // @media (max-width: $tableToSingleColumn) {
-    //     display: block;
-    // }
+    @media (max-width: 700px) { //break the list down into 2 columns to display better on mobile
+        display: inline-block; 
+        margin-right: 0;
+        min-width: 110px; //takes us all the way down to 320px devices
+    }
 }
 
 </style>

@@ -12,8 +12,6 @@ import ManageGroupFilters from './manage-group-filters.vue';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import FilterEvents from './manageGroupFilterEvents';
 
-import { data } from '../../../../stories/pages/manageGroup/dataManageGroup';
-
 
 const props = defineProps({
     /**
@@ -67,10 +65,9 @@ onMounted(() => {
  */
 async function loadGroupMembers () {
     try {
-        // const response = await fetch(props.endpoint);
-        // const responseJson = await response.json();
-        // groupMembers.value = responseJson;
-        groupMembers.value = data;
+        const response = await fetch(props.endpoint);
+        const responseJson = await response.json();
+        groupMembers.value = responseJson;
         groupMembers.value.forEach((groupMember) => { //to highlight new members just added
             groupMember = { ...groupMember, isNew: false };
         });
@@ -96,6 +93,12 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     //     edit: 'edit-td ', //to specify a width
     // },
     customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+        {
+            name: FilterEvents.SHOW_WAITING_LIST,
+            callback: (row, query) => {
+                return row.access !== query;
+            }
+        },
         {
             name: FilterEvents.SHOW_READ_ACCESS,
             callback: (row, query) => {
@@ -127,7 +130,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
     },
-    // sortable: ['name', 'access'], //the edit column doesn't need to be sortable
+    sortable: ['name', 'access'], //the access column doesn't need to be sortable
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
@@ -141,6 +144,24 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
  */
 async function onLoaded () {
     updateFooterUI();
+}
+
+/**
+ * To determine which meta info to display, based 
+ * on their access type
+ * 
+ * @param { Object }
+ * 
+ * @returns { String }
+ */
+function getMemberMeta (row) {
+    const memberMeta = {
+        'waiting': `<i class="icon-open"></i>Waiting List`,
+        'read': `<i class="icon-view"></i>Read Access`,
+        'write': `<i class="icon-modify"></i>Write Access`,
+        'admin': `<i class="icon-favourite"></i>Group Admin`,
+    };
+    return memberMeta[row.access];
 }
 
 /**
@@ -160,7 +181,7 @@ function onMemberAccessChange (row) {
  * 
  ****************************************************************/
 
-const selectedFilters = ref(['read', 'write', 'admin']);
+const selectedFilters = ref(['waiting', 'read', 'write', 'admin']);
 
 /**
  * Add/remove from selectedFilters and fire an event for the table
@@ -194,6 +215,7 @@ function updateSelectedFilters (accessType) {
 function dispatchFilterEvent (accessType) {
     const filterParam = selectedFilters.value.includes(accessType) ? '' : accessType ;
     const filterEventsType = {
+        'waiting': FilterEvents.SHOW_WAITING_LIST,
         'read': FilterEvents.SHOW_READ_ACCESS,
         'write': FilterEvents.SHOW_WRITE_ACCESS,
         'admin': FilterEvents.SHOW_ADMIN_ACCESS,
@@ -246,12 +268,22 @@ function dispatchFilterEvent (accessType) {
                         @on-filter-change="onFilterChange"
                     />
                 </template>
+                <template #name="props">
+                    <div class="card small-12">
+                        <a href="#">
+                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${props.row.name} portrait`">
+                            {{ props.row.name }}
+                        </a>
+                        <p class="meta" v-html="getMemberMeta(props.row)"></p>
+                    </div>
+                </template>
                 <template #access="props">
                     <!-- <nav class="edit">
                         <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view-hollow' : 'icon-view' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
                         <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                     </nav> -->
-                    <select id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
+                    <button v-if="props.row.access === 'waiting'" title="Approve Membership">Approve Membership</button>
+                    <select v-else id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
                         <option value="read">Read Access</option>
                         <option value="write">Write Access</option>
                         <option value="admin">Group Admin</option>
@@ -296,5 +328,17 @@ function dispatchFilterEvent (accessType) {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-    
+
+.VueTables__search {
+    padding-bottom: 0.5rem; //to put the manage-group-filters.vue up closer to the search input
+}
+
+.VueTables__search-field label {
+    display: none; //there's a 'Search files' in the input and 'Filter to' label below in manage-group-filters.vue, so not needed
+}
+
+.VueTables__search-field input {
+    margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
+}
+
 </style>
