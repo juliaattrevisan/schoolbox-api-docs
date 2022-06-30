@@ -250,6 +250,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $this->router->generate('adminReportExport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
                 'report' => $report,
+                'options' => $this->decompilePayload($report),
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
@@ -304,6 +305,88 @@ class Controller extends ConfigController
         $this->reportMapper->save($report);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+    }
+
+
+    /**
+     * Break open the options payload
+     * because selectizes need pieces of this
+     *
+     * @param Model $report
+     * @return array
+     */
+    public function decompilePayload(Model $report): array
+    {
+        $options = [];
+        $optionPayload = json_decode($report->getOptions(), true);
+
+        /* Squish out the Terms
+         */
+        $terms = $this->termMapper->findByColumn('id', explode(',', $optionPayload['terms']));
+
+        foreach ($terms as $term) {
+            $options['terms'][] = [
+                'id'   => $term->getId(),
+                'name' => $term->getTitle(),
+            ];
+        }
+
+        /* Squish out the Year Levels
+         */
+        $yearLevels = $this->yearLevelMapper->findByColumn('id', explode(',', $optionPayload['yearLevels']));
+
+        foreach ($yearLevels as $yearLevel) {
+            $options['yearLevels'][] = [
+                'id'   => $yearLevel->getId(),
+                'name' => $yearLevel->getName(),
+            ];
+        }
+
+        /* Squish out the Campuses
+         */
+        $campuses = $this->campusMapper->findByColumn('id', explode(',', $optionPayload['campuses']));
+
+        foreach ($campuses as $campus) {
+            $options['campuses'][] = [
+                'id'   => $campus->getId(),
+                'name' => $campus->getName(),
+            ];
+        }
+
+        /* Squish out the Students
+         */
+        $students = $this->userMapper->findByColumn('id', explode(',', $optionPayload['students']));
+
+        foreach ($students as $student) {
+            $options['students'][] = [
+                'id'   => $student->getId(),
+                'name' => $student->getFullName(),
+            ];
+        }
+
+        /* Summary Work Types
+         */
+        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['summary']['workType']);
+
+        foreach ($summaryWorkTypes as $summaryWorkType) {
+            $options['summary']['workType'][] = [
+                'id'   => $summaryWorkType->getId(),
+                'name' => $summaryWorkType->getName(),
+            ];
+        }
+
+        /* Class Work Types
+         */
+        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['class']['workType']);
+
+        foreach ($classWorkTypes as $classWorkType) {
+            $options['class']['workType'][] = [
+                'id'   => $classWorkType->getId(),
+                'name' => $classWorkType->getName(),
+            ];
+        }
+
+        return $options;
     }
 
 

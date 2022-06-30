@@ -1,7 +1,11 @@
 {##
  # Create/Update a Summative Report
  #
+ # @param string $pageCurrent         url to the current page
+ # @param array allBreadcrumbs        A set of breadcrumbs
  # @param ReportExport\Model $report  A of ReportExport/Model instance
+ # @param array $options              A structure containing report options
+ # @param Zone $logoZone              An attachzone for uploading images
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
@@ -13,31 +17,9 @@
             targetElements: $('#report-introduction')
         });
 
-        $('#report-summary-work-types, #report-class-work-types').selectizeSelector({
-            multiple: true,
-            selectize: {
-                create: false,
-                placeholder: 'Search work types',
-                preload: true,
-                persist: true,
-                hideSelected: true,
-                load: function (query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {query: query}
-                    }).done(function (result) {
-                        callback(result)
-                    }).fail(function () {
-                        callback()
-                    })
-                }
-            },
-        });
-
         $('#report-terms').selectizeSelector({
             multiple: true,
+            value: {{ options.terms|json_encode|raw }},
             selectize: {
                 create: false,
                 placeholder: 'Search {{ locale.term.plural }}',
@@ -61,6 +43,7 @@
 
         $('#report-year-levels').selectizeSelector({
             multiple: true,
+            value: {{ options.yearLevels|json_encode|raw }},
             selectize: {
                 create: false,
                 placeholder: 'Search year levels',
@@ -84,6 +67,7 @@
 
         $('#report-campuses').selectizeSelector({
             multiple: true,
+            value: {{ options.campuses|json_encode|raw }},
             selectize: {
                 create: false,
                 placeholder: 'Search campuses',
@@ -107,6 +91,7 @@
 
         $('#report-students').selectizeSelector({
             multiple: true,
+            value: {{ options.students|json_encode|raw }},
             ajax: {
                 url: '/ajax/user.php',
                 type: 'GET',
@@ -114,6 +99,54 @@
                     roleTypeID: 'student',
                 },
                 dataType: 'json'
+            },
+        });
+
+        $('#report-summary-work-types').selectizeSelector({
+            multiple: true,
+            value: {{ options.summary.workType|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search work types',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        $('#report-class-work-types').selectizeSelector({
+            multiple: true,
+            value: {{ options.class.workType|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search work types',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
             },
         });
     });
@@ -157,7 +190,7 @@
 
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="report-academic-periods">Academic Periods</label>
+                            <label for="report-report-terms">Academic Periods</label>
                             <input type="text" id="report-terms" name="terms" />
                         </div>
                     </fieldset>
