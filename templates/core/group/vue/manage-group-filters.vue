@@ -4,70 +4,94 @@
  * So we can easily filter group members by access type
  */
 
-import { ref, onMounted, nextTick } from 'vue';
-import { EventBus } from 'v-tables-3-select-rows';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import FilterEvents from './manageGroupFilterEvents';
 
 
-onMounted(() => {
-    initResetFiltersListener();
+const props = defineProps({
+    /**
+     * the endpoint to retrieve all the group data from
+     */
+    selectedFilters: {
+        type: Array,
+        required: true,
+    },
 });
+
+const emit = defineEmits(['on-filter-change']);
+
+// onMounted(() => {
+//     initResetFiltersListener();
+// });
       
-const isShowReadAccessChecked = ref(true);      
-const isShowWriteAccessChecked = ref(true);
-const isShowAdminAccessChecked = ref(true);
+const isShowReadAccessChecked = computed(() => {
+    return props.selectedFilters.includes('read');
+});
+
+const isShowWriteAccessChecked = computed(() => {
+    return props.selectedFilters.includes('write');
+});
+
+const isShowAdminAccessChecked = computed(() => {
+    return props.selectedFilters.includes('admin');
+});
 
 /**
  * Reset all the filters back to there base level
  */
-function initResetFiltersListener () {
-    document.addEventListener(FilterEvents.RESET_FILTERS, () => {
-        isShowReadAccessChecked.value = true;
-        isShowWriteAccessChecked.value = true;
-        isShowAdminAccessChecked.value = true;
-        onShowReadAccessChange();
-        onShowWriteAccessChange();
-        onShowAdminAccessChange();
-    });
+// function initResetFiltersListener () {
+//     document.addEventListener(FilterEvents.RESET_FILTERS, () => {
+//         onShowReadAccessChange();
+//         onShowWriteAccessChange();
+//         onShowAdminAccessChange();
+//     });
+// }
+
+/**
+ * 
+ */
+function onFilterChange (accessType) {
+    emit('on-filter-change', accessType); //picked up by view-all-files.vue 
 }
+
 
 /**
  * Toggle the display of members that are read acccess
  * If it's checked, it's shown, so there's no filter applied, otherwise any 
  * rows with access 'read' will be hidden
  */
-async function onShowReadAccessChange () {
-    const filterParam = isShowReadAccessChecked.value ? 'read' : ''; 
-    console.warn(filterParam);
-    EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_READ_ACCESS}`, filterParam); //picked up by manage-group.vue 
-    await nextTick();
-    document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_READ_ACCESS)); //picked up by manage-group.vue 
-    isShowReadAccessChecked.value = !isShowReadAccessChecked.value;
-}
+// async function onShowReadAccessChange () {
+//     const filterParam = isShowReadAccessChecked.value ? 'read' : ''; 
+//     console.warn(filterParam);
+//     EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_READ_ACCESS}`, filterParam); //picked up by manage-group.vue 
+//     await nextTick();
+//     document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_READ_ACCESS)); //picked up by manage-group.vue 
+//     isShowReadAccessChecked.value = !isShowReadAccessChecked.value;
+// }
 
 /**
  * Toggle the display of members that are marked as write access
  * If it's checked, it's shown, so there's no filter applied, otherwise any 
  * rows with access 'write' will be hidden
  */
-async function onShowWriteAccessChange () {
-    const filterParam = isShowWriteAccessChecked ? '' : 'write'; 
-    EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_WRITE_ACCESS}`, filterParam); //picked up by manage-group.vue 
-    await nextTick();
-    document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_WRITE_ACCESS)); //picked up by manage-group.vue 
-}
+// async function onShowWriteAccessChange () {
+//     const filterParam = isShowWriteAccessChecked ? '' : 'write'; 
+//     EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_WRITE_ACCESS}`, filterParam); //picked up by manage-group.vue 
+//     await nextTick();
+//     document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_WRITE_ACCESS)); //picked up by manage-group.vue 
+// }
 
 /**
  * Toggle the display of members that are admin access
  * If it's checked, it's shown, so there's no filter applied, otherwise any 
  * rows with access 'admin' will be hidden
  */
-async function onShowAdminAccessChange () {
-    const filterParam = isShowAdminAccessChecked ? '' : 'admin'; 
-    EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_ADMIN_ACCESS}`, filterParam); //picked up by manage-group.vue 
-    await nextTick();
-    document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_ADMIN_ACCESS)); //picked up by manage-group.vue 
-}
+// async function onShowAdminAccessChange () {
+//     const filterParam = isShowAdminAccessChecked ? '' : 'admin'; 
+//     EventBus.emit(`vue-tables.filter::${FilterEvents.SHOW_ADMIN_ACCESS}`, filterParam); //picked up by manage-group.vue 
+//     await nextTick();
+//     document.dispatchEvent(new CustomEvent(FilterEvents.SHOW_ADMIN_ACCESS)); //picked up by manage-group.vue 
+// }
 
 </script>
 
@@ -78,15 +102,15 @@ async function onShowAdminAccessChange () {
                 <label>Access</label>
                 <ul class="option-list">
                     <li>
-                        <input type="checkbox" id="read-access" :checked="isShowReadAccessChecked" @change="onShowReadAccessChange()">
+                        <input type="checkbox" id="read-access" :checked="isShowReadAccessChecked" @change="onFilterChange('read')">
                         <label for="read-access">Read</label>
                     </li>
                     <li>
-                        <input type="checkbox" id="write-access" v-model="isShowWriteAccessChecked" @change="onShowWriteAccessChange()">
+                        <input type="checkbox" id="write-access" :checked="isShowWriteAccessChecked" @change="onFilterChange('write')">
                         <label for="write-access">Write</label>
                     </li>
                     <li>
-                        <input type="checkbox" id="admin-access" v-model="isShowAdminAccessChecked" @change="onShowAdminAccessChange()">
+                        <input type="checkbox" id="admin-access" :checked="isShowAdminAccessChecked" @change="onFilterChange('admin')">
                         <label for="admin-access">Admin</label>
                     </li>
                 </ul>

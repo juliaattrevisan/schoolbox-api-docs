@@ -5,6 +5,7 @@
  */
 
 import { ref, computed, onMounted  } from 'vue';
+import { EventBus } from 'v-tables-3-select-rows';
 import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupFilters from './manage-group-filters.vue';
@@ -24,9 +25,9 @@ const props = defineProps({
     },
 });
 
-// onMounted(() => {
-//     $(document).foundation(); //to enable the Foundation features such as the drop down in -header and tabs in -add-members
-// });
+onMounted(() => {
+    $(document).foundation(); //to enable the Foundation features such as the drop down in -header and tabs in -add-members
+});
 
 
 /*****************************************************************
@@ -159,29 +160,70 @@ function onMemberAccessChange (row) {
  * 
  ****************************************************************/
 
-onMounted(() => {
-    initFilterListeners();
-});
+const selectedFilters = ref(['read', 'write', 'admin']);
+
+/**
+ * Add/remove from selectedFilters and fire an event for the table
+ *
+ * @param { String }
+ */
+function onFilterChange (accessType) {
+    updateSelectedFilters(accessType);
+    dispatchFilterEvent(accessType);
+}
+
+/**
+ * Add/remove from selectedFilters
+ *
+ * @param { String }
+ */
+function updateSelectedFilters (accessType) {
+    if (selectedFilters.value.includes(accessType)) {
+        selectedFilters.value = selectedFilters.value.filter((filterType) => filterType !== accessType);
+    } else {
+        selectedFilters.value = [...selectedFilters.value, accessType];
+    }
+}
+
+/**
+ * Modify what's displayed in the table, showing or hiding a filter type
+ * depending on whether it's in the selected filters
+ *
+ * @param { String }
+ */
+function dispatchFilterEvent (accessType) {
+    const filterParam = selectedFilters.value.includes(accessType) ? '' : accessType ;
+    const filterEventsType = {
+        'read': FilterEvents.SHOW_READ_ACCESS,
+        'write': FilterEvents.SHOW_WRITE_ACCESS,
+        'admin': FilterEvents.SHOW_ADMIN_ACCESS,
+    };
+    EventBus.emit(`vue-tables.filter::${filterEventsType[accessType]}`, filterParam);
+}
+
+// onMounted(() => {
+//     initFilterListeners();
+// });
 
 /**
  * So we can ensure that rows that are removed through filters are also removed from the selected rows
  */
-function initFilterListeners () {
-    document.addEventListener(FilterEvents.SHOW_READ_ACCESS, () => onFilterChanged());
-    document.addEventListener(FilterEvents.SHOW_WRITE_ACCESS, () => onFilterChanged());
-    document.addEventListener(FilterEvents.SHOW_ADMIN_ACCESS, () => onFilterChanged());
-}
+// function initFilterListeners () {
+//     document.addEventListener(FilterEvents.SHOW_READ_ACCESS, () => onFilterChanged());
+//     document.addEventListener(FilterEvents.SHOW_WRITE_ACCESS, () => onFilterChanged());
+//     document.addEventListener(FilterEvents.SHOW_ADMIN_ACCESS, () => onFilterChanged());
+// }
 
 /**
  * Pull any rows that are no longer visible out of the selected rows
  */
-function onFilterChanged () {
+// function onFilterChanged () {
     // const filteredRowsIds = this.$refs.table.allFilteredData.map((filteredRow) => filteredRow.id); //is the currently visible list of rows, mapped to just the ids
     // const selectedRowsIds = this.selectedRows.map((selectedRow) => selectedRow.id);
     // const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
     // this.$refs.table.unselectRows(rowsToUnselect);
     // this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
-}
+// }
 
 </script>
 
@@ -199,7 +241,10 @@ function onFilterChanged () {
                 @loaded="onLoaded"
             >
                 <template #beforeTable>
-                    <manage-group-filters />
+                    <manage-group-filters 
+                        :selected-filters="selectedFilters"
+                        @on-filter-change="onFilterChange"
+                    />
                 </template>
                 <template #access="props">
                     <!-- <nav class="edit">
