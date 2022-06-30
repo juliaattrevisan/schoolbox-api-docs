@@ -333,7 +333,7 @@ class Controller extends Base
      */
     private function authenticateViaJwt(string $jwt): User
     {
-        $user = $this->jwtParser->determineUserFromJwt($jwt);
+        $user = $this->jwtParser->determineUser($jwt);
         $this->auth->createSession($user->getUsername());
         return $user;
 

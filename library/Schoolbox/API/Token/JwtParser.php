@@ -34,6 +34,18 @@ class JwtParser
     }
 
     /**
+     * Does this parser accept this JWT?
+     *
+     * @param string $jwt
+     * @return bool
+     */
+    public function accepts(string $jwt): bool
+    {
+        $claims = $this->tokenBuilder->decodeWithoutVerification($jwt);
+        return $this->parser->accepts($claims);
+    }
+
+    /**
      * Determine a user from a JWT.
      *
      * @param string $jwt
@@ -44,10 +56,10 @@ class JwtParser
      * @throws UnexpectedValueException             if something else went wrong when decoding the JWT
      * @throws Exception\NotFound                   if the JWT is valid, but identifies a user which does not exist
      */
-    public function determineUserFromJwt(string $jwt): User
+    public function determineUser(string $jwt): User
     {
         // Need to know what's in the JWT first,
-        // before attempting to determine a user
+        // before attempting to determine a user.
         $claims = $this->tokenBuilder->decodeWithoutVerification($jwt);
         return $this->parser->determineUser($jwt, $claims);
     }

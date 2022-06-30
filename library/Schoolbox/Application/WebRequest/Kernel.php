@@ -617,15 +617,17 @@ class Kernel extends WebKernelAbstract
      */
     private function extractUserFromAuthHeader(?string $authHeader): ?User
     {
-        $user = null;
         if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
 
             /** @var JwtParser $tokenParser */
             $tokenParser = $this->get('user.tokenParser');
-            return $tokenParser->determineUserFromJwt($token);
+
+            if ($tokenParser->accepts($token)) {
+                return $tokenParser->determineUser($token);
+            }
         }
-        return $user;
+        return null;
     }
 
     /**

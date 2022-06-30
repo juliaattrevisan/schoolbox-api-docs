@@ -213,7 +213,7 @@ class Controller extends Base
             );
         }
 
-        $user = $this->jwtParser->determineUserFromJwt($jwt);
+        $user = $this->jwtParser->determineUser($jwt);
         $this->auth->createSession($user->getUsername());
     }
 
