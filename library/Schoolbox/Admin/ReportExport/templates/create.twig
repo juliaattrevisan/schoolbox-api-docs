@@ -104,6 +104,18 @@
                 }
             },
         });
+
+        $('#report-students').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {
+                    roleTypeID: 'student',
+                },
+                dataType: 'json'
+            },
+        });
     });
 </script>
 
@@ -145,17 +157,17 @@
                     </fieldset>
 
                     <fieldset class="content">
-                        <div class="small-12 large-4 columns">
+                        <div class="small-12 large-6 columns">
                             <label for="report-year-levels">Year Levels</label>
                             <input type="text" id="report-year-levels" name="yearLevels" />
                         </div>
-                        <div class="small-12 large-4 columns">
+                        <div class="small-12 large-6 columns">
                             <label for="report-campuses">Campuses</label>
                             <input type="text" id="report-campuses" name="campuses" />
                         </div>
-                        <div class="small-12 large-4 columns">
+                        <div class="small-12 columns">
                             <label for="report-students">Students</label>
-                            <input type="text" />
+                            <input type="text" id="report-students" name="students" />
                         </div>
                     </fieldset>
                 </section>
