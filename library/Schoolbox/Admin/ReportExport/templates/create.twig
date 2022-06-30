@@ -2,13 +2,38 @@
  # Create/Update a Summative Report
  #
  # @param ReportExport\Model $report  A of ReportExport/Model instance
-#}
+ #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
         $.fn.alaressEditor({
             targetElements: $('#report-introduction')
+        });
+
+        $('#report-summary-work-types, #report-class-work-types').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                placeholder: 'Search work types',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
         });
     });
 </script>
@@ -64,30 +89,126 @@
                             <input type="text" />
                         </div>
                     </fieldset>
+                </section>
 
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Summary Page</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <span class="switch inline" data-ruleset-enabled="">
+                            <input type="hidden" name="summary[active]" value="0" />
+
+                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" />
+                            <label for="report-include-summary">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </nav>
+                </div>
+
+                <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="report-include-summary-page" class="checkbox-label">Include Summary Pages</label>
-                            <div class="switch">
-                                <input id="report-include-summary-page" type="checkbox">
-                                <label for="report-include-summary-page">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
+                            <label for="report-summary-heading">Heading</label>
+                            <input type="text" name="summary[heading]" />
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-summary-work-types">Work types</label>
+                            <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
+                        </div>
+
+                        <legend>Assessment Options</legend>
+
+                        <div class="small-12 columns">
+                            <input name="summary[showOverallGrade]" type="hidden" value="0" />
+                            <input id="report-summary-show-overall-grade" name="summary[showOverallGrade]" type="checkbox" value="1" />
+                            <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="summary[showComments]" type="hidden" value="0" />
+                            <input id="report-summary-show-comments" name="summary[showComments]" type="checkbox" value="1" />
+                            <label for="report-summary-show-comments" class="checkbox-label">Show comments</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="summary[showRubrics]" type="hidden" value="0" />
+                            <input id="report-summary-show-rubrics" name="summary[showRubrics]" type="checkbox" value="1" />
+                            <label for="report-summary-show-rubrics" class="checkbox-label">Show rubrics</label>
                         </div>
                     </fieldset>
+                </section>
 
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Class Page</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <span class="switch inline" data-ruleset-enabled="">
+                            <input type="hidden" name="class[active]" value="0" />
+
+                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" />
+                            <label for="report-include-class">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </nav>
+                </div>
+
+                <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="report-include-class-page" class="checkbox-label">Include Class Pages</label>
-                            <div class="switch">
-                                <input id="report-include-class-page" type="checkbox">
-                                <label for="report-include-class-page">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
+                            <label for="report-class-work-types">Work types</label>
+                            <select id="report-class-work-types" name="class[workType][]" multiple></select>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[showOverallGrade]" type="hidden" value="0" />
+                            <input id="report-class-show-overall-grade" name="class[showOverallGrade]" type="checkbox" value="1" />
+                            <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[showLearningLevels]" type="hidden" value="0" />
+                            <input id="report-class-show-learning-levels" name="class[showLearningLevels]" type="checkbox" value="1" />
+                            <label for="report-class-show-learning-levels" class="checkbox-label">Show learning levels</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[showCohort]" type="hidden" value="0" />
+                            <input id="report-class-show-cohort" name="class[showLearningLevels]" type="checkbox" value="1" />
+                            <label for="report-class-show-learning-levels" class="checkbox-label">Show cohort/class results</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[showCapabilityGrades]" type="hidden" value="0" />
+                            <input id="report-class-show-capability-grades" name="class[showCapabilityGrades]" type="checkbox" value="1" />
+                            <label for="report-class-show-capability-grades" class="checkbox-label">Show capability grades results</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[showProgression]" type="hidden" value="0" />
+                            <input id="report-class-show-progression" name="class[showProgression]" type="checkbox" value="1" />
+                            <label for="report-class-show-progression" class="checkbox-label">Show progression</label>
+                        </div>
+
+                        <legend>Assessment Options</legend>
+
+                        <div class="small-12 columns">
+                            <input name="class[showComments]" type="hidden" value="0" />
+                            <input id="report-class-show-comments" name="class[showComments]" type="checkbox" value="1" />
+                            <label for="report-class-show-comments" class="checkbox-label">Show comments</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="class[showRubrics]" type="hidden" value="0" />
+                            <input id="report-class-show-rubrics" name="class[showRubrics]" type="checkbox" value="1" />
+                            <label for="report-class-show-rubrics" class="checkbox-label">Show rubrics</label>
                         </div>
                     </fieldset>
                 </section>
