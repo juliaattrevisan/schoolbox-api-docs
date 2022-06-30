@@ -16,6 +16,7 @@ use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -517,7 +518,10 @@ class CommandLineTool extends App
         $document = DocumentFactory::makeFromString($filename, Scrub::htmlAbsoluteUri($input, $this->baseUri));
         $request  = new HTMLRequest($document);
         $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
-        $request->addWebhookURLHTTPHeader('SBAuth', $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+        $request->addWebhookURLHTTPHeader(
+            RequestFactory::AUTH_HTTP_HEADER,
+            $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+        );
 
         /** @var GotenbergClientInterface $gotenberg */
         $gotenberg = $this->getDi()->get('pdfGenerator');
