@@ -248,7 +248,10 @@ class Controller extends ConfigController
             'template' => '@adminReportExport/create.twig',
             'data' => [
                 'pageCurrent' => $this->router->generate('adminReportExport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                    [['Modify', null]]
+                ),
                 'report' => $report,
                 'options' => $this->decompilePayload($report),
                 'logoZone' => $logoZone->getTwigContext()
