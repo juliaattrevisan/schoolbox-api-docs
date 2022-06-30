@@ -23,28 +23,14 @@ use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
 use Schoolbox\User;
-use Schoolbox\User\Token\Mapper as TokenMapper;
-use Schoolbox\UserMapper;
 use Laminas\Uri\Uri;
 
 class Controller extends Base
 {
     /**
-     * Default session length, in seconds: used as the default leeway for the
-     * JWT verifier.
-     */
-    private const SESSION_LENGTH_DEFAULT = 1800;
-
-    /**
      * Authenticator, for creating a user session.
      */
     private Authenticator $auth;
-
-    /**
-     * User mapper, for finding the user to create a session for (once the
-     * username has been extracted from a provided JWT).
-     */
-    private UserMapper $userMapper;
 
     /**
      * Registry mapper, for performing CRUD actions on a registration for a
@@ -59,11 +45,6 @@ class Controller extends Base
     private ServiceMapper $serviceMapper;
 
     /**
-     * For validating JWT ID
-     */
-    private TokenMapper $tokenMapper;
-
-    /**
      * JWT parser, for validating and identifying a user in a token generated
      * by any of:
      * * this instance
@@ -76,25 +57,19 @@ class Controller extends Base
      * Constructor
      *
      * @param Authenticator  $auth
-     * @param UserMapper     $userMapper
      * @param RegistryMapper $registryMapper
      * @param ServiceMapper  $serviceMapper
-     * @param TokenMapper    $tokenMapper
      * @param JwtParser      $jwtParser
      */
     public function __construct(
         Authenticator $auth,
-        UserMapper $userMapper,
         RegistryMapper $registryMapper,
         ServiceMapper $serviceMapper,
-        TokenMapper $tokenMapper,
         JwtParser $jwtParser
     ) {
         $this->auth           = $auth;
-        $this->userMapper     = $userMapper;
         $this->registryMapper = $registryMapper;
         $this->serviceMapper  = $serviceMapper;
-        $this->tokenMapper    = $tokenMapper;
         $this->jwtParser      = $jwtParser;
     }
 

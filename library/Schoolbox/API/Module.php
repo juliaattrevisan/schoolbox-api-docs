@@ -38,10 +38,8 @@ class Module extends BaseModule
     {
         return new Controller(
             new Authenticator(),
-            $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RegistryMapper::class),
             $this->getMapperFactory()->get(ServiceMapper::class),
-            $this->getMapperFactory()->get(TokenMapper::class),
             $this->injector->get('user.jwtParser'),
         );
     }

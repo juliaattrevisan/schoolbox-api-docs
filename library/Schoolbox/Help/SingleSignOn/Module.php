@@ -42,8 +42,6 @@ class Module extends BaseModule
             $this->injector->get('user.tokenBuilder'),
             $this->injector->get('user.jwtParser'),
             new Authenticator(),
-            $this->getMapperFactory()->get(UserMapper::class),
-            $this->getMapperFactory()->get(InstanceRegistryMapper::class),
         );
     }
 }
