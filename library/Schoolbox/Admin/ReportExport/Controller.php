@@ -239,6 +239,28 @@ class Controller extends ConfigController
 
 
     /**
+     * Get terms (academic periods) for selectize
+     *
+     * @return void
+     * @api GET /adminv2/report-export/terms
+     */
+    public function getTerms(): void
+    {
+        $output = [];
+        $terms  = $this->termMapper->findAll();
+
+        foreach ($terms as $term) {
+            $output[] = [
+                'id'   => $term->getId(),
+                'name' => $term->getTitle(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+
+    /**
      * Get work types for selectize
      * @return void
      * @api GET /adminv2/report-export/worktypes
@@ -452,23 +474,7 @@ class Controller extends ConfigController
         );
     }
 
-    /**
-     * Get terms for selectize
-     * @return void
-     * @api GET /adminv2/report-export/getTerms
-     */
-    public function getTerms(): void
-    {
-        $output = [];
-        $terms  = $this->termMapper->findAll();
-        foreach ($terms as $term) {
-            $output[] = [
-                'id'   => $term->getId(),
-                'name' => $term->getTitle(),
-            ];
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($output));
-    }
+
 
     /**
      * Get year levels for selectize

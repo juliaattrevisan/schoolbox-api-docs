@@ -35,6 +35,29 @@
                 }
             },
         });
+
+        $('#report-terms').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: false,
+                placeholder: 'Search {{ locale.term.plural }}',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminReportExport.getTerms') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
     });
 </script>
 
@@ -71,7 +94,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-academic-periods">Academic Periods</label>
-                            <input type="text" />
+                            <input type="text" id="report-terms" name="terms" />
                         </div>
                     </fieldset>
 
