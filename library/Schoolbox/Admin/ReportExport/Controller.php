@@ -183,7 +183,7 @@ class Controller extends ConfigController
      */
     public function getCreate(): void
     {
-        /* Feature image
+        /* Logo image
          */
         $logoZone = (new Zone('logo'))
             ->setMulti(false)
@@ -203,17 +203,34 @@ class Controller extends ConfigController
         ]);
     }
 
+
+    /**
+     * Create a new summative report
+     *
+     * @return void
+     * @throws MapperException
+     * @throws \DebugBar\DebugBarException
+     * @api POST /report-export/create
+     */
+    public function postCreate(): void
+    {
+        $report = $this->reportMapper->createModel();
+
+        $this->postUpdate($report);
+    }
+
+
     /**
      * The form you use to update a report
      *
      * @param Model $report
      * @return void
-     * @throws \DebugBar\DebugBarException
+     * @throws RouteNotFound
      * @api GET /adminv2/report-export/{reportId}/update
      */
     public function getUpdate(Model $report): void
     {
-        /* Feature image
+        /* Logo image
          */
         $logoZone = (new Zone('logo'))
             ->setMulti(false)
@@ -235,6 +252,22 @@ class Controller extends ConfigController
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
+    }
+
+
+    /**
+     * Persist the report's contents to the db
+     *
+     * @param Model $report
+     * @return void
+     * @throws \DebugBar\DebugBarException
+     * @api POST /report-export/{reportId}/update
+     */
+    public function postUpdate(Model $report): void
+    {
+        $data = $this->getRequest()->post->getArrayCopy();
+
+        new \Alaress_Probe($data);
     }
 
 

@@ -127,8 +127,14 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
+    {% if report and report.id %}
+        {% set formAction = routeLookupIfAuthorized('adminReportExport.postUpdate', {report: report, reportId: report.id}) %}
+    {% else %}
+        {% set formAction = routeLookupIfAuthorized('adminReportExport.postCreate') %}
+    {% endif %}
+
     <div class="admin-content">
-        <form>
+        <form action="{{ formAction }}" method="post">
             <div class="small-12 island">
                 <section>
                     <fieldset class="content">
@@ -296,6 +302,8 @@
                     </fieldset>
                 </section>
             </div>
+
+            <input type="submit" value="Save" />
         </form>
     </div>
 </div>
