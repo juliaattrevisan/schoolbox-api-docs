@@ -90,9 +90,6 @@ class Controller extends ConfigController
 
     private RoleMapper $roleMapper;
 
-    private Jwt $tokenBuilder;
-
-
     /**
      * Constructor
      *
@@ -107,7 +104,6 @@ class Controller extends ConfigController
      * @param Access                $access
      * @param UserBulkMapper        $userBulkMapper
      * @param RoleMapper            $roleMapper
-     * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      * @param Rebuilder             $rebuilder
@@ -124,7 +120,6 @@ class Controller extends ConfigController
         Access $access,
         UserBulkMapper $userBulkMapper,
         RoleMapper $roleMapper,
-        Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder
@@ -138,7 +133,6 @@ class Controller extends ConfigController
         $this->folderMapper          = $folderMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
-        $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
         $this->roleMapper            = $roleMapper;
