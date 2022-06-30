@@ -92,15 +92,16 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser()
-                /* Presumably this will one day include a special subset of stuff
-                 * whose duty will be to manufacture these reports. This staff
-                 * member(s) might not be superusers, nor teachers; their ability
-                 * to be here wil be based on a Service Permission that might
-                 * not currently exist
-                 */
-                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
             )
         );
+
+        /* Presumably this will one day include a special subset of stuff
+         * whose duty will be to manufacture these reports. This staff
+         * member(s) might not be superusers, nor teachers; their ability
+         * to be here wil be based on a Service Permission that might
+         * not currently exist
+         */
+        //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
 
         $preloadReport = function ($params) {
             return $this->preloadReport($params);
