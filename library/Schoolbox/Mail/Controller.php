@@ -13,6 +13,7 @@ use Alaress\Html\ToText as Html2Text;
 use Alaress\Web\Controller\Base;
 use Alaress\Mail\Mailer;
 use Alaress\Mail\Codec;
+use Aura\Web\Request\Values;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -21,6 +22,8 @@ use Schoolbox\UserMapper;
 use Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * Class Controller
@@ -52,8 +55,11 @@ class Controller extends Base
     }
 
     /**
-     * www/mail/createMail.php
+     * Display email form populated with requested parameters
+     *
      * @return void
+     * @since 22.1
+     * @api   GET /mail/create
      */
     public function getCreateMail()
     {
@@ -61,15 +67,24 @@ class Controller extends Base
     }
 
     /**
-     * www/mail/createMail.php
+     * Display email form populated with posted data
+     *
      * @return void
+     * @since 22.1
+     * @api   POST /mail/create
      */
     public function postCreateMail()
     {
         $this->createMail($this->request->post);
     }
 
-    private function createMail($params)
+    /**
+     * www/mail/createMail.php
+     *
+     * @param Values $params
+     * @return void
+     */
+    private function createMail(Values $params)
     {
         // Parse out list of emails passed
         // The name needs to be included in both the ID and value
@@ -230,9 +245,13 @@ class Controller extends Base
     }
 
     /**
+     * Send out email
      * www/mail/send.php
      * @return void
      * @throws \Alaress\Web\Controller\Exception
+     * @throws \League\Flysystem\FilesystemException
+     * @api   POST /mail/send
+     * @since 22.1
      */
     public function send()
     {
@@ -328,19 +347,25 @@ class Controller extends Base
         return $emailAddresses[Mailer::KEY_VALID] ?? [];
     }
 
+    /**
+     * @return string
+     */
     private function getDefaultHost(): string
     {
         return trim($this->getConfigLoader()->get('site_hostname')) . '.' . trim($this->getConfigLoader()->get('site_domain'));
     }
 
     /**
+     * Display feedback form
      * www/emailForm.php
      * @return void
      * @throws TransportExceptionInterface
      * @throws \Alaress\Web\Controller\Exception
      * @throws \GuzzleHttp\Exception\GuzzleException
+     * @since 22.1
+     * @api   POST /mail/feedback
      */
-    public function emailForm()
+    public function postFeedback()
     {
         /* This form used to be for generic emails, now only used for the feedback form
            It requires the following variables;
@@ -361,20 +386,25 @@ class Controller extends Base
             $this->sendError("The Human Checker (reCAPTCHA) failed.");
         }
 
-        $name = $this->getUser()->getFullName();
+        $name    = $this->getUser()->getFullName();
+        $email   = $this->request->post->get('email');
+        $replyTo = null;
+        if ($email) {
+            try {
+                $replyTo = new Address($email, $name);
+            } catch (RfcComplianceException | LogicException $e) {
+                // noop
+            }
+        }
 
-        if ($this->validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
-            foreach ($_POST as $key => $var) {
+        if ($replyTo && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $this->request->post->get('template'))) {
+            foreach ($this->request->post->getArrayCopy() as $key => $var) {
                 if (!$this->checkSpamHeaders($var)) {
                     $this->getResponse()->redirect->to('/');
                 }
-
                 $key = strtoupper($key);
-                if (is_array($var)) {
-                    $context[$key] = implode(Mailer::implodeGlue(), $var);
-                } else {
-                    $context[$key] = $var;
-                }
+
+                $context[$key] = $var;
             }
 
             $context['NAME']            = $name;
@@ -383,7 +413,7 @@ class Controller extends Base
             $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
             $to      = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
             $email   = $this->emailFactory->buildTwigEmail('feedback.twig', $subject, $to);
-            $email->setReplyTo($_POST['email'], $name);
+            $email->setReplyTo($replyTo->getAddress(), $replyTo->getName());
             $email->setContext($context);
             $email->send();
             /*  if($_POST['receipt']) {
@@ -402,7 +432,11 @@ class Controller extends Base
         }
     }
 
-    private function checkSpamHeaders($text)
+    /**
+     * @param string $text
+     * @return bool
+     */
+    private function checkSpamHeaders(string $text): bool
     {
         //checks for common spammer injected headers
         if (stristr($text, 'Content-Type:') !== false) {
@@ -416,29 +450,5 @@ class Controller extends Base
         }
 
         return true;
-    }
-
-
-    private function validateEmailAddress($email)
-    {
-        //check from contains valid email
-        if (!preg_match('/^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$/', $email)) {
-            return false;
-        }
-
-        //do domain lookup
-        [$alias, $domain] = explode('@', $email);
-
-        //this prevents appending of localhost to lookup
-        $domain = $domain . '.';
-
-        //check for mx records or that it resolves
-        if (getmxrr($domain, $temp)) {
-            return true;
-        } elseif (checkdnsrr($domain, 'ANY')) {
-            return true;
-        } else {
-            return false;
-        }
     }
 }
