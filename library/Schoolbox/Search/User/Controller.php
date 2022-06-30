@@ -49,7 +49,6 @@ use Twig\Environment;
  */
 class Controller extends BaseController
 {
-
     /**
      * UserMapper
      */
@@ -499,6 +498,7 @@ class Controller extends BaseController
 
         // Load contact's user IDs
         $contacts = [];
+        $contactList = [];
         if ($student->getExternalId()) {
             $contactList = $this->externalUser->getStudentContactList([$student->getExternalId()]);
             foreach ($contactList as $contact) {
@@ -535,7 +535,7 @@ class Controller extends BaseController
         $student->loadParents();
         $isParentOfStudent = $this->getUser()->isParentOf($student);
         $isPrimaryCarer    = false;
-        if ($isParentOfStudent && isset($contactList)) {
+        if ($isParentOfStudent && !empty($contactList)) {
             // Only the primary parent will see emergency contact information
             if (
                 $contactList[0]['StudentContactID'] == $this->getUser()->getExternalId()
