@@ -62,7 +62,7 @@ function onDisbandSelected () {
             </li>
         </ul>
     </div>
-    <reveal-modal ref="updateSettingsModal">
+    <reveal-modal ref="updateSettingsModal" size="tiny">
         <h2>Update Group Settings</h2>
         <input type="hidden" name="categoryID" value="" />
         <div class="row">
@@ -114,5 +114,9 @@ function onDisbandSelected () {
 </template>
 
 <style scoped>
+
+legend {
+    margin-bottom: 0.5rem;
+}
 
 </style>

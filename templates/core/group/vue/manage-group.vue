@@ -9,6 +9,7 @@ import { EventBus } from 'v-tables-3-select-rows';
 import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupFilters from './manage-group-filters.vue';
+import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import FilterEvents from './manageGroupFilterEvents';
 
@@ -86,6 +87,7 @@ async function loadGroupMembers () {
  * 
  ****************************************************************/
 
+const tableEl = ref(null);
 const tableColumns = ['name', 'access']
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     // columnsClasses: {
@@ -130,7 +132,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
     },
-    sortable: ['name', 'access'], //the access column doesn't need to be sortable
+    sortable: ['name'], //the access column doesn't need to be sortable
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
@@ -171,6 +173,13 @@ function getMemberMeta (row) {
  */
 function onMemberAccessChange (row) {
     console.warn('onMemberAccessChange - ' + row.name);
+}
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected () {
+    location.reload();
 }
 
 
@@ -247,6 +256,99 @@ function dispatchFilterEvent (accessType) {
     // this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
 // }
 
+
+
+/*****************************************************************
+ * 
+ * Select group members
+ * 
+ ****************************************************************/
+
+const selectedMembers = ref([]);
+const isShiftKeySelected = ref(false);
+const hasSelectedShiftKey = ref(false);
+
+onMounted(() => {
+    initShiftKeyDetection();
+});
+
+/**
+ * to hide a UI note informing of shift-selection once pressed once
+ */
+function initShiftKeyDetection () {
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Shift') {
+            isShiftKeySelected.value = true;
+        }
+    });
+    document.addEventListener('keyup', (event) => {
+        if (event.key === 'Shift') {
+            isShiftKeySelected.value = false;
+        }
+    });
+}
+
+/**
+ * to keep track of selected rows
+ * 
+ * @param { Object }
+ */
+function onRowSelected (event) {
+    selectedMembers.value = event;
+    if (selectedMembers.value.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
+        hasSelectedShiftKey.value = true;
+    }
+}
+
+/**
+ * To track how many are selected 
+ *
+ * @returns { Number }
+ */
+const selectedMembersCount = computed(() => {
+    return selectedMembers.value.length;
+});
+
+/**
+ * For proper count display, eg: '1 member' / '4 members'
+ *
+ * @returns { String }
+ */
+const selectedMembersCountWithRowName = computed(() => {
+    if (selectedMembersCount.value === 0) {
+        return `No members`;	
+    } else if (selectedMembersCount.value === 1) {
+        return `${selectedMembersCount.value} member`;	
+    } else {
+        return `${selectedMembersCount.value} members`;	
+    }
+});
+
+/**
+ * To determine whether we can show the approve membership 
+ * button in the bottom drawer
+ *
+ * @returns { Boolean }
+ */
+const areAllSelectedOnWaitingList = computed(() => {
+    return selectedMembers.value.every((member) => member.access === 'waiting');
+});
+
+/**
+ * 
+ */
+function onClearMemberSelection () {
+    selectedMembers.value = [];
+    tableEl.value.resetSelectedRows();
+}
+
+/**
+ * 
+ */
+function onRemoveMembersSelected () {
+    
+}
+
 </script>
 
 <template>
@@ -257,10 +359,12 @@ function dispatchFilterEvent (accessType) {
             <h2 class="subheader">Current Members</h2>
             <v-client-table
                 v-if="hasGroupMembers"
+                ref="tableEl"
                 :data="groupMembers"
                 :columns="tableColumns"
                 :options="tableOptions"
                 @loaded="onLoaded"
+                @select="onRowSelected"
             >
                 <template #beforeTable>
                     <manage-group-filters 
@@ -278,11 +382,7 @@ function dispatchFilterEvent (accessType) {
                     </div>
                 </template>
                 <template #access="props">
-                    <!-- <nav class="edit">
-                        <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view-hollow' : 'icon-view' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
-                        <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
-                    </nav> -->
-                    <button v-if="props.row.access === 'waiting'" title="Approve Membership">Approve Membership</button>
+                    <button v-if="props.row.access === 'waiting'" class="button expand" title="Approve Membership">Approve Membership</button>
                     <select v-else id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
                         <option value="read">Read Access</option>
                         <option value="write">Write Access</option>
@@ -300,7 +400,7 @@ function dispatchFilterEvent (accessType) {
             <div v-else-if="hasLoadError">
                 <section class="content">
                     <div tableData-alert class="alert-box alert">
-                        Sorry, we are currently unable to load the group members. Please contact your support it the problem persists.
+                        Sorry, we are currently unable to load the group members. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again contact and your support it the problem persists.
                     </div>
                 </section>
             </div>
@@ -323,6 +423,19 @@ function dispatchFilterEvent (accessType) {
             </div>
         </div><!-- small-12 island -->
     </div><!-- row  -->
+    <bottom-drawer :showDrawer="selectedMembersCount > 0">
+        <h3 class="selected-count"><em>{{ selectedMembersCountWithRowName }} selected</em></h3>
+        <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple members</span>
+        <button @click.prevent="onClearMemberSelection" class="button-clear">Clear member selection</button>
+        <ul class="flex-list buttons">
+            <li v-if="areAllSelectedOnWaitingList">
+                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-add">Approve Membership</button>
+            </li>
+            <li>
+                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete">Remove {{ selectedMembersCountWithRowName }}</button>
+            </li>
+        </ul>
+    </bottom-drawer>
 </template>
 
 <style lang="scss">
@@ -339,6 +452,31 @@ function dispatchFilterEvent (accessType) {
 
 .VueTables__search-field input {
     margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
+}
+
+.selected-count {
+    margin-right: 1rem;
+}
+
+.button-clear, .button-delete, .selected-count {
+    display: inline-block;
+}
+
+.shift-select-note {
+    color: #9a9a9a;
+    font-size: 13px;
+    font-style: italic;
+    margin-right: 1rem;
+}
+
+.button-clear {
+    background: none;
+    font-size: 0.8rem;
+    padding: 0px;
+    vertical-align: baseline;
+    &:hover {
+        background: none;
+    }
 }
 
 </style>
