@@ -20,7 +20,6 @@ use Alaress\Rules\Token\Tokenizer as Super;
  */
 class Tokenizer extends Super
 {
-
     /**
      * @var string
      */
@@ -49,7 +48,7 @@ class Tokenizer extends Super
             return strlen($input) ? $input[0] : '';
         }));
         $this->addFilter(new Filter('trimfirst', 'Returns everything after the first character', function ($input) {
-            return substr( $input, 1);
+            return substr($input, 1);
         }));
         $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) {
             return preg_replace('`[^a-z]`i', '', $input);
