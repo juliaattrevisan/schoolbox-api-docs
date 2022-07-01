@@ -70,6 +70,36 @@ class Controller extends ConfigController
     private const FOOTER_HTML = '/templates/footer.html';
 
 
+    /**
+     * Report Options has this structure
+     */
+    private const DEFAULT_OPTIONS = [
+        'terms' => [],
+        'yearLevels' => [],
+        'campuses' => [],
+        'students' => [],
+        'summary' => [
+            'active' => 0,
+            'heading' => '',
+            'workType' => [],
+            'showOverallGrade' => 0,
+            'showComments' => 0,
+            'showRubrics' => 0
+        ],
+        'class' => [
+            'active' => 0,
+            'workType' => [],
+            'showOverallGrade' => 0,
+            'showLearningLevels' => 0,
+            'showCohort' => 0,
+            'showCapabilityGrades' => 0,
+            'showProgression' => 0,
+            'showComments' => 0,
+            'showRubrics' => 0
+        ]
+    ];
+
+
     private Mapper $reportMapper;
 
     private UserMapper $userMapper;
@@ -199,6 +229,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $this->router->generate('adminReportExport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
                 'report' => null,
+                'options' => self::DEFAULT_OPTIONS,
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
@@ -317,29 +348,22 @@ class Controller extends ConfigController
      *
      * @param Model $report
      * @return array
+     * @throws \DebugBar\DebugBarException
      */
     public function decompilePayload(Model $report): array
     {
-        $options = [];
         $optionPayload = json_decode($report->getOptions(), true);
 
-        /* Extract the optional summary heading string
-         * Extract the checkbox settings
+        /* Superimpose selected options over the default
+         * Disabling fields prevents the keys from existing
          */
-        $options['summary'] = $optionPayload['summary'];
-
-        /* Extract the optional class checkboxes
-         * Extract the checkbox settings
-         */
-        $options['class'] = $optionPayload['class'];
-
-        /* Clear these stacks (we fill them with selectize tuples)
-         */
-        unset($options['summary']['workType'], $options['class']['workType']);
+        $options = array_replace_recursive(self::DEFAULT_OPTIONS, $optionPayload);
 
         /* Squish out the Terms
          */
         $terms = $this->termMapper->findByColumn('id', explode(',', $optionPayload['terms']));
+
+        $options['terms'] = [];
 
         foreach ($terms as $term) {
             $options['terms'][] = [
@@ -352,6 +376,8 @@ class Controller extends ConfigController
          */
         $yearLevels = $this->yearLevelMapper->findByColumn('id', explode(',', $optionPayload['yearLevels']));
 
+        $options['yearLevels'] = [];
+
         foreach ($yearLevels as $yearLevel) {
             $options['yearLevels'][] = [
                 'id'   => $yearLevel->getId(),
@@ -362,6 +388,8 @@ class Controller extends ConfigController
         /* Squish out the Campuses
          */
         $campuses = $this->campusMapper->findByColumn('id', explode(',', $optionPayload['campuses']));
+
+        $options['campuses'] = [];
 
         foreach ($campuses as $campus) {
             $options['campuses'][] = [
@@ -374,6 +402,8 @@ class Controller extends ConfigController
          */
         $students = $this->userMapper->findByColumn('id', explode(',', $optionPayload['students']));
 
+        $options['students'] = [];
+
         foreach ($students as $student) {
             $options['students'][] = [
                 'id'   => $student->getId(),
@@ -383,7 +413,9 @@ class Controller extends ConfigController
 
         /* Summary Work Types
          */
-        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['summary']['workType']);
+        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['summary']['workType'] ?? []);
+
+        $options['summary']['workType'] = [];
 
         foreach ($summaryWorkTypes as $summaryWorkType) {
             $options['summary']['workType'][] = [
@@ -394,7 +426,9 @@ class Controller extends ConfigController
 
         /* Class Work Types
          */
-        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['class']['workType']);
+        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['class']['workType'] ?? []);
+
+        $options['class']['workType'] = [];
 
         foreach ($classWorkTypes as $classWorkType) {
             $options['class']['workType'][] = [

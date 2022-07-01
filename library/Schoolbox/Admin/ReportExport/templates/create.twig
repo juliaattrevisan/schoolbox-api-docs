@@ -231,7 +231,7 @@
                 </div>
 
                 <section>
-                    <fieldset class="content">
+                    <fieldset class="content" {% if not options.summary.active %}disabled{% endif %}>
                         <div class="small-12 columns">
                             <label for="report-summary-heading">Heading</label>
                             <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
@@ -242,7 +242,7 @@
                             <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
                         </div>
                     </fieldset>
-                    <fieldset class="content">
+                    <fieldset class="content" {% if not options.summary.active %}disabled{% endif %}>
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
@@ -283,10 +283,10 @@
                 </div>
 
                 <section>
-                    <fieldset class="content">
+                    <fieldset class="content" {% if not options.class.active %}disabled{% endif %}>
                         <div class="small-12 columns">
                             <label for="report-class-work-types">Work types</label>
-                            <select id="report-class-work-types" name="class[workType][]" multiple></select>
+                            <select id="report-class-work-types" name="class[workType][]" multiple {% if not options.class.active %}readonly{% endif %}></select>
                         </div>
 
                         <div class="small-12 columns">
@@ -319,7 +319,7 @@
                             <label for="report-class-show-progression" class="checkbox-label">Show progression</label>
                         </div>
                     </fieldset>
-                    <fieldset class="content">
+                    <fieldset class="content" {% if not options.class.active %}disabled{% endif %}>
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
