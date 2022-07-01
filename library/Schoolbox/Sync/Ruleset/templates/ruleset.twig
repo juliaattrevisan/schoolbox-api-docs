@@ -332,6 +332,9 @@ set upsConfig = {
                             <dt class="small-6">first</dt>
                             <dd class="small-6">Returns only the first character</dd>
 
+                            <dt class="small-6">cutfirst</dt>
+                            <dd class="small-6">Returns all after the first character</dd>
+
                             <dt class="small-6">alpha</dt>
                             <dd class="small-6">Strips all non-alpha characters</dd>
 
@@ -353,6 +356,7 @@ set upsConfig = {
                             {:lastname|uc} = ALLEN-SMITH<br />
                             {:lastname|lc} = allen-smith<br />
                             {:lastname|first} = A<br />
+                            {:lastname|cutfirst} = llen-Smith<br />
                             {:lastname|alpha} = AllenSmith<br />
                             {:lastname|alpha|lc} = allensmith<br />
                             <br />
