@@ -39,7 +39,7 @@ class Transformer
             ->setSubmittedBy($model->getSubmittedBy())
             ->setSubmittedOnBehalfOf($model->getOwner())
             ->setCreatedAt($model->getCreatedAt())
-            ->setDeletedAt(new \Alaress_Date_NullDate())
+            ->setDeletedAt($model->getDeletedAt())
             ->setUpdatedAt($model->getUpdatedAt())
             ->setSubmittedAt($model->getSubmittedAt());
 
@@ -76,7 +76,8 @@ class Transformer
             ->setSubmittedBy($domainObject->getSubmittedBy())
             ->setOwner($domainObject->getSubmittedOnBehalfOf())
             ->setCreatedAt($domainObject->getCreatedAt())
-            ->setSubmittedAt($domainObject->getSubmittedAt());
+            ->setSubmittedAt($domainObject->getSubmittedAt())
+            ->setDeletedAt($domainObject->getDeletedAt());
 
         // Files
         if ($domainObject->getAllFiles() !== null) {
