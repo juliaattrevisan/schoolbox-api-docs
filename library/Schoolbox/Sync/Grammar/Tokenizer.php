@@ -47,7 +47,7 @@ class Tokenizer extends Super
         $this->addFilter(new Filter('first', 'Returns only the first character', function ($input) {
             return strlen($input) ? $input[0] : '';
         }));
-        $this->addFilter(new Filter('trimfirst', 'Returns everything after the first character', function ($input) {
+        $this->addFilter(new Filter('cutfirst', 'Returns everything after the first character', function ($input) {
             return substr($input, 1);
         }));
         $this->addFilter(new Filter('alpha', 'Strips all non-alpha characters', function ($input) {
