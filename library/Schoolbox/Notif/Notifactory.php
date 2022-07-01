@@ -10,9 +10,9 @@
 namespace Schoolbox\Notif;
 
 use Alaress\Lumberjack;
+use Alaress\Mail\Mailer;
 use ConfigFallback;
 use Database;
-use Mailer;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -21,7 +21,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class Notifactory
 {
-
     /** @var IConfigLoader */
     protected $conf;
 

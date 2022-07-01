@@ -110,7 +110,10 @@ class Admin extends ModuleLoader
         // Usage Graphs
         $this->loadModule($di, \Schoolbox\Admin\Usage\Module::class, '/adminv2/usage');
 
-        // Usage Graphs
+        // Intellischool
         $this->loadModule($di, \Schoolbox\Admin\Intellischool\Module::class, '/adminv2/intellischool');
+
+        // Email DKIM
+        $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
     }
 }

@@ -10,7 +10,7 @@
 abstract class Leave_Notice_Abstract_Notice
 {
     protected $request = null;
-    protected $emailTemplateFile = '';
+    protected string $emailTemplateFile = '';
 
     /**
      * Constructor

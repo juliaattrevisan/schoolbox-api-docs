@@ -202,6 +202,7 @@ module.exports = {
         shapsList: './library/Schoolbox/Admin/SHAPS/vue/shapsList.js',
         usageGlobal: './library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js',
         usageSpecific: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js',
+        emailDkim: './library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js',
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',

@@ -470,7 +470,6 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
-
         return $di;
     }
 }

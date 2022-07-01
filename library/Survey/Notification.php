@@ -1,7 +1,5 @@
 <?php
 
-use Schoolbox\UserMapper;
-
 /**
  * Survey_Notification
  *
@@ -9,34 +7,43 @@ use Schoolbox\UserMapper;
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Url\Factory as UrlFactory;
+use Schoolbox\UserMapper;
+
 class Survey_Notification
 {
-    /** @var string */
-    protected $emailTemplateFile = '../survey/email/authorNotification.html';
-
-    /** @var Mailer|null */
-    protected $email = null;
+    /** @var \Schoolbox\Mail\TwigEmail|null */
+    protected ?\Schoolbox\Mail\TwigEmail $email = null;
 
     /** @var array */
-    private $survey = array();
+    private array $survey;
 
     /** @var array */
-    private $attempt = array();
+    private array $attempt;
 
     /** @var UserMapper */
-    private $userMapper = null;
+    private UserMapper $userMapper;
+
+    private \Schoolbox\Config\Loader $config;
+
+    private \Schoolbox\Mail\EmailFactory $emailFactory;
 
     /**
      * Constructor
      *
-     * @param array $survey
-     * @param array $attempt
+     * @param array                        $survey
+     * @param array                        $attempt
+     * @param \Schoolbox\Mail\EmailFactory $emailFactory
      */
-    public function __construct($survey, $attempt)
+    public function __construct(array $survey, array $attempt, \Schoolbox\Mail\EmailFactory $emailFactory)
     {
-        $this->setSurvey($survey);
-        $this->setAttempt($attempt);
-        $this->setUserMapper(UserMapper::getInstance());
+        $this->survey     = $survey;
+        $this->attempt    = $attempt;
+        $this->userMapper = UserMapper::getInstance();
+        $this->config     = \Schoolbox\Config\Loader::getInstance();
+
+        $this->emailFactory = $emailFactory;
 
         $this->setup();
     }
@@ -46,14 +53,12 @@ class Survey_Notification
      */
     public function setup()
     {
-        $survey  = $this->getSurvey();
-        $attempt = $this->getAttempt();
         // Load first section for link to review page
         $sectionHandler = new Assess_Section();
-        $firstSection = $sectionHandler->getFirst($survey['assess_id']);
+        $firstSection   = $sectionHandler->getFirst($this->survey['assess_id']);
 
         try {
-            $author = $this->getUserMapper()->findById($this->getAuthorId());
+            $author = $this->userMapper->findById($this->getAuthorId());
         } catch (\Schoolbox\Mapper\Exception $e) {
             return;
         }
@@ -62,16 +67,36 @@ class Survey_Notification
         }
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
-        $email = new Mailer($this->getEmailTemplateFile(), $subject, $author->getEmail());
-
-        $email->setVar([
-                           'SURVEY_SURVEY_ID'   => $survey['assess_id'],
-                           'SURVEY_TITLE'       => Scrub::text($survey['title']),
-                           'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
-                           'ATTEMPT_ATTEMPT_ID' => $attempt['attempt_id'],
-                       ]);
-
-        $this->setEmail($email);
+        $baseUrl = (new UrlFactory($this->config))->buildFullyQualified();
+        $email   = $this->emailFactory->buildTwigEmail('instantmail.twig', $subject, $author->getEmail());
+        $email->setContext(
+            [
+                'hideUnsubscribe' => true,
+                'recipient'       => $author->getFullName(),
+                'groups'          => [
+                    [
+                        'rows' => [
+                            [
+                                'messages' => [
+                                    [
+                                        'icon' => $baseUrl->setPath('/images/icon.php')->setQuery(
+                                            [
+                                                'size' => 64,
+                                                'icon' => 'report',
+                                            ]
+                                        )->toString(),
+                                        'title' => sprintf('A response was submitted to %s. You may access this response', Scrub::text($this->getSurveyTitle())),
+                                        'href' => $baseUrl->setPath(sprintf('/survey/review/%d/%d/%d', $this->survey['assess_id'], $firstSection['section_id'], $this->attempt['attempt_id']))->toString(),
+                                        'meta' => null,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+        $this->email = $email;
     }
 
     /**
@@ -80,7 +105,7 @@ class Survey_Notification
     public function send()
     {
         if ($this->email) {
-            $this->getEmail()->send();
+            $this->email->send();
         }
     }
 
@@ -105,94 +130,5 @@ class Survey_Notification
     private function getSurveyTitle()
     {
         return $this->survey['title'];
-    }
-
-    /**
-     * Get email template file
-     *
-     * @return string
-     */
-    protected function getEmailTemplateFile()
-    {
-        return $this->emailTemplateFile;
-    }
-
-    /**
-     * Set email
-     *
-     * @param Mailer $email
-     */
-    protected function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * Get email
-     *
-     * @return Mailer|null
-     */
-    protected function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * Set survey
-     *
-     * @param array $survey
-     */
-    private function setSurvey($survey)
-    {
-        $this->survey = $survey;
-    }
-
-    /**
-     * Get survey
-     *
-     * @return array
-     */
-    private function getSurvey()
-    {
-        return $this->survey;
-    }
-
-    /**
-     * @return array
-     */
-    private function getAttempt()
-    {
-        return $this->attempt;
-    }
-
-    /**
-     * @param  array $attempt
-     *
-     * @return $this
-     */
-    private function setAttempt($attempt)
-    {
-        $this->attempt = $attempt;
-        return $this;
-    }
-
-    /**
-     * Set user handler
-     *
-     * @param UserMapper $userMapper
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Get user handler
-     *
-     * @return UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
     }
 }

@@ -12,24 +12,32 @@ namespace Alaress\Mail;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Admin\EmailDKIM\Mapper;
+use Schoolbox\Admin\EmailDKIM\Model as EmailDKIM;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Crypto\DkimOptions;
+use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\Multipart\AlternativePart;
+use Symfony\Component\Mime\Part\TextPart;
 
 use function count;
 use function trim;
 
-abstract class AbstractMailer implements IMailer
+class Mailer implements IMailer
 {
     // These two const are just a key for an array structure that will separate valid and invalid email addresses
     // As of the moment, these keys are being used here and in createMail.php::45 only
@@ -48,37 +56,43 @@ abstract class AbstractMailer implements IMailer
      */
     protected static $transport;
 
-    /**
-     * @var IConfigLoader
-     */
-    protected static $conf;
-
-
     /** @var Email */
-    protected $email;
+    protected Email $email;
 
     /**
      * List of headers that are added to the email that is sent.
      *
      * @var array
      */
-    protected $headers;
+    protected array $headers;
 
     /** @var LoggerInterface */
-    protected $log;
+    protected LoggerInterface $log;
+
+    protected IConfigLoader $config;
+
+    protected Mapper $dkimMapper;
+
+    /**
+     * Whether to use base64 rather than quoted printable
+     */
+    private bool $encodeBase64 = false;
 
     /**
      * Construct the basics of a new Mailer
      *
-     * @param string $template
-     * @param string $subject
-     * @param string $to
-     * @param string $host
+     * @param string                    $subject
+     * @param string|array|Address|User $to
+     * @param IConfigLoader             $config
+     * @param Mapper                    $dkimMapper
      */
-    public function __construct($template, $subject = '', $to = '', $host = '')
+    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
     {
+        $this->config     = $config;
+        $this->dkimMapper = $dkimMapper;
+
         $this->email = new Email();
-        $this->setFrom(self::getConfig()->get('mail_from_address'), self::getConfig()->get('mail_from_name'));
+        $this->setFrom($this->config->get('mail_from_address'), $this->config->get('mail_from_name'));
 
         //setup header
         $this->headers['MessageID'] = '<' . md5(time()) . '@alaressmailer>';
@@ -103,9 +117,18 @@ abstract class AbstractMailer implements IMailer
     }
 
 
-    public function setTo($to)
+    /**
+     * Set To
+     * @param string|array|Address|User $to
+     * @return void
+     */
+    public function setTo(string | array | Address | User $to)
     {
-        if (\is_array($to)) {
+        if ($to instanceof User) {
+            $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
+        } elseif ($to instanceof Address) {
+            $this->email->addTo($to);
+        } elseif (\is_array($to)) {
             if ($to['email']) {
                 //Assume one dimensional array
                 $this->email->addTo(new Address($to['email'], $to['name'] ?? ''));
@@ -121,20 +144,74 @@ abstract class AbstractMailer implements IMailer
                 }
             }
         } else {
-            foreach (self::parseAddressString($to ?? '')[self::KEY_VALID] as $address => $name) {
+            $defaultHost = trim($this->config->get('site_hostname')) . '.' . trim($this->config->get('site_domain'));
+            foreach (self::parseAddressString($to, $defaultHost)[self::KEY_VALID] as $address => $name) {
                 $this->email->addTo(new Address($address, $name ?? ''));
             }
         }
     }
 
+    /**
+     * Set CC
+     * @param Address $cc
+     * @return void
+     */
+    public function setCc(Address $cc)
+    {
+        $this->email->addCc($cc);
+    }
 
-    public function setSubject($subject)
+    /**
+     * Set BCC
+     * @param Address $bcc
+     * @return void
+     */
+    public function setBcc(Address $bcc)
+    {
+        $this->email->addBcc($bcc);
+    }
+
+    /**
+     * Set subject
+     * @param string $subject
+     * @return void
+     */
+    public function setSubject(string $subject)
     {
         $this->email->subject($subject);
     }
 
+    /**
+     * Get subject
+     * @return string|null
+     */
+    public function getSubject(): ?string
+    {
+        return $this->email->getSubject();
+    }
 
     /**
+     * Set text
+     * @param string $text
+     * @return void
+     */
+    public function setText(string $text)
+    {
+        $this->email->text($text);
+    }
+
+    /**
+     * Set html
+     * @param string $html
+     * @return void
+     */
+    public function setHtml(string $html)
+    {
+        $this->email->html($html);
+    }
+
+    /**
+     * Set from
      * @param string $email
      * @param string $name
      */
@@ -143,7 +220,6 @@ abstract class AbstractMailer implements IMailer
         $this->email->from(new Address($email, $name));
         $this->email->returnPath($email);
     }
-
 
     /**
      * Set the reply-to header
@@ -165,25 +241,24 @@ abstract class AbstractMailer implements IMailer
         }
     }
 
-
     /**
-     * Convenience method for setting this mailer's From address as the currently logged in user.
-     *
-     * @param array $sessionData
-     * @return $this
+     * Set date
+     * @param \DateTimeInterface $date
+     * @return void
      */
-    public function setFromAsCurrentUser($sessionData = null)
+    public function setDate(\DateTimeInterface $date)
     {
-        $sessionData = $sessionData ?: $_SESSION;
-
-        /** @var User $user */
-        $user = $sessionData['user'];
-        $this->setFrom($user->getEmail() ?? '', $user->formatName());
-
-        return $this;
+        $this->email->date($date);
     }
 
-
+    /**
+     * Add file
+     * @param mixed       $file
+     * @param string      $type
+     * @param string|null $filename
+     * @param bool        $isFile
+     * @return void
+     */
     public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true)
     {
         // add attachment to email
@@ -194,7 +269,12 @@ abstract class AbstractMailer implements IMailer
         }
     }
 
-
+    /**
+     * Add image
+     * @param mixed       $file
+     * @param string|null $type
+     * @return Email
+     */
     public function addImage($file, $type = 'application/octet')
     {
         //add inline image to email
@@ -202,47 +282,66 @@ abstract class AbstractMailer implements IMailer
         return $this->email->embed($file, null, $type);
     }
 
-
     /**
-     * Returns the HTML rendering of the templated email constructed by this object.
-     *
      * @return string
      */
-    abstract protected function composeHTML();
-
+    protected function composeHTML()
+    {
+        return (string)$this->email->getHtmlBody();
+    }
 
     /**
-     * Returns the plaintext rendering of the templated email constructed by this object.
-     *
      * @return string
      */
-    abstract protected function composePlain();
-
+    protected function composePlain()
+    {
+        return (string)$this->email->getTextBody();
+    }
 
     /**
      * Encodes email in base64 rather than quoted printable.
-     *
-     * @deprecated this does nothing with the migration to Symfony mailer:
-     *             whilst `\Symfony\Component\Mime\Encoder\Base64ContentEncoder`
-     *             exists, I don't know how to set it as an email's encoding
-     *             method.
      */
     public function encodeBase64()
     {
-//        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
-//        $this->email->setEncoder($encoder);
+        $this->encodeBase64 = true;
+    }
+
+    /**
+     * Encode with base64, if specified
+     * @return void
+     */
+    private function encode()
+    {
+        if (!$this->encodeBase64) {
+            return;
+        }
+        $this->email->setBody(
+            new AlternativePart(
+                new TextPart(
+                    $this->email->getTextBody(),
+                    $this->email->getTextCharset(),
+                    'plain',
+                    'base64'
+                ),
+                new TextPart(
+                    $this->email->getHtmlBody(),
+                    $this->email->getHtmlCharset(),
+                    'html',
+                    'base64'
+                )
+            )
+        );
     }
 
     /**
      * Attempts to send the email constructed by this class. Returns mailing success or failure.
      *
      * @param string $to
-     * @throws TransportExceptionInterface
      * @return bool
+     * @throws TransportExceptionInterface
      */
     public function send($to = '')
     {
-
         if (!empty($to)) {
             $this->setTo($to);
         }
@@ -250,6 +349,7 @@ abstract class AbstractMailer implements IMailer
         // construct body and set headers
         $this->email->text($this->composePlain());
         $this->email->html($this->composeHTML());
+        $this->encode();
         foreach ($this->headers as $name => $value) {
             $this->email->getHeaders()->addTextHeader($name, $value);
         }
@@ -300,10 +400,22 @@ abstract class AbstractMailer implements IMailer
     {
         // create transport and send email
         try {
-            $mailer = new Mailer(self::getTransport($reinitialise));
+            $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
             $this->configureMailer($mailer);
 
-            $mailer->send($this->email);
+            // get all recipients before signing
+            $recipients = array_merge($this->email->getTo(), $this->email->getCC(), $this->email->getBcc());
+
+            foreach ($this->email->getFrom() as $from) {
+                [$email, $domain] = explode('@', $from->getAddress());
+                try {
+                    $dkim    = $this->dkimMapper->findOneByColumn('domain', $domain);
+                    $message = $this->getSignedMessage($dkim->getPrivate(), $dkim->getDomain());
+                } catch (Exception $e) {
+                    $message = $this->email;
+                }
+                $mailer->send($message, new Envelope($from, $recipients));
+            }
         } catch (TransportExceptionInterface $e) {
             $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
@@ -365,20 +477,11 @@ abstract class AbstractMailer implements IMailer
     }
 
     /**
-     * @param bool $reinitialise
-     * @return TransportInterface
-     */
-    public static function getTransport($reinitialise = false)
-    {
-        return static::getConfiguredTransport(self::getConfig(), $reinitialise);
-    }
-
-    /**
      * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
      *
      * @return array
      */
-    public static function parseAddressString(string $emailAddresses): array
+    public static function parseAddressString(string $emailAddresses, string $defaultHost): array
     {
         $return_list = [
             self::KEY_VALID   => [],
@@ -388,7 +491,7 @@ abstract class AbstractMailer implements IMailer
         if (trim($emailAddresses) === '') {
             return $return_list;
         }
-        $address_list = self::parseAddressList($emailAddresses);
+        $address_list = self::parseAddressList($emailAddresses, $defaultHost);
 
         foreach ($address_list[self::KEY_VALID] as $address) {
             $to                                = $address->mailbox . '@' . $address->host;
@@ -416,21 +519,10 @@ abstract class AbstractMailer implements IMailer
     }
 
     /**
-     * @return IConfigLoader
-     */
-    protected static function getConfig()
-    {
-        if (!self::$conf instanceof IConfigLoader) {
-            self::$conf = ConfigLoader::getInstance();
-        }
-        return self::$conf;
-    }
-
-    /**
      * @param string $emailAddresses
      * @return array
      */
-    private static function parseAddressList(string $emailAddresses): array
+    private static function parseAddressList(string $emailAddresses, string $defaultHost): array
     {
         $emails = [];
         //Explode emails by the ascii's Record Separator
@@ -454,7 +546,7 @@ abstract class AbstractMailer implements IMailer
         }
 
         return [
-            self::KEY_VALID   => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID]) : [],
+            self::KEY_VALID   => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID], $defaultHost) : [],
             self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
         ];
     }
@@ -465,13 +557,12 @@ abstract class AbstractMailer implements IMailer
      * @param array $emails
      * @return array
      */
-    private static function parseValidEmailAddresses($emails): array
+    private static function parseValidEmailAddresses(array $emails, string $defaultHost): array
     {
+        $emailAddresses = [];
         foreach ($emails as $email) {
             $emailAddresses[] = Codec::encode($email);
         }
-
-        $defaultHost = self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain');
 
         return imap_rfc822_parse_adrlist(implode(',', $emailAddresses), $defaultHost);
     }
@@ -525,5 +616,26 @@ abstract class AbstractMailer implements IMailer
     public static function implodeGlue(): string
     {
         return \chr(self::EMAIL_SEPARATOR_CODE);
+    }
+
+    /**
+     * Sign - note: bcc will be dropped by signing
+     *        https://github.com/symfony/symfony/issues/44006
+     * @param string $privateKey
+     * @param string $domain
+     * @return Message
+     */
+    private function getSignedMessage(string $privateKey, string $domain): Message
+    {
+        $signer       = new DkimSigner($privateKey, $domain, EmailDKIM::SELECTOR);
+        $emailForSign = new Message($this->email->getPreparedHeaders(), $this->email->getBody());
+        return $signer->sign(
+            $emailForSign,
+            (new DkimOptions())
+                ->bodyCanon('relaxed')
+                ->headerCanon('relaxed')
+                ->headersToIgnore(['message-id', 'date', 'mime-version', 'messageid'])
+                ->toArray()
+        );
     }
 }

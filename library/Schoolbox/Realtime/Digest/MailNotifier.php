@@ -10,10 +10,11 @@
 namespace Schoolbox\Realtime\Digest;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\Realtime\MessageList\IListFactory;
 use Schoolbox\Realtime\WorkNotifier;
@@ -35,14 +36,16 @@ class MailNotifier extends WorkNotifier
     private $userMapper;
 
     /**
-     * @param IListFactory    $factory
-     * @param UserMapper      $userMapper
-     * @param IConfigLoader   $configLoader
-     * @param LoggerInterface $log
+     * @param IListFactory         $factory
+     * @param UserMapper           $userMapper
+     * @param EmailFactory         $emailFactory
+     * @param IConfigLoader|null   $configLoader
+     * @param LoggerInterface|null $log
      */
     public function __construct(
         IListFactory $factory,
         UserMapper $userMapper,
+        EmailFactory $emailFactory,
         IConfigLoader $configLoader = null,
         LoggerInterface $log = null
     ) {
@@ -52,7 +55,7 @@ class MailNotifier extends WorkNotifier
         $this->userMapper = $userMapper;
 
         // set up a mailer (we forcibly exclude reply-to headers from digest emails)
-        $this->mailer = new Mailer(new TwigEmailFactory(new CoreContext($this->conf), $this->log()), $this->log(), $userMapper, false);
+        $this->mailer = new Mailer($emailFactory, $this->log(), $userMapper, false);
     }
 
 
@@ -112,6 +115,10 @@ class MailNotifier extends WorkNotifier
      */
     public function unserialize($serialized)
     {
-        $this->__construct(unserialize($serialized), UserMapper::getInstance());
+        $this->__construct(
+            unserialize($serialized),
+            UserMapper::getInstance(),
+            new EmailFactory(Loader::getInstance(), DKIMMapper::getInstance())
+        );
     }
 }

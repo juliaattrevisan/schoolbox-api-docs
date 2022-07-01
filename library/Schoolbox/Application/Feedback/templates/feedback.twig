@@ -25,7 +25,7 @@
 </div>
 <div class="row">
     <div class="small-12 island">
-        <form id="feedbackForm" action="/emailForm.php" method="post" class="top">
+        <form id="feedbackForm" action="{{ routeLookup('mail.postFeedback') }}" method="post" class="top">
             <input type="hidden" name="template" value="feedback.html" />
             <input type="hidden" name="confirmation" value="/feedback/thank-you" />
 

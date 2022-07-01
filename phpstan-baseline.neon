@@ -351,26 +351,6 @@ parameters:
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
 
 		-
-			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$host\\.$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$template\\.$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
-			message: "#^Variable \\$emailAddresses might not be defined\\.$#"
-			count: 1
-			path: library/Alaress/Mail/AbstractMailer.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Alaress/Module/Module.php

@@ -49,6 +49,9 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var FilesystemProxy $filesystemProxy */
     $filesystemProxy = $di->get('filesystem.storageProxy');
 
+    /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
+    $emailFactory = $di->get('mail.emailFactory');
+
     (new Routing\WorkerFactory(
         $config,
         $log,
@@ -58,6 +61,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $routePermMapper,
         $instance,
         $filesystemProxy,
+        $emailFactory
     ))->build($loop, INSTANCE_ID);
 });
 

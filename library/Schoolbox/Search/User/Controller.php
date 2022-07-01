@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\User;
 
 use Alaress\Color\ColorFactory;
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use Custom;
@@ -18,7 +18,6 @@ use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -594,7 +593,7 @@ class Controller extends BaseController
             }
         }
 
-        $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
+        $allTeacherEmails = implode(Mailer::implodeGlue(), array_filter(array_unique($emails)));
 
         $pd = null;
         if (strtolower($this->getConfigLoader()->get('site_school_code')) === 'help') {
@@ -696,7 +695,7 @@ class Controller extends BaseController
                     'allTeacherEmails'         => $allTeacherEmails,
                     'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                     'pd'                       => $pd,
-                    'emailSeparator'           => AbstractMailer::implodeGlue(),
+                    'emailSeparator'           => Mailer::implodeGlue(),
                     'showDetails'              => $showDetails,
                     'showEmail'                => $showEmails,
                     'travelLogs'               => $travelLogs,

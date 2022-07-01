@@ -11,6 +11,9 @@
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mail\EmailFactory;
 
 class Leave_Controller extends Controller
 {
@@ -868,8 +871,10 @@ class Leave_Controller extends Controller
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
-        $startString = trim("{$data['request']['start']['date']} {$data['request']['start']['time']}");
-        $endString   = trim("{$data['request']['finish']['date']} {$data['request']['finish']['time']}");
+        $startTime = $data['request']['start']['time'] ?? '';
+        $endTime = $data['request']['start']['time'] ?? '';
+        $startString = trim("{$data['request']['start']['date']} {$startTime}");
+        $endString   = trim("{$data['request']['finish']['date']} {$endTime}");
 
         $start = Alaress_Date_Format::newLocal($startString);
         $finish = Alaress_Date_Format::newLocal($endString);
@@ -879,15 +884,15 @@ class Leave_Controller extends Controller
         $request->setHostType($data['request']['hostType']);
         $request->setHostName($data['request']['hostName']);
         $request->setHostPhone($data['request']['hostPhone']);
-        $request->setHostMobile($data['request']['hostMobile']);
-        $request->setHostAddress($data['request']['hostAddress']);
+        $request->setHostMobile($data['request']['hostMobile'] ?? '');
+        $request->setHostAddress($data['request']['hostAddress'] ?? '');
         $request->setUserPhone($data['request']['userPhone']);
         $request->setDescription($data['request']['description']);
         $request->setNotes($data['request']['notes']);
         $request->setConfirmedBy($data['request']['confirmedBy']);
-        $request->setReturnerName($data['request']['returnerName']);
-        $request->setCollectorName($data['request']['collectorName']);
-        $request->setReason($data['request']['reason']);
+        $request->setReturnerName($data['request']['returnerName'] ?? '');
+        $request->setCollectorName($data['request']['collectorName'] ?? '');
+        $request->setReason($data['request']['reason'] ?? '');
 
         $travelType  = $data['request']['travelType'];
         $travelTypes = $this->getTravelTypes();
@@ -1669,7 +1674,8 @@ class Leave_Controller extends Controller
      */
     public function executeEmailTest()
     {
-        $email = new Mailer('../modules/leave/userNoticeEmail.html', 'test', 'steve.chan@alaress.com.au');
+        $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
+        $email = $emailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
 
         $email->setFrom(Config::get('mail_from_address'), 'Test Schoolbox');
         $email->send();

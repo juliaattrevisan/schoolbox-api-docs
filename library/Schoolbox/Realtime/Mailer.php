@@ -12,18 +12,19 @@ namespace Schoolbox\Realtime;
 use Alaress\Async\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Twig\Error\RuntimeError;
 use UnderflowException;
 
 class Mailer
 {
-    /** @var TwigEmailFactory */
+    /** @var EmailFactory */
     private $emailFactory;
 
     /** @var LoggerInterface */
@@ -37,12 +38,12 @@ class Mailer
 
 
     /**
-     * @param TwigEmailFactory $emailFactory
-     * @param LoggerInterface  $log
-     * @param UserMapper       $userMapper
-     * @param bool             $includeReplyToHeaders
+     * @param EmailFactory    $emailFactory
+     * @param LoggerInterface $log
+     * @param UserMapper      $userMapper
+     * @param bool            $includeReplyToHeaders
      */
-    public function __construct(TwigEmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper, $includeReplyToHeaders)
+    public function __construct(EmailFactory $emailFactory, LoggerInterface $log, UserMapper $userMapper, $includeReplyToHeaders)
     {
         $this->emailFactory = $emailFactory;
         $this->log          = $log;
@@ -61,16 +62,13 @@ class Mailer
      * @throws UnderflowException
      * @return bool
      */
-    public function sendListContents(QueueInterface $list, User $recipient, $template, $subject = '', $sortDir = SORT_ASC): bool
+    public function sendListContents(QueueInterface $list, User $recipient, string $template, string $subject = '', int $sortDir = SORT_ASC): bool
     {
         $address = trim($recipient->getEmail());
 
         if (empty($address)) {
             throw new RfcComplianceException("Empty address for user {$recipient->getId()}");
         }
-
-        // format rfc2822
-        $address = sprintf('"%s" <%s>', $recipient->formatName(), $address);
 
         $decorator = new Decorator();
 
@@ -87,12 +85,12 @@ class Mailer
 
         $this->log->debug(sprintf('Compiling %d notification%s for user %s', $decorator->count(), $decorator->count() === 1 ? '' : 's', $recipient->getUsername()));
 
-        $context = $decorator->renderAsTwigContext($this->emailFactory->getCoreContext(), 0, $sortDir);
-        $context['recipient'] = $recipient->getFirstname();
-
         // build the email object
-        $email = $this->emailFactory->build($template, $subject);
-        $email->setContext($context)->setTo($address);
+        $email = $this->emailFactory->buildTwigEmail($template, $subject, new Address($address, $recipient->formatName()));
+        $email->setLogger($this->log);
+        $context = $decorator->renderAsTwigContext($email->getCoreContext(), 0, $sortDir);
+        $context['recipient'] = $recipient->getFirstname();
+        $email->setContext($context);
 
         // we can only include the reply-to header if there is but one email
         if ($this->useReplyTo && $decorator->count() === 1) {

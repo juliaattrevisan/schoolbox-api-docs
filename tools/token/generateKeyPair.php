@@ -12,12 +12,11 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Role;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App {
-
+$app = new class extends CliTool\App
+{
     private const OPT_SHORT_HELP  = 'h';
     private const OPT_LONG_HELP   = 'help';
 
@@ -111,20 +110,11 @@ $app = new class extends CliTool\App {
             }
         }
 
-
-        // Build key pair
-        $res = openssl_pkey_new([
-            'digest_alg'       => 'SHA512',
-            'private_key_bits' => 2048,
-            'private_key_type' => OPENSSL_KEYTYPE_RSA,
-        ]);
-        openssl_pkey_export($res, $privateKey);
-        $keyDetails = openssl_pkey_get_details($res);
-        $publicKey  = $keyDetails['key'];
+        $keyPair = \Schoolbox\Auth\KeyPairGenerator::generate();
 
         // and update
-        $updateQuery->execute(['value' => $publicKey, 'name' => 'jwt_public_key']);
-        $updateQuery->execute(['value' => $privateKey, 'name' => 'jwt_private_key']);
+        $updateQuery->execute(['value' => $keyPair['public'], 'name' => 'jwt_public_key']);
+        $updateQuery->execute(['value' => $keyPair['private'], 'name' => 'jwt_private_key']);
         $this->getLogger()->notice('Key pair successfully generated.');
     }
 

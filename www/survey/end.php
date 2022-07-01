@@ -17,6 +17,7 @@ $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
 
+/** @var SitePage $this */
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
 }
@@ -103,7 +104,9 @@ if (!$attempt['finish']) {
     /* Notify the survey author when someone completes this
      */
     if ($survey['notify_author']) {
-        $notification = new Survey_Notification($survey, $attempt);
+        /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
+        $emailFactory = $this->di->get('mail.emailFactory');
+        $notification = new Survey_Notification($survey, $attempt, $emailFactory);
         $notification->send();
     }
 } else {
@@ -115,6 +118,7 @@ if (!$attempt['finish']) {
     $this->setVar('endAssess_block', '');
 }
 
+/** @var \Schoolbox\Resource\Folder\Model $folder */
 $trail = new Breadcrumbs();
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     [
