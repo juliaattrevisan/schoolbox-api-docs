@@ -9,9 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
+use Firebase\JWT\Key;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -39,15 +42,15 @@ class OtherInstanceIssued extends Base
     /**
      * Constructor
      *
-     * @param Jwt                    $tokenBuilder           The token builder, used for decoding JWTs.
      * @param UserMapper             $userMapper             Mapper for retrieving users once the user in the JWT is
      *                                                       identified.
      * @param InstanceRegistryMapper $instanceRegistryMapper Mapper for retrieving an instance's JWT public key.
+     * @param IConfigLoader          $config                 Standard configuration store.
      */
     public function __construct(
-        private Jwt $tokenBuilder,
         private UserMapper $userMapper,
         private InstanceRegistryMapper $instanceRegistryMapper,
+        private IConfigLoader $config,
     ) {
     }
 
@@ -74,7 +77,11 @@ class OtherInstanceIssued extends Base
         }
 
         // Verify the payload
-        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
+        $verifiedPayload = $this->decode(
+            $jwt,
+            new Key($instanceDetails->getJwtPublicKey(), Jwt::SIGNING_ALGORITHM),
+            (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
+        );
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
