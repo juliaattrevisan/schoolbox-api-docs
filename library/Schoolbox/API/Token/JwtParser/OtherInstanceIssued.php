@@ -66,11 +66,12 @@ class OtherInstanceIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): User
+    public function determineUser(string $jwt): User
     {
         // Look up the instance in the registry, and get its public key so that
         // the JWT can be verified.
-        $instanceId = $claims[self::CLAIM_INSTANCE_ID];
+        $unverifiedClaims = $this->decodeWithoutVerification($jwt);
+        $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
         try {
             $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
         } catch (MapperException $e) {

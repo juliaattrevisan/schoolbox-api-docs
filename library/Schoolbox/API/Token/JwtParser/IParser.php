@@ -34,11 +34,9 @@ interface IParser
     /**
      * Determine the user identified by the JWT.
      *
-     * Presumes `$this->accepts($claims)` has returned true.
+     * Presumes `$this->accepts($jwt)` has returned true.
      *
-     * @param string $jwt    The encoded JWT: this method is expected to verify the JWT as well.
-     * @param array  $claims The JWT's decoded claims: passed in addition to the JWT as the parser may need to know
-     *                       where the JWT is from in order to verify it.
+     * @param string $jwt The JWT to use to identify a user.
      * @return User The user identified by the JWT.
      * @throws JwtLibrary\BeforeValidException      if the JWT isn't yet valid
      * @throws JwtLibrary\ExpiredException          if the JWT is expired
@@ -46,5 +44,5 @@ interface IParser
      * @throws UnexpectedValueException             if something else went wrong when decoding the JWT
      * @throws Exception\NotFound                   if the JWT is valid, but identifies a user which does not exist
      */
-    public function determineUser(string $jwt, array $claims): User;
+    public function determineUser(string $jwt): User;
 }

@@ -58,7 +58,7 @@ class OauthProviderIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): User
+    public function determineUser(string $jwt): User
     {
         // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
@@ -78,7 +78,7 @@ class OauthProviderIssued extends Base
         if ($sessionLength <= 0) {
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
-        $decodedToken = $this->decode(
+        $claims = $this->decode(
             $jwt,
             JwtLibrary\JWK::parseKeySet($jwks),
             $sessionLength,

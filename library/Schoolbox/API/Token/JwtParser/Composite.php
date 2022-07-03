@@ -52,11 +52,11 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): User
+    public function determineUser(string $jwt): User
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
-                return $parser->determineUser($jwt, $claims);
+                return $parser->determineUser($jwt);
             }
         }
         throw new NotFound();

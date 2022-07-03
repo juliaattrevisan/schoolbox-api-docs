@@ -53,7 +53,7 @@ class SelfIssued extends Base
     /**
      * @inheritdoc
      */
-    public function determineUser(string $jwt, array $claims): User
+    public function determineUser(string $jwt): User
     {
         $claims = $this->decode(
             $jwt,
