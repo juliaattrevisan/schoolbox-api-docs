@@ -77,21 +77,15 @@ class OauthProviderIssued extends Base
         if ($sessionLength <= 0) {
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
-        $originalLeeway = JwtLibrary\JWT::$leeway;
-        JwtLibrary\JWT::$leeway = $sessionLength;
-        try {
-            $decodedToken = JwtLibrary\JWT::decode(
-                $jwt,
-                JwtLibrary\JWK::parseKeySet($jwks),
-                $algs,
-            );
-        } finally {
-            JwtLibrary\JWT::$leeway = $originalLeeway;
-        }
+        $decodedToken = $this->decode(
+            $jwt,
+            JwtLibrary\JWK::parseKeySet($jwks),
+            $sessionLength,
+        );
 
         // Validate audience
         $validAudience = false;
-        $audiences     = (array)$decodedToken->aud;
+        $audiences     = (array)$decodedToken['aud'];
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         foreach ($audiences as $audience) {
             if ($audience === $oauthClientId) {
@@ -110,8 +104,8 @@ class OauthProviderIssued extends Base
         $messages = [];
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
-            if (isset($decodedToken->$candidateClaim)) {
-                $user = $this->userMapper->findByUsername($decodedToken->$candidateClaim);
+            if (isset($decodedToken[$candidateClaim])) {
+                $user = $this->userMapper->findByUsername($decodedToken[$candidateClaim]);
                 if ($user) {
                     return $user;
                 }
