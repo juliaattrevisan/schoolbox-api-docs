@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
+use Firebase\JWT\Key;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
@@ -27,13 +29,11 @@ class SelfIssued extends Base
     /**
      * Constructor
      *
-     * @param Jwt               $tokenBuilder The token builder, used for decoding JWTs.
      * @param UserMapper        $userMapper   Mapper for retrieving users once the user in the JWT is identified.
      * @param User\Token\Mapper $tokenMapper  Mapper for retrieving user tokens.
      * @param IConfigLoader     $config       Standard configuration store.
      */
     public function __construct(
-        private Jwt $tokenBuilder,
         private UserMapper $userMapper,
         private User\Token\Mapper $tokenMapper,
         private IConfigLoader $config,
@@ -54,7 +54,11 @@ class SelfIssued extends Base
      */
     public function determineUser(string $jwt, array $claims): User
     {
-        $claims = $this->tokenBuilder->decode($jwt);
+        $claims = $this->decode(
+            $jwt,
+            new Key($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
+            (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
+        );
         $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
         if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
