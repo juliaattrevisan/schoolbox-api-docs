@@ -13,8 +13,6 @@ use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
-use Schoolbox\User\Token\Mapper as TokenMapper;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {

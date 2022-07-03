@@ -620,7 +620,7 @@ class Kernel extends WebKernelAbstract
         if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
 
-            /** @var JwtParser $tokenParser */
+            /** @var JwtParser\IParser $tokenParser */
             $tokenParser = $this->get('user.jwtParser');
 
             if ($tokenParser->accepts($token)) {

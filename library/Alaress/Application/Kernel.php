@@ -1737,20 +1737,15 @@ abstract class Kernel
             'user.jwtParser',
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
-                    /** @var Jwt $tokenBuilder */
-                    $tokenBuilder           = $di->get('user.tokenBuilder');
                     /** @var GuzzleHttp\Client $httpClient */
                     $httpClient             = $di->get('httpClient');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
-                    return new JwtParser(
-                        $tokenBuilder,
-                        new JwtParser\Composite(
-                            new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
-                            new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
-                            new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
-                        ),
+                    return new JwtParser\Composite(
+                        new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
+                        new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
                     );
                 }
             )

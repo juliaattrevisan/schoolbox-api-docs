@@ -51,21 +51,21 @@ class Controller extends Base
      * * this instance's oAuth provider
      * * another instance (as stored in the instance registry table)
      */
-    private JwtParser $jwtParser;
+    private JwtParser\IParser $jwtParser;
 
     /**
      * Constructor
      *
-     * @param Authenticator  $auth
-     * @param RegistryMapper $registryMapper
-     * @param ServiceMapper  $serviceMapper
-     * @param JwtParser      $jwtParser
+     * @param Authenticator     $auth
+     * @param RegistryMapper    $registryMapper
+     * @param ServiceMapper     $serviceMapper
+     * @param JwtParser\IParser $jwtParser
      */
     public function __construct(
         Authenticator $auth,
         RegistryMapper $registryMapper,
         ServiceMapper $serviceMapper,
-        JwtParser $jwtParser
+        JwtParser\IParser $jwtParser
     ) {
         $this->auth           = $auth;
         $this->registryMapper = $registryMapper;
