@@ -22,7 +22,7 @@ use Schoolbox\UserMapper;
 /**
  * Parser for JWTs issued by this instance.
  */
-class SelfIssued implements IParser
+class SelfIssued extends Base
 {
     /**
      * Constructor

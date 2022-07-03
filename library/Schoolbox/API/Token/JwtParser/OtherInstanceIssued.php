@@ -23,7 +23,7 @@ use UnexpectedValueException;
  * It's expected that the other instance's JWT public key be stored in the
  * instance registry mapper's table.
  */
-class OtherInstanceIssued implements IParser
+class OtherInstanceIssued extends Base
 {
     /**
      * Key for the email JWT claim. This is a public claim, so it doesn't need

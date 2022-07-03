@@ -21,7 +21,7 @@ use Schoolbox\UserMapper;
 /**
  * Parser for configured oAuth provider-issued JWTs.
  */
-class OauthProviderIssued implements IParser
+class OauthProviderIssued extends Base
 {
     /**
      * Default session length, in seconds: used as the default leeway for the
