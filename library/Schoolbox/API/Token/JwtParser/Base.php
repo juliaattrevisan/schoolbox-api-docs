@@ -20,8 +20,15 @@ use UnexpectedValueException;
 abstract class Base implements IParser
 {
     /**
-     * Parses a JWT, and verifies that the JWT has been signed appropriately and
-     * not tampered with.
+     * Cached results from `$this->decodeWithoutVerification`.
+     *
+     * @var array<string, array>
+     */
+    private array $decodeWithoutVerificationResults;
+
+    /**
+     * Decodes a JWT, and verifies that the JWT has been signed appropriately
+     * and not tampered with.
      *
      * @param string               $jwt         The JWT to parse.
      * @param Key|array<Key>|mixed $keyOrKeySet A key object (or set thereof) to verify the JWT against.
@@ -30,7 +37,7 @@ abstract class Base implements IParser
      *                                          * nbf (not before)
      *                                          * iat (issued at)
      *                                          * exp (expiry)
-     * @return array
+     * @return array The claims within the JWT.
      */
     protected function decode(string $jwt, mixed $keyOrKeySet, int $leeway): array
     {
@@ -45,25 +52,29 @@ abstract class Base implements IParser
     }
 
     /**
-     * Parses a JWT without verifying that the JWT is valid.
+     * Decodes a JWT without verifying that the JWT is valid.
      *
      * This is required so that a JWT's claims may be interrogated, in order to
      * decide whether this parser accepts it and may attempt to determine the
      * user which it identifies.
      *
      * @param string $jwt The JWT to parse.
-     * @return array
+     * @return array The claims within the JWT.
      * @throws UnexpectedValueException JWT doesn't contain a header, payload
      *                                  and signature segment
      * @throws DomainException          JWT payload is invalid JSON
      */
     protected function decodeWithoutVerification(string $jwt): array
     {
-        $parts = explode('.', $jwt);
-        if (count($parts) !== 3) {
-            throw new UnexpectedValueException('JWT must contain a header, payload and signature');
+        if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
+            $parts = explode('.', $jwt);
+            if (count($parts) !== 3) {
+                throw new UnexpectedValueException('JWT must contain a header, payload and signature');
+            }
+            [, $payload,] = $parts;
+            $this->decodeWithoutVerificationResults[$jwt]
+                = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
         }
-        [, $payload,] = $parts;
-        return (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
+        return $this->decodeWithoutVerificationResults[$jwt];
     }
 }
