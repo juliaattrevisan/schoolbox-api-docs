@@ -57,8 +57,9 @@ class OtherInstanceIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(array $claims): bool
+    public function accepts(string $jwt): bool
     {
+        $claims = $this->decodeWithoutVerification($jwt);
         return isset($claims[self::CLAIM_INSTANCE_ID]);
     }
 

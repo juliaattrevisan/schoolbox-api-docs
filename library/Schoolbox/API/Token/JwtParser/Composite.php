@@ -39,10 +39,10 @@ class Composite implements IParser
     /**
      * @inheritdoc
      */
-    public function accepts(array $claims): bool
+    public function accepts(string $jwt): bool
     {
         foreach ($this->parsers as $parser) {
-            if ($parser->accepts($claims)) {
+            if ($parser->accepts($jwt)) {
                 return true;
             }
         }
@@ -55,7 +55,7 @@ class Composite implements IParser
     public function determineUser(string $jwt, array $claims): User
     {
         foreach ($this->parsers as $parser) {
-            if ($parser->accepts($claims)) {
+            if ($parser->accepts($jwt)) {
                 return $parser->determineUser($jwt, $claims);
             }
         }

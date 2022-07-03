@@ -43,8 +43,9 @@ class SelfIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(array $claims): bool
+    public function accepts(string $jwt): bool
     {
+        $claims = $this->decodeWithoutVerification($jwt);
         return isset($claims[MessagePayloadInterface::CLAIM_ISS])
             && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->determineThisInstanceIssuer();
     }

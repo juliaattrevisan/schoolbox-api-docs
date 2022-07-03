@@ -46,8 +46,9 @@ class OauthProviderIssued extends Base
     /**
      * @inheritdoc
      */
-    public function accepts(array $claims): bool
+    public function accepts(string $jwt): bool
     {
+        $claims      = $this->decodeWithoutVerification($jwt);
         $jwtIssuer   = $claims[MessagePayloadInterface::CLAIM_ISS] ?? null;
         $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         return isset($jwtIssuer, $oauthIssuer)

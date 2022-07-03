@@ -20,15 +20,16 @@ use UnexpectedValueException;
 interface IParser
 {
     /**
-     * Does this parser accept this set of claims?
+     * Does this parser accept this JWT?
      *
-     * @param array $claims The JWT's decoded claims.
-     *                      Note these claims have been decoded without
-     *                      verifying the JWT: that happens in
-     *                      `$this->determineUser`.
+     * In order to determine this, the parser is expected to decode the JWT's
+     * claims without verifying it: this means that the JWT must be signed but
+     * not encrypted.
+     *
+     * @param string $jwt The JWT to verify.
      * @return bool
      */
-    public function accepts(array $claims): bool;
+    public function accepts(string $jwt): bool;
 
     /**
      * Determine the user identified by the JWT.
