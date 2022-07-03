@@ -79,7 +79,7 @@ class OtherInstanceIssued extends Base
         }
 
         // Verify the payload
-        $verifiedPayload = $this->decode(
+        $claims = $this->decode(
             $jwt,
             new Key($instanceDetails->getJwtPublicKey(), Jwt::SIGNING_ALGORITHM),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
@@ -87,7 +87,7 @@ class OtherInstanceIssued extends Base
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
-        $email = $verifiedPayload[self::CLAIM_EMAIL] ?? null;
+        $email = $claims[self::CLAIM_EMAIL] ?? null;
         if (!isset($email)) {
             throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }

@@ -86,7 +86,7 @@ class OauthProviderIssued extends Base
 
         // Validate audience
         $validAudience = false;
-        $audiences     = (array)$decodedToken['aud'];
+        $audiences     = (array)$claims['aud'];
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         foreach ($audiences as $audience) {
             if ($audience === $oauthClientId) {
@@ -105,8 +105,8 @@ class OauthProviderIssued extends Base
         $messages = [];
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
-            if (isset($decodedToken[$candidateClaim])) {
-                $user = $this->userMapper->findByUsername($decodedToken[$candidateClaim]);
+            if (isset($claims[$candidateClaim])) {
+                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
                 if ($user) {
                     return $user;
                 }
