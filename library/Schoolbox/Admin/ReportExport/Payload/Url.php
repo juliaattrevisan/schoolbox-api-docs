@@ -22,7 +22,7 @@ class Url
     /**
      * Max length for filenames: anything longer causes issues on upload.
      */
-    private const FILENAME_MAX_LENGTH = 250;
+    public const FILENAME_MAX_LENGTH = 250;
 
 
     /**

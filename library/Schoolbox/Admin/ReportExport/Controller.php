@@ -63,6 +63,13 @@ class Controller extends ConfigController
      */
     private const FOOTER_HTML = '/templates/footer.html';
 
+
+    /**
+     * This is in the notification when your reports finish generating a zip
+     */
+    private const NOTIFICATION_TEXT = 'Your summative report %s is ready to download';
+
+
     private Mapper $reportMapper;
 
     private UserMapper $userMapper;
@@ -564,23 +571,118 @@ class Controller extends ConfigController
      *
      * @param Model $report
      * @return void
+     * @throws RouteNotFound
      * @throws \DebugBar\DebugBarException
+     * @throws \Interop\Queue\Exception
+     * @throws \Interop\Queue\Exception\InvalidDestinationException
+     * @throws \Interop\Queue\Exception\InvalidMessageException
+     * @throws \JsonException
+     * @throws \Laminas\Uri\Exception\InvalidUriException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      * @api GET /adminv2/report-export/{reportId}/generate
      */
     public function getGenerate(Model $report): void
     {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
         /* Generate a (warnings, reportConfigs) stack
          */
         $reportConfigs = (new Payload\Url(
             $this->router,
-            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $urlBase,
             $this->termMapper,
             $this->roleMapper,
             $this->userBulkMapper,
             $this->userMapper
         ))->generate($report);
 
-        new \Alaress_Probe($reportConfigs);
+        $warnings = $reportConfigs['warnings'];
+        $reports = $reportConfigs['reportConfigs'];
+
+        $numReports = \count($reports);
+
+        /* If there's something to send to taskd, then
+         * set up all the credentials and punt it across
+         */
+        if ($numReports) {
+            // Get the taskd context, and send
+            /** @var Producer $producer */
+            $producer = $this->getDi()->get('taskd.messageProducer');
+
+            /** @var MessageFactory $messageFactory */
+            $messageFactory = $this->getDi()->get('taskd.messageFactory');
+            $userSerializer = new ModelToArray();
+
+            /* This is the filename for the zip that contains everything
+             * It's a concat of today's date and the report name
+             */
+            $outfile = mb_substr(sprintf(
+                '%s-%s.zip',
+                \Alaress_Date_Format::now()->getDatabaseDate(),
+                $report->getTitle()
+            ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8');
+
+            /* Gotenberg authentication credentials
+             */
+            $gotenbergAuth = null;
+
+            /* If an api key exists, set up the credentials struct
+             */
+            $gotenbergApiKey = trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+
+            if ('' !== $gotenbergApiKey) {
+                $gotenbergAuth = [
+                    'key' => $gotenbergApiKey,
+                    'header' => 'SBAuth'
+                ];
+            }
+
+            /* This $message instance is the payload that we send to taskd
+             * which it then unpacks, configures its Gotenberg client, and uses
+             * to generate the pdfs. This is the bridge between the systems
+             */
+            $message = $messageFactory->build(
+                'download-pages',
+                [
+                    'token'     => $this->tokenBuilder->generate($this->getUser()),
+                    'content'   => $reportConfigs['reportConfigs'],
+                    'outfile'   => $outfile,
+                    'gotenberg' => [
+                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        'auth' => $gotenbergAuth,
+                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
+                    ],
+                ],
+                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
+                    ->setQuery(null)
+                    ->toString(),
+                [
+                    'message' => sprintf(self::NOTIFICATION_TEXT, $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
+                    'from'    => call_user_func($userSerializer, $this->getUser()),
+                    'to'      => call_user_func($userSerializer, $this->getUser()),
+                ],
+                $this->getUser(),
+            );
+
+            /* Send it to task for async processing
+             */
+            $producer->send($message);
+        }
+
+        /* Show waiting screen
+         */
+        $this->getResponse()->content->set([
+            'template' => '@adminReportExport/result.twig',
+            'data' => [
+                'pageCurrent'    => $this->router->generate('adminReportExport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                    $this->router->generate('adminReportExport.getList')
+                ),
+                'reportCount'    => $numReports,
+                'warnings'       => $warnings,
+            ]
+        ]);
     }
 
 
@@ -655,74 +757,68 @@ class Controller extends ConfigController
 //                // noop
 //            }
 //        }
-
-        if (!empty($reports)) {
-            // Get the taskd context, and send
-            /** @var Producer $producer */
-            $producer = $this->getDi()->get('taskd.messageProducer');
-
-            /** @var MessageFactory $messageFactory */
-            $messageFactory = $this->getDi()->get('taskd.messageFactory');
-            $userSerializer = new ModelToArray();
-
-            $date = \Alaress_Date_Format::now()->getDatabaseDate();
-            $outfile = $escapedTitle !== ''
-                ? ($date . '-' . $escapedTitle)
-                : $date;
-
-            $gotenbergApiKey = $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
-            $gotenbergAuth   = $gotenbergApiKey
-                ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
-                : null;
-
-            /* This $message instance is the payload that we send to taskd
-             * which it then unpacks, configures its Gotenberg client, and uses
-             * to generate the pdfs. This is the bridge between the systems
-             */
-            $message = $messageFactory->build(
-                'download-pages',
-                [
-                    'token'     => $this->tokenBuilder->generate($this->getUser()),
-                    'content'   => $reports,
-                    'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
-                    'gotenberg' => [
-                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                        'auth' => $gotenbergAuth,
-                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
-                    ],
-                ],
-                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
-                        ->setQuery(null)
-                        ->toString(),
-                [
-                    'message' => sprintf('Your summative report %s is ready to download', $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
-                    'from'    => call_user_func($userSerializer, $this->getUser()),
-                    'to'      => call_user_func($userSerializer, $this->getUser()),
-                ],
-                $this->getUser(),
-            );
-            $producer->send($message);
-        }
-        $this->getResponse()->content->set(
-            [
-                'template' => '@adminReportExport/result.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminReportExport.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                        $this->router->generate('adminReportExport.getIndex')
-                    ),
-                    'reportCount'    => count($reports),
-                    'warnings'       => $warnings,
-                ],
-            ]
-        );
+//
+//        if (!empty($reports)) {
+//            // Get the taskd context, and send
+//            /** @var Producer $producer */
+//            $producer = $this->getDi()->get('taskd.messageProducer');
+//
+//            /** @var MessageFactory $messageFactory */
+//            $messageFactory = $this->getDi()->get('taskd.messageFactory');
+//            $userSerializer = new ModelToArray();
+//
+//            $date = \Alaress_Date_Format::now()->getDatabaseDate();
+//            $outfile = $escapedTitle !== ''
+//                ? ($date . '-' . $escapedTitle)
+//                : $date;
+//
+//            $gotenbergApiKey = $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+//            $gotenbergAuth   = $gotenbergApiKey
+//                ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
+//                : null;
+//
+//            /* This $message instance is the payload that we send to taskd
+//             * which it then unpacks, configures its Gotenberg client, and uses
+//             * to generate the pdfs. This is the bridge between the systems
+//             */
+//            $message = $messageFactory->build(
+//                'download-pages',
+//                [
+//                    'token'     => $this->tokenBuilder->generate($this->getUser()),
+//                    'content'   => $reports,
+//                    'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
+//                    'gotenberg' => [
+//                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+//                        'auth' => $gotenbergAuth,
+//                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
+//                    ],
+//                ],
+//                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
+//                        ->setQuery(null)
+//                        ->toString(),
+//                [
+//                    'message' => sprintf('Your summative report %s is ready to download', $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
+//                    'from'    => call_user_func($userSerializer, $this->getUser()),
+//                    'to'      => call_user_func($userSerializer, $this->getUser()),
+//                ],
+//                $this->getUser(),
+//            );
+//            $producer->send($message);
+//        }
+//        $this->getResponse()->content->set(
+//            [
+//                'template' => '@adminReportExport/result.twig',
+//                'data'     => [
+//                    'pageCurrent'    => $this->router->generate('adminReportExport.getIndex'),
+//                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+//                        $this->router->generate('adminReportExport.getIndex')
+//                    ),
+//                    'reportCount'    => count($reports),
+//                    'warnings'       => $warnings,
+//                ],
+//            ]
+//        );
     }
-
-
-
-
-
-
 
 
     /**
