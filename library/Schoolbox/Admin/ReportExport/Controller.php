@@ -604,7 +604,6 @@ class Controller extends ConfigController
          * set up all the credentials and punt it across
          */
         if ($numReports) {
-
             // Get the taskd context, and send
             /** @var Producer $producer */
             $producer = $this->getDi()->get('taskd.messageProducer');

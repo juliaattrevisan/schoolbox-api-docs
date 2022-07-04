@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\ReportExport\Payload;
@@ -208,7 +210,8 @@ class Url
      * @param array $termIds
      * @return array
      */
-    public function calculateDateRange(array $termIds): array {
+    public function calculateDateRange(array $termIds): array
+    {
         $startDate = null;
         $endDate = null;
 

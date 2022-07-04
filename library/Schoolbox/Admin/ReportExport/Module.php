@@ -98,7 +98,6 @@ class Module extends BaseModule
             try {
                 $report = $this->getMapperFactory()->get(Mapper::class)->findById($params['reportId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 throw new NotFound('Unknown summative report.', 0, $e);
             }
         }
@@ -124,7 +123,6 @@ class Module extends BaseModule
             try {
                 $report = $this->getMapperFactory()->get(Mapper::class)->findById($params['reportId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 throw new NotFound('Unknown summative report.', 0, $e);
             }
         }
