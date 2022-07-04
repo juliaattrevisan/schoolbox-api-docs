@@ -253,22 +253,45 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-report-terms">Academic Periods</label>
+                            <p class="meta">
+                                The report will only include assessments that are due between the start and
+                                end of these academic periods.
+                            </p>
                             <input type="text" id="report-terms" name="terms" />
                         </div>
                     </fieldset>
 
                     <fieldset class="content">
-                        <div class="small-12 large-6 columns">
-                            <label for="report-year-levels">Year Levels</label>
-                            <input type="text" id="report-year-levels" name="yearLevels" />
-                        </div>
-                        <div class="small-12 large-6 columns">
-                            <label for="report-campuses">Campuses</label>
-                            <input type="text" id="report-campuses" name="campuses" />
-                        </div>
+                        <legend>Student Selection</legend>
                         <div class="small-12 columns">
-                            <label for="report-students">Students</label>
-                            <input type="text" id="report-students" name="students" />
+                            <p class="meta">
+                                Select the students to be included in the report generation; all students
+                                in each group will be included in the final export.
+                            </p>
+
+                            <div class="row">
+                                <div class="small-12 large-6 columns">
+                                    <label for="report-year-levels">Year Levels
+                                        <span class="hint has-tip tip-top" title="We'll generate reports for all the students found in the
+                                    Year Levels chosen below." data-tooltip="">?</span>
+                                    </label>
+                                    <input type="text" id="report-year-levels" name="yearLevels" />
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <label for="report-campuses">Campuses
+                                        <span class="hint has-tip tip-top" title="We'll generate reports for all the students found in the
+                                    Campuses chosen below." data-tooltip="">?</span>
+                                    </label>
+                                    <input type="text" id="report-campuses" name="campuses" />
+                                </div>
+                                <div class="small-12 columns">
+                                    <label for="report-students">Students
+                                        <span class="hint has-tip tip-top" title="Reports for the following students will also be generated in addition
+                                    to the students found via the Year Level and Campus selections." data-tooltip="">?</span>
+                                    </label>
+                                    <input type="text" id="report-students" name="students" />
+                                </div>
+                            </div>
                         </div>
                     </fieldset>
                 </section>
