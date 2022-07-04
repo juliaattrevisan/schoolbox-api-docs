@@ -37,7 +37,12 @@
                                     </a>
                                     <p class="meta">
                                         Last modified by
-                                        <a href="/search/user/{{ report.updatedBy.id }}" title="{{ report.updatedBy.fullname }}">{{ report.updatedBy.fullname }}</a>
+                                        {% if report.updatedBy.deleted %}
+                                            {{ report.updatedBy.fullname }}
+                                        {% else %}
+                                            <a href="/search/user/{{ report.updatedBy.id }}" title="{{ report.updatedBy.fullname }}">{{ report.updatedBy.fullname }}</a>
+                                        {% endif %}
+
                                         on {{ report.updatedAt.local }}
                                     </p>
                                 </div>
