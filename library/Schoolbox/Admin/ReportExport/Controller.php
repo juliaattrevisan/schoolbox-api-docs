@@ -550,7 +550,9 @@ class Controller extends ConfigController
         /* Remove id and shank in a new title
          */
         $report->setId(null)
-            ->setTitle($newTitle);
+            ->setTitle($newTitle)
+            ->setUpdatedBy($this->getUser())
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->reportMapper->save($report);
 
