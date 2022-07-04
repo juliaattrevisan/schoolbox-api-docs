@@ -141,31 +141,30 @@
                         </div>
                     </li>
                     <li>
-                        <div>
-                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_https_upgrade"></div>
-                            <div class="small-5 large-9 columns content">
-                                <h4 class="no-margin">HTTP > HTTPS upgrade</h4>
+                        <div id="https_upgrade">
+                            <div class="expander icon-down-arrow" data-collapser="ssl_https_upgrade"></div>
+                            <div class="column-left columns content">
+                                <h3 class="no-margin">HTTP > HTTPS upgrade</h3>
                             </div>
-                            <div class="small-7 large-3 content">
-                                <span class="full-width neutral label" data-light="ssl_https_upgrade">Testing...</span>
+                            <div class="column-right content">
+                                <span class="full-width no-margin neutral label" data-light="ssl_https_upgrade">Testing...</span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_https_upgrade" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_https_upgrade" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>The problem is this...</p>
-                                <h5>Common causes</h5>
+                                <p>Let's Encrypt domain verification requests are made with HTTP. If these requests are escalated to HTTPS, Schoolbox will redirect this unauthenticated traffic to the Schoolbox login page and the SSL certificate renewal process will fail.</p>
+                                <h5>Common cause</h5>
                                 <ul>
-                                    <li>
-                                        <p>You firewall is...</p>
-                                    </li>
+                                    <li>A service upstream of the Schoolbox server may be intercepting Let's Encrypt's requests and escalating it from HTTP to HTTPS</li>
                                 </ul>
-                                <h5>Resolution advice</h5>
-                                <ul>
-                                    <li>
-                                        <p>Try reviewing your firewall...</p>
-                                    </li>
-                                </ul>
+                                <h5>Resolution steps</h5>
+                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to reach the Schoolbox server directly. For more information, visit <a href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox Help - System Requirements - Security, Firewall and Ports</a>.</p>
+                                <p id="https_upgrade_server_para" class="hide">
+                                    Our test has identified that the service causing the HTTP to HTTPS escalation identifies itself as
+                                    <code id="https_upgrade_server_span" class=""></code>.
+                                    Please review your configuration of this service and remove the rules that are redirecting HTTP requests to HTTPS.
+                                </p>
                             </article>
                         </div>
                     </li>
