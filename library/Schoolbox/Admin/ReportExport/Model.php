@@ -33,20 +33,20 @@ class Model implements ISoftDeletable
             'active' => 0,
             'heading' => '',
             'workType' => [],
-            'showOverallGrade' => 0,
-            'showComments' => 0,
-            'showRubrics' => 0
+            'overallGrade' => 0,
+            'comments' => 0,
+            'rubrics' => 0
         ],
         'class' => [
             'active' => 0,
             'workType' => [],
-            'showOverallGrade' => 0,
-            'showLearningLevels' => 0,
-            'showCohort' => 0,
-            'showCapabilityGrades' => 0,
-            'showProgression' => 0,
-            'showComments' => 0,
-            'showRubrics' => 0
+            'overallGrade' => 0,
+            'learningLevels' => 0,
+            'cohort' => 0,
+            'capabilityGrades' => 0,
+            'progression' => 0,
+            'comments' => 0,
+            'rubrics' => 0
         ]
     ];
 

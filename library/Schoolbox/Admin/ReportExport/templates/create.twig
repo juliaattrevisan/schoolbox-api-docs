@@ -308,18 +308,18 @@
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
-                            <input name="summary[showOverallGrade]" type="hidden" value="0" />
-                            <input id="report-summary-show-overall-grade" name="summary[showOverallGrade]" type="checkbox" value="1" {% if options.summary.showOverallGrade %}checked="checked"{% endif %} />
+                            <input name="summary[overallGrade]" type="hidden" value="0" />
+                            <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade %}checked="checked"{% endif %} />
                             <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
                         </div>
                         <div class="small-12 columns">
-                            <input name="summary[showComments]" type="hidden" value="0" />
-                            <input id="report-summary-show-comments" name="summary[showComments]" type="checkbox" value="1" {% if options.summary.showComments %}checked="checked"{% endif %} />
+                            <input name="summary[comments]" type="hidden" value="0" />
+                            <input id="report-summary-show-comments" name="summary[comments]" type="checkbox" value="1" {% if options.summary.comments %}checked="checked"{% endif %} />
                             <label for="report-summary-show-comments" class="checkbox-label">Show comments</label>
                         </div>
                         <div class="small-12 columns">
-                            <input name="summary[showRubrics]" type="hidden" value="0" />
-                            <input id="report-summary-show-rubrics" name="summary[showRubrics]" type="checkbox" value="1" {% if options.summary.showRubrics %}checked="checked"{% endif %} />
+                            <input name="summary[rubrics]" type="hidden" value="0" />
+                            <input id="report-summary-show-rubrics" name="summary[rubrics]" type="checkbox" value="1" {% if options.summary.rubrics %}checked="checked"{% endif %} />
                             <label for="report-summary-show-rubrics" class="checkbox-label">Show rubrics</label>
                         </div>
                     </fieldset>
@@ -352,32 +352,32 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[showOverallGrade]" type="hidden" value="0" />
-                            <input id="report-class-show-overall-grade" name="class[showOverallGrade]" type="checkbox" value="1" {% if options.class.showOverallGrade %}checked="checked"{% endif %} />
+                            <input name="class[overallGrade]" type="hidden" value="0" />
+                            <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade %}checked="checked"{% endif %} />
                             <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[showLearningLevels]" type="hidden" value="0" />
-                            <input id="report-class-show-learning-levels" name="class[showLearningLevels]" type="checkbox" value="1" {% if options.class.showLearningLevels %}checked="checked"{% endif %} />
+                            <input name="class[learningLevels]" type="hidden" value="0" />
+                            <input id="report-class-show-learning-levels" name="class[learningLevels]" type="checkbox" value="1" {% if options.class.learningLevels %}checked="checked"{% endif %} />
                             <label for="report-class-show-learning-levels" class="checkbox-label">Show learning levels</label>
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[showCohort]" type="hidden" value="0" />
-                            <input id="report-class-show-cohort" name="class[showCohort]" type="checkbox" value="1" {% if options.class.showCohort %}checked="checked"{% endif %} />
+                            <input name="class[cohort]" type="hidden" value="0" />
+                            <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort %}checked="checked"{% endif %} />
                             <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class results</label>
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[showCapabilityGrades]" type="hidden" value="0" />
-                            <input id="report-class-show-capability-grades" name="class[showCapabilityGrades]" type="checkbox" value="1" {% if options.class.showCapabilityGrades %}checked="checked"{% endif %} />
+                            <input name="class[capabilityGrades]" type="hidden" value="0" />
+                            <input id="report-class-show-capability-grades" name="class[capabilityGrades]" type="checkbox" value="1" {% if options.class.capabilityGrades %}checked="checked"{% endif %} />
                             <label for="report-class-show-capability-grades" class="checkbox-label">Show capability grades results</label>
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[showProgression]" type="hidden" value="0" />
-                            <input id="report-class-show-progression" name="class[showProgression]" type="checkbox" value="1" {% if options.class.showProgression %}checked="checked"{% endif %} />
+                            <input name="class[progression]" type="hidden" value="0" />
+                            <input id="report-class-show-progression" name="class[progression]" type="checkbox" value="1" {% if options.class.progression %}checked="checked"{% endif %} />
                             <label for="report-class-show-progression" class="checkbox-label">Show progression</label>
                         </div>
                     </fieldset>
@@ -385,13 +385,13 @@
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
-                            <input name="class[showComments]" type="hidden" value="0" />
-                            <input id="report-class-show-comments" name="class[showComments]" type="checkbox" value="1" {% if options.class.showComments %}checked="checked"{% endif %} />
+                            <input name="class[comments]" type="hidden" value="0" />
+                            <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments %}checked="checked"{% endif %} />
                             <label for="report-class-show-comments" class="checkbox-label">Show comments</label>
                         </div>
                         <div class="small-12 columns">
-                            <input name="class[showRubrics]" type="hidden" value="0" />
-                            <input id="report-class-show-rubrics" name="class[showRubrics]" type="checkbox" value="1" {% if options.class.showRubrics %}checked="checked"{% endif %} />
+                            <input name="class[rubrics]" type="hidden" value="0" />
+                            <input id="report-class-show-rubrics" name="class[rubrics]" type="checkbox" value="1" {% if options.class.rubrics %}checked="checked"{% endif %} />
                             <label for="report-class-show-rubrics" class="checkbox-label">Show rubrics</label>
                         </div>
                     </fieldset>
