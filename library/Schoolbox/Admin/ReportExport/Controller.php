@@ -749,12 +749,6 @@ class Controller extends ConfigController
                 break;
         }
 
-        /* Instantiate the Work Type instances for each of the sections in the report:
-         * Summary and Class Pages
-         */
-        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
-        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
-
         /* This helps us micromanage assessments
          */
         $gradeHelper = new Helper(
@@ -770,8 +764,15 @@ class Controller extends ConfigController
          */
         $summaryAssessments = new Collection();
 
-        if ($summaryWorkTypes && $summaryWorkTypes->count() > 0) {
-            $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
+        if (\count($optionsPayload['summary']['workType'])) {
+            $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
+
+            /* Instantiate the Work Type instances for each of the sections in the report:
+             * Summary and Class Pages
+             */
+            if ($summaryWorkTypes->count() > 0) {
+                $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
+            }
         }
 
         $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, (bool)$optionsPayload['summary']['rubrics']);
@@ -780,12 +781,21 @@ class Controller extends ConfigController
          */
         $classAssessments = new Collection();
 
-        if ($classWorkTypes && $classWorkTypes->count() > 0) {
-            $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
+        if (\count($optionsPayload['class']['workType'])) {
+            $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
+
+            /* Instantiate the Work Type instances for each of the sections in the report:
+             * Summary and Class Pages
+             */
+            if ($classWorkTypes->count() > 0) {
+                $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
+            }
         }
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
+        /* Build it
+         */
         $data = [
             'student'                    => $student,
             'folders'                    => $folders,
