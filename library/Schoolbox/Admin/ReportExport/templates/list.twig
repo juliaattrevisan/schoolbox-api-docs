@@ -43,7 +43,10 @@
                                 </div>
                             </div>
                             <nav>
-                                <a class="icon-download" href="#" title="Download"></a>
+                                {% set generateRoute = routeLookupIfAuthorized('adminReportExport.getGenerate', {report:report, reportId: report.id}) %}
+                                {% if generateRoute %}
+                                <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
+                                {% endif %}
 
                                 {% set updateRoute = routeLookupIfAuthorized('adminReportExport.getUpdate', {reportId: report.id}) %}
                                 {% if updateRoute %}

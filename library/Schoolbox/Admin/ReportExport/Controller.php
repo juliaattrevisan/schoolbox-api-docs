@@ -575,6 +575,33 @@ class Controller extends ConfigController
     }
 
 
+    /**
+     * Generate a report using its configured payload as settings for the pdfs
+     *
+     * @param Model $report
+     * @return void
+     * @throws \DebugBar\DebugBarException
+     * @api GET /adminv2/report-export/{reportId}/generate
+     */
+    public function getGenerate(Model $report): void
+    {
+        /* Decide what this report's filename should be
+         * It's based on the sanitised name of the report
+         */
+        $filename = Scrub::filename(trim((string)$report->getTitle()));
+
+        /* Generate a list of student identifiers
+         */
+        $studentIds = [];
+
+
+
+        new \Alaress_Probe($report);
+    }
+
+
+
+
 
 
 
