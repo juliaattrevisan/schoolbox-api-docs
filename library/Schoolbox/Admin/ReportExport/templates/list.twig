@@ -50,7 +50,11 @@
                                     <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
                                 {% endif %}
 
-                                <a class="icon-copy" href="#" title="Duplicate"></a>
+                                {% set dupeRoute = routeLookupIfAuthorized('adminReportExport.getDuplicate', {report: report, reportId: report.id}) %}
+                                {% if dupeRoute %}
+                                <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate"></a>
+                                {% endif %}
+
                                 <a class="icon-delete" href="#" title="Delete"></a>
                             </nav>
                         </li>

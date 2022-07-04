@@ -71,6 +71,7 @@ class Module extends BaseModule
         $this->register('GET', '/campuses', 'getCampuses', $getPerms);
         $this->register('GET', '/{reportId}/update', 'getUpdate', $getPerms, $preloadReport);
         $this->register('POST', '/{reportId}/update', 'postUpdate', $postPerms, $preloadReport);
+        $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $getPerms, $preloadReport);
     }
 
 
@@ -90,10 +91,10 @@ class Module extends BaseModule
             try {
                 $report = $this->getMapperFactory()->get(Mapper::class)->findById($params['reportId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
+
                 throw new NotFound('Unknown summative report.', 0, $e);
             }
         }
-
         return [
             'report' => $report
         ];

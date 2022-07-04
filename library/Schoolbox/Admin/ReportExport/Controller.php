@@ -529,6 +529,35 @@ class Controller extends ConfigController
     }
 
 
+    /**
+     * Duplicate a report's settings
+     *
+     * @param Model $report
+     * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     * @api GET /adminv2/report-export/{reportId}/duplicate
+     */
+    public function getDuplicate(Model $report): void
+    {
+        $newTitle = sprintf(
+            'Copy of %s',
+            $report->getTitle()
+        );
+
+        /* Remove id and shank in a new title
+         */
+        $report->setId(null)
+            ->setTitle($newTitle);
+
+        $this->reportMapper->save($report);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+    }
+
+
 
 
 
