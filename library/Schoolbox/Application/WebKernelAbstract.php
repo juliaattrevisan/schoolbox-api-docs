@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
 use Schoolbox\IConfigLoader;
@@ -130,6 +131,18 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = $e->getHttpStatusCode();
                     $message = $e->getMessage();
                     $info    = '';
+                } elseif ($e instanceof JwtParser\Exception\Unparseable) {
+                    $code    = 401;
+                    $message = 'Schoolbox could not parse your auth token.';
+                    $info    = $e->getMessage();
+                } elseif ($e instanceof JwtParser\Exception\Rejected) {
+                    $code    = 401;
+                    $message = 'Schoolbox has detected a problem with your auth token.';
+                    $info    = $e->getMessage();
+                } elseif ($e instanceof JwtParser\Exception\InvalidIdentity) {
+                    $code    = 401;
+                    $message = 'Schoolbox has detected that your auth token identifies an invalid user.';
+                    $info    = $e->getMessage();
                 } elseif (
                     ($e instanceof \PDOException && $e->getCode() === "70100") ||
                     ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100")
