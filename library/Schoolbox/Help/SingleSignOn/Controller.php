@@ -132,60 +132,33 @@ class Controller extends Base
         // Hold on, are you already logged in?
         // Just go straight to the page without authenticating.
         if ($this->getUser()->getId()) {
-            $this->response->redirect->seeOther($page);
+            $this->redirectToPage($page);
             return;
         }
 
-        try {
-            $this->authenticateUserFromToken();
-            $this->response->redirect->seeOther($page);
+        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
+        if (!$jwt) {
+            // No JWT: redirect to login
+            $this->redirectToLogin($page);
             return;
-        } catch (
-            UnexpectedValueException
-            | DomainException
-            | MapperException
-            | SignatureInvalidException
-            | BeforeValidException
-            | ExpiredException
-            | NotFound
-            | NotAuthenticated $e
-        ) {
+        }
+        try {
+            $user = $this->jwtParser->determineUser($jwt);
+        } catch (JwtParser\Exception\Base $e) {
             // noop: fall through to the login page case
         }
-        // For now: just redirect to login page
-        // Later: show a more useful message
-        $loginUrl = (new Uri($this->router->generate('login.getLogin')))
-            ->setQuery(['page' => $page]);
-        $this->response->redirect->seeOther($loginUrl->toString());
-    }
 
-    /**
-     * @throws UnexpectedValueException  if no "jwt" query string param exists
-     * @throws UnexpectedValueException  if JWT is incorrectly formed
-     * @throws DomainException           if JWT payload is invalid JSON
-     * @throws UnexpectedValueException  if JWT contains no instance ID claim
-     * @throws MapperException           if instance ID matches no instance
-     * @throws SignatureInvalidException if JWT signature invalid
-     * @throws BeforeValidException      if JWT is not yet valid or issued
-     * @throws ExpiredException          if JWT has since expired
-     * @throws NotFound                  if JWT identifies a user which cannot
-     *                                   be found
-     * @throws NotAuthenticated          if user identified in JWT cannot be
-     *                                   authenticated (because they don't exist
-     *                                   or their account is inactive)
-     */
-    private function authenticateUserFromToken(): void
-    {
-        // Find the JWT
-        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
-        if (!isset($jwt)) {
-            throw new UnexpectedValueException(
-                sprintf('"%s" query string parameter must be provided', self::QUERY_STRING_JWT)
-            );
+        if (isset($user)) {
+            try {
+                $this->auth->createSession($user->getUsername());
+            } catch (MapperException | NotAuthenticated $e) {
+                // noop: fall through to the login page case
+            }
         }
 
-        $user = $this->jwtParser->determineUser($jwt);
-        $this->auth->createSession($user->getUsername());
+        // For now: just redirect to login page
+        // Later: show a more useful message
+        $this->redirectToPage($page);
     }
 
     /**
@@ -206,5 +179,30 @@ class Controller extends Base
         return $url->isValidRelative()
             ? $url->toString()
             : self::QUERY_STRING_PAGE_DEFAULT;
+    }
+
+    /**
+     * Helper for redirecting to `$page`.
+     *
+     * @param string $page
+     * @return void
+     */
+    private function redirectToPage(string $page): void
+    {
+        $this->response->redirect->seeOther($page);
+    }
+
+    /**
+     * Helper for redirecting to the login form, and then after a successful
+     * login to `$page`.
+     *
+     * @param string $page
+     * @return void
+     */
+    private function redirectToLogin(string $page): void
+    {
+        $loginUrl = (new Uri($this->router->generate('login.getLogin')))
+            ->setQuery(['page' => $page]);
+        $this->response->redirect->seeOther($loginUrl->toString());
     }
 }
