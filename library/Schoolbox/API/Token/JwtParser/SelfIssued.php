@@ -86,10 +86,15 @@ class SelfIssued extends Base
                 throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
         }
-        return $user
-            ?? throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim does not match a user\'s username', self::CLAIM_SUB)
+        if (!$user) {
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_SUB));
+        }
+        if (!$user->getEnabled()) {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT "%s" claim matches a deactivated user', self::CLAIM_SUB)
             );
+        }
+        return $user;
     }
 
     /**

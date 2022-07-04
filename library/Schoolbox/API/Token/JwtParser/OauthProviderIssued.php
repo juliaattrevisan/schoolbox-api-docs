@@ -105,13 +105,19 @@ class OauthProviderIssued extends Base
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
                 $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
-                if ($user) {
+                if (!$user) {
+                    $failureMessage = sprintf(
+                        'JWT "%s" claim does not match a user',
+                        $candidateClaim
+                    );
+                } elseif (!$user->getEnabled()) {
+                    $failureMessage = sprintf(
+                        'JWT "%s" claim matches a deactivated user',
+                        $candidateClaim
+                    );
+                } else {
                     return $user;
                 }
-                $failureMessage = sprintf(
-                    'JWT "%s" claim does not match a user\'s username',
-                    $candidateClaim
-                );
             } else {
                 $failureMessage = sprintf(
                     'JWT "%s" claim is empty',

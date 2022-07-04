@@ -92,7 +92,15 @@ class OtherInstanceIssued extends Base
         if (trim($email) === '') {
             throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
         }
-        return $this->userMapper->findByUsername($email)
-            ?? throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_EMAIL));
+        $user = $this->userMapper->findByUsername($email);
+        if (!$user) {
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_EMAIL));
+        }
+        if (!$user->getEnabled()) {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT "%s" claim matches a deactivated user', self::CLAIM_EMAIL)
+            );
+        }
+        return $user;
     }
 }
