@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use Firebase\JWT\Key;
+use Schoolbox\API\Token\JwtParser\Exception\Unparseable;
 use UnexpectedValueException;
 
 /**
@@ -60,20 +61,24 @@ abstract class Base implements IParser
      *
      * @param string $jwt The JWT to parse.
      * @return array The claims within the JWT.
-     * @throws UnexpectedValueException JWT doesn't contain a header, payload
-     *                                  and signature segment
-     * @throws DomainException          JWT payload is invalid JSON
+     * @throws Unparseable JWT doesn't contain a header, payload and signature
+     *                     segment, or is not parseable for any other reason
+     *                     (e.g. a segment is invalid JSON).
      */
     protected function decodeWithoutVerification(string $jwt): array
     {
         if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                throw new UnexpectedValueException('JWT must contain a header, payload and signature');
+                throw new Unparseable('JWT must contain a header, payload and signature');
             }
             [, $payload,] = $parts;
-            $this->decodeWithoutVerificationResults[$jwt]
-                = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
+            try {
+                $this->decodeWithoutVerificationResults[$jwt]
+                    = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
+            } catch (DomainException $e) {
+                throw new Unparseable($e->getMessage(), $e->getCode(), $e);
+            }
         }
         return $this->decodeWithoutVerificationResults[$jwt];
     }
