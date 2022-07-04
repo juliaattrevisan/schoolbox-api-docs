@@ -187,7 +187,7 @@
          */
         function initSections(sectionSwitch, fieldsets) {
             if ($(sectionSwitch).prop('checked')) {
-                fieldsets.find('input:checkbox').each(function(index, checkbox) {
+                fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', false);
                     $(checkbox).removeAttr('onclick');
                 });
@@ -199,7 +199,7 @@
                     $(selectizeControl).siblings('select').data('selectize').unlock();
                 });
             } else {
-                fieldsets.find('input:checkbox').each(function(index, checkbox) {
+                fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
                 });
 
