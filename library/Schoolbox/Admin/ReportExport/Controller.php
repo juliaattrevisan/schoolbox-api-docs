@@ -914,7 +914,7 @@ class Controller extends ConfigController
             $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
         }
 
-        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $optionsPayload['summary']['rubrics']);
+        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, (bool)$optionsPayload['summary']['rubrics']);
 
         /* Find the assessments that fulfil $classWorkTypes requirements
          */
@@ -924,7 +924,7 @@ class Controller extends ConfigController
             $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
         }
 
-        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['rubrics']);
+        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
         /* Render the full report with all the settings from $report instance
          */
@@ -947,12 +947,12 @@ class Controller extends ConfigController
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
-            'showSummaryGrades'          => $params->getShowSummaryGrades(),
+            'showSummaryGrades'          => (bool)$optionsPayload['summary']['grades'],
             'showSummaryComments'        => (bool)$optionsPayload['summary']['comments'],
             'showSummaryRubrics'         => (bool)$optionsPayload['summary']['rubrics'],
             'showClass'                  => (bool)$optionsPayload['class']['active'],
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
-            'showClassGrades'            => $params->getShowClassGrades(),
+            'showClassGrades'            => (bool)$optionsPayload['class']['grades'],
             'showClassComments'          => (bool)$optionsPayload['class']['comments'],
             'showClassRubrics'           => (bool)$optionsPayload['summary']['rubrics'],
 

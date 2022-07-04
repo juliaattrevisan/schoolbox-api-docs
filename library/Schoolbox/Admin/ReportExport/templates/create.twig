@@ -326,14 +326,20 @@
                             <label for="report-summary-work-types">Work types</label>
                             <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
                         </div>
-                    </fieldset>
-                    <fieldset class="content">
-                        <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
                             <input name="summary[overallGrade]" type="hidden" value="0" />
                             <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade %}checked="checked"{% endif %} />
                             <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Assessment Options</legend>
+
+                        <div class="small-12 columns">
+                            <input name="summary[grades]" type="hidden" value="0" />
+                            <input id="report-class-summary-grade" name="summary[grades]" type="checkbox" value="1" {% if options.summary.grades %}checked="checked"{% endif %} />
+                            <label for="report-class-summary-grade" class="checkbox-label">Show grades</label>
                         </div>
                         <div class="small-12 columns">
                             <input name="summary[comments]" type="hidden" value="0" />
@@ -406,7 +412,11 @@
                     </fieldset>
                     <fieldset class="content">
                         <legend>Assessment Options</legend>
-
+                        <div class="small-12 columns">
+                            <input name="class[grades]" type="hidden" value="0" />
+                            <input id="report-class-show-grade" name="class[grades]" type="checkbox" value="1" {% if options.class.grades %}checked="checked"{% endif %} />
+                            <label for="report-class-show-grade" class="checkbox-label">Show grades</label>
+                        </div>
                         <div class="small-12 columns">
                             <input name="class[comments]" type="hidden" value="0" />
                             <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments %}checked="checked"{% endif %} />
