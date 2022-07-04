@@ -94,8 +94,6 @@ class Controller extends ConfigController
 
     private RoleMapper $roleMapper;
 
-    private Jwt $tokenBuilder;
-
 
     /**
      * Constructor
@@ -112,7 +110,6 @@ class Controller extends ConfigController
      * @param Access                $access
      * @param UserBulkMapper        $userBulkMapper
      * @param RoleMapper            $roleMapper
-     * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      * @param Rebuilder             $rebuilder
@@ -130,7 +127,6 @@ class Controller extends ConfigController
         Access $access,
         UserBulkMapper $userBulkMapper,
         RoleMapper $roleMapper,
-        Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder
@@ -145,7 +141,6 @@ class Controller extends ConfigController
         $this->folderMapper          = $folderMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
-        $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
         $this->roleMapper            = $roleMapper;
@@ -606,13 +601,21 @@ class Controller extends ConfigController
          * set up all the credentials and punt it across
          */
         if ($numReports) {
+
             // Get the taskd context, and send
             /** @var Producer $producer */
             $producer = $this->getDi()->get('taskd.messageProducer');
 
             /** @var MessageFactory $messageFactory */
-            $messageFactory = $this->getDi()->get('taskd.messageFactory');
+            $messageFactory = $this->getDi()->get('taskd.downloadPagesMessageFactory');
             $userSerializer = new ModelToArray();
+
+            /* armatronic:
+             * Not sure what this does/did...?
+             */
+            foreach ($reports as $current) {
+                $messageFactory = $messageFactory->addPdfContent($current['filename'], $current['urls']);
+            }
 
             /* This is the filename for the zip that contains everything
              * It's a concat of today's date and the report name
@@ -623,47 +626,33 @@ class Controller extends ConfigController
                 $report->getTitle()
             ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8');
 
-            /* Gotenberg authentication credentials
-             */
-            $gotenbergAuth = null;
-
-            /* If an api key exists, set up the credentials struct
-             */
-            $gotenbergApiKey = trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
-
-            if ('' !== $gotenbergApiKey) {
-                $gotenbergAuth = [
-                    'key' => $gotenbergApiKey,
-                    'header' => 'SBAuth'
-                ];
-            }
-
             /* This $message instance is the payload that we send to taskd
              * which it then unpacks, configures its Gotenberg client, and uses
              * to generate the pdfs. This is the bridge between the systems
              */
-            $message = $messageFactory->build(
-                'download-pages',
-                [
-                    'token'     => $this->tokenBuilder->generate($this->getUser()),
-                    'content'   => $reportConfigs['reportConfigs'],
-                    'outfile'   => $outfile,
-                    'gotenberg' => [
-                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                        'auth' => $gotenbergAuth,
-                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
-                    ],
-                ],
-                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
-                    ->setQuery(null)
-                    ->toString(),
-                [
-                    'message' => sprintf(self::NOTIFICATION_TEXT, $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
+            $message = $messageFactory
+                ->setUser($this->getUser())
+                ->setCallbackUrl(
+                    $urlBase
+                        ->setPath(
+                            $this->getRouter()->generate(
+                                'apiusernotify.apiUserNotify',
+                                ['userId' => $this->getUser()->getId()]
+                            )
+                        )
+                        ->setQuery(null)
+                        ->toString()
+                )
+                ->setCallbackParams([
+                    'message' => sprintf(
+                        'Your summative report %s is ready to download',
+                        $report->getTitle(),
+                    ),
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
-                ],
-                $this->getUser(),
-            );
+                ])
+                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+                ->build($outfile);
 
             /* Send it to task for async processing
              */
@@ -683,141 +672,6 @@ class Controller extends ConfigController
                 'warnings'       => $warnings,
             ]
         ]);
-    }
-
-
-
-
-
-
-
-    /**
-     * Request report generation to taskd
-     * @return void
-     * @throws RouteNotFound
-     * @throws \Interop\Queue\Exception
-     * @throws \Interop\Queue\Exception\InvalidDestinationException
-     * @throws \Interop\Queue\Exception\InvalidMessageException
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     */
-    public function postReport(): void
-    {
-//        $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
-//
-//        // find students
-//        if (empty($reportParams->getCampuses()) && empty($reportParams->getYearLevels())) {
-//            // if both campuses and year levels are not provided, generate only for specific students
-//            $studentIds = [];
-//        } else {
-//
-//        }
-//
-//        if ($reportParams->getStudentIds()) {
-//            $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
-//            $studentIds = array_unique($studentIds);
-//        }
-//        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
-//
-//        $warnings = [];
-//
-//        $reports = [];
-//        $params  = $reportParams->getParams();
-//        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-//        $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
-//        foreach ($reportStudents as $student) {
-//            if ($reportParams->getViewAs() === Role::PARENT) {
-//                $student->loadParents();
-//                if ($student->getParents()->count() === 0) {
-//                    $warnings[] = sprintf('Unable to generate report for student id %d. No parents.', $student->getId());
-//                    continue;
-//                }
-//            }
-//            try {
-//                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
-//                    'studentId' => $student->getId(),
-//                    'student'   => $student,
-//                ]);
-//                if ($reportPath) {
-//                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
-//                    $fullName   = Scrub::filename($student->getFullName());
-//                    $filename   = $escapedTitle !== ''
-//                        ? sprintf('%s - %s', $fullName, $escapedTitle)
-//                        : $fullName;
-//                    $reports[] = [
-//                        'filename' => sprintf(
-//                            "%s/%s.pdf",
-//                            $externalId,
-//                            mb_substr($filename, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
-//                        ),
-//                        'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
-//                    ];
-//                }
-//            } catch (RouteNotFound $e) {
-//                // noop
-//            }
-//        }
-//
-//        if (!empty($reports)) {
-//            // Get the taskd context, and send
-//            /** @var Producer $producer */
-//            $producer = $this->getDi()->get('taskd.messageProducer');
-//
-//            /** @var MessageFactory $messageFactory */
-//            $messageFactory = $this->getDi()->get('taskd.messageFactory');
-//            $userSerializer = new ModelToArray();
-//
-//            $date = \Alaress_Date_Format::now()->getDatabaseDate();
-//            $outfile = $escapedTitle !== ''
-//                ? ($date . '-' . $escapedTitle)
-//                : $date;
-//
-//            $gotenbergApiKey = $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
-//            $gotenbergAuth   = $gotenbergApiKey
-//                ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
-//                : null;
-//
-//            /* This $message instance is the payload that we send to taskd
-//             * which it then unpacks, configures its Gotenberg client, and uses
-//             * to generate the pdfs. This is the bridge between the systems
-//             */
-//            $message = $messageFactory->build(
-//                'download-pages',
-//                [
-//                    'token'     => $this->tokenBuilder->generate($this->getUser()),
-//                    'content'   => $reports,
-//                    'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
-//                    'gotenberg' => [
-//                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-//                        'auth' => $gotenbergAuth,
-//                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
-//                    ],
-//                ],
-//                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
-//                        ->setQuery(null)
-//                        ->toString(),
-//                [
-//                    'message' => sprintf('Your summative report %s is ready to download', $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
-//                    'from'    => call_user_func($userSerializer, $this->getUser()),
-//                    'to'      => call_user_func($userSerializer, $this->getUser()),
-//                ],
-//                $this->getUser(),
-//            );
-//            $producer->send($message);
-//        }
-//        $this->getResponse()->content->set(
-//            [
-//                'template' => '@adminReportExport/result.twig',
-//                'data'     => [
-//                    'pageCurrent'    => $this->router->generate('adminReportExport.getIndex'),
-//                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-//                        $this->router->generate('adminReportExport.getIndex')
-//                    ),
-//                    'reportCount'    => count($reports),
-//                    'warnings'       => $warnings,
-//                ],
-//            ]
-//        );
     }
 
 

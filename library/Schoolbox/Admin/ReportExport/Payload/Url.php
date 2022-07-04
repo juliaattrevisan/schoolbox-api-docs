@@ -179,9 +179,7 @@ class Url
                             $externalId,
                             $reportFilename,
                         ),
-                        'urls' => [
-                            $urlBase->setPath($reportPath)->toString()
-                        ],
+                        'url' => $urlBase->setPath($reportPath)->toString(),
                     ];
 
                     $reportConfigs[] = $reportConfig;
