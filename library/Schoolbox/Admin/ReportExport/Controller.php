@@ -689,6 +689,8 @@ class Controller extends ConfigController
      * @return void
      * @throws MapperException
      * @throws \Alaress\Web\Controller\Exception
+     * @throws \InvalidArgumentException
+     * @throws \JsonException
      * @api GET /adminv2/report-export/student/:studentId
      */
     public function getStudentReport(\Schoolbox\Admin\ReportExport\Model $report, User $student): void
@@ -721,7 +723,7 @@ class Controller extends ConfigController
          */
         $viewer = $this->getUser();
 
-        switch ($this->request->query['viewAs']) {
+        switch ($optionsPayload['viewAs']) {
             case Role::STUDENT:
                 $viewer = $student;
                 break;
