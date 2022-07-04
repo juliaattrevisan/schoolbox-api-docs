@@ -740,6 +740,10 @@ class Controller extends ConfigController
                         $student->getExternalId()
                     ));
                 }
+
+                /* View as the first parent in the stack...whoever that might be
+                 */
+                $viewer = $student->getParents()->first();
                 break;
             case Role::STAFF:
             default:
