@@ -72,6 +72,7 @@ class Module extends BaseModule
         $this->register('GET', '/{reportId}/update', 'getUpdate', $getPerms, $preloadReport);
         $this->register('POST', '/{reportId}/update', 'postUpdate', $postPerms, $preloadReport);
         $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $getPerms, $preloadReport);
+        $this->register('POST', '/{reportId}/delete', 'postDelete', $postPerms, $preloadReport);
     }
 
 

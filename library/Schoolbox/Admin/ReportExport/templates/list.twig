@@ -55,7 +55,51 @@
                                 <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate"></a>
                                 {% endif %}
 
-                                <a class="icon-delete" href="#" title="Delete"></a>
+                                {% set deleteRoute = routeLookupIfAuthorized('adminReportExport.postDelete', {report: report, reportId: report.id}) %}
+                                {% if deleteRoute %}
+                                    <script>
+                                        $(function() {
+                                            let toast = $('#toast');
+
+                                            $('#container').on('click', 'a[data-delete="{{ report.id }}"]', function(event) {
+                                                event.preventDefault();
+
+                                                /* Activate indicator label
+                                                 */
+                                                toast.toastActivate({
+                                                    text: "Deleting..."
+                                                });
+
+                                                let element = $(this);
+
+                                                element.confirmDialog({
+                                                    text: 'Are you sure you want to delete this summative report?',
+                                                    confirmEvent: function() {
+                                                        $.post(element.attr('href'), function() {
+                                                        })
+                                                            .done(function() {
+                                                                toast.toastTimeout({
+                                                                    text: 'Saved',
+                                                                    css: 'success'
+                                                                });
+
+
+                                                            })
+                                                            .fail(function(response) {
+                                                                let temp = $.parseJSON(response.responseText);
+
+                                                                toast.toastTimeout({
+                                                                    text: 'Could not save: ' + temp.error,
+                                                                    css: 'alert'
+                                                                });
+                                                            });
+                                                    }
+                                                });
+                                            });
+                                        });
+                                    </script>
+                                    <a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ report.id }}"></a>
+                                {% endif %}
                             </nav>
                         </li>
                         {% endfor %}
@@ -74,4 +118,4 @@
     </div>
 </div>
 
-
+<div id='toast' class="toast" data-toast></div>

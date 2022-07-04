@@ -558,6 +558,23 @@ class Controller extends ConfigController
     }
 
 
+    /**
+     * Soft-delete a report
+     *
+     * @param Model $report
+     * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @api POST /adminv2/report-export/{reportId}/delete
+     */
+    public function postDelete(Model $report): void
+    {
+        $this->reportMapper->delete($report);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+    }
+
+
 
 
 
