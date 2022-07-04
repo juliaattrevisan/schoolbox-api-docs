@@ -521,7 +521,7 @@ class Queue extends ResourceVideo
         if ($transformModel) {
             $transformMapper->save($transformModel->setSize($fileSize)->setState(Transform\Model::STATE_DONE));
         } else {
-            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE);
+            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE, 'jpg');
         }
     }
 

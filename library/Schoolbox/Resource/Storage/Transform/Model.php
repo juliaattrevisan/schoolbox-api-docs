@@ -42,7 +42,7 @@ class Model
     /**
      * @var string
      */
-    private $hash;
+    private string $hash;
 
     /**
      * The cacheKey does not always equal the transformation name.
@@ -57,16 +57,22 @@ class Model
      *
      * @var string
      */
-    private $cacheKey;
+    private string $cacheKey;
 
     /**
      * Will be NULL if state is not yet 'done'
      *
      * @var null|int
      */
-    private $size;
+    private ?int $size;
 
     private ?string $state;
+
+    /**
+     * This is the format of the transformed file, it may be jpg, png, webp or gif
+     * @var string
+     */
+    private string $format;
 
     /**
      * @param string $hash
@@ -163,5 +169,25 @@ class Model
             throw new InsufficientHydrationException("State is null");
         }
         return $this->state === self::STATE_DONE;
+    }
+
+    /**
+     * @param string $format
+     *
+     * @return $this
+     */
+    public function setFormat(string $format): self
+    {
+        $this->format = $format;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat(): string
+    {
+        return $this->format;
     }
 }

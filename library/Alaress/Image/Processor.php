@@ -110,14 +110,14 @@ class Processor
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $mimetype   = $this->mimetype ?? $this->pathFilesystem->mimeType($this->path);
-        $fileFormat = $this->getFormatFromMime($mimetype);
+        $fileFormat = new TransformFormat($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
-        if ($fileFormat === 'svg') {
+        if ('svg' === $fileFormat->getFormat()) {
             // Assume the stream to the base SVG exists
             return new StreamableFile(
                 true,
-                $mimetype,
+                $fileFormat->getMime(),
                 $this->pathFilesystem->fileSize($this->path),
                 $this->pathFilesystem->readStream($this->path),
             );
@@ -134,9 +134,10 @@ class Processor
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
             try {
+                $fileFormat->setFormat($transformModel->getFormat());
                 return new StreamableFile(
                     true,
-                    $mimetype,
+                    $fileFormat->getMime(),
                     $this->storageFilesystem->fileSize($transformPath),
                     $this->storageFilesystem->readStream($transformPath),
                 );
@@ -161,11 +162,11 @@ class Processor
             if ($transformModel) {
                 $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
             } else {
-                $transformMapper->createRecord($hash, $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
+                $transformMapper->createRecord($hash, $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE, $fileFormat->getFormat());
             }
             return new StreamableFile(
                 true,
-                $mimetype,
+                $fileFormat->getMime(),
                 $transformSize,
                 $this->storageFilesystem->readStream($transformPath),
             );
@@ -179,6 +180,7 @@ class Processor
                 $this->cacheKey,
                 null,
                 Storage\Transform\Model::STATE_PROCESSING,
+                $fileFormat->getFormat()
             );
         } else {
             // Transformation HAS been attempted before.
@@ -201,7 +203,7 @@ class Processor
         try {
             $transformSize = $this->generateTransformation(
                 $maxAttempts,
-                $fileFormat,
+                $fileFormat->getFormat(),
                 $transformPath,
             );
         } catch (
@@ -231,7 +233,7 @@ class Processor
 
         return new StreamableFile(
             false,
-            $mimetype,
+            $fileFormat->getMime(),
             $transformSize,
             $this->storageFilesystem->readStream($transformPath),
         );
@@ -313,13 +315,20 @@ class Processor
             },
             E_WARNING
         );
-        $imageSize       = getimagesizefromstring($this->pathFilesystem->read($this->path));
-        set_error_handler($oldErrorHandler);
-        error_reporting($oldErrorLevel);
-        if ($imageSize === false) {
+        /**
+         * load the image into imagick and pick the metadata out of the header using
+         * https://www.php.net/manual/en/imagick.pingimageblob.php
+         */
+        try {
+            $imagick = new Imagick();
+            $imagick->pingImageBlob($this->pathFilesystem->read($this->path));
+        } catch (ImagickException $e) {
             throw new CorruptImageException("Unable to derive image size");
         }
-        [$width, $height] = $imageSize;
+        $width = $imagick->getImageWidth();
+        $height = $imagick->getImageHeight();
+        set_error_handler($oldErrorHandler);
+        error_reporting($oldErrorLevel);
 
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
@@ -366,33 +375,5 @@ class Processor
     private function parseImageMagickResourceLimits(): array
     {
         return (new ImagickConfigParser())->parseImageMagickResourceLimits();
-    }
-
-
-    /**
-     * Get an image format from mime
-     *
-     * @param string $mime
-     * @return string
-     * @throws DomainException
-     */
-    private function getFormatFromMime(string $mime): string
-    {
-        switch ($mime) {
-            case 'image/jpeg':
-            case 'image/pjpeg':
-                return 'jpg';
-            case 'image/gif':
-                return 'gif';
-            case 'image/png':
-            case 'image/x-png':
-                return 'png';
-            case 'image/bmp':
-                return 'bmp';
-            case 'image/svg+xml':
-                return 'svg';
-            default:
-                throw new DomainException("Unknown image type '$mime'");
-        }
     }
 }
