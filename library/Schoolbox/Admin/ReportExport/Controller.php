@@ -56,12 +56,6 @@ use Scrub;
 class Controller extends ConfigController
 {
     /**
-     * Max length for filenames: anything longer causes issues on upload.
-     */
-    private const FILENAME_MAX_LENGTH = 250;
-
-
-    /**
      * This file contains an html fragment that represents the footer
      * for all the generated summative reports. Schools wanting a custom
      * theme or layout for their reports will require customisation of almost
@@ -216,7 +210,12 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws MapperException
-     * @throws \DebugBar\DebugBarException
+     * @throws RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      * @api POST /report-export/create
      */
     public function postCreate(): void
@@ -233,6 +232,8 @@ class Controller extends ConfigController
      * @param Model $report
      * @return void
      * @throws RouteNotFound
+     * @throws \DebugBar\DebugBarException
+     * @throws \JsonException
      * @api GET /adminv2/report-export/{reportId}/update
      */
     public function getUpdate(Model $report): void
@@ -271,8 +272,13 @@ class Controller extends ConfigController
      *
      * @param Model $report
      * @return void
-     * @throws \DebugBar\DebugBarException
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \InvalidArgumentException
      * @throws \JsonException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      * @api POST /report-export/{reportId}/update
      */
     public function postUpdate(Model $report): void
@@ -447,7 +453,7 @@ class Controller extends ConfigController
      */
     public function getYearLevels(): void
     {
-        $output     = [['id' => 0, 'name' => 'No Year Level']];
+        $output = [['id' => 0, 'name' => 'No Year Level']];
 
         $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
 
@@ -469,7 +475,7 @@ class Controller extends ConfigController
      */
     public function getWorkTypes(): void
     {
-        $output    = [];
+        $output = [];
         $workTypes = $this->workTypeMapper->findAll()->sortBy('sequence', 'ASC');
 
         foreach ($workTypes as $workType) {
@@ -491,7 +497,7 @@ class Controller extends ConfigController
      */
     public function getCampuses(): void
     {
-        $output   = [];
+        $output = [];
         $campuses = $this->campusMapper->findAll()->sortBy('sequence', 'ASC');
 
         foreach ($campuses as $campus) {
@@ -563,130 +569,17 @@ class Controller extends ConfigController
      */
     public function getGenerate(Model $report): void
     {
-        $optionsPayload = $report->decode();
-
-        /* Decide what this report's filename should be
-         * It's based on the sanitised name of the report
+        /* Generate a (warnings, reportConfigs) stack
          */
-        $filename = Scrub::filename(trim((string)$report->getTitle()));
+        $reportConfigs = (new Payload\Url(
+            $this->router,
+            (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->roleMapper,
+            $this->userBulkMapper,
+            $this->userMapper
+        ))->generate($report);
 
-        /* Base url for report generation
-         */
-        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-
-        /* Generate a list of student identifiers:
-         * demographic students + additional students
-         *
-         * Anyone in the selected years (demographic students)
-         * plus anyone in the selected campuses (demographic students)
-         * plus the specific guys you chose (additional students)
-         *
-         * This is accumulated via the bulkModify search function, believe it or not
-         */
-        $demographicStudentsIds = [];
-        $additionalStudentIds = $optionsPayload['students'];
-
-        /* Year Levels and Campus student demographics
-         *
-         * Check the config to see what Role Type should have come out in the zip
-         * This lets you prevent staff users from getting a pdf when you only wanted students
-         */
-        if (\count($optionsPayload['yearLevels']) || \count($optionsPayload['campuses'])) {
-            $roleIds = $this->roleMapper->findByColumn('group_type', Role::STUDENT)->indexBy('id')->keys();
-
-            $demographicStudents = $this->userBulkMapper->bulkModifySearch(
-                empty($optionsPayload['yearLevels']) ? [ UserBulkMapper::ANY ] : $optionsPayload['yearLevels'],
-                $roleIds,
-                UserBulkMapper::ANY,
-                empty($optionsPayload['campuses']) ? [ UserBulkMapper::ANY ] : $optionsPayload['campuses'],
-                UserBulkMapper::ANY
-            );
-
-            $demographicStudentsIds = array_column($demographicStudents, 'id');
-        }
-
-        /* Combine the list of students and blow away any null/zero/falsey values
-         */
-        $studentIds = array_filter(array_unique(array_merge($demographicStudentsIds, $additionalStudentIds)));
-
-        /* Fetch hydrated instances
-         */
-        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
-
-        /* Start generating report paths and any associated warnings
-         */
-        $reports = [];
-        $warnings = [];
-
-        foreach ($reportStudents as $student) {
-            if ($optionsPayload['viewAs'] === Role::PARENT) {
-                $student->loadParents();
-
-                /* Student doesn't have parents, but we tried to make reports
-                 * formatted specifically for parents; skip them
-                 */
-                if ($student->getParents()->count() === 0) {
-                    $warnings[] = sprintf(
-                        'Unable to generate report for student id %d (%s). No parents.',
-                        $student->getId(),
-                        $student->getExternalId()
-                    );
-
-                    continue;
-                }
-            }
-
-            /* See if we can make a url for this student's report
-             */
-            try {
-                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
-                    'studentId' => $student->getId(),
-                    'student'   => $student,
-                ]);
-
-                if ($reportPath) {
-                    /* Pacify any weird or wonky data in people's names and external ids
-                     * to prevent hacking the filesystem somehow
-                     */
-                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
-                    $fullName   = Scrub::filename($student->getFullName());
-
-                    /* Concat the names
-                     * Report names were mandatory in the create/update screen
-                     */
-                    $reportFilename = mb_substr(sprintf(
-                        '%s - %s',
-                        $filename,
-                        $fullName
-                    ), 0, self::FILENAME_MAX_LENGTH, 'UTF-8');
-
-                    /* Assemble paths/hierarchy in the zip
-                     *
-                     * The zip file contains the student's externalId as a folder
-                     * and their report as a pdf inside that folder so you can see
-                     * who owns which file
-                     */
-                    $reports[] = [
-                        'filename' => sprintf(
-                            "%s/%s.pdf",
-                            $externalId,
-                            $reportFilename,
-                        ),
-                        'urls' => [
-                            $urlBase->setPath($reportPath)->setQuery($params)->toString()
-                        ],
-                    ];
-                }
-            } catch (RouteNotFound $e) {
-                /* noop
-                 *
-                 * Couldn't find the part for this student's report;
-                 * just ignore these missing reports
-                 */
-            }
-
-        }
-
+        new \Alaress_Probe($reportConfigs);
     }
 
 

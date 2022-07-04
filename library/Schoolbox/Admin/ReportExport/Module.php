@@ -62,6 +62,10 @@ class Module extends BaseModule
             return $this->preloadReport($params);
         };
 
+        $preloadReportWithStudent = function ($params) {
+            return $this->preloadReportWithStudent($params);
+        };
+
         $this->register('GET', '', 'getList', $getPerms);
         $this->register('GET', '/create', 'getCreate', $getPerms);
         $this->register('POST', '/create', 'postCreate', $getPerms);
@@ -74,6 +78,7 @@ class Module extends BaseModule
         $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $getPerms, $preloadReport);
         $this->register('POST', '/{reportId}/delete', 'postDelete', $postPerms, $preloadReport);
         $this->register('GET', '/{reportId}/generate', 'getGenerate', $postPerms, $preloadReport);
+        $this->register('GET', '/{reportId}/getStudentReport/{studentId}', 'getStudentReport', $postPerms, $preloadReportWithStudent);
     }
 
 
@@ -99,6 +104,44 @@ class Module extends BaseModule
         }
         return [
             'report' => $report
+        ];
+    }
+
+
+    /**
+     * Preload a summative report with a student
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     * @throws \InvalidArgumentException
+     */
+    private function preloadReportWithStudent(array $params): array
+    {
+        if (\array_key_exists('report', $params)) {
+            $report = $params['report'];
+        } else {
+            try {
+                $report = $this->getMapperFactory()->get(Mapper::class)->findById($params['reportId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                throw new NotFound('Unknown summative report.', 0, $e);
+            }
+        }
+
+        if (\array_key_exists('student', $params)) {
+            $student = $params['student'];
+        } else {
+            try {
+                $student = $this->getMapperFactory()->get(\Schoolbox\UserMapper::class)->findById($params['student']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Unknown student.', 0, $e);
+            }
+        }
+
+        return [
+            'report' => $report,
+            'student' => $student
         ];
     }
 
