@@ -149,6 +149,58 @@
                 }
             },
         });
+
+        /* Dynamically enable sections
+         */
+        $('[data-section-enabled]').each(function(index, element) {
+            let sectionId = $(element).attr('data-section-enabled');
+            let fieldsets = $('#' + sectionId).find('fieldset');
+
+            /* Make checkboxes unchangeable
+             */
+            fieldsets.find('input:checkbox').each(function(index, input) {
+                $(input).on('click', function (event) {
+                    if ($(this).prop('readonly')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+            /* Initialise sections
+             */
+            initSections($(this), fieldsets);
+
+            /* Toggle settings in the section
+             */
+            $(element).on('change', function() {
+                initSections($(this), fieldsets);
+            });
+        });
+
+
+        /**
+         * Set up the initial conditions for the fieldsets
+         * based on whether the report section was enabled
+         *
+         * @param sectionSwitch
+         * @param fieldsets
+         */
+        function initSections(sectionSwitch, fieldsets) {
+            if ($(sectionSwitch).prop('checked')) {
+                fieldsets.find('input:checkbox').each(function(index, checkbox) {
+                    $(checkbox).prop('readonly', false);
+                    $(checkbox).removeAttr('onclick');
+                });
+
+                // $('#report-class-work-types').data('selectize').enable().unlock();
+            } else {
+                fieldsets.find('input:checkbox').each(function(index, checkbox) {
+                    $(checkbox).prop('readonly', true);
+                });
+
+                // $('#report-class-work-types').data('selectize').lock();
+            }
+        }
     });
 </script>
 
@@ -218,10 +270,10 @@
                         </div>
                     </div>
                     <nav>
-                        <span class="switch inline" data-ruleset-enabled="">
+                        <span class="switch inline">
                             <input type="hidden" name="summary[active]" value="0" />
 
-                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" {% if options.summary.active %}checked="checked"{% endif %} />
+                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" data-section-enabled="section-summary" {% if options.summary.active %}checked="checked"{% endif %} />
                             <label for="report-include-summary">
                                 <span>On</span>
                                 <span>Off</span>
@@ -230,8 +282,8 @@
                     </nav>
                 </div>
 
-                <section>
-                    <fieldset class="content" {% if not options.summary.active %}disabled{% endif %}>
+                <section id="section-summary">
+                    <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-summary-heading">Heading</label>
                             <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
@@ -242,7 +294,7 @@
                             <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
                         </div>
                     </fieldset>
-                    <fieldset class="content" {% if not options.summary.active %}disabled{% endif %}>
+                    <fieldset class="content">
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
@@ -270,10 +322,10 @@
                         </div>
                     </div>
                     <nav>
-                        <span class="switch inline" data-ruleset-enabled="">
+                        <span class="switch inline">
                             <input type="hidden" name="class[active]" value="0" />
 
-                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" {% if options.class.active %}checked="checked"{% endif %} />
+                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" data-section-enabled="section-class" {% if options.class.active %}checked="checked"{% endif %} />
                             <label for="report-include-class">
                                 <span>On</span>
                                 <span>Off</span>
@@ -282,11 +334,11 @@
                     </nav>
                 </div>
 
-                <section>
-                    <fieldset class="content" {% if not options.class.active %}disabled{% endif %}>
+                <section id="section-class">
+                    <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-class-work-types">Work types</label>
-                            <select id="report-class-work-types" name="class[workType][]" multiple {% if not options.class.active %}readonly{% endif %}></select>
+                            <select id="report-class-work-types" name="class[workType][]" multiple></select>
                         </div>
 
                         <div class="small-12 columns">
@@ -319,7 +371,7 @@
                             <label for="report-class-show-progression" class="checkbox-label">Show progression</label>
                         </div>
                     </fieldset>
-                    <fieldset class="content" {% if not options.class.active %}disabled{% endif %}>
+                    <fieldset class="content">
                         <legend>Assessment Options</legend>
 
                         <div class="small-12 columns">
