@@ -318,10 +318,11 @@ class Controller extends ConfigController
      * @param Model $report
      * @return array
      * @throws \DebugBar\DebugBarException
+     * @throws \JsonException
      */
     public function decompilePayload(Model $report): array
     {
-        $optionPayload = json_decode($report->getOptions(), true);
+        $optionPayload = $report->decode();
 
         /* Superimpose selected options over the default
          * Disabling fields prevents the keys from existing
@@ -330,7 +331,7 @@ class Controller extends ConfigController
 
         /* Squish out the Terms
          */
-        $terms = $this->termMapper->findByColumn('id', explode(',', $optionPayload['terms']));
+        $terms = $this->termMapper->findByColumn('id', $optionPayload['terms']);
 
         $options['terms'] = [];
 
@@ -343,7 +344,7 @@ class Controller extends ConfigController
 
         /* Squish out the Year Levels
          */
-        $yearLevels = $this->yearLevelMapper->findByColumn('id', explode(',', $optionPayload['yearLevels']));
+        $yearLevels = $this->yearLevelMapper->findByColumn('id', $optionPayload['yearLevels']);
 
         $options['yearLevels'] = [];
 
@@ -356,7 +357,7 @@ class Controller extends ConfigController
 
         /* Squish out the Campuses
          */
-        $campuses = $this->campusMapper->findByColumn('id', explode(',', $optionPayload['campuses']));
+        $campuses = $this->campusMapper->findByColumn('id', $optionPayload['campuses']);
 
         $options['campuses'] = [];
 
@@ -369,7 +370,7 @@ class Controller extends ConfigController
 
         /* Squish out the Students
          */
-        $students = $this->userMapper->findByColumn('id', explode(',', $optionPayload['students']));
+        $students = $this->userMapper->findByColumn('id', $optionPayload['students']);
 
         $options['students'] = [];
 
@@ -556,18 +557,24 @@ class Controller extends ConfigController
      */
     public function getGenerate(Model $report): void
     {
+        $optionPayload = $report->decode();
+
         /* Decide what this report's filename should be
          * It's based on the sanitised name of the report
          */
         $filename = Scrub::filename(trim((string)$report->getTitle()));
 
-        /* Generate a list of student identifiers
+        /* Generate a list of student identifiers:
+         *
+         * The specific guys you chose,
+         * plus anyone in the selected years,
+         * plus anyone in the selected campuses
+         *
+         * This is accumulated via the bulkModify search function, believe it or not
          */
         $studentIds = [];
 
-
-
-        new \Alaress_Probe($report);
+        new \Alaress_Probe($optionPayload);
     }
 
 

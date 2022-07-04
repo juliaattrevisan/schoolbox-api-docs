@@ -58,6 +58,35 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Take the report settings and convert it into an associative array
+     * so you can inspect its guts
+     *
+     * @return array|null
+     * @throws \JsonException
+     */
+    public function decode(): ?array
+    {
+        $optionsPayload = json_decode($this->getOptions(), true, 512, JSON_THROW_ON_ERROR);
+
+        /* Bad data or couldn't decode, for some obscure reason
+         * Kind of common with third parties, more so than us
+         */
+        if (!$optionsPayload) {
+            return null;
+        }
+
+        /* If possible, explode the csv values
+        */
+        $optionsPayload['terms'] = explode(',', (string)$optionsPayload['terms']);
+        $optionsPayload['yearLevels'] = explode(',', (string)$optionsPayload['yearLevels']);
+        $optionsPayload['campuses'] = explode(',', (string)$optionsPayload['campuses']);
+        $optionsPayload['students'] = explode(',', (string)$optionsPayload['students']);
+
+        return $optionsPayload;
+    }
+
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string
