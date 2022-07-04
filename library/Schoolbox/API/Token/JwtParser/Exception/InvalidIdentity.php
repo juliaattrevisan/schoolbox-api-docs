@@ -12,8 +12,10 @@ namespace Schoolbox\API\Token\JwtParser\Exception;
 use RuntimeException;
 
 /**
- * Exception raised when a JWT provided to Schoolbox is accepted, but the
- * identity claim it makes does not match a Schoolbox user.
+ * Exception raised when a JWT provided to Schoolbox is accepted, but the JWT
+ * either:
+ * * has no usable identity claim
+ * * makes an identity claim which does not match a Schoolbox user
  */
 class InvalidIdentity extends RuntimeException
 {

@@ -12,7 +12,6 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -65,9 +64,7 @@ class OauthProviderIssued extends Base
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
 
         // TODO allow these to be configurable
-        $oidcConfigUri = $oauthIdp . '/.well-known/openid-configuration';
-        $algs          = ['RS256'];
-
+        $oidcConfigUri     = $oauthIdp . '/.well-known/openid-configuration';
         $oidcConfigRequest = $this->httpClient->get($oidcConfigUri);
         $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
         $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
@@ -95,7 +92,7 @@ class OauthProviderIssued extends Base
             }
         }
         if (!$validAudience) {
-            throw new JwtLibrary\SignatureInvalidException('JWT audience does not match configured client ID');
+            throw new Exception\Rejected('JWT audience does not match configured client ID');
         }
 
         // The identification in the token seems to be in one of two claims:
@@ -124,7 +121,7 @@ class OauthProviderIssued extends Base
         }
 
         // Candidate claims found no user: can't use it
-        throw new SchoolboxNotFoundException(
+        throw new Exception\InvalidIdentity(
             sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
         );
     }
