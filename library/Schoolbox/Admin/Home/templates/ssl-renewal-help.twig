@@ -116,31 +116,27 @@
             <section>
                 <ol class="information-list expandable-card">
                     <li>
-                        <div class="">
-                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_port_80"></div>
-                            <div class="small-5 large-9 columns content">
-                                <h4 class="no-margin">Port 80 timeout</h4>
+                        <div id="port_80">
+                            <div class="expander icon-down-arrow" data-collapser="ssl_port_80"></div>
+                            <div class="column-left columns content">
+                                <h3 class="no-margin">Port 80 timeout</h3>
                             </div>
-                            <div class="small-7 large-3 content">
-                                <span class="full-width neutral label" data-light="ssl_port_80">Testing...</span>
+                            <div class="column-right content">
+                                <span class="full-width no-margin neutral label" data-light="ssl_port_80">Testing...</span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_port_80" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_port_80" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>The problem is this...</p>
+                                <p>Let's Encrypt sends web requests via HTTP over port 80. If port 80 traffic is restricted, that could be causing SSL certificate renewal requests to fail.</p>
                                 <h5>Common causes</h5>
-                                <ul>
-                                    <li>
-                                        <p>You firewall is...</p>
-                                    </li>
-                                </ul>
-                                <h5>Resolution advice</h5>
-                                <ul>
-                                    <li>
-                                        <p>Try reviewing your firewall...</p>
-                                    </li>
-                                </ul>
+                                <ol>
+                                    <li>A firewall may be restricting traffic on port 80</li>
+                                    <li>A firewall may be restricting HTTP requests</li>
+                                    <li>A firewall if restricting traffic from the US/EU (see <a href="#geoblocking">Geoblocking</a>)</li>
+                                </ol>
+                                <h5>Resolution steps</h5>
+                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to reach the Schoolbox server directly. For more information, visit <a href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox Help - System Requirements - Security, Firewall and Ports</a>.</p>
                             </article>
                         </div>
                     </li>
