@@ -98,27 +98,19 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
         {
             name: FilterEvents.SHOW_WAITING_LIST,
-            callback: (row, query) => {
-                return row.access !== query;
-            }
+            callback: (row, query) => row.access !== query,
         },
         {
             name: FilterEvents.SHOW_READ_ACCESS,
-            callback: (row, query) => {
-                return row.access !== query;
-            }
+            callback: (row, query) => row.access !== query,
         },
         {
             name: FilterEvents.SHOW_WRITE_ACCESS,
-            callback: (row, query) => {
-                return row.access !== query;
-            }
+            callback: (row, query) => row.access !== query,
         },
         {
             name: FilterEvents.SHOW_ADMIN_ACCESS,
-            callback: (row, query) => {
-                return row.access !== query;
-            }
+            callback: (row, query) => row.access !== query,
         },
     ],
     debounce: 100, //shorter debounce time as data is stored locally
@@ -209,6 +201,31 @@ function onSelectionCleared () {
     selectedMembers.value = [];
     tableEl.value.resetSelectedRows();
 }
+
+
+
+/*****************************************************************
+ * 
+ * Remove group members
+ * 
+ ****************************************************************/
+
+/**
+ * to keep track of selected rows
+ * 
+ * @param { Object }
+ */
+// function onRowSelected (event) {
+//     selectedMembers.value = event;
+// }
+
+/**
+ * clear the current selection
+ */
+// function onSelectionCleared () {
+//     selectedMembers.value = [];
+//     tableEl.value.resetSelectedRows();
+// }
 
 
 

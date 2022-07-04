@@ -1,7 +1,8 @@
 <script setup>
 
 /**
- * Manage member selection and the various events that can occur
+ * Manage member selection and the various actions that can occur based
+ * on the members currently selected
  */
 
 import { ref, computed, watch, onMounted  } from 'vue';
@@ -94,6 +95,13 @@ function onClearMemberSelection () {
 }
 
 /**
+ * Email the selected group members
+ */
+function onEmailMembersSelected () {
+    // 
+}
+
+/**
  * Dispatch to manage-group.vue so the selected members can be removed
  */
 function onRemoveMembersSelected () {
@@ -110,6 +118,9 @@ function onRemoveMembersSelected () {
         <ul class="flex-list buttons">
             <li v-if="areAllSelectedOnWaitingList">
                 <button @click.prevent="onRemoveMembersSelected" class="button submit icon-add">Approve Membership</button>
+            </li>
+            <li>
+                <button @click.prevent="onEmailMembersSelected" class="button submit icon-email">Email {{ selectedMembersCountWithRowName }}</button>
             </li>
             <li>
                 <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete">Remove {{ selectedMembersCountWithRowName }}</button>
