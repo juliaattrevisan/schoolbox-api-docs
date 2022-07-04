@@ -12,10 +12,10 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output;
 use Alaress_Date_Format;
 use Authenticator;
-use Firebase\JWT;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
+use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -253,14 +253,14 @@ class Controller extends Base
                     : 'Either the "username" and "password" or the "jwt" POST fields must be set'
             ];
             $status   = 400;
-        } catch (JWT\BeforeValidException $e) {
-            $response = 'JWT is not yet valid';
+        } catch (JwtParser\Exception\Unparseable $e) {
+            $response = 'JWT is not valid: ' . $e->getMessage();
             $status   = 401;
-        } catch (JWT\SignatureInvalidException $e) {
-            $response = 'JWT signature is invalid';
+        } catch (JwtParser\Exception\Rejected $e) {
+            $response = 'JWT rejected: ' . $e->getMessage();
             $status   = 401;
-        } catch (JWT\ExpiredException $e) {
-            $response = empty($e->getMessage()) ? 'JWT expired' : $e->getMessage();
+        } catch (JwtParser\Exception\InvalidIdentity $e) {
+            $response = 'JWT identifies invalid user: ' . $e->getMessage();
             $status   = 401;
         } catch (SchoolboxAccessDeniedException $e) {
             $response = 'Invalid username or password';
@@ -306,6 +306,8 @@ class Controller extends Base
      * @param string $jwt
      * @return User The authenticated user (only if auth was successful)
      * @throws JwtParser\Exception\Base if JWT was rejected for whatever reason
+     * @throws MapperException
+     * @throws NotAuthenticated
      */
     private function authenticateViaJwt(string $jwt): User
     {

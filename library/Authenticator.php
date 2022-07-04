@@ -64,6 +64,7 @@ class Authenticator
      * @param User\Token\Model|null $userToken
      * @return bool
      * @throws \Schoolbox\Mapper\Exception
+     * @throws SchoolboxNotAuthenticatedException if session couldn't be created
      */
     public function createSession(string $username, ?User\Token\Model $userToken = null): bool
     {
