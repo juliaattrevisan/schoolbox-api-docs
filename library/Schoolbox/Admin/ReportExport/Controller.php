@@ -543,7 +543,7 @@ class Controller extends ConfigController
     public function getDuplicate(Model $report): void
     {
         $newTitle = sprintf(
-            'Copy of %s',
+            '%s (copy)',
             $report->getTitle()
         );
 
