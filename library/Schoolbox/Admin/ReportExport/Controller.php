@@ -36,7 +36,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TaskDaemon\Producer;
-use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
@@ -93,6 +93,9 @@ class Controller extends ConfigController
 
     private RoleMapper $roleMapper;
 
+    private Jwt $tokenBuilder;
+
+
     /**
      * Constructor
      *
@@ -108,6 +111,7 @@ class Controller extends ConfigController
      * @param Access                $access
      * @param UserBulkMapper        $userBulkMapper
      * @param RoleMapper            $roleMapper
+     * @param Jwt                   $tokenBuilder
      * @param ConfigMapper          $configMapper
      * @param FieldStrategyFactory  $fieldStrategyFactory
      * @param Rebuilder             $rebuilder
@@ -125,6 +129,7 @@ class Controller extends ConfigController
         Access $access,
         UserBulkMapper $userBulkMapper,
         RoleMapper $roleMapper,
+        Jwt $tokenBuilder,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder
@@ -139,6 +144,7 @@ class Controller extends ConfigController
         $this->folderMapper          = $folderMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->rubricDataSource      = $rubricDataSource;
+        $this->tokenBuilder          = $tokenBuilder;
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
         $this->roleMapper            = $roleMapper;
@@ -557,24 +563,130 @@ class Controller extends ConfigController
      */
     public function getGenerate(Model $report): void
     {
-        $optionPayload = $report->decode();
+        $optionsPayload = $report->decode();
 
         /* Decide what this report's filename should be
          * It's based on the sanitised name of the report
          */
         $filename = Scrub::filename(trim((string)$report->getTitle()));
 
+        /* Base url for report generation
+         */
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
         /* Generate a list of student identifiers:
+         * demographic students + additional students
          *
-         * The specific guys you chose,
-         * plus anyone in the selected years,
-         * plus anyone in the selected campuses
+         * Anyone in the selected years (demographic students)
+         * plus anyone in the selected campuses (demographic students)
+         * plus the specific guys you chose (additional students)
          *
          * This is accumulated via the bulkModify search function, believe it or not
          */
-        $studentIds = [];
+        $demographicStudentsIds = [];
+        $additionalStudentIds = $optionsPayload['students'];
 
-        new \Alaress_Probe($optionPayload);
+        /* Year Levels and Campus student demographics
+         *
+         * Check the config to see what Role Type should have come out in the zip
+         * This lets you prevent staff users from getting a pdf when you only wanted students
+         */
+        if (\count($optionsPayload['yearLevels']) || \count($optionsPayload['campuses'])) {
+            $roleIds = $this->roleMapper->findByColumn('group_type', Role::STUDENT)->indexBy('id')->keys();
+
+            $demographicStudents = $this->userBulkMapper->bulkModifySearch(
+                empty($optionsPayload['yearLevels']) ? [ UserBulkMapper::ANY ] : $optionsPayload['yearLevels'],
+                $roleIds,
+                UserBulkMapper::ANY,
+                empty($optionsPayload['campuses']) ? [ UserBulkMapper::ANY ] : $optionsPayload['campuses'],
+                UserBulkMapper::ANY
+            );
+
+            $demographicStudentsIds = array_column($demographicStudents, 'id');
+        }
+
+        /* Combine the list of students and blow away any null/zero/falsey values
+         */
+        $studentIds = array_filter(array_unique(array_merge($demographicStudentsIds, $additionalStudentIds)));
+
+        /* Fetch hydrated instances
+         */
+        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
+
+        /* Start generating report paths and any associated warnings
+         */
+        $reports = [];
+        $warnings = [];
+
+        foreach ($reportStudents as $student) {
+            if ($optionsPayload['viewAs'] === Role::PARENT) {
+                $student->loadParents();
+
+                /* Student doesn't have parents, but we tried to make reports
+                 * formatted specifically for parents; skip them
+                 */
+                if ($student->getParents()->count() === 0) {
+                    $warnings[] = sprintf(
+                        'Unable to generate report for student id %d (%s). No parents.',
+                        $student->getId(),
+                        $student->getExternalId()
+                    );
+
+                    continue;
+                }
+            }
+
+            /* See if we can make a url for this student's report
+             */
+            try {
+                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
+                    'studentId' => $student->getId(),
+                    'student'   => $student,
+                ]);
+
+                if ($reportPath) {
+                    /* Pacify any weird or wonky data in people's names and external ids
+                     * to prevent hacking the filesystem somehow
+                     */
+                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
+                    $fullName   = Scrub::filename($student->getFullName());
+
+                    /* Concat the names
+                     * Report names were mandatory in the create/update screen
+                     */
+                    $reportFilename = mb_substr(sprintf(
+                        '%s - %s',
+                        $filename,
+                        $fullName
+                    ), 0, self::FILENAME_MAX_LENGTH, 'UTF-8');
+
+                    /* Assemble paths/hierarchy in the zip
+                     *
+                     * The zip file contains the student's externalId as a folder
+                     * and their report as a pdf inside that folder so you can see
+                     * who owns which file
+                     */
+                    $reports[] = [
+                        'filename' => sprintf(
+                            "%s/%s.pdf",
+                            $externalId,
+                            $reportFilename,
+                        ),
+                        'urls' => [
+                            $urlBase->setPath($reportPath)->setQuery($params)->toString()
+                        ],
+                    ];
+                }
+            } catch (RouteNotFound $e) {
+                /* noop
+                 *
+                 * Couldn't find the part for this student's report;
+                 * just ignore these missing reports
+                 */
+            }
+
+        }
+
     }
 
 
@@ -595,84 +707,68 @@ class Controller extends ConfigController
      */
     public function postReport(): void
     {
-        $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
+//        $reportParams = new ReportParams($this->request->post->getArrayCopy(), $this->termMapper);
+//
+//        // find students
+//        if (empty($reportParams->getCampuses()) && empty($reportParams->getYearLevels())) {
+//            // if both campuses and year levels are not provided, generate only for specific students
+//            $studentIds = [];
+//        } else {
+//
+//        }
+//
+//        if ($reportParams->getStudentIds()) {
+//            $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
+//            $studentIds = array_unique($studentIds);
+//        }
+//        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
+//
+//        $warnings = [];
+//
+//        $reports = [];
+//        $params  = $reportParams->getParams();
+//        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+//        $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
+//        foreach ($reportStudents as $student) {
+//            if ($reportParams->getViewAs() === Role::PARENT) {
+//                $student->loadParents();
+//                if ($student->getParents()->count() === 0) {
+//                    $warnings[] = sprintf('Unable to generate report for student id %d. No parents.', $student->getId());
+//                    continue;
+//                }
+//            }
+//            try {
+//                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
+//                    'studentId' => $student->getId(),
+//                    'student'   => $student,
+//                ]);
+//                if ($reportPath) {
+//                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
+//                    $fullName   = Scrub::filename($student->getFullName());
+//                    $filename   = $escapedTitle !== ''
+//                        ? sprintf('%s - %s', $fullName, $escapedTitle)
+//                        : $fullName;
+//                    $reports[] = [
+//                        'filename' => sprintf(
+//                            "%s/%s.pdf",
+//                            $externalId,
+//                            mb_substr($filename, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
+//                        ),
+//                        'urls'     => [$urlBase->setPath($reportPath)->setQuery($params)->toString()],
+//                    ];
+//                }
+//            } catch (RouteNotFound $e) {
+//                // noop
+//            }
+//        }
 
-        // find students
-        if (empty($reportParams->getCampuses()) && empty($reportParams->getYearLevels())) {
-            // if both campuses and year levels are not provided, generate only for specific students
-            $studentIds = [];
-        } else {
-            /* Check the config to see what Role Type should have come out in the zip
-             * This lets you prevent staff users from getting a pdf when you only wanted students
-             */
-            $roleIds = $this->roleMapper->findByColumn('group_type', Role::STUDENT)->indexBy('id')->keys();
-
-            $students   = $this->userBulkMapper->bulkModifySearch(
-                empty($reportParams->getCampuses()) ? [UserBulkMapper::ANY] : $reportParams->getCampuses(),
-                $roleIds,
-                UserBulkMapper::ANY,
-                empty($reportParams->getYearLevels()) ? [UserBulkMapper::ANY] : $reportParams->getYearLevels(),
-                UserBulkMapper::ANY
-            );
-
-            $studentIds = array_column($students, 'id');
-        }
-
-        if ($reportParams->getStudentIds()) {
-            $studentIds = array_merge($studentIds, $reportParams->getStudentIds());
-            $studentIds = array_unique($studentIds);
-        }
-        $reportStudents = $this->userMapper->findByColumn('id', $studentIds);
-
-        $warnings = [];
-
-        $params  = $reportParams->getParams();
-        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-        $escapedTitle = Scrub::filename(trim($this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE) ?? ''));
-
-        /** @var MessageFactory $messageFactory */
-        $messageFactory = $this->getDi()->get('taskd.downloadPagesMessageFactory');
-        $reportCount    = 0;
-
-        foreach ($reportStudents as $student) {
-            if ($reportParams->getViewAs() === Role::PARENT) {
-                $student->loadParents();
-                if ($student->getParents()->count() === 0) {
-                    $warnings[] = sprintf('Unable to generate report for student id %d. No parents.', $student->getId());
-                    continue;
-                }
-            }
-            try {
-                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
-                    'studentId' => $student->getId(),
-                    'student'   => $student,
-                ]);
-                if ($reportPath) {
-                    $externalId = Scrub::filename($student->getExternalId() ?: 'unknown');
-                    $fullName   = Scrub::filename($student->getFullName());
-                    $filename   = $escapedTitle !== ''
-                        ? sprintf('%s - %s', $fullName, $escapedTitle)
-                        : $fullName;
-                    $messageFactory = $messageFactory->addPdfContent(
-                        sprintf(
-                            "%s/%s.pdf",
-                            $externalId,
-                            mb_substr($filename, 0, self::FILENAME_MAX_LENGTH, 'UTF-8')
-                        ),
-                        $urlBase->setPath($reportPath)->setQuery($params)->toString(),
-                    );
-                    $reportCount++;
-                }
-            } catch (RouteNotFound $e) {
-                // noop
-            }
-        }
-
-        if ($reportCount > 0) {
+        if (!empty($reports)) {
             // Get the taskd context, and send
             /** @var Producer $producer */
             $producer = $this->getDi()->get('taskd.messageProducer');
 
+            /** @var MessageFactory $messageFactory */
+            $messageFactory = $this->getDi()->get('taskd.messageFactory');
             $userSerializer = new ModelToArray();
 
             $date = \Alaress_Date_Format::now()->getDatabaseDate();
@@ -680,33 +776,37 @@ class Controller extends ConfigController
                 ? ($date . '-' . $escapedTitle)
                 : $date;
 
+            $gotenbergApiKey = $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+            $gotenbergAuth   = $gotenbergApiKey
+                ? ['key' => $gotenbergApiKey, 'header' => 'SBAuth']
+                : null;
+
             /* This $message instance is the payload that we send to taskd
              * which it then unpacks, configures its Gotenberg client, and uses
              * to generate the pdfs. This is the bridge between the systems
              */
-            $message = $messageFactory
-                ->setUser($this->getUser())
-                ->setCallbackUrl(
-                    $urlBase
-                        ->setPath(
-                            $this->getRouter()->generate(
-                                'apiusernotify.apiUserNotify',
-                                ['userId' => $this->getUser()->getId()]
-                            )
-                        )
+            $message = $messageFactory->build(
+                'download-pages',
+                [
+                    'token'     => $this->tokenBuilder->generate($this->getUser()),
+                    'content'   => $reports,
+                    'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
+                    'gotenberg' => [
+                        'url'  => $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        'auth' => $gotenbergAuth,
+                        'footer' => file_get_contents(__DIR__ . self::FOOTER_HTML)
+                    ],
+                ],
+                $urlBase->setPath($this->getRouter()->generate('apiusernotify.apiUserNotify', ['userId' => $this->getUser()->getId()]))
                         ->setQuery(null)
-                        ->toString()
-                )
-                ->setCallbackParams([
-                    'message' => sprintf(
-                        'Your summative report %s is ready to download',
-                        $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE),
-                    ),
+                        ->toString(),
+                [
+                    'message' => sprintf('Your summative report %s is ready to download', $this->getConfigLoader()->get(ConfigMapper::NAME_REPORT_TITLE)),
                     'from'    => call_user_func($userSerializer, $this->getUser()),
                     'to'      => call_user_func($userSerializer, $this->getUser()),
-                ])
-                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
-                ->build(mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip');
+                ],
+                $this->getUser(),
+            );
             $producer->send($message);
         }
         $this->getResponse()->content->set(
@@ -717,7 +817,7 @@ class Controller extends ConfigController
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
                         $this->router->generate('adminReportExport.getIndex')
                     ),
-                    'reportCount'    => $reportCount,
+                    'reportCount'    => count($reports),
                     'warnings'       => $warnings,
                 ],
             ]
