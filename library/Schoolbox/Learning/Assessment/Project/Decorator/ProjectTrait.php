@@ -19,7 +19,7 @@ trait ProjectTrait
     protected $summator;
 
     /**
-     * @return int
+     * @return string
      */
     protected function getSummator()
     {
@@ -27,7 +27,7 @@ trait ProjectTrait
     }
 
     /**
-     * @param int $summator
+     * @param string $summator
      * @return $this
      */
     protected function setSummator($summator)
