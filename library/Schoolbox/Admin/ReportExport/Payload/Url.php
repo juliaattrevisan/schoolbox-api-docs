@@ -25,12 +25,6 @@ class Url
     public const FILENAME_MAX_LENGTH = 250;
 
 
-    /**
-     * The Academic Periods are specified with this array key
-     */
-    private const TERMS = 'terms';
-
-
     private Router $router;
     private UriInterface $baseUrl;
     private \Schoolbox\Assessment\Term\Mapper $termMapper;
@@ -207,86 +201,6 @@ class Url
             'warnings' => $warnings,
             'reportConfigs' => $reportConfigs
         ];
-    }
-
-
-    /**
-     * Convert the payload settings to a single serialized querystring
-     * ...but why do we need this? we can get those settings from the report id
-     *
-     * @param \Schoolbox\Admin\ReportExport\Model $report
-     * @return string
-     * @throws \JsonException
-     */
-    public function buildQuerystring(\Schoolbox\Admin\ReportExport\Model $report): string
-    {
-        $optionsPayload = json_decode($report->getOptions(), true, 512, JSON_THROW_ON_ERROR);
-
-        /* Bad data or couldn't decode, for some obscure reason
-         * Kind of common with third parties, more so than us
-         */
-        if (!$optionsPayload) {
-            return '';
-        }
-
-        /* Recursively serialize with prefix
-         * Example $stack shown below
-         *
-                Array
-                (
-                    [0] => startDate=2015-01-01
-                    [1] => endDate=2020-12-31
-                    [2] => yearLevels=1,2,3
-                    [3] => campuses=1
-                    [4] => students=45,6,25
-                    [5] => summaryActive=1
-                    [6] => summaryHeading=werI am a cat
-                    [7] => summaryWorkType=1,2,3,5,6,7,8,9,10,11
-                    [8] => summaryOverallGrade=1
-                    [9] => summaryComments=1
-                    [10] => summaryRubrics=1
-                    [11] => classActive=0
-                    [12] => classWorkType=1,2,3,5,6,7,8,9,10,11,12
-                    [13] => classOverallGrade=1
-                    [14] => classLearningLevels=1
-                    [15] => classCohort=1
-                    [16] => classCapabilityGrades=1
-                    [17] => classProgression=1
-                    [18] => classComments=1
-                    [19] => classRubrics=1
-                )
-         */
-        $stack  = [];
-
-        foreach ($optionsPayload as $key => $sectionValue) {
-            if (self::TERMS === $key) {
-                /* Term is specified with querystring params 'startDate' and 'endDate'
-                 * These are the earliest and latest dates out of all the Academic
-                 * Periods selected via the selectize
-                 */
-                $dates = $this->calculateDateRange(explode(',', $sectionValue));
-
-                $stack[] = "startDate={$dates['startDate']}";
-                $stack[] = "endDate={$dates['endDate']}";
-            } else if (!is_array($sectionValue)) {
-                /* Non-hierarchical
-                 */
-                $stack[] = "{$key}={$sectionValue}";
-            } else {
-                /* Summary and Class subsections
-                 */
-                foreach ($sectionValue as $subsectionKey => $subsectionValue) {
-                    $stack[] = sprintf(
-                        '%s%s=%s',
-                        $key,
-                        ucwords($subsectionKey),
-                        is_array($subsectionValue) ? implode(',', $subsectionValue) : $subsectionValue
-                    );
-                }
-            }
-        }
-
-        return implode('&', $stack);
     }
 
 
