@@ -17,6 +17,6 @@ use RuntimeException;
  * This implies that the JWT itself is malformed, and thus it's pointless to
  * attempt to verify whether it is acceptable.
  */
-class Unparseable extends RuntimeException
+class Unparseable extends RuntimeException implements Base
 {
 }

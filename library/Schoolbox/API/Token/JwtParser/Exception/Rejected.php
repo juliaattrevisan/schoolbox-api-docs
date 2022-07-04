@@ -22,6 +22,6 @@ use RuntimeException;
  * * its signature may be invalid
  * * the key used to attempt to verify the JWT is invalid
  */
-class Rejected extends RuntimeException
+class Rejected extends RuntimeException implements Base
 {
 }

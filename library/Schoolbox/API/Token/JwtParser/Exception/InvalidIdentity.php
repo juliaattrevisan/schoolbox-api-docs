@@ -17,6 +17,6 @@ use RuntimeException;
  * * has no usable identity claim
  * * makes an identity claim which does not match a Schoolbox user
  */
-class InvalidIdentity extends RuntimeException
+class InvalidIdentity extends RuntimeException implements Base
 {
 }
