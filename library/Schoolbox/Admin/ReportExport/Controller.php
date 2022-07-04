@@ -617,7 +617,7 @@ class Controller extends ConfigController
              * Not sure what this does/did...?
              */
             foreach ($reports as $current) {
-                $messageFactory = $messageFactory->addPdfContent($current['filename'], $current['urls']);
+                $messageFactory = $messageFactory->addPdfContent($current['filename'], $current['url']);
             }
 
             /* This is the filename for the zip that contains everything
