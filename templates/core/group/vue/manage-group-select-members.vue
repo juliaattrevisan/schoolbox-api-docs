@@ -6,18 +6,11 @@
  */
 
 import { ref, computed, watch, onMounted  } from 'vue';
+import { useStore } from './manageGroupStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 
 
-const props = defineProps({
-    /**
-     * the members currently selected in the table
-     */
-    selectedMembers: {
-        type: Array,
-        required: true,
-    },
-});
+const store = useStore(); //to keep track of selectedMembers
 
 const emit = defineEmits(['on-selection-cleared', 'on-remove-selected']);
 
@@ -47,8 +40,8 @@ function initShiftKeyDetection () {
 /**
  * remove the note once a selection with shift key down has been detected
  */
-watch(() => props.selectedMembers, () => {
-    if (props.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
+watch(() => store.selectedMembers, () => {
+    if (store.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
         shiftSelectNoteEl.value.remove();
     } 
 });
@@ -59,7 +52,7 @@ watch(() => props.selectedMembers, () => {
  * @returns { Number }
  */
 const selectedMembersCount = computed(() => {
-    return props.selectedMembers.length;
+    return store.selectedMembers.length;
 });
 
 /**
@@ -84,14 +77,14 @@ const selectedMembersCountWithRowName = computed(() => {
  * @returns { Boolean }
  */
 const areAllSelectedOnWaitingList = computed(() => {
-    return props.selectedMembers.every((member) => member.access === 'waiting');
+    return store.selectedMembers.every((member) => member.access === 'waiting');
 });
 
 /**
  * Dispatch to manage-group.vue so the selection can be cleared
  */
 function onClearMemberSelection () {
-    emit('on-selection-cleared'); 
+    store.clearSelectedMembers();
 }
 
 /**
