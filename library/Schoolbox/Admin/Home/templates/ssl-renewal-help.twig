@@ -1,6 +1,91 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
+<script>
+    const apiEndpoint = '' //'/urlCheck/';
+    const urlCheckHostname = 'gateway.glasshouse.qld.edu.au' //location.hostname;
+    const chromeUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+
+    function updateStatusBar(dataLight, text, colour) {
+        $('[data-light=' + dataLight + ']').html(text).removeClass('neutral').addClass(colour);
+    }
+
+    function updateServer(text) {
+        const span = document.getElementById("https_upgrade_server_span");
+        const para = document.getElementById("https_upgrade_server_para");
+        span.innerText = text;
+        para.classList.remove('hide');
+    }
+
+    function updateResponseDetails(statusCode, headers, body) {
+        let headerString = '';
+        for ( const [key,value] of Object.entries( headers ) ) {
+            headerString += key + ': ' + value + "\n";
+        }
+        document.getElementById("response_status").innerText = statusCode;
+        document.getElementById("response_headers").innerText = headerString;
+        document.getElementById("response_body").innerText = body;
+    }
+
+    $(window).on('load', function () {
+        // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/acme-challenge/ping is accessible
+        const baseCheck = $.ajax({
+            url: "{{ api_url }}" + apiEndpoint + "?url=http://" + urlCheckHostname + "/.well-known/acme-challenge/ping",
+            success: function () {
+                updateStatusBar("ssl_port_80", "Pass", "success");
+                updateStatusBar("ssl_https_upgrade", "Pass", "success");
+                updateStatusBar("ssl_upstream_error", "Pass", "success");
+            },
+            error: function (xhr) {
+                updateStatusBar("ssl_port_80", "Fail", "alert");
+
+                if ('location' in xhr.responseJSON.response.headers) {
+                    if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
+                        if ('server' in xhr.responseJSON.response.headers) {
+                            const serverResponseHeader = xhr.responseJSON.response.headers['server']
+                            updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                            updateServer(serverResponseHeader);
+                        } else {
+                            updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                        }
+                    } else {
+                        updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
+                    }
+                }
+
+                if (xhr.status === 400) {
+                    updateStatusBar("ssl_upstream_error", "Fail", "alert");
+                } else if (xhr.status === 500) {
+                    updateStatusBar("ssl_upstream_error", "Timeout", "alert");
+                }
+            },
+            complete: function (xhr) {
+                updateResponseDetails(xhr.responseJSON.response.status, xhr.responseJSON.response.headers, xhr.responseJSON.response.body);
+            },
+        });
+
+        const chromeUserAgentCheck = $.ajax({
+            url: "{{ api_url }}" + apiEndpoint + "?url=http://" + urlCheckHostname + "/.well-known/acme-challenge/ping&useragent=" + chromeUserAgent,
+            success: function () {
+                // wait for baseCheck to complete
+                $.when(baseCheck).then(
+                    function() {
+                        //if baseCheck and chromeUserAgentCheck both succeed
+                        updateStatusBar("ssl_user_agent", "Pass", "success");
+                    },
+                    function() {
+                        //if baseCheck fails but chromeUserAgentCheck succeeded
+                        updateStatusBar("ssl_user_agent", "Fail", "alert");
+                    }
+                )
+            },
+            error: function () {
+                updateStatusBar("ssl_user_agent", "Indeterminate", "warning");
+            },
+        });
+    });
+</script>
+
 <div class="admin-container row">
 
     {# Shared navigation menu #}
