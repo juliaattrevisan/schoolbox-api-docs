@@ -69,37 +69,6 @@ class Controller extends ConfigController
      */
     private const FOOTER_HTML = '/templates/footer.html';
 
-
-    /**
-     * Report Options has this structure
-     */
-    private const DEFAULT_OPTIONS = [
-        'terms' => [],
-        'yearLevels' => [],
-        'campuses' => [],
-        'students' => [],
-        'summary' => [
-            'active' => 0,
-            'heading' => '',
-            'workType' => [],
-            'showOverallGrade' => 0,
-            'showComments' => 0,
-            'showRubrics' => 0
-        ],
-        'class' => [
-            'active' => 0,
-            'workType' => [],
-            'showOverallGrade' => 0,
-            'showLearningLevels' => 0,
-            'showCohort' => 0,
-            'showCapabilityGrades' => 0,
-            'showProgression' => 0,
-            'showComments' => 0,
-            'showRubrics' => 0
-        ]
-    ];
-
-
     private Mapper $reportMapper;
 
     private UserMapper $userMapper;
@@ -229,7 +198,7 @@ class Controller extends ConfigController
                 'pageCurrent' => $this->router->generate('adminReportExport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
                 'report' => null,
-                'options' => self::DEFAULT_OPTIONS,
+                'options' => Model::DEFAULT_OPTIONS,
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
@@ -357,7 +326,7 @@ class Controller extends ConfigController
         /* Superimpose selected options over the default
          * Disabling fields prevents the keys from existing
          */
-        $options = array_replace_recursive(self::DEFAULT_OPTIONS, $optionPayload);
+        $options = array_replace_recursive(Model::DEFAULT_OPTIONS, $optionPayload);
 
         /* Squish out the Terms
          */

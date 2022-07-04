@@ -21,6 +21,35 @@ class Model implements ISoftDeletable
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
 
+    /**
+     * Report Options has this structure
+     */
+    public const DEFAULT_OPTIONS = [
+        'terms' => [],
+        'yearLevels' => [],
+        'campuses' => [],
+        'students' => [],
+        'summary' => [
+            'active' => 0,
+            'heading' => '',
+            'workType' => [],
+            'showOverallGrade' => 0,
+            'showComments' => 0,
+            'showRubrics' => 0
+        ],
+        'class' => [
+            'active' => 0,
+            'workType' => [],
+            'showOverallGrade' => 0,
+            'showLearningLevels' => 0,
+            'showCohort' => 0,
+            'showCapabilityGrades' => 0,
+            'showProgression' => 0,
+            'showComments' => 0,
+            'showRubrics' => 0
+        ]
+    ];
+
     private ?string $title = null;
     private ?string $introduction = null;
     private ?\Schoolbox\Resource\Storage\Model $logo = null;
