@@ -11,13 +11,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\ReportExport;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Router;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\CampusMapper;
@@ -28,7 +25,6 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -37,46 +33,6 @@ class Module extends BaseModule
 {
     protected $basename = 'adminReportExport';
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function initRoutes(Router $router, $basePath)
-//    {
-//        $this->addGetRoute($router, 'getIndex', $basePath, '');
-//        $this->addGetRoute($router, 'getTerms', $basePath, '/getTerms');
-//        $this->addGetRoute($router, 'getYearLevels', $basePath, '/getYearLevels');
-//        $this->addGetRoute($router, 'getCampuses', $basePath, '/getCampuses');
-//        $this->addGetRoute($router, 'getWorkTypes', $basePath, '/getWorkTypes');
-//        $this->addPostRoute($router, 'postReport', $basePath, '/postReport');
-//        $this->addGetRoute($router, 'getStudentReport', $basePath, '/student/{studentId}');
-//        $this->addPostRoute($router, 'postConfig', $basePath, '/postConfig');
-//    }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function initRoutePermissions(Authorizer $authorizer)
-//    {
-//        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-//             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
-//    }
-//
-//    /**
-//     * @param PathMatcher $matcher
-//     */
-//    public function initRoutePreloads(PathMatcher $matcher)
-//    {
-//        $this->addRoutePreload($matcher, '.*', function ($params) {
-//            $preloads = [];
-//            if (isset($params['student']) && $params['student'] instanceof User) {
-//                $preloads['student'] = $params['student'];
-//            }
-//            if (isset($params['studentId'])) {
-//                $preloads['student'] = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
-//            }
-//            return $preloads;
-//        });
-//    }
 
     /**
      * Hook method for setting up routes via self::register()
@@ -85,7 +41,6 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-
         /* Any staff can see the form
          */
         $getPerms = $postPerms = new Rule\All(

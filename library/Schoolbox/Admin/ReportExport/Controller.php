@@ -532,59 +532,6 @@ class Controller extends ConfigController
 
 
 
-
-    /**
-     * Landing page
-     * @return void
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @api GET /adminv2/report-export
-     */
-    public function getIndex(): void
-    {
-        $configContext = $this->buildConfigContext(
-            $this->buildConfigPredicate(),
-            $this->router->generate('adminReportExport.postConfig'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
-        );
-        // Hack a maxlength into the report title setting
-        if (is_iterable($configContext['settings'] ?? null)) {
-            foreach ($configContext['settings'] as $i => $setting) {
-                $name = $setting['data']['name'] ?? null;
-                if ($name === ConfigMapper::NAME_REPORT_TITLE) {
-                    $configContext['settings'][$i]['data']['maxlength'] = self::FILENAME_MAX_LENGTH;
-                    break;
-                }
-            }
-        }
-        $this->getResponse()->content->set(
-            [
-                'template' => '@adminReportExport/index.twig',
-                'data'     => [
-                    'pageCurrent'              => $this->router->generate('adminReportExport.getIndex'),
-                    'allBreadcrumbs'           => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getIndex')),
-                    'summaryPageOptions'       => ReportParams::SUMMARY_PAGE_OPTIONS,
-                    'classPageOptions'         => ReportParams::CLASS_PAGE_OPTIONS,
-                    'summaryAssessmentOptions' => ReportParams::SUMMARY_ASSESSMENT_OPTIONS,
-                    'classAssessmentOptions'   => ReportParams::CLASS_ASSESSMENT_OPTIONS,
-                    'configContext'            => $configContext,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * Save settings
-     *
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    public function postConfig(): void
-    {
-        $this->updateConfig($this->request->post->get(), $this->buildConfigPredicate());
-        $this->response->redirect->afterPost($this->router->generate('adminReportExport.getIndex'));
-    }
-
-
     /**
      * Request report generation to taskd
      * @return void
