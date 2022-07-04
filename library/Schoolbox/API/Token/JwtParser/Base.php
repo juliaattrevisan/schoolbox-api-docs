@@ -38,18 +38,21 @@ abstract class Base implements IParser
      *                                          * nbf (not before)
      *                                          * iat (issued at)
      *                                          * exp (expiry)
+     * @param array $algs                       Deprecated list of supported verification algorithms: currently required
+     *                                          for backward compatibility with oAuth provider issued keys, which use
+     *                                          `\Firebase\JWT\JWK::parseKeySet` to create a set of keys.
      * @return array The claims within the JWT.
      * @throws Exception\Rejected JWT cannot be decoded for some reason
      *                            (e.g. the key is not valid for the given JWT,
      *                            or the signature is invalid)
      */
-    protected function decode(string $jwt, mixed $keyOrKeySet, int $leeway): array
+    protected function decode(string $jwt, mixed $keyOrKeySet, int $leeway, array $algs = []): array
     {
         // Set leeway for this decode only, set it back once done
         $previousLeeway         = JwtLibrary\JWT::$leeway;
         JwtLibrary\JWT::$leeway = $leeway;
         try {
-            return (array)JwtLibrary\JWT::decode($jwt, $keyOrKeySet);
+            return (array)JwtLibrary\JWT::decode($jwt, $keyOrKeySet, $algs);
         } catch (
             InvalidArgumentException
             | UnexpectedValueException
