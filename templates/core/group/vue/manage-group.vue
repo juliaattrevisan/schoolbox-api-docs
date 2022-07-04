@@ -12,6 +12,7 @@ import ManageGroupFilters from './manage-group-filters.vue';
 import ManageGroupSelectMembers from './manage-group-select-members.vue';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import FilterEvents from './manageGroupFilterEvents';
+import FilterTypes from './manageGroupFilterTypes';
 
 
 const props = defineProps({
@@ -158,10 +159,10 @@ async function onLoaded () {
  */
 function getMemberMeta (row) {
     const memberMeta = {
-        'waiting': `<i class="icon-open"></i>Waiting List`,
-        'read': `<i class="icon-view"></i>Read Access`,
-        'write': `<i class="icon-modify"></i>Write Access`,
-        'admin': `<i class="icon-favourite"></i>Group Admin`,
+        [FilterTypes.WAITING]: `<i class="icon-open"></i>Waiting List`,
+        [FilterTypes.READ]: `<i class="icon-view"></i>Read Access`,
+        [FilterTypes.WRITE]: `<i class="icon-modify"></i>Write Access`,
+        [FilterTypes.ADMIN]: `<i class="icon-favourite"></i>Group Admin`,
     };
     return memberMeta[row.access];
 }
@@ -186,11 +187,38 @@ function onRefreshSelected () {
 
 /*****************************************************************
  * 
+ * Select group members
+ * 
+ ****************************************************************/
+
+const selectedMembers = ref([]); //to track the current group member selection
+
+/**
+ * to keep track of selected rows
+ * 
+ * @param { Object }
+ */
+function onRowSelected (event) {
+    selectedMembers.value = event;
+}
+
+/**
+ * clear the current selection
+ */
+function onSelectionCleared () {
+    selectedMembers.value = [];
+    tableEl.value.resetSelectedRows();
+}
+
+
+
+/*****************************************************************
+ * 
  * Filter the group members
  * 
  ****************************************************************/
 
-const selectedFilters = ref(['waiting', 'read', 'write', 'admin']);
+const selectedFilters = ref([FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN]);
 
 /**
  * Add/remove from selectedFilters and fire an event for the table
@@ -200,6 +228,7 @@ const selectedFilters = ref(['waiting', 'read', 'write', 'admin']);
 function onFilterChange (accessType) {
     updateSelectedFilters(accessType);
     dispatchFilterEvent(accessType);
+    updateSelectedMembers();
 }
 
 /**
@@ -224,63 +253,28 @@ function updateSelectedFilters (accessType) {
 function dispatchFilterEvent (accessType) {
     const filterParam = selectedFilters.value.includes(accessType) ? '' : accessType ;
     const filterEventsType = {
-        'waiting': FilterEvents.SHOW_WAITING_LIST,
-        'read': FilterEvents.SHOW_READ_ACCESS,
-        'write': FilterEvents.SHOW_WRITE_ACCESS,
-        'admin': FilterEvents.SHOW_ADMIN_ACCESS,
-    };
+        [FilterTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
+        [FilterTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
+        [FilterTypes.WRITE]: FilterEvents.SHOW_WRITE_ACCESS,
+        [FilterTypes.ADMIN]: FilterEvents.SHOW_ADMIN_ACCESS,
+    }
     EventBus.emit(`vue-tables.filter::${filterEventsType[accessType]}`, filterParam);
 }
 
-// onMounted(() => {
-//     initFilterListeners();
-// });
-
 /**
- * So we can ensure that rows that are removed through filters are also removed from the selected rows
+ * Ensure the current selectedMembers also considers the current filter selection, 
+ * taking any out that no longer match the selected filters
  */
-// function initFilterListeners () {
-//     document.addEventListener(FilterEvents.SHOW_READ_ACCESS, () => onFilterChanged());
-//     document.addEventListener(FilterEvents.SHOW_WRITE_ACCESS, () => onFilterChanged());
-//     document.addEventListener(FilterEvents.SHOW_ADMIN_ACCESS, () => onFilterChanged());
-// }
-
-/**
- * Pull any rows that are no longer visible out of the selected rows
- */
-// function onFilterChanged () {
-    // const filteredRowsIds = this.$refs.table.allFilteredData.map((filteredRow) => filteredRow.id); //is the currently visible list of rows, mapped to just the ids
-    // const selectedRowsIds = this.selectedRows.map((selectedRow) => selectedRow.id);
-    // const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
-    // this.$refs.table.unselectRows(rowsToUnselect);
-    // this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
-// }
-
-
-
-/*****************************************************************
- * 
- * Select group members
- * 
- ****************************************************************/
-
-const selectedMembers = ref([]);
-
-/**
- * to keep track of selected rows
- * 
- * @param { Object }
- */
-function onRowSelected (event) {
-    selectedMembers.value = event;
-}
-
-/**
- * 
- */
-function onSelectionCleared () {
-    selectedMembers.value = [];
-    tableEl.value.resetSelectedRows();
+function updateSelectedMembers () {
+    const newSelectedMembers = [];
+    selectedMembers.value.forEach((member) => {
+        if (selectedFilters.value.some((accessType) => member.access == accessType)) {
+            newSelectedMembers.push(member); //add the member to the new filtered list
+        } else {
+            tableEl.value.unselectRow(member.id); //otherwise pull it out
+        }
+    });
+    selectedMembers.value = newSelectedMembers;
 }
 
 </script>
@@ -318,9 +312,9 @@ function onSelectionCleared () {
                 <template #access="props">
                     <button v-if="props.row.access === 'waiting'" class="button expand" title="Approve Membership">Approve Membership</button>
                     <select v-else id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
-                        <option value="read">Read Access</option>
-                        <option value="write">Write Access</option>
-                        <option value="admin">Group Admin</option>
+                        <option :value="FilterTypes.READ">Read Access</option>
+                        <option :value="FilterTypes.WRITE">Write Access</option>
+                        <option :value="FilterTypes.ADMIN">Group Admin</option>
                     </select>
                 </template>
                 <template #afterTable>
