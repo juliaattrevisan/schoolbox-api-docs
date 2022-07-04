@@ -12,7 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use Firebase\JWT\Key;
-use Schoolbox\API\Token\JwtParser\Exception\Unparseable;
+use InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
@@ -39,6 +39,9 @@ abstract class Base implements IParser
      *                                          * iat (issued at)
      *                                          * exp (expiry)
      * @return array The claims within the JWT.
+     * @throws Exception\Rejected JWT cannot be decoded for some reason
+     *                            (e.g. the key is not valid for the given JWT,
+     *                            or the signature is invalid)
      */
     protected function decode(string $jwt, mixed $keyOrKeySet, int $leeway): array
     {
@@ -47,6 +50,14 @@ abstract class Base implements IParser
         JwtLibrary\JWT::$leeway = $leeway;
         try {
             return (array)JwtLibrary\JWT::decode($jwt, $keyOrKeySet);
+        } catch (
+            InvalidArgumentException
+            | UnexpectedValueException
+            | JwtLibrary\SignatureInvalidException
+            | JwtLibrary\BeforeValidException
+            | JwtLibrary\ExpiredException $e
+        ) {
+            throw new Exception\Rejected($e->getMessage(), $e->getCode(), $e);
         } finally {
             JwtLibrary\JWT::$leeway = $previousLeeway;
         }
@@ -61,23 +72,24 @@ abstract class Base implements IParser
      *
      * @param string $jwt The JWT to parse.
      * @return array The claims within the JWT.
-     * @throws Unparseable JWT doesn't contain a header, payload and signature
-     *                     segment, or is not parseable for any other reason
-     *                     (e.g. a segment is invalid JSON).
+     * @throws Exception\Unparseable JWT doesn't contain a header, payload and
+     *                               signature segment, or is not parseable for
+     *                               any other reason
+     *                               (e.g. a segment is invalid JSON).
      */
     protected function decodeWithoutVerification(string $jwt): array
     {
         if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                throw new Unparseable('JWT must contain a header, payload and signature');
+                throw new Exception\Unparseable('JWT must contain a header, payload and signature');
             }
             [, $payload,] = $parts;
             try {
                 $this->decodeWithoutVerificationResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
             } catch (DomainException $e) {
-                throw new Unparseable($e->getMessage(), $e->getCode(), $e);
+                throw new Exception\Unparseable($e->getMessage(), $e->getCode(), $e);
             }
         }
         return $this->decodeWithoutVerificationResults[$jwt];
