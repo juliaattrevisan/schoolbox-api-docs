@@ -129,10 +129,6 @@ class Url
         $reportConfigs = [];
         $warnings = [];
 
-        /* This is the same for everyone
-         */
-        $querystring = $this->buildQuerystring($report);
-
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
                 $student->loadParents();
@@ -190,7 +186,7 @@ class Url
                             $reportFilename,
                         ),
                         'urls' => [
-                            $urlBase->setPath($reportPath)->setQuery($querystring)->toString()
+                            $urlBase->setPath($reportPath)->toString()
                         ],
                     ];
 
@@ -216,6 +212,7 @@ class Url
 
     /**
      * Convert the payload settings to a single serialized querystring
+     * ...but why do we need this? we can get those settings from the report id
      *
      * @param \Schoolbox\Admin\ReportExport\Model $report
      * @return string
@@ -299,7 +296,7 @@ class Url
      * @param array $termIds
      * @return array
      */
-    private function calculateDateRange(array $termIds): array {
+    public function calculateDateRange(array $termIds): array {
         $startDate = null;
         $endDate = null;
 

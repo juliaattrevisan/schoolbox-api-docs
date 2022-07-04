@@ -78,7 +78,7 @@ class Module extends BaseModule
         $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $getPerms, $preloadReport);
         $this->register('POST', '/{reportId}/delete', 'postDelete', $postPerms, $preloadReport);
         $this->register('GET', '/{reportId}/generate', 'getGenerate', $postPerms, $preloadReport);
-        $this->register('GET', '/{reportId}/getStudentReport/{studentId}', 'getStudentReport', $postPerms, $preloadReportWithStudent);
+        $this->register('GET', '/{reportId}/studentReport/{studentId}', 'getStudentReport', $getPerms, $preloadReportWithStudent);
     }
 
 
@@ -133,7 +133,7 @@ class Module extends BaseModule
             $student = $params['student'];
         } else {
             try {
-                $student = $this->getMapperFactory()->get(\Schoolbox\UserMapper::class)->findById($params['student']);
+                $student = $this->getMapperFactory()->get(\Schoolbox\UserMapper::class)->findById($params['studentId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 throw new NotFound('Unknown student.', 0, $e);
             }

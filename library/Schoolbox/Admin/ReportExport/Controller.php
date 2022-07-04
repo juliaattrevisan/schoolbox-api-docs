@@ -822,77 +822,118 @@ class Controller extends ConfigController
 
 
     /**
-     * Generates report
-     * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/student/25?startDate=2021-01-01&endDate=2022-12-31&showOverallGrade=1&showSummary=1
-     * @param User $student
+     * Generates report for a particular $student,
+     * using the options set in $report
+     *
+     * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/2/getStudentReport/25?startDate=2015-01-01&endDate=2020-12-31&yearLevels=1,2,3&campuses=1&students=45,6,25&summaryActive=1&summaryHeading=werI%20am%20a%20cat&summaryWorkType=1,2,3,5,6,7,8,9,10,11&summaryOverallGrade=1&summaryComments=1&summaryRubrics=1&classActive=0&classWorkType=1,2,3,5,6,7,8,9,10,11,12&classOverallGrade=1&classLearningLevels=1&classCohort=1&classCapabilityGrades=1&classProgression=1&classComments=1&classRubrics=1
+     *
+     * @param Model $report
+     * @param User  $student
      * @return void
      * @throws MapperException
+     * @throws \Alaress\Web\Controller\Exception
      * @api GET /adminv2/report-export/student/:studentId
      */
-    public function getStudentReport(User $student)
+    public function getStudentReport(\Schoolbox\Admin\ReportExport\Model $report, User $student)
     {
-        $params = new ReportParams($this->request->query->getArrayCopy(), $this->termMapper);
+        $optionsPayload = $report->decode();
 
-        // Dates
-        try {
-            $from = new \Alaress_Date_Format($params->getStartDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $to   = new \Alaress_Date_Format($params->getEndDate(), \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            // fake term
-            $term = $this->termMapper->createModel()->setStart($from)->setActualFinish($to);
-        } catch (\Exception $e) {
-            $term = $this->termMapper->findForToday();
-            $from = $term->getStart();
-            $to   = $term->getActualFinish();
-        }
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
-        // View As
-        switch ($params->getViewAs()) {
+        /* This payload instance can tell you things about the settings
+         * Use it to find the start/end date span
+         */
+        $range = (new Payload\Url(
+            $this->router,
+            $urlBase,
+            $this->termMapper,
+            $this->roleMapper,
+            $this->userBulkMapper,
+            $this->userMapper
+        ))->calculateDateRange($optionsPayload['terms']);
+
+        $from = new \Alaress_Date_Format($range['startDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $to   = new \Alaress_Date_Format($range['endDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+        /* Manufacture a placeholder instance
+         */
+        $term = $this->termMapper->createModel()->setStart($from)->setActualFinish($to);
+
+        /* View As
+         * Default to the current admin
+         */
+        $viewer = $this->getUser();
+
+        /* TODO: Remove hardcode
+         */
+        switch ($this->request->query['viewAs'] ?? 'student') {
             case Role::STUDENT:
                 $viewer = $student;
                 break;
             case Role::PARENT:
                 $student->loadParents();
-                $viewer = $student->getParents()->first();
-                if (!$viewer) {
-                    $this->sendError(sprintf('Unable to generate report for student id %d. No parents.', $student->getId()));
+
+                /* No parents found for the current guy
+                 * Exit - nothing to render
+                 */
+                if (!$student->getParents()->count()) {
+                    $this->sendError(sprintf(
+                        'Unable to generate report for student id %d (%s). No parents.',
+                        $student->getId(),
+                        $student->getExternalId()
+                    ));
                 }
                 break;
             case Role::STAFF:
             default:
-                // the current admin
-                $viewer = $this->getUser();
+                break;
         }
 
-        $summaryWorkTypes = !$params->getSummaryWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getSummaryWorkTypeIds());
-        $classWorkTypes   = !$params->getClassWorkTypeIds() ? null : $this->workTypeMapper->findByColumn('id', $params->getClassWorkTypeIds());
+        /* Instantiate the Work Type instances for each of the sections in the report:
+         * Summary and Class Pages
+         */
+        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
+        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
 
-        $markSchemeFactory = new Factory($this->getConfigLoader());
-
+        /* This helps us micromanage assessments
+         */
         $gradeHelper = new Helper(
             $this->folderMapper,
             $this->assessmentMapperProxy,
             $this->access,
-            $markSchemeFactory
+            new Factory($this->getConfigLoader())
         );
 
-        [
-            $folders,
-            $markbooks,
-            $assessments,
-        ] = $gradeHelper->generateGrades($viewer, $student, $term, $from, $to);
+        [ $folders, $markbooks, $assessments ] = $gradeHelper->generateGrades($viewer, $student, $term, $from, $to);
 
+        /* Find the assessments that fulfil $summaryWorkTypes requirements
+         */
         $summaryAssessments = new Collection();
+
         if ($summaryWorkTypes && $summaryWorkTypes->count() > 0) {
             $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
         }
+
+        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $optionsPayload['summary']['rubrics']);
+
+        /* Find the assessments that fulfil $classWorkTypes requirements
+         */
         $classAssessments = new Collection();
+
         if ($classWorkTypes && $classWorkTypes->count() > 0) {
             $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
         }
 
-        $summaryAssessmentFeedbacks = $this->collateFeedbacks($summaryAssessments, $student, $viewer, $params->getShowSummaryRubrics());
+        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $optionsPayload['class']['rubrics']);
 
-        $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, $params->getShowClassRubrics());
+        /* Render the full report with all the settings from $report instance
+         */
+        $reportTitle = sprintf(
+            '%s (%s - %s)',
+            $report->getTitle(),
+            $from->getLocalShort(),
+            $to->getLocalShort()
+        );
 
         $data = [
             'student'                    => $student,
@@ -902,28 +943,30 @@ class Controller extends ConfigController
             'classAssessments'           => $classAssessments,
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
-            'reportTitle'                => "Report {$from->getLocalShort()} ~ {$to->getLocalShort()}",
-            'showSummary'                => $params->getShowSummary(),
-            'summaryHeading'             => $params->getSummaryHeading(),
-            'showSummaryOverallGrade'    => $params->getShowSummaryOverallGrade(),
+            'reportTitle'                => $reportTitle,
+            'showSummary'                => (bool)$optionsPayload['summary']['active'],
+            'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
+            'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
             'showSummaryGrades'          => $params->getShowSummaryGrades(),
-            'showSummaryComments'        => $params->getShowSummaryComments(),
-            'showSummaryRubrics'         => $params->getShowSummaryRubrics(),
-            'showClass'                  => $params->getShowClass(),
-            'showClassOverallGrade'      => $params->getShowClassOverallGrade(),
+            'showSummaryComments'        => (bool)$optionsPayload['summary']['comments'],
+            'showSummaryRubrics'         => (bool)$optionsPayload['summary']['rubrics'],
+            'showClass'                  => (bool)$optionsPayload['class']['active'],
+            'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
             'showClassGrades'            => $params->getShowClassGrades(),
-            'showClassComments'          => $params->getShowClassComments(),
-            'showClassRubrics'           => $params->getShowClassRubrics(),
+            'showClassComments'          => (bool)$optionsPayload['class']['comments'],
+            'showClassRubrics'           => (bool)$optionsPayload['summary']['rubrics'],
 
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
              */
             'customReportStyle'          => (new CustomStyleExtractor())->extract((string)$this->getConfigLoader()->get('skin_custom_css'))
         ];
+
         $this->getResponse()->content->set(
             $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
         );
     }
+
 
     /**
      * Hydrate feedback and returns as a collection indexed by assessment id
@@ -965,17 +1008,5 @@ class Controller extends ConfigController
             }
         }
         return $feedbacks;
-    }
-
-    /**
-     * Returns a predicate suitable for finding config for this module
-     *
-     * @return Predicate\Builder
-     */
-    private function buildConfigPredicate(): Predicate\Builder
-    {
-        return $this->getConfigMapper()
-                    ->getPredicateBuilder()
-                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_REPORT_EXPORT);
     }
 }
