@@ -12,10 +12,8 @@ namespace Schoolbox\Admin\ReportExport;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
@@ -42,9 +40,6 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
-use Alaress\Database\Predicate;
-use Schoolbox\Admin\ReportExport\Parameters as ReportParams;
-use Scrub;
 
 /**
  * Class Controller
@@ -688,7 +683,7 @@ class Controller extends ConfigController
      * @throws \Alaress\Web\Controller\Exception
      * @api GET /adminv2/report-export/student/:studentId
      */
-    public function getStudentReport(\Schoolbox\Admin\ReportExport\Model $report, User $student)
+    public function getStudentReport(\Schoolbox\Admin\ReportExport\Model $report, User $student): void
     {
         $optionsPayload = $report->decode();
 
