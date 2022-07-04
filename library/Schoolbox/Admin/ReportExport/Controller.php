@@ -926,15 +926,6 @@ class Controller extends ConfigController
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
-        /* Render the full report with all the settings from $report instance
-         */
-        $reportTitle = sprintf(
-            '%s (%s - %s)',
-            $report->getTitle(),
-            $from->getLocalShort(),
-            $to->getLocalShort()
-        );
-
         $data = [
             'student'                    => $student,
             'folders'                    => $folders,
@@ -943,7 +934,7 @@ class Controller extends ConfigController
             'classAssessments'           => $classAssessments,
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
-            'reportTitle'                => $reportTitle,
+            'report'                     => $report,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
