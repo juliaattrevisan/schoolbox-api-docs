@@ -96,10 +96,16 @@
             <h2 class="subheader">SSL Renewal Help</h2>
             <section class="content">
                 <article>
-                    <h2>Problem</h2>
-                    This this
-                    <h2>Troubleshooting</h2>
-                    This this
+                    <p>
+                        This page is intended to assist IT systems administrators who manage their school's firewall and on-premises Schoolbox server in troubleshooting their firewall and network configuration to allow automatic SSL renewal.
+                    </p>
+                    <h3>Schoolbox's SSL certificate policy</h3>
+                    <p>
+                        Schoolbox uses Let's Encrypt as a certificate provider and uses Certbot to manage these certificates. Our Certbot scripts are configured to provision certs with 3 months of validity. Certbot will automatically attempt to renew SSL certificates when the current certs have less than 30 days of validity.
+                    </p>
+                    <p>
+                        There are times when this automatic certificate renewal process fails. Most of the time, all is needed is a small change in the firewall configuration to allow this traffic through to the Schoolbox server. This page is intended to assist in diagnosing the cause and finding the change that needs to be made.
+                    </p>
                 </article>
                 <br>
                 <div class="alert-box highlight no-margin">
