@@ -27,12 +27,6 @@ use Schoolbox\UserMapper;
 class OtherInstanceIssued extends Base
 {
     /**
-     * Key for the email JWT claim. This is a public claim, so it doesn't need
-     * a prefix.
-     */
-    private const CLAIM_EMAIL = 'email';
-
-    /**
      * Key for the instance ID custom JWT claim.
      */
     private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -44,8 +43,7 @@ class SelfIssued extends Base
     public function accepts(string $jwt): bool
     {
         $claims = $this->decodeWithoutVerification($jwt);
-        return isset($claims[MessagePayloadInterface::CLAIM_ISS])
-            && $claims[MessagePayloadInterface::CLAIM_ISS] === $this->determineThisInstanceIssuer();
+        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
     }
 
     /**
@@ -58,26 +56,26 @@ class SelfIssued extends Base
             new Key($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
-        if (!isset($claims[MessagePayloadInterface::CLAIM_SUB])) {
+        if (!isset($claims[self::CLAIM_SUB])) {
             throw new Exception\InvalidIdentity(
-                sprintf('JWT must contain a "%s"', MessagePayloadInterface::CLAIM_SUB)
+                sprintf('JWT must contain a "%s"', self::CLAIM_SUB)
             );
         }
-        $username = $claims[MessagePayloadInterface::CLAIM_SUB];
+        $username = $claims[self::CLAIM_SUB];
         if (trim($username) === '') {
             throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim must not be empty', MessagePayloadInterface::CLAIM_SUB)
+                sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB)
             );
         }
-        $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
-        if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
+        $user   = $this->userMapper->findByUsername($claims[self::CLAIM_SUB]);
+        if ($user && isset($claims[self::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
             try {
                 /** @var User\Token\Model $token */
                 $token = $this->tokenMapper->findOneByColumnList(
                     [
                         'user_id' => $user->getId(),
-                        'jwt_id'  => $claims[MessagePayloadInterface::CLAIM_JTI],
+                        'jwt_id'  => $claims[self::CLAIM_JTI],
                     ]
                 );
                 if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
@@ -90,7 +88,7 @@ class SelfIssued extends Base
         }
         return $user
             ?? throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim does not match a user\'s username', MessagePayloadInterface::CLAIM_SUB)
+                sprintf('JWT "%s" claim does not match a user\'s username', self::CLAIM_SUB)
             );
     }
 

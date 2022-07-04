@@ -11,7 +11,6 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -48,7 +47,7 @@ class OauthProviderIssued extends Base
     public function accepts(string $jwt): bool
     {
         $claims      = $this->decodeWithoutVerification($jwt);
-        $jwtIssuer   = $claims[MessagePayloadInterface::CLAIM_ISS] ?? null;
+        $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
         $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         return isset($jwtIssuer, $oauthIssuer)
             && trim($jwtIssuer, '/') === trim($oauthIssuer, '/');
@@ -83,7 +82,7 @@ class OauthProviderIssued extends Base
 
         // Validate audience
         $validAudience = false;
-        $audiences     = (array)$claims[MessagePayloadInterface::CLAIM_AUD];
+        $audiences     = (array)$claims[self::CLAIM_AUD];
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         foreach ($audiences as $audience) {
             if ($audience === $oauthClientId) {
@@ -93,7 +92,7 @@ class OauthProviderIssued extends Base
         }
         if (!$validAudience) {
             throw new Exception\Rejected(
-                sprintf('JWT "%s" claim does not match configured client ID', MessagePayloadInterface::CLAIM_AUD)
+                sprintf('JWT "%s" claim does not match configured client ID', self::CLAIM_AUD)
             );
         }
 
