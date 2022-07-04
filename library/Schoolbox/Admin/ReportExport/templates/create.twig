@@ -192,13 +192,23 @@
                     $(checkbox).removeAttr('onclick');
                 });
 
-                // $('#report-class-work-types').data('selectize').enable().unlock();
+                /* Micromanage selectize
+                 */
+                fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
+                    $(selectizeControl).css('opacity', 1);
+                    $(selectizeControl).siblings('select').data('selectize').unlock();
+                });
             } else {
                 fieldsets.find('input:checkbox').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
                 });
 
-                // $('#report-class-work-types').data('selectize').lock();
+                /* Micromanage selectize
+                 */
+                fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
+                    $(selectizeControl).css('opacity', 0.5);
+                    $(selectizeControl).siblings('select').data('selectize').lock();
+                });
             }
         }
     });
