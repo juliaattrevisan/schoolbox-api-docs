@@ -83,7 +83,7 @@ class OauthProviderIssued extends Base
 
         // Validate audience
         $validAudience = false;
-        $audiences     = (array)$claims['aud'];
+        $audiences     = (array)$claims[MessagePayloadInterface::CLAIM_AUD];
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
         foreach ($audiences as $audience) {
             if ($audience === $oauthClientId) {
@@ -92,7 +92,9 @@ class OauthProviderIssued extends Base
             }
         }
         if (!$validAudience) {
-            throw new Exception\Rejected('JWT audience does not match configured client ID');
+            throw new Exception\Rejected(
+                sprintf('JWT "%s" claim does not match configured client ID', MessagePayloadInterface::CLAIM_AUD)
+            );
         }
 
         // The identification in the token seems to be in one of two claims:
@@ -108,12 +110,12 @@ class OauthProviderIssued extends Base
                     return $user;
                 }
                 $failureMessage = sprintf(
-                    'The token contained a "%s" claim, but its value did not match a Schoolbox user',
+                    'JWT "%s" claim does not match a user\'s username',
                     $candidateClaim
                 );
             } else {
                 $failureMessage = sprintf(
-                    'The token did not contain a "%s" claim',
+                    'JWT "%s" claim is empty',
                     $candidateClaim
                 );
             }
@@ -122,7 +124,7 @@ class OauthProviderIssued extends Base
 
         // Candidate claims found no user: can't use it
         throw new Exception\InvalidIdentity(
-            sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
+            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages))
         );
     }
 }

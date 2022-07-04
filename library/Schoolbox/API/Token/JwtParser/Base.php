@@ -89,7 +89,7 @@ abstract class Base implements IParser
                 $this->decodeWithoutVerificationResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
             } catch (DomainException $e) {
-                throw new Exception\Unparseable($e->getMessage(), $e->getCode(), $e);
+                throw new Exception\Unparseable('JWT could not be parsed: ' . $e->getMessage(), $e->getCode(), $e);
             }
         }
         return $this->decodeWithoutVerificationResults[$jwt];

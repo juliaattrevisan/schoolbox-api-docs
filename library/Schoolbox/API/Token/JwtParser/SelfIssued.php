@@ -58,6 +58,17 @@ class SelfIssued extends Base
             new Key($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY), Jwt::SIGNING_ALGORITHM),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
+        if (!isset($claims[MessagePayloadInterface::CLAIM_SUB])) {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT must contain a "%s"', MessagePayloadInterface::CLAIM_SUB)
+            );
+        }
+        $username = $claims[MessagePayloadInterface::CLAIM_SUB];
+        if (trim($username) === '') {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT "%s" claim must not be empty', MessagePayloadInterface::CLAIM_SUB)
+            );
+        }
         $user   = $this->userMapper->findByUsername($claims[MessagePayloadInterface::CLAIM_SUB]);
         if ($user && isset($claims[MessagePayloadInterface::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
