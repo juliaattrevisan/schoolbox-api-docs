@@ -248,6 +248,21 @@
                             <label for="report-introduction">Introductory Message</label>
                             <textarea id="report-introduction" name="introduction">{{ report.introduction ?? '' }}</textarea>
                         </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-view-as">View As</label>
+                            <select name="viewAs">
+                                {% for key, value in viewAs %}
+                                    {% set selected = '' %}
+
+                                    {% if (options.viewAs ?? null) == key %}
+                                        {% set selected = 'selected="selected"' %}
+                                    {% endif %}
+
+                                    <option value="{{ key }}" {{ selected }}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </fieldset>
 
                     <fieldset class="content">

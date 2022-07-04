@@ -60,9 +60,14 @@ class Controller extends ConfigController
 
 
     /**
-     * This is in the notification when your reports finish generating a zip
+     * These are used in the View As dropdown, the existence of
+     * which in and of itself is questionable atm
      */
-    private const NOTIFICATION_TEXT = 'Your summative report %s is ready to download';
+    private const AVAILABLE_ROLETYPES = [
+        Role::STUDENT => 'Student',
+        Role::PARENT => 'Parent',
+        Role::STAFF => 'Staff',
+    ];
 
 
     private Mapper $reportMapper;
@@ -196,6 +201,7 @@ class Controller extends ConfigController
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
                 'report' => null,
                 'options' => Model::DEFAULT_OPTIONS,
+                'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
@@ -258,6 +264,7 @@ class Controller extends ConfigController
                 ),
                 'report' => $report,
                 'options' => $this->decompilePayload($report),
+                'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()
             ]
         ]);
@@ -286,6 +293,7 @@ class Controller extends ConfigController
          * To avoid making millions of schema we can just serialize it
          */
         $payloadKeys = [
+            'viewAs' => true,
             'terms' => true,
             'yearLevels' => true,
             'campuses' => true,
@@ -713,9 +721,7 @@ class Controller extends ConfigController
          */
         $viewer = $this->getUser();
 
-        /* TODO: Remove hardcode
-         */
-        switch ($this->request->query['viewAs'] ?? 'student') {
+        switch ($this->request->query['viewAs']) {
             case Role::STUDENT:
                 $viewer = $student;
                 break;
