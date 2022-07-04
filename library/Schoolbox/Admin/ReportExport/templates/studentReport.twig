@@ -409,8 +409,8 @@
             <h1>{{ report.title }}</h1>
             <h2 class="school-name">{{ config.school_name }}</h2>
         </div>
-        {% if config.report_school_logo %}
-        <img src="/storage/image.php?hash={{ config.report_school_logo }}" alt="{{ config.school_name }}" class="logo" />
+        {% if report.logo.hash %}
+        <img src="/storage/image.php?hash={{ report.logo.hash }}" alt="{{ config.school_name }}" class="logo" />
         {% endif %}
     </div>
 
@@ -429,11 +429,13 @@
         </div>
     </div>
 
+    {% if report.introduction|length %}
     <div class="introduction">
         <article>
-            {{ config.report_export_introduction | purify }}
+            {{ report.introduction | purify }}
         </article>
     </div>
+    {% endif %}
 
     {# Summary #}
     {% if showSummary %}
