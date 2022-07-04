@@ -11,7 +11,7 @@ namespace Schoolbox\API\Token;
 
 use Alaress_Date_Format;
 use Firebase\JWT\JWT as JwtLibrary;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
+use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Factory;
@@ -26,18 +26,6 @@ class Jwt
      * Signing algorithm for JWTs.
      */
     public const SIGNING_ALGORITHM = 'RS256';
-
-
-    /**
-     * Namespace used for custom claims created by Schoolbox.
-     *
-     * Any claims added to a token which are not registered or public claims
-     * must be prefixed with this value.
-     *
-     * @see https://tools.ietf.org/html/rfc7519#section-4.1
-     * @see https://www.iana.org/assignments/jwt/jwt.xhtml
-     */
-    public const CUSTOM_CLAIM_NAMESPACE = 'https://schoolbox.com.au/';
 
 
     /**
@@ -76,14 +64,14 @@ class Jwt
         // Not before: not used for now
         // May add ability to regenerate tokens later?
         $claims = [
-            MessagePayloadInterface::CLAIM_ISS => $this->getSchoolboxIssuer(),
-            MessagePayloadInterface::CLAIM_SUB => $user->getUsername(),
+            IParser::CLAIM_ISS => $this->getSchoolboxIssuer(),
+            IParser::CLAIM_SUB => $user->getUsername(),
         ];
         if ($expiry !== null && !$expiry->isNull()) {
-            $claims[MessagePayloadInterface::CLAIM_EXP] = $expiry->getUnixTimeStamp();
+            $claims[IParser::CLAIM_EXP] = $expiry->getUnixTimeStamp();
         }
         if ($jwtId !== null) {
-            $claims[MessagePayloadInterface::CLAIM_JTI] = $jwtId;
+            $claims[IParser::CLAIM_JTI] = $jwtId;
         }
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),

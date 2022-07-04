@@ -45,6 +45,35 @@ interface IParser
     public const CLAIM_AUD = 'aud';
 
     /**
+     * Constant for the expiry JWT claim.
+     *
+     * This defines the time at which the JWT expires: it will be rejected after
+     * this time.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
+     */
+    public const CLAIM_EXP = 'exp';
+
+    /**
+     * Constant for the not-before JWT claim.
+     *
+     * This defines the earliest time at which the JWT will be accepted: it will
+     * be rejected before this time.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5
+     */
+    public const CLAIM_NBF = 'nbf';
+
+    /**
+     * Constant for the issued-at JWT claim.
+     *
+     * The JWT will be rejected before this time.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6
+     */
+    public const CLAIM_IAT = 'iat';
+
+    /**
      * Constant for the JWT ID JWT claim.
      *
      * This is a unique identifier for the JWT: its purpose is to ensure that
