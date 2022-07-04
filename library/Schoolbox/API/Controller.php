@@ -305,6 +305,7 @@ class Controller extends Base
      *
      * @param string $jwt
      * @return User The authenticated user (only if auth was successful)
+     * @throws JwtParser\Exception\Base if JWT was rejected for whatever reason
      */
     private function authenticateViaJwt(string $jwt): User
     {

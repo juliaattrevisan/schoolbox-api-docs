@@ -25,29 +25,19 @@ use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Web\Request;
 use Aura\Web\Response;
-use Firebase\JWT\BeforeValidException;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use ReflectionMethod;
 use RuntimeException;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
-use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\MapperFactory;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Throwable;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Database;
-use Psr\Log\NullLogger;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 
@@ -611,9 +601,8 @@ class Kernel extends WebKernelAbstract
      *
      * @param string|null $authHeader
      * @return User|null
-     * @throws Unauthenticated if auth header exists but is invalid
-     * @throws Unauthenticated if auth header is valid, but doesn't point to a
-     *                         valid user
+     * @throws JwtParser\Exception\Base if a header exists and is recognised,
+     *                                  but is rejected for whatever reason
      */
     private function extractUserFromAuthHeader(?string $authHeader): ?User
     {
