@@ -11,14 +11,12 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * Parser for JWTs issued by another instance.
@@ -75,7 +73,7 @@ class OtherInstanceIssued extends Base
         try {
             $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
         } catch (MapperException $e) {
-            throw new UnexpectedValueException(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
+            throw new Exception\Rejected(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
         }
 
         // Verify the payload
@@ -89,14 +87,15 @@ class OtherInstanceIssued extends Base
         // create a session for the user matching the email address in the JWT
         $email = $claims[self::CLAIM_EMAIL] ?? null;
         if (!isset($email)) {
-            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
+            throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }
 
         // The email must be valid too, or at least not blank
         $email = (string)$email;
         if (trim($email) === '') {
-            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
         }
-        return $this->userMapper->findByUsername($email) ?? throw new SchoolboxNotFoundException();
+        return $this->userMapper->findByUsername($email)
+            ?? throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim does not match a user', self::CLAIM_EMAIL));
     }
 }
