@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
-use Firebase\JWT as JwtLibrary;
 use Firebase\JWT\Key;
 use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -72,14 +70,17 @@ class SelfIssued extends Base
                     ]
                 );
                 if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
-                    throw new JwtLibrary\ExpiredException();
+                    throw new Exception\Rejected('The JWT ID provided has expired');
                 }
             } catch (MapperException $e) {
                 // could not find a token with user id and jwt id
-                throw new JwtLibrary\SignatureInvalidException($e->getMessage(), 0, $e);
+                throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
         }
-        return $user ?? throw new SchoolboxNotFoundException();
+        return $user
+            ?? throw new Exception\InvalidIdentity(
+                sprintf('JWT "%s" claim does not match a user\'s username', MessagePayloadInterface::CLAIM_SUB)
+            );
     }
 
     /**
