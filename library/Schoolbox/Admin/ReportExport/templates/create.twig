@@ -250,7 +250,8 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <label for="report-view-as">View As</label>
+                            <label for="report-view-as">View as</label>
+                            <p class="meta">Only show assessment results that are visible as this type of user.</p>
                             <select name="viewAs">
                                 {% for key, value in viewAs %}
                                     {% set selected = '' %}
@@ -314,7 +315,9 @@
                 <div class="row actions-small-1">
                     <div class="list-item">
                         <div class="small-12 columns">
-                            <h2 class="subheader">Summary Page</h2>
+                            <h2 class="subheader">Summary Page
+                                <span class="hint has-tip tip-top" title="The summary page will display a list of subjects. You may choose to display just overall grades or the grades from specific assessments in each subject." data-tooltip="">?</span>
+                            </h2>
                         </div>
                     </div>
                     <nav>
@@ -334,6 +337,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-summary-heading">Heading</label>
+                            <p class="meta">Optionally customise the name of the summary section. Leave blank to omit it altogether.</p>
                             <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
                         </div>
 
@@ -372,7 +376,9 @@
                 <div class="row actions-small-1">
                     <div class="list-item">
                         <div class="small-12 columns">
-                            <h2 class="subheader">Class Page</h2>
+                            <h2 class="subheader">Class Page
+                                <span class="hint has-tip tip-top" title="This will include a new page in the report for each class. This may include summary graphs and assessments for more detailed information about the class." data-tooltip="">?</span>
+                            </h2>
                         </div>
                     </div>
                     <nav>
