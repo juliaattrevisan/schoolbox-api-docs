@@ -35,17 +35,6 @@ class Controller extends Base
     private const JWT_EXPIRY = 300;
 
     /**
-     * Key for the email JWT claim. This is a public claim, so it doesn't need
-     * a prefix.
-     */
-    private const CLAIM_EMAIL = 'email';
-
-    /**
-     * Key for the instance ID custom JWT claim.
-     */
-    private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
-
-    /**
      * The name of the JWT query string parameter: this contains the JWT passed
      * to the Help instance.
      */
@@ -105,8 +94,8 @@ class Controller extends Base
             Alaress_Date_Format::now()->addSeconds(self::JWT_EXPIRY),
             null,
             [
-                self::CLAIM_EMAIL       => $this->getUser()->getEmail(),
-                self::CLAIM_INSTANCE_ID => INSTANCE_ID,
+                JwtParser\IParser::CLAIM_EMAIL                   => $this->getUser()->getEmail(),
+                JwtParser\OtherInstanceIssued::CLAIM_INSTANCE_ID => INSTANCE_ID,
             ]
         );
 

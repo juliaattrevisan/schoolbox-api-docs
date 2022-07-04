@@ -29,7 +29,7 @@ interface IParser
      * Constant for the subject JWT claim.
      *
      * This claim may be used to identify the user which is the subject of the
-     * claim.
+     * JWT.
      *
      * @see https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2
      */
@@ -58,12 +58,23 @@ interface IParser
     /**
      * Constant for the email JWT claim.
      *
-     * This claim may be used to identify the user which is the subject of the
-     * claim.
+     * This claim may be used instead of `self::CLAIM_AUD` to identify the user
+     * which is the subject of the JWT.
      *
      * @see https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
      */
     public const CLAIM_EMAIL = 'email';
+
+    /**
+     * Namespace used for custom claims created by Schoolbox.
+     *
+     * Any claims added to a token which are not registered or public claims
+     * must be prefixed with this value.
+     *
+     * @see https://tools.ietf.org/html/rfc7519#section-4.1
+     * @see https://www.iana.org/assignments/jwt/jwt.xhtml
+     */
+    public const CUSTOM_CLAIM_NAMESPACE = 'https://schoolbox.com.au/';
 
     /**
      * Does this parser accept this JWT?

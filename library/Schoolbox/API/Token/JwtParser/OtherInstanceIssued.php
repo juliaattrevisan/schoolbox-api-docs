@@ -28,8 +28,11 @@ class OtherInstanceIssued extends Base
 {
     /**
      * Key for the instance ID custom JWT claim.
+     *
+     * This claim is used to identify the Schoolbox instance which issued this
+     * JWT, so that its key may be used to decode and verify the JWT.
      */
-    private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
+    public const CLAIM_INSTANCE_ID = self::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
 
     /**
      * Constructor
