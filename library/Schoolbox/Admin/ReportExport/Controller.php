@@ -574,6 +574,7 @@ class Controller extends ConfigController
         $reportConfigs = (new Payload\Url(
             $this->router,
             (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified(),
+            $this->termMapper,
             $this->roleMapper,
             $this->userBulkMapper,
             $this->userMapper

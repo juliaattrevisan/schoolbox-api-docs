@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\ReportExport\Payload;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Laminas\Uri\UriInterface;
+use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserBulkMapper;
 
@@ -23,8 +24,16 @@ class Url
      */
     private const FILENAME_MAX_LENGTH = 250;
 
+
+    /**
+     * The Academic Periods are specified with this array key
+     */
+    private const TERMS = 'terms';
+
+
     private Router $router;
     private UriInterface $baseUrl;
+    private \Schoolbox\Assessment\Term\Mapper $termMapper;
     private \Schoolbox\RoleMapper $roleMapper;
     private \Schoolbox\UserBulkMapper $userBulkMapper;
     private \Schoolbox\UserMapper $userMapper;
@@ -35,6 +44,7 @@ class Url
      *
      * @param Router                $router
      * @param UriInterface          $baseUrl
+     * @param Mapper                $termMapper
      * @param \Schoolbox\RoleMapper $roleMapper
      * @param UserBulkMapper        $userBulkMapper
      * @param \Schoolbox\UserMapper $userMapper
@@ -42,13 +52,14 @@ class Url
     public function __construct(
         Router $router,
         UriInterface $baseUrl,
+        \Schoolbox\Assessment\Term\Mapper $termMapper,
         \Schoolbox\RoleMapper $roleMapper,
         \Schoolbox\UserBulkMapper $userBulkMapper,
         \Schoolbox\UserMapper $userMapper
-    )
-    {
+    ) {
         $this->router = $router;
         $this->baseUrl = $baseUrl;
+        $this->termMapper = $termMapper;
         $this->roleMapper = $roleMapper;
         $this->userBulkMapper = $userBulkMapper;
         $this->userMapper = $userMapper;
@@ -120,7 +131,7 @@ class Url
 
         /* This is the same for everyone
          */
-        $querystring = $report->buildQuerystring();
+        $querystring = $this->buildQuerystring($report);
 
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
@@ -199,6 +210,130 @@ class Url
         return [
             'warnings' => $warnings,
             'reportConfigs' => $reportConfigs
+        ];
+    }
+
+
+    /**
+     * Convert the payload settings to a single serialized querystring
+     *
+     * @param \Schoolbox\Admin\ReportExport\Model $report
+     * @return string
+     * @throws \JsonException
+     */
+    public function buildQuerystring(\Schoolbox\Admin\ReportExport\Model $report): string
+    {
+        $optionsPayload = json_decode($report->getOptions(), true, 512, JSON_THROW_ON_ERROR);
+
+        /* Bad data or couldn't decode, for some obscure reason
+         * Kind of common with third parties, more so than us
+         */
+        if (!$optionsPayload) {
+            return '';
+        }
+
+        /* Recursively serialize with prefix
+         * Example $stack shown below
+         *
+                Array
+                (
+                    [0] => startDate=2015-01-01
+                    [1] => endDate=2020-12-31
+                    [2] => yearLevels=1,2,3
+                    [3] => campuses=1
+                    [4] => students=45,6,25
+                    [5] => summaryActive=1
+                    [6] => summaryHeading=werI am a cat
+                    [7] => summaryWorkType=1,2,3,5,6,7,8,9,10,11
+                    [8] => summaryOverallGrade=1
+                    [9] => summaryComments=1
+                    [10] => summaryRubrics=1
+                    [11] => classActive=0
+                    [12] => classWorkType=1,2,3,5,6,7,8,9,10,11,12
+                    [13] => classOverallGrade=1
+                    [14] => classLearningLevels=1
+                    [15] => classCohort=1
+                    [16] => classCapabilityGrades=1
+                    [17] => classProgression=1
+                    [18] => classComments=1
+                    [19] => classRubrics=1
+                )
+         */
+        $stack  = [];
+
+        foreach ($optionsPayload as $key => $sectionValue) {
+            if (self::TERMS === $key) {
+                /* Term is specified with querystring params 'startDate' and 'endDate'
+                 * These are the earliest and latest dates out of all the Academic
+                 * Periods selected via the selectize
+                 */
+                $dates = $this->calculateDateRange(explode(',', $sectionValue));
+
+                $stack[] = "startDate={$dates['startDate']}";
+                $stack[] = "endDate={$dates['endDate']}";
+            } else if (!is_array($sectionValue)) {
+                /* Non-hierarchical
+                 */
+                $stack[] = "{$key}={$sectionValue}";
+            } else {
+                /* Summary and Class subsections
+                 */
+                foreach ($sectionValue as $subsectionKey => $subsectionValue) {
+                    $stack[] = sprintf(
+                        '%s%s=%s',
+                        $key,
+                        ucwords($subsectionKey),
+                        is_array($subsectionValue) ? implode(',', $subsectionValue) : $subsectionValue
+                    );
+                }
+            }
+        }
+
+        return implode('&', $stack);
+    }
+
+
+    /**
+     * Find the total date range spanned by the all selected Academic Periods
+     *
+     * @param array $termIds
+     * @return array
+     */
+    private function calculateDateRange(array $termIds): array {
+        $startDate = null;
+        $endDate = null;
+
+        /* No terms specified? Use today's term's date range
+         */
+        if (!\count($termIds)) {
+            $currentTerm = $this->termMapper->findForToday();
+
+            return [
+                'startDate' => $currentTerm->getStart()->getDatabaseDate(),
+                'endDate' => $currentTerm->getDisplayFinish()->getDatabaseDate()
+            ];
+        }
+
+        /* Otherwise traverse the set
+         *
+         * Find the earliest date and find the latest date
+         * and use this as the date range
+         */
+        $terms = $this->termMapper->findByColumn('id', $termIds);
+
+        foreach ($terms as $term) {
+            if (!$startDate || $term->getStart()->lt($startDate)) {
+                $startDate = $term->getStart();
+            }
+
+            if (!$endDate || $term->getDisplayFinish()->gt($endDate)) {
+                $endDate = $term->getDisplayFinish();
+            }
+        }
+
+        return [
+            'startDate' => $startDate->getDatabaseDate(),
+            'endDate' => $endDate->getDatabaseDate()
         ];
     }
 }
