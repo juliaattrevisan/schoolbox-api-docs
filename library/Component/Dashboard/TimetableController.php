@@ -13,7 +13,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
-
     /** @var External_TimetableInterface $externalTimetable */
     private $externalTimetable;
 
@@ -219,15 +218,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     private function buildPeriodContext(int $campusId, ?array $currentPeriod, array $period, Alaress_Date_Format $now): array
     {
         // Always highlight the current cell, regardless of whether it contains any classes
-         $isCurrent = $currentPeriod
+        $isCurrent = $currentPeriod
             && $currentPeriod['PeriodNumber'] == $period['periodNumber']
             && $currentPeriod['PeriodNumberSeq'] == $period['periodSequence'];
 
         $periodContext = [
-            'name'       => $period['periodName'],
-            'start'      => $period['periodStart'],
-            'end'        => $period['periodEnd'],
-            'isCurrent'  => $isCurrent,
+            'name'      => $period['periodName'],
+            'start'     => $period['periodStart'],
+            'end'       => $period['periodEnd'],
+            'isCurrent' => $isCurrent,
         ];
 
         if (is_array($period['class'])) {
@@ -276,7 +275,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 'link'   => $this->externalAttendanceLink->getAttendanceLink(
                     $class['code'],
                     $class['campus'],
-                    $class['FileType'],
+                    $class['FileType'] ?? null,
                     $class['AttendancePeriods'] ?? [],
                     $period['periodNumber'],
                     $now,
@@ -285,7 +284,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $this->getUser()->getExternalId(),
                     $this->dayNumber[$campusId]
                 ),
-                'marked' => (bool)$class['AttendanceMarked'],
+                'marked' => (bool)($class['AttendanceMarked'] ?? false),
                 'target' => $this->externalAttendanceLink->getAttendanceLinkTarget(),
             ];
         }
