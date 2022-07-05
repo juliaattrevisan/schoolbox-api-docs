@@ -87,7 +87,7 @@ class Controller extends Base
     public function apiMembershipGet(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enroled in the Group'))
+            $problem = (new ApiProblem('User is not enroled in the group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -113,7 +113,7 @@ class Controller extends Base
     public function apiMembershipAdd(User $user, Group $group)
     {
         if ($this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is already Enroled in the Group'))
+            $problem = (new ApiProblem('User is already enroled in the group'))
                 ->setStatus(409)
                 ->asArray();
             $this->getResponse()->status->setCode(409);
@@ -173,7 +173,7 @@ class Controller extends Base
     public function apiMembershipPut(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enroled in the Group'))
+            $problem = (new ApiProblem('User is not enroled in the group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -216,7 +216,7 @@ class Controller extends Base
     public function apiMembershipPatch(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enroled in the Group'))
+            $problem = (new ApiProblem('User is not enroled in the group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -238,7 +238,7 @@ class Controller extends Base
     private function processGroupPostData(User $user, Group $group, array $post, array $defaultData): void
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enroled in the Group'))
+            $problem = (new ApiProblem('User is not enroled in the group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -300,7 +300,7 @@ class Controller extends Base
     public function apiMembershipDelete(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enroled in the Group'))
+            $problem = (new ApiProblem('User is not enroled in the group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
