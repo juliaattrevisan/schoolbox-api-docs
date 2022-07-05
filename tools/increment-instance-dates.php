@@ -16,7 +16,6 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Tool to increment data dates for sandbox instances
  */
 $app = new class extends CliTool\App {
-
     // Columns to increment by year
     private const WHITELISTED_COLUMNS_YEAR = [
         'sis_timetable_cycle'      => ['finish', 'start', 'title'],
