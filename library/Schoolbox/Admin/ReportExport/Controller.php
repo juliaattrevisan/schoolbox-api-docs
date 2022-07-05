@@ -623,10 +623,10 @@ class Controller extends ConfigController
              * It's a concat of today's date and the report name
              */
             $outfile = mb_substr(sprintf(
-                '%s-%s.zip',
+                '%s-%s',
                 \Alaress_Date_Format::now()->getDatabaseDate(),
                 $report->getTitle()
-            ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8');
+            ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip';
 
             /* This $message instance is the payload that we send to taskd
              * which it then unpacks, configures its Gotenberg client, and uses
