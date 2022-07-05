@@ -188,16 +188,25 @@ class Browser extends Source\BrowserAbstract
     /**
      * Creates this node and its children from the JSON object.
      *
-     * @param  object $jsonTree
+     * @param object              $jsonTree
+     * @param LearningLevel\Model $level
      * @return bool|Node\Model
      */
-    protected function buildOutputTree($jsonTree, $level)
+    protected function buildOutputTree(object $jsonTree, LearningLevel\Model $level)
     {
-        if ($jsonTree->dcterms_educationLevel->uri === $level->getReference()) {
+        if (
+            isset($jsonTree->dcterms_educationLevel->uri)
+            && $jsonTree->dcterms_educationLevel->uri === $level->getReference()
+        ) {
             // This is the right year level within this learning area.
             // Build an outcome tree out of it.
             $node = $this->buildSingleNode($jsonTree);
-        } elseif (is_array($jsonTree->dcterms_educationLevel)) {
+        } elseif (
+            isset($jsonTree->dcterms_educationLevel)
+            && is_array($jsonTree->dcterms_educationLevel)
+        ) {
+            // This part of the tree has multiple learning levels:
+            // if any match the given learning level, build an outcome tree.
             if (
                 count(array_filter($jsonTree->dcterms_educationLevel, function ($v) use ($level) {
                     return $v->uri ==  $level->getReference();
