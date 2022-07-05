@@ -643,8 +643,9 @@ class Classes implements IStrategy
                      */
                     if (isset($this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()])) {
                         $this->log->debug(sprintf(
-                            'Reusing existing timetable event %s on %s %s (%s-%s)',
+                            'Reusing existing timetable event %s %s on %s %s (%s-%s)',
                             $title,
+                            $classCode,
                             $day,
                             $period,
                             $startAt->getDatabase(),
@@ -686,8 +687,9 @@ class Classes implements IStrategy
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
                         $this->log->info(sprintf(
-                            'Creating new timetable event %s - %s, %s, %s-%s',
+                            'Creating new timetable event %s %s - %s, %s, %s-%s',
                             $event->getTitle(),
+                            $event->getCode(),
                             $event->getDay(),
                             $event->getPeriod(),
                             $event->getStartAt()->getDatabase(),
