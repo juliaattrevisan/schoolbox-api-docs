@@ -211,7 +211,7 @@ class Scrub
                     '_blank',
                     '_self',
                     '_parent',
-                    '_top'
+                    '_top',
                 )
             );
 
@@ -325,7 +325,7 @@ class Scrub
                         'href' => 'URI',
                         'shape' => new HTMLPurifier_AttrDef_Enum(array('rect','circle','poly','default')),
                         'tabindex' => 'Number',
-                        'target' => new HTMLPurifier_AttrDef_Enum(array('_blank','_self','_target','_top'))
+                        'target' => new HTMLPurifier_AttrDef_Enum(array('_blank','_self','_target','_top')),
                     )
                 );
                 $area->excludes = array('area' => true);
@@ -460,29 +460,39 @@ class Scrub
             'scrub.html',
             function ($param) {
                 $purified = self::getHtmlPurifierInstance()->purify($param);
+                if ($purified === '') {
+                    return $purified;
+                }
                 // Run iframely over this content.
                 // Find every data-oembed-url content,
                 // replace it with iframely's response
                 $doc = new DOMDocument();
-                if ($purified !== '') {
-                    $doc->loadHTML($purified);
-                    $xpath = new DOMXPath($doc);
-                    $matches = $xpath->query('//div[@data-oembed-url]');
-                    if ($matches instanceof DOMNodeList) {
-                        foreach ($matches as $match) {
-                            if ($match instanceof DOMNode && $match->parentNode instanceof DOMNode) {
-                                /** @var DOMAttr $oembedUrl */
-                                $oembedUrl = $match->attributes['data-oembed-url'];
-                                $newNode = new DOMText($oembedUrl->value);
-                                $match->parentNode->replaceChild(
-                                    $doc->importNode($newNode, true),
-                                    $match,
-                                );
-                            }
+                $doc->loadHTML($purified);
+                $xpath = new DOMXPath($doc);
+                $matches = $xpath->query('//div[@data-oembed-url]');
+                if (!($matches instanceof DOMNodeList && $matches->count() > 0)) {
+                    return $purified;
+                }
+                foreach ($matches as $match) {
+                    if ($match instanceof DOMNode && $match->parentNode instanceof DOMNode) {
+                        /** @var DOMAttr $oembedUrl */
+                        $oembedUrl = $match->attributes['data-oembed-url'];
+                        $newNode = new DOMText($oembedUrl->value);
+                        $match->parentNode->replaceChild(
+                            $doc->importNode($newNode, true),
+                            $match,
+                        );
+                    }
+                }
+                $output = '';
+                foreach ($doc->getElementsByTagName('body') as $body) {
+                    if ($body instanceof DOMNode) {
+                        foreach ($body->childNodes as $bodyChild) {
+                            $output .= $doc->saveHTML($bodyChild);
                         }
                     }
                 }
-                return $doc->saveHTML();
+                return $output;
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
