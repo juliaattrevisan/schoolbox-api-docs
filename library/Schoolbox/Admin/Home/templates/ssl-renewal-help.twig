@@ -128,7 +128,7 @@
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_port_80" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>Let's Encrypt sends web requests via HTTP over port 80. If port 80 traffic is restricted, that could be causing SSL certificate renewal requests to fail.</p>
+                                <p>Let's Encrypt sends domain verification requests via HTTP on port 80. If port 80 traffic is restricted, that could be causing SSL certificate renewal requests to fail.</p>
                                 <h5>Common causes</h5>
                                 <ol>
                                     <li>A firewall may be restricting traffic on port 80</li>
