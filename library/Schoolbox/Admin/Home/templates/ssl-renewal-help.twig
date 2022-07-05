@@ -178,22 +178,18 @@
                                 <span class="full-width no-margin neutral label" data-light="ssl_upstream_error"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_upstream_error" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_upstream_error" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>The problem is this...</p>
+                                <p>'Upstream error' is an umbrella term for any number of issues that could be restricting the Let's Encrypt requests trying to reach the Schoolbox server.</p>
                                 <h5>Common causes</h5>
-                                <ul>
-                                    <li>
-                                        <p>You firewall is...</p>
-                                    </li>
-                                </ul>
-                                <h5>Resolution advice</h5>
-                                <ul>
-                                    <li>
-                                        <p>Try reviewing your firewall...</p>
-                                    </li>
-                                </ul>
+                                <ol>
+                                    <li>A firewall/service may be severing the connection that Let's Encrypt is trying to establish</li>
+                                    <li>A firewall/service may be filtering Let's Encrypt requests based on some kind of 'smart filtering' feature</li>
+                                    <li>A firewall/service placed in front may be filtering Let's Encrypt requests based on their use of the <code>acme-challenge</code> application protocol</li>
+                                </ol>
+                                <h5>Resolution steps</h5>
+                                <p>Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt traffic is able to reach the Schoolbox server directly.</p>
                             </article>
                         </div>
                     </li>
