@@ -91,7 +91,7 @@
                                                                     css: 'success'
                                                                 });
 
-                                                                window.location.href = window.location.href;
+                                                                location.reload();
                                                             })
                                                             .fail(function(response) {
                                                                 let temp = $.parseJSON(response.responseText);
