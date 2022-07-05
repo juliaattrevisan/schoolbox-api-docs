@@ -122,7 +122,7 @@
                                 <h3 class="no-margin">Port 80 timeout</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_port_80">Testing...</span>
+                                <span class="full-width no-margin neutral label" data-light="ssl_port_80"><span class="loader"></span></span>
                             </div>
                         </div>
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_port_80" style="display: none;">
@@ -147,7 +147,7 @@
                                 <h3 class="no-margin">HTTP > HTTPS upgrade</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_https_upgrade">Testing...</span>
+                                <span class="full-width no-margin neutral label" data-light="ssl_https_upgrade"><span class="loader"></span></span>
                             </div>
                         </div>
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_https_upgrade" style="display: none;">
@@ -169,13 +169,13 @@
                         </div>
                     </li>
                     <li>
-                        <div>
-                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_upstream_error"></div>
-                            <div class="small-5 large-9 columns content">
-                                <h4 class="no-margin">Upstream error response</h4>
+                        <div id="upstream_error">
+                            <div class="expander icon-down-arrow" data-collapser="ssl_upstream_error"></div>
+                            <div class="column-left columns content">
+                                <h3 class="no-margin">Upstream error</h3>
                             </div>
-                            <div class="small-7 large-3 content">
-                                <span class="full-width neutral label" data-light="ssl_upstream_error">Testing...</span>
+                            <div class="column-right content">
+                                <span class="full-width no-margin neutral label" data-light="ssl_upstream_error"><span class="loader"></span></span>
                             </div>
                         </div>
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_upstream_error" style="display: none;">
@@ -198,16 +198,16 @@
                         </div>
                     </li>
                     <li>
-                        <div>
-                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_user_agent"></div>
-                            <div class="small-5 large-9 columns content">
-                                <h4 class="no-margin">User agent blocking</h4>
+                        <div id="user_agent">
+                            <div class="expander icon-down-arrow" data-collapser="ssl_user_agent"></div>
+                            <div class="column-left columns content">
+                                <h3 class="no-margin">User agent blocking</h3>
                             </div>
-                            <div class="small-7 large-3 content">
-                                <span class="full-width neutral label" data-light="ssl_user_agent">Testing...</span>
+                            <div class="column-right content">
+                                <span class="full-width no-margin neutral label" data-light="ssl_user_agent"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_user_agent" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_user_agent" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>The problem is this...</p>
@@ -227,16 +227,16 @@
                         </div>
                     </li>
                     <li>
-                        <div>
-                            <div class="expander icon-down-arrow" data-collapser="collap_ssl_geoblocking"></div>
-                            <div class="small-5 large-9 columns content">
-                                <h4 class="no-margin">Geoblocking</h4>
+                        <div id="geoblocking">
+                            <div class="expander icon-down-arrow" data-collapser="ssl_geoblocking"></div>
+                            <div class="column-left columns content">
+                                <h3 class="no-margin">Geoblocking</h3>
                             </div>
-                            <div class="small-7 large-3 content">
-                                <span class="full-width neutral label" data-light="ssl_geoblocking">Testing...</span>
+                            <div class="column-right content">
+                                <span class="full-width no-margin neutral label" data-light="ssl_geoblocking">No test available</span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="collap_ssl_geoblocking" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_geoblocking" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>The problem is this...</p>
@@ -270,7 +270,7 @@
                             <h5 class="no-margin">Response status code:</h5>
                         </div>
                         <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_status"></pre>
+                            <pre id="response_status"><span class="loader"></span></pre>
                         </div>
                     </li>
                     <li class="">
@@ -278,7 +278,7 @@
                             <h5 class="no-margin">Response headers:</h5>
                         </div>
                         <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_headers"></pre>
+                            <pre id="response_headers"><span class="loader"></span></pre>
                         </div>
                     </li>
                     <li class="">
@@ -286,7 +286,7 @@
                             <h5 class="no-margin">Response body:</h5>
                         </div>
                         <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_body"></pre>
+                            <pre id="response_body"><span class="loader"></span></pre>
                         </div>
                     </li>
                 </ol>
