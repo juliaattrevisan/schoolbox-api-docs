@@ -750,6 +750,10 @@ class Classes implements IStrategy
         /* If the location is DUT, it's a duty
          */
         return 'DUT' === $event->getLocation();
+
+        /* TODO Add this to SUDS Config so schools can decide which locations
+         *  correspond to "communal events" like Yard Duties, shared tutes, etc
+         */
     }
 
 
