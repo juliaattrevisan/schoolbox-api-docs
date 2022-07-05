@@ -140,6 +140,8 @@
                     While this page attempts to aid self-diagnosis of SSL renewal issues using the tests above, the accuracy of the results cannot be guaranteed. The information on this page is provided to aid troubleshooting and should not be taken as 100% fact. Schoolbox takes no responsibility for the changes made to your firewall as a result of the information provided by this page.
                 </div>
             </section>
+        </div>
+        <div class="small-12 island">
             <h3 class="subheader">Troubleshooting</h3>
             <section>
                 <ol class="information-list expandable-card">
@@ -286,37 +288,8 @@
                     });
                 </script>
             </section>
-            <h3 class="subheader">Response details</h3>
-            <section>
-                <ol class="information-list">
-                    <li class="">
-                        <div class="small-12 medium-3 columns content">
-                            <h5 class="no-margin">Response status code:</h5>
-                        </div>
-                        <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_status"><span class="loader"></span></pre>
-                        </div>
-                    </li>
-                    <li class="">
-                        <div class="small-12 medium-3 columns content">
-                            <h5 class="no-margin">Response headers:</h5>
-                        </div>
-                        <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_headers"><span class="loader"></span></pre>
-                        </div>
-                    </li>
-                    <li class="">
-                        <div class="small-12 medium-3 columns content">
-                            <h5 class="no-margin">Response body:</h5>
-                        </div>
-                        <div class="small-12 medium-9 alert-box highlight columns no-margin">
-                            <pre id="response_body"><span class="loader"></span></pre>
-                        </div>
-                    </li>
-                </ol>
-            </section>
         </div>
-        <div class="medium-6 island">
+        <div id="request-details" class="medium-12 large-6 island">
             <h3 class="subheader">Let's Encrypt request details</h3>
             <section>
                 <ol class="information-list">
@@ -347,7 +320,7 @@
                 </ol>
             </section>
         </div>
-        <div class="medium-6 island">
+        <div class="medium-12 large-6 island">
             <h3 class="subheader">Response details</h3>
             <section>
                 <ol class="information-list">
