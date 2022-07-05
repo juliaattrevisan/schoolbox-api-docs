@@ -34,10 +34,12 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
+        $this->uses('template_private', self::TYPE_STRING);
         $this->uses('color', self::TYPE_COLOR);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('visibility_locked', self::TYPE_BOOLEAN);
+        $this->uses('sentiment', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::SENTIMENT_VALUES);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
