@@ -652,6 +652,19 @@ try {
                     $sentry
                 ));
 
+                /* timetable days
+                */
+                $api->add(buildApiClass(
+                    Calendar_Api_EventType_TimetableDays_External_Default::class,
+                    [
+                        $user,
+                        $viewer,
+                        \Schoolbox\Calendar\EventTypeMapper::getInstance()
+                    ],
+                    true,
+                    $sentry
+                ));
+
                 //set the end of the export
                 $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
             }
