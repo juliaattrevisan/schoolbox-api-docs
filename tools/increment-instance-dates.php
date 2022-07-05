@@ -16,10 +16,81 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Tool to increment data dates for sandbox instances
  */
 $app = new class extends CliTool\App {
-    private const BLACKLISTED_COLUMNS = [
-//        'table' => [
-//            'column',
-//        ]
+
+    // Columns to increment by year
+    private const WHITELISTED_COLUMNS_YEAR = [
+        'sis_timetable_cycle'      => ['finish', 'start', 'title'],
+        'sis_user_profile_student' => ['date_of_birth'],
+        'sportsfixtures_season'    => ['start', 'end', 'name'],
+        'term'                     => ['start', 'actual_finish', 'display_finish', 'title', 'code'],
+    ];
+
+    // Columns to increment
+    private const WHITELISTED_COLUMNS = [
+        'assess'                 => ['finish', 'start'],
+        'assessment'             => ['close_date', 'due_date', 'open_date', 'publish_date'],
+        'assessment_participant' => ['due_date', 'open_date'],
+        'assessment_view'        => ['last_visit'],
+        'assess_attempt'         => ['finish', 'reviewed_at,', 'start'],
+        'assess_response'        => ['updated_at'],
+        'badge_user'             => ['awarded_at', 'expires_at', 'viewed_on'],
+        'blog'                   => ['created_at', 'updated_at'],
+        'blog_comment'           => ['created_at', 'updated_at'],
+        'chat'                   => ['time'],
+        'chat_poll'              => ['time'],
+        'comms_news_article'     => [
+            'accepted_at',
+            'created_at',
+            'expires_at',
+            'publish_at',
+            'rejected_at',
+            'submitted_at',
+            'updated_at',
+            'occurs_at',
+        ],
+
+        'comms_news_article_statistics_cumulative' => ['date'],
+        'course_unit_implementation'               => ['due_date', 'open_date'],
+        'discussion_thread'                        => ['created_at', 'updated_at'],
+        'discussion_thread_comment'                => ['created_at', 'updated_at'],
+        'eportfolio_component_blog'                => ['created_at', 'updated_at'],
+        'eportfolio_component_blog_comment'        => ['created_at', 'updated_at'],
+        'event'                                    => [
+            'created_at',
+            'ends',
+            'end_datetime',
+            'execute_at',
+            'last_executed',
+            'publish_date',
+            'starts',
+            'start_datetime',
+            'updated_at',
+        ],
+        'evidence'                                 => ['created_at', 'updated_at'],
+        'file'                                     => ['modified', 'submitted'],
+        'forumPost'                                => ['date', 'modified'],
+        'forumThread'                              => ['date', 'last_post_date'],
+        'homepage_log'                             => ['datetime'],
+        'homepage_visits'                          => ['date'],
+        'link'                                     => ['modified', 'submitted'],
+        'participant_plan'                         => ['close_date', 'due_date', 'open_date', 'publish_date'],
+        'pastoral'                                 => ['created_at', 'updated_at'],
+        'pastoral_audit'                           => ['created_at'],
+        'pastoral_comment'                         => ['created_at', 'updated_at'],
+        'pastoral_revision'                        => ['created_at', 'updated_at'],
+        'poll'                                     => ['close'],
+        'sis_event'                                => ['finish_at', 'start_at'],
+        'sis_user_profile_student'                 => ['enrolment_date', 'leaving_date'],
+        'socialstream_post'                        => ['created_at', 'updated_at'],
+        'sportsfixtures_match'                     => ['finish_at', 'start_at'],
+        'sportsfixtures_match_itineraryitem'       => ['start_at'],
+        'student_submission'                       => ['created_at', 'submitted_at', 'updated_at'],
+        'student_submission_file'                  => ['created_at', 'updated_at'],
+        'submission_box'                           => ['date', 'late_date', 'open_date', 'publish_date'],
+        'submission_return'                        => ['created_at', 'published_at', 'updated_at'],
+        'submission_return_file'                   => ['created_at', 'updated_at'],
+        'task_completion'                          => ['completion_date'],
+        'task_file'                                => ['created_at', 'updated_at'],
     ];
 
     public function runAsRoot(): ?bool
@@ -41,8 +112,10 @@ $app = new class extends CliTool\App {
         }
         $epochDate = new Alaress_Date_Format($epoch_config, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
+        // If date_increment_epoch is more than 7 days ago, increment dates by week(s)
+        // I don't think we ever want to set a date in the future to this config?
         $diffDays = floor(($epochDate->diffInDays(Alaress_Date_Format::now(), false) / 7)) * 7;
-        if (!$diffDays) {
+        if ($diffDays <= 0) {
             $this->getLogger()->notice("Day diff: $diffDays. There's nothing to do here just yet. Exiting.");
             exit;
         }
@@ -65,7 +138,7 @@ $app = new class extends CliTool\App {
     private function incrementDates(int $diffDays): void
     {
         // Fetch all tables
-        $query = $this->getDatabaseInternal()->executeQuery(
+        $query        = $this->getDatabaseInternal()->executeQuery(
             "
                 SELECT c.TABLE_NAME, c.COLUMN_NAME
                 FROM INFORMATION_SCHEMA.TABLES t
@@ -77,9 +150,21 @@ $app = new class extends CliTool\App {
             ",
             ['schema' => $this->getDatabaseInternal()->getDatabase()],
         );
+        $tableColumns = [];
         foreach ($query->fetchAll(PDO::FETCH_NUM) as [$table, $column]) {
-            $this->incrementColumn($table, $column, $diffDays);
+            $tableColumns[$table]   ??= [];
+            $tableColumns[$table][] = $column;
         }
+
+        $diffYears = (int)floor($diffDays / 365);
+
+        foreach ($tableColumns as $tableName => $columns) {
+            $this->incrementColumn($tableName, $columns, $diffDays);
+            if ($diffYears > 0 && isset(self::WHITELISTED_COLUMNS_YEAR[$tableName])) {
+                $this->incrementYear($tableName, $columns, $diffYears);
+            }
+        }
+
         $this->getDatabaseInternal()->executeQuery(
             "
                 UPDATE config
@@ -98,33 +183,103 @@ $app = new class extends CliTool\App {
      * Increments column by specified number of days
      *
      * @param string $tableName
-     * @param string $column
+     * @param array  $dbColumns
      * @param int    $diffDays
      */
-    private function incrementColumn(string $tableName, string $column, int $diffDays): void
+    private function incrementColumn(string $tableName, array $dbColumns, int $diffDays): void
     {
-        // Is column blacklisted?
-        // @phpstan-ignore-next-line: whilst blacklisted columns are currently empty, they may not be forever
-        if (isset(self::BLACKLISTED_COLUMNS[$tableName]) && in_array($column, self::BLACKLISTED_COLUMNS[$tableName])) {
+        if (!isset(self::WHITELISTED_COLUMNS[$tableName])) {
             return;
         }
 
-        // If column is part of index we need to avoid creating a temporary collision.
-        // If increasing the value, need to update the largest first.
-        // Else decreasing the value, need to update the smallest first.
-        $order = $diffDays > 0
-            ? 'DESC'
-            : 'ASC';
+        $columns = array_intersect(self::WHITELISTED_COLUMNS[$tableName], $dbColumns);
+        if (empty($columns)) {
+            return;
+        }
 
-        $this->getLogger()->info("Incrementing dates for: $tableName.$column");
-        $updateQuery = $this->getDatabaseInternal()->prepareQuery(
-            "
+        $whereNotDeleted = '';
+        if (in_array('deleted_at', $dbColumns)) {
+            $whereNotDeleted = ' WHERE deleted_at IS NULL ';
+        }
+
+        foreach ($columns as $column) {
+            // If column is part of index we need to avoid creating a temporary collision.
+            // If increasing the value, need to update the largest first.
+            // Else decreasing the value, need to update the smallest first.
+            $order = $diffDays > 0
+                ? 'DESC'
+                : 'ASC';
+
+            $this->getLogger()->info("Incrementing dates for: $tableName.$column");
+            $updateQuery = $this->getDatabaseInternal()->prepareQuery(
+                "
             UPDATE $tableName
             SET $column = DATE_ADD($column, INTERVAL :diff DAY)
+            $whereNotDeleted
             ORDER BY $column $order
         "
-        );
-        $updateQuery->execute([':diff' => $diffDays]);
+            );
+            $updateQuery->execute([':diff' => $diffDays]);
+        }
+    }
+
+    /**
+     * Increments column by specified number of days
+     *
+     * @param string $tableName
+     * @param array  $dbColumns
+     * @param int    $diffYears
+     */
+    private function incrementYear(string $tableName, array $dbColumns, int $diffYears): void
+    {
+        $dateColumns = array_intersect(self::WHITELISTED_COLUMNS_YEAR[$tableName], $dbColumns);
+        $nameColumns = array_diff(self::WHITELISTED_COLUMNS_YEAR[$tableName], $dbColumns);
+        if (empty($dateColumns)) {
+            return;
+        }
+
+        $whereNotDeleted = '';
+        if (in_array('deleted_at', $dbColumns)) {
+            $whereNotDeleted = ' WHERE deleted_at IS NULL ';
+        }
+
+        // update name first
+        if ($diffYears > 0 && count($nameColumns)) {
+            foreach ($nameColumns as $column) {
+                $rows = $this->getDatabaseInternal()->executeQuery(
+                    "SELECT
+                       REPLACE(`$column`, YEAR(`$dateColumns[0]`), YEAR(`$dateColumns[0]`) + $diffYears) AS new_name,
+                       `$column` AS old_name
+                     FROM $tableName
+                     WHERE `$dateColumns[0]` IS NOT NULL
+                     ORDER BY `$dateColumns[0]` DESC"
+                )->fetchAll();
+                foreach ($rows as $row) {
+                    $this->getDatabaseInternal()->executeQuery(
+                        "UPDATE $tableName SET `$column` = :newName WHERE `$column` = :oldName",
+                        [
+                            'newName' => $row['new_name'],
+                            'oldName' => $row['old_name'],
+                        ]
+                    );
+                }
+            }
+        }
+
+        foreach ($dateColumns as $column) {
+            $this->getLogger()->info("Incrementing year for: $tableName.$column");
+            // name column
+
+            $updateQuery = $this->getDatabaseInternal()->prepareQuery(
+                "
+            UPDATE $tableName
+            SET $column = DATE_ADD($column, INTERVAL :diff DAY)
+            $whereNotDeleted
+            ORDER BY $column DESC
+        "
+            );
+            $updateQuery->execute([':diff' => $diffYears * 365]);
+        }
     }
 };
 
