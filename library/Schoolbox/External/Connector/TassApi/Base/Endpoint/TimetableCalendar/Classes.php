@@ -711,7 +711,7 @@ class Classes implements IStrategy
 
                     /* Decide how involved humans are saved
                      */
-                    if ($this->isDuty($event)) {
+                    if ($this->isDuty($event, $subject)) {
                         /* FIXME SPECULATIVE PROGRAMMING
                          *
                          * If this event is a Duty (identified by room code DUT)
@@ -743,17 +743,28 @@ class Classes implements IStrategy
      * Clear everyone's involvement then add specific people for a given date
      *
      * @param \Schoolbox\External\Event\Model $event
+     * @param array                           $subject
      * @return bool
      */
-    private function isDuty(\Schoolbox\External\Event\Model $event): bool
+    private function isDuty(\Schoolbox\External\Event\Model $event, array $subject): bool
     {
-        /* If the location is DUT, it's a duty
-         */
-        return 'DUT' === $event->getLocation();
-
         /* TODO Add this to SUDS Config so schools can decide which locations
          *  correspond to "communal events" like Yard Duties, shared tutes, etc
          */
+
+        /* If the location is DUT, it's a duty
+         */
+        if ('DUT' === $event->getLocation()) {
+            return true;
+        }
+
+        /* If the Subject Code is X, it's a shared tutorial thing
+         */
+        if ('X' === trim((string)$subject['SUB_CODE'])) {
+            return true;
+        }
+
+        return false;
     }
 
 
