@@ -10,6 +10,16 @@ import Toast from '@schoolboxVue/components/toast.vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
+const props = defineProps({
+    /**
+     * the endpoint to remove members
+     */
+    removeMembersEndpoint: {
+        type: String,
+        required: true,
+    },
+});
+
 const store = useStore();
 const removeModalEl = ref(null);
 const toastEl = ref(null);
@@ -26,7 +36,7 @@ watch(() => store.isRemoveSelectedMembersPromptOpen, (newIsOpen) => {
  * remove the selected members
  */
 function onRemoveSelected () {
-    store.removeSelectedMembers();
+    store.removeSelectedMembers(props.removeMembersEndpoint);
 }
 
 /**
@@ -55,7 +65,7 @@ store.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => isProcessing.value ? 'Removing' : 'Remove');
+const removeButtonText = computed(() => isProcessing.value ? 'Removing...' : 'Remove');
 
 /**
  * to prevent the user from moving away from the modal while 
@@ -83,7 +93,11 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal ref="removeModalEl" @closed="onModalClosed" :is-close-disabled="isCloseModalDisabled">
+    <reveal-modal ref="removeModalEl" 
+        :is-close-disabled="isCloseModalDisabled" 
+        :close-on-background-click="false" 
+        @closed="onModalClosed"
+    >
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to remove the selected members?</p>
         <ul class="flex-list buttons">

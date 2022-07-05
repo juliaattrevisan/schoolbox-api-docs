@@ -11,11 +11,19 @@ import ManageGroupTable from './manage-group-table.vue';
 import ManageGroupSelectMembers from './manage-group-select-members.vue';
 import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
 
+
 const props = defineProps({
     /**
      * the endpoint to retrieve all the group data from
      */
-    endpoint: {
+    getMembersEndpoint: {
+        type: String,
+        required: true,
+    },
+    /**
+     * the endpoint to remove members
+     */
+    removeMembersEndpoint: {
         type: String,
         required: true,
     },
@@ -30,7 +38,7 @@ onMounted(() => {
 <template>
     <manage-group-heading />
     <manage-group-add-members />
-    <manage-group-table :endpoint="props.endpoint" />
+    <manage-group-table :get-members-endpoint="props.getMembersEndpoint" />
     <manage-group-select-members />
-    <manage-group-remove-members />
+    <manage-group-remove-members :remove-members-endpoint="props.removeMembersEndpoint" />
 </template>

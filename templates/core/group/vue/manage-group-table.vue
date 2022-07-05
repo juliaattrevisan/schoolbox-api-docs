@@ -17,7 +17,7 @@ const props = defineProps({
     /**
      * the endpoint to retrieve all the group data from
      */
-    endpoint: {
+    getMembersEndpoint: {
         type: String,
         required: true,
     },
@@ -34,7 +34,7 @@ const props = defineProps({
 const store = useStore();
 
 onMounted(() => {
-    store.loadGroupMembers(props.endpoint);
+    store.loadGroupMembers(props.getMembersEndpoint);
 });
 
 

@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from 'pinia';
-import { timeout } from '@js/util/jsUtils'
 import FilterTypes from './manageGroupFilterTypes';
 
 
@@ -102,24 +101,29 @@ export const useStore = defineStore('manageGroup', {
         /**
          * member removal has been confirmed so pull them out
          */
-        async removeSelectedMembers () {
+        async removeSelectedMembers (endpoint) {
             try {
-                // await fetch(this.endpoint, {
-                //     method: 'POST',
-                //     body: this.getFormData(),
-                // });
-                await timeout(3000);
-                this.groupMembers = this.groupMembers.filter((row) => { //pull out any deleted members, those rows that are in selectedMembers, which have just been deleted
-                    if (this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id)) { 
-                        return false;
-                    }
-                    return true;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: getRemoveMembersFormData(this.selectedMembers),
                 });
-                this.selectedMembers = [];
-                this.isRemoveSelectedMembersPromptOpen = false;
+                const responseJson = await response.json();
+                if (responseJson.success) {
+                    this.groupMembers = this.groupMembers.filter((row) => { //pull out any deleted members, those rows that are in selectedMembers, which have just been deleted
+                        if (this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id)) { 
+                            return false;
+                        }
+                        return true;
+                    });
+                    this.selectedMembers = [];
+                } else {
+                    throw new Error();
+                }
             } catch (error) {
                 console.warn(error);
-            }  
+            } finally {
+                this.isRemoveSelectedMembersPromptOpen = false;
+            }
         },
 
         /**
@@ -132,3 +136,20 @@ export const useStore = defineStore('manageGroup', {
     },
     
 })
+
+
+/**
+ * Set up a deleted users array to POST
+ *
+ * @param { Array }
+ * 
+ * @returns { FormData }
+ */
+function getRemoveMembersFormData (selectedMembers) {
+    const membersToRemoveIdList = selectedMembers.map(row => row.id);
+    const formData = new FormData();
+    membersToRemoveIdList.forEach((item) => {
+        formData.append('users[]', item);
+    });
+    return formData;
+}

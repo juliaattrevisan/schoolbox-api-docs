@@ -39,21 +39,34 @@ const Template = (args, { argTypes }) => ({
         `,
 });
 
-const endpoint = 'https://swapi.dev/api/films/'; //just using any active endpoint for a connection
+const getMembersEndpoint = '/getMembers'; //just using any active endpoint for a connection
+const removeMembersEndpoint = '/removeMembers';
 
 export const Default = Template.bind({});
 Default.parameters = {
     controls: { hideNoControlsWarning: true },
     msw: {
         handlers: [
-            rest.get(endpoint, (req, res, ctx) => {
-                return res(ctx.json(data)) //we grab an endpoint and then modify the data before it's returned
+            rest.get(getMembersEndpoint, (req, res, ctx) => {
+                return res( //we grab an endpoint and then modify the data before it's returned
+                    ctx.delay(1000),
+                    ctx.json(data)
+                ) 
+            }),
+            rest.post(removeMembersEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.delay(3000),
+                    ctx.json({
+                       success: true,
+                    })
+                )
             }), 
         ]
     },
 }
 Default.args = {
-    endpoint: endpoint,
+    getMembersEndpoint: getMembersEndpoint,
+    removeMembersEndpoint: removeMembersEndpoint,
 }
 
 // export const LoadError = Template.bind({});
