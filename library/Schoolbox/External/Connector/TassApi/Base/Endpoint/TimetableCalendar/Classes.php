@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Event\Overrides\Model;
@@ -625,11 +626,25 @@ class Classes implements IStrategy
                     $startAt = new \Alaress_Date_Format("{$date} {$startTime}", \Alaress_Date_Format::DATABASE_FORMAT);
                     $finishAt = new \Alaress_Date_Format("{$date} {$endTime}", \Alaress_Date_Format::DATABASE_FORMAT);
 
+                    /* Across the fleet, some schools use SUBTAB_YEAR_GROUP
+                     * but some schools use YEAR_GROUP instead; find the first
+                     * meaningful value and use that; one will exist, but the
+                     * other will not. You can't tell which scheme people used,
+                     * nor do I know why they'd choose one over the other
+                     *
+                     * WCC uses YEAR_GROUP
+                     * Scopus uses SUBTAB_YEAR_GROUP
+                     */
+                    $yearGroup = (new FirstMeaningfulValue())->find([
+                        (string)$subject['YEAR_GRP'],
+                        (string)$subject['SUBTAB_YEAR_GRP']
+                    ]);
+
                     $title = trim((string)$subject['SUB_DESC']);
                     $detail = '';
                     $day = "Day {$dayNumber}";
                     $room = trim((string)$subject['ROOM_CODE']);
-                    $classCode = (new Code())->encode((string)$subject['YEAR_GRP'], (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
+                    $classCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
                     $period = $periodData['PRD_DESC'];
                     $type = '';
                     $guid = '';
