@@ -20,7 +20,6 @@ use League\CommonMark;
  */
 class Scrub
 {
-
     /**
      * Singleton HTMLPurifier instance used by this class.
      *
@@ -460,7 +459,30 @@ class Scrub
         return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.html',
             function ($param) {
-                return self::getHtmlPurifierInstance()->purify($param);
+                $purified = self::getHtmlPurifierInstance()->purify($param);
+                // Run iframely over this content.
+                // Find every data-oembed-url content,
+                // replace it with iframely's response
+                $doc = new DOMDocument();
+                if ($purified !== '') {
+                    $doc->loadHTML($purified);
+                    $xpath = new DOMXPath($doc);
+                    $matches = $xpath->query('//div[@data-oembed-url]');
+                    if ($matches instanceof DOMNodeList) {
+                        foreach ($matches as $match) {
+                            if ($match instanceof DOMNode && $match->parentNode instanceof DOMNode) {
+                                /** @var DOMAttr $oembedUrl */
+                                $oembedUrl = $match->attributes['data-oembed-url'];
+                                $newNode = new DOMText($oembedUrl->value);
+                                $match->parentNode->replaceChild(
+                                    $doc->importNode($newNode, true),
+                                    $match,
+                                );
+                            }
+                        }
+                    }
+                }
+                return $doc->saveHTML();
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
