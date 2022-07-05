@@ -95,7 +95,7 @@ class Factory
     private $reviewRoute;
 
     /**
-     * @var DueWorkResponse
+     * @var DueWorkResponse|null
      */
     private $response;
 
@@ -127,8 +127,8 @@ class Factory
         $files,
         $fromInlineGrader,
         string $reviewRoute,
-        IFeedback $mostRecentFeedback = null,
-        DueWorkResponse $response = null
+        ?IFeedback $mostRecentFeedback = null,
+        ?DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
         $this->participant               = $participant;
@@ -228,9 +228,10 @@ class Factory
             $feedback->setPublishedAt(\Alaress_Date_Format::now());
         }
 
-        /* Attach feedback to a particular Response instance
+        /* Attach feedback to a particular Response instance, but only if the
+         * response has not been deleted
          */
-        if ($this->response) {
+        if ($this->response && !$this->response->isDeleted()) {
             $feedback->setResponse($this->response);
         }
 
