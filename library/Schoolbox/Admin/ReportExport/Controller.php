@@ -34,7 +34,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TaskDaemon\Producer;
-use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
