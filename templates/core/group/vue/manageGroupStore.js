@@ -4,6 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
+import FilterTypes from './manageGroupFilterTypes';
 
 
 export const useStore = defineStore('manageGroup', {
@@ -13,6 +14,7 @@ export const useStore = defineStore('manageGroup', {
         hasLoadError: false, //to display loading error
         groupMembers: [], //all the group members
         selectedMembers: [], //to track the current group member selection
+        selectedFilters: [FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN], //the list of table filters available
     }),
 
     getters: {
@@ -74,7 +76,21 @@ export const useStore = defineStore('manageGroup', {
          */
         clearSelectedMembers () {
             this.selectedMembers = [];
-        }
+        },
+
+        /**
+         * update the selected filters based on the latest selection change
+         * 
+         * @param { String }
+         */
+        updateFilterSelection (accessType) {
+            console.warn('updateFilterSelection');
+            if (this.selectedFilters.includes(accessType)) { //pull the updated filter out of the list
+                this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== accessType);
+            } else { //otherwise add it back in
+                this.selectedFilters = [...this.selectedFilters, accessType];
+            }
+        },
 
     },
     

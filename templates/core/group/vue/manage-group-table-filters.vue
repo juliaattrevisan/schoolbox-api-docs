@@ -6,24 +6,15 @@
 
 import { computed } from 'vue';
 import filterTypes from './manageGroupFilterTypes';
+import { useStore } from './manageGroupStore';
 
 
-const props = defineProps({
-    /**
-     * the endpoint to retrieve all the group data from
-     */
-    selectedFilters: {
-        type: Array,
-        required: true,
-    },
-});
+const store = useStore(); //to access the selectedFilters and notify of any changes
 
-const emit = defineEmits(['on-filter-change']);
-      
-const isShowWaitingListChecked = computed(() => props.selectedFilters.includes(filterTypes.WAITING));
-const isShowReadAccessChecked = computed(() => props.selectedFilters.includes(filterTypes.READ));
-const isShowWriteAccessChecked = computed(() => props.selectedFilters.includes(filterTypes.WRITE));
-const isShowAdminAccessChecked = computed(() => props.selectedFilters.includes(filterTypes.ADMIN));
+const isShowWaitingListChecked = computed(() => store.selectedFilters.includes(filterTypes.WAITING));
+const isShowReadAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.READ));
+const isShowWriteAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.WRITE));
+const isShowAdminAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.ADMIN));
 
 /**
  * Dispatch to filter the member display 
@@ -31,7 +22,7 @@ const isShowAdminAccessChecked = computed(() => props.selectedFilters.includes(f
  * @param { String }
  */
 function onFilterChange (accessType) {
-    emit('on-filter-change', accessType); //picked up by manage-group.vue 
+    store.updateFilterSelection(accessType);
 }
 
 </script>

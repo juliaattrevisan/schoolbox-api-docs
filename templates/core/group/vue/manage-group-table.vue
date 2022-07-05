@@ -150,10 +150,10 @@ function onRowSelected (currentSelection) {
 }
 
 /**
- * remove the note once a selection with shift key down has been detected
+ * ensure the table selection is also cleared when 'Clear Selection' is selected
  */
-watch(() => store.selectedMembers, (newSelectedMembers) => {
-    if (newSelectedMembers.length === 0) { //to clear the current selection
+watch(() => store.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
+    if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) { //to clear the current selection
         tableEl.value.resetSelectedRows();
     } 
 });
@@ -166,31 +166,19 @@ watch(() => store.selectedMembers, (newSelectedMembers) => {
  * 
  ****************************************************************/
 
-const selectedFilters = ref([FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN]);
-
 /**
- * Add/remove from selectedFilters and fire an event for the table
- *
- * @param { String }
+ * to update the table display based on the selected filters change
  */
-function onFilterChange (accessType) {
-    updateSelectedFilters(accessType);
-    dispatchFilterEvent(accessType);
-    updateSelectedMembers();
-}
-
-/**
- * Add/remove from selectedFilters
- *
- * @param { String }
- */
-function updateSelectedFilters (accessType) {
-    if (selectedFilters.value.includes(accessType)) {
-        selectedFilters.value = selectedFilters.value.filter((filterType) => filterType !== accessType);
-    } else {
-        selectedFilters.value = [...selectedFilters.value, accessType];
+watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
+    let selectedFilter = []; //to store the filter that has been toggled
+    if (newSelectedFilters.length < oldSelectedFilters.length) { //a filter has been taken out
+        selectedFilter = oldSelectedFilters.filter(x => !newSelectedFilters.includes(x)); //comparing the two arrays to find the only value in oldSelectedFilters
+    } else { //otherwise one has been added back in
+        selectedFilter = newSelectedFilters.filter(x => !oldSelectedFilters.includes(x)); //comparing the two arrays to find the only value in newSelectedFilters
     }
-}
+    dispatchFilterEvent(selectedFilter.join()); //to just get the 
+    updateSelectedMembers();
+});
 
 /**
  * Modify what's displayed in the table, showing or hiding a filter type
@@ -198,15 +186,15 @@ function updateSelectedFilters (accessType) {
  *
  * @param { String }
  */
-function dispatchFilterEvent (accessType) {
-    const filterParam = selectedFilters.value.includes(accessType) ? '' : accessType ;
+function dispatchFilterEvent (selectedFilter) {
+    const filterParam = store.selectedFilters.includes(selectedFilter) ? '' : selectedFilter ;
     const filterEventsType = {
         [FilterTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
         [FilterTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
         [FilterTypes.WRITE]: FilterEvents.SHOW_WRITE_ACCESS,
         [FilterTypes.ADMIN]: FilterEvents.SHOW_ADMIN_ACCESS,
     }
-    EventBus.emit(`vue-tables.filter::${filterEventsType[accessType]}`, filterParam);
+    EventBus.emit(`vue-tables.filter::${filterEventsType[selectedFilter]}`, filterParam);
 }
 
 /**
@@ -214,14 +202,18 @@ function dispatchFilterEvent (accessType) {
  * taking any out that no longer match the selected filters
  */
 function updateSelectedMembers () {
-    const newSelectedMembers = [];
+    const newSelectedMembers = []; //to store the newly selected members with the filter change considered
+    const membersToRemove = []; //to store those selected members that need to be removed due to the filter change
     store.selectedMembers.forEach((member) => {
-        if (selectedFilters.value.some((accessType) => member.access == accessType)) {
+        if (store.selectedFilters.some((accessType) => member.access == accessType)) {
             newSelectedMembers.push(member); //add the member to the new filtered list
         } else {
-            tableEl.value.unselectRow(member.id); //otherwise pull it out
+            membersToRemove.push(member.id); //otherwise pull it out
         }
     });
+    if (membersToRemove.length > 0) {
+        tableEl.value.unselectRows(membersToRemove); //pull out all the unselected members at once
+    }
     store.updateSelectedMembers(newSelectedMembers);
 }
 
@@ -241,10 +233,7 @@ function updateSelectedMembers () {
                 @select="onRowSelected"
             >
                 <template #beforeTable>
-                    <manage-group-table-filters 
-                        :selected-filters="selectedFilters"
-                        @on-filter-change="onFilterChange"
-                    />
+                    <manage-group-table-filters />
                 </template>
                 <template #name="props">
                     <div class="card small-12">
