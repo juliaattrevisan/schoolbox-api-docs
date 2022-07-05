@@ -69,7 +69,14 @@ class Student extends IteratorIterator
 
         /* Set the student boarding status, effectively it's a bool
          */
-        $student->setBoardingStatus((int)($currentResult['student_boarder'] ?? null));
+        if (!isset($currentResult['student_boarder'])) {
+            $studentBoarder = null;
+        } elseif (is_numeric($currentResult['student_boarder'])) {
+            $studentBoarder = (int)$currentResult['student_boarder'];
+        } else {
+            $studentBoarder = $currentResult['student_boarder'];
+        }
+        $student->setBoardingStatus($studentBoarder);
 
         /* Boarding House should be set if it has a value
          * You can't actually rely on StudentBoarder field, because that

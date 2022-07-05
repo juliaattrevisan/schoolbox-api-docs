@@ -56,9 +56,9 @@ class Student extends Base
     /**
      * Boarding Status is a bool denoting whether they are a boarder or not
      *
-     * @var int|null
+     * @var int|string|null
      */
-    protected ?int $boardingStatus = null;
+    protected null|int|string $boardingStatus = null;
 
 
     /* Academics
@@ -358,19 +358,19 @@ class Student extends Base
 
 
     /**
-     * @return int|null
+     * @return int|string|null
      */
-    public function getBoardingStatus(): ?int
+    public function getBoardingStatus(): int|string|null
     {
         return $this->boardingStatus;
     }
 
 
     /**
-     * @param int|null $boardingStatus
+     * @param int|string|null $boardingStatus
      * @return Student
      */
-    public function setBoardingStatus(?int $boardingStatus): self
+    public function setBoardingStatus(int|string|null $boardingStatus): self
     {
         $this->boardingStatus = $boardingStatus;
         return $this;
