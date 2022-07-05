@@ -113,7 +113,7 @@ class Controller extends Base
     public function apiMembershipAdd(User $user, Group $group)
     {
         if ($this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is already Enrolled in the Group'))
+            $problem = (new ApiProblem('User is already Enroled in the Group'))
                 ->setStatus(409)
                 ->asArray();
             $this->getResponse()->status->setCode(409);
@@ -137,8 +137,8 @@ class Controller extends Base
         }
         $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
         //check if user is trying to break the system by deleting a user via the PUT command, and error
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? GroupsHelper::ENROLLED;
-        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? GroupsHelper::ENROLED;
+        if (GroupsHelper::NOTENROLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
             $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
                 ->setStatus(401)
                 ->asArray();
@@ -173,7 +173,7 @@ class Controller extends Base
     public function apiMembershipPut(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -200,7 +200,7 @@ class Controller extends Base
             'membership'        => UserAccess::ACCESS_READ,
             'isNotificationsOn' => true,
             'isFavourite'       => false,
-            'enrolmentStatus'   => GroupsHelper::ENROLLED,
+            'enrolmentStatus'   => GroupsHelper::ENROLED,
         ];
         $this->processGroupPostData($user, $group, $post, $defaultData);
     }
@@ -216,7 +216,7 @@ class Controller extends Base
     public function apiMembershipPatch(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -238,7 +238,7 @@ class Controller extends Base
     private function processGroupPostData(User $user, Group $group, array $post, array $defaultData): void
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
@@ -247,7 +247,7 @@ class Controller extends Base
         }
 
         //check if user is trying to break the system by deleting a user via the PUT command, and error
-        if (GroupsHelper::NOTENROLLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
+        if (GroupsHelper::NOTENROLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
             $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
                 ->setStatus(401)
                 ->asArray();
@@ -300,7 +300,7 @@ class Controller extends Base
     public function apiMembershipDelete(User $user, Group $group)
     {
         if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not Enrolled in the Group'))
+            $problem = (new ApiProblem('User is not Enroled in the Group'))
                 ->setStatus(404)
                 ->asArray();
             $this->getResponse()->status->setCode(404);
