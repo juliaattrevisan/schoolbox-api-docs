@@ -9,6 +9,7 @@ import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupTable from './manage-group-table.vue';
 import ManageGroupSelectMembers from './manage-group-select-members.vue';
+import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
 
 const props = defineProps({
     /**
@@ -31,4 +32,5 @@ onMounted(() => {
     <manage-group-add-members />
     <manage-group-table :endpoint="props.endpoint" />
     <manage-group-select-members />
+    <manage-group-remove-members />
 </template>

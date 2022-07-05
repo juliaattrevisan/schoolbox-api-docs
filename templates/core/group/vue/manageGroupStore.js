@@ -1,9 +1,9 @@
 /** 
  * Handles the store of the current Manage Group page
- *
  */
 
 import { defineStore } from 'pinia';
+import { timeout } from '@js/util/jsUtils'
 import FilterTypes from './manageGroupFilterTypes';
 
 
@@ -15,6 +15,7 @@ export const useStore = defineStore('manageGroup', {
         groupMembers: [], //all the group members
         selectedMembers: [], //to track the current group member selection
         selectedFilters: [FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN], //the list of table filters available
+        isRemoveSelectedMembersPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
     getters: {
@@ -72,7 +73,7 @@ export const useStore = defineStore('manageGroup', {
         },
 
         /**
-         * clear the selected member selection
+         * clear the current selected member selection
          */
         clearSelectedMembers () {
             this.selectedMembers = [];
@@ -84,12 +85,48 @@ export const useStore = defineStore('manageGroup', {
          * @param { String }
          */
         updateFilterSelection (accessType) {
-            console.warn('updateFilterSelection');
             if (this.selectedFilters.includes(accessType)) { //pull the updated filter out of the list
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== accessType);
             } else { //otherwise add it back in
                 this.selectedFilters = [...this.selectedFilters, accessType];
             }
+        },
+
+        /**
+         * to display a prompt to confirm member removal
+         */
+        promptRemoveSelectedMembers () {
+            this.isRemoveSelectedMembersPromptOpen = true;
+        },
+
+        /**
+         * member removal has been confirmed so pull them out
+         */
+        async removeSelectedMembers () {
+            try {
+                // await fetch(this.endpoint, {
+                //     method: 'POST',
+                //     body: this.getFormData(),
+                // });
+                await timeout(3000);
+                this.groupMembers = this.groupMembers.filter((row) => { //pull out any deleted members, those rows that are in selectedMembers, which have just been deleted
+                    if (this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id)) { 
+                        return false;
+                    }
+                    return true;
+                });
+                this.selectedMembers = [];
+                this.isRemoveSelectedMembersPromptOpen = false;
+            } catch (error) {
+                console.warn(error);
+            }  
+        },
+
+        /**
+         * to hide the confirmation prompt
+         */
+        cancelRemoveSelectedMembers () {
+            this.isRemoveSelectedMembersPromptOpen = false;
         },
 
     },

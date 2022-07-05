@@ -11,9 +11,6 @@ import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vu
 
 
 const store = useStore(); //to keep track of selectedMembers
-
-const emit = defineEmits(['on-selection-cleared', 'on-remove-selected']);
-
 const isShiftKeySelected = ref(false);
 const shiftSelectNoteEl = ref(null);
 
@@ -51,9 +48,7 @@ watch(() => store.selectedMembers, () => {
  *
  * @returns { Number }
  */
-const selectedMembersCount = computed(() => {
-    return store.selectedMembers.length;
-});
+const selectedMembersCount = computed(() => store.selectedMembers.length);
 
 /**
  * For proper count display, eg: '1 member' / '4 members'
@@ -98,7 +93,7 @@ function onEmailMembersSelected () {
  * Dispatch to manage-group.vue so the selected members can be removed
  */
 function onRemoveMembersSelected () {
-    emit('on-remove-selected'); 
+    store.promptRemoveSelectedMembers();
 }
 
 </script>

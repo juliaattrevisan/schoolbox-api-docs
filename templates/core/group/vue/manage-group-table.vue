@@ -151,6 +151,7 @@ function onRowSelected (currentSelection) {
 
 /**
  * ensure the table selection is also cleared when 'Clear Selection' is selected
+ * or when the selected members have been removed
  */
 watch(() => store.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
     if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) { //to clear the current selection
@@ -172,9 +173,9 @@ watch(() => store.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
 watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
     let selectedFilter = []; //to store the filter that has been toggled
     if (newSelectedFilters.length < oldSelectedFilters.length) { //a filter has been taken out
-        selectedFilter = oldSelectedFilters.filter(x => !newSelectedFilters.includes(x)); //comparing the two arrays to find the only value in oldSelectedFilters
+        selectedFilter = oldSelectedFilters.filter(filterType => !newSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in oldSelectedFilters
     } else { //otherwise one has been added back in
-        selectedFilter = newSelectedFilters.filter(x => !oldSelectedFilters.includes(x)); //comparing the two arrays to find the only value in newSelectedFilters
+        selectedFilter = newSelectedFilters.filter(filterType => !oldSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in newSelectedFilters
     }
     dispatchFilterEvent(selectedFilter.join()); //to just get the 
     updateSelectedMembers();
