@@ -110,10 +110,7 @@ export const useStore = defineStore('manageGroup', {
                 const responseJson = await response.json();
                 if (responseJson.success) {
                     this.groupMembers = this.groupMembers.filter((row) => { //pull out any deleted members, those rows that are in selectedMembers, which have just been deleted
-                        if (this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id)) { 
-                            return false;
-                        }
-                        return true;
+                        return !this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
                     });
                     this.selectedMembers = [];
                 } else {

@@ -46,12 +46,11 @@ onMounted(() => {
  ****************************************************************/
 
 const tableEl = ref(null);
-const tableColumns = ['name', 'access']
+const tableColumns = ['name', 'meta', 'access']
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-    // columnsClasses: {
-    //     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
-    //     edit: 'edit-td ', //to specify a width
-    // },
+    columnsClasses: {
+        access: 'access-td ', //to specify a width
+    },
     customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
         {
             name: FilterEvents.SHOW_WAITING_LIST,
@@ -74,8 +73,8 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     headings: {
         name: 'Name',
         access: 'Access',
-        // ['dateModified.formatted']: 'Date modified',
     },
+    hiddenColumns: ['meta'], //the meta data is added to the name column, but we need a meta column so we can search for it
     perPage: 50,
     perPageValues: [50, 100, 200],
     resizableColumns: false,
@@ -86,7 +85,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group members',
+        filterPlaceholder: 'Search group members, they can be searched by name or role',
         noResults: 'No matching group members',
     },
 }
@@ -96,24 +95,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
  */
 async function onLoaded () {
     updateFooterUI();
-}
-
-/**
- * To determine which meta info to display, based 
- * on their access type
- * 
- * @param { Object }
- * 
- * @returns { String }
- */
-function getMemberMeta (row) {
-    const memberMeta = {
-        [FilterTypes.WAITING]: `<i class="icon-open"></i>Waiting List`,
-        [FilterTypes.READ]: `<i class="icon-view"></i>Read Access`,
-        [FilterTypes.WRITE]: `<i class="icon-modify"></i>Write Access`,
-        [FilterTypes.ADMIN]: `<i class="icon-favourite"></i>Group Admin`,
-    };
-    return memberMeta[row.access];
 }
 
 /**
@@ -177,7 +158,7 @@ watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
     } else { //otherwise one has been added back in
         selectedFilter = newSelectedFilters.filter(filterType => !oldSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in newSelectedFilters
     }
-    dispatchFilterEvent(selectedFilter.join()); //to just get the 
+    dispatchFilterEvent(selectedFilter.join()); //to just get the single filter as a string
     updateSelectedMembers();
 });
 
@@ -242,7 +223,7 @@ function updateSelectedMembers () {
                             <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${props.row.name} portrait`">
                             {{ props.row.name }}
                         </a>
-                        <p class="meta" v-html="getMemberMeta(props.row)"></p>
+                        <p class="meta">{{ props.row.meta }}</p>
                     </div>
                 </template>
                 <template #access="props">
@@ -303,6 +284,11 @@ function updateSelectedMembers () {
 
 .VueTables__search-field input {
     margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
+}
+
+.VueTables__table .access-td {
+    padding-left: 0; //bring it inline with the right side border
+    width: 15rem; //keep the edit icon on the right side
 }
 
 </style>
