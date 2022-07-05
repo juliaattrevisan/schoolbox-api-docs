@@ -17,11 +17,13 @@ use Alaress_Date_Format;
 use DateTime;
 use EasyRdf\Sparql\Client;
 use Alaress\Html\ToText as Html2Text;
+use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
+use stdClass;
 use UnexpectedValueException;
 
 use function count;
@@ -188,11 +190,11 @@ class Browser extends Source\BrowserAbstract
     /**
      * Creates this node and its children from the JSON object.
      *
-     * @param object              $jsonTree
+     * @param stdClass            $jsonTree
      * @param LearningLevel\Model $level
      * @return Node\Model|null
      */
-    protected function buildOutputTree(object $jsonTree, LearningLevel\Model $level): ?Node\Model
+    protected function buildOutputTree(stdClass $jsonTree, LearningLevel\Model $level): ?Node\Model
     {
         $node = null;
         if (
@@ -229,10 +231,10 @@ class Browser extends Source\BrowserAbstract
     /**
      * Creates a single node from the given JSON object.
      *
-     * @param  object $json
+     * @param  stdClass $json
      * @return Node\Model
      */
-    protected function buildSingleNode(object $json): Node\Model
+    protected function buildSingleNode(stdClass $json): Node\Model
     {
         $node = new Node\Model();
         $node->setReference($json->id ?? $json->Id ?? '');
@@ -274,12 +276,15 @@ class Browser extends Source\BrowserAbstract
             $node->setCode($json->asn_statementNotation->literal);
         }
         if (isset($json->dcterms_modified->literal)) {
-            $modified = new Alaress_Date_Format(
-                new DateTime($json->dcterms_modified->literal)
-            );
-            $node
-                ->setCreatedAt($modified)
-                ->setModifiedAt($modified);
+            try {
+                $datetime = new DateTime($json->dcterms_modified->literal);
+                $modified = new Alaress_Date_Format($datetime);
+                $node
+                    ->setCreatedAt($modified)
+                    ->setModifiedAt($modified);
+            } catch (Exception) {
+                // noop: simply don't set the created/modified fields
+            }
         }
         return $node;
     }
