@@ -2,11 +2,11 @@
 
 CREATE TABLE `summative_report` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(255) NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
   `introduction` LONGTEXT NULL,
   `logo_hash` VARCHAR(100) NULL,
   `options` LONGTEXT NULL,
-  `updated_by` VARCHAR(45) NOT NULL,
+  `updated_by` VARCHAR(100) NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,

@@ -235,7 +235,8 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-title" class="required">Title</label>
-                            <input type="text" id="report-title" name="title" value="{{ report.title ?? '' }}" />
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="report-title" name="title" maxlength="100" value="{{ report.title ?? '' }}" />
                         </div>
 
                         <div class="small-12 columns">
