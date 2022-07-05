@@ -175,7 +175,7 @@ class Browser extends Source\BrowserAbstract
         $curl->exec();
         if (!count($curl->getErrors()) && $manifest = json_decode($curl->getResult())) {
             foreach ($manifest as $part) {
-                if (($nodes = $this->buildOutputTree($part, $level)) != false) {
+                if (($nodes = $this->buildOutputTree($part, $level))) {
                     $collection->add($nodes);
                 }
             }
@@ -190,10 +190,11 @@ class Browser extends Source\BrowserAbstract
      *
      * @param object              $jsonTree
      * @param LearningLevel\Model $level
-     * @return bool|Node\Model
+     * @return Node\Model|null
      */
-    protected function buildOutputTree(object $jsonTree, LearningLevel\Model $level)
+    protected function buildOutputTree(object $jsonTree, LearningLevel\Model $level): ?Node\Model
     {
+        $node = null;
         if (
             isset($jsonTree->dcterms_educationLevel->uri)
             && $jsonTree->dcterms_educationLevel->uri === $level->getReference()
@@ -207,24 +208,19 @@ class Browser extends Source\BrowserAbstract
         ) {
             // This part of the tree has multiple learning levels:
             // if any match the given learning level, build an outcome tree.
-            if (
-                count(array_filter($jsonTree->dcterms_educationLevel, function ($v) use ($level) {
-                    return $v->uri ==  $level->getReference();
-                })) > 0
-            ) {
-                $node = $this->buildSingleNode($jsonTree);
-            } else {
-                return false;
+            foreach ($jsonTree->dcterms_educationLevel as $educationLevel) {
+                if (isset($educationLevel->uri) && $educationLevel->uri === $level->getReference()) {
+                    $node = $this->buildSingleNode($jsonTree);
+                    break;
+                }
             }
-        } else {
-            return false;
         }
 
-        if (isset($jsonTree->children) && is_iterable($jsonTree->children)) {
+        if ($node && isset($jsonTree->children) && is_iterable($jsonTree->children)) {
             foreach ($jsonTree->children as $child) {
-                if (($nodes = $this->buildOutputTree($child, $level)) != false) {
+                if (($nodes = $this->buildOutputTree($child, $level))) {
                     $node->addChild($nodes);
-                };
+                }
             }
         }
         return $node;
@@ -236,7 +232,7 @@ class Browser extends Source\BrowserAbstract
      * @param  object $json
      * @return Node\Model
      */
-    protected function buildSingleNode($json)
+    protected function buildSingleNode(object $json): Node\Model
     {
         $node = new Node\Model();
         $node->setReference($json->id ?? $json->Id ?? '');
