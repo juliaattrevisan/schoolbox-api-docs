@@ -18,13 +18,15 @@
     }
 
     function updateResponseDetails(statusCode, headers, body) {
+        document.getElementById("response_status").innerText = statusCode;
+
         let headerString = '';
         for ( const [key,value] of Object.entries( headers ) ) {
             headerString += key + ': ' + value + "\n";
         }
-        document.getElementById("response_status").innerText = statusCode;
-        document.getElementById("response_headers").innerText = headerString;
-        document.getElementById("response_body").innerText = body;
+        document.getElementById("response_headers").innerText = headers ? headerString : "undefined";
+
+        document.getElementById("response_body").innerText = body ? body : "undefined";
     }
 
     $(window).on('load', function () {
