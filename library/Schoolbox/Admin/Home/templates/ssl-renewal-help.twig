@@ -4,12 +4,25 @@
 <script>
     const apiEndpoint = '' //'/urlCheck/';
     const urlCheckHostname = 'gateway.glasshouse.qld.edu.au' //location.hostname;
+    const urlCheckUrl = 'http://' + urlCheckHostname + '/.well-known/acme-challenge/ping';
+    const letsEncryptUserAgent = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)';
     const chromeUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
 
+    //General function for building a string of the keys and values in an object
+    function buildHeadersString(headersObj) {
+        let headersString = '';
+        for (const [key,value] of Object.entries(headersObj)) {
+            headersString += key + ': ' + value + "\n";
+        }
+        return headersString
+    }
+
+    //General function for updating labels
     function updateStatusBar(dataLight, text, colour) {
         $('[data-light=' + dataLight + ']').html(text).removeClass('neutral').addClass(colour);
     }
 
+    //If present, shows the server header on the page so that the user knows what service is causing the issue
     function updateServer(text) {
         const span = document.getElementById("https_upgrade_server_span");
         const para = document.getElementById("https_upgrade_server_para");
@@ -17,22 +30,35 @@
         para.classList.remove('hide');
     }
 
+    //Populate the request details part of the page
+    function updateRequestDetails(type, uri, headers) {
+        document.getElementById("request_type").innerText = type;
+        document.getElementById("request_uri").innerText = uri;
+        document.getElementById("request_headers").innerText = buildHeadersString(headers);
+    }
+
+    //Shows the user what response Let's Encrypt is getting
     function updateResponseDetails(statusCode, headers, body) {
         document.getElementById("response_status").innerText = statusCode;
 
-        let headerString = '';
-        for ( const [key,value] of Object.entries( headers ) ) {
-            headerString += key + ': ' + value + "\n";
-        }
-        document.getElementById("response_headers").innerText = headers ? headerString : "undefined";
+        const headersString = buildHeadersString(headers);
+        document.getElementById("response_headers").innerText = headers ? headersString : "undefined";
 
         document.getElementById("response_body").innerText = body ? body : "undefined";
     }
 
     $(window).on('load', function () {
+        updateRequestDetails(
+                "GET",
+                urlCheckUrl,
+                {
+                    "user-agent": letsEncryptUserAgent,
+                },
+        );
+
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/acme-challenge/ping is accessible
         const baseCheck = $.ajax({
-            url: "{{ api_url }}" + apiEndpoint + "?url=http://" + urlCheckHostname + "/.well-known/acme-challenge/ping",
+            url: "{{ api_url }}" + apiEndpoint + "?url=" + urlCheckUrl,
             success: function () {
                 updateStatusBar("ssl_port_80", "Pass", "success");
                 updateStatusBar("ssl_https_upgrade", "Pass", "success");
@@ -67,7 +93,7 @@
         });
 
         const chromeUserAgentCheck = $.ajax({
-            url: "{{ api_url }}" + apiEndpoint + "?url=http://" + urlCheckHostname + "/.well-known/acme-challenge/ping&useragent=" + chromeUserAgent,
+            url: "{{ api_url }}" + apiEndpoint + "?url=" + urlCheckUrl + "&useragent=" + chromeUserAgent,
             success: function () {
                 // wait for baseCheck to complete
                 $.when(baseCheck).then(
@@ -284,6 +310,68 @@
                             <h5 class="no-margin">Response body:</h5>
                         </div>
                         <div class="small-12 medium-9 alert-box highlight columns no-margin">
+                            <pre id="response_body"><span class="loader"></span></pre>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+        </div>
+        <div class="medium-6 island">
+            <h3 class="subheader">Let's Encrypt request details</h3>
+            <section>
+                <ol class="information-list">
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Request type:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
+                            <pre id="request_type">Loading...</pre>
+                        </div>
+                    </li>
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Request URI:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
+                            <pre id="request_uri">Loading...</pre>
+                        </div>
+                    </li>
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Request headers:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
+                            <pre id="request_headers">Loading...</pre>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+        </div>
+        <div class="medium-6 island">
+            <h3 class="subheader">Response details</h3>
+            <section>
+                <ol class="information-list">
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Response status code:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
+                            <pre id="response_status"><span class="loader"></span></pre>
+                        </div>
+                    </li>
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Response headers:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
+                            <pre id="response_headers"><span class="loader"></span></pre>
+                        </div>
+                    </li>
+                    <li class="">
+                        <div class="large-12 xlarge-3 columns content">
+                            <h5 class="no-margin">Response body:</h5>
+                        </div>
+                        <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
                             <pre id="response_body"><span class="loader"></span></pre>
                         </div>
                     </li>
