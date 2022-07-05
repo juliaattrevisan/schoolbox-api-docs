@@ -12,9 +12,8 @@ namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
 trait ProjectTrait
 {
-
     /**
-     * @var int
+     * @var string
      */
     protected $summator;
 
