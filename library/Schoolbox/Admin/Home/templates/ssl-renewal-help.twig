@@ -259,18 +259,14 @@
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_geoblocking" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>The problem is this...</p>
+                                <p>Let's Encrypt domain verification requests can come from a range of IP addresses around world including the US, EU, etc. Blocking web requests from specific regions can cause Let's Encrypt domain verification to fail.</p>
                                 <h5>Common causes</h5>
                                 <ul>
-                                    <li>
-                                        <p>You firewall is...</p>
-                                    </li>
+                                    <li>A firewall/service placed in front of Schoolbox may be blocking web requests from certain regions based on IP ranges (aka 'geoblocking')</li>
                                 </ul>
-                                <h5>Resolution advice</h5>
+                                <h5>Resolution steps</h5>
                                 <ul>
-                                    <li>
-                                        <p>Try reviewing your firewall...</p>
-                                    </li>
+                                    <li>Review the firewall configuration and remove any rules that are geoblocking HTTP requests on port 80.</li>
                                 </ul>
                             </article>
                         </div>
