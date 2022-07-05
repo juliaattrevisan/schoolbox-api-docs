@@ -17,6 +17,17 @@
             targetElements: $('#report-introduction')
         });
 
+        $('#summative-report-form').alaressValidate({
+            rules: {
+                'title': {
+                    requiredNotBlank: true
+                }
+            },
+            messages: {
+                'title': "Please enter a title"
+            }
+        });
+
         $('#report-terms').selectizeSelector({
             multiple: true,
             value: {{ options.terms|json_encode|raw }},
@@ -229,7 +240,7 @@
     {% endif %}
 
     <div class="admin-content">
-        <form action="{{ formAction }}" method="post">
+        <form id="summative-report-form" action="{{ formAction }}" method="post">
             <div class="small-12 island">
                 <section>
                     <fieldset class="content">

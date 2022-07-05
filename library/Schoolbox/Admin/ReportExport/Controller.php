@@ -69,6 +69,10 @@ class Controller extends ConfigController
         Role::STAFF => 'Staff',
     ];
 
+    /**
+     * @var \Schoolbox\Error\Mapper
+     */
+    private \Schoolbox\Error\Mapper $errorMapper;
 
     private Mapper $reportMapper;
 
@@ -98,23 +102,25 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param Mapper                $reportMapper
-     * @param UserMapper            $userMapper
-     * @param TermMapper            $termMapper
-     * @param YearLevelMapper       $yearLevelMapper
-     * @param CampusMapper          $campusMapper
-     * @param WorkTypeMapper        $workTypeMapper
-     * @param FolderMapper          $folderMapper
-     * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param RubricDataSource      $rubricDataSource
-     * @param Access                $access
-     * @param UserBulkMapper        $userBulkMapper
-     * @param RoleMapper            $roleMapper
-     * @param ConfigMapper          $configMapper
-     * @param FieldStrategyFactory  $fieldStrategyFactory
-     * @param Rebuilder             $rebuilder
+     * @param \Schoolbox\Error\Mapper $errorMapper
+     * @param Mapper                  $reportMapper
+     * @param UserMapper              $userMapper
+     * @param TermMapper              $termMapper
+     * @param YearLevelMapper         $yearLevelMapper
+     * @param CampusMapper            $campusMapper
+     * @param WorkTypeMapper          $workTypeMapper
+     * @param FolderMapper            $folderMapper
+     * @param AssessmentMapperProxy   $assessmentMapperProxy
+     * @param RubricDataSource        $rubricDataSource
+     * @param Access                  $access
+     * @param UserBulkMapper          $userBulkMapper
+     * @param RoleMapper              $roleMapper
+     * @param ConfigMapper            $configMapper
+     * @param FieldStrategyFactory    $fieldStrategyFactory
+     * @param Rebuilder               $rebuilder
      */
     public function __construct(
+        \Schoolbox\Error\Mapper $errorMapper,
         Mapper $reportMapper,
         UserMapper $userMapper,
         TermMapper $termMapper,
@@ -132,6 +138,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
+        $this->errorMapper           = $errorMapper;
         $this->reportMapper          = $reportMapper;
         $this->userMapper            = $userMapper;
         $this->termMapper            = $termMapper;
@@ -281,6 +288,7 @@ class Controller extends ConfigController
      * @throws \InvalidArgumentException
      * @throws \JsonException
      * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      * @api POST /report-export/{reportId}/update
@@ -303,6 +311,12 @@ class Controller extends ConfigController
         ];
 
         $options = json_encode(array_intersect_key($postData, $payloadKeys), JSON_THROW_ON_ERROR);
+
+        /* Title is required
+         */
+        if ('' === trim((string)$postData['title'])) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
 
         /* Cram in all the data
          */
