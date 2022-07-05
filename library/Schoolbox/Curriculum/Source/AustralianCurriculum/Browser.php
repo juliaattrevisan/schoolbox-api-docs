@@ -193,7 +193,6 @@ class Browser extends Source\BrowserAbstract
      */
     protected function buildOutputTree($jsonTree, $level)
     {
-
         if ($jsonTree->dcterms_educationLevel->uri === $level->getReference()) {
             // This is the right year level within this learning area.
             // Build an outcome tree out of it.
@@ -212,7 +211,7 @@ class Browser extends Source\BrowserAbstract
             return false;
         }
 
-        if ($jsonTree->children) {
+        if (isset($jsonTree->children) && is_iterable($jsonTree->children)) {
             foreach ($jsonTree->children as $child) {
                 if (($nodes = $this->buildOutputTree($child, $level)) != false) {
                     $node->addChild($nodes);
@@ -235,7 +234,7 @@ class Browser extends Source\BrowserAbstract
 
         // Figure out what the name and description should be.
         $statementLabel = '';
-        if ($json->asn_statementLabel && $json->asn_statementLabel->literal) {
+        if (isset($json->asn_statementLabel->literal)) {
             $statementLabel = $json->asn_statementLabel->literal;
         }
         switch ($statementLabel) {
@@ -244,18 +243,18 @@ class Browser extends Source\BrowserAbstract
                 // Let's just call it an achievement standard.
                 $node
                     ->setName($statementLabel)
-                    ->setDescription($json->text);
+                    ->setDescription($json->text ?? '');
                 break;
             default:
                 // Try basing name off the title, and desc off the text.
                 // If that fails, set the name as the text and an empty desc.
-                if ($json->dcterms_title && $json->dcterms_title->literal) {
+                if (isset($json->dcterms_title->literal)) {
                     $node
                         ->setName($json->dcterms_title->literal)
-                        ->setDescription($json->text);
+                        ->setDescription($json->text ?? '');
                 } else {
                     $node
-                        ->setName($json->text)
+                        ->setName($json->text ?? '')
                         ->setDescription('');
                 }
                 break;
@@ -266,10 +265,10 @@ class Browser extends Source\BrowserAbstract
         $node->setName(preg_replace('/\\s+/', ' ', $this->getHtmlConverter()->getText()));
 
         // Set the timetable code if there is one
-        if ($json->asn_statementNotation && $json->asn_statementNotation->literal) {
+        if (isset($json->asn_statementNotation->literal)) {
             $node->setCode($json->asn_statementNotation->literal);
         }
-        if ($json->dcterms_modified && $json->dcterms_modified->literal) {
+        if (isset($json->dcterms_modified->literal)) {
             $modified = new Alaress_Date_Format(
                 new DateTime($json->dcterms_modified->literal)
             );
