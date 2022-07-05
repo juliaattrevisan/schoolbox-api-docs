@@ -52,6 +52,7 @@ $app = new class extends CliTool\App {
         'course_unit_implementation'               => ['due_date', 'open_date'],
         'discussion_thread'                        => ['created_at', 'updated_at'],
         'discussion_thread_comment'                => ['created_at', 'updated_at'],
+        'eotc_event'                               => ['end_datetime', 'start_datetime'],
         'eportfolio_component_blog'                => ['created_at', 'updated_at'],
         'eportfolio_component_blog_comment'        => ['created_at', 'updated_at'],
         'event'                                    => [
@@ -71,6 +72,7 @@ $app = new class extends CliTool\App {
         'forumThread'                              => ['date', 'last_post_date'],
         'homepage_log'                             => ['datetime'],
         'homepage_visits'                          => ['date'],
+        'leave_request'                            => ['authorisation_datetime', 'finish', 'start'],
         'link'                                     => ['modified', 'submitted'],
         'participant_plan'                         => ['close_date', 'due_date', 'open_date', 'publish_date'],
         'pastoral'                                 => ['created_at', 'updated_at'],
@@ -212,10 +214,10 @@ $app = new class extends CliTool\App {
             $this->getLogger()->info("Incrementing dates for: $tableName.$column");
             $updateQuery = $this->getDatabaseInternal()->prepareQuery(
                 "
-            UPDATE $tableName
-            SET $column = DATE_ADD($column, INTERVAL :diff DAY)
+            UPDATE `$tableName`
+            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff DAY)
             $whereNotDeleted
-            ORDER BY $column $order
+            ORDER BY `$column` $order
         "
             );
             $updateQuery->execute([':diff' => $diffDays]);
@@ -242,20 +244,20 @@ $app = new class extends CliTool\App {
             $whereNotDeleted = ' WHERE deleted_at IS NULL ';
         }
 
-        // update name first
+        // update name (e.g. Semester 1, 2021 -> Semester 1, 2022) first
         if ($diffYears > 0 && count($nameColumns)) {
             foreach ($nameColumns as $column) {
                 $rows = $this->getDatabaseInternal()->executeQuery(
                     "SELECT
                        REPLACE(`$column`, YEAR(`$dateColumns[0]`), YEAR(`$dateColumns[0]`) + $diffYears) AS new_name,
                        `$column` AS old_name
-                     FROM $tableName
+                     FROM `$tableName`
                      WHERE `$dateColumns[0]` IS NOT NULL
                      ORDER BY `$dateColumns[0]` DESC"
                 )->fetchAll();
                 foreach ($rows as $row) {
                     $this->getDatabaseInternal()->executeQuery(
-                        "UPDATE $tableName SET `$column` = :newName WHERE `$column` = :oldName",
+                        "UPDATE `$tableName` SET `$column` = :newName WHERE `$column` = :oldName",
                         [
                             'newName' => $row['new_name'],
                             'oldName' => $row['old_name'],
@@ -271,10 +273,10 @@ $app = new class extends CliTool\App {
 
             $updateQuery = $this->getDatabaseInternal()->prepareQuery(
                 "
-            UPDATE $tableName
-            SET $column = DATE_ADD($column, INTERVAL :diff DAY)
+            UPDATE `$tableName`
+            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff DAY)
             $whereNotDeleted
-            ORDER BY $column DESC
+            ORDER BY `$column` DESC
         "
             );
             $updateQuery->execute([':diff' => $diffYears * 365]);
