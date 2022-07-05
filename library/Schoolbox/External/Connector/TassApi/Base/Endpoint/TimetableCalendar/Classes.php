@@ -775,7 +775,7 @@ class Classes implements IStrategy
 
         /* If the Subject Code is X, it's a shared tutorial thing
          */
-        if ('X' === trim((string)$subject['SUB_CODE'])) {
+        if ('X' === trim((string)$subject['CLASS'])) {
             return true;
         }
 

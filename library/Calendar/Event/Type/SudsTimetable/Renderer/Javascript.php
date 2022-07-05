@@ -10,7 +10,6 @@ namespace Calendar\Event\Type\SudsTimetable\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
