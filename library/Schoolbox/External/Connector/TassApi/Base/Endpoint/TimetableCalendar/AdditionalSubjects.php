@@ -40,7 +40,7 @@ class AdditionalSubjects implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = [106989];
+    private const WATCHLIST = null;
 
 
     /**

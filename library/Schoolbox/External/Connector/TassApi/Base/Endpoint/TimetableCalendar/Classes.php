@@ -47,7 +47,7 @@ class Classes implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = [106989];
+    private const WATCHLIST = null;
 
 
     /**
@@ -711,7 +711,7 @@ class Classes implements IStrategy
 
                     /* Decide how involved humans are saved
                      */
-                    if ($deconflictAll) {
+                    if ($this->isDuty($event)) {
                         /* FIXME SPECULATIVE PROGRAMMING
                          *
                          * If this event is a Duty (identified by room code DUT)
@@ -745,12 +745,12 @@ class Classes implements IStrategy
      * @param \Schoolbox\External\Event\Model $event
      * @return bool
      */
-//    private function isDuty(\Schoolbox\External\Event\Model $event): bool
-//    {
-//        /* If the location is DUT, it's a duty
-//         */
-//        return 'DUT' === $event->getLocation();
-//    }
+    private function isDuty(\Schoolbox\External\Event\Model $event): bool
+    {
+        /* If the location is DUT, it's a duty
+         */
+        return 'DUT' === $event->getLocation();
+    }
 
 
     /**
