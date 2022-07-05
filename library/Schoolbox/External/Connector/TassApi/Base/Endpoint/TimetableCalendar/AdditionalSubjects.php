@@ -38,6 +38,12 @@ class AdditionalSubjects implements IStrategy
 
 
     /**
+     * Filter to specific people; set to null to disable filtering
+     */
+    private const WATCHLIST = [106989];
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -116,8 +122,8 @@ class AdditionalSubjects implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentAdditionalSubjects();
-        $this->importStaffAdditionalSubjects();
+        $this->importStudentAdditionalSubjects(self::WATCHLIST);
+        $this->importStaffAdditionalSubjects(self::WATCHLIST);
     }
 
 
@@ -131,7 +137,7 @@ class AdditionalSubjects implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentAdditionalSubjects(): void
+    private function importStudentAdditionalSubjects(?array $watchlist = null): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -144,6 +150,12 @@ class AdditionalSubjects implements IStrategy
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+                continue;
+            }
+
             try {
                 $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                     'code' => $externalId
@@ -268,7 +280,7 @@ class AdditionalSubjects implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffAdditionalSubjects(): void
+    private function importStaffAdditionalSubjects(?array $watchlist = null): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -279,6 +291,12 @@ class AdditionalSubjects implements IStrategy
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
         foreach ($users as $externalId => $userData) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+                continue;
+            }
+
             /* Allow continuation even if this dies irrecoverably
              */
             try {
@@ -364,5 +382,23 @@ class AdditionalSubjects implements IStrategy
                 }
             }
         }
+    }
+
+    /**
+     * Decide if $externalId is in $watchlist, which is a set of externalIds
+     *
+     * @param string|null $externalId
+     * @param array|null  $watchlist
+     * @return bool
+     */
+    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
+    {
+        /* "Everyone is on the watchlist"
+         */
+        if (null === $watchlist) {
+            return true;
+        }
+
+        return $watchlist && in_array($externalId, $watchlist, false);
     }
 }

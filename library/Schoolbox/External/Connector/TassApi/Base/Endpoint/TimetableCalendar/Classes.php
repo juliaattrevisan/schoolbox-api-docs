@@ -47,7 +47,7 @@ class Classes implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = null;
+    private const WATCHLIST = [106989];
 
 
     /**
