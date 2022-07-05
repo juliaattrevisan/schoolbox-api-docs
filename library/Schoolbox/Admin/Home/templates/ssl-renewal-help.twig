@@ -236,19 +236,13 @@
                         <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_user_agent" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>The problem is this...</p>
+                                <p>Let's Encrypt domain verification requests use the user-agent header <code>Mozilla/5.0 (compatible; Let's Encrypt validation server; +https://letsencrypt.org)</code>. Some firewalls may block this user-agent when they do not recognise it.</p>
                                 <h5>Common causes</h5>
                                 <ul>
-                                    <li>
-                                        <p>You firewall is...</p>
-                                    </li>
+                                    <li>A firewall/service placed in front of the Schoolbox server may be blocking requests with the Let's Encrypt user agent.</li>
                                 </ul>
-                                <h5>Resolution advice</h5>
-                                <ul>
-                                    <li>
-                                        <p>Try reviewing your firewall...</p>
-                                    </li>
-                                </ul>
+                                <h5>Resolution steps</h5>
+                                <p>Whitelist traffic matching the Let's Encrypt domain verification requests (see <a href="#request-details">Let's Encrypt request details</a>).</p>
                             </article>
                         </div>
                     </li>
