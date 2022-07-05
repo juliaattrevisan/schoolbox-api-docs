@@ -6,7 +6,7 @@ CREATE TABLE `summative_report` (
   `introduction` LONGTEXT NULL,
   `logo_hash` VARCHAR(100) NULL,
   `options` LONGTEXT NULL,
-  `updated_by` VARCHAR(100) NOT NULL,
+  `updated_by` INT NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL,
