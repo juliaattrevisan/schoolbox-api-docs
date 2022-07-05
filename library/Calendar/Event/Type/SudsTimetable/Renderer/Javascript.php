@@ -50,10 +50,11 @@ class Javascript extends Base
         $title = implode(', ', array_filter([
             $this->event->getDay(),
             $this->event->getPeriod(),
-            $this->event->getTitle()
+            $this->event->getTitle(),
+
         ], static function ($val) {
             return '' !== trim($val);
-        }));
+        })) . " ({$this->event->getCode()})";
 
         /* Flatten the representation into a standardised structure
          */
