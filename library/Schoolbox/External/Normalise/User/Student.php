@@ -20,7 +20,6 @@ use Schoolbox\External\Normalise\User\Common\House;
 
 class Student extends Base
 {
-
     /* Personal
      */
 
