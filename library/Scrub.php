@@ -466,8 +466,19 @@ class Scrub
                 // Run iframely over this content.
                 // Find every data-oembed-url content,
                 // replace it with iframely's response
-                $doc = new DOMDocument();
-                $doc->loadHTML($purified);
+                $wrapper = <<<HTML
+                <!DOCTYPE html>
+                <html lang="en">
+                    <head>
+                        <title></title>
+                        <meta charset="utf-8">
+                    </head>
+                    <body>%s</body>
+                </html>
+                HTML;
+
+                $doc = new DOMDocument('1.0', 'UTF-8');
+                $doc->loadHTML(sprintf($wrapper, $purified));
                 $xpath = new DOMXPath($doc);
                 $matches = $xpath->query('//div[@data-oembed-url]');
                 if (!($matches instanceof DOMNodeList && $matches->count() > 0)) {
