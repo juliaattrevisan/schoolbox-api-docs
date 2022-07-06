@@ -19,12 +19,6 @@ class External_Tass_Timetable implements External_TimetableInterface
 
 
     /**
-     * Keeps track of calendar day events
-     */
-    private $tassDay;
-
-
-    /**
      * @var Group
      */
     private $groupHandler;
@@ -94,7 +88,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                 'campusCode'    => $campusCode,
             ];
             $longestDay = $this->getConnector()->executeQuery($query, $params)->fetch();
-            $day        = $longestDay['day_code'];
+            if (!empty($longestDay)) {
+                $day = $longestDay['day_code'];
+            }
         }
 
         $query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
@@ -170,25 +166,6 @@ class External_Tass_Timetable implements External_TimetableInterface
     public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
-    }
-
-
-    public function getLastDay($date, Campus $campus)
-    {
-
-        $nowmssqldate = date('Y-m-d', $date) . ' 00:00:00';
-
-        $query = "SELECT ttdate, day_code FROM ttcalendar
-                    WHERE ttdate <= '$nowmssqldate'
-                    AND cmpy_code = '" . $this->getCampusCode($campus) . "'
-                    AND tt_id = '" . $this->getTimetableCode($campus) . "'
-                    ORDER BY ttdate DESC";
-
-        $result               = $this->getConnector()->executeQuery($query)->fetch();
-        $time                 = strtotime($result['ttdate']);
-        $this->tassDay[$time] = $result['day_code'];
-
-        return $time;
     }
 
 
@@ -268,7 +245,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(
@@ -343,7 +319,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         // Build the timetable
         // TODO do this somewhere generic as it's the same for all connectors
-        if (is_array($timetabledef['desc'])) {
+        if (is_array($timetabledef['desc'] ?? false)) {
             foreach ($timetabledef['desc'] as $x => $name) {
                 $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
                 $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
@@ -362,7 +338,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                 foreach ($timetable as $x => $timetablePeriod) {
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
-                        && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['day'][$desc['day_code']][$code])
                     ) {
                         $timetable[$x]['day'][$desc['day_code']][$code] = array(

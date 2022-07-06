@@ -21,7 +21,6 @@ use UnexpectedValueException;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     // Table definition
     public const TABLE_NAME       = 'storage_transform';
     public const FIELD_HASH       = 'hash';
@@ -29,6 +28,7 @@ class Mapper extends \Schoolbox\Mapper
     public const FIELD_SIZE       = 'size';
     public const FIELD_STATE      = 'state';
     public const FIELD_UPDATED_AT = 'updated_at';
+    public const FIELD_FORMAT    = 'format';
 
     /**
      * @inheritdoc
@@ -42,6 +42,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
         $this->uses(self::FIELD_STATE, self::TYPE_STRING, self::COLUMN_ENUM, null, Model::STATES);
         $this->uses(self::FIELD_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses(self::FIELD_FORMAT, self::TYPE_STRING);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifySizeAndStateCombo']);
     }
@@ -97,19 +98,21 @@ class Mapper extends \Schoolbox\Mapper
      * @param string   $cacheKey
      * @param null|int $size
      * @param string   $state
+     * @param string $format
      * @return Model
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function createRecord(string $hash, string $cacheKey, ?int $size, string $state): Model
+    public function createRecord(string $hash, string $cacheKey, ?int $size, string $state, string $format): Model
     {
         $imageTransformation = $this->createModel()
                                     ->setHash($hash)
                                     ->setCacheKey($cacheKey)
                                     ->setSize($size)
-                                    ->setState($state);
+                                    ->setState($state)
+                                    ->setFormat($format);
         $this->save($imageTransformation);
         return $imageTransformation;
     }

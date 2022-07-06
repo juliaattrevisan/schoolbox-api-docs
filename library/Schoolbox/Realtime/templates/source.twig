@@ -1,4 +1,4 @@
-<fieldset class="collapsible content" data-source="{{ sources[source.id].key }}">
+<fieldset class="collapsible content">
     <legend data-collapser="fset-{{ ns[namespace.id].slug }}-{{ sources[source.id].key }}{{ source.id }}" class="icon-down-arrow">Send a message when {{ locale.translateSentence(sources[source.id].description) }}.</legend>
     <div class="small-12 column">
         <p class="meta" data-summary></p>
@@ -7,7 +7,7 @@
         <form method="post" action="{{ routeLookup('adminMessages.saveConfig') }}">
             <ul class="permission-list" data-roles data-digest-settings>
                 {% for role in source.roles %}
-                <li data-role="{{ role.id }}">
+                <li data-role="{{ role.id }}" data-source="{{ role.sourceKey }}">
                     <label data-role-title>{{ roles[role.id].name }}</label>
                     <div class="actions-small-6">
                         <nav data-custom>

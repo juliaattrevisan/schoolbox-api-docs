@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
 class GradeSummary extends Base
 {
-
     /**
      * Heading
      *
@@ -48,11 +47,12 @@ class GradeSummary extends Base
                             $letter = $data['StrippedResult'];
 
                             $finalStack[$studentYearLevel]['fileYear'] = $fileyear;
+                            $finalStack[$studentYearLevel]['enteredGrades'] ??= 0;
                             $finalStack[$studentYearLevel]['enteredGrades']++;
 
                             /* Initialise totals for letters
                              */
-                            if (!is_array($finalStack[$studentYearLevel]['letters'])) {
+                            if (!is_array($finalStack[$studentYearLevel]['letters'] ?? false)) {
                                 $finalStack[$studentYearLevel]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
                             }
 

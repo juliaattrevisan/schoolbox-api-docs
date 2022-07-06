@@ -1,14 +1,13 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Image;
+use Alaress\Image\ProcessorFactory;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -37,6 +36,32 @@ try {
     exit;
 }
 
+$allFiles = \Component\Eportfolio\FileListMapper::getInstance()->findByColumn('file_id', $image->getId());
+
+$isViewable = false;
+
+if ($allFiles->count()) {
+    foreach ($allFiles as $currentFile) {
+        $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $image->getOwner(), $currentFile->getPageId());
+
+        /* If you can view one of the pages that this file is shared on,
+         * break out of here
+         */
+        if ($authenticator->canView()) {
+            $isViewable = true;
+
+            break;
+        }
+    }
+}
+
+/* If the file was never viewable on any eportfolio page and you aren't
+ * the owner, get out
+ */
+if (!$isViewable && ($_SESSION['user']->getId() != $image->getOwner()->getId()) && !$_SESSION['user']->isSuperuser()) {
+    error(5);
+}
+
 if (isset($_GET['key'])) {
     $transforms = new Image\Transformation\Storage();
     $cacheKey   = $transforms->getCacheKey($_GET['key']);
@@ -52,7 +77,14 @@ if (isset($_GET['key'])) {
 
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
-$processor    = new Image\Processor($storageModel, $cacheKey, $transform);
+
+/** @var ProcessorFactory $processorFactory */
+$processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+$processor        = $processorFactory->buildForStorage(
+    $storageModel,
+    $cacheKey,
+    $transform,
+);
 try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {

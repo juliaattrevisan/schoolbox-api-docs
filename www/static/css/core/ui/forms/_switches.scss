@@ -58,7 +58,7 @@ $switch-active-color: $content-ui-foreground;
     color: transparent;
     cursor: pointer;
     display: block;
-    margin-bottom: ($switch-height-med / 2);
+    margin-bottom: calc($switch-height-med / 2);
     position: relative;
     text-indent: 100%;
     width: $switch-height-med * 2; height: $switch-height-med;

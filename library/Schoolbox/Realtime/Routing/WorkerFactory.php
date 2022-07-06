@@ -15,8 +15,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmailFactory;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\MobileApp;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Mailer;
@@ -24,6 +23,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\Filter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 class WorkerFactory
@@ -49,6 +49,8 @@ class WorkerFactory
     /** @var Schoolbox\Instance */
     private $instance;
 
+    private EmailFactory $emailFactory;
+
 
     /**
      * @param IConfigLoader         $conf
@@ -58,6 +60,8 @@ class WorkerFactory
      * @param UserMapper            $userMapper
      * @param RoutePermissionMapper $routePermMapper
      * @param \Schoolbox\Instance   $instance
+     * @param FilesystemProxy       $filesystemProxy
+     * @param EmailFactory          $emailFactory
      */
     public function __construct(
         IConfigLoader $conf,
@@ -66,7 +70,9 @@ class WorkerFactory
         RegistryMapper $registryMapper,
         UserMapper $userMapper,
         RoutePermissionMapper $routePermMapper,
-        Schoolbox\Instance $instance
+        Schoolbox\Instance $instance,
+        private FilesystemProxy $filesystemProxy,
+        EmailFactory $emailFactory
     ) {
         $this->conf = $conf;
         $this->log = $log;
@@ -75,6 +81,7 @@ class WorkerFactory
         $this->userMapper = $userMapper;
         $this->routePermMapper = $routePermMapper;
         $this->instance = $instance;
+        $this->emailFactory = $emailFactory;
     }
 
 
@@ -91,14 +98,12 @@ class WorkerFactory
             $this->registryMapper,
             $this->instance,
             $this->conf->get('title'),
+            $this->filesystemProxy,
             MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
-        // factory for configuring instant emails
-        $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);
-
         // responsible for draining a list into an email and sending it (only include reply-to headers if config allows)
-        $mailer = new Mailer($twigFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
+        $mailer = new Mailer($this->emailFactory, $this->log, $this->userMapper, $this->conf->get('mail_replyto_enabled'));
 
         // build a list factory
         $listFactory = new MessageList\PublicationFactory($instanceId, $this->client, $cloudManager, $this->userMapper, $mailer);

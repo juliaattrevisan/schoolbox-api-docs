@@ -11,10 +11,10 @@ namespace Schoolbox\Sync\Grammar\Condition;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
+use Schoolbox\Collection;
 
 class ExternalUserValueIn extends Condition\In
 {
-
     /** @var string */
     protected $entityLabel = 'externalUser';
 
@@ -39,20 +39,20 @@ class ExternalUserValueIn extends Condition\In
         $reader = new ObjectReader();
         $value  = $reader->read($externalUser, $this->field);
 
-        // this occurs if the field being read is multi, such as emails and campus codes
-        if (is_array($value)) {
+        // this occurs if the field being read is multi, such as
+        // * emails and campus codes (array)
+        // * positions (Collection)
+        if (is_array($value) || $value instanceof Collection) {
             // require ANY, not ALL
-            return (bool)count(array_intersect($this->validValues, $value));
+            foreach ($value as $singleValue) {
+                if ($this->matchesValidValue($singleValue)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        /* Positions (meta.position.code) manifest in $value as a Collection
-         * This passes none of the array checks and must be treated specially
-         */
-        if ($value instanceof \Schoolbox\Collection) {
-            return (bool)count(array_intersect($this->validValues, $value->getAll()));
-        }
-
-        return in_array($value, $this->validValues);
+        return $this->matchesValidValue($value);
     }
 
 
@@ -68,5 +68,21 @@ class ExternalUserValueIn extends Condition\In
         }
 
         return sprintf($pattern, $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
+    }
+
+    /**
+     * Does `$value` match one of the valid values for this condition?
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    private function matchesValidValue($value): bool
+    {
+        foreach ($this->validValues as $validValue) {
+            if ($value === $validValue || fnmatch($validValue, $value, FNM_CASEFOLD | FNM_NOESCAPE)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

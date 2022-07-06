@@ -17,6 +17,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
@@ -29,7 +30,6 @@ use Schoolbox\YearLevel;
  */
 class Bulk_Folder
 {
-
     /**
      * Default id for HomepageTemplate instance
      *
@@ -73,6 +73,13 @@ class Bulk_Folder
     /** @var FileMapper */
     private $fileMapper;
 
+    private HomepageTemplateMapper $homepageTemplateMapper;
+
+    /**
+     * list of homepage templates to help
+     */
+    private $homepageTemplateList;
+
     /**
      * Constructor
      *
@@ -99,6 +106,7 @@ class Bulk_Folder
         $this->yearLevelMapper      = YearLevel\Mapper::getInstance();
         $this->storageMapper        = StorageMapper::getInstance();
         $this->fileMapper           = FileMapper::getInstance();
+        $this->homepageTemplateMapper = HomepageTemplateMapper::getInstance();
     }
 
 
@@ -128,6 +136,7 @@ class Bulk_Folder
         $folderImageColumn  = $this->determineColumnIndex($headerRow, 'image', false);
         $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
         $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
+        $templateColumn     = $this->determineColumnIndex($headerRow, 'template', false);
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -146,7 +155,8 @@ class Bulk_Folder
                 $folderCodeColumns,
                 $yearLevelColumns,
                 $yearLevels,
-                $perform
+                $perform,
+                $templateColumn
             );
         }
 
@@ -184,7 +194,8 @@ class Bulk_Folder
         array $folderCodeColumnIndexes,
         array $yearLevelColumnIndexes,
         GenericCollection $yearLevels,
-        bool $perform
+        bool $perform,
+        int $templateColumnIndex
     ): array {
 
         $parentId   = trim($row[$parentColumnIndex]);
@@ -203,7 +214,28 @@ class Bulk_Folder
             return $this->buildRowResult($rowIdx, '', $folderName, 'Not Added', "Could not find parent folder {$parentId}");
         }
 
-        $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($this->templateID));
+        $warnings = [];
+
+        //set template id to default
+        $templateId = $this->templateID;
+        //if template has been set in the csv
+        if ($templateColumnIndex >= 0 && '' !== trim($row[$templateColumnIndex])) {
+            //if template name is 'No template' then set to default 0, else check db list
+            if ('No template' == trim($row[$templateColumnIndex])) {
+                $templateId = 0;
+            } else {
+                //grab that template if it exists
+                $templateObj = $this->getHomepageTemplateList()->getOffset(trim($row[$templateColumnIndex]));
+                if (null !== $templateObj) {
+                    $templateId = $templateObj->getId();
+                } else {
+                    //noop csv template does not exist, ignore the template and use the one specified in the webform
+                    $warnings[] = sprintf('%s is not a homepage template.', trim($row[$templateColumnIndex]));
+                }
+            }
+        }
+        //set homepage to the specified template
+        $homepageConfig = (new HomepageConfig())->setTemplate((new HomepageTemplate())->setId($templateId));
 
         // Create new Folder
         $newFolder = (new Folder\Model())
@@ -211,8 +243,6 @@ class Bulk_Folder
             ->setParent($parent)
             ->setHomepage($homepageConfig);
         $homepageConfig->setCategory($newFolder);
-
-        $warnings = [];
 
         // Folder Colour
         $folderColour = $folderColourColumnIndex >= 0 ? trim($row[$folderColourColumnIndex]) : '';
@@ -409,7 +439,8 @@ class Bulk_Folder
      */
     private function saveHomepageConfig($homepageConfig): void
     {
-        if ($this->templateID) {
+        //save the template config when there is a template specified
+        if ($homepageConfig->getTemplate()->getId()) {
             $this->homepageConfigMapper->save($homepageConfig);
             $this->homepageConfigMapper->resetToTemplate($homepageConfig);
         }
@@ -548,5 +579,17 @@ class Bulk_Folder
     {
         $nameProperty = $this->yearLevelMapper->getPropertyFromColumn($this->yearLevelMapper::COL_NAME);
         return $this->yearLevelMapper->findAll()->indexBy($nameProperty);
+    }
+
+    /**
+     * Helper to only hit the db once to get the HomepageTemplates
+     * but to still return them in a standard format.
+     */
+    private function getHomepageTemplateList(): GenericCollection
+    {
+        if (null === $this->homepageTemplateList) {
+            $this->homepageTemplateList = $this->homepageTemplateMapper->findAll()->indexBy('name');
+        }
+        return $this->homepageTemplateList;
     }
 }

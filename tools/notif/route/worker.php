@@ -17,6 +17,7 @@ use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Routing;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -45,8 +46,23 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var RoutePermissionMapper $routePermMapper */
     $routePermMapper = $di->get('mapperFactory')->get(RoutePermissionMapper::class);
 
-    (new Routing\WorkerFactory($config, $log, $client, $registryMapper, $userMapper, $routePermMapper, $instance))
-        ->build($loop, INSTANCE_ID);
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $di->get('filesystem.storageProxy');
+
+    /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
+    $emailFactory = $di->get('mail.emailFactory');
+
+    (new Routing\WorkerFactory(
+        $config,
+        $log,
+        $client,
+        $registryMapper,
+        $userMapper,
+        $routePermMapper,
+        $instance,
+        $filesystemProxy,
+        $emailFactory
+    ))->build($loop, INSTANCE_ID);
 });
 
 // yup. that's all you need to do.

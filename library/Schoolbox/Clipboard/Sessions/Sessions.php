@@ -14,7 +14,6 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
-use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -22,7 +21,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Sessions implements IStrategy
 {
-
     /**
      * Short-circuit to prevent infinite loops
      */
@@ -42,6 +40,17 @@ class Sessions implements IStrategy
 
 
     /**
+     * Whitelist meaningful results
+     *     W     We won
+     *     L     We lost
+     *     D     It's a draw
+     *     F     We forfeited
+     *     OF    Opponent forfeited
+     */
+    private const VALID_RESULT_OUTCOMES = ['W', 'L', 'D', 'F', 'OF'];
+
+
+    /**
      * This is used as the description in the event modal popup
      * There isn't one field that corresponds to that usage, but there
      * is a conglomerate of various fields which result in the same outcome
@@ -54,6 +63,22 @@ class Sessions implements IStrategy
         %s
         <p>%s</p>
     ";
+
+
+    /**
+     * This is a giant slab of text that comes from the accumulation of Additional Fields'
+     * data which may, or may not, exist. If there's meaningful content, it's appended to
+     * the end of NOTES_TEMPLATE, with e.g. a horizontal rule for a separator
+     */
+    private const ADDITIONAL_FIELDS_TEMPLATE = "
+        %s
+    ";
+
+
+    /**
+     * This represents the custom fields' key-value pair
+     */
+    private const ADDITIONAL_FIELDS_TUPLE = "<strong>%s:</strong> %s<br />";
 
 
     /**
@@ -104,6 +129,12 @@ class Sessions implements IStrategy
      * @var IApi
      */
     private IApi $api;
+
+
+    /**
+     * @var string
+     */
+    private string $timezone;
 
 
     /**
@@ -161,6 +192,7 @@ class Sessions implements IStrategy
      * @param bool                                  $perform
      * @param LockInterface                         $lock
      * @param IApi                                  $api
+     * @param string                                $timezone
      * @param Registry                              $registry
      * @param Person                                $userLookup
      * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
@@ -174,6 +206,7 @@ class Sessions implements IStrategy
         bool $perform,
         LockInterface $lock,
         IApi $api,
+        string $timezone,
         Registry $registry,
         Person $userLookup,
         \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
@@ -186,6 +219,7 @@ class Sessions implements IStrategy
         $this->perform = $perform;
         $this->lock = $lock;
         $this->api = $api;
+        $this->timezone = $timezone;
         $this->registry = $registry;
         $this->userLookup = $userLookup;
         $this->venueMapper = $venueMapper;
@@ -199,8 +233,12 @@ class Sessions implements IStrategy
 
     /**
      * @return void
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
+     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -255,6 +293,9 @@ class Sessions implements IStrategy
                 'includeStaff' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
+                /* These might also be known as "Additional Fields" in the clipboard ui
+                 */
+                'includeCustomFieldsMetadata' => 'true',
                 'startDateTime' => $startDateTime,
                 'endDateTime' => $endDateTime,
                 /* Apparently this should give you "only not cancelled" sessions
@@ -265,6 +306,20 @@ class Sessions implements IStrategy
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
             ]);
+
+            /* Store metadata for custom fields: their types and their labels
+             * This is to make their contents presentable in the frontend by
+             * appending it to each event's $notes
+             *
+             * Metadata is supplied in the $session var, not the $session['data']
+             * var; it's meant to apply to everything in the payload
+             *
+             * Therefore we can remember it per endpoint retrieval. Technically
+             * we'd only need to remember it once, I think, but I don't really
+             * see there being an advantage one way or the other; we canjust use
+             * the customFieldsMetadata struct as provided in each $session
+             */
+            $customFieldsMetadata = $sessions['customFieldsMetadata'] ?? null;
 
             foreach ($sessions['data'] as $session) {
                 /* Sport identifiers
@@ -327,22 +382,24 @@ class Sessions implements IStrategy
 
                     $matchupName = trim($session['title']);
 
-                    /*
-                     * Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
+                    /* Clipboard sends the timestamps as UTC but with no identification that they are UTC timestamps.
                      * so lets force the creation of the date object to be a UTC timezone,
                      * then update that object to the local timezone specified from the DB config.
                      *
                      * The rest of the system expects all dates to be in a local timezone, NOT UTC
                      * https://api-docs.clipboard.app/?id=timestamps
+                     *
+                     * Sometimes clipboard sends data with microseconds in there, which carbon won't understand
+                     * with the date format we want to use - explode it out first
+                     *
+                     * We set the timezone to be appropriate to wherever the schoolbox instance happens to be
+                     * so that frontend can render the UTC timestamp correctly
                      */
-                    //grab local TZ from DB
-                    $localTZ = ConfigMapper::getInstance()->getConfigLoader()->get('date_timezone');
-                    $startAt = new \Alaress_Date_Format($session['startDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $startAt->setTimezone($localTZ);
-                    $finishAt = new \Alaress_Date_Format($session['endDateTime'], 'Y-m-d H:i:s', new \DateTimeZone('UTC'));
-                    //update based on local TZ
-                    $finishAt->setTimezone($localTZ);
+                    $startAt = (new \Alaress_Date_Format(explode('.', $session['startDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
+
+                    $finishAt = (new \Alaress_Date_Format(explode('.', $session['endDateTime'])[0], \Alaress_Date_Format::DATABASE_FORMAT, new \DateTimeZone('UTC')))
+                        ->setTimezone($this->timezone);
 
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
@@ -397,6 +454,47 @@ class Sessions implements IStrategy
                         nl2br(trim((string)$session['studentParentNotes']))
                     );
 
+                    /* Cram in a set of custom fields' metadata contents into $notes
+                     * by collating all the custom metadata records into one big slab
+                     */
+                    if ($customFieldsMetadata && $session['customFieldsData']) {
+                        $customFields = [];
+
+                        foreach ($session['customFieldsData'] as $key => $value) {
+                            /* Look up what this was meant to be called
+                             */
+                            $label = $customFieldsMetadata[$key]['label'];
+
+                            /* If there's a meaningful value, stack it up
+                             * Otherwise ignore it
+                             */
+                            if ('' !== trim((string)$value)) {
+                                $customFields[] = sprintf(
+                                    self::ADDITIONAL_FIELDS_TUPLE,
+                                    $label,
+                                    $value
+                                );
+                            }
+                        }
+
+                        /* Use a standard html break for a separator
+                         * I assume each key/value appears on its own line
+                         */
+                        if (\count($customFields)) {
+                            /* customFieldMetadata is a set of key-value pairs:
+                             *    busDepartureTime
+                             *    studentArrivalTime
+                             *    coachstaffContactDetails
+                             *
+                             * so I guess we just concatenate all their values for now
+                             */
+                            $notes .= sprintf(
+                                self::ADDITIONAL_FIELDS_TEMPLATE,
+                                implode('', $customFields)
+                            );
+                        }
+                    }
+
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups
                      * which existed previously anymore.
@@ -412,24 +510,38 @@ class Sessions implements IStrategy
                     /* Figure out existing results for the home team
                      * then update it to whatever it currently is
                      */
-                    try {
-                        $result = $this->resultMapper
-                            ->findOneByColumnList([
-                                'match_id' => $matchup->getId(),
-                                'team_id' => $team->getId()
-                            ]);
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        $result = $this->resultMapper->createModel()
-                            ->setMatchup($matchup)
-                            ->setTeam($team);
-                    }
+                    $resultDescription = $this->generateResult($session);
 
-                    /* Update home team's description with whatever it is now
+                    /* If the resultDescription is null, it means this matchup
+                     * shouldn't have a result; delete all results if they existed
                      */
-                    $result->setDescription($this->generateResult($result, $session));
+                    if (null === $resultDescription) {
+                        foreach ($matchup->getResults() as $currentResult) {
+                            $this->resultMapper->delete($currentResult);
+                        }
+                    } else {
+                        /* There was something meaningful to say; save a new Result
+                         * if one doesn't already exist for this matchup and team
+                         */
+                        try {
+                            $result = $this->resultMapper
+                                ->findOneByColumnList([
+                                    'match_id' => $matchup->getId(),
+                                    'team_id' => $team->getId()
+                                ]);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            $result = $this->resultMapper->createModel()
+                                ->setMatchup($matchup)
+                                ->setTeam($team);
+                        }
 
-                    if ($this->perform) {
-                        $this->resultMapper->save($result);
+                        /* Update home team's description with whatever it is now
+                         */
+                        $result->setDescription($resultDescription);
+
+                        if ($this->perform) {
+                            $this->resultMapper->save($result);
+                        }
                     }
                 }
             }
@@ -572,23 +684,53 @@ class Sessions implements IStrategy
     /**
      * Generate a slab of text for the home team's result description
      *
-     * @param \Schoolbox\Fixtures\Result\Model $result
-     * @param array                            $session
-     * @return string
+     * @param array         $session
+     * @return string|null
      */
-    private function generateResult(\Schoolbox\Fixtures\Result\Model $result, array $session): string
+    private function generateResult(array $session): ?string
     {
+        /* Whitelist meaningful results
+         *     W     We won
+         *     L     We lost
+         *     D     It's a draw
+         *     F     We forfeited
+         *     OF    Opponent forfeited
+         *
+         * Confirmed with Ed Kolyer that 'NR' means "No Results" and is functionally
+         * equivalent to a null
+         *
+         * Not in any of the valid result outcomes? Nothing to say
+         *
+         * Exit early
+         */
+        if (!\in_array($session['result'], self::VALID_RESULT_OUTCOMES, true)) {
+            $this->log->debug('No valid results recorded; skipping result creation.');
+
+            return null;
+        }
+
         /* Neither team has anything interesting in the results fields
          * Nothing to say
          */
         if ('' === trim((string)$session['organisationScore']) && '' === trim((string)$session['opponentScore'])) {
-            return '';
+            $this->log->debug('Our score and opponent scores are empty; skipping result creation.');
+
+            return null;
         }
 
-        return sprintf(
+        /* I guess something meaningful happened here
+         */
+        $result = sprintf(
             self::RESULT_TEMPLATE,
-            $session['organisationScore'] ?? '',
-            $session['opponentScore'] ?? ''
+            $session['organisationScore'],
+            $session['opponentScore']
         );
+
+        $this->log->debug(sprintf(
+            'Found result for this matchup: %s',
+            $result
+        ));
+
+        return $result;
     }
 }

@@ -492,13 +492,7 @@ HELP;
 
             /* If the file already exists, just reuse its storage entry
              */
-            try {
-                $attachment = $this->storageMapper->acceptStream($filename, $row['Document'], true);
-            } catch (\League\Flysystem\FileExistsException $e) {
-                $bits = explode('/', $e->getPath());
-                $hash = array_pop($bits);
-                $attachment = $this->storageMapper->findByHash($hash);
-            }
+            $attachment = $this->storageMapper->acceptStream($filename, $row['Document'], true);
 
             /* Assign the storage file to the pastoral record
              */

@@ -15,6 +15,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Image\ProcessorFactory;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
@@ -46,6 +47,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
+use League\Flysystem\Filesystem;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -54,6 +56,7 @@ use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -74,8 +77,10 @@ use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
@@ -120,6 +125,7 @@ use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Registration\RepositoryFactory as RegistrationRepositoryFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
@@ -142,8 +148,12 @@ use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
@@ -153,9 +163,11 @@ use Schoolbox\Sync\Provisioner\UserMapper as SyncUserMapper;
 use Schoolbox\Sync\Rule\Mapper as SyncRuleMapper;
 use Schoolbox\Sync\Ruleset\Factory as SyncRulesetFactory;
 use Schoolbox\TaskDaemon\ProducerFactory;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Scrub;
 use SitePage;
@@ -443,6 +455,19 @@ abstract class Kernel
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                ],
+            )
+        );
+        $di->set(
+            'taskd.downloadPagesMessageFactory',
+            $di->lazyNew(
+                DownloadPagesMessageFactory::class,
+                [
+                    'instance'            => $di->lazyGet('instance'),
+                    'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
+                    'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                    'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                    'gotenbergHttpHeader' => RequestFactory::AUTH_HTTP_HEADER,
                 ],
             )
         );
@@ -1445,6 +1470,8 @@ abstract class Kernel
                     'unitSpecificationMapper'  => $mapperFactory->getLazy(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class),
                     'assessmentMapperProxy'    => $di->lazyGet('assessmentDataSource'),
                     'plagscanMapper'           => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::class),
+                    'turnitinGroupMapper'      => $mapperFactory->getLazy(\Schoolbox\Learning\Turnitin\Group\Mapper::class),
+                    'submissionBoxMapper'      => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBoxMapper::class),
                     'submissionFileMapper'     => $mapperFactory->getLazy(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::class),
                     'quizMapper'               => $mapperFactory->getLazy(\Schoolbox\Learning\Quiz\Mapper::class),
                     'router'                   => $di->lazyGet('router'),
@@ -1705,6 +1732,24 @@ abstract class Kernel
             )
         );
 
+        // JWT parser
+        $di->set(
+            'user.jwtParser',
+            $di->lazy(
+                function () use ($di, $config, $mapperFactory) {
+                    /** @var GuzzleHttp\Client $httpClient */
+                    $httpClient             = $di->get('httpClient');
+                    $userMapper             = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
+                    $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
+                    return new JwtParser\Composite(
+                        new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
+                        new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                    );
+                }
+            )
+        );
 
         // Lock factory
         // TODO inject this everywhere a lock is used
@@ -1804,6 +1849,82 @@ abstract class Kernel
                     new KeyGenerator('accessToken', INSTANCE_ID),
                 );
             })
+        );
+
+
+        // Filesystems
+        $di->set(
+            'filesystem.storage',
+            $di->lazy(
+                function () use ($config) {
+                    return (new FilesystemFactory())->buildStorage($config);
+                }
+            )
+        );
+        $di->set(
+            'filesystem.storageProxy',
+            $di->lazy(
+                function () use ($di, $config) {
+                    /** @var Filesystem $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new FilesystemProxy(
+                        $storage,
+                        new HashGenerator(),
+                        $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
+                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
+                    );
+                }
+            )
+        );
+        $di->set(
+            'filesystem.receiver',
+            $di->lazyNew(
+                Receiver::class,
+                [
+                    'storageMapper'          => $mapperFactory->getLazy(StorageMapper::class),
+                    'mimetypeMapper'         => $mapperFactory->getLazy(MimetypeMapper::class),
+                    'storageFilesystemProxy' => $di->lazyGet('filesystem.storageProxy'),
+                    'sanitizer'              => $di->lazyGet('storage.sanitizer'),
+                    'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
+                    // CLI scripts have no current user, thus this is null
+                    'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                ],
+            )
+        );
+        $di->set(
+            'filesystem.temp',
+            $di->lazy(
+                function () {
+                    return (new FilesystemFactory())->buildTemp();
+                }
+            )
+        );
+        $di->set(
+            'filesystem.imageProcessorFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var Filesystem $storage */
+                    $storage = $di->get('filesystem.storage');
+                    return new ProcessorFactory($storage, new HashGenerator());
+                }
+            ),
+        );
+
+        // email
+        $di->set(
+            'mail.emailFactory',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $conf */
+                    $conf = $di->get('config');
+                    /** @var MapperFactory $mapperFactory */
+                    $mapperFactory = $di->get('mapperFactory');
+                    return new EmailFactory(
+                        $conf,
+                        $mapperFactory->get(\Schoolbox\Admin\EmailDKIM\Mapper::class)
+                    );
+                }
+            )
         );
 
         return $di;

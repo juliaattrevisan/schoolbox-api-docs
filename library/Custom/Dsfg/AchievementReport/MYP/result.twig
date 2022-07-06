@@ -1,7 +1,12 @@
 {% for classCode, subjectData in subjects %}
     <div class="row">
         <div class="small-12 island">
-            <section class="type-blue content"><strong>{{ headings[classCode].subjectName }}</strong></section>
+            <section class="type-blue content">
+                <strong>{{ headings[classCode].subjectName }}</strong>
+                <p class="meta">
+                    <a href="mailto:{{ headings[classCode].staffEmail }}">{{ headings[classCode].staffName }}</a>
+                </p>
+            </section>
         </div>
     </div>
     <div class="row">
@@ -38,7 +43,7 @@
                     <tr>
                         <th>Interim Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
+                            <td class="centered">{{ grades[classCode][2][shortCode]['AssessResultsResult'] ?? '' }}</td>
                         {% endfor %}
                     </tr>
                     <tr>
@@ -47,7 +52,7 @@
                     <tr>
                         <th>Final Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
+                            <td class="centered">{{ grades[classCode][4][shortCode]['AssessResultsResult'] ?? '' }}</td>
                         {% endfor %}
                     </tr>
                     </tbody>
@@ -58,7 +63,12 @@
     <div class="row">
         <div class="small-12 island">
             <section class="content">
-                <p>{{ subjectData.comment }}</p>
+                <p class="subheading">Comments</p>
+                <p>{{ subjectData.comment }}
+                    {% if subjectData.comment is not empty and subjectData.staffName is not empty %}
+                        &mdash; <a href="mailto:{{ subjectData.staffEmail }}">{{ subjectData.staffName }}</a>
+                    {% endif %}
+                </p>
             </section>
         </div>
     </div>

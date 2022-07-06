@@ -430,7 +430,7 @@
                                     {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
-                                        <form id="email-all-form" action="/mail/createMail.php" class="hide" method="post">
+                                        <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
                                             <input name="cc" value="{{ allTeacherEmails }}" type="hidden">
                                             <input name="replyto" value="{{ replyTo }}" type="hidden">
                                         </form>
@@ -442,7 +442,7 @@
                                 {% if isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
                                     <li>
                                         <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
-                                        <form action="/mail/createMail.php" method="post" class="no-margin" id="email-contacts-form">
+                                        <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
                                             <input type="hidden" name="replyto" value="{{session.user.getFormattedEmailDisplay}}"/>
                                             <input type="hidden" name="selectedIds" value="{{ user.externalId }}"/>
                                             <input type="hidden" name="selectedGroups" value="parents"/>
@@ -537,7 +537,7 @@
                 visible: showAchievementsTab
             },
             {
-                label: 'Achievements',
+                label: achievementsTabLabel | default('Achievements'),
                 anchor: 'tab-achievements',
                 visible: showAchievementsTab
             },
@@ -714,7 +714,7 @@
                                         <a id="email-all-{{ groupIdentifier }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
                                     </li>
                                 </ul>
-                                <form id="email-all-form-{{ groupIdentifier }}" action="/mail/createMail.php" method="post">
+                                <form id="email-all-form-{{ groupIdentifier }}" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post">
                                     <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                     <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
                                     {# <input type="submit" value="Email all {{ group }} teachers" /> #}

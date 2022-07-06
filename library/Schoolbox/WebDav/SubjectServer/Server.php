@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageDataSource;
 use Schoolbox\WebDav\HasUserSource;
 use Schoolbox\WebDav\NameGenerator;
@@ -69,7 +70,7 @@ class Server extends DAV\Collection
     /**
      * A list of child nodes, cached whenever getChildren() is called.
      *
-     * @var DAV\INode[]
+     * @var DAV\INode[]|null
      */
     private $childNodeCache = null;
 
@@ -92,6 +93,7 @@ class Server extends DAV\Collection
      * @param DueWorkResponseDataSource $dueWorkResponseDataSource
      * @param ErrorMapper               $errorMapper
      * @param NameGenerator             $nameGenerator
+     * @param FilesystemProxy           $filesystemProxy
      */
     public function __construct(
         $name,
@@ -100,7 +102,8 @@ class Server extends DAV\Collection
         StorageDataSource $storageDataSource,
         DueWorkResponseDataSource $dueWorkResponseDataSource,
         ErrorMapper $errorMapper,
-        NameGenerator $nameGenerator
+        NameGenerator $nameGenerator,
+        private FilesystemProxy $filesystemProxy,
     ) {
         $this->name                      = $name;
         $this->setUserSource($userSource);
@@ -265,7 +268,8 @@ class Server extends DAV\Collection
                                                 $responseNode,
                                                 $this->nameGenerator->sanitiseName($file->getBasename())
                                             ),
-                                            $file
+                                            $file,
+                                            $this->filesystemProxy,
                                         )
                                     );
                                 } catch (DAV\Exception $e) {

@@ -13,8 +13,6 @@ use Alaress\Web\Controller\Base;
 use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
-use Schoolbox\User\Token\Mapper as TokenMapper;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -38,11 +36,9 @@ class Module extends BaseModule
     {
         return new Controller(
             new Authenticator(),
-            $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RegistryMapper::class),
             $this->getMapperFactory()->get(ServiceMapper::class),
-            $this->getMapperFactory()->get(TokenMapper::class),
-            $this->injector->get('user.tokenBuilder'),
+            $this->injector->get('user.jwtParser'),
         );
     }
 }

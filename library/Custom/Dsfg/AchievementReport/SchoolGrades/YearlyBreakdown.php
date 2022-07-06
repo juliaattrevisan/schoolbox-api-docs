@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
 class YearlyBreakdown extends Base
 {
-
     /**
      * Heading
      *
@@ -43,11 +42,10 @@ class YearlyBreakdown extends Base
         foreach ($preprocessed as $year => $allCourses) {
             /* Initialise totals for letters
              */
-            if (!is_array($totals[$year]['letters'])) {
-                $totals[$year]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-            }
+            $totals[$year]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
             $totals[$year]['achievedGrades'] = 0;
+            $totals[$year]['enteredGrades']  = 0;
 
             /* Choose which values to accumulate, from either
              * term4 or term2 (depending on which is available)
@@ -57,11 +55,10 @@ class YearlyBreakdown extends Base
             foreach ($allCourses as $courseName => $allAreas) {
                 /* Initialise totals for letters
                  */
-                if (!is_array($yearStack[$year][$courseName]['letters'])) {
-                    $yearStack[$year][$courseName]['letters'] = array_fill_keys($this->getLetterRegistry(), 0);
-                }
+                $yearStack[$year][$courseName]['letters'] ??= array_fill_keys($this->getLetterRegistry(), 0);
 
                 $yearStack[$year][$courseName]['achievedGrades'] = 0;
+                $yearStack[$year][$courseName]['enteredGrades']  = 0;
 
                 /* Explore all the areas
                  */
@@ -102,6 +99,7 @@ class YearlyBreakdown extends Base
         /* Available Grades
          */
         foreach ($yearStack as $currentYear => $allCourses) {
+            $totals[$currentYear]['availableGrades'] = 0;
             foreach ($allCourses as $courseName => $data) {
                 $yearStack[$currentYear][$courseName]['availableGrades'] = $yearStack[$currentYear][$courseName]['enteredGrades'] - array_sum($yearStack[$currentYear][$courseName]['letters']);
                 $totals[$currentYear]['availableGrades'] ??= 0;

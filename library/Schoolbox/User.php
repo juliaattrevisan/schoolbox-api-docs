@@ -341,7 +341,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEmail()
     {

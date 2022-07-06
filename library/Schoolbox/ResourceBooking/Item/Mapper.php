@@ -20,12 +20,20 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\Role;
+use Schoolbox\User;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Cache for the list of moderators for a resource: stored because it's
+     * possible that the list be requested more than once for a single resource.
+     *
+     * @var array<int, GenericCollection<User>>
+     */
+    private array $moderatorCache;
 
     public function mapping()
     {
@@ -281,19 +289,7 @@ class Mapper extends BaseMapper
                 /** @var Model $model */
 
                 // populate the moderator list
-                $modMapper  = $mapper->getJoinMapper('moderator');
-                $userMapper = $modMapper->getJoinMapper('moderator');
-                $query      = "
-                    SELECT
-                      {$modMapper->getColumnString('m')},
-                      {$userMapper->getColumnString('u')}
-                    FROM {$modMapper->getTable()} `m`
-                    INNER JOIN {$modMapper->getJoinSql('moderator', 'm', 'u')}
-                    WHERE m.resource_id=?
-                ";
-                $statement  = $userMapper->getDatabase()->prepare($query);
-                $statement->execute([$model->getId()]);
-                $model->setModeratorList($userMapper->hydrateList($statement, 'u'));
+                $this->loadModeratorsIntoModel($model);
 
                 // populate related resources
                 $relationMapper     = $mapper->getJoinMapper('related_resource');
@@ -306,13 +302,14 @@ class Mapper extends BaseMapper
                     INNER JOIN {$relationMapper->getJoinSql('related_resource', 'r', 'm')}
                     WHERE r.resource_id=? AND m.deleted_at IS NULL
                 ";
-                $statement          = $userMapper->getDatabase()->prepare($query);
+                $statement = $mapper->getDatabase()->prepare($query);
                 $statement->execute([$model->getId()]);
                 $model->setRelatedResourceList(
                     $relatedModelMapper->hydrateList(
                         $statement,
                         'm',
                         function ($mapper, $model) {
+                            $this->loadModeratorsIntoModel($model);
                             return $model;
                         }
                     )
@@ -462,5 +459,33 @@ class Mapper extends BaseMapper
         // Hydration:
         // progress through each join that was passed.
         return $this->hydrateList($statement, 'r');
+    }
+
+
+    /**
+     * Loads this resource's moderators into its moderator list.
+     *
+     * Requires a query to fetch all this resource's moderators.
+     *
+     * @param Model $model
+     */
+    private function loadModeratorsIntoModel(Model $model): void
+    {
+        if (!isset($this->moderatorCache[$model->getId()])) {
+            $modMapper  = $this->getJoinMapper('moderator');
+            $userMapper = $modMapper->getJoinMapper('moderator');
+            $query      = "
+                SELECT
+                    {$modMapper->getColumnString('m')},
+                    {$userMapper->getColumnString('u')}
+                FROM {$modMapper->getTable()} `m`
+                INNER JOIN {$modMapper->getJoinSql('moderator', 'm', 'u')}
+                WHERE m.resource_id=?
+            ";
+            $statement  = $userMapper->getDatabase()->prepare($query);
+            $statement->execute([$model->getId()]);
+            $this->moderatorCache[$model->getId()] = $userMapper->hydrateList($statement, 'u');
+        }
+        $model->setModeratorList($this->moderatorCache[$model->getId()]);
     }
 }

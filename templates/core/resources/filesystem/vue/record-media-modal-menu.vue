@@ -219,7 +219,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@css/core/utils/variables';
+@import '@css/core/base/variables';
 
 $font-family-icon: 'schoolbox';
 

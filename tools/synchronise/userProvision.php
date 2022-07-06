@@ -49,7 +49,8 @@ $kernel->run(
         if ($actualUser !== $requiredUser) {
             $log->error("Invalid process user. Required '$requiredUser', Actual: '$actualUser'");
             $i = INSTANCE_ID;
-            $log->error("Maybe try something like:\n\tsu -s /bin/bash -c 'INSTANCE_ID=$i php ./userProvision.php' $requiredUser");
+            $path = realpath(__FILE__);
+            $log->error("Maybe try something like:\n\tsudo -u $requiredUser INSTANCE_ID=$i $path");
             exit(2);
         }
 

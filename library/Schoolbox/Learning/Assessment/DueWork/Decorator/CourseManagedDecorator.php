@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use DomainException;
@@ -63,12 +65,12 @@ class CourseManagedDecorator implements DecoratorInterface
         array $attachedFiles,
         ?DueWork $original
     ) {
-        $this->setMarkType(trim($markType));
-        $this->setGradingScheme(trim($gradingScheme));
-        $this->setUseRubric(trim($useRubric));
-        $this->setCapabilityMarkType(trim($capabilityMarkType));
+        $this->setMarkType($markType);
+        $this->setGradingScheme($gradingScheme);
+        $this->setUseRubric($useRubric);
+        $this->setCapabilityMarkType($capabilityMarkType);
         $this->setCapabilityGradeGroup($capabilityGradeGroup);
-        $this->setUseMarkRange(trim($useMarkRange));
+        $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
@@ -85,7 +87,6 @@ class CourseManagedDecorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
-
         /* If there were attachments, accumulate them
          * Otherwise set attachedFiles to an empty collection
          */

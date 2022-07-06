@@ -2,6 +2,8 @@
 
 {# turn off specific sections for year 6-12 students#}
 {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+{% set showHeadOfHouse = externalUser.StudentYearLevel in [9,10,11,12] %}
+{% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
 
 {# Turn off these tutor blocks
  # All the tutor stuff is dealt with in details_formTeacher
@@ -15,6 +17,31 @@
 
 {% block details_tutorGroup %}
 {% endblock %}
+
+{% block details_hohTeacher %}
+    {% if showClasses %}
+        {% if showHeadOfHouse and hohTeacher %}
+            <dt class="small-4 medium-3 columns">Head of House:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if hohTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
+                {% else %}
+                    {{ hohTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+        {% if showCoordTeacher and coordTeacher %}
+            <dt class="no-margin small-6 medium-3">Head of Year {{ externalUser.StudentYearLevel }}:</dt>
+            <dd class="no-margin small-6 medium-9">
+                {% if coordTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
+                {% else %}
+                    {{ coordTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_hohTeacher %}
 
 {% block details_formTeacher %}
     {% if showClasses %}

@@ -13,7 +13,6 @@
  */
 class Leave_Core_Notice_Admin_Rejected extends Leave_Core_Notice_Parent_Abstract
 {
-
     public function send()
     {
         return;

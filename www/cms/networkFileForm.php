@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -37,14 +38,16 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
         // if file was ajax-uploaded
         if (isset($_POST['attachment'])) {
             try {
-                $factory = new CollectorFactory();
+                /** @var FilesystemProxy $filesystemProxy */
+                $filesystemProxy = $kernel->get('filesystem.storageProxy');
+                $factory         = new CollectorFactory();
                 /** @var Model $result */
                 $result = $factory->build($_POST['attachment'])->getFirst();
                 $fileHandler->create(
                     $file,
                     [
                         'name'     => $result->getBasename(),
-                        'resource' => $result->readStream(),
+                        'resource' => $filesystemProxy->readStream($result),
                     ]
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {

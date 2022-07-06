@@ -27,6 +27,13 @@ use SitePage;
 class UsermediaController extends AbstractController
 {
     /**
+     * The maximum number of files that can be uploaded when multi-uploads
+     * are enabled.
+     */
+    private const DEFAULT_MAX_FILES = 32;
+
+
+    /**
      * @param bool   $multi
      * @param string $mimeFilter
      * @param bool   $useFolder
@@ -77,7 +84,7 @@ class UsermediaController extends AbstractController
         $config = $page->getDi()->get('config');
         $page->setVar(
             array(
-                'MAX_FILES'      => $this->multi ? '32' : '1',
+                'MAX_FILES'      => $this->multi ? self::DEFAULT_MAX_FILES : '1',
                 'MAX_FILE_SIZE'  => $config->get(ConfigMapper::NAME_MAX_FILE_SIZE),
                 'ACCEPTED_FILES' => $mime
             )

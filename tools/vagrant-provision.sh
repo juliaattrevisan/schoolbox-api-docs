@@ -3,13 +3,8 @@
 # * Executed after puppet provisioner has set up host
 # * Installs the vagrantx instance into this host, then invokes puppet again to configure the host for this instance
 
-# Global constants
-readonly SITE_ROOT=/usr/share/schoolbox # Cannot derive this, because it is copied by vagrant to /tmp in guest
-readonly LOG=/usr/bin/alaress-logger
-readonly L_INFO=200;
-readonly L_WARN=300;
-readonly L_ERROR=400;
-readonly cachedir="$SITE_ROOT"/vagrantcache;
+# Global constants and functions
+source /usr/share/schoolbox/tools/vagrant-consts.sh # Cannot derive this, because it is copied by vagrant to /tmp in guest
 
 # Global vars
 # Defaults
@@ -22,16 +17,6 @@ instance_registry_url="https://manage.schoolbox.cloud"
 declare phpversion_supported                                # Must be specified via script arg
 declare aws_iam_key
 declare aws_iam_secret
-
-function log(){
-  $LOG $L_INFO "$1"
-}
-function warn(){
-  $LOG $L_WARN "$1"
-}
-function error(){
-  $LOG $L_ERROR "$1"
-}
 
 if [[ $# -ne 14 ]]; then
   error "Script requires 14 params, found $#"
@@ -59,9 +44,21 @@ if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
 fi
-taskd_build_from_local="${12}";
+taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
+if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
+  error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
+  exit 1
+fi
 aws_iam_key=${13}
 aws_iam_secret=${14}
+
+# Does this environment use the systemd-wrapped taskd service?
+declare taskd_systemd_service_installed
+if [[ $taskd_build_from_local == "0" ]];then
+  taskd_systemd_service_installed="1"
+else
+  taskd_systemd_service_installed="0"
+fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -80,14 +77,6 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
-
-# Function to fetch value from .env file by key
-# Usage: value=$(read_var $key)
-read_var() {
-    VAR=$(grep -E "^\s*$1" "$SITE_ROOT"/.env | xargs)
-    IFS="=" read -ra VAR <<< "$VAR"
-    echo "${VAR[1]}"
-}
 
 s3Referer=$(read_var AWS_S3_REFERER)
 if [[ -z $s3Referer ]]; then
@@ -227,18 +216,37 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
 --config amqp_vhost "'/'" \
+--config boarder_leave_enabled "'1'" \
+--config debug_show_stack_trace "'1'" \
+--config debug_templates "'1'" \
+--config eotc_enabled "'1'" \
 --config external_type "'$external_db'" \
---config external_db_host "'$external_db_host'" \
 --config external_db_db "'$external_db_db'" \
+--config external_db_host "'$external_db_host'" \
+--config external_db_user "'schoolbox'" \
+--config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
+--config fixtures_enabled "'1'" \
+--config gotenberg_host "'http://localhost:3000'" \
 --config instance_registry_url "'$instance_registry_url'" \
+--config ldap_enable "'0'" \
+--config mail_enable "'1'" \
+--config mail_smtp_host "'127.0.0.1'" \
+--config mail_smtp_port "'1025'" \
+--config pastoral_enabled "'1'" \
+--config push_notifications_enabled "'1'" \
+--config qr_login_enabled "'1'" \
 --config redis_url "'tcp://127.0.0.1:6379'" \
 --config redis_ephemeral_url "'tcp://127.0.0.1:6380'" \
+--config resource_booking_enabled "'1'" \
 --config site_domain "'dev.schoolbox.cloud'" \
 --config site_hostname "'vagrant'" \
 --config site_school_code "'vagrant'" \
 --config site_environment "'client-hosted'" \
 --config site_type "'dev'" \
---config title "'Schoolbox [vagrant]'"; then
+--config strict_templates "'1'" \
+--config summative_report_enabled "'1'" \
+--config title "'Schoolbox [vagrant]'" \
+--config ups_groups_enabled "'1'"; then
   error "Unable to install instance. Exiting."
   exit 1
 fi
@@ -247,18 +255,14 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
-# TODO remove this once route+module cache is built in schoolbox-data-refresh.sh
-echo "[SB][`date +%Y-%m-%d\ %X`] Loading route+module cache (should be in schoolbox-data-refresh.sh)";
-"$SITE_ROOT"/tools/module/refresh-cache.php 2>&1;
-
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
-  [FACTER_taskd_build_from_local]="$taskd_build_from_local"
+  [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
   [FACTER_iam_access_key]="$aws_iam_key"
-  [FACTER_iam_access_key]="$aws_iam_secret"
+  [FACTER_iam_secret_key]="$aws_iam_secret"
 )
 for config_name in "${!env_vars[@]}"; do
   config_value=${env_vars[$config_name]}
@@ -279,7 +283,7 @@ done
 echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
 FACTER_vagrant_extra_hostname="$extra_hostname" \
     FACTER_primary_php_majver="$phpversion_supported" \
-    Facter_taskd_build_from_local="$taskd_build_from_local" \
+    FACTER_taskd_systemd_service_installed="$taskd_systemd_service_installed" \
     FACTER_iam_access_key="$aws_iam_key" \
     FACTER_iam_secret_key="$aws_iam_secret" \
     "$SITE_ROOT"/puppet-apply.sh
@@ -439,40 +443,10 @@ else
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-service schoolbox-epl restart;
-eval "service php${phpversion_supported}-fpm restart"
 service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 "$SITE_ROOT"/tools/maintenance/site_up.sh;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Gotenberg service";
-gotenberg_container_ids="$(docker ps -f ancestor=thecodingmachine/gotenberg:6 -q)"
-if [[ -n $gotenberg_container_ids ]]; then
-  echo -e "$gotenberg_container_ids" | xargs docker stop
-fi
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
-docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
-
-
-# Start and rebuild task daemon
-# if `taskd_build_from_local` then build from the mounted taskd dir
-if [ $taskd_build_from_local -gt 0 ]; then
-  "$SITE_ROOT"/tools/taskd/rebuild.sh
-else
-  accessToken=$(read_var DOCKERHUB_ACCESS_TOKEN)
-  if [[ -z $accessToken ]]; then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Cannot start task daemon: not building from local dir, and unable to derive Dockerhub access token from .env environment file";
-  else
-    # Docker login needs the `pass` package to actually accept a password,
-    # otherwise this error gets raised:
-    # "Cannot autolaunch D-Bus without X11 $DISPLAY"
-    apt install -y pass
-    "$SITE_ROOT"/tools/taskd/rebuild.sh --pull-from-dockerhub --dockerhub-access-token=$accessToken
-  fi
-fi;
-
 
 # call custom provisioning
 if [ -f "$SITE_ROOT"/post-provision.sh ];

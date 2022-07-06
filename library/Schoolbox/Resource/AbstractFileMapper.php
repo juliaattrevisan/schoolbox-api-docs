@@ -29,7 +29,6 @@ use Schoolbox\UserMapper;
  */
 abstract class AbstractFileMapper extends Schoolbox\Mapper
 {
-
     /**
      * @var Resource\Storage\Mapper
      */
@@ -151,8 +150,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
             $store = $this->hydrateJoin($r, 'hash', 'h')
                           ->setMimetype($mimetype);
 
-            // ensure the path is set
-            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+//            // ensure the path is set
+//            $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
 
             $file->setStorage($store);
             $file->setOwner($this->hydrateJoin($r, 'owner', 'u'));

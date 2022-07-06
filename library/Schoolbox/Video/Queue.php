@@ -9,11 +9,13 @@
 
 namespace Schoolbox\Video;
 
+use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Transform;
@@ -99,15 +101,15 @@ class Queue extends ResourceVideo
     /**
      * Determines if file is audio or video and does corresponding processing
      *
-     * @param LoggerInterface|null $logger Optional logger for debugging purposes
+     * @param Filesystem           $filesystem Filesystem to write transcodes to
+     * @param LoggerInterface|null $logger     Optional logger for debugging purposes
      *
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function process(LoggerInterface $logger = null)
+    public function process(Filesystem $filesystem, LoggerInterface $logger = null)
     {
         // Grab transcoding configuration
 
@@ -132,11 +134,9 @@ class Queue extends ResourceVideo
 
         try {
             if ($this->getStorage()->getMimetype()->isAudio()) {
-                /** @noinspection PhpDeprecationInspection */
-                $result = $this->processAudio();
+                $result = $this->processAudio($filesystem);
             } elseif ($this->getStorage()->getMimeType()->isVideo()) {
-                /** @noinspection PhpDeprecationInspection */
-                $result = $this->processVideo();
+                $result = $this->processVideo($filesystem);
             }
         } catch (RuntimeException $e) {
             // Re-throw any exception we catch
@@ -183,12 +183,13 @@ class Queue extends ResourceVideo
     /**
      * Take audio file and transcode into MP3 for playback via HTML5 <audio> tag
      *
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processAudio()
+    public function processAudio(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -236,7 +237,7 @@ class Queue extends ResourceVideo
         // Upload transcode to storage
         // ------------------------------------------------------------------------------------------------------------
 
-        $this->uploadTranscode($filenameTranscodeAudio);
+        $this->uploadTranscode($filesystem, $filenameTranscodeAudio);
 
         // Try to retrieve audio duration from command output
 
@@ -248,13 +249,13 @@ class Queue extends ResourceVideo
     /**
      * Takes existing file and transcode into web format and creates thumbnail
      *
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @return bool
      *
      * @throws MapperException
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws \League\Flysystem\UnableToReadFile
      */
-    public function processVideo()
+    public function processVideo(Filesystem $filesystem)
     {
         // ------------------------------------------------------------------------------------------------------------
         // Setup
@@ -337,7 +338,7 @@ class Queue extends ResourceVideo
         // Upload transcoded video to storage and update the file size
         // ------------------------------------------------------------------------------------------------------------
 
-        $this->uploadTranscode($filenameTranscodeVideo);
+        $this->uploadTranscode($filesystem, $filenameTranscodeVideo);
 
         // ------------------------------------------------------------------------------------------------------------
         // Create thumbnail & poster if the video had a valid duration, otherwise skip it
@@ -368,7 +369,7 @@ class Queue extends ResourceVideo
             // Upload thumbnail to storage
 
             $this->log("Uploading video thumbnail");
-            $this->uploadPreviewImage($filenameTranscodeThumbnail, $this->getThumbnailPath());
+            $this->uploadPreviewImage($filesystem, $filenameTranscodeThumbnail, $this->getThumbnailPath());
 
             // Create poster
 
@@ -391,7 +392,7 @@ class Queue extends ResourceVideo
             // Upload poster to storage
 
             $this->log("Uploading video poster");
-            $this->uploadPreviewImage($filenameTranscodePoster, $this->getPosterPath());
+            $this->uploadPreviewImage($filesystem, $filenameTranscodePoster, $this->getPosterPath());
         } else {
             $this->log("Skipping thumbnail and poster generation");
         }
@@ -404,12 +405,13 @@ class Queue extends ResourceVideo
     // ----------------------------------------------------------------------------------------------------------------
 
     /**
+     * @param Filesystem $filesystem Filesystem to write transcodes to
      * @param string $filename
      */
-    private function uploadTranscode($filename)
+    private function uploadTranscode(Filesystem $filesystem, $filename)
     {
         $this->log('Saving transcode to storage');
-        $this->getStorage()->getFilesystem()->put($this->getTranscodePath(), file_get_contents($filename));
+        $filesystem->write($this->getTranscodePath(), file_get_contents($filename));
 
         $this->log('Deleting local transcode file');
         unlink($filename);
@@ -425,7 +427,7 @@ class Queue extends ResourceVideo
      */
     private function getSourceLocation($sourceObject)
     {
-        return $this->getConfig()->get('storage_dir') . '/' . $sourceObject->getPath();
+        return $this->getConfig()->get('storage_dir') . '/' . FilesystemProxy::getPathFromHash($sourceObject->getHash());
     }
 
 
@@ -451,7 +453,10 @@ class Queue extends ResourceVideo
             $this->log('Downloading file to local disk');
             $mediaFilename = $this->getTempFilename("{$storage->getHash()}-source", $storage->getExtension());
             $mediaFileOut  = fopen($mediaFilename, "w");
-            $this->getStorage()->pipe($mediaFileOut);
+            stream_copy_to_stream(
+                $this->storageMapper->getStorageFilesystemProxy()->readStream($this->getStorage()),
+                $mediaFileOut,
+            );
             fclose($mediaFileOut);
 
             // Remember that we created this temporary file so we can delete it later
@@ -473,22 +478,19 @@ class Queue extends ResourceVideo
     /**
      * Upload preview image to storage
      *
-     * @param string $fileName        Local filename to be uploaded
-     * @param string $destinationPath Destination to which the image should be uploaded
-     * @throws \League\Flysystem\FileExistsException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @param Filesystem        $filesystem      Filesystem to write transcodes to
+     * @param string            $fileName        Local filename to be uploaded
+     * @param string            $destinationPath Destination to which the image should be uploaded
+     * @throws \League\Flysystem\UnableToReadFile
      * @throws MapperException
      */
-    private function uploadPreviewImage(string $fileName, string $destinationPath): void
-    {
-
+    private function uploadPreviewImage(
+        Filesystem $filesystem,
+        string $fileName,
+        string $destinationPath
+    ): void {
         // If it already exists we have to update, otherwise write
-
-        if ($this->getStorage()->getFilesystem()->has($destinationPath)) {
-            $this->getStorage()->getFilesystem()->update($destinationPath, file_get_contents($fileName));
-        } else {
-            $this->getStorage()->getFilesystem()->write($destinationPath, file_get_contents($fileName));
-        }
+        $filesystem->write($destinationPath, file_get_contents($fileName));
 
         $this->createStorageTransform($destinationPath, filesize($fileName));
         // Remove the thumbnail
@@ -519,7 +521,7 @@ class Queue extends ResourceVideo
         if ($transformModel) {
             $transformMapper->save($transformModel->setSize($fileSize)->setState(Transform\Model::STATE_DONE));
         } else {
-            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE);
+            $transformMapper->createRecord($hash, $cacheKey, $fileSize, Transform\Model::STATE_DONE, 'jpg');
         }
     }
 

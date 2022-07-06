@@ -21,6 +21,7 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\LogTrait;
 use Schoolbox\Learning\Turnitin\ValidFile;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -50,7 +51,7 @@ class Transmit
      *
      * https://developers.turnitin.com/docs/tca#groups
      */
-    private const REPORT_GENERATION_COLLUSION = 'IMMEDIATELY_AND_DUE_DATE';
+    public const REPORT_GENERATION_COLLUSION = 'IMMEDIATELY_AND_DUE_DATE';
 
 
     /**
@@ -96,6 +97,12 @@ class Transmit
 
 
     /**
+     * @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy
+     */
+    private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy;
+
+
+    /**
      * Constructor.
      *
      * @param string                $instanceIdentifier
@@ -105,6 +112,7 @@ class Transmit
      * @param UserMapper            $userMapper
      * @param SubmissionBoxMapper   $boxMapper
      * @param SingleFile\Mapper     $ssfMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy
      * @param LoggerInterface|null  $log
      */
     public function __construct(
@@ -115,6 +123,7 @@ class Transmit
         UserMapper $userMapper,
         SubmissionBoxMapper $boxMapper,
         SingleFile\Mapper $ssfMapper,
+        \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
         ?LoggerInterface $log = null
     ) {
         $this->instanceIdentifier = $instanceIdentifier;
@@ -124,6 +133,7 @@ class Transmit
         $this->userMapper = $userMapper;
         $this->boxMapper = $boxMapper;
         $this->ssfMapper = $ssfMapper;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->log = $log;
     }
 
@@ -401,10 +411,14 @@ class Transmit
         if ('' === (string)$group->getGroupId()) {
             $groupId = (new Turnitin\Group\IdCodec())->encode($box->getId(), $this->instanceIdentifier);
 
+            /* Fish out due dates from the official Assessment table
+             */
+            $assessment = $this->assessmentMapperProxy->findById($box->getAssessmentId());
+
             $newGroup = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
                 'name' => $box->getName(),
                 'type' => Turnitin\Group\Process\Group::GROUP_TYPE,
-                'due_date' => gmdate("Y-m-d\TH:i:s\Z", $box->getDueDate()->getUnixTimeStamp()),
+                'due_date' => $assessment->getDueAt()->getZuluTime(),
                 'report_generation' => self::REPORT_GENERATION_COLLUSION,
             ]);
 
@@ -520,7 +534,7 @@ class Transmit
          */
         $eulaResult = $this->api->retrieve('POST', '/api/v1/eula/v1beta/accept', [
             'user_id' => $owner->getId(),
-            'accepted_timestamp' => gmdate("Y-m-d\TH:i:s\Z"),
+            'accepted_timestamp' => \Alaress_Date_Format::now()->getZuluTime(),
             'language' => self::EULA_LANGUAGE
         ]);
 
@@ -607,9 +621,10 @@ class Transmit
             Turnitin\File\Model::STATUS_TRANSMIT_UPLOADING
         );
 
+        // TODO inject filesystem proxy
         $payload = [
             'filename' => $ssf->getBasename(),
-            'contents' => $ssf->read()
+            'contents' => StorageMapper::getInstance()->getStorageFilesystemProxy()->read($ssf)
         ];
 
         return $this->api->retrieve('UPLOAD', "/api/v1/submissions/{$submission['id']}/original", $payload);

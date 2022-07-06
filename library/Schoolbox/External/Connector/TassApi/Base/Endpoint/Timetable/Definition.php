@@ -39,6 +39,18 @@ class Definition implements IStrategy
     private const CYCLE_END = '2999-01-01 00:00:00';
     private const CYCLE_DEFAULT_DAY_NUMBER = 1;
 
+
+    /**
+     * A set of option related to our ability to detect Current Semester
+     */
+    private const ACADEMIC_PERIOD_KEYS = [
+        ['tap1start', 'tap1end'],
+        ['tap2start', 'tap2end'],
+        ['tap3start', 'tap3end'],
+        ['tap4start', 'tap4end']
+    ];
+
+
     /**
      * @var LoggerInterface
      */
@@ -49,6 +61,15 @@ class Definition implements IStrategy
      * @var array
      */
     private array $api;
+
+
+    /**
+     * This is the config setting for date_local
+     * It's used by the Nat Picker in the optional TASS Academic Periods area
+     *
+     * @var string
+     */
+    private string $dateLocalFormat;
 
 
     /**
@@ -95,6 +116,7 @@ class Definition implements IStrategy
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Api[]                 $api
+     * @param string                $dateLocalFormat
      * @param Lookup                $lookup
      * @param Registry              $timetableRegistry
      * @param Registry              $cycleRegistry
@@ -105,6 +127,7 @@ class Definition implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        string $dateLocalFormat,
         Lookup $lookup,
         Registry $timetableRegistry,
         Registry $cycleRegistry,
@@ -114,6 +137,7 @@ class Definition implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->dateLocalFormat = $dateLocalFormat;
         $this->lookup = $lookup;
 
         /* Store timetableCache and cycleCache in a registry object that its output
@@ -418,7 +442,8 @@ class Definition implements IStrategy
          * The getTeacherTimetable endpoint is different to students' version
          */
         $year = date('Y');
-        $semester = (string)$this->getCurrentSemester();
+
+        $semester = $this->detectSemester($this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
         /* Inspect every staff's timetable
          */
@@ -431,6 +456,76 @@ class Definition implements IStrategy
 
             $this->preloadTimetable((string)$externalId, $person, $data, 'teacher_timetable');
         }
+    }
+
+
+    /**
+     * This bypasses the dependency on tass to fix the way to get Current Semester
+     *
+     * For the given set of TASS Academic Period dates, find out which "semester" we are currently in
+     * A school running 4 term years will have $semester available in tass as 1 through to 4, which
+     * isn't what a semester really is, because tass reasons...
+     *
+     * Check each of the pairs until we find the first match where: Start <= Now <= End
+     *
+     * @param array $options
+     * @return int
+     * @throws \InvalidArgumentException
+     */
+    public function detectSemester(array $options): int
+    {
+        $now = \Alaress_Date_Format::now();
+
+        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $pair) {
+            /* If both were defined, check Start <= Now <= End
+             * This returns the first semester that fulfils the date requirements
+             *
+             * Otherwise, continue trying
+             */
+            [$startKey, $endKey] = $pair;
+
+            $start = trim((string)($options[$startKey] ?? null));
+            $end = trim((string)($options[$endKey] ?? null));
+
+            /* One of the pairs is inconclusive - keep going
+             */
+            if ('' === $start || '' === $end) {
+                continue;
+            }
+
+            /* Check Alaress Date Format boundaries
+             */
+            $startDate = (new \Alaress_Date_Format($start, $this->dateLocalFormat))->startOfDay();
+            $endDate = (new \Alaress_Date_Format($end, $this->dateLocalFormat))->endOfDay();
+
+            /* If it is, return that $pair's index+1, since:
+             *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
+             *     but it corresponds to "semester 1" in tass.
+             */
+            if ($now->between($startDate, $endDate)) {
+                $semester = $index + 1;
+
+                $this->log->debug(sprintf(
+                    'Detected TASS Academic Period %s via DSN options; using that as semester value',
+                    $semester
+                ));
+
+                return $semester;
+            }
+        }
+
+        /* If none of the Academic Periods help us figure out what semester
+         * we're currently in, fall back to the default presumptive behaviour of
+         * guessing that Jan-Jun is Semester 1, and everything else is semester 2
+         */
+        $semester = $this->getCurrentSemester();
+
+        $this->log->debug(sprintf(
+            'Detecting semester %s with classic assumption; using that as semester value',
+            $semester
+        ));
+
+        return $semester;
     }
 
 

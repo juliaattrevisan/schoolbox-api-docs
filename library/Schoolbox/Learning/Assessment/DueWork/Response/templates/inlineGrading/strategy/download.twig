@@ -19,22 +19,12 @@
 
                             {# Similarity Check #}
                             {% include '@learning/dueWork/similarity/status.twig' with {
-                                plagscanApiEnabled: plagscanApiEnabled,
                                 turnitinApiEnabled: turnitinApiEnabled,
                                 currentFile: file
                             } %}
                         </div>
                     </div>
                     <nav>
-                        {# Similarity Check #}
-                        {% include '@learning/dueWork/plagscan/link.twig' with {
-                            assessmentId: assessment.id,
-                            assessment:   assessment,
-                            responseId:   response.id,
-                            response:     response,
-                            participant:  participant,
-                            currentFile: file
-                        } %}
                         <a href="/storage/fetch.php?hash={{ file.hash }}" class="icon-download" title="Download"></a>
                     </nav>
                 </li>

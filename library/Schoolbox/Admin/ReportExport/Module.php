@@ -94,7 +94,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(UserBulkMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\RoleMapper::class),
-            $this->injector->get('user.tokenBuilder'),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),

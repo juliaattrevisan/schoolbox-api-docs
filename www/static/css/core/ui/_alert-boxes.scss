@@ -86,7 +86,7 @@ $alert-transition-ease: ease-out;
   color: $alert-close-color;
   font-size: $alert-close-font-size;
   line-height: .9;
-  margin-top: -($alert-close-font-size / 2);
+  margin-top: calc(($alert-close-font-size * -1) / 2);
   opacity: $alert-close-opacity;
   padding: $alert-close-padding;
   position: absolute;
@@ -138,9 +138,14 @@ $alert-default-background: css-darken($body-bg, 10%);
 .alert-box {
     background-color: $alert-default-background;
     color: $body-bg-contrast;
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
-
+    print-color-adjust: exact;
+    a {
+        &:not(.close) {
+            color: inherit;
+            text-decoration: underline;
+        }
+    }
     .close {
         &:hover {
             text-decoration: none;

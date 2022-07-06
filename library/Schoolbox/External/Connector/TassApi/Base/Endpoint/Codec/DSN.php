@@ -56,6 +56,30 @@ class DSN implements IDSN
 
 
     /**
+     * This character separates module-related tuples from each other
+     */
+    private const MODULE_SEPARATOR = ',';
+
+
+    /**
+     * This character separates module configuration tuples from each otehr
+     */
+    private const MODULE_TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * This character separates module-related tuples from option tuples
+     */
+    private const OPTION_SEPARATOR = '?';
+
+
+    /**
+     * Optional params we permitted in SUDS Config
+     */
+    private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
+
+
+    /**
      * The expected key-value tuples per module
      * At the moment we expect three keys which should have three values
      */
@@ -71,9 +95,19 @@ class DSN implements IDSN
      */
     public function decode(string $dsn): array
     {
-        $dsnParts = explode(',', $dsn);
-        $struct = [];
+        $bits = explode(self::OPTION_SEPARATOR, $dsn);
+        $modules = $bits[0];
+        $options = $bits[1] ?? null;
 
+        $dsnParts = explode(self::MODULE_SEPARATOR, $modules);
+
+        $struct = [
+            'modules' => [],
+            'options' => []
+        ];
+
+        /* Break apart module config
+         */
         foreach ($dsnParts as $dsnPart) {
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
@@ -105,11 +139,31 @@ class DSN implements IDSN
                 throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
-            $struct[$matches[1]] = [
+            $struct['modules'][$matches[1]] = [
                 'companycode' => $matches[2],
                 'appcode' => $matches[3],
                 'token' => $matches[4]
             ];
+        }
+
+        /* Break apart optional config
+         */
+        if (null !== $options) {
+            /* No tuples, but you gave an option separator; malformed DSN
+             * Looks like there were supposed to be options, but none exist
+             */
+            if ('' === $options) {
+                throw new DomainException('Detected option separator but no options found');
+            }
+
+            $dsnParts = explode(self::MODULE_TUPLE_SEPARATOR, $options);
+
+            foreach ($dsnParts as $dsnPart) {
+                $matches = [];
+                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
+
+                $struct['options'][$matches[1]] = $matches[2];
+            }
         }
 
         return $struct;
@@ -128,7 +182,7 @@ class DSN implements IDSN
     {
         $struct = [];
 
-        foreach ($parts as $module => $pairs) {
+        foreach ($parts['modules'] as $module => $pairs) {
             /* Skip encoding of the optional schoolcalendarandnotices
              * if none of its parts were meaningful
              */
@@ -144,9 +198,29 @@ class DSN implements IDSN
                 $tuples[] = "{$key}={$value}";
             }
 
-            $struct[] = $module . implode(';', $tuples);
+            $struct[] = $module . implode(self::MODULE_TUPLE_SEPARATOR, $tuples);
         }
 
-        return implode(',', $struct);
+        /* Encode option pieces
+         */
+        $options = [];
+
+        foreach ($parts['options'] as $key => $value) {
+            $options[] = "{$key}={$value}";
+        }
+
+        $moduleEncoding = implode(self::MODULE_SEPARATOR, $struct);
+        $optionEncoding = implode(self::MODULE_TUPLE_SEPARATOR, $options);
+
+        if (\count($options)) {
+            return sprintf(
+                '%s%s%s',
+                $moduleEncoding,
+                self::OPTION_SEPARATOR,
+                $optionEncoding
+            );
+        }
+
+        return $moduleEncoding;
     }
 }

@@ -15,12 +15,13 @@
 namespace Calendar\Event\Type\Submission;
 
 use Calendar\Event\Type\EventBase;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Event extends EventBase
 {
-
     /* Contextual: The owner of the submission box
       */
     protected $authorId   = -1;
@@ -63,7 +64,7 @@ class Event extends EventBase
     /**
      * Get category codes
      *
-     * @return array
+     * @return GenericCollection<FolderCode>|null
      */
     public function getCategoryCodes()
     {

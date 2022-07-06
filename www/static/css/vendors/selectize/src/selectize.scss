@@ -287,7 +287,7 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
         position: absolute;
         top: 50%;
         right: $selectize-arrow-offset;
-        margin-top: round(-$selectize-arrow-size / 2);
+        margin-top: round(calc(($selectize-arrow-size * -1) / 2));
         width: 0;
         height: 0;
         border-style: solid;

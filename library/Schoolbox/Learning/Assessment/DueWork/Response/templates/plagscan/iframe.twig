@@ -1,23 +1,23 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {# Conditional bread?? -_-
- #}
+#}
 {% if assessment.context is project %}
     {% set nodes = [
-    ['Learning', routeLookupIfAuthorized('learning.getClasses')],
-    [assessment.context.folder.name, routeLookupIfAuthorized('learningMarkbook.getMarkbookForClass', {folder: assessment.context.folder, folderId: assessment.context.folder.id}) ],
-    [assessment.context.title, routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId: assessment.context.id, student: participant.user, studentId: response.submittedOnBehalfOf.id}) ],
-    [assessment.title, routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id})],
-    ['Inline Grader', routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
-    ['Similarity Report', null]
+        ['Learning', routeLookupIfAuthorized('learning.getClasses')],
+        [assessment.context.folder.name, routeLookupIfAuthorized('learningMarkbook.getMarkbookForClass', {folder: assessment.context.folder, folderId: assessment.context.folder.id}) ],
+        [assessment.context.title, routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId: assessment.context.id, student: participant.user, studentId: response.submittedOnBehalfOf.id}) ],
+        [assessment.title, routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id})],
+        ['Inline Grader', routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
+        ['Similarity Report', null]
     ] %}
 {% else %}
     {% set nodes = [
-    ['Learning', routeLookupIfAuthorized('learning.getClasses')],
-    [assessment.context.folder.name, routeLookupIfAuthorized('learningMarkbook.getMarkbookForClass', {folder: assessment.context.folder, folderId: assessment.context.folder.id})],
-    [assessment.title, routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id})],
-    ['Inline Grader', routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
-    ['Similarity Report', null]
+        ['Learning', routeLookupIfAuthorized('learning.getClasses')],
+        [assessment.context.folder.name, routeLookupIfAuthorized('learningMarkbook.getMarkbookForClass', {folder: assessment.context.folder, folderId: assessment.context.folder.id})],
+        [assessment.title, routeLookupIfAuthorized('learningAssessment.getStatus', {assessment: assessment, assessmentId: assessment.id})],
+        ['Inline Grader', routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response})],
+        ['Similarity Report', null]
     ] %}
 {% endif %}
 
@@ -35,4 +35,3 @@
         plagscanId:   plagscan.plagscanId})
     }}"></iframe>
 {% endif %}
-

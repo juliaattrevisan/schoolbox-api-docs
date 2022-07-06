@@ -11,6 +11,8 @@
 namespace Schoolbox;
 
 use InvalidArgumentException;
+use PDO;
+use Schoolbox\Mapper\Exception\CallbackException;
 
 /**
  * @method Role createModel($idValue = null)
@@ -22,7 +24,6 @@ use InvalidArgumentException;
  */
 class RoleMapper extends Mapper
 {
-
     /**
      * Setup mapper
      *
@@ -57,6 +58,7 @@ class RoleMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
 
@@ -117,5 +119,29 @@ class RoleMapper extends Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Role $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Role $model): bool
+    {
+        if (trim($model->getName() ?? '') === '') {
+            throw new CallbackException("Role name cannot be empty");
+        }
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A Role with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
+        }
+
+        return true;
     }
 }

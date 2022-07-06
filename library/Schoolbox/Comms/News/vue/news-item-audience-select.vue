@@ -63,6 +63,9 @@ export default {
              */
             audienceBricks: [],
 
+            // The audience string for form submission, generated from the list of audience bricks in this.audienceBricks
+            audienceFormString: '',
+
             // Preloader and empty state showing/hiding for the 2nd screen
             showLoader: true,
             showEmptyState: false,
@@ -200,18 +203,25 @@ export default {
             }
         },
 
+    },
+
+    watch: {
+
         //To create an audience string to add to the form submission, linked to the audienceBricks rather than the selectize element
         //This is needed as it's possible to delete audience bricks just by tapping the backspace in the audience input field a few times...
         //Which would result in the bricks displayed in the custom UI not matching what's actually going to be submitted
-        audienceFormString() {
-            const encodedAudienceSegments = [];
-            this.audienceBricks.forEach(function (brick) {
-                brick.segments.forEach(function (segment) {
-                    encodedAudienceSegments.push(codec.encode(segment));
+        audienceBricks: {
+            handler () {
+                const encodedAudienceSegments = [];
+                this.audienceBricks.forEach((brick) => { //loop through each brick
+                    brick.segments.forEach((segment) => { //and then each segment within
+                        encodedAudienceSegments.push(codec.encode(segment)); //to add each into the array
+                    });
                 });
-            });
-            return encodedAudienceSegments.join(','); //for a comma delimited segment string
-        },
+                this.audienceFormString = encodedAudienceSegments.join(','); //then create a comma delimited segment string
+            },
+            deep: true, //we need to watch 'deeply', as there can be changes in the 'segments' within each 'audienceBrick'
+        }
 
     },
 
@@ -695,9 +705,9 @@ export default {
         <div data-reveal id="audience-browse" class="reveal-modal no-pad">
 
             <template v-if="canCreateComplex">
-                <dl class="tabs text-center" role="tablist">
-                    <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Audience</a></dd>
-                    <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Composite Audience</a></dd>
+                <dl class="tabs text-center" role="list">
+                    <dd :class="{ active: pageShow.index || pageShow.valueSelect }"><a @click="showPage('index')">Select Audience</a></dd>
+                    <dd :class="{ active: pageShow.intersect }"><a @click="advancedToggle()">Create Composite Audience</a></dd>
                 </dl>
             </template>
 

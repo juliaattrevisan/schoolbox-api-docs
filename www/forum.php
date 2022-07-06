@@ -87,7 +87,7 @@ if ($perm >= UserAccess::ACCESS_WRITE) {
 
 /* output pagination */
 
-$threadList = $threadMapper->findByColumn('categoryID', $category->getId())->getAll();
+$threadCount = $threadMapper->countByColumn('categoryID', $category->getId());
 $pageNum = $this->arg[1] ?? 1;
 
 if (!$pageNum) {
@@ -95,7 +95,7 @@ if (!$pageNum) {
 }
 
 $threadPerPage = \Schoolbox\Forum\ThreadMapper::FORUM_THREADS_PER_PAGE;
-$totalPages = count($threadList) ? ceil(count($threadList) / $threadPerPage) : 0;
+$totalPages = $threadCount ? ceil($threadCount / $threadPerPage) : 0;
 $threadIndex = $threadPerPage * ($pageNum - 1);
 
 $this->setVar(array(
@@ -150,7 +150,6 @@ $threadList = new \Schoolbox\Collection($threadMapper->findByColumn(
 )->getAll());
 
 if (0 !== count($threadList)) {
-    $userHandler = new User();
     $j = 0;
     $threadPostCounts = $threadMapper->findPostCount($threadList);
     foreach ($threadList as $thread) {
@@ -162,7 +161,6 @@ if (0 !== count($threadList)) {
             'THREAD_AUTHOR_EXTERNAL_ID' => $thread->getUser()->getExternalId(),
             'THREAD_TIME' => $thread->getDate()->getRelativeTime(),
             'THREAD_LAST_POST_TIME' => $thread->getLastPostDate()->getRelativeTime(),
-            'THREAD_LAST_POST_ID' => $thread->getLastPost()->getId(),
             'THREAD_LAST_POST_USER_EXTERNAL_ID' => $thread->getLastPostUser()->getExternalId(),
             'THREAD_LAST_POST_USER_ID' => $thread->getLastPostUser()->getId(),
             'THREAD_LAST_POST_USER' => $thread->getLastPostUser()->getFullname(),

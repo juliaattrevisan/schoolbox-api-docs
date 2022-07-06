@@ -8,10 +8,10 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Component_Homepage_RSSController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -36,11 +36,19 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             // Initialise feed
             $rss = new Alaress_Rss_Stream($this->getConfig('url'));
             $rss->setLimit($this->getConfig('size'));
-            $rss->stream();
 
-            // Process each item in feed
-            $allRss = $rss->getOutput();
-
+            try {
+                $rss->stream();
+                // Process each item in feed
+                $allRss = $rss->getOutput();
+            } catch (SchoolboxException $e) {
+                /**
+                 * `$rss->stream()` has the ability to throw a `SchoolboxException` usually due to a Guzzle exception
+                 * will only occur when the cache gets the URL the first time, or on a cache refresh.
+                 * catch this and set an empty state.
+                 */
+                $allRss = [];
+            }
             if (count($allRss) == 0) {
                 $emptyState = true;
             }

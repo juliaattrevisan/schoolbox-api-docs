@@ -27,7 +27,6 @@ use Schoolbox\Resource\Storage;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *
@@ -95,10 +94,10 @@ class Mapper extends Schoolbox\Mapper
                                    ->hydrateJoin($r, 'allowedFileExtension', 'm')
                           );
 
-            // ensure path is set
-            if (!$store->getPath()) {
-                $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
-            }
+//            // ensure path is set
+//            if (!$store->getPath()) {
+//                $store->setPath($this->getStorageMapper()->getManager()->calcPath($store));
+//            }
 
             $log->setStorage($store);
 

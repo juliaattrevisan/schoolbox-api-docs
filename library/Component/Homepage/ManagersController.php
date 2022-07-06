@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -230,8 +230,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 && $this->getUser()->getRole()->isStaff()
             ) {
                 $this->setVar([
-                    "REPLYTO" => $this->getUser()->getEmail(),
-                    "EMAILALL" => implode(AbstractMailer::implodeGlue(), array_unique($emailAll)),
+                                  "REPLYTO" => $this->getUser()->getEmail(),
+                                  "EMAILALL" => implode(Mailer::implodeGlue(), array_unique($emailAll)),
                 ]);
 
                 $this->parse("member_email_block", "member_email");

@@ -332,6 +332,9 @@ set upsConfig = {
                             <dt class="small-6">first</dt>
                             <dd class="small-6">Returns only the first character</dd>
 
+                            <dt class="small-6">cutfirst</dt>
+                            <dd class="small-6">Returns all after the first character</dd>
+
                             <dt class="small-6">alpha</dt>
                             <dd class="small-6">Strips all non-alpha characters</dd>
 
@@ -353,6 +356,7 @@ set upsConfig = {
                             {:lastname|uc} = ALLEN-SMITH<br />
                             {:lastname|lc} = allen-smith<br />
                             {:lastname|first} = A<br />
+                            {:lastname|cutfirst} = llen-Smith<br />
                             {:lastname|alpha} = AllenSmith<br />
                             {:lastname|alpha|lc} = allensmith<br />
                             <br />
@@ -376,6 +380,17 @@ set upsConfig = {
                         <p>
                             When matching against a string, you may use ? to match a single character, or * to match against many characters.  For example “*cat*” will match anything that contains the string “cat”.
                         </p>
+                        <p>
+                            String matches are case-insensitive: therefore, “*cat*” will also match anything containing “Cat”, “CAT” or any other combination of uppercase and lowercase letters.
+                        </p>
+                        <p>
+                            String matching works when matching SIS data against:
+                        </p>
+                        <ul>
+                            <li>the “SIS Values” field of a General condition</li>
+                            <li>the “SIS Output” fields of a Maps effect</li>
+                        </ul>
+
                         <table>
                             <thead>
                             <tr>

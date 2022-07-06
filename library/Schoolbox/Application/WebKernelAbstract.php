@@ -13,8 +13,10 @@ use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
 use Database;
 use InvalidArgumentException;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use RuntimeException;
 use Crell\ApiProblem\ApiProblem;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
 use Schoolbox\IConfigLoader;
@@ -92,9 +94,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if ($e instanceof \Throwable) {
             $isException = true;
 
+            // Special case for oAuth exceptions:
+            // they provide a hint about what might've gone wrong
+            $message = $e->getMessage();
+            if ($e instanceof OAuthServerException) {
+                $message = sprintf('%s (Hint: %s)', $message, $e->getHint());
+            }
             $error = [
                 'file'    => $e->getFile(),
-                'message' => $e->getMessage(),
+                'message' => $message,
                 'line'    => $e->getLine(),
                 'type'    => $e->getCode(),
             ];
@@ -123,6 +131,18 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $code    = $e->getHttpStatusCode();
                     $message = $e->getMessage();
                     $info    = '';
+                } elseif ($e instanceof JwtParser\Exception\Unparseable) {
+                    $code    = 401;
+                    $message = 'Schoolbox could not parse your auth token.';
+                    $info    = $e->getMessage();
+                } elseif ($e instanceof JwtParser\Exception\Rejected) {
+                    $code    = 401;
+                    $message = 'Schoolbox has detected a problem with your auth token.';
+                    $info    = $e->getMessage();
+                } elseif ($e instanceof JwtParser\Exception\InvalidIdentity) {
+                    $code    = 401;
+                    $message = 'Schoolbox has detected that your auth token identifies an invalid user.';
+                    $info    = $e->getMessage();
                 } elseif (
                     ($e instanceof \PDOException && $e->getCode() === "70100") ||
                     ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100")
@@ -141,6 +161,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $message          = $error['message'];
                     $infoFromLocation = true;
                 } else {
+                    $info             = sprintf('%s %s', $info, $error['message']);
                     $message          = 'Schoolbox has encountered a fatal error.';
                     $infoFromLocation = true;
                 }
@@ -344,10 +365,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
                     $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
-                        $problem['trace'] = array_merge(
-                            [$error],
-                            $e instanceof \Throwable ? $e->getTrace() : $e['trace']
-                        );
+                        $problem['trace'] = $e instanceof \Throwable
+                            ? $e->getTrace()
+                            : ($e['trace'] ?? []);
                     }
 
                     /** @var Output\Json $output */

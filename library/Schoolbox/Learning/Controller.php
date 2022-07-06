@@ -9,7 +9,7 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Config\ConfigMapper;
@@ -339,7 +339,7 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-            'emailSeparator'            => AbstractMailer::implodeGlue(),
+            'emailSeparator'            => Mailer::implodeGlue(),
         ])->getAsString();
     }
 

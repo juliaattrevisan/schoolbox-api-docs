@@ -19,6 +19,7 @@ use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -50,7 +51,6 @@ use Alaress_Date_Format;
  */
 class ListController extends Web\Controller\Base
 {
-
     /**
      * @var UserMapper
      */
@@ -87,7 +87,7 @@ class ListController extends Web\Controller\Base
     protected $unitSpecificationMapper;
 
     /**
-     * @var GenericCollection|null $existingParticipationPerUser
+     * @var Collection<GenericCollection>|null $existingParticipationPerUser
      */
     private $existingParticipationPerUser;
 
@@ -756,9 +756,11 @@ class ListController extends Web\Controller\Base
             ], ['cache' => false]);
 
             // userId => plan (should only have one plan per user)
-            $this->existingParticipationPerUser = $allExistingParticipation->groupByCallback(function (ParticipantModel $model) {
-                return $model->getUser()->getId();
-            });
+            $this->existingParticipationPerUser = $allExistingParticipation->groupByCallback(
+                function (ParticipantModel $model) {
+                    return $model->getUser()->getId();
+                }
+            );
         }
 
         // Check to see whether only one participation exists for the current user and get it

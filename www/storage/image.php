@@ -8,15 +8,15 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\ProcessorFactory;
 use Alaress\Image\Transformation;
-use League\Flysystem\Filesystem;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -27,24 +27,22 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
         $size = $_GET['size'] ?? 'maxsize';
-        $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $fileSystem = $resource->getFilesystem();
-
-        $transforms = new Transformation\Storage();
-
-        if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
-            /** @var IConfigLoader $config */
-            $config = $kernel->get('config');
-
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
+        $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
+        $transforms      = new Transformation\Storage();
+        /** @var IConfigLoader $config */
+        $config = $kernel->get('config');
+        if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
             if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
-                $preSignedUrlService = new PreSignedUrlService($config);
-
-                $resourcePath = $resource->getPath();
-
+                $preSignedUrlService    = new PreSignedUrlService($config);
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $resource,
                     Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                    $transforms->getTranscodePath($resourcePath, $transforms->getCacheKey($size))
+                    $transforms->getTranscodePath(
+                        FilesystemProxy::getPathFromHash($resource->getHash()),
+                        $transforms->getCacheKey($size),
+                    ),
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);
@@ -59,10 +57,16 @@ try {
             ShutdownHandler::PRIORITY_HIGHEST,
         );
 
-        $imageProcessor = new Image\Processor($resource, $transforms->getCacheKey($size), $transforms->retrieve($size));
+        /** @var ProcessorFactory $processorFactory */
+        $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+        $imageProcessor   = $processorFactory->buildForStorage(
+            $resource,
+            $transforms->getCacheKey($size),
+            $transforms->retrieve($size),
+        );
         $imageProcessor->load()->stream();
     }
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
 } catch (Exception $e) {

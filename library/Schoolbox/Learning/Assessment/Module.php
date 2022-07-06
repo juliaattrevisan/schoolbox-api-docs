@@ -445,6 +445,7 @@ class Module extends BaseModule
                     $this->injector->get('feedbackDataSource'),
                     $folderMapper,
                     $viewLatestMapper,
+                    $this->injector->get('filesystem.storageProxy'),
                 );
 
             case Assessment\Project\Controller::class:

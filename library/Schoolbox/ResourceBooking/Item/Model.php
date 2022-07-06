@@ -22,7 +22,6 @@ use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
-
     /**
      * @var int
      */
@@ -512,9 +511,12 @@ class Model implements ISoftDeletable, JsonSerializable
                 return true;
             }
         }
-        foreach ($this->getModeratorList() as $moderator) {
-            if ($moderator->getId() == $user->getId()) {
-                return true;
+        //if there are no moderators, do not attempt to iterate through the null
+        if (null !== $this->getModeratorList()) {
+            foreach ($this->getModeratorList() as $moderator) {
+                if ($moderator->getId() == $user->getId()) {
+                    return true;
+                }
             }
         }
         return false;

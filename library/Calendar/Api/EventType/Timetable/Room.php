@@ -151,7 +151,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 // this gets around issue SB-5493 (where events that haven't
                 // occured yet only show to superusers)
                 $event->setPublishDate(null);
-                $event->setTitle($room['Description'] . ' (' . $room['ClassCode'] . ')');
+                $event->setTitle($room['Description'] . (!empty((string)$room['ClassCode']) ? ' (' . $room['ClassCode'] . ')' : ''));
                 $event->setCampusList($campusId);
                 $event->setResourceId($this->roomCodes[$room['RoomCode']]);
 
@@ -179,7 +179,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                         $room['ClassCode']
                     );
                 }
-                if ($categoryList[$key] instanceof FolderModel) {
+                if (($categoryList[$key] ?? null) instanceof FolderModel) {
                     $event->setCategoryId($categoryList[$key]->getId());
                     $event->setCategoryName($categoryList[$key]->getName());
                 }

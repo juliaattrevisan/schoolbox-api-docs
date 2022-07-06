@@ -9,6 +9,7 @@
 namespace Schoolbox;
 
 use PDO;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
 
@@ -22,7 +23,6 @@ use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
  */
 class CampusMapper extends Mapper
 {
-
     /**
      * @inheritDoc
      *
@@ -45,6 +45,7 @@ class CampusMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'campusHasUsers']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeDeletedCampusFromUPSRules']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
     /**
@@ -232,5 +233,29 @@ class CampusMapper extends Mapper
     protected function getDefaultOrderByParams(): array
     {
         return ['sequence' => 'ASC'];
+    }
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Campus $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Campus $model): bool
+    {
+        if (trim($model->getName()) === '') {
+            throw new CallbackException("Campus name cannot be empty");
+        }
+        if (!$this->isUnique(['name' => $model->getName()], $model->getId())) {
+            throw new CallbackException(
+                sprintf(
+                    'A Campus with the name "%s" already exists, you must have a unique name',
+                    $model->getName()
+                )
+            );
+        }
+
+        return true;
     }
 }

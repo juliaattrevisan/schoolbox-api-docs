@@ -174,9 +174,8 @@ class Base implements OutputInterface
             header("Content-Length: " . strlen($output));
             echo $output;
 
-            // Finish the request, and close the session
+            // Finish the request
             fastcgi_finish_request();
-            session_write_close();
 
             // Allow the process however long it needs to finish:
             // 30 minutes should be more than enough.
@@ -188,6 +187,10 @@ class Base implements OutputInterface
                     $callback();
                 }
             }
+
+            // Close session once done
+            // (actions in post-output may require session data)
+            session_write_close();
         }
     }
 

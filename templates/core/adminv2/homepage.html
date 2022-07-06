@@ -116,11 +116,20 @@
             $modal.find('input').prop('disabled', true);
             $toastDiv.toastActivate({text: 'Renaming template...'});
 
+            $.ajaxSetup({
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
             $.post(action, data, function(){
                 $modal.find('input').prop('disabled', false);
                 $templateSelect.find('option:selected').text($newNameInput.val());
                 $modal.foundation('reveal', 'close');
                 $toastDiv.toastTimeout({text: 'Template renamed.', css: 'success'});
+            }).fail(function(message) {
+                $modal.find('input').prop('disabled', false);
+                $modal.foundation('reveal', 'close');
+                $toastDiv.toastTimeout({text: 'Template rename failed: ' + message.responseJSON.message, css: 'alert'});
             });
         });
 

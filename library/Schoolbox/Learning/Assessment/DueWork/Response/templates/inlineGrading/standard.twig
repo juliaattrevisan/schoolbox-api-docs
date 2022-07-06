@@ -20,7 +20,6 @@ Usage:
     subfragment         null|string[]
     errors              string[]
     participant         Participant
-    plagscanApiEnabled  bool
     turnitinApiEnabled  bool
     interactionLocked   bool                             Is the assessment due in an archived term?
     reviewRoute         string                           The mechansim by which feedback is being given
@@ -98,7 +97,6 @@ Usage:
             data:            subfragment.data is defined ? subfragment.data : null,
             participant:     participant,
             file:            file,
-            plagscanApiEnabled: plagscanApiEnabled,
             turnitinApiEnabled: turnitinApiEnabled
         } %}
     {% endif %}
@@ -112,7 +110,6 @@ Usage:
         response: response,
         latestFeedback: feedback,
         kamiEnabled: true,
-        plagscanApiEnabled: plagscanApiEnabled,
         turnitinApiEnabled: turnitinApiEnabled,
         selectedFileHash: selectedFileHash,
         blindMode: blindMode ?? false

@@ -13,7 +13,6 @@
  */
 class Leave_Core_Notice_Admin_Authorised extends Leave_Core_Notice_Admin_Abstract
 {
-
     public function send()
     {
         return;

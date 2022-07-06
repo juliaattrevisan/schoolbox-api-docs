@@ -10,11 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Test;
 
-use Alaress_Byte_Format;
 use Component_InstanceMapper;
-use League\Flysystem\Adapter\NullAdapter;
-use League\Flysystem\Filesystem;
-use League\Flysystem\MountManager;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -26,14 +22,12 @@ use Schoolbox\External\SubjectMapper;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use Schoolbox\Resource;
 use Schoolbox\TagCloud;
 use Schoolbox\Video;
 use SplFileInfo;
 
 class ISoftDeletableTest extends TestCase
 {
-
     /**
      * Ensure that if a mapper has a soft-delete column, then its model implements ISoftDeletable
      *
@@ -89,34 +83,6 @@ class ISoftDeletableTest extends TestCase
                 continue;
             }
             $mapper->setConfigLoader(new TestLoader());
-
-            // Special case for resource mappers that depend on the storage mapper
-            if ($mapper instanceof Resource\AbstractFileMapper) {
-                $mapper->setStorageMapper(new class extends Resource\Storage\Mapper
-                {
-
-                    /**
-                     * @param int $idValue
-                     * @return Resource\Storage\Model
-                     */
-                    public function createModel($idValue = null): Resource\Storage\Model
-                    {
-                        return new Resource\Storage\Model();
-                    }
-                });
-            }
-            // Special case for Storage Mapper
-            if ($mapper instanceof Resource\Storage\Mapper) {
-                $fileSystem = new Filesystem(new NullAdapter());
-                $mgr        = new MountManager([Resource\Storage\Manager::FS_STORAGE => $fileSystem]);
-                $mapper->setManager(
-                    new Resource\Storage\Manager(
-                        $mgr,
-                        new Alaress_Byte_Format(),
-                        new Resource\Storage\Sanitizer\Composite()
-                    )
-                );
-            }
             $mappers[] = [$mapper, $reflection, $className];
         }
         return $mappers;

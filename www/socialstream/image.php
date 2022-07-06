@@ -13,14 +13,14 @@ namespace SocialStream;
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress_Date_Format;
-use League\Flysystem\FilesystemInterface;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -70,42 +70,48 @@ if ($urlDetect->isStorageUrl()) {
         /* Unknown file
          */
         \SitePage::redirectToBrokenImageWithTransform('storage', $size);
+        exit;
     }
 } else {
     $storage = $cache->getFile();
     if (!$storage) {
         \SitePage::redirectToBrokenImageWithTransform('storage', $size, 400);
+        exit;
     }
 }
 
 try {
-    $fileSystem = $storage->getFilesystem();
-
     /** @var IConfigLoader $config */
     $config = $kernel->get('config');
 
     $transforms = new Image\Transformation\Storage();
 
     if (
-        $fileSystem instanceof FilesystemInterface &&
-        $fileSystem->getAdapter() instanceof S3Adapter &&
-        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
-        $preSignedUrlService = new PreSignedUrlService($config);
-        $resourcePath = $storage->getPath();
-
+        $preSignedUrlService   = new PreSignedUrlService($config);
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            $transforms->getTranscodePath($resourcePath, $transforms->getCacheKey($size))
+            $transforms->getTranscodePath(
+                FilesystemProxy::getPathFromHash($storage->getHash()),
+                $transforms->getCacheKey($size),
+            ),
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
+    /** @var Image\ProcessorFactory $processorFactory */
+    $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
+    $processor        = $processorFactory->buildForStorage(
+        $storage,
+        $transforms->getCacheKey($size),
+        $transforms->retrieve($size),
+    );
     $processor->load()->stream();
-} catch (ConcurrentTransformationException|InvalidPresignedUrlDurationExecption $e) {
+} catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
     \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {

@@ -2,6 +2,7 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -44,14 +45,16 @@ if (is_numeric($_GET['delete'] ?? false)) {
             $attach = "";
         }
 
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $kernel->get('filesystem.storageProxy');
+
         //send headers
         header("Cache-control: private");
         header("Content-Ranges: none");
         header("Content-Type: {$file->getStorage()->getMimetype()->getMime()}");
         header("Content-Disposition: $attach filename=\"" . $file->getStorage()->getBasename() . "\"");
-        header("Content-Length: " . $file->getStorage()->getSize());
-
-        fpassthru($file->getStorage()->readStream());
+        header("Content-Length: " . $filesystemProxy->fileSize($file->getStorage()));
+        fpassthru($filesystemProxy->readStream($file->getStorage()));
         exit;
     } catch (Schoolbox\Mapper\Exception $e) {
         error(5);

@@ -71,7 +71,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      *
      * Null means 'unknown'. Empty collection means this folder has no codes.
      *
-     * @var null|Collection|FolderCode[]
+     * @var null|GenericCollection<FolderCode>
      */
     private $codes;
 
@@ -118,7 +118,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $unitSpecification;
 
     /**
-     * @var IAssessable[]|GenericCollection<IAssessable>
+     * @var GenericCollection<IAssessable>
      */
     private $assessables;
 
@@ -436,7 +436,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
 
     /**
-     * @param GenericCollection $codes
+     * @param GenericCollection<FolderCode> $codes
      * @return $this
      * @throws TypeError
      */
@@ -448,7 +448,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return GenericCollection<FolderCode>|FolderCode[]|null
+     * @return GenericCollection<FolderCode>|null
      */
     public function getCodes()
     {
@@ -595,7 +595,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return IAssessable[]|GenericCollection<IAssessable>
+     * @return GenericCollection<IAssessable>
      */
     public function getAssessables()
     {
@@ -603,7 +603,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param Collection|GenericCollection|IAssessable[] $assessables
+     * @param GenericCollection<IAssessable> $assessables
      * @return static
      * @throws TypeError
      */

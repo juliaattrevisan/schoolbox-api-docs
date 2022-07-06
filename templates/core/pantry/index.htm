@@ -771,11 +771,6 @@
 
         $('#myAwesomeDropzone').dropzone();
 
-        $('[data-target="delete-it"]').on('click', function(){
-            $('.delete-it').toggleClass('show');
-            event.preventDefault();
-        });
-
         $('.settings').on('click', function(){
             $('.editPanel').toggleClass('hide');
             $(this).closest();

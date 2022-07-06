@@ -29,7 +29,6 @@ abstract class ModuleLoader implements ModuleConfigInterface
         /** @var Module $module */
         $module = new $className($di, null);
         $module->registerModule($path);
-        // @phpstan-ignore-next-line: this should be recognized
         return $module;
     }
 

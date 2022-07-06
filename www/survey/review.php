@@ -24,6 +24,7 @@ $sectionHandler  = new Survey_Section();
 $groupHandler    = new Group();
 $userHandler     = new User();
 
+/** @var SitePage $this */
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
@@ -203,14 +204,14 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
  */
-if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section_id'])) {
+if (!is_numeric($nextSection['section_id'] ?? null) && !is_numeric($prevSection['section_id'] ?? null)) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+    * previous button if applicable
+    */
     if (is_numeric($nextSection['section_id'])) {
         $this->setVar(
             array(

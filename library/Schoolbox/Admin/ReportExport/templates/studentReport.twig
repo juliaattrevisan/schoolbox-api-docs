@@ -1,22 +1,15 @@
 <style>
-    .text-center, .card.compact [class*=icon-] {
-        text-align: center !important;
-    }
-
-    /* Quarantine zone
-     */
 
     /* Vaguely analogous to A4 dimensions so you can preview in browser
      * otherwise the pdf print wraps in a different place, throwing your judgement
      */
-    .report {
-        width: 1100px;
+    .summative-report {
+        width: 1000px;
         margin: auto;
     }
 
     /* Typography
      */
-    p,
     h1, h2, h3, h4, h5, h6 {
         color: black;
         margin: 0;
@@ -46,6 +39,18 @@
 
     h6 {
         font-size: 1rem;
+    }
+
+    p {
+        color: black;
+        line-height: 1.5rem;
+    }
+
+    /* Images must be no larger than 100% max-width
+     * otherwise they go off the page
+     */
+    img {
+        max-width: 100%;
     }
 
     /* Make background colours print
@@ -103,37 +108,16 @@
     /* The thing that tells you about students
      */
     .card {
-        width: 100%;
-        clear: both;
-        float: left;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
-        position: relative;
+        align-items: center;
+        display: flex;
     }
 
-    /* Removes side padding on student card at top when there's no picture
-     */
-    .card.no-pad {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .card .name {
-        margin: 0;
+    .card img {
+        margin-right: 0.75rem;
     }
 
     .card .year {
-        font-size: 1.2rem;
-        margin: 0 0 1rem 0;
-    }
-
-    .compact img {
-        width: 2rem;
-    }
-
-    .card img, .card .img, .card [class^=icon-], .card [class*=" icon-"] {
-        float: left;
-        margin-right: 0.75rem;
+        margin: 0;
     }
 
     /* Introductory text
@@ -153,14 +137,22 @@
      */
     .folder-title {
         align-items: center;
-        background: lightgrey;
-        border: 1px solid black;
         display: flex;
         padding: 0.75rem;
     }
 
     .folder-title .left {
         flex-grow: 2;
+    }
+
+    /* These appear the name of the assessment and the comment
+     * as little subtitle sort of things
+     */
+    .worktype {
+        color: grey;
+        font-size: 0.75rem;
+        font-style: italic;
+        margin: 0;
     }
 
     /* A grade value, suitable for Folder Title
@@ -172,38 +164,20 @@
     .grade {
         font-size: 1.5rem;
         font-weight: bold;
+        margin: 0;
         padding-left: 2rem;
         padding-right: 0.75rem;
         min-width: 8rem;
         text-align: right;
     }
 
-    /* For some reason there's a thing called a summary result
-     * and another thing called a subject result, but the demo
-     * data makes them all seem the same data? Unsure of the
-     * functional difference between the two
+    /* Comments, if provided, are generally plaintext but could be ckeditor stuff
+     * Wrap it in a div anyway. If the comment is very long, padding-right stops
+     * it from being directly adjacent to the grade if it exists
      */
-
-    /* A folder title in the class summary section
-     */
-    .class-summary {
-        padding: 0.75rem;
-    }
-
-    /* Teachers in the Class Summary section have a more space-efficient style
-     * and layout, but we don't need its excess padding
-     */
-    .class-summary .card.compact {
-        display: flex;
-        align-items: center;
-        margin: 0.75rem 0 0 0;
-        padding: 0;
-    }
-
-    /* Special cosmetic representation of semantic h5
-     */
-    .class-summary h5 {
-        font-size: 1rem;
+    .comment {
+        margin: 1rem 0;
+        padding-right: 2rem;
     }
 
     /* This .feedback-assessment-container element typically has a bottom border for a
@@ -235,23 +209,52 @@
         padding-right: 0;
     }
 
-    /* These appear the name of the assessment and the comment
-     * as little subtitle sort of things
+    /* The summary section is anticipated to be a less-detailed overview of what
+     * a student accomplished for this reporting period. Functionally identical to the
+     * Class Pages section, but their intents are different. The styling is specifically
+     * so that content flows contiguously; no page breaks, no obtrusive folder highlighting,
+     * and indenting to show the hierarchy of assessments. The rubric grid, while
+     * optional, probably shouldn't be activated for this section. We don't stop people
+     * from doing that though.
      */
-    .worktype {
-        color: grey;
-        font-size: 0.75rem;
-        font-style: italic;
-        margin-top: 0.25rem;
+    .summary .folder-title {
+        border-bottom: 1px solid #ccc;
+        clear: both;
+        margin: 2rem 0 0.5rem 2rem;
+        padding: 0 0 0.5rem 0;
     }
 
-    /* Comments, if provided, are generally plaintext but could be ckeditor stuff
-     * Wrap it in a div anyway. If the comment is very long, padding-right stops
-     * it from being directly adjacent to the grade if it exists
+    /* Reduce the bottom margin in the Summary area
+     * because we don't have the wrapping block here
      */
-    .comment {
-        margin: 1rem 0;
-        padding-right: 2rem;
+    .summary .grade {
+        margin: 0 0 0.5rem 0;
+    }
+
+    .summary .feedback-assessment-container {
+        border: 0;
+        margin-left: 4rem;
+    }
+
+    /* A folder title in the class summary section
+     */
+    .class-page {
+        background: lightgrey;
+        border: 1px solid black;
+        padding: 0.75rem;
+    }
+
+    /* Teachers in the Class Summary section have a more space-efficient style
+     * and layout, but we don't need its excess padding
+     */
+    .class-page .card.compact {
+        margin: 0.75rem 0 0 0;
+    }
+
+    /* Special cosmetic representation of semantic h5
+     */
+    .class-page h5 {
+        font-size: 1rem;
     }
 
     /* Push the rubric grid down a little bit, if it exists
@@ -261,6 +264,12 @@
         margin-top: 1rem;
         margin-bottom: 2rem;
         width: 100%;
+    }
+
+    /* All p elements get squished to fit more aggressively
+     */
+    .rubric-wrap p {
+        line-height: 1rem;
     }
 
     /* Rubric table
@@ -276,8 +285,8 @@
     /* Headings were oddly grey by intent but black we go
      */
     th p {
-        text-align: left;
         padding-left: 0.25rem;
+        text-align: left;
         word-wrap: break-word;
     }
 
@@ -354,7 +363,7 @@
      */
     @page {
         size: A4 portrait; /* try and enforce portrait orientation */
-        margin: 0.25in 0.25in 0.75in 0.25in;
+        margin: 0.5in 0.5in 0.75in 0.5in;
     }
 
     @media print {
@@ -362,8 +371,19 @@
             padding: 0; /* to get more of the page real estate */
         }
 
-        .folder-title {
+        /* Folder titles in the Class Pages section always get a page break
+         * They always start on a new page.
+         */
+        .class-page {
             page-break-before: always; /* ensure each individual subject goes on new page */
+        }
+
+        /* Summary always starts on a separate page
+         * Folders In the Summary section will just
+         * render one underneath the other, contiguously
+         */
+        .summary {
+            page-break-before: always;
         }
 
         /* This is so so so extremely wasteful if grids are very short
@@ -379,9 +399,11 @@
             page-break-inside: avoid;
         }
     }
+
+    {{ customReportStyle ?? '' }}
 </style>
 
-<div class="report">
+<div class="summative-report">
     <div class="header-content">
         <div class="left">
             <h1>{{ config.report_title }}</h1>
@@ -392,25 +414,34 @@
         {% endif %}
     </div>
 
-    <div class="card {% if not student.portrait %}no-pad{% endif %}">
+    <div class="card">
         {% if student.portrait %}
         <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
         {% endif %}
-        <h3 class="name">{{ student.fullname }}</h3>
+        <div>
+            <h3 class="name">{{ student.fullname }}</h3>
 
-        {# Only show year if it was ever set and meaningful
-         #}
-        {% if student.year and student.year.longName != '' %}
-        <p class="year">{{ student.year.longName }}</p>
-        {% endif %}
-
-        <div class="introduction">
-            {{ config.report_export_introduction | purify }}
+            {# Only show year if it was ever set and meaningful
+             #}
+            {% if student.year and student.year.longName != '' %}
+            <p class="year">{{ student.year.longName }}</p>
+            {% endif %}
         </div>
+    </div>
+
+    <div class="introduction">
+        <article>
+            {{ config.report_export_introduction | purify }}
+        </article>
     </div>
 
     {# Summary #}
     {% if showSummary %}
+    <div class="summary">
+        {% if summaryHeading|length %}
+            <h3>{{ summaryHeading }}</h3>
+        {% endif %}
+
         {% for folder in folders %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
@@ -423,7 +454,6 @@
                 <p class="grade">{{ weightedMean ?? '' }}</p>
                 {% endif %}
             </div>
-
             {% if (summaryAssessments[folder.id] ?? [])| length %}
                 {% for assessment in summaryAssessments[folder.id] %}
                     {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
@@ -440,14 +470,17 @@
                 {% endfor %}
             {% endif %}
         {% endfor %}
+    </div>
     {% endif %}
 
     {# Class #}
     {% if showClass %}
         {% for folder in folders %}
+            {# if there are no filtered assessments for this folder, ignore the folder #}
+            {% if (classAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-            <div class="folder-title class-summary">
+            <div class="folder-title class-page">
                 <div class="left">
                     <h4>{{ folder.title }}</h4>
                     {% for teacher in folder.teachers %}
@@ -464,7 +497,6 @@
                 {% endif %}
             </div>
 
-            {% if (classAssessments[folder.id] ?? [])| length %}
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminReportExport/assessmentReport.twig' with
                         {

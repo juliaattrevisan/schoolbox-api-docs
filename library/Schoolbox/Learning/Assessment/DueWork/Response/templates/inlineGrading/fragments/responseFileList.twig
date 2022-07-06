@@ -48,22 +48,11 @@
                                 {# Similarity Check #}
                                 {% include '@learning/dueWork/similarity/status.twig' with {
                                     turnitinApiEnabled: turnitinApiEnabled,
-                                    plagscanApiEnabled: plagscanApiEnabled,
                                     currentFile: currentFile
                                 } %}
                             </div>
                         </div>
                         <nav>
-                            {# Similarity Check #}
-                            {% include '@learning/dueWork/similarity/link.twig' with {
-                                turnitinApiEnabled: turnitinApiEnabled,
-                                plagscanApiEnabled: plagscanApiEnabled,
-                                assessment: assessment,
-                                response: response,
-                                currentFile: currentFile,
-                                participant: participant
-                            } only %}
-
                             <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
                         </nav>
                         {% set latestFeedback    = latestFeedback ?? participant.findMostRecentInstructorGivenFeedback %}

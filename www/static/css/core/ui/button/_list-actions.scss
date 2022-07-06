@@ -2,157 +2,146 @@
  * These occur as their own row, they aren't nested inside a
  * column. Typically this will look like .actions-small-12.row
  */
-@mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 
-	// We shoudln't use more than 5 action buttons in a row
-	@for $i from 1 through 5 {
-		.actions-#{$size}-#{$i},
-		.island .row.actions-#{$size}-#{$i}{
-			position: relative;
-			min-width: $button-size * $i;
-			min-height: $button-size;
+// We shouldn't use more than 5 action buttons in a row
+@for $i from 1 through 5 {
+    .actions-small-#{$i},
+    .island .row.actions-small-#{$i} {
+        position: relative;
+        min-width: $global-button-height * $i;
+        min-height: $global-button-height;
 
-			> .list-item {
-				padding-right: 0.5 + ($i * $button-size) !important;
-				// https://css-tricks.com/flexbox-truncated-text/
-				min-width: 0;
-			}
-
-			> nav {
-				display: inline-block;
-				margin: 0;
-				padding: 0;
-				position: absolute;
-				top: 0;
-				right: 0;
-				height: $button-size;
-				white-space: nowrap;
-                &:hover {
-                    a {
-                        opacity: 0.4;
-                    }
-                }
-                a {
-                    opacity: 0.7;
-                    &:hover {
-                        opacity: 1;
-                    }
-                }
-				a[class*="icon-"],
-				a[class^="icon-"]{
-					padding: 0;
-					display: inline-block;
-					text-align: center;
-					width: $button-size;
-					line-height: strip-unit($button-size);
-					color: $button-color;
-
-					&:before {
-						padding-right: 0;
-						float: none;
-					}
-					&[disabled], &.disabled {
-						opacity: 0.33;
-					}
-					&.selected {
-						color: $content-ui-selected;
-						background-color: $button-color;
-					}
-					&:hover {
-						background-color: rgba(0,0,0,0.1);
-						text-decoration: none;
-					}
-				}
-
-				a[aria-expanded="true"]{
-					background-color: $content-ui-background;
-					opacity: 1;
-					&:hover{
-						background-color: $content-ui-background;
-						opacity: 0.7;
-					}
-				}
-
-				input:checked + label {
-					a {
-						background-color: $button-color;
-                        // DONE As far as I can know, there's never a checkbox inside a header action
-                        color: $content-ui-selected;
-					}
-				}
-			}
-            // Override for dropzone error
-            &.dz-error > nav a {
-                color: $attachzone-error-color;
-            }
-
-		}
-
-		/* Inside a containing column, but not an action-
-		 * or information-list construct (e.g. h2 actions).
-		 */
-		.row.actions-#{$size}-#{$i} {
-			 nav {
-				 right: 1rem;
-				 @media #{$small-only} {
-					 right: 0;
-				 }
-			 }
-		 }
-        // A unique situation where h2 actions need to exist inside a form
-        form.row .row.actions-#{$size}-#{$i} {
-          nav {
-            right: 0;
-          }
-
-          @media #{$small-only} {
-            .column, .columns {
-              padding-left: 0;
-              padding-right: 0;
-            }
-          }
+        > .list-item {
+            padding-right: 0.5 + ($i * $global-button-height) !important;
+            // https://css-tricks.com/flexbox-truncated-text/
+            min-width: 0;
         }
-	}
+
+        > nav {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: $global-button-height;
+            white-space: nowrap;
+            &:hover {
+                a {
+                    opacity: 0.4;
+                }
+            }
+            a {
+                opacity: 0.7;
+                &:hover {
+                    opacity: 1;
+                }
+            }
+            a[class*="icon-"],
+            a[class^="icon-"]{
+                padding: 0;
+                display: inline-block;
+                text-align: center;
+                width: $global-button-height;
+                line-height: strip-unit($global-button-height);
+                color: $content-ui-foreground;
+
+                &:before {
+                    padding-right: 0;
+                    float: none;
+                }
+                &[disabled], &.disabled {
+                    opacity: 0.33;
+                }
+                &.selected {
+                    color: $content-ui-selected;
+                    background-color: $content-ui-foreground;
+                }
+                &:hover {
+                    background-color: rgba(0,0,0,0.1);
+                    text-decoration: none;
+                }
+            }
+
+            a[aria-expanded="true"]{
+                background-color: $content-ui-background;
+                opacity: 1;
+                &:hover{
+                    background-color: $content-ui-background;
+                    opacity: 0.7;
+                }
+            }
+
+            input:checked + label {
+                a {
+                    background-color: $content-ui-foreground;
+                    // DONE As far as I can know, there's never a checkbox inside a header action
+                    color: $content-ui-selected;
+                }
+            }
+        }
+        // Override for dropzone error
+        &.dz-error > nav a {
+            color: $attachzone-error-color;
+        }
+
+    }
+
+    /* Inside a containing column, but not an action-
+        * or information-list construct (e.g. h2 actions).
+        */
+    .row.actions-small-#{$i} {
+        nav {
+            right: 1rem;
+            @media #{$small-only} { //currently creating a Sass compile error
+                right: 0;
+            }
+        }
+    }
+    // A unique situation where h2 actions need to exist inside a form
+    form.row .row.actions-small-#{$i} {
+        nav {
+            right: 0;
+        }
+
+        @media #{$small-only} { //currently creating a Sass compile error
+            .column, .columns {
+                padding-left: 0;
+                padding-right: 0;
+            }
+        }
+    }
 }
 
 .list-item {
-	width: 100%;
+    width: 100%;
 }
 
 // headers for lists
 .list-header {
-	@extend .show-for-medium-up;
-	font-weight: $font-weight-bold;
-	font-size: $paragraph-font-size;
+    @extend .show-for-medium-up;
+    font-weight: $font-weight-bold;
+    font-size: $paragraph-font-size;
     padding-top: .5rem;
 }
 
 .sortable, .sortable-card {
-	.list-header {
-		padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
-	}
+    .list-header {
+        padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
+    }
 }
 
 // small behaves a little differently to the other viewports
 @media #{$small-only} {
-	form .list-item {
-		// restore guttering
-		padding-right: 0.5rem;
-		padding-left: 0.5rem;
-	}
-	.sortable, .sortable-card {
-		.list-item {
-			// remove guttering if there's a grip handle
-			padding-left: 0;
-		}
-	}
-}
-
-@media #{$small-up}  { @include action-html-classes($size:small);  }
-@media #{$medium-up} { @include action-html-classes($size:medium); }
-@media #{$large-up}  { @include action-html-classes($size:large);  }
-
-@if $include-xl-html-grid-classes {
-	@media #{$xlarge-up}  { @include action-html-classes($size:xlarge);  }
-	@media #{$xxlarge-up} { @include action-html-classes($size:xxlarge); }
+    form .list-item {
+        // restore guttering
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    .sortable, .sortable-card {
+        .list-item {
+            // remove guttering if there's a grip handle
+            padding-left: 0;
+        }
+    }
 }

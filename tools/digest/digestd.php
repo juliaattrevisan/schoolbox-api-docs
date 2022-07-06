@@ -55,7 +55,11 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     /** @var Async\Client $asyncRedis */
     $asyncRedis = $di->get('redis.signalQueue.sub');
     $strat      = new DefaultDispatchStrategy($flags);
-    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $conf, $log);
+
+    /** @var \Schoolbox\Mail\EmailFactory $emailFactory */
+    $emailFactory = $di->get('mail.emailFactory');
+
+    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $emailFactory, $conf, $log);
     $factory    = new DigestTriggerFactory($notifier, $clock, $debugInterval);
 
     $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);

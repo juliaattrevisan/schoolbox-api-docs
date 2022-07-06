@@ -201,8 +201,8 @@
         });
     });
 </script>
-<form data-emailallparents action="/mail/createMail.php" method="post">
-    <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
+<form data-emailallparents action="/mail/create" method="post">
+<input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
     <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
 </form>
 <!-- END email_all_parents -->

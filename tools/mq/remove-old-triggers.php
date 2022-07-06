@@ -180,6 +180,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             case -2:
                 return "expired";
             default:
+                // @phpstan-ignore-next-line: date can return false
                 return date('Y-m-d H:i:s', time() + $ttl) ?: '';
         }
     }

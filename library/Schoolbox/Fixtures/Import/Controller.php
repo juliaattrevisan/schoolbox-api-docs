@@ -47,6 +47,7 @@ use Schoolbox\Fixtures\Import\Mapper as ImportMapper;
 use Schoolbox\Fixtures\Import\Model as Import;
 use Schoolbox\Fixtures\Import\Errors\Mapper as ImportErrorsMapper;
 use Schoolbox\Fixtures\Import\Errors\Model as ImportErrors;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\UserMapper;
 
 /**
@@ -208,7 +209,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(private FilesystemProxy $filesystemProxy)
     {
         $this->setUserMapper(UserMapper::getInstance());
         $this->setMatchupMapper(MatchupMapper::getInstance());
@@ -552,7 +553,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -603,7 +604,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -659,7 +660,7 @@ class Controller extends Base
      */
     private function loadVenues($storageObject)
     {
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -725,7 +726,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -765,7 +766,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -804,7 +805,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
 
         while ($reader->valid()) {
             $reader->next();
@@ -883,7 +884,7 @@ class Controller extends Base
     {
         // Go through the CSV and extract all of the information into an array
 
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
         $reader->setLoadFromFirst(true);
 
         while ($reader->valid()) {
@@ -1029,7 +1030,7 @@ class Controller extends Base
      */
     private function loadCoaches($storageObject)
     {
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
         $reader->setLoadFromFirst(true);
 
         while ($reader->valid()) {
@@ -1153,7 +1154,7 @@ class Controller extends Base
      */
     private function loadFixtures($storageObject)
     {
-        $reader = new Reader($storageObject->readStream());
+        $reader = new Reader($this->filesystemProxy->readStream($storageObject));
         $reader->setLoadFromFirst(true);
 
         while ($reader->valid()) {

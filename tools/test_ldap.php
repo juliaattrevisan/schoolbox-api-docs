@@ -14,6 +14,7 @@
 
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -25,7 +26,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         $username = $this->getConfig()->get('ldap_user');
         $password = $this->getConfig()->get('ldap_pass');
         $ldapCaCertHash = $this->getConfig()->get('ldap_ca_certificate');
-        $session = new Session;
+        /** @var FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+        $session = new Session();
 
         // This enables the debug output from the LDAP functions
         ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
@@ -36,12 +39,12 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
                 $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
                 $ldapCaCertPath = sprintf(
                     '%s/ldap-ca-cert-%s-%s',
-                    Config::get('stream_dir'),
+                    $this->getConfig()->get('stream_dir'),
                     INSTANCE_ID,
                     $ldapCaCert->getHash()
                 );
                 if (!file_exists($ldapCaCertPath)) {
-                    file_put_contents($ldapCaCertPath, $ldapCaCert->read());
+                    file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
                 }
                 ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
                 ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);

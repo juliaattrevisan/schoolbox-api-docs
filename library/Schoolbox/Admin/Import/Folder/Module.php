@@ -61,6 +61,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Error\Mapper::class),
             $this->getMapperFactory()->get(HomepageTemplateMapper::class),
             $this->getConfig(),
+            $this->injector->get('filesystem.storageProxy'),
         );
     }
 

@@ -70,6 +70,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -181,7 +182,8 @@ class Controller extends Assessment\Controller
         Turnitin\File\Mapper $turnitinFileMapper,
         Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
         \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        private FilesystemProxy $filesystemProxy,
     ) {
         parent::__construct(
             $userMapper,
@@ -393,7 +395,6 @@ class Controller extends Assessment\Controller
 
             /* Similarity Check status
              */
-            'plagscanApiEnabled'     => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'turnitinApiEnabled'     => (new TurnitinHelper($this->getConfigLoader()))->isEnabled($this->getUser()),
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
@@ -514,14 +515,14 @@ class Controller extends Assessment\Controller
                 if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to the ZIP archive
                     foreach ($response->getAllFiles() as $file) {
-                        if ($file->exists()) {
+                        if ($this->filesystemProxy->fileExists($file)) {
                             $zipFilename = sprintf(
                                 "%s/%s/%s",
                                 $baseFolderName,
                                 $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
                                 $this->sanitizeForFilename($file->getBasename())
                             );
-                            $zipStream->addFileFromStream($zipFilename, $file->readStream());
+                            $zipStream->addFileFromStream($zipFilename, $this->filesystemProxy->readStream($file));
                         }
                     }
                 }
@@ -860,7 +861,7 @@ class Controller extends Assessment\Controller
                  */
                 foreach ($latestResponse->getAllFiles() as $file) {
                     if ($file->getEditableInline()) {
-                        $editorContents = $file->read();
+                        $editorContents = $this->filesystemProxy->read($file);
                     }
                 }
             } else {
@@ -902,7 +903,6 @@ class Controller extends Assessment\Controller
              */
             'errors' => [],
 
-            'plagscanEnabled' => PlagscanMapper::getInstance()->isEnabled($this->getUser()),
             'reviewRoute'       => $reviewRoute,
             'studentView'       => true,
             'student'        => $student,
@@ -1246,7 +1246,10 @@ class Controller extends Assessment\Controller
                  */
                 $instanceIdentifier = $this->getConfigLoader()->get('site_type');
 
-                $detachedFunction = static function () use ($api, $models, $instanceIdentifier) {
+                /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+                $detachedFunction = static function () use ($api, $models, $instanceIdentifier, $assessmentMapperProxy) {
                     /* Set up a record processor
                      */
                     $processor = (new Turnitin\File\Process\Transmit(
@@ -1256,7 +1259,8 @@ class Controller extends Assessment\Controller
                         Turnitin\Group\Mapper::getInstance(),
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
-                        SingleFile\Mapper::getInstance()
+                        SingleFile\Mapper::getInstance(),
+                        $assessmentMapperProxy,
                     ));
 
                     /* Shank them all up
@@ -1265,60 +1269,6 @@ class Controller extends Assessment\Controller
                         $processor->process($model);
                     }
                 };
-            } else {
-                /* This is the original behaviour. Note that the Plagscan Mapper itself can
-                 * figure out if plagscan is enabled or not so we don't need to do it here
-                 *
-                 * This is only a temporary setup - eventually plagscan goes away entirely,
-                 * halving the logic established here
-                 */
-
-                /* Save stubble record and send each file in the Submission to Plagscan
-                 * if the Submission was saved successfully
-                 *
-                 * Only plagscan when actually submitting final
-                 * Only plagscan non-online-submission files (for some reason, plag won't do html files)
-                 */
-                $plagscanMapper = PlagscanMapper::getInstance();
-
-                /* Plagscans should only spawn upon saving a Submitted IResponse instance
-                 * This screen is shared between self-reflection and non-self-reflection steps
-                 * Self-reflection's plagscan stubs saving .......happens elsewhere
-                 * Similarity Check must be enabled
-                 */
-                if (
-                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
-                    && $response->getId()
-                ) {
-                    foreach ($response->getAllFiles() as $currentFile) {
-                        if (!$currentFile->getEditableInline()) {
-                            $plagscanMapper->saveNewPlagscanStub($currentFile);
-                        }
-                    }
-                }
-
-                /* Asynchronously shove it into plagscan so we don't make the user wait ages
-                 * for it to read 1 byte at a time >_<
-                 */
-                $this->getResponse()->content->set(
-                    [
-                        'format' => 'noContent',
-                        'postOutput' => [
-                            function () use ($plagscanMapper, $reviewRoute, $response) {
-                                if (
-                                    $reviewRoute === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR
-                                    && $response->getId()
-                                ) {
-                                    foreach ($response->getAllFiles() as $currentFile) {
-                                        $filename = $plagscanMapper->plagscanFilename($currentFile);
-
-                                        $plagscanMapper->saveNewPlagscan($currentFile, $filename);
-                                    }
-                                }
-                            },
-                        ],
-                    ]
-                );
             }
         }
 
@@ -1734,12 +1684,29 @@ class Controller extends Assessment\Controller
                 continue;
             }
             // File is eligible, and not yet queued.
-            $kamiModel = $this->kamiMapper->createModel()
-                                          ->setStudentSubmissionFile($file)
-                                          ->setStatusQueued();
-            $this->kamiMapper->save($kamiModel);
+
+            /* Try to find out if this file already existed in kami
+             *
+             * If it did, just skip past it - there's been no consideration
+             * for what happens to dupes, plus, mapper cache messes with you
+             */
+            try {
+                $kamiModel = $this->kamiMapper->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Create a new one if it didn't already exist
+                 */
+                $kamiModel = $this->kamiMapper->createModel()
+                    ->setStudentSubmissionFile($file)
+                    ->setStatusQueued();
+
+                $this->kamiMapper->save($kamiModel);
+            }
+
+            /* Pile it into whatever lookup this is
+             */
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }
+
         return $kamiModels;
     }
 

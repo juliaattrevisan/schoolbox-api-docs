@@ -59,7 +59,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const URL_FORMAT = 'd-m-Y';
     const AM = 'AM';
     const PM = 'PM';
-    public const FORMAT_DATE_PICKER = 'd/m/Y h:ia'; // Used by JS DatePicker, eg '29/07/2014 11:59pm'
+    public const FORMAT_DATE_PICKER = 'd/m/Y h:ia';    // Used by JS DatePicker, eg '29/07/2014 11:59pm'
 
     const SUNDAY = 0;
     const MONDAY = 1;
@@ -68,6 +68,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const THURSDAY = 4;
     const FRIDAY = 5;
     const SATURDAY = 6;
+
 
     /**
      * Returns an instance of static at the current time.
@@ -1738,6 +1739,24 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         return $this->getUsingFormat('Hi') == '2359';
     }
+
+
+    /**
+     * Takes the input date, converts it to UTC first,
+     * then outputs the Zulu time (a subvariant of ISO 8601)
+     *
+     * Returns a cloned instance because of the requirement
+     * to process the timezone conversion
+     *
+     * @return string
+     */
+    public function getZuluTime(): string
+    {
+        $clone = clone $this;
+
+        return $clone->setTimezone('UTC')->getUsingFormat('Y-m-d\TH:i:sp');
+    }
+
 
     /** DIFF */
 

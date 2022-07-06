@@ -11,6 +11,7 @@
 #
 
 # Global const
+readonly LOCKFILE_INSPECTOR="/usr/local/bin/schoolbox-lock-inspector"
 readonly LOG=/usr/bin/alaress-logger
 readonly L_DEBUG=100
 readonly L_INFO=200
@@ -195,23 +196,15 @@ function parse_sql_credentials(){
 # Check if script is already running
 function check_script_overlap() {
   stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
-  lock_file=$stream_dir/lockfile.lock;
-  # Create empty lock file if none exists
-  touch "$lock_file";
-  # Read the contents of the lockfile into a variable
-  read -r lastPID < "$lock_file";
-  # If lastPID is not null and a process with that pid exists and the pid is associated with another instance of the same script, exit the script
-  script_name=$(basename "$0")
-  if [[ -n "$lastPID" ]] && [[ -d /proc/$lastPID ]] && pgrep --full "$script_name" | grep -qE "^$lastPID$"; then
+  lock_file=$stream_dir/config-data-dirs.lock;
+  if ! $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args; then
     if ! type mail &> /dev/null; then
       warn "mail is not available. Cannot send email."
     else
-      mail -s "Overlapping cronjob on $instance_id" ist@alaress.com.au <<< "An overlap for $script_name was prevented on $instance_id".
+      mail -s "Overlapping cronjob on $instance_id" ist@alaress.com.au <<< "An overlap for $(basename "$0") was prevented on $instance_id".
     fi
     exit
   fi
-  # else write the PID of the current running script to the lock file
-  echo $$ > "$lock_file";
 }
 
 
@@ -327,7 +320,7 @@ function update_directories(){
       find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
-  rm "$lock_file"
+  $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args --rm
 }
 
 

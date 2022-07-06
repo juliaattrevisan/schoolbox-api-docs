@@ -12,16 +12,16 @@
 
 //includes
 use Alaress\Exception\UnreachableException;
-use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\LogMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
-use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
@@ -67,7 +67,6 @@ if (is_numeric($_GET['id'])) {
             LogMapper::getInstance()->logRead($file, $_SESSION['user']);
         } catch (Schoolbox\Mapper\Exception $e) {
             error(Mapper::ERROR_FILE_NOT_FOUND);
-            exit;
         }
     }
 
@@ -78,23 +77,18 @@ if (is_numeric($_GET['id'])) {
     $basename       = $file->getBasename();
     /** @var Storage $storage */
     $storage      = $file->getStorage();
-    $fileSystem   = $storage->getFilesystem();
     $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
-    if (
-        $fileSystem instanceof Flysystem\Filesystem
-        && $fileSystem->getAdapter() instanceof S3Adapter
-    ) {
-        /** @var IConfigLoader $config */
-        $config = $kernel->get('config');
-
+    /** @var IConfigLoader $config */
+    $config = $kernel->get('config');
+    if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
         if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
             try {
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $storage,
                     Alaress_Date_Format::now()->setTimezone('UTC')->addDays(1),
-                    $storage->getPath(),
+                    FilesystemProxy::getPathFromHash($storage->getHash()),
                     $cacheControl,
                     $disposition
                 );
@@ -106,15 +100,16 @@ if (is_numeric($_GET['id'])) {
         }
     }
 
-
     //send headers
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $kernel->get('filesystem.storageProxy');
     header("Content-Type: $contentType");
     header("Pragma: ");
     header("Cache-control: private");
     header("Content-Ranges: none");
     header("Content-Disposition: $disposition; filename=\"$basename\"");
-    header("Content-Length: {$file->getSize()}");
-    fpassthru($file->readStream());
+    header("Content-Length: {$filesystemProxy->fileSize($file)}");
+    fpassthru($filesystemProxy->readStream($file));
     exit;
 }
 

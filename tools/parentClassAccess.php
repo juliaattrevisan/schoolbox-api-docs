@@ -97,7 +97,7 @@ $app = new class extends CliTool\App
 
         $handle = fopen($this->getOpt(self::OPT_SHORT_FILE), 'rb');
 
-        if (is_resource($handle)) {
+        if (!is_resource($handle)) {
             // Couldn't read file
             $this->getLogger()->error('Could not locate file to import.');
             exit;

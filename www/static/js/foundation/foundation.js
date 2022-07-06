@@ -40,7 +40,6 @@
     'foundation-mq-xxlarge',
     'foundation-data-attribute-namespace']);
 
-
   // private Fast Selector wrapper,
   // returns jQuery object. Only use where
   // getElementById is not available.

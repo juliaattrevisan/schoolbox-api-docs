@@ -17,11 +17,13 @@ use Alaress_Date_Format;
 use DateTime;
 use EasyRdf\Sparql\Client;
 use Alaress\Html\ToText as Html2Text;
+use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
+use stdClass;
 use UnexpectedValueException;
 
 use function count;
@@ -175,7 +177,8 @@ class Browser extends Source\BrowserAbstract
         $curl->exec();
         if (!count($curl->getErrors()) && $manifest = json_decode($curl->getResult())) {
             foreach ($manifest as $part) {
-                if (($nodes = $this->buildOutputTree($part, $level)) != false) {
+                $nodes = $this->buildOutputTree($part, $level);
+                if ($nodes) {
                     $collection->add($nodes);
                 }
             }
@@ -188,35 +191,40 @@ class Browser extends Source\BrowserAbstract
     /**
      * Creates this node and its children from the JSON object.
      *
-     * @param  object $jsonTree
-     * @return bool|Node\Model
+     * @param stdClass            $jsonTree
+     * @param LearningLevel\Model $level
+     * @return Node\Model|null
      */
-    protected function buildOutputTree($jsonTree, $level)
+    protected function buildOutputTree(stdClass $jsonTree, LearningLevel\Model $level): ?Node\Model
     {
-
-        if ($jsonTree->dcterms_educationLevel->uri === $level->getReference()) {
+        $node = null;
+        if (
+            isset($jsonTree->dcterms_educationLevel->uri)
+            && $jsonTree->dcterms_educationLevel->uri === $level->getReference()
+        ) {
             // This is the right year level within this learning area.
             // Build an outcome tree out of it.
             $node = $this->buildSingleNode($jsonTree);
-        } elseif (is_array($jsonTree->dcterms_educationLevel)) {
-            if (
-                count(array_filter($jsonTree->dcterms_educationLevel, function ($v) use ($level) {
-                    return $v->uri ==  $level->getReference();
-                })) > 0
-            ) {
-                $node = $this->buildSingleNode($jsonTree);
-            } else {
-                return false;
+        } elseif (
+            isset($jsonTree->dcterms_educationLevel)
+            && is_array($jsonTree->dcterms_educationLevel)
+        ) {
+            // This part of the tree has multiple learning levels:
+            // if any match the given learning level, build an outcome tree.
+            foreach ($jsonTree->dcterms_educationLevel as $educationLevel) {
+                if (isset($educationLevel->uri) && $educationLevel->uri === $level->getReference()) {
+                    $node = $this->buildSingleNode($jsonTree);
+                    break;
+                }
             }
-        } else {
-            return false;
         }
 
-        if ($jsonTree->children) {
+        if ($node && isset($jsonTree->children) && is_iterable($jsonTree->children)) {
             foreach ($jsonTree->children as $child) {
-                if (($nodes = $this->buildOutputTree($child, $level)) != false) {
+                $nodes = $this->buildOutputTree($child, $level);
+                if ($nodes) {
                     $node->addChild($nodes);
-                };
+                }
             }
         }
         return $node;
@@ -225,17 +233,17 @@ class Browser extends Source\BrowserAbstract
     /**
      * Creates a single node from the given JSON object.
      *
-     * @param  object $json
+     * @param  stdClass $json
      * @return Node\Model
      */
-    protected function buildSingleNode($json)
+    protected function buildSingleNode(stdClass $json): Node\Model
     {
         $node = new Node\Model();
-        $node->setReference($json->id ?? $json->Id);
+        $node->setReference($json->id ?? $json->Id ?? '');
 
         // Figure out what the name and description should be.
         $statementLabel = '';
-        if ($json->asn_statementLabel && $json->asn_statementLabel->literal) {
+        if (isset($json->asn_statementLabel->literal)) {
             $statementLabel = $json->asn_statementLabel->literal;
         }
         switch ($statementLabel) {
@@ -244,18 +252,18 @@ class Browser extends Source\BrowserAbstract
                 // Let's just call it an achievement standard.
                 $node
                     ->setName($statementLabel)
-                    ->setDescription($json->text);
+                    ->setDescription($json->text ?? '');
                 break;
             default:
                 // Try basing name off the title, and desc off the text.
                 // If that fails, set the name as the text and an empty desc.
-                if ($json->dcterms_title && $json->dcterms_title->literal) {
+                if (isset($json->dcterms_title->literal)) {
                     $node
                         ->setName($json->dcterms_title->literal)
-                        ->setDescription($json->text);
+                        ->setDescription($json->text ?? '');
                 } else {
                     $node
-                        ->setName($json->text)
+                        ->setName($json->text ?? '')
                         ->setDescription('');
                 }
                 break;
@@ -266,16 +274,19 @@ class Browser extends Source\BrowserAbstract
         $node->setName(preg_replace('/\\s+/', ' ', $this->getHtmlConverter()->getText()));
 
         // Set the timetable code if there is one
-        if ($json->asn_statementNotation && $json->asn_statementNotation->literal) {
+        if (isset($json->asn_statementNotation->literal)) {
             $node->setCode($json->asn_statementNotation->literal);
         }
-        if ($json->dcterms_modified && $json->dcterms_modified->literal) {
-            $modified = new Alaress_Date_Format(
-                new DateTime($json->dcterms_modified->literal)
-            );
-            $node
-                ->setCreatedAt($modified)
-                ->setModifiedAt($modified);
+        if (isset($json->dcterms_modified->literal)) {
+            try {
+                $datetime = new DateTime($json->dcterms_modified->literal);
+                $modified = new Alaress_Date_Format($datetime);
+                $node
+                    ->setCreatedAt($modified)
+                    ->setModifiedAt($modified);
+            } catch (Exception) {
+                // noop: simply don't set the created/modified fields
+            }
         }
         return $node;
     }

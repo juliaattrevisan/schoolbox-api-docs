@@ -217,6 +217,9 @@ HELP;
                 $this->getConfig()->get('turnitin_api_key')
             );
 
+            /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+            $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
             /* Set up a record processor
              */
             $processor = (new Turnitin\Group\Process\Group(
@@ -226,6 +229,7 @@ HELP;
                 Turnitin\Group\Attachment\Mapper::getInstance(),
                 SubmissionBoxMapper::getInstance(),
                 SubmissionBox\SingleFile\Mapper::getInstance(),
+                $assessmentMapperProxy,
                 $this->getLogger()
             ));
 

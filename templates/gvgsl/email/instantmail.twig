@@ -42,17 +42,19 @@
                     <td>
                         <p>
                             {# raw HTML NOT sanctioned - this should never be HTML, so it shouldn't be necessary #}
-                            <em>{{ msg.meta.byline | raw }}</em>
+                            <em>{{ msg.meta.byline ?? '' | raw }}</em>
                         </p>
                     </td>
                 </tr>
+                <tr>
                     <td>
-                        {% if msg.meta.blurb %}
+                        {% if msg.meta.blurb is defined and (msg.meta.blurb | length > 0) %}
                             {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
-                        {% else %}
+                        {% elseif msg.meta.body is defined %}
                             <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
                         {% endif %}
                     </td>
+                </tr>
                 {% endif %}
             </table>
         </td>

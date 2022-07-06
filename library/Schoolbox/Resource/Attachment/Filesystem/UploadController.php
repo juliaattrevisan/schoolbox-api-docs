@@ -19,6 +19,12 @@ use SitePage;
  */
 class UploadController extends AbstractController
 {
+    /**
+     * The maximum number of files that can be uploaded when multi-uploads
+     * are enabled.
+     */
+    private const DEFAULT_MAX_FILES = 256;
+
 
     /**
      * @param SitePage $page
@@ -32,7 +38,7 @@ class UploadController extends AbstractController
         }
 
         $page->setVar(array(
-            'MAX_FILES'      => $this->multi ? '32' : '1',
+            'MAX_FILES'      => $this->multi ? self::DEFAULT_MAX_FILES : '1',
             'ACCEPTED_FILES' => $mime,
         ));
     }

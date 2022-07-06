@@ -19,7 +19,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Factory
 {
-
     /**
      * @var LoggerInterface
      */
@@ -55,24 +54,33 @@ class Factory
 
 
     /**
+     * @var string
+     */
+    private string $timezone;
+
+
+    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param LockInterface   $lock
      * @param string          $host
      * @param string          $token
+     * @param string          $timezone
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         LockInterface $lock,
         string $host,
-        string $token
+        string $token,
+        string $timezone
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->lock = $lock;
         $this->host = $host;
         $this->token = $token;
+        $this->timezone = $timezone;
     }
 
 
@@ -140,42 +148,44 @@ class Factory
          */
         $bus = new GenericCollection(IStrategy::class);
 
-        $bus->add(new Hierarchy\Prepare(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $seasonMapper,
-            $sportMapper,
-            $positionMapper,
-            $divisionMapper,
-            $teamMapper,
-            $teamPlayerMapper,
-            $teamPositionMapper,
-            $divisionUserMapper
-        ))
-        ->add(new Hierarchy\Team(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $api,
-            $membership,
-            $registry,
-            $userLookup,
-            $divisionUserMapper,
-            $teamPlayerMapper,
-            $teamPositionMapper,
-            $userMapper
-        ))
-        ->add(new Hierarchy\Cleanup(
-            $this->log,
-            $this->perform,
-            $this->lock,
-            $seasonMapper,
-            $sportMapper,
-            $positionMapper,
-            $divisionMapper,
-            $teamMapper
-        ));
+        if ($membership) {
+            $bus->add(new Hierarchy\Prepare(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper,
+                $teamPlayerMapper,
+                $teamPositionMapper,
+                $divisionUserMapper
+            ))
+            ->add(new Hierarchy\Team(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $api,
+                $membership,
+                $registry,
+                $userLookup,
+                $divisionUserMapper,
+                $teamPlayerMapper,
+                $teamPositionMapper,
+                $userMapper
+            ))
+            ->add(new Hierarchy\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->lock,
+                $seasonMapper,
+                $sportMapper,
+                $positionMapper,
+                $divisionMapper,
+                $teamMapper
+            ));
+        }
 
         /* Optionally load Sessions (the equivalent of schoolbox Matchups)
          * This is where we assign people to positions, add coaches, etc.
@@ -205,6 +215,7 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $api,
+                $this->timezone,
                 $registry,
                 $userLookup,
                 $venueMapper,

@@ -16,16 +16,17 @@ use Alaress\Image;
 use Alaress\Image\Transformation\ITransformFactory;
 use Alaress\Lock\InstanceLockFactory;
 use InvalidArgumentException;
+use Monolog\Logger;
 use OutOfBoundsException;
 use PDO;
 use PDOException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External as SchoolboxExternal;
 use Schoolbox\Resource\FilesystemFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -60,7 +61,7 @@ class Manager
     // If a transformation is 'processing' and was last updated greater than this number of seconds ago,
     // assume it has died and attempt another transformation.
     // TODO expose as CLI option
-    private const TIMED_OUT_THRESHOLD = 300;
+    public const TIMED_OUT_THRESHOLD = 300;
 
     // List of transformations that we will generate for each image
     private const CUSTOM_TRANSFORMS  = [
@@ -77,7 +78,7 @@ class Manager
     private const SPINLOCK_WAIT_TIME_MICRO = 5000;
 
     // How many seconds should CLI have to process a single transformation
-    private const IMAGICK_TIME_LIMIT = 3600;
+    public const IMAGICK_TIME_LIMIT = 3600;
 
     // If file is GIF and larger than this, only allow 1 simultaneous execution
     private const MUTEX_FILESIZE_LIMIT_BYTES = 1000000;
@@ -177,6 +178,8 @@ class Manager
     private array $requiresMutexCache = [];
 
     /**
+     * Constructor
+     *
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
      * @param int             $workerCount     Max number of concurrent workers
@@ -657,17 +660,24 @@ class Manager
                     }
                 } else {
                     // Worker Process
-                    $worker = new Worker(
-                        $t->getHash(),
-                        $t->getCacheKey(),
-                        $t->getTransform(),
-                        self::TIMED_OUT_THRESHOLD,
-                        self::IMAGICK_TIME_LIMIT,
-                        $this->retryFailed,
-                        $this->attemptsPerTransform
+                    $verbosity = match ($this->logLevel) {
+                        Logger::DEBUG  => '-vvv',
+                        Logger::INFO   => '-vv',
+                        Logger::NOTICE => '-v',
+                        default        => '',
+                    };
+                    $command = sprintf(
+                        'php %s %s --hash %s --cache-key %s --transform %s %s --attempts %s',
+                        escapeshellarg(SITE_root . '/tools/image/worker.php'),
+                        $verbosity,
+                        escapeshellarg($t->getHash()),
+                        escapeshellarg($t->getCacheKey()),
+                        escapeshellarg(base64_encode(serialize($t->getTransform()))),
+                        ($this->retryFailed ? '--retry-failed' : ''),
+                        escapeshellarg((string)$this->attemptsPerTransform),
                     );
-                    (new CliTool\Kernel($worker, [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]))->runApp();
-                    exit;
+                    passthru($command, $resultCode);
+                    exit($resultCode);
                 }
             }
             usleep(self::SPINLOCK_WAIT_TIME_MICRO);
@@ -698,7 +708,7 @@ class Manager
             $this->logger->debug($this->prefixLog("Checking mutex required: '$hash'"));
             if ($this->localStorageDir !== null) {
                 // If using local storage
-                $path        = \Schoolbox\Resource\Storage\Manager::getPathFromHash($hash);
+                $path        = FilesystemProxy::getPathFromHash($hash);
                 $cmd         = "/usr/bin/identify -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
                 $countLayers = (int)exec($cmd, $output, $exitCode);
                 if ($exitCode) {

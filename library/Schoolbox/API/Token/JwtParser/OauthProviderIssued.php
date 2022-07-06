@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\API\Token\JwtParser;
+
+use Firebase\JWT as JwtLibrary;
+use GuzzleHttp\Client;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+/**
+ * Parser for configured oAuth provider-issued JWTs.
+ */
+class OauthProviderIssued extends Base
+{
+    /**
+     * Default session length, in seconds: used as the default leeway for the
+     * JWT verifier.
+     */
+    private const SESSION_LENGTH_DEFAULT = 1800;
+
+    /**
+     * Constructor
+     *
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     */
+    public function __construct(
+        private UserMapper $userMapper,
+        private IConfigLoader $config,
+        private Client $httpClient,
+    ) {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function accepts(string $jwt): bool
+    {
+        $claims      = $this->decodeWithoutVerification($jwt);
+        $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
+        $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
+        return isset($jwtIssuer, $oauthIssuer)
+            && trim($jwtIssuer, '/') === trim($oauthIssuer, '/');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function determineUser(string $jwt): User
+    {
+        // Determine JWKS for this provider
+        $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
+        $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
+
+        // TODO allow these to be configurable
+        $oidcConfigUri     = $oauthIdp . '/.well-known/openid-configuration';
+        $oidcConfigRequest = $this->httpClient->get($oidcConfigUri);
+        $oidcConfig        = json_decode($oidcConfigRequest->getBody()->getContents(), true);
+        $jwksRequest       = $this->httpClient->get($oidcConfig['jwks_uri']);
+        $jwks              = json_decode($jwksRequest->getBody()->getContents(), true);
+        $algs              = ['RS256'];
+
+        // Verify the JWT
+        $sessionLength = (int)$this->config->get('session_length');
+        if ($sessionLength <= 0) {
+            $sessionLength = self::SESSION_LENGTH_DEFAULT;
+        }
+        $claims = $this->decode(
+            $jwt,
+            JwtLibrary\JWK::parseKeySet($jwks),
+            $sessionLength,
+            $algs,
+        );
+
+        // Validate audience
+        $validAudience = false;
+        $audiences     = (array)$claims[self::CLAIM_AUD];
+        $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        foreach ($audiences as $audience) {
+            if ($audience === $oauthClientId) {
+                $validAudience = true;
+                break;
+            }
+        }
+        if (!$validAudience) {
+            throw new Exception\Rejected(
+                sprintf('JWT "%s" claim does not match configured client ID', self::CLAIM_AUD)
+            );
+        }
+
+        // The identification in the token seems to be in one of two claims:
+        // * "preferred_username" matches a Schoolbox username
+        // * "https://cloudwork.id/claims/sis_id" matches an external ID
+        // We'll just use the preferred username until I hear otherwise.
+        $messages = [];
+        foreach ($candidateClaims as $candidateClaim) {
+            $candidateClaim = trim($candidateClaim);
+            if (isset($claims[$candidateClaim])) {
+                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
+                if (!$user) {
+                    $failureMessage = sprintf(
+                        'JWT "%s" claim does not match a user',
+                        $candidateClaim
+                    );
+                } elseif (!$user->getEnabled()) {
+                    $failureMessage = sprintf(
+                        'JWT "%s" claim matches a deactivated user',
+                        $candidateClaim
+                    );
+                } else {
+                    return $user;
+                }
+            } else {
+                $failureMessage = sprintf(
+                    'JWT "%s" claim is empty',
+                    $candidateClaim
+                );
+            }
+            $messages[] = $failureMessage;
+        }
+
+        // Candidate claims found no user: can't use it
+        throw new Exception\InvalidIdentity(
+            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages))
+        );
+    }
+}

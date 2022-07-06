@@ -27,7 +27,8 @@ $publicdir     = (new WebDavFolder(
     $mapperFactory->get(\Schoolbox\Resource\Folder\Mapper::class),
     $mapperFactory->get(\Schoolbox\Resource\File\Mapper::class),
     $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
-    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class)
+    $mapperFactory->get(\Schoolbox\Permission\Access\Access::class),
+    $kernel->get('filesystem.storageProxy'),
 ))->addSubjectList(
     new WebDavSubjectList(
         'My Subjects',
@@ -36,7 +37,8 @@ $publicdir     = (new WebDavFolder(
         $mapperFactory->get(\Schoolbox\Resource\Storage\Mapper::class),
         $kernel->get('submissionDataSource'),
         $mapperFactory->get(ErrorMapper::class),
-        new WebDavNameGenerator()
+        new WebDavNameGenerator(),
+        $kernel->get('filesystem.storageProxy'),
     )
 );
 

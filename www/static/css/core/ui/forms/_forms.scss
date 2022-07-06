@@ -89,11 +89,11 @@ $select-hover-bg-color: tint($warning-color, 50%);
 // We use this mixin to give us form styles for rows inside of forms
 @mixin form-row-base {
   .row {
-    margin: 0 ((-$form-spacing) / 2);
+    margin: 0 calc(strip-unit(-$form-spacing) / 2);
 
     .column,
     .columns {
-      padding: 0 ($form-spacing / 2);
+      padding: 0 calc($form-spacing / 2);
     }
 
     // Use this to collapse the margins of a form row
@@ -113,7 +113,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   input.columns,
   textarea.column,
   textarea.columns {
-    padding-#{$default-float}: ($form-spacing / 2);
+    padding-#{$default-float}: calc($form-spacing / 2);
   }
 }
 
@@ -134,7 +134,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   font-size: $input-font-size;
   height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
   margin: 0 0 $form-spacing 0;
-  padding: $form-spacing / 2;
+  padding: calc($form-spacing / 2);
   width: 100%;
   box-sizing: border-box;
   @if $input-include-glowing-effect {
@@ -185,7 +185,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
     text-align: right;
   } @else if $alignment == inline {
     margin: 0 0 $form-spacing 0;
-    padding: $form-spacing / 2 + rem-calc($input-border-width) 0;
+    padding: calc($form-spacing / 2) + rem-calc($input-border-width) 0;
   }
 }
 
@@ -370,7 +370,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
   font-family: $input-font-family;
   font-size: $input-font-size;
   line-height: normal;
-  padding: ($form-spacing / 2);
+  padding: calc($form-spacing / 2);
   @include radius(0);
   &.radius {
     @include radius($global-radius);
@@ -410,6 +410,11 @@ $select-hover-bg-color: tint($warning-color, 50%);
       @include form-row-base;
     }
 
+    /* Remove built-in form typography styles */
+    input, button, textarea, select {
+        font: inherit;
+    }
+
     /* Label Styles */
     label {
       @include form-label;
@@ -424,6 +429,12 @@ $select-hover-bg-color: tint($warning-color, 50%);
         text-transform: $form-label-small-transform;
         color: scale-color($form-label-font-color, $lightness: 15%);
       }
+    }
+
+    section {
+        label {
+            font-size: $paragraph-font-size;
+        }
     }
 
     /* Attach elements to the beginning or end of an input */
@@ -696,7 +707,7 @@ form {
         color: $aluminum; 
         font-weight: normal; 
     }
-    margin: 0 0 $form-spacing / 2 0;
+    margin: 0 0 calc($form-spacing / 2) 0;
 }
 
 label {
@@ -755,7 +766,7 @@ input[type="radio"] {
 }
 
 input[type="number"] {
-    padding: 0 0 0 $form-spacing / 2;
+    padding: 0 0 0 calc($form-spacing / 2);
 }
 
 select {
@@ -1207,6 +1218,12 @@ ul.filters {
 
 .filter-interaction {
     border-bottom: 1px solid #ededed;
+    .filter-summary {
+        line-height: 2rem;
+    }
+    input[type="submit"] {
+        margin-bottom: 0;
+    }
 }
 
 // flex version of columns for filter results

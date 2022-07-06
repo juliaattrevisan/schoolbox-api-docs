@@ -44,7 +44,6 @@ use UnexpectedValueException;
  */
 class Transactor
 {
-
     /**
      * @var IAssessable
      */
@@ -82,6 +81,18 @@ class Transactor
 
 
     /**
+     * @var Turnitin\Group\Mapper
+     */
+    protected Turnitin\Group\Mapper $turnitinGroupMapper;
+
+
+    /**
+     * @var SubmissionBoxMapper
+     */
+    protected SubmissionBoxMapper $submissionBoxMapper;
+
+
+    /**
      * @var SingleFile\Mapper
      */
     protected $submissionFileMapper;
@@ -101,6 +112,7 @@ class Transactor
      */
     protected Replicator $replicator;
 
+
     /**
      * Transactor constructor.
      *
@@ -109,6 +121,8 @@ class Transactor
      * @param UnitSpecificationMapper               $unitSpecificationMapper
      * @param AssessmentMapperProxy                 $assessmentMapperProxy
      * @param DueWork\Response\File\Plagscan\Mapper $plagscanMapper
+     * @param Turnitin\Group\Mapper                 $turnitinGroupMapper
+     * @param SubmissionBoxMapper                   $submissionBoxMapper
      * @param SingleFile\Mapper                     $submissionFileMapper
      * @param QuizMapper                            $quizMapper
      * @param Router                                $router
@@ -120,6 +134,8 @@ class Transactor
         UnitSpecificationMapper $unitSpecificationMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         DueWork\Response\File\Plagscan\Mapper $plagscanMapper,
+        Turnitin\Group\Mapper $turnitinGroupMapper,
+        SubmissionBoxMapper $submissionBoxMapper,
         SingleFile\Mapper $submissionFileMapper,
         QuizMapper $quizMapper,
         Router $router,
@@ -130,6 +146,8 @@ class Transactor
         $this->unitSpecificationMapper = $unitSpecificationMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->plagscanMapper = $plagscanMapper;
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
+        $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionFileMapper = $submissionFileMapper;
         $this->quizMapper = $quizMapper;
         $this->router = $router;
@@ -198,12 +216,9 @@ class Transactor
                 /** @var DueWork\Model $assessment */
                 if ($assessment->getSimilarityCheckEnabled()) {
                     /* If turnitin is enabled, retrofit any old submissions' documents
-                     * Otherwise do the original behaviour (retrofit to plag)
                      */
                     if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
                         (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper))->retrofit($this->assessment->getId());
-                    } else {
-                        (new DueWork\Response\File\Plagscan\Retrofit($this->plagscanMapper, $this->submissionFileMapper))->retrofit($assessment->getId());
                     }
                 }
             }
@@ -227,10 +242,13 @@ class Transactor
             $relocated = true;
         }
 
-        /* If Similarity Check is enabled, and turnitin is enabled,
+        /* If Similarity Check is enabled, and turnitin is enabled, and this is an implementation,
          * send the attachments to turnitin to use as exclusion data for student submissions
+         *
+         * (We only care about assessment implementations because turnitin has no utility for
+         * assessment specifications, so skip those ones)
          */
-        if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled()) {
+        if ($this->assessment instanceof DueWork\Model && $this->assessment->getSimilarityCheckEnabled() && $this->assessment->isImplementation()) {
             /* If turnitin is enabled, create a group attachment for each file
              */
             if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
@@ -243,18 +261,16 @@ class Transactor
                  * TODO There should be an easier way to do this, but idk,
                  *  something is going funny in the swamp
                  */
-                $submissionBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $this->assessment->getId(), ['cache' => false]);
-
-                $turnitinGroupMapper = Turnitin\Group\Mapper::getInstance();
+                $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $this->assessment->getId(), [ 'cache' => false ]);
 
                 /* Create a turnitin_group queue record if one doesn't already exist
                  * Upon save, set its status to Pending; we need to find out what files
                  * needed to be micromanaged into turnitin
                  */
                 try {
-                    $turnitinGroup = $turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());
+                    $turnitinGroup = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $turnitinGroup = $turnitinGroupMapper->createModel()
+                    $turnitinGroup = $this->turnitinGroupMapper->createModel()
                         ->setSubmissionBoxId($submissionBox->getId());
                 }
 
@@ -264,7 +280,7 @@ class Transactor
                  */
                 $turnitinGroup->setStatus(Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
 
-                $turnitinGroupMapper->save($turnitinGroup);
+                $this->turnitinGroupMapper->save($turnitinGroup);
             }
         }
 

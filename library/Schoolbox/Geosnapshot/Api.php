@@ -14,6 +14,7 @@ use GuzzleHttp\RequestOptions;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
 /**
@@ -25,7 +26,6 @@ use Schoolbox\User;
  */
 class Api
 {
-
     /**
      * POST to this endpoint
      */
@@ -97,7 +97,8 @@ class Api
      *
      * Manufacture a payload with the necessary parts and send it out there
      *
-     * @param User $viewee
+     * @param User            $viewee
+     * @param FilesystemProxy $filesystemProxy
      * @return array
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -105,9 +106,9 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveStudentPhotos(User $viewee): array
+    public function retrieveStudentPhotos(User $viewee, FilesystemProxy $filesystemProxy): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto())->build($viewee));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee));
     }
 
 

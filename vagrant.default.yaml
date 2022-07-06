@@ -53,6 +53,5 @@ taskd_dir: "../taskd"
 taskd_sync_type: "gitsync"
 
 # Should the task daemon image be built from the local dir at all?
-# If not, then the image will be pulled from Dockerhub
-# (requires a valid DOCKERHUB_ACCESS_TOKEN in .env)
+# If not, then the image will be pulled from Dockerhub and managed as systemd service by puppet
 taskd_build_from_local: false

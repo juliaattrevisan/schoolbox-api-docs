@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Mailer;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -17,7 +17,6 @@ use Schoolbox\Profile\ValidEmailVisible;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Maximum number of members to display
      * If the collection exceeds this it will truncate the list and leave a message
@@ -237,7 +236,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 }
 
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                $this->setVar("EMAILALL", implode(AbstractMailer::implodeGlue(), array_unique($emailall)));
+                $this->setVar("EMAILALL", implode(Mailer::implodeGlue(), array_unique($emailall)));
 
                 if ($this->getConfigLoader()->get('mail_enable') && $this->getUser()->hasEmail()) {
                     $this->parse("member_email_block", "member_email");

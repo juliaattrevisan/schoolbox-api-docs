@@ -18,22 +18,6 @@ Admin,"User Management Schoolbox Help All",Superuser,https://vagrant.dev.schoolb
 Admin,"User Management Schoolbox Help All",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/shaps,401
 Admin,"User Management Schoolbox Help All",Student,https://vagrant.dev.schoolbox.cloud/adminv2/shaps,401
 Admin,"User Management Schoolbox Help All",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/shaps,401
-Admin,"User Management Schoolbox Help Provisioned",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned,200
-Admin,"User Management Schoolbox Help Provisioned",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned,401
-Admin,"User Management Schoolbox Help Provisioned",Student,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned,401
-Admin,"User Management Schoolbox Help Provisioned",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/provisioned,401
-Admin,"User Management Schoolbox Help Not Provisioned",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned,200
-Admin,"User Management Schoolbox Help Not Provisioned",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned,401
-Admin,"User Management Schoolbox Help Not Provisioned",Student,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned,401
-Admin,"User Management Schoolbox Help Not Provisioned",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/unprovisioned,401
-Admin,"User Management Schoolbox Help Search",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search,200
-Admin,"User Management Schoolbox Help Search",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search,401
-Admin,"User Management Schoolbox Help Search",Student,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search,401
-Admin,"User Management Schoolbox Help Search",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/provisioning/search,401
-Admin,"User Management Schoolbox Help Courses",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses,200
-Admin,"User Management Schoolbox Help Courses",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses,401
-Admin,"User Management Schoolbox Help Courses",Student,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses,401
-Admin,"User Management Schoolbox Help Courses",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/shaps/courses,401
 Admin,"User Management Remove Users",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/user/stale,200
 Admin,"User Management Remove Users",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/user/stale,401
 Admin,"User Management Remove Users",Student,https://vagrant.dev.schoolbox.cloud/adminv2/user/stale,401

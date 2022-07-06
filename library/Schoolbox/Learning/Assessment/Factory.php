@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
@@ -159,10 +161,10 @@ class Factory
         $this->setAssessmentType(trim($post['assessmentType'] ?? ''));
         $this->setContext($post['context'] ?? '');
         $this->setTitle(trim($post['title'] ?? ''));
-        $this->setWorkType(trim($post['workType'] ?? ''));
+        $this->setWorkType(empty($post['workType']) ? null : (int)trim($post['workType']));
         $this->setDescription(trim($post['description'] ?? ''));
         $this->setCreator($creator);
-        $this->setWeight(trim($post['weight'] ?? ''));
+        $this->setWeight((float)(trim($post['weight'] ?? '')));
         $this->setCurriculumNodes($post['curriculumCodes'] ?? []);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setCourseManaged((bool)($post['courseManaged'] ?? ''));
@@ -178,12 +180,11 @@ class Factory
 
         /* Due Work needs this to instantiate correctly
          */
-        $this->setAcceptOnline(trim($post['acceptOnline'] ?? ''));
-        $this->setWorkType(trim($post['workType'] ?? ''));
-        $markType = trim($post['markType'] ?? '');
+        $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
+        $markType = (int)trim($post['markType'] ?? '');
         $this->setMarkType($markType);
-        $this->setGradingScheme(trim($post['gradingScheme'] ?? ''));
-        $this->setUseRubric(trim($post['useRubric'] ?? ''));
+        $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
+        $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
         $this->setCapabilityMarkType((int)trim($post['capability-markType'] ?? ''));
@@ -240,8 +241,8 @@ class Factory
 
         /* Quiz needs this to instantiate correctly
          */
-        $this->setDurationHours(trim($post['durationHours'] ?? 0));
-        $this->setDurationMinutes(trim($post['durationMinutes'] ?? 0));
+        $this->setDurationHours(intval($post['durationHours'] ?? 0));
+        $this->setDurationMinutes(intval($post['durationMinutes'] ?? 0));
         $this->setMaxAttempts(intval($post['maxAttempts'] ?? 0));
         $this->setMarkVisibility(intval($post['visibility'] ?? 0));
         $this->setCompletionMessage($post['completion_message'] ?? '');
@@ -343,7 +344,6 @@ class Factory
                 $this->getSummator()
             );
         } elseif ($assessment instanceof DueWork) {
-
             /** @var DueWork $originalDueWork */
             $originalDueWork = $this->original;
 

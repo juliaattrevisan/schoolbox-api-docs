@@ -8,7 +8,6 @@
  # These are checked inside Plag mapper and Turnitin Mapper isEnabled()
  #
  # @param bool $turnitinApiEnabled              A bool declaring whether Turnitin was configured adequately
- # @param bool $plagscanApiEnabled              A bool declaring whether PLagscan was configured adequately
  # @param IAssessable $assessment               An assessment instance (typically a due work)
  # @param IResponse $response                   A response instance (what the student submitted)
  # @param Participant $participant              The participating student
@@ -42,13 +41,6 @@
             currentFile: currentFile
         } %}
     {% endif %}
-{% elseif plagscanApiEnabled %}
-    {# If the plagscan api was configured then assume we're using that
-     # instead of turnitin (this here is mutually exclusive)
-     #}
-    {% include '@learning/dueWork/plagscan/status.twig' with {
-        currentFile: currentFile
-    } %}
 {% endif %}
 
 {# You might not be using either similiarity checkers; do nothing,

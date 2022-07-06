@@ -96,6 +96,12 @@ class Api implements IApi
 
 
     /**
+     * @var array
+     */
+    private array $options;
+
+
+    /**
      * @var Client
      */
     private Client $client;
@@ -151,11 +157,17 @@ class Api implements IApi
          */
         $dsnParts = (new Codec\DSN())->decode($dsn);
 
-        if (!isset($dsnParts[$module])) {
+        if (!isset($dsnParts['modules'][$module])) {
             throw new MissingModule("Tass API DSN: Invalid module name {$module}");
         }
 
-        $this->credentials = $dsnParts[$module];
+        /* Remember the module's credentials
+         */
+        $this->credentials = $dsnParts['modules'][$module];
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $dsnParts['options'] ?? [];
 
         /* Set up a token codec which does some security stuff based on the
          * params provided to its generateToken() method
@@ -353,5 +365,14 @@ class Api implements IApi
     public function getToken(): string
     {
         return $this->credentials['token'];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

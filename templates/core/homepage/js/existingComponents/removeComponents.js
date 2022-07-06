@@ -44,7 +44,7 @@ function initToggleButon (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.addEventListener('click', (event) => {
         event.preventDefault();
-        gsap.to(toggleButton, { rotation: '+=180', transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+        gsap.to(toggleButton, { rotation: isOpen(component) ? 0 : 180, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
         isOpen(component) ? close(component) : open(component);
     });
 }

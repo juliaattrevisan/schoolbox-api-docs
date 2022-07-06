@@ -137,9 +137,8 @@ class Reader implements \Iterator
      * Check that the filename/resource is valid, and that the resource is
      * seekable: die loudly if it's not.
      *
-     * @see \Schoolbox\Resource\Storage\SeekableStream\Factory::buildSeekableStream
-     *      for building a resource stream that is guaranteed to be seekable
-     *      (a stream from AWS might not be)
+     * @see \Schoolbox\Resource\Storage\S3\Adapter::readStream()
+     *      for building a resource stream from S3 that is guaranteed seekable.
      *
      * @param resource|string $filename a path to file or a fopen'd file resource
      * @param bool            $hasHeaderRow

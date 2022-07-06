@@ -34,7 +34,6 @@ use Schoolbox\Sync\Rule\Model as Rule;
  */
 class Controller extends Base
 {
-
     /**
      * @var string
      */
@@ -51,9 +50,12 @@ class Controller extends Base
      * Constructor
      *
      * @param Schoolbox\File\MimetypeMapper $mimetypeMapper
+     * @param Storage\FilesystemProxy       $filesystemProxy
      */
-    public function __construct(Schoolbox\File\MimetypeMapper $mimetypeMapper)
-    {
+    public function __construct(
+        Schoolbox\File\MimetypeMapper $mimetypeMapper,
+        private Storage\FilesystemProxy $filesystemProxy,
+    ) {
         $this->mimetypeMapper = $mimetypeMapper;
     }
 
@@ -162,7 +164,7 @@ class Controller extends Base
 
         foreach ($logs as $log) {
             $logdata[$log->getId()] = [
-                'Timestamp' => $log->getStorage()->getCreatedAt()->getShort(),
+                'Timestamp' => $log->getStorage()->getCreatedAt(),
                 'Role Type' => ucfirst($log->getRoleType()),
                 'Dry Run'   => $log->isDry(),
                 'Created'   => $log->getUsersCreated(),
@@ -259,7 +261,7 @@ class Controller extends Base
                     ],
                     'callback'  => [ $this, 'streamLog' ],
                     'param_arr' => [
-                        'stream'          => $model->getStorage()->readStream(),
+                        'stream'          => $this->filesystemProxy->readStream($model->getStorage()),
                         'filter'          => $this->parseFilterString($filter),
                         'filterBlacklist' => ['rulestring'],
                     ],
@@ -375,7 +377,7 @@ class Controller extends Base
     protected function getLogPartial(Storage\Model $storage, $page = 1, $filter = [], $linesPerPage = 50)
     {
         // read the stream so we don't load 50,000 lines of JSON into memory at once
-        $inStream = $storage->readStream();
+        $inStream = $this->filesystemProxy->readStream($storage);
 
         // type enforcement
         $page         = (int)max($page, 0);

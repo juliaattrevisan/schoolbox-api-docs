@@ -85,7 +85,7 @@
     </div>
     <div class="component-action" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed" style="display: none;">
         <section>
-            <form action="/mail/createMail.php" method="post" class="no-margin">
+            <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin">
                 <div class="row">
                     <div class="small-12 columns">
                         <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>

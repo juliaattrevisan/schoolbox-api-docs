@@ -1,0 +1,172 @@
+/*
+    The Sass file where all other Sass files are born
+    Essentially just imports all required files so can can reference 
+    the compiled core.css 
+*/
+
+@charset "UTF-8";
+
+// CDN prefix:
+// applied before all url() CSS rules
+// The CDN prefix relative to the compiled stylesheet
+// (currently CDN_PREFIX + '/css/core/main.css')
+$cdn-prefix: "../..";
+
+// Base
+@import "base/colors";
+@import "base/font-faces";
+@import "base/variables";
+@import "base/mixins";
+@import "base/functions";
+@import "base/settings";
+@import "base/global";
+@import "base/typography";
+
+//Utils
+@import "utils/meta";
+@import "utils/modifiers";
+@import "utils/visibility";
+
+// Layout
+@import "layout/footer";
+@import "layout/grid";
+@import "layout/container";
+@import "layout/login";
+@import "layout/flex";
+
+// Shared user interface
+@import "ui/icons";
+@import "ui/skeleton";
+@import "ui/lists";
+@import "ui/forms/labels";
+@import "ui/progress-bars";
+@import "ui/reveal";
+@import "ui/thumbs";
+@import "ui/content";
+@import "ui/accordion";
+
+// Must import before forms, as forms reimports buttons.scss
+@import "components/buttons";
+
+@import "ui/forms/forms";
+@import "components/tree";
+@import "components/masonry";
+@import "components/ups";
+@import "ui/preview";
+@import "components/debugbar/debugbar";
+
+// Refined UI Elements
+@import "ui/button/button";
+@import "ui/button/list-actions"; // requires _button.scss
+@import "ui/button/dropdown";
+@import "ui/button/tabs";
+@import "ui/navigation/navigation";
+@import "ui/navigation/notification"; // requires _button.scss
+@import "ui/forms/search"; // requires _navigation.scss
+@import "ui/navigation/breadcrumb";
+@import "ui/navigation/pagination";
+@import "ui/navigation/sub-nav";
+@import "ui/navigation/side-nav";
+@import "ui/shaps";
+@import "ui/atlas";
+@import "ui/tables";
+@import "ui/weather";
+
+//////////////////////////////////////////////////////////
+// Common UI Elements
+//
+// Specialist elements, plugins and widgets
+//////////////////////////////////////////////////////////
+@import "ui/data-tables";
+@import "ui/alert-boxes";
+@import "ui/iframe";
+@import "ui/cards";
+@import "ui/highcharts";
+
+// Schoolbox Areas
+@import "components/evaluation/evaluation";
+@import "components/submissions/inline-grading";
+@import "components/submissions/submissions";
+@import "components/submissions/rubric";
+@import "components/wiki/wiki";
+@import "components/timetable/timetable";
+@import "components/calendar/calendar";
+@import "components/calendar/event";
+@import "components/calendar/studentconference";
+@import "components/curriculum/curriculum";
+@import "components/course/course";
+@import "components/marksheet";
+@import "components/assessment/participation";
+@import "components/news/news";
+@import "components/discussion/discussion";
+@import "components/learning-moments/student-dashboard";
+@import "components/learning-moments/evidence-capture";
+@import "components/badge/badge";
+@import "components/profile/profile";
+@import "components/image-gallery";
+@import "components/google/picker";
+@import "components/yandex/yandex";
+@import "components/geosnapshot/geosnapshot";
+@import "components/similarity-report/similarity-report";
+@import "components/suds/suds";
+
+// Slider
+@import "../../js/vendors/swiper/dist/css/swiper";
+@import "ui/slider";
+
+// Feature Tour
+@import "/node_modules/intro.js/introjs";
+@import "components/feature-tour/feature-tour";
+
+// Select Source shard
+@import "components/sourceSelect";
+
+// Dashboard/Homepage/Eportfolio component styles
+@import "components/components";
+
+// UPS
+@import "components/ups/ups";
+
+// EOTC
+@import "components/eotc/eotc";
+
+// CK Editor
+@import "components/editor/editor";
+@import "components/editor/custom-styles";
+@import "components/editor/mejs";
+@import "components/editor/inline";
+
+// Boarder Leave
+@import "components/boarder-leave/boarder-leave";
+
+// Sports Fixtures
+@import "components/sportsfixtures/sportsfixtures";
+
+// Mr Matt's Modal
+@import "components/attachment-browser/attachment-browser";
+
+// Flatpickr
+@import "components/flatpickr/flatpickr"; // For now, till we manage to move our whole flatpickr to webpack
+@import "components/alaress-datetime-picker/alaress-datetime-picker";
+
+// Needs to be included outside of container in order to work
+@import "ui/reveal";
+@import "ui/tooltips";
+@import "layout/flex-video";
+@import "ui/button/dropdown-buttons";
+@import "ui/joyride";
+@import "ui/selectize.customisation";
+
+//Magnific Popup
+@import "/node_modules/magnific-popup/src/css/main";
+@import "components/magnific/settings";
+
+// combobox relies on selectize styles
+@import "ui/combobox";
+
+// jqmath
+@import "../../js/math/jqmath-0.4.0";
+
+// jQuery UI
+@import "/node_modules/jquery-ui/themes/base/draggable";
+@import "/node_modules/jquery-ui/themes/base/sortable";

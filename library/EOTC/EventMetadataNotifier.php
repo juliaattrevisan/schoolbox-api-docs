@@ -29,7 +29,6 @@ use Alaress_Date_Format;
 
 class EventMetadataNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_SUBMITTED     = 'submitted';
     const TRIGGER_UPDATED       = 'updated';
     const TRIGGER_STATUSCHANGED = 'statuschanged';
@@ -229,11 +228,12 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
         array_push($userIds, $relEvent->getAuthor()->getId());
 
-        if (count($userIds) == 0) {
-            // no audience? no messages
-            $this->log->error("No audience for EOTC $relEventId");
-            return $envelope;
-        }
+        // Envelope can't possibly be empty if we just pushed something onto it.
+//        if (count($userIds) == 0) {
+//            // no audience? no messages
+//            $this->log->error("No audience for EOTC $relEventId");
+//            return $envelope;
+//        }
 
         // compensate for timing issues by pushing "now" back a few minutes.
         $days = $relEventStart->diffInDays((new \Alaress_Date_Format(time(), Alaress_Date_Format::TIMESTAMP))->addMinutes(-10));

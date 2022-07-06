@@ -10,17 +10,17 @@ declare(strict_types=1);
 namespace Alaress\Image\Processor;
 
 use Alaress\Image;
-use Alaress\Image\Cache\LocalFS;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\UnableToReadFile;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\File as SchoolboxFile;
 use Schoolbox\Instance;
 use Schoolbox\Mapper as SchoolboxMapper;
@@ -33,88 +33,17 @@ use Throwable;
  * The worker process logic used by the background cron job that pre-transforms images
  *
  * A new worker is spawned for every distinct transformation.
+ *
+ * Not intended to be called directly by end users: this should be called only
+ * by the image processor.
  */
 class Worker extends CliTool\App
 {
-    /**
-     * The original file hash
-     *
-     * @var string
-     */
-    private string $hash;
-
-    /**
-     * A string that describes/represents the transformation being applied
-     *
-     * @var string
-     */
-    private string $cacheKey;
-
-    /**
-     * Transform to apply to original image
-     *
-     * @var ITransform
-     */
-    private ITransform $transform;
-
-    /**
-     * After how many seconds should we assume that a transformation still 'processing' has timed out and can
-     * be re-attempted
-     *
-     * @var int
-     */
-    private int $timeOutThreshold;
-
-    /**
-     * How long should image magick be allowed to execute for.
-     *
-     * This must be less than or equal to the Lock/max-execution-time of the PHP process
-     *
-     * @var int
-     */
-    private int $imageMagickTimeout;
-
-    /**
-     * Normally we want to notify Sentry of failures. However if re-trying previous failures, we want to suppress
-     * that behaviour as it is quite normal for failed transforms to not be fixable on subsequent attempts.
-     *
-     * @var bool
-     */
-    private bool $suppressSentryReporting;
-
-    /**
-     * Maximum number of times we will attempt each transformation if it throws a catchable exception
-     *
-     * @var int
-     */
-    private int $attemptsPerTransform;
-
-    /**
-     * @param string     $hash
-     * @param string     $cacheKey
-     * @param ITransform $transform
-     * @param int        $timeOutThreshold
-     * @param int        $imageMagickTimeout
-     * @param bool       $suppressSentryReporting
-     * @param int        $attemptsPerTransform
-     */
-    public function __construct(
-        string $hash,
-        string $cacheKey,
-        ITransform $transform,
-        int $timeOutThreshold,
-        int $imageMagickTimeout,
-        bool $suppressSentryReporting,
-        int $attemptsPerTransform
-    ) {
-        $this->hash                    = $hash;
-        $this->cacheKey                = $cacheKey;
-        $this->transform               = $transform;
-        $this->timeOutThreshold        = $timeOutThreshold;
-        $this->imageMagickTimeout      = $imageMagickTimeout;
-        $this->suppressSentryReporting = $suppressSentryReporting;
-        $this->attemptsPerTransform    = $attemptsPerTransform;
-    }
+    private const OPT_LONG_HASH         = 'hash:';
+    private const OPT_LONG_CACHE_KEY    = 'cache-key:';
+    private const OPT_LONG_TRANSFORM    = 'transform:';
+    private const OPT_LONG_RETRY_FAILED = 'retry-failed';
+    private const OPT_LONG_ATTEMPTS     = 'attempts:';
 
     /** @inheritDoc */
     public function getRequiredProcessUser(): ?string
@@ -122,6 +51,19 @@ class Worker extends CliTool\App
         return 'www-data';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HASH,
+            self::OPT_LONG_CACHE_KEY,
+            self::OPT_LONG_TRANSFORM,
+            self::OPT_LONG_RETRY_FAILED,
+            self::OPT_LONG_ATTEMPTS,
+        ];
+    }
 
     /** @inheritDoc */
     public function setup(array $appOptions, ContainerInterface $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
@@ -168,10 +110,40 @@ class Worker extends CliTool\App
      */
     public function run(): void
     {
-        $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$this->hash}, CacheKey: '{$this->cacheKey}'"));
-        $hashObject = $this->fetchHashObject();
-        if ($hashObject) {
-            $this->generateTransform($hashObject, $this->cacheKey, $this->transform);
+        $hash = $this->getOpt(self::OPT_LONG_HASH);
+        if (!isset($hash)) {
+            $this->getLogger()->error('A hash must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $cacheKey = $this->getOpt(self::OPT_LONG_CACHE_KEY);
+        if (!isset($cacheKey)) {
+            $this->getLogger()->error('A cache-key must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $transform = $this->getOpt(self::OPT_LONG_TRANSFORM);
+        if (!isset($transform)) {
+            $this->getLogger()->error('A transform must be provided');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $transform = unserialize(base64_decode($transform));
+        if (!$transform instanceof ITransform) {
+            $this->getLogger()->error('A transform must be provided, and a base64-encoded serialized ITransform instance');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $attempts = $this->getOptAsInt(self::OPT_LONG_ATTEMPTS);
+        if (!isset($attempts) || $attempts <= 0) {
+            $this->getLogger()->error('An attempts value must be provided, and be greater than 0');
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+        $retryFailed = (bool)$this->getOpt(self::OPT_LONG_RETRY_FAILED);
+
+        $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$hash}, CacheKey: '{$cacheKey}'"));
+
+        /** @var Image\ProcessorFactory $processorFactory */
+        $processorFactory = $this->getDi()->get('filesystem.imageProcessorFactory');
+        $processor        = $this->fetchProcessor($processorFactory, $hash, $cacheKey, $transform);
+        if ($processor) {
+            $this->generateTransform($processor, $hash, $cacheKey, $attempts, $retryFailed);
         }
         $this->getLogger()->debug($this->prefixLog("Finished"));
     }
@@ -182,72 +154,88 @@ class Worker extends CliTool\App
      *
      * Normally this is a storage file, but in rare cases may represent a static file.
      *
-     * @return Storage\Model|null
-     * @throws LogicException
-     * @throws SchoolboxFile\Exception
-     * @throws SchoolboxMapper\Exception
+     * @param Image\ProcessorFactory $processorFactory
+     * @param string                 $hash
+     * @param string                 $cacheKey
+     * @param ITransform             $transform
+     * @return Image\Processor|null
      */
-    private function fetchHashObject(): ?Storage\Model
-    {
+    private function fetchProcessor(
+        Image\ProcessorFactory $processorFactory,
+        string $hash,
+        string $cacheKey,
+        ITransform $transform,
+    ): ?Image\Processor {
         /** @var Storage\Model|null $hashObject */
-        $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $this->hash)->first();
-        if (!$hashObject) {
-            // This is most likely the rare case where we failed to transcode a static image.
-            // We need to locate that image from the hash.
-            $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$this->hash}, searching static files..."));
+        $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $hash)->first();
+        if ($hashObject) {
+            return $processorFactory->buildForStorage(
+                $hashObject,
+                $cacheKey,
+                $transform,
+                Manager::IMAGICK_TIME_LIMIT,
+            );
+        }
+        // This is most likely the rare case where we failed to transcode a static image.
+        // We need to locate that image from the hash.
+        $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$hash}, searching static files..."));
 
-            $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
-            $excludedExtensions = [
-                '1',
-                'checksum',
-                'css',
-                'csv',
-                'def',
-                'editorconfig',
-                'eot',
-                'gitattributes',
-                'gitignore',
-                'htm',
-                'html',
-                'js',
-                'jshintrc',
-                'json',
-                'jst',
-                'less',
-                'lock',
-                'map',
-                'md',
-                'npmignore',
-                'otf',
-                'php',
-                'psd',
-                'scss',
-                'spmignore',
-                'ttf',
-                'txt',
-                'woff',
-                'woff2',
-                'xml',
-                'yml',
-            ];
-            $hashGenerator      = new Storage\HashGenerator();
-            foreach ($itr as $item) {
-                /** @var SplFileInfo $item */
-                if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
-                    continue;
-                }
-                $fp   = fopen($item->getPathname(), 'rb');
-                $hash = $hashGenerator->generateHash($fp);
-                fclose($fp);
-                if ($hash === $this->hash) {
-                    $fileName = str_replace(WEB_root, '', $item->getPathname());
-                    $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
-                    $hashObject = LocalFS::getStorageModel(WEB_root, $fileName);
-                    break;
-                }
+        $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
+        $excludedExtensions = [
+            '1',
+            'checksum',
+            'css',
+            'csv',
+            'def',
+            'editorconfig',
+            'eot',
+            'gitattributes',
+            'gitignore',
+            'htm',
+            'html',
+            'js',
+            'jshintrc',
+            'json',
+            'jst',
+            'less',
+            'lock',
+            'map',
+            'md',
+            'npmignore',
+            'otf',
+            'php',
+            'psd',
+            'scss',
+            'spmignore',
+            'ttf',
+            'txt',
+            'woff',
+            'woff2',
+            'xml',
+            'yml',
+        ];
+        $hashGenerator = new Storage\HashGenerator();
+        foreach ($itr as $item) {
+            /** @var SplFileInfo $item */
+            if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
+                continue;
+            }
+            $fp       = fopen($item->getPathname(), 'rb');
+            $itemHash = $hashGenerator->generateHash($fp);
+            fclose($fp);
+            if ($itemHash === $hash) {
+                $fileName = str_replace(WEB_root, '', $item->getPathname());
+                $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
+                return $processorFactory->buildForLocalFile(
+                    WEB_root,
+                    $fileName,
+                    $cacheKey,
+                    $transform,
+                    Manager::IMAGICK_TIME_LIMIT,
+                );
             }
         }
-        return $hashObject;
+        return null;
     }
 
     /**
@@ -264,19 +252,24 @@ class Worker extends CliTool\App
     /**
      * Apply the specified transform to the storage object and save it using specified cache key
      *
-     * @param Storage\Model    $hashObject
-     * @param string           $cacheKey
-     * @param Image\ITransform $transform
+     * @param Image\Processor $processor
+     * @param string          $hash
+     * @param string          $cacheKey
+     * @param int             $attempts
+     * @param bool            $retryFailed
+     * @return void
      */
-    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform): void
-    {
-        $hash      = $hashObject->getHash();
-        $processor = new Image\Processor($hashObject, $cacheKey, $transform, $this->imageMagickTimeout);
-
+    private function generateTransform(
+        Image\Processor $processor,
+        string $hash,
+        string $cacheKey,
+        int $attempts,
+        bool $retryFailed,
+    ): void {
         try {
             // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
             //we are in the cli, so perm fail any images that fail here.
-            $transformFile = $processor->load($this->attemptsPerTransform, $this->timeOutThreshold, true);
+            $transformFile = $processor->load($attempts, Manager::TIMED_OUT_THRESHOLD, true);
             if (!$transformFile->isCacheHit()) {
                 $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'success')));
             } else {
@@ -293,9 +286,9 @@ class Worker extends CliTool\App
             // * we attempted to transcode a non-GIF layered image
             // * this is a staging instance and file not found on disk. This is normal after a prd-to-stg sync
             if (
-                !$this->suppressSentryReporting &&
+                !$retryFailed &&
                 !($e instanceof LayeredNonGifException) &&
-                !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof FileNotFoundException)
+                !($this->getConfig()->get('site_type') === Instance::SITE_TYPE_STAGING && $e instanceof UnableToReadFile)
             ) {
                 $this->captureException($e);
             }

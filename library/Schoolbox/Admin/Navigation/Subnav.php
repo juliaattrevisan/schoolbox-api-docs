@@ -31,7 +31,6 @@ use function count;
  */
 class Subnav
 {
-
     /**
      * For access to booleans that determine availability/visibility of certain menu
      * items based on plan, configuration, etc.
@@ -768,6 +767,12 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
                         'children'    => [],
                         'description' => 'Control how we send email from the platform.',
+                    ],
+                    '/adminv2/email-dkim'                  => [
+                        'name'        => 'Email DKIM',
+                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
+                        'children'    => [],
+                        'description' => '',
                     ],
                     '/adminv2/setting/External%20DB'          => [
                         'name'        => 'External DB',

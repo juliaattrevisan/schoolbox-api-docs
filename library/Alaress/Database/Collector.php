@@ -71,9 +71,9 @@ class Collector extends DataCollector implements Renderable, AssetProvider
                 $sql .= sprintf(
                     "Statement Class: %s\nLine %d: %s::%s()\n\n",
                     get_class($statement),
-                    isset($trace['line']) ? $trace['line'] : '<unknown>',
-                    isset($trace['file']) ? $trace['file'] : '<unknown>',
-                    isset($trace['function']) ? $trace['function'] : '<unknown>'
+                    $trace['line'] ?? '<unknown>',
+                    $trace['file'] ?? '<unknown>',
+                    $trace['function'],
                 );
 
                 break;

@@ -210,7 +210,8 @@ readsqlconfig() {
       echo "Unable to fetch value for config '$config_name'" >&2
       exit 1
     fi
-    sql_config[$config_name]="$config_value"
+    #all config values to base 64 and save in array
+    sql_config[$config_name]="$(echo -n $config_value | base64)"
   done
   sql_command="SELECT password FROM user WHERE username = 'alaress' AND deleted_at IS NULL"
   if ! alaress_password=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
@@ -222,7 +223,8 @@ readsqlconfig() {
 setsqlconfig() {
   local sql_command;
   for config_name in "${!sql_config[@]}"; do
-    sql_command="UPDATE config SET value='${sql_config[$config_name]}' WHERE name='$config_name'"
+    #config values are in array as base64 values
+    sql_command="UPDATE config SET value=FROM_BASE64('${sql_config[$config_name]}') WHERE name='$config_name'"
     if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
       echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
     fi
