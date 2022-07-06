@@ -205,7 +205,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         $result = $this->getDb()->getRow($query);
 
-        return $result['QCOL'];
+        return empty($result) ? 0 : $result['QCOL'];
     }
 
 

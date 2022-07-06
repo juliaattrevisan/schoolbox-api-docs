@@ -171,16 +171,18 @@ class External_Maze_Helper
          */
         if (strstr($schoolboxClassCode, ',')) {
             foreach (str_getcsv($schoolboxClassCode) as $currentClassCode) {
-                [$classCode, $classNumber] = explode('-', $currentClassCode);
+                $classCodeParts = explode('-', $currentClassCode);
 
-                $allClassCodes[] = "'{$classCode}'";
-                $allClassNumbers[] = "'{$classNumber}'";
+                $allClassCodes[] = "'{$classCodeParts[0]}'";
+                // if $currentClassCode does not have "-", just set 0
+                // so that $allClassCodes count and $allClassNumbers count will be the same
+                $allClassNumbers[] = (int)($classCodeParts[1] ?? 0);
             }
         } else {
-            [$classCode, $classNumber] = explode('-', $schoolboxClassCode);
+            $classCodeParts = explode('-', $schoolboxClassCode);
 
-            $allClassCodes[] = "'{$classCode}'";
-            $allClassNumbers[] = "'{$classNumber}'";
+            $allClassCodes[] = "'{$classCodeParts[0]}'";
+            $allClassNumbers[] = (int)($classCodeParts[1] ?? 0);
         }
 
         return [
