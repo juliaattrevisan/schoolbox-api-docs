@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Iframely;
 
+use DiDom\Document;
+use DiDom\Query;
 use DOMAttr;
 use DOMDocument;
 use DOMNode;
@@ -56,7 +58,7 @@ class EmbedReplacer
      * The XPath statement which identifies the actual embed iframe or other
      * source attribute within each embed container.
      */
-    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH = '//@src';
+    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH = '//*[@src]';
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -108,29 +110,22 @@ class EmbedReplacer
         }
 
         // Load the purified content into a DOM document
-        $doc = new DOMDocument('1.0', 'UTF-8');
-        $doc->loadHTML(sprintf(self::HTML5_WRAPPER, $html));
-        $xpath = new DOMXPath($doc);
+        $doc = new Document($html, false, 'UTF-8');
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        $embeds = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH);
-        if (!($embeds instanceof DOMNodeList && $embeds->count() > 0)) {
+        $embeds = $doc->xpath(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH);
+        if (count($embeds) === 0) {
             return $html;
         }
 
         // Process each embed
         $replacementsApplied = false;
         foreach ($embeds as $embed) {
-            // Type checks fail: can't do anything
-            if (!$embed instanceof DOMNode) {
-                continue;
-            }
-
             // Find all src attributes within the embed node:
             // if there are none, skip this embed
-            $srcNodes = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH, $embed);
-            if (!($srcNodes instanceof DOMNodeList && $srcNodes->count() > 0)) {
+            $srcNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH);
+            if (count($srcNodes) === 0) {
                 continue;
             }
 
@@ -140,12 +135,8 @@ class EmbedReplacer
             // HTML embed which bypasses Iframely's CDN
             $replacementHtml = null;
             foreach ($srcNodes as $srcNode) {
-                if (!$srcNode instanceof DOMAttr) {
-                    continue;
-                }
-
                 // Get embed without Iframely's iframe
-                $srcUrl = new Uri($srcNode->value);
+                $srcUrl = new Uri($srcNode->getAttribute('src'));
                 if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                     // Get the src, and do something with it
                     $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
@@ -162,21 +153,7 @@ class EmbedReplacer
             // Replace the Iframely element's HTML with the new embed
             if (isset($replacementHtml)) {
                 $replacementsApplied = true;
-                // Clear the existing embed content
-                while ($embed->hasChildNodes()) {
-                    $embed->removeChild($embed->firstChild);
-                }
-
-                // Build the replacement, and inject it into the embed
-                $replacement = new DOMDocument('1.0', 'UTF-8');
-                $replacement->loadHTML(sprintf(self::HTML5_WRAPPER, $replacementHtml));
-                foreach ($replacement->getElementsByTagName('body') as $body) {
-                    if ($body instanceof DOMNode) {
-                        foreach ($body->childNodes as $bodyChild) {
-                            $embed->appendChild($doc->importNode($bodyChild, true));
-                        }
-                    }
-                }
+                $embed->setInnerHtml($replacementHtml);
             }
         }
 
@@ -184,14 +161,6 @@ class EmbedReplacer
         if (!$replacementsApplied) {
             return $html;
         }
-        $newHtml = '';
-        foreach ($doc->getElementsByTagName('body') as $body) {
-            if ($body instanceof DOMNode) {
-                foreach ($body->childNodes as $bodyChild) {
-                    $newHtml .= $doc->saveHTML($bodyChild);
-                }
-            }
-        }
-        return $newHtml;
+        return $doc->first('body')->html();
     }
 }
