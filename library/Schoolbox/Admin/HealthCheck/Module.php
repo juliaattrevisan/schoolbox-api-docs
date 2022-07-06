@@ -1,0 +1,66 @@
+<?php
+
+namespace Schoolbox\Admin\HealthCheck;
+
+use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Controller\Base;
+use Alaress\Authorizer\Rule;
+use InvalidArgumentException;
+
+class Module extends BaseModule
+{
+    protected $basename = 'adminHealthCheckExport';
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    protected function registerRoutes(): void
+    {
+        $isAlaress = new Rule\IsSchoolboxAdmin();
+        $this->register('GET', '/audit', 'getAudit', $isAlaress);
+        // UXUI Audits
+        $this->register('GET', '/audit/topMenuReport', 'topMenuReport', $isAlaress);
+        $this->register('GET', '/audit/sideMenuReport', 'sideMenuReport', $isAlaress);
+        // User Management Audits
+        $this->register('GET', '/audit/listOfRoles', 'listOfRoles', $isAlaress);
+        $this->register('GET', '/audit/listOfCampuses', 'listOfCampuses', $isAlaress);
+        $this->register('GET', '/audit/listOfYearLevels', 'listOfYearLevels', $isAlaress);
+        $this->register('GET', '/audit/listOfHouses', 'listOfHouses', $isAlaress);
+        $this->register('GET', '/audit/servicePermissions', 'servicePermissions', $isAlaress);
+        $this->register('GET', '/audit/listOfSuperusers', 'listOfSuperusers', $isAlaress);
+        // LMS Fundamental Audits
+        $this->register('GET', '/audit/gradeGroups', 'gradeGroups', $isAlaress);
+        $this->register('GET', '/audit/academicPeriods', 'academicPeriods', $isAlaress);
+        $this->register('GET', '/audit/workTypes', 'workTypes', $isAlaress);
+        $this->register('GET', '/audit/submissionStates', 'submissionStates', $isAlaress);
+        $this->register('GET', '/audit/lmsSettings', 'lmsSettings', $isAlaress);
+        $this->register('GET', '/audit/yearLevelPermissions', 'yearLevelPermissions', $isAlaress);
+        // Community Engagement Audits
+        $this->register('GET', '/audit/newsTopics', 'newsTopics', $isAlaress);
+        $this->register('GET', '/audit/newsServicePermissions', 'newsServicePermissions', $isAlaress);
+        $this->register('GET', '/audit/newsSettings', 'newsSettings', $isAlaress);
+        $this->register('GET', '/audit/eventTypes', 'eventTypes', $isAlaress);
+        $this->register('GET', '/audit/calendarServicePermissions', 'calendarServicePermissions', $isAlaress);
+        $this->register('GET', '/audit/parentNewsNotifications', 'parentNewsNotifications', $isAlaress);
+        // Common Audits
+        $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
+        $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(): Base
+    {
+        return new Controller(
+            $this->injector->get('user.tokenBuilder'),
+            $this->getConfig(),
+            $this->getRouter(),
+            $this->injector->get('taskd.messageFactory'),
+            $this->injector->get('taskd.messageProducer')
+        );
+    }
+}

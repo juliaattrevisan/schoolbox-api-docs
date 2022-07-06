@@ -113,6 +113,9 @@ class Admin extends ModuleLoader
         // Intellischool
         $this->loadModule($di, \Schoolbox\Admin\Intellischool\Module::class, '/adminv2/intellischool');
 
+        //Health Check
+        $this->loadModule($di, \Schoolbox\Admin\HealthCheck\Module::class, '/adminv2/health-check-export');
+
         // Email DKIM
         $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
     }
