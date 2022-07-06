@@ -1,6 +1,8 @@
 <?php
 
+use GuzzleHttp\Client;
 use League\CommonMark;
+use Schoolbox\Iframely\EmbedReplacer;
 
 /**
  * Scrub
@@ -459,118 +461,8 @@ class Scrub
         return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.html',
             function ($param) {
-                // Base purification procedure
                 $purified = self::getHtmlPurifierInstance()->purify($param);
-                if ($purified === '') {
-                    return $purified;
-                }
-
-                // Replace any iframely embeds with a version which doesn't use
-                // iframely.
-                // Behold: the jungle that is PHP DOM manipulation
-                // TODO inject client
-                $httpClient = new GuzzleHttp\Client();
-
-                // Load the purified content into a DOM document:
-                // be as forceful as possible about making the document UTF-8
-                $wrapper = <<<HTML
-                <!DOCTYPE html>
-                <html lang="en">
-                    <head>
-                        <title></title>
-                        <meta charset="utf-8">
-                    </head>
-                    <body>%s</body>
-                </html>
-                HTML;
-                $doc = new DOMDocument('1.0', 'UTF-8');
-                $doc->loadHTML(sprintf($wrapper, $purified));
-                $xpath = new DOMXPath($doc);
-
-                // Are there any oEmbed attributes?
-                // If not, there's no need to do anything
-                $matches = $xpath->query('//div[@data-oembed-url]');
-                if (!($matches instanceof DOMNodeList && $matches->count() > 0)) {
-                    return $purified;
-                }
-
-                // Process each oEmbed node
-                $replacementsApplied = false;
-                foreach ($matches as $match) {
-                    // Type checks fail: can't do anything
-                    if (!($match instanceof DOMNode && $match->parentNode instanceof DOMNode)) {
-                        continue;
-                    }
-                    $oembedUrlNode = $match->attributes->getNamedItem('data-oembed-url');
-                    if (!$oembedUrlNode instanceof DOMNode) {
-                        continue;
-                    }
-
-                    // Find all src nodes within the oembed node
-                    $childMatches = $xpath->query('//*[@src]', $match);
-                    if (!($childMatches instanceof DOMNodeList && $childMatches->count() > 0)) {
-                        continue;
-                    }
-
-                    // If there are src nodes, if any of those URLs point to the
-                    // iframely CDN:
-                    // make a separate call to the iframely API to get the HTML
-                    // embed without iframely's special iframe
-                    $replacementHtml = null;
-                    foreach ($childMatches as $childMatch) {
-                        if ($childMatch instanceof DOMNode) {
-                            $srcNode = $childMatch->attributes->getNamedItem('src');
-                            if (!$srcNode) {
-                                continue;
-                            }
-
-                            // Get embed without iframely's iframe
-                            $srcUrl = new Laminas\Uri\Uri($srcNode->value);
-                            if ($srcUrl->getHost() === 'cdn.iframe.ly') {
-                                // Get the src, and do something with it
-                                $apiUrl = (new Laminas\Uri\Uri('https://iframe.ly/api/iframely'))
-                                    ->setQuery(['iframe' => 0] + $srcUrl->getQueryAsArray());
-                                $response     = $httpClient->get($apiUrl->toString());
-                                $responseBody = json_decode($response->getBody()->getContents(), true);
-                                if (isset($responseBody['html'])) {
-                                    $replacementHtml = $responseBody['html'];
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    // Replace the iframely element's HTML with the new embed
-                    if (isset($replacementHtml)) {
-                        $replacementsApplied = true;
-                        while ($match->hasChildNodes()) {
-                            $match->removeChild($match->firstChild);
-                        }
-                        $replacement = new DOMDocument('1.0', 'UTF-8');
-                        $replacement->loadHTML(sprintf($wrapper, $replacementHtml));
-                        foreach ($replacement->getElementsByTagName('body') as $body) {
-                            if ($body instanceof DOMNode) {
-                                foreach ($body->childNodes as $bodyChild) {
-                                    $match->appendChild($doc->importNode($bodyChild, true));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Were any embeds replaced? If so, return the replaced HTML
-                if (!$replacementsApplied) {
-                    return $purified;
-                }
-                $output = '';
-                foreach ($doc->getElementsByTagName('body') as $body) {
-                    if ($body instanceof DOMNode) {
-                        foreach ($body->childNodes as $bodyChild) {
-                            $output .= $doc->saveHTML($bodyChild);
-                        }
-                    }
-                }
-                return $output;
+                return (new EmbedReplacer(new Client()))->replace($purified);
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
@@ -591,7 +483,8 @@ class Scrub
             'scrub.htmlAbsoluteUri',
             function ($params) {
                 $purifier = self::getHtmlPurifierInstance($params[1]);
-                return $purifier->purify($params[0]);
+                $purified = $purifier->purify($params[0]);
+                return (new EmbedReplacer(new Client()))->replace($purified);
             },
             ["$html", $domain],
             Config::get('scrub_html_cache_timeout')
