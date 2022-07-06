@@ -479,20 +479,45 @@ class Scrub
 
                 $doc = new DOMDocument('1.0', 'UTF-8');
                 $doc->loadHTML(sprintf($wrapper, $purified));
-                $xpath = new DOMXPath($doc);
+                $xpath   = new DOMXPath($doc);
                 $matches = $xpath->query('//div[@data-oembed-url]');
                 if (!($matches instanceof DOMNodeList && $matches->count() > 0)) {
                     return $purified;
                 }
                 foreach ($matches as $match) {
                     if ($match instanceof DOMNode && $match->parentNode instanceof DOMNode) {
-                        /** @var DOMAttr $oembedUrl */
-                        $oembedUrl = $match->attributes['data-oembed-url'];
-                        $newNode = new DOMText($oembedUrl->value);
-                        $match->parentNode->replaceChild(
-                            $doc->importNode($newNode, true),
-                            $match,
-                        );
+                        $oembedUrlNode = $match->attributes->getNamedItem('data-oembed-url');
+                        if (!$oembedUrlNode) {
+                            continue;
+                        }
+                        $oembedUrl = $oembedUrlNode->value;
+                        // Replace the source of an iframe here with the actual
+                        // oembed URL?
+                        $childMatches = $xpath->query('//*[@src]', $match);
+                        if (!($childMatches instanceof DOMNodeList && $childMatches->count() > 0)) {
+                            continue;
+                        }
+                        foreach ($childMatches as $childMatch) {
+                            if ($childMatch instanceof DOMNode) {
+                                $srcNode = $childMatch->attributes->getNamedItem('src');
+                                if (!$srcNode) {
+                                    continue;
+                                }
+                                $src = $srcNode->value;
+                                // Is this an iframely url? Replace if so
+                                $srcUri = new Laminas\Uri\Uri($src);
+                                if ($srcUri->getHost() === 'cdn.iframe.ly') {
+                                    // Get the src, and do something with it
+                                    $srcNode->value = $oembedUrl;
+                                }
+                            }
+                        }
+
+//                        $newNode   = new DOMText($oembedUrlNode->value);
+//                        $match->parentNode->replaceChild(
+//                            $doc->importNode($newNode, true),
+//                            $match,
+//                        );
                     }
                 }
                 $output = '';
