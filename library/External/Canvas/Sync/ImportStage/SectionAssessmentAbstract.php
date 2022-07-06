@@ -331,6 +331,10 @@ abstract class SectionAssessmentAbstract
                         $allDayDate
                     );
 
+                    if (!$assessableImpl) {
+                        continue;
+                    }
+
                     $assessmentImplId                                = $assessableImpl->getAssessmentModel()->getId();
                     $assessmentImplIdSynchronised[$assessmentImplId] = $assessmentImplId;
                     $this->countCanvasSectionAssessmentsSynchronised++;
@@ -365,6 +369,10 @@ abstract class SectionAssessmentAbstract
                             $studentExternalIdUserIdMap
                         );
 
+                        if (!$plan) {
+                            continue;
+                        }
+
                         $plansSynchronised[$plan->getId()] = $plan;
                     }
                     // If we didn't have a section override, and assignment is for everyone in course,
@@ -382,6 +390,11 @@ abstract class SectionAssessmentAbstract
                             null,
                             $studentExternalIdUserIdMap
                         );
+
+                        if (!$plan) {
+                            // should not happen, but just in case
+                            continue;
+                        }
 
                         $plansSynchronised[$plan->getId()] = $plan;
                     }
@@ -535,7 +548,7 @@ abstract class SectionAssessmentAbstract
      * @param string|null    $dueAt
      * @param bool           $allDay
      * @param string|null    $allDayDate
-     * @return IAssessableDataModel
+     * @return IAssessableDataModel|null
      * @throws Database\Exception
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
@@ -550,23 +563,29 @@ abstract class SectionAssessmentAbstract
         ?string $dueAt,
         bool $allDay,
         ?string $allDayDate
-    ): IAssessableDataModel {
+    ): ?IAssessableDataModel {
         $assessableSpec = $this->findAssessableSpec($assessmentCanvasId);
         $assessableImpl = $this->findAssessableImpl($assessableSpec->getAssessmentModel(), $unitImpl);
 
         $unitOpenDate = $unitImpl->getOpenDate()->getDatabase();
         $unitDueDate  = $unitImpl->getDueDate()->getDatabase();
 
+        $canvasEntity    = ucfirst($this->getCanvasEntity());
+        $schoolboxEntity = ucfirst($this->getSchoolboxEntity());
+        $sisSourceId = $this->courseSectionBridge->getSisSourceIdForFolderId($unitImpl->getFolder()->getId());
+
         [$publishDate, $openDate, $dueDate, $closeDate] = $this->assignmentDatesBridge
             ->assessmentDates($unlockAt, $dueAt, $allDay, $allDayDate, $lockAt, $unitOpenDate, $unitDueDate);
+
+        if (!$dueDate) {
+            $this->log->debug("Skipping creating new {$schoolboxEntity}Impl for Canvas CourseSection (sisSourceId: '$sisSourceId') and {$canvasEntity} (canvasId: $assessmentCanvasId) - no due date");
+            return null;
+        }
+
         [$publishDate, $openDate, $dueDate, $closeDate] = $this->assignmentDatesBridge
             ->normaliseDates($publishDate, $openDate, $dueDate, $closeDate, $this->log);
 
-        $owner       = $classTeacher ?? $this->getAssessableOwner($assessableSpec);
-        $sisSourceId = $this->courseSectionBridge->getSisSourceIdForFolderId($unitImpl->getFolder()->getId());
-
-        $canvasEntity    = ucfirst($this->getCanvasEntity());
-        $schoolboxEntity = ucfirst($this->getSchoolboxEntity());
+        $owner = $classTeacher ?? $this->getAssessableOwner($assessableSpec);
 
         if (!$assessableImpl) {
             $this->log->debug("Creating new {$schoolboxEntity}Impl for Canvas CourseSection (sisSourceId: '$sisSourceId') and {$canvasEntity} (canvasId: $assessmentCanvasId)");
@@ -1191,7 +1210,7 @@ abstract class SectionAssessmentAbstract
      * @param string|null      $allDayDate
      * @param string[]|null    $participants Student's externalIds
      * @param int[]            $studentExternalIdUserIdMap
-     * @return Participant\Plan\Model
+     * @return Participant\Plan\Model|null
      * @throws Database\Exception
      * @throws InvalidColumnException
      * @throws Mapper\Exception
@@ -1209,7 +1228,7 @@ abstract class SectionAssessmentAbstract
         ?string $allDayDate,
         ?array $participants,
         array $studentExternalIdUserIdMap
-    ): Participant\Plan\Model {
+    ): ?Participant\Plan\Model {
         // Create a dynamic plan if assignment is for 'everyone'.
         // This will always have NULL fields to allow the assignment's details to flow through.
         $isEveryonePlan = $canvasId === null;
@@ -1235,6 +1254,10 @@ abstract class SectionAssessmentAbstract
                 $assessmentModel->getPublishDate()->getDatabase(),
                 $assessmentModel->getDueDate()->getDatabase()
             );
+            if (!$due) {
+                $this->log->debug("Skip creating new $planType plan '$planName' - no due date");
+                return null;
+            }
             [$publish, $open, $due, $close,] = $this->assignmentDatesBridge
                 ->normaliseDates($publish, $open, $due, $close, $this->log);
         }
