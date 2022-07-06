@@ -487,7 +487,7 @@ class Scrub
                 foreach ($matches as $match) {
                     if ($match instanceof DOMNode && $match->parentNode instanceof DOMNode) {
                         $oembedUrlNode = $match->attributes->getNamedItem('data-oembed-url');
-                        if (!$oembedUrlNode) {
+                        if (!$oembedUrlNode instanceof DOMNode) {
                             continue;
                         }
 //                        $oembedUrl = $oembedUrlNode->value;
@@ -516,14 +516,30 @@ class Scrub
                                     $responseBody = json_decode($response->getBody()->getContents(), true);
                                     // This works for the specific Youtube case:
                                     // need to test with others
-                                    $srcNode->value = $responseBody['links']['player'][0]['href'];
+                                    if (isset($responseBody['html'])) {
+                                        foreach ($match->childNodes as $childNode) {
+                                            $match->removeChild($childNode);
+                                        }
+                                        $replacement = new DOMDocument('1.0', 'UTF-8');
+                                        $replacement->loadHTML(sprintf($wrapper, $responseBody['html']));
+                                        foreach ($replacement->getElementsByTagName('body') as $body) {
+                                            if ($body instanceof DOMNode) {
+                                                foreach ($body->childNodes as $bodyChild) {
+                                                    $match->appendChild($doc->importNode($bodyChild, true));
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Construct a new node out of the response
+//                                    $srcNode->value = $responseBody['links']['player'][0]['href'];
                                 }
                             }
                         }
 
 //                        $newNode   = new DOMText($oembedUrlNode->value);
 //                        $match->parentNode->replaceChild(
-//                            $doc->importNode($newNode, true),
+//                            $oembedUrlNode,
 //                            $match,
 //                        );
                     }
