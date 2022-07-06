@@ -15,7 +15,6 @@ use Schoolbox\Database\Factory;
  */
 class External_Maze_Timetable implements External_TimetableInterface
 {
-
     /**
      * An instance of MSSQL
      *
