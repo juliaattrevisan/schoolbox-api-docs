@@ -50,13 +50,13 @@ class EmbedReplacer
      * The XPath statement which identifies an Iframely embed container within
      * the HTML.
      */
-    private const IFRAMELY_EMBED_CONTAINER_XPATH = '//div[@data-oembed-url]';
+    private const IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH = '//div[@data-oembed-url]';
 
     /**
      * The XPath statement which identifies the actual embed iframe or other
-     * source element within each embed container.
+     * source attribute within each embed container.
      */
-    private const IFRAMELY_EMBED_CONTAINER_SOURCE_XPATH = '//*[@src]';
+    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH = '//@src';
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -114,7 +114,7 @@ class EmbedReplacer
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        $embeds = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_XPATH);
+        $embeds = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH);
         if (!($embeds instanceof DOMNodeList && $embeds->count() > 0)) {
             return $html;
         }
@@ -123,14 +123,14 @@ class EmbedReplacer
         $replacementsApplied = false;
         foreach ($embeds as $embed) {
             // Type checks fail: can't do anything
-            if (!($embed instanceof DOMNode && $embed->parentNode instanceof DOMNode)) {
+            if (!$embed instanceof DOMNode) {
                 continue;
             }
 
             // Find all src attributes within the embed node:
             // if there are none, skip this embed
-            $childMatches = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_SOURCE_XPATH, $embed);
-            if (!($childMatches instanceof DOMNodeList && $childMatches->count() > 0)) {
+            $srcNodes = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH, $embed);
+            if (!($srcNodes instanceof DOMNodeList && $srcNodes->count() > 0)) {
                 continue;
             }
 
@@ -139,25 +139,22 @@ class EmbedReplacer
             // If any do: make a separate call to the iframely API to get the
             // HTML embed which bypasses Iframely's CDN
             $replacementHtml = null;
-            foreach ($childMatches as $childMatch) {
-                if ($childMatch instanceof DOMNode) {
-                    $srcNode = $childMatch->attributes->getNamedItem('src');
-                    if (!$srcNode instanceof DOMAttr) {
-                        continue;
-                    }
+            foreach ($srcNodes as $srcNode) {
+                if (!$srcNode instanceof DOMAttr) {
+                    continue;
+                }
 
-                    // Get embed without Iframely's iframe
-                    $srcUrl = new Uri($srcNode->value);
-                    if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                        // Get the src, and do something with it
-                        $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
-                            ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
-                        $response     = $this->httpClient->get($apiUrl->toString());
-                        $responseBody = json_decode($response->getBody()->getContents(), true);
-                        if (isset($responseBody['html'])) {
-                            $replacementHtml = $responseBody['html'];
-                            break;
-                        }
+                // Get embed without Iframely's iframe
+                $srcUrl = new Uri($srcNode->value);
+                if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
+                    // Get the src, and do something with it
+                    $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
+                        ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
+                    $response     = $this->httpClient->get($apiUrl->toString());
+                    $responseBody = json_decode($response->getBody()->getContents(), true);
+                    if (isset($responseBody['html'])) {
+                        $replacementHtml = $responseBody['html'];
+                        break;
                     }
                 }
             }
@@ -165,9 +162,12 @@ class EmbedReplacer
             // Replace the Iframely element's HTML with the new embed
             if (isset($replacementHtml)) {
                 $replacementsApplied = true;
+                // Clear the existing embed content
                 while ($embed->hasChildNodes()) {
                     $embed->removeChild($embed->firstChild);
                 }
+
+                // Build the replacement, and inject it into the embed
                 $replacement = new DOMDocument('1.0', 'UTF-8');
                 $replacement->loadHTML(sprintf(self::HTML5_WRAPPER, $replacementHtml));
                 foreach ($replacement->getElementsByTagName('body') as $body) {
