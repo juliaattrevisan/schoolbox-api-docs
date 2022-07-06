@@ -28,7 +28,6 @@ use function strcmp;
  */
 class AssignmentDates
 {
-
     /**
      * Derive the logical publish/open/due/close dates of a Canvas Assignment.
      *
