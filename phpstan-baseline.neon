@@ -4681,11 +4681,6 @@ parameters:
 			path: library/Schoolbox/Greenhouse/Controller.php
 
 		-
-			message: "#^Property Schoolbox\\\\Help\\\\SingleSignOn\\\\Controller\\:\\:\\$userMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Help/SingleSignOn/Controller.php
-
-		-
 			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
