@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Iframely;
 
+use DOMAttr;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
@@ -46,9 +47,16 @@ class EmbedReplacer
         HTML;
 
     /**
-     * The attribute which identifies an Iframely embed within the HTML.
+     * The XPath statement which identifies an Iframely embed container within
+     * the HTML.
      */
-    private const IFRAMELY_EMBED_ATTRIBUTE = 'data-oembed-url';
+    private const IFRAMELY_EMBED_CONTAINER_XPATH = '//div[@data-oembed-url]';
+
+    /**
+     * The XPath statement which identifies the actual embed iframe or other
+     * source element within each embed container.
+     */
+    private const IFRAMELY_EMBED_CONTAINER_SOURCE_XPATH = '//*[@src]';
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -106,7 +114,7 @@ class EmbedReplacer
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        $embeds = $xpath->query('//div[@' . self::IFRAMELY_EMBED_ATTRIBUTE . ']');
+        $embeds = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_XPATH);
         if (!($embeds instanceof DOMNodeList && $embeds->count() > 0)) {
             return $html;
         }
@@ -118,14 +126,10 @@ class EmbedReplacer
             if (!($embed instanceof DOMNode && $embed->parentNode instanceof DOMNode)) {
                 continue;
             }
-            $embedUrlNode = $embed->attributes->getNamedItem(self::IFRAMELY_EMBED_ATTRIBUTE);
-            if (!$embedUrlNode instanceof DOMNode) {
-                continue;
-            }
 
             // Find all src attributes within the embed node:
             // if there are none, skip this embed
-            $childMatches = $xpath->query('//*[@src]', $embed);
+            $childMatches = $xpath->query(self::IFRAMELY_EMBED_CONTAINER_SOURCE_XPATH, $embed);
             if (!($childMatches instanceof DOMNodeList && $childMatches->count() > 0)) {
                 continue;
             }
@@ -138,7 +142,7 @@ class EmbedReplacer
             foreach ($childMatches as $childMatch) {
                 if ($childMatch instanceof DOMNode) {
                     $srcNode = $childMatch->attributes->getNamedItem('src');
-                    if (!$srcNode) {
+                    if (!$srcNode instanceof DOMAttr) {
                         continue;
                     }
 
