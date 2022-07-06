@@ -177,7 +177,8 @@ class Browser extends Source\BrowserAbstract
         $curl->exec();
         if (!count($curl->getErrors()) && $manifest = json_decode($curl->getResult())) {
             foreach ($manifest as $part) {
-                if (($nodes = $this->buildOutputTree($part, $level))) {
+                $nodes = $this->buildOutputTree($part, $level);
+                if ($nodes) {
                     $collection->add($nodes);
                 }
             }
@@ -220,7 +221,8 @@ class Browser extends Source\BrowserAbstract
 
         if ($node && isset($jsonTree->children) && is_iterable($jsonTree->children)) {
             foreach ($jsonTree->children as $child) {
-                if (($nodes = $this->buildOutputTree($child, $level))) {
+                $nodes = $this->buildOutputTree($child, $level);
+                if ($nodes) {
                     $node->addChild($nodes);
                 }
             }
