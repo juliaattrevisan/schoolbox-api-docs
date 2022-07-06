@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport;
+namespace Schoolbox\Admin\SummativeReport;
 
 /**
  * Extracts all the .summative-report rules from the slab of css

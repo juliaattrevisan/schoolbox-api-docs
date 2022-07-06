@@ -1,11 +1,11 @@
 {##
  # Create/Update a Summative Report
  #
- # @param string $pageCurrent         url to the current page
- # @param array allBreadcrumbs        A set of breadcrumbs
- # @param ReportExport\Model $report  A of ReportExport/Model instance
- # @param array $options              A structure containing report options
- # @param Zone $logoZone              An attachzone for uploading images
+ # @param string $pageCurrent            url to the current page
+ # @param array allBreadcrumbs           A set of breadcrumbs
+ # @param SummativeReport\Model $report  A of SummativeReportModel instance
+ # @param array $options                 A structure containing report options
+ # @param Zone $logoZone                 An attachzone for uploading images
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
@@ -43,7 +43,7 @@
                 hideSelected: true,
                 load: function (query, callback) {
                     $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getTerms') }}',
+                        url: '{{ routeLookup('adminSummativeReport.getTerms') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
@@ -67,7 +67,7 @@
                 hideSelected: true,
                 load: function (query, callback) {
                     $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getYearLevels') }}',
+                        url: '{{ routeLookup('adminSummativeReport.getYearLevels') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
@@ -91,7 +91,7 @@
                 hideSelected: true,
                 load: function (query, callback) {
                     $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getCampuses') }}',
+                        url: '{{ routeLookup('adminSummativeReport.getCampuses') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
@@ -128,7 +128,7 @@
                 hideSelected: true,
                 load: function (query, callback) {
                     $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
@@ -152,7 +152,7 @@
                 hideSelected: true,
                 load: function (query, callback) {
                     $.ajax({
-                        url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
@@ -238,9 +238,9 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     {% if report and report.id %}
-        {% set formAction = routeLookupIfAuthorized('adminReportExport.postUpdate', {report: report, reportId: report.id}) %}
+        {% set formAction = routeLookupIfAuthorized('adminSummativeReport.postUpdate', {report: report, reportId: report.id}) %}
     {% else %}
-        {% set formAction = routeLookupIfAuthorized('adminReportExport.postCreate') %}
+        {% set formAction = routeLookupIfAuthorized('adminSummativeReport.postCreate') %}
     {% endif %}
 
     <div class="admin-content">

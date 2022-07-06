@@ -1,7 +1,7 @@
 {##
  # List of Summative Reports
  #
- # @param GenericCollection $reports  A list of ReportExport/Model instances
+ # @param GenericCollection $reports  A list of SummativeReport/Model instances
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -11,7 +11,7 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    {% set createRoute = routeLookupIfAuthorized('adminReportExport.getCreate') %}
+    {% set createRoute = routeLookupIfAuthorized('adminSummativeReport.getCreate') %}
 
     <div class="admin-content">
         {% if reports|length %}
@@ -48,22 +48,22 @@
                                 </div>
                             </div>
                             <nav>
-                                {% set generateRoute = routeLookupIfAuthorized('adminReportExport.getGenerate', {report:report, reportId: report.id}) %}
+                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
                                 {% if generateRoute %}
                                 <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
                                 {% endif %}
 
-                                {% set updateRoute = routeLookupIfAuthorized('adminReportExport.getUpdate', {reportId: report.id}) %}
+                                {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}
                                 {% if updateRoute %}
                                     <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
                                 {% endif %}
 
-                                {% set dupeRoute = routeLookupIfAuthorized('adminReportExport.getDuplicate', {report: report, reportId: report.id}) %}
+                                {% set dupeRoute = routeLookupIfAuthorized('adminSummativeReport.getDuplicate', {report: report, reportId: report.id}) %}
                                 {% if dupeRoute %}
                                 <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate"></a>
                                 {% endif %}
 
-                                {% set deleteRoute = routeLookupIfAuthorized('adminReportExport.postDelete', {report: report, reportId: report.id}) %}
+                                {% set deleteRoute = routeLookupIfAuthorized('adminSummativeReport.postDelete', {report: report, reportId: report.id}) %}
                                 {% if deleteRoute %}
                                     <script>
                                         $(function() {

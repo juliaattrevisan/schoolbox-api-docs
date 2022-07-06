@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport\Payload;
+namespace Schoolbox\Admin\SummativeReport\Payload;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
@@ -63,12 +63,12 @@ class Url
 
 
     /**
-     * @param \Schoolbox\Admin\ReportExport\Model $report
+     * @param \Schoolbox\Admin\SummativeReport\Model $report
      * @return array
      * @throws \JsonException
      * @throws \Laminas\Uri\Exception\InvalidUriException
      */
-    public function generate(\Schoolbox\Admin\ReportExport\Model $report): array
+    public function generate(\Schoolbox\Admin\SummativeReport\Model $report): array
     {
         $optionsPayload = $report->decode();
 
@@ -146,7 +146,7 @@ class Url
             /* See if we can make a url for this student's report
              */
             try {
-                $reportPath = $this->router->generate('adminReportExport.getStudentReport', [
+                $reportPath = $this->router->generate('adminSummativeReport.getStudentReport', [
                     'reportId' => $report->getId(),
                     'report' => $report,
                     'studentId' => $student->getId(),

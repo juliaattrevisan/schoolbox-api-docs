@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Report export admin page
+ * Summative Report admin page
  *
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport;
+namespace Schoolbox\Admin\SummativeReport;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -32,7 +32,7 @@ use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 class Module extends BaseModule
 {
-    protected $basename = 'adminReportExport';
+    protected $basename = 'adminSummativeReport';
 
 
     /**

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport;
+namespace Schoolbox\Admin\SummativeReport;
 
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
@@ -44,9 +44,9 @@ use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 /**
  * Class Controller
  *
- * Admin report export page
+ * Admin Summative Report page
  *
- * @package Schoolbox\Admin\ReportExport
+ * @package Schoolbox\Admin\SummativeReport
  */
 class Controller extends ConfigController
 {
@@ -159,7 +159,7 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws RouteNotFound
-     * @api GET /adminv2/report-export
+     * @api GET /adminv2/summative-report
      */
     public function getList(): void
     {
@@ -173,10 +173,10 @@ class Controller extends ConfigController
         ]);
 
         $this->getResponse()->content->set([
-            'template' => '@adminReportExport/list.twig',
+            'template' => '@adminSummativeReport/list.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
                 'reports' => $reports
             ]
         ]);
@@ -188,7 +188,7 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws RouteNotFound
-     * @api GET /adminv2/report-export/create
+     * @api GET /adminv2/summative-report/create
      */
     public function getCreate(): void
     {
@@ -202,10 +202,10 @@ class Controller extends ConfigController
             ->setFilesystemContext('images');
 
         $this->getResponse()->content->set([
-            'template' => '@adminReportExport/create.twig',
+            'template' => '@adminSummativeReport/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
                 'report' => null,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
@@ -226,7 +226,7 @@ class Controller extends ConfigController
      * @throws \PDOException
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
-     * @api POST /report-export/create
+     * @api POST /summative-report/create
      */
     public function postCreate(): void
     {
@@ -244,7 +244,7 @@ class Controller extends ConfigController
      * @throws RouteNotFound
      * @throws \DebugBar\DebugBarException
      * @throws \JsonException
-     * @api GET /adminv2/report-export/{reportId}/update
+     * @api GET /adminv2/summative-report/{reportId}/update
      */
     public function getUpdate(Model $report): void
     {
@@ -262,11 +262,11 @@ class Controller extends ConfigController
         }
 
         $this->getResponse()->content->set([
-            'template' => '@adminReportExport/create.twig',
+            'template' => '@adminSummativeReport/create.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('adminReportExport.getList'),
+                'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminReportExport.getList')),
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
                     [['Modify', null]]
                 ),
                 'report' => $report,
@@ -291,7 +291,7 @@ class Controller extends ConfigController
      * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
-     * @api POST /report-export/{reportId}/update
+     * @api POST /summative-report/{reportId}/update
      */
     public function postUpdate(Model $report): void
     {
@@ -344,7 +344,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
     }
 
 
@@ -450,7 +450,7 @@ class Controller extends ConfigController
      * Get terms (academic periods) for selectize
      *
      * @return void
-     * @api GET /adminv2/report-export/terms
+     * @api GET /adminv2/summative-report/terms
      */
     public function getTerms(): void
     {
@@ -472,7 +472,7 @@ class Controller extends ConfigController
      * Get year levels for selectize
      *
      * @return void
-     * @api GET /adminv2/report-export/yearlevels
+     * @api GET /adminv2/summative-report/yearlevels
      */
     public function getYearLevels(): void
     {
@@ -494,7 +494,7 @@ class Controller extends ConfigController
     /**
      * Get work types for selectize
      * @return void
-     * @api GET /adminv2/report-export/worktypes
+     * @api GET /adminv2/summative-report/worktypes
      */
     public function getWorkTypes(): void
     {
@@ -516,7 +516,7 @@ class Controller extends ConfigController
      * Get campuses for selectize
      *
      * @return void
-     * @api GET /adminv2/report-export/campuses
+     * @api GET /adminv2/summative-report/campuses
      */
     public function getCampuses(): void
     {
@@ -543,7 +543,7 @@ class Controller extends ConfigController
      * @throws RouteNotFound
      * @throws \PDOException
      * @throws \UnexpectedValueException
-     * @api GET /adminv2/report-export/{reportId}/duplicate
+     * @api GET /adminv2/summative-report/{reportId}/duplicate
      */
     public function getDuplicate(Model $report): void
     {
@@ -561,7 +561,7 @@ class Controller extends ConfigController
 
         $this->reportMapper->save($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
     }
 
 
@@ -572,13 +572,13 @@ class Controller extends ConfigController
      * @return void
      * @throws MapperException
      * @throws RouteNotFound
-     * @api POST /adminv2/report-export/{reportId}/delete
+     * @api POST /adminv2/summative-report/{reportId}/delete
      */
     public function postDelete(Model $report): void
     {
         $this->reportMapper->delete($report);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminReportExport.getList'));
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminSummativeReport.getList'));
     }
 
 
@@ -596,7 +596,7 @@ class Controller extends ConfigController
      * @throws \Laminas\Uri\Exception\InvalidUriException
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
-     * @api GET /adminv2/report-export/{reportId}/generate
+     * @api GET /adminv2/summative-report/{reportId}/generate
      */
     public function getGenerate(Model $report): void
     {
@@ -682,11 +682,11 @@ class Controller extends ConfigController
         /* Show waiting screen
          */
         $this->getResponse()->content->set([
-            'template' => '@adminReportExport/result.twig',
+            'template' => '@adminSummativeReport/result.twig',
             'data' => [
-                'pageCurrent'    => $this->router->generate('adminReportExport.getList'),
+                'pageCurrent'    => $this->router->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
-                    $this->router->generate('adminReportExport.getList')
+                    $this->router->generate('adminSummativeReport.getList')
                 ),
                 'reportCount'    => $numReports,
                 'warnings'       => $warnings,
@@ -699,7 +699,7 @@ class Controller extends ConfigController
      * Generates report for a particular $student,
      * using the options set in $report
      *
-     * https://vagrant.dev.schoolbox.cloud/adminv2/report-export/2/getStudentReport/25?startDate=2015-01-01&endDate=2020-12-31&yearLevels=1,2,3&campuses=1&students=45,6,25&summaryActive=1&summaryHeading=werI%20am%20a%20cat&summaryWorkType=1,2,3,5,6,7,8,9,10,11&summaryOverallGrade=1&summaryComments=1&summaryRubrics=1&classActive=0&classWorkType=1,2,3,5,6,7,8,9,10,11,12&classOverallGrade=1&classLearningLevels=1&classCohort=1&classCapabilityGrades=1&classProgression=1&classComments=1&classRubrics=1
+     * https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/2/getStudentReport/25?startDate=2015-01-01&endDate=2020-12-31&yearLevels=1,2,3&campuses=1&students=45,6,25&summaryActive=1&summaryHeading=werI%20am%20a%20cat&summaryWorkType=1,2,3,5,6,7,8,9,10,11&summaryOverallGrade=1&summaryComments=1&summaryRubrics=1&classActive=0&classWorkType=1,2,3,5,6,7,8,9,10,11,12&classOverallGrade=1&classLearningLevels=1&classCohort=1&classCapabilityGrades=1&classProgression=1&classComments=1&classRubrics=1
      *
      * @param Model $report
      * @param User  $student
@@ -708,9 +708,9 @@ class Controller extends ConfigController
      * @throws \Alaress\Web\Controller\Exception
      * @throws \InvalidArgumentException
      * @throws \JsonException
-     * @api GET /adminv2/report-export/student/:studentId
+     * @api GET /adminv2/summative-report/student/:studentId
      */
-    public function getStudentReport(\Schoolbox\Admin\ReportExport\Model $report, User $student): void
+    public function getStudentReport(\Schoolbox\Admin\SummativeReport\Model $report, User $student): void
     {
         $optionsPayload = $report->decode();
 
@@ -842,7 +842,7 @@ class Controller extends ConfigController
         ];
 
         $this->getResponse()->content->set(
-            $this->buildUnthemedHtmlOutput('@adminReportExport/studentReport.twig', $data)
+            $this->buildUnthemedHtmlOutput('@adminSummativeReport/studentReport.twig', $data)
         );
     }
 

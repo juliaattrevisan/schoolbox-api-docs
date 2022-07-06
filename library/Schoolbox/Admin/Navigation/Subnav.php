@@ -371,7 +371,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
-                    '/adminv2/report-export'                => [
+                    '/adminv2/summative-report'              => [
                         'name'        => 'Summative Reports',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
                         'children'    => [],

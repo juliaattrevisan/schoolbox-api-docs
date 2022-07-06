@@ -29,7 +29,7 @@ class Admin extends ModuleLoader
         }
         if ($di->get('config')->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED)) {
             // Report export
-            $this->loadModule($di, \Schoolbox\Admin\ReportExport\Module::class, '/adminv2/report-export');
+            $this->loadModule($di, \Schoolbox\Admin\SummativeReport\Module::class, '/adminv2/summative-report');
         }
 
         // Eportfolio

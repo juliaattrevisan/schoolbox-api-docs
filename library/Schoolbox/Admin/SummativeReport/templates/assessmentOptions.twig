@@ -24,7 +24,7 @@
             hideSelected: true,
             load: function (query, callback) {
                 $.ajax({
-                    url: '{{ routeLookup('adminReportExport.getWorkTypes') }}',
+                    url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
                     type: 'GET',
                     dataType: 'json',
                     data: {query: query}

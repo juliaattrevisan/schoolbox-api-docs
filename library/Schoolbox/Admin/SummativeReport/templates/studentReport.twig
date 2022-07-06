@@ -459,7 +459,7 @@
             {% if (summaryAssessments[folder.id] ?? [])| length %}
                 {% for assessment in summaryAssessments[folder.id] %}
                     {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
-                    {% include '@adminReportExport/assessmentReport.twig' with
+                    {% include '@adminSummativeReport/assessmentReport.twig' with
                         {
                             student: student,
                             assessment: assessment,
@@ -500,7 +500,7 @@
             </div>
 
                 {% for assessment in classAssessments[folder.id] %}
-                    {% include '@adminReportExport/assessmentReport.twig' with
+                    {% include '@adminSummativeReport/assessmentReport.twig' with
                         {
                             student: student,
                             assessment: assessment,

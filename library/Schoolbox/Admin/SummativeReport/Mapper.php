@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport;
+namespace Schoolbox\Admin\SummativeReport;
 
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
