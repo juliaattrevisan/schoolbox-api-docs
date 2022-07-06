@@ -318,6 +318,12 @@ class Controller extends ConfigController
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        /* Academic Periods are required
+         */
+        if ('' === trim((string)$postData['terms'])) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
         /* Cram in all the data
          */
         $report->setTitle($postData['title'])

@@ -209,21 +209,19 @@ class Url
      *
      * @param array $termIds
      * @return array
+     * @throws \InvalidArgumentException
      */
     public function calculateDateRange(array $termIds): array
     {
         $startDate = null;
         $endDate = null;
 
-        /* No terms specified? Use today's term's date range
+        /* No terms specified? You aren't supposed to be here
+         * and I have no idea how you managed to get here
+         * (maybe you have a broken payload though)
          */
         if (!\count($termIds)) {
-            $currentTerm = $this->termMapper->findForToday();
-
-            return [
-                'startDate' => $currentTerm->getStart()->getDatabaseDate(),
-                'endDate' => $currentTerm->getDisplayFinish()->getDatabaseDate()
-            ];
+            throw new \InvalidArgumentException('Academic periods are mandatory; none found');
         }
 
         /* Otherwise traverse the set
