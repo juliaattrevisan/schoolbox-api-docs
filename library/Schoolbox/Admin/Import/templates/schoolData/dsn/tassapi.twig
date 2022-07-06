@@ -133,6 +133,25 @@
                         <input id='tap4end' type="text" name="dsn[tassapi][options][tap4end]" value="{{ options.tap4end ?? '' }}" data-datepicker data-datesync-startdate="#tap4start" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Communal Classes</h4>
+                <p class="meta">
+                    This primarily affects staff timetables.
+                    Yard Duties, classes taught by multiple teachers on alternating days, etc. could
+                    show up incorrectly on staff timetables. For these classes/duties, specify their
+                    class identifier here and we'll treat them specially. If you had a class code like
+                    <strong>12-ABCD-X</strong> you should have <strong>X</strong> in this field.
+                    You can specify multiple Yard Duties separated by a comma.
+                </p>
+
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <label>TASS Class Identifier</label>
+                        <input id='communal' type="text" name="dsn[tassapi][options][communal]" value="{{ options.communal ?? '' }}" />
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>

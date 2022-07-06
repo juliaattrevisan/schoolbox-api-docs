@@ -201,7 +201,7 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentTimetables(self::WATCHLIST);
+//        $this->importStudentTimetables(self::WATCHLIST);
         $this->importStaffTimetables(self::WATCHLIST);
     }
 
@@ -388,6 +388,19 @@ class Classes implements IStrategy
 
         $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
+        /* Find all the class identifiers that require special treatment
+         */
+        $options = $this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions();
+
+        /* Class Identifiers are separated by a comma un the ui
+         * These Class Identifiers allow schools to tell us which ones are communal,
+         * like Yard Duties, shared teaching classes, etc. which require deconfliction
+         */
+        $deconflictClassIdentifiers = explode(',', $options['communal']);
+
+        /* Pummel my way through each person's timetable, using $classIdentifiers as a way
+         * to identify the classes that need special treatment due to Yard Duties etc.
+         */
         foreach ($staff as $externalId => $person) {
             /* Only import data for externalIds in $watchlist, if provided
              */
@@ -426,7 +439,7 @@ class Classes implements IStrategy
 //                    print_r($timetable);
 //                }
 
-                $this->process($person, $timetable, true);
+                $this->process($person, $timetable, $deconflictClassIdentifiers);
             }
 
             /* Example $timetable extract
@@ -514,14 +527,14 @@ class Classes implements IStrategy
      *
      * @param array $person
      * @param array $timetable
-     * @param bool  $deconflictAll
+     * @param array $deconflictClassIdentifiers
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function process(array $person, array $timetable, bool $deconflictAll): void
+    private function process(array $person, array $timetable, array $deconflictClassIdentifiers): void
     {
         $now = \Alaress_Date_Format::now();
 
@@ -726,7 +739,7 @@ class Classes implements IStrategy
 
                     /* Decide how involved humans are saved
                      */
-                    if ($this->isDuty($event, $subject)) {
+                    if ($this->isDuty($subject, $deconflictClassIdentifiers)) {
                         /* FIXME SPECULATIVE PROGRAMMING
                          *
                          * If this event is a Duty (identified by room code DUT)
@@ -757,29 +770,21 @@ class Classes implements IStrategy
      * Decide if $event is one of those communal Duty events
      * Clear everyone's involvement then add specific people for a given date
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param array                           $subject
+     * @param array $subject
+     * @param array $classIdentifiers
      * @return bool
      */
-    private function isDuty(\Schoolbox\External\Event\Model $event, array $subject): bool
+    private function isDuty(array $subject, array $classIdentifiers): bool
     {
-        /* TODO Add this to SUDS Config so schools can decide which locations
-         *  correspond to "communal events" like Yard Duties, shared tutes, etc
+        /* No identifiers? No trabajo
          */
-
-        /* If the location is DUT, it's a duty
-         */
-        if ('DUT' === $event->getLocation()) {
-            return true;
+        if (!\count($classIdentifiers)) {
+            return false;
         }
 
-        /* If the Subject Code is X, it's a shared tutorial thing
+        /* Otherwise, check if the current class identifier is requires special treatment
          */
-        if ('X' === trim((string)$subject['CLASS'])) {
-            return true;
-        }
-
-        return false;
+        return \in_array(trim((string)$subject['CLASS']), $classIdentifiers, true);
     }
 
 
