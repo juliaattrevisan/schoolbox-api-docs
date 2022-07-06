@@ -221,5 +221,4 @@ class External_Maze_Helper
     {
         $this->currentYear = $currentYear;
     }
-
 }
