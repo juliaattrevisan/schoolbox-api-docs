@@ -26,7 +26,7 @@ class Controller extends Base
     {
         /* Co-erce to string in case someone visits this page directly w/o a location querystring param
          */
-        $location = (new Location())->detect((string)$this->request->query['location'], $this->getConfigLoader()->get('weather_location'));
+        $location = (new Location())->detect((string)$this->request->query->get('location'), $this->getConfigLoader()->get('weather_location'));
 
         $apiKey = $this->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
