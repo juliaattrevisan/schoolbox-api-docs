@@ -490,7 +490,7 @@ class Scrub
                         if (!$oembedUrlNode) {
                             continue;
                         }
-                        $oembedUrl = $oembedUrlNode->value;
+//                        $oembedUrl = $oembedUrlNode->value;
                         // Replace the source of an iframe here with the actual
                         // oembed URL?
                         $childMatches = $xpath->query('//*[@src]', $match);
@@ -505,10 +505,18 @@ class Scrub
                                 }
                                 $src = $srcNode->value;
                                 // Is this an iframely url? Replace if so
-                                $srcUri = new Laminas\Uri\Uri($src);
-                                if ($srcUri->getHost() === 'cdn.iframe.ly') {
+                                $srcUrl = new Laminas\Uri\Uri($src);
+                                if ($srcUrl->getHost() === 'cdn.iframe.ly') {
                                     // Get the src, and do something with it
-                                    $srcNode->value = $oembedUrl;
+                                    $httpClient = new GuzzleHttp\Client();
+                                    $apiUrl = (new Laminas\Uri\Uri('https://iframe.ly/api/iframely'))
+                                        ->setQuery(
+                                            $srcUrl->getQueryAsArray() + ['iframe' => 0]);
+                                    $response = $httpClient->get($apiUrl->toString());
+                                    $responseBody = json_decode($response->getBody()->getContents(), true);
+                                    // This works for the specific Youtube case:
+                                    // need to test with others
+                                    $srcNode->value = $responseBody['links']['player'][0]['href'];
                                 }
                             }
                         }
