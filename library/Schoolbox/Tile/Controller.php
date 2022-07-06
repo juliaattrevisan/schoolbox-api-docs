@@ -132,7 +132,7 @@ class Controller extends Base
 
         if ($this->layoutMapper->save($layout)) {
             // Rearrange tiles
-            $tilesOrder = $this->getRequest()->post['tile'];
+            $tilesOrder = $this->getRequest()->post->get('tile', []);
             if (!empty($tilesOrder)) {
                 foreach ($layout->getTileList() as $tile) {
                     $order = array_search($tile->getId(), $tilesOrder);
