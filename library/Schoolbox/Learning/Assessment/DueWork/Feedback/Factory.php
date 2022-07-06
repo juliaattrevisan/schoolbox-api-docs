@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -27,7 +26,6 @@ use Schoolbox\Learning\DueWork\StateMapper;
 
 class Factory
 {
-
     /**
      * @var DueWorkFeedbackDataSource
      */
