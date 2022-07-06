@@ -26,7 +26,6 @@ use Schoolbox\Learning\Turnitin\Exception\Credentials;
  */
 class Controller extends Base
 {
-
     /**
      * The header which turnitin uses to tell us which step it just did
      */
@@ -256,11 +255,10 @@ class Controller extends Base
          */
         try {
             $model = $this->turnitinFileMapper->findOneByColumn('turnitin_submission_id', $turnitinSubmissionId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw new Turnitin\Exception\Exception(sprintf(
-                'Turnitin submission identifier %s does not have a corresponding turnitin_report record.',
-                $turnitinSubmissionId
-            ));
+        } catch (\Schoolbox\Mapper\Exception\Deleted $deleted) {
+            $model = $deleted->getDeletedObject();
+        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+            throw $e;
         }
 
         return [
