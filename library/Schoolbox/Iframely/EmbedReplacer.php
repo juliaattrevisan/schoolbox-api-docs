@@ -32,23 +32,6 @@ use Laminas\Uri\Uri;
 class EmbedReplacer
 {
     /**
-     * Wrapper which is used for generating UTF-8 encoded HTML fragments.
-     *
-     * Required so that PHP's DOM manipulation is as forceful as possible about
-     * making the document UTF-8.
-     */
-    private const HTML5_WRAPPER = <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-            <head>
-                <title></title>
-                <meta charset="utf-8">
-            </head>
-            <body>%s</body>
-        </html>
-        HTML;
-
-    /**
      * The XPath statement which identifies an Iframely embed container within
      * the HTML.
      */
@@ -56,9 +39,9 @@ class EmbedReplacer
 
     /**
      * The XPath statement which identifies the actual embed iframe or other
-     * source attribute within each embed container.
+     * source attribute's element within each embed container.
      */
-    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH = '//*[@src]';
+    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ELEMENT_XPATH = '//*[@src]';
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -124,7 +107,7 @@ class EmbedReplacer
         foreach ($embeds as $embed) {
             // Find all src attributes within the embed node:
             // if there are none, skip this embed
-            $srcNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ATTR_XPATH);
+            $srcNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ELEMENT_XPATH);
             if (count($srcNodes) === 0) {
                 continue;
             }
