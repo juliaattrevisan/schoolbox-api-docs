@@ -14,3 +14,13 @@ CREATE TABLE `summative_report` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
+
+-- remove old reportexport settings
+-- these are now saved in each summative report's settings
+
+DELETE FROM `config`
+WHERE `name` IN (
+    'report_school_logo',
+    'report_export_introduction',
+    'report_title'
+);
