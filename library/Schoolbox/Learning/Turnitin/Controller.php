@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * A set of webhooks that Turnitin access when it finishes certain steps
