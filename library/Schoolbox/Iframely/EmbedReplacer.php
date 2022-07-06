@@ -18,6 +18,7 @@ use DOMNodeList;
 use DOMXPath;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Laminas\Uri\Uri;
 
 /**
@@ -121,7 +122,21 @@ class EmbedReplacer
                 // Get embed without Iframely's iframe
                 $srcUrl = new Uri($srcNode->getAttribute('src'));
                 if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                    // Get the src, and do something with it
+                    // Get the src, and figure out where it actually redirects
+                    // to in the end
+                    $response = $this->httpClient->get(
+                        $srcNode->getAttribute('src'),
+                        [
+                            RequestOptions::ALLOW_REDIRECTS => [
+                                'track_redirects' => true,
+                                'on_redirect'     => function (...$args) {
+                                    var_dump($args);
+                                }
+                            ],
+                        ],
+                    );
+
+
                     $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
                         ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
                     try {
