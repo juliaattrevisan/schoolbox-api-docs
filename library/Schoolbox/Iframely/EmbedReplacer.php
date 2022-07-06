@@ -124,7 +124,16 @@ class EmbedReplacer
                     // Get the src, and do something with it
                     $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
                         ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
-                    $response     = $this->httpClient->get($apiUrl->toString());
+                    try {
+                        $response = $this->httpClient->get($apiUrl->toString());
+                    } catch (GuzzleException $e) {
+                        // Something went wrong whilst making the new request,
+                        // e.g. this request return a 417 Expectation Failed:
+                        // this means Iframely doesn't know how to output this
+                        // content without its embed.
+                        // Anyway: just skip this conversion.
+                        continue;
+                    }
                     $responseBody = json_decode($response->getBody()->getContents(), true);
                     if (isset($responseBody['html'])) {
                         $replacementHtml = $responseBody['html'];
