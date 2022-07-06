@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Client;
 use League\CommonMark;
+use Proxy\Server as ProxyServer;
 use Schoolbox\Iframely\EmbedReplacer;
 
 /**
@@ -44,6 +45,13 @@ class Scrub
      * @var CommonMark\MarkdownConverterInterface|null
      */
     private static ?CommonMark\MarkdownConverterInterface $markdownConverter = null;
+
+
+    /**
+     * Singleton Iframely embed replacer used by this class in `html` and
+     * `htmlAbsoluteUri`.
+     */
+    private static ?EmbedReplacer $embedReplacer = null;
 
 
     /**
@@ -462,7 +470,7 @@ class Scrub
             'scrub.html',
             function ($param) {
                 $purified = self::getHtmlPurifierInstance()->purify($param);
-                return (new EmbedReplacer(new Client()))->replace($purified);
+                return self::buildEmbedReplacer()->replace($purified);
             },
             "$html",
             Config::get('scrub_html_cache_timeout')
@@ -484,7 +492,7 @@ class Scrub
             function ($params) {
                 $purifier = self::getHtmlPurifierInstance($params[1]);
                 $purified = $purifier->purify($params[0]);
-                return (new EmbedReplacer(new Client()))->replace($purified);
+                return self::buildEmbedReplacer()->replace($purified);
             },
             ["$html", $domain],
             Config::get('scrub_html_cache_timeout')
@@ -505,5 +513,20 @@ class Scrub
     public static function filename(string $filename): string
     {
         return preg_replace('/[^a-zA-Z\d\-_]/', '_', $filename);
+    }
+
+    /**
+     * Build the Iframely embed replacer.
+     *
+     * @return EmbedReplacer
+     */
+    private static function buildEmbedReplacer(): EmbedReplacer
+    {
+        if (!self::$embedReplacer) {
+            // TODO inject this
+            $httpClient = new Client(['curl' => ProxyServer::getInstance()->buildCurlOptions()]);
+            self::$embedReplacer = new EmbedReplacer($httpClient);
+        }
+        return self::$embedReplacer;
     }
 }
