@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use DomainException;
@@ -78,13 +80,13 @@ class Decorator implements DecoratorInterface
         bool $similarityCheckEnabled,
         ?DueWork $original
     ) {
-        $this->setAcceptOnline(trim($acceptOnline));
-        $this->setMarkType(trim($markType));
-        $this->setGradingScheme(trim($gradingScheme));
-        $this->setUseRubric(trim($useRubric));
-        $this->setCapabilityMarkType(trim($capabilityMarkType));
+        $this->setAcceptOnline($acceptOnline);
+        $this->setMarkType($markType);
+        $this->setGradingScheme($gradingScheme);
+        $this->setUseRubric($useRubric);
+        $this->setCapabilityMarkType($capabilityMarkType);
         $this->setCapabilityGradeGroup($capabilityGradeGroup);
-        $this->setUseMarkRange(trim($useMarkRange));
+        $this->setUseMarkRange($useMarkRange);
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
@@ -105,9 +107,9 @@ class Decorator implements DecoratorInterface
     {
         if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
             $assessment->setAcceptsNone();
-        } else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
+        } elseif ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
             $assessment->setAcceptsSingle();
-        } else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
+        } elseif ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
             $assessment->setAcceptsMultiple();
         }
 

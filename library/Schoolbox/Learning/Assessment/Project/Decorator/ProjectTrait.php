@@ -12,14 +12,13 @@ namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
 trait ProjectTrait
 {
-
     /**
-     * @var int
+     * @var string
      */
     protected $summator;
 
     /**
-     * @return int
+     * @return string
      */
     protected function getSummator()
     {
@@ -27,7 +26,7 @@ trait ProjectTrait
     }
 
     /**
-     * @param int $summator
+     * @param string $summator
      * @return $this
      */
     protected function setSummator($summator)
