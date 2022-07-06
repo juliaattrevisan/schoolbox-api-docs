@@ -75,6 +75,11 @@ class Model implements ISoftDeletable
             return null;
         }
 
+        /* Superimpose selected options over the default
+         * Disabling fields prevents the keys from existing
+         */
+        $optionsPayload = array_replace_recursive(self::DEFAULT_OPTIONS, $optionsPayload);
+
         /* If possible, explode the csv values
         */
         $optionsPayload['terms'] = explode(',', (string)$optionsPayload['terms']);

@@ -353,16 +353,14 @@ class Controller extends ConfigController
      */
     public function decompilePayload(Model $report): array
     {
-        $optionPayload = $report->decode();
-
-        /* Superimpose selected options over the default
-         * Disabling fields prevents the keys from existing
+        /* Reconstruct a selectize-compatible set of tuples into $options
+         * which starts out as a clone fo $optionsPayload
          */
-        $options = array_replace_recursive(Model::DEFAULT_OPTIONS, $optionPayload);
+        $options = $optionsPayload = $report->decode();
 
         /* Squish out the Terms
          */
-        $terms = $this->termMapper->findByColumn('id', $optionPayload['terms']);
+        $terms = $this->termMapper->findByColumn('id', $optionsPayload['terms']);
 
         $options['terms'] = [];
 
@@ -375,7 +373,7 @@ class Controller extends ConfigController
 
         /* Squish out the Year Levels
          */
-        $yearLevels = $this->yearLevelMapper->findByColumn('id', $optionPayload['yearLevels']);
+        $yearLevels = $this->yearLevelMapper->findByColumn('id', $optionsPayload['yearLevels']);
 
         $options['yearLevels'] = [];
 
@@ -388,7 +386,7 @@ class Controller extends ConfigController
 
         /* Squish out the Campuses
          */
-        $campuses = $this->campusMapper->findByColumn('id', $optionPayload['campuses']);
+        $campuses = $this->campusMapper->findByColumn('id', $optionsPayload['campuses']);
 
         $options['campuses'] = [];
 
@@ -401,7 +399,7 @@ class Controller extends ConfigController
 
         /* Squish out the Students
          */
-        $students = $this->userMapper->findByColumn('id', $optionPayload['students']);
+        $students = $this->userMapper->findByColumn('id', $optionsPayload['students']);
 
         $options['students'] = [];
 
@@ -414,7 +412,7 @@ class Controller extends ConfigController
 
         /* Summary Work Types
          */
-        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['summary']['workType'] ?? []);
+        $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType'] ?? []);
 
         $options['summary']['workType'] = [];
 
@@ -427,7 +425,7 @@ class Controller extends ConfigController
 
         /* Class Work Types
          */
-        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionPayload['class']['workType'] ?? []);
+        $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType'] ?? []);
 
         $options['class']['workType'] = [];
 
