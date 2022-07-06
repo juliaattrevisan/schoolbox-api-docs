@@ -144,14 +144,14 @@ class Classes implements IStrategy
     private array $eventEntries = [];
 
 
-    /**
-     * A caching mechanism to prevent dupe CLEAR overrides actions
-     *
-     * $overridesEntries[$classCode][$startDate][$finishDate] = true
-     *
-     * @var array
-     */
-    private array $overridesEntries = [];
+//    /**
+//     * A caching mechanism to prevent dupe CLEAR overrides actions
+//     *
+//     * $overridesEntries[$classCode][$startDate][$finishDate] = true
+//     *
+//     * @var array
+//     */
+//    private array $overridesEntries = [];
 
 
     /**
@@ -201,7 +201,7 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-//        $this->importStudentTimetables(self::WATCHLIST);
+        $this->importStudentTimetables(self::WATCHLIST);
         $this->importStaffTimetables(self::WATCHLIST);
     }
 
@@ -388,16 +388,6 @@ class Classes implements IStrategy
 
         $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
-        /* Find all the class identifiers that require special treatment
-         */
-        $options = $this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions();
-
-        /* Class Identifiers are separated by a comma un the ui
-         * These Class Identifiers allow schools to tell us which ones are communal,
-         * like Yard Duties, shared teaching classes, etc. which require deconfliction
-         */
-        $deconflictClassIdentifiers = explode(',', $options['communal']);
-
         /* Pummel my way through each person's timetable, using $classIdentifiers as a way
          * to identify the classes that need special treatment due to Yard Duties etc.
          */
@@ -439,7 +429,7 @@ class Classes implements IStrategy
 //                    print_r($timetable);
 //                }
 
-                $this->process($person, $timetable, $deconflictClassIdentifiers);
+                $this->process($person, $timetable, true);
             }
 
             /* Example $timetable extract
@@ -527,14 +517,14 @@ class Classes implements IStrategy
      *
      * @param array $person
      * @param array $timetable
-     * @param array $deconflictClassIdentifiers
+     * @param bool  $deconflictAll
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function process(array $person, array $timetable, array $deconflictClassIdentifiers): void
+    private function process(array $person, array $timetable, bool $deconflictAll): void
     {
         $now = \Alaress_Date_Format::now();
 
@@ -739,7 +729,7 @@ class Classes implements IStrategy
 
                     /* Decide how involved humans are saved
                      */
-                    if ($this->isDuty($subject, $deconflictClassIdentifiers)) {
+                    if ($deconflictAll) {
                         /* FIXME SPECULATIVE PROGRAMMING
                          *
                          * If this event is a Duty (identified by room code DUT)
@@ -764,28 +754,28 @@ class Classes implements IStrategy
     }
 
 
-    /**
-     * FIXME SPECULATIVE PROGRAMMING
-     *
-     * Decide if $event is one of those communal Duty events
-     * Clear everyone's involvement then add specific people for a given date
-     *
-     * @param array $subject
-     * @param array $classIdentifiers
-     * @return bool
-     */
-    private function isDuty(array $subject, array $classIdentifiers): bool
-    {
-        /* No identifiers? No trabajo
-         */
-        if (!\count($classIdentifiers)) {
-            return false;
-        }
-
-        /* Otherwise, check if the current class identifier is requires special treatment
-         */
-        return \in_array(trim((string)$subject['CLASS']), $classIdentifiers, true);
-    }
+//    /**
+//     * FIXME SPECULATIVE PROGRAMMING
+//     *
+//     * Decide if $event is one of those communal Duty events
+//     * Clear everyone's involvement then add specific people for a given date
+//     *
+//     * @param array $subject
+//     * @param array $classIdentifiers
+//     * @return bool
+//     */
+//    private function isDuty(array $subject, array $classIdentifiers): bool
+//    {
+//        /* No identifiers? No trabajo
+//         */
+//        if (!\count($classIdentifiers)) {
+//            return false;
+//        }
+//
+//        /* Otherwise, check if the current class identifier is requires special treatment
+//         */
+//        return \in_array(trim((string)$subject['CLASS']), $classIdentifiers, true);
+//    }
 
 
     /**
@@ -803,9 +793,9 @@ class Classes implements IStrategy
      */
     private function deconflict(array $person, \Schoolbox\External\Event\Model $event): void
     {
-        $classCode = $event->getCode();
-        $startAt = $event->getStartAt()->getDatabase();
-        $finishAt = $event->getFinishAt()->getDatabase();
+//        $classCode = $event->getCode();
+//        $startAt = $event->getStartAt()->getDatabase();
+//        $finishAt = $event->getFinishAt()->getDatabase();
 
         $this->log->debug(sprintf(
             'Establishing overrides for %s in %s',
@@ -813,26 +803,26 @@ class Classes implements IStrategy
             $event->getTitle()
         ));
 
-        /* Set up a CLEAR action, with a hardcoded sequence 1
-         * This must always happen first
-         */
-        if (!isset($this->overridesEntries[$classCode][$startAt][$finishAt])) {
-            $this->log->debug('Setting up CLEAR override');
-
-            $overrideClear = $this->overridesMapper->createModel()
-                ->setEventId($event->getId())
-                ->setExternalId(null)
-                ->setAction(Model::CLEAR)
-                ->setSequence(1);
-
-            if ($this->perform) {
-                $this->overridesMapper->save($overrideClear);
-            }
-
-            /* Remember we did this
-             */
-            $this->overridesEntries[$classCode][$startAt][$finishAt] = true;
-        }
+//        /* Set up a CLEAR action, with a hardcoded sequence 1
+//         * This must always happen first
+//         */
+//        if (!isset($this->overridesEntries[$classCode][$startAt][$finishAt])) {
+//            $this->log->debug('Setting up CLEAR override');
+//
+//            $overrideClear = $this->overridesMapper->createModel()
+//                ->setEventId($event->getId())
+//                ->setExternalId(null)
+//                ->setAction(Model::CLEAR)
+//                ->setSequence(1);
+//
+//            if ($this->perform) {
+//                $this->overridesMapper->save($overrideClear);
+//            }
+//
+//            /* Remember we did this
+//             */
+//            $this->overridesEntries[$classCode][$startAt][$finishAt] = true;
+//        }
 
         /* Add a guy (doesn't matter what ordering these happen;
          * just hardcode it to 2 for now)
