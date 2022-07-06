@@ -182,7 +182,7 @@ class Controller extends BaseController
                                        'user'            => $user->getId(),
                                        'group'           => $post['group'],
                                        'action'          => 'delete',
-                                       'enrolmentStatus' => GroupsHelper::NOTENROLLED,
+                                       'enrolmentStatus' => GroupsHelper::NOTENROLED,
                                    ])
         );
     }

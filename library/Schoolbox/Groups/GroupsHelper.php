@@ -21,9 +21,9 @@ use Timetable_ColourMapper;
 class GroupsHelper
 {
     //sting const's for enrolment text
-    public const ENROLLED    = 'enrolled';
-    public const NOTENROLLED = 'notEnrolled';
-    public const PENDING     = 'pending';
+    public const ENROLED    = 'enroled';
+    public const NOTENROLED = 'notEnroled';
+    public const PENDING    = 'pending';
 
     public const MEMBERSHIP_NONE = 'none';
     public const MEMBERSHIP_READ = 'read';
@@ -64,14 +64,14 @@ class GroupsHelper
 //        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
 
         $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
-        //combine to show list of all groups, both available to the user, and those they are enrolled in
+        //combine to show list of all groups, both available to the user, and those they are enroled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
 
         return $this->buildGroups($user, $groupIds, $userPerms);
     }
 
     /**
-     * get all groups a user is currently enrolled in
+     * get all groups a user is currently enroled in
      */
     public function getCurrentGroups(User $user)
     {
@@ -192,7 +192,7 @@ class GroupsHelper
     public function getEnrollmentText(?UserAccess $userGroup): string
     {
         if ($userGroup === null) {
-            return self::NOTENROLLED;
+            return self::NOTENROLED;
         }
 
         /**
@@ -203,16 +203,16 @@ class GroupsHelper
         }
 
         /**
-         * ACCESS_READ perm is enrolled, so that is helpful
+         * ACCESS_READ perm is enroled, so that is helpful
          */
         if (UserAccess::ACCESS_READ <= $userGroup->getAccessLevel()) {
-            return self::ENROLLED;
+            return self::ENROLED;
         }
 
         /**
          * to help php stan with is return issue, and to catch any failures of the above
          */
-        return self::NOTENROLLED;
+        return self::NOTENROLED;
     }
 
     /**
@@ -322,7 +322,7 @@ class GroupsHelper
      * @param User  $user
      * @param Group $group
      * @param int   $enrollmentStatus (default: ACCESS_AWAITING_AUTHORISATION)
-     * @param int   $membership (default: ACCESS_READ, only has effect if $enrolmentStatus is GroupsHelper::ENROLLED)
+     * @param int   $membership (default: ACCESS_READ, only has effect if $enrolmentStatus is GroupsHelper::ENROLED)
      * @param bool  $isFavourite (default: false)
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -492,9 +492,9 @@ class GroupsHelper
     public static function getEnrolmentInt(string $enrolment): int
     {
         $enrolmentArray = [
-            self::NOTENROLLED   => UserAccess::ACCESS_DENY,
-            self::PENDING       => UserAccess::ACCESS_AWAITING_AUTHORISATION,
-            self::ENROLLED      => UserAccess::ACCESS_READ,
+            self::NOTENROLED => UserAccess::ACCESS_DENY,
+            self::PENDING    => UserAccess::ACCESS_AWAITING_AUTHORISATION,
+            self::ENROLED    => UserAccess::ACCESS_READ,
         ];
         if (!isset($enrolmentArray[$enrolment])) {
             throw new SchoolboxException("Incorrect enrolment value");
