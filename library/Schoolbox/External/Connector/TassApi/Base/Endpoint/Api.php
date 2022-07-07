@@ -26,7 +26,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCod
  */
 class Api implements IApi
 {
-
     /**
      * Tass API Version Number
      *
@@ -192,13 +191,11 @@ class Api implements IApi
      * @param array  $params
      * @param int    $version
      * @return array|null
-     * @throws DomainException
      * @throws RuntimeException
      * @throws \JsonException
      */
     public function retrieveDocument(string $method, array $params, int $version = self::VERSION_3): ?array
     {
-
         /* Record endpoint usage
          */
         $this->apiUsage->record($method);
@@ -237,7 +234,6 @@ class Api implements IApi
      * @param array  $params
      * @param array  $queryArgs
      * @return mixed|void
-     * @throws DomainException
      * @throws RuntimeException
      * @throws \JsonException
      */
@@ -298,7 +294,6 @@ class Api implements IApi
             if (in_array($response->getStatusCode(), $nonTransient, true)) {
                 $fails = self::NUM_RETRY;
             } else {
-
                 /* We got a response but it's broken
                  * Take a little nap before trying again
                  * (We suspect that it might be timing related, or network traffic)
