@@ -13,7 +13,6 @@ use Schoolbox\Database\Factory;
  */
 class External_Maze_Helper
 {
-
     /**
      * An instance of MSSQL
      *
@@ -34,13 +33,6 @@ class External_Maze_Helper
      * @var string
      */
     private $currentYear = '';
-
-    /**
-     * Decide whether you're in between semesters
-     *
-     * @var bool
-     */
-    private $betweenSemesters = false;
 
     /**
      * Constructor
@@ -82,7 +74,7 @@ class External_Maze_Helper
                           TT.TTKEY = TH.TT12KEY OR
                           TT.TTKEY = TH.TT13KEY
                   WHERE TH.THKEY = '{$this->getCurrentTHKEY()}'";
-        return $this->getDb()->getOne($query);
+        return $this->db->getOne($query);
     }
 
     /**
@@ -134,7 +126,7 @@ class External_Maze_Helper
 			ORDER BY TH.CALENDAR_END01,TH.CALENDAR_END02,TH.CALENDAR_END03,TH.CALENDAR_END04 ASC
 		";
 
-        $value = $this->getDb()->getOne($query);
+        $value = $this->db->getOne($query);
         if ($value === false) {
             return '';
         }
@@ -171,16 +163,18 @@ class External_Maze_Helper
          */
         if (strstr($schoolboxClassCode, ',')) {
             foreach (str_getcsv($schoolboxClassCode) as $currentClassCode) {
-                [$classCode, $classNumber] = explode('-', $currentClassCode);
+                $classCodeParts = explode('-', $currentClassCode);
 
-                $allClassCodes[] = "'{$classCode}'";
-                $allClassNumbers[] = "'{$classNumber}'";
+                $allClassCodes[] = "'{$classCodeParts[0]}'";
+                // if $currentClassCode does not have "-", just set 0
+                // so that $allClassCodes count and $allClassNumbers count will be the same
+                $allClassNumbers[] = (int)($classCodeParts[1] ?? 0);
             }
         } else {
-            [$classCode, $classNumber] = explode('-', $schoolboxClassCode);
+            $classCodeParts = explode('-', $schoolboxClassCode);
 
-            $allClassCodes[] = "'{$classCode}'";
-            $allClassNumbers[] = "'{$classNumber}'";
+            $allClassCodes[] = "'{$classCodeParts[0]}'";
+            $allClassNumbers[] = (int)($classCodeParts[1] ?? 0);
         }
 
         return [
@@ -189,38 +183,8 @@ class External_Maze_Helper
         ];
     }
 
-    /**
-     * Alias
-     *
-     * @return bool
-     */
-    public function isBetweenSemesters()
-    {
-        return $this->getBetweenSemesters();
-    }
-
     /* Getters/Setters
      */
-
-    /**
-     * Set db
-     *
-     * @param IConnector $db
-     */
-    private function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * Get db
-     *
-     * @return IConnector
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
 
     /**
      * Set current semester
@@ -256,25 +220,5 @@ class External_Maze_Helper
     private function setCurrentYear($currentYear)
     {
         $this->currentYear = $currentYear;
-    }
-
-    /**
-     * Set between semesters
-     *
-     * @param boolean $betweenSemesters
-     */
-    private function setBetweenSemesters($betweenSemesters)
-    {
-        $this->betweenSemesters = $betweenSemesters;
-    }
-
-    /**
-     * Get between semesters
-     *
-     * @return boolean
-     */
-    private function getBetweenSemesters()
-    {
-        return $this->betweenSemesters;
     }
 }
