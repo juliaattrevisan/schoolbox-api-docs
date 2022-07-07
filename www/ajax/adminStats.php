@@ -296,22 +296,28 @@ switch ($_POST['module']) {
             STREAM_CLIENT_CONNECT,
             $streamContext
         );
-        $response = stream_context_get_params($client);
-        $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
+        if($client) {
+            $response              = stream_context_get_params($client);
+            $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
 
-        // Check cert is issued by LetsEncrypt for exact hostname
-        if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
-            // Not issued by LetsEncrypt
-            $isCustomCert = true;
+            // Check cert is issued by LetsEncrypt for exact hostname
+            if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
+                // Not issued by LetsEncrypt
+                $isCustomCert = true;
+            } else {
+                // Does not contain exact match
+                $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
+            }
+            $output = [
+                'isCustomCert' => $isCustomCert,
+                'expiry'       => (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
+            ];
         } else {
-            // Does not contain exact match
-            $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
+            $output = [
+                'error_code' => $errorNumber,
+                'error_message' => $errorDescription,
+            ];
         }
-
-        $output =  [
-            'isCustomCert' => $isCustomCert,
-            'expiry' => (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
-        ];
         break;
     case 'turnitin':
         /** @var IConfigLoader $config */
