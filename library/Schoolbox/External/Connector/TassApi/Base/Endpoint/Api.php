@@ -289,13 +289,24 @@ class Api implements IApi
                 return $contents;
             }
 
-            /* We got a response but it's broken
-             * Take a little nap before trying again
-             * (We suspect that it might be timing related, or network traffic)
+            /* HTTP 401 Unauthorized is not likely to be a transient issue
+             * Skip retrying any other likely nontransient issues by adding
+             * their http status codes to this array
              */
-            $fails++;
+            $nonTransient = [401];
 
-            sleep(self::NAP_TIMEOUT);
+            if (in_array($response->getStatusCode(), $nonTransient, true)) {
+                $fails = self::NUM_RETRY;
+            } else {
+
+                /* We got a response but it's broken
+                 * Take a little nap before trying again
+                 * (We suspect that it might be timing related, or network traffic)
+                 */
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+            }
 
             /* We tried multiple times and failed multiple times
              * This might as well have died
