@@ -441,7 +441,7 @@ class EDiary implements IStrategy
              * Sometimes one of these will be empty for no reason (skip it)
              */
             $tassStartDate = trim((string)$tassEvent['start']);
-            $tassEndDate = trim((string)$tassEvent['start']);
+            $tassEndDate = trim((string)$tassEvent['end']);
 
             if ('' === $tassStartDate || '' === $tassEndDate) {
                 $this->log->debug(sprintf(
