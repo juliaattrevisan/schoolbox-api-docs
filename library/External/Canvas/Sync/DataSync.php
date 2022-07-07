@@ -44,7 +44,6 @@ use UnexpectedValueException;
  */
 class DataSync
 {
-
     /** @var IConnector */
     private IConnector $canvasDb;
 
