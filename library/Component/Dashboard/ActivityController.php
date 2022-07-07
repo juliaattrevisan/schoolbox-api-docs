@@ -10,7 +10,6 @@
 
 class Component_Dashboard_ActivityController extends Component_Dashboard_ControllerAbstract
 {
-
     protected $group;
 
     protected $activity;

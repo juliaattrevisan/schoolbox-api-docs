@@ -12,7 +12,6 @@
  */
 class Activity
 {
-
     /**
      * @var DeprecatedDatabase
      */
@@ -39,7 +38,7 @@ class Activity
         $query  = "SELECT datetime FROM homepage_log WHERE folder_id = '$id' AND user_id = '" . $_SESSION['id'] . "'";
         $result = $this->db->getRow($query);
 
-        if ($result['datetime']) {
+        if (false !== $result && $result['datetime']) {
             return $result['datetime'];
         }
 
