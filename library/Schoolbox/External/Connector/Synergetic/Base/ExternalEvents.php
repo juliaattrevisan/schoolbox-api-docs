@@ -48,6 +48,7 @@ class ExternalEvents extends Base implements IExternalEvents
               ss.StaffID             AS owner,
               ss.Comment             AS comment,
               r.Description          AS room,
+              0                      AS type,
               CONVERT(VARCHAR(20),ss.ScheduleDateTimeFrom,120) AS start,
               CONVERT(VARCHAR(20),ss.ScheduleDateTimeTo,120)   AS finish,
               l.Description          AS location,

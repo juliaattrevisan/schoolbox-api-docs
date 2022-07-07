@@ -6,7 +6,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Database\Iterator\IIterator;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -18,7 +17,6 @@ use Schoolbox\UserMapper;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * A string to indicate the source from which this event emerged
      *
@@ -29,7 +27,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     /**
      * An external event handler instance
      *
-     * @var Calendar
+     * @var IExternalEvents
      */
     private $externalEvents;
 
@@ -72,14 +70,13 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
-
         $stack = new Collection();
 
         // Figure out default event type
         try {
             /** @var Calendar_Api_Config_Record $config */
-            $config = $this->loadConnectorConfiguration();
-            $decodedConfig = $config->decodeConfig();
+            $config           = $this->loadConnectorConfiguration();
+            $decodedConfig    = $config->decodeConfig();
             $defaultEventType = $decodedConfig->getLuEventType();
         } catch (MapperException $e) {
             /* Something went awry with loadConnectorConfiguration()
@@ -105,7 +102,6 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         }
 
         try {
-            /** @var IIterator $externalEvents */
             $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
         } catch (InvalidArgumentException $e) {
             return $stack;
