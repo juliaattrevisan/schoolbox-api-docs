@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * @var External_TimetableInterface
      */
@@ -70,6 +69,9 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
         $stack = new Collection();
 
         $roomTimetable = $this->externalTimetable->getRoomTimetable(array_keys($this->roomCodes));
+
+        // change all room codes in the lookup to lower case, as some connectors returns room code in different case
+        $resourceLookUp = array_change_key_case($this->roomCodes);
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
@@ -149,11 +151,11 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setEndTime(new Alaress_Date_Format($classEndTime));
                 // Let's say the event doesn't have a publish date,
                 // this gets around issue SB-5493 (where events that haven't
-                // occured yet only show to superusers)
+                // occurred yet only show to superusers)
                 $event->setPublishDate(null);
                 $event->setTitle($room['Description'] . (!empty((string)$room['ClassCode']) ? ' (' . $room['ClassCode'] . ')' : ''));
                 $event->setCampusList($campusId);
-                $event->setResourceId($this->roomCodes[$room['RoomCode']]);
+                $event->setResourceId($resourceLookUp[strtolower($room['RoomCode'])]);
 
                 // Load room and category if they aren't already there.
                 $userExternalId = $room['StaffID'];
