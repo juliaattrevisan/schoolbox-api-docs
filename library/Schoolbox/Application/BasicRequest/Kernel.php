@@ -11,8 +11,10 @@ namespace Schoolbox\Application\BasicRequest;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
+use GuzzleHttp;
 use League\Flysystem\Filesystem;
-use League\Flysystem\MountManager;
+use Proxy\Server as ProxyServer;
+use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Schoolbox\Application\WebRequest\RequestUriParser;
@@ -24,6 +26,7 @@ use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Instance;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -40,6 +43,8 @@ use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\User\Token\Mapper as TokenMapper;
+use Schoolbox\UserMapper;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -234,6 +239,26 @@ class Kernel extends WebKernelAbstract
         $mapperFactory = new MapperFactory($di);
         $di->set('mapperFactory', $mapperFactory);
 
+        $di->set(
+            'proxyServer',
+            $di->lazyNew(
+                ProxyServer::class,
+                ['conf' => $di->lazyGet('config')]
+            )
+        );
+
+        // TODO this should be used wherever a HTTP client is used
+        $di->set(
+            'httpClient',
+            $di->lazy(
+                static function () use ($di) {
+                    /** @var ProxyServer $proxyServer */
+                    $proxyServer = $di->get('proxyServer');
+                    return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
+                }
+            ),
+        );
+
         // install sentry
         $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
         $sentryProject = \defined('SENTRY_PROJECT') ? SENTRY_PROJECT : '';
@@ -260,6 +285,25 @@ class Kernel extends WebKernelAbstract
                 )
             );
         }
+
+        // JWT parser
+        $di->set(
+            'user.jwtParser',
+            $di->lazy(
+                function () use ($di, $config, $mapperFactory) {
+                    /** @var GuzzleHttp\Client $httpClient */
+                    $httpClient             = $di->get('httpClient');
+                    $userMapper             = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
+                    $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
+                    return new JwtParser\Composite(
+                        new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
+                        new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                    );
+                }
+            )
+        );
 
         $di->set(
             'templateEngine',

@@ -23,6 +23,7 @@ use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
 use Schoolbox\User;
+use Throwable;
 
 /**
  * Common ancestor for all Web Requests
@@ -91,7 +92,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     public function shutdownSafely($e = null, $stack = null): void
     {
         $isException = false;
-        if ($e instanceof \Throwable) {
+        if ($e instanceof Throwable) {
             $isException = true;
 
             // Special case for oAuth exceptions:
@@ -312,13 +313,13 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     /**
      * Output an error. The format depends on the request type (JSON or HTML).
      *
-     * @param array|\Throwable $e       The throwable that led us here, or the
+     * @param array|Throwable $e        The throwable that led us here, or the
      *                                  stack trace in array form.
-     * @param string           $message A human-friendly message to output.
-     * @param string           $info    More descriptive description of what
+     * @param string          $message  A human-friendly message to output.
+     * @param string          $info     More descriptive description of what
      *                                  happened.
-     * @param array            $error   An array-format stack trace
-     * @param int              $code    A HTTP status code
+     * @param array           $error    An array-format stack trace
+     * @param int             $code     A HTTP status code
      */
     protected function outputError(
         $e,
@@ -365,7 +366,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
                     $problem['message'] = $message;
                     if ($args['outputStackTrace']) {
-                        $problem['trace'] = $e instanceof \Throwable
+                        $problem['trace'] = $e instanceof Throwable
                             ? $e->getTrace()
                             : ($e['trace'] ?? []);
                     }
@@ -422,7 +423,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         if ($args['outputStackTrace']) {
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}") . "</li>";
-            if ($args['stackTrace'] instanceof \Throwable) {
+            if ($args['stackTrace'] instanceof Throwable) {
                 foreach ($args['stackTrace']->getTrace() as $i => $frame) {
                     foreach (['class', 'type', 'function', 'file', 'line'] as $prop) {
                         $frame[$prop] ??= '';
@@ -442,5 +443,73 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         http_response_code($code);
         echo $output;
+    }
+
+
+    /**
+     * Extract a user from the "Authorization" HTTP header, if that header
+     * exists.
+     *
+     * @param string|null $authHeader
+     * @return User|null
+     * @throws JwtParser\Exception\Base if a header exists and is recognised,
+     *                                  but is rejected for whatever reason
+     */
+    public function extractUserFromAuthHeader(?string $authHeader): ?User
+    {
+        if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
+            [, $token] = $matches;
+
+            /** @var JwtParser\IParser $tokenParser */
+            $tokenParser = $this->get('user.jwtParser');
+
+            if ($tokenParser->accepts($token)) {
+                return $tokenParser->determineUser($token);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Authenticate the user for this request only, storing their data in the
+     * session.
+     *
+     * After this request finishes: restore the original session if somebody was
+     * logged in, or destroy the session completely if nobody was logged in.
+     *
+     * @param User $user
+     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     */
+    public function authenticateUserForThisRequestOnly(User $user): void
+    {
+        // Determine who was logged in, and preserve their data
+        /** @var \Alaress\Session\Session $sessionDataStore */
+        $sessionDataStore   = $this->di->get('session');
+        $currentSessionData = null;
+        $currentUser        = $sessionDataStore->getAuthUser();
+        if ($currentUser->getId()) {
+            $currentSessionData = $_SESSION;
+        }
+
+        // Now authenticate the given user
+        $sessionHandler = new \Session();
+        $sessionHandler->create($user->getUsername());
+
+        // Also: override the DI user with this user?
+        // Should not be required because the DI user is fetched from the
+        // session, anyway.
+        // (This would die when the container was locked, anyway)
+//        $this->di->set('user', $user);
+
+        // Restore or destroy the session when all is done
+        $this->getShutdownHandler()->registerFunction(
+            function () use ($sessionHandler, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $sessionHandler->destroy();
+                }
+            }
+        );
     }
 }
