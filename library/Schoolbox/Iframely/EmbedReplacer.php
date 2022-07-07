@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Iframely;
 
 use DiDom\Document;
+use DiDom\Element;
 use DiDom\Query;
 use DOMAttr;
 use DOMDocument;
@@ -43,6 +44,12 @@ class EmbedReplacer
      * source attribute's element within each embed container.
      */
     private const IFRAMELY_EMBED_CONTAINER_SOURCE_ELEMENT_XPATH = '//*[@src]';
+
+    /**
+     * The XPath statement which identifies an Iframely URL within each embed
+     *
+     */
+    private const IFRAMELY_EMBED_CONTAINER_IFRAMELY_URL_ELEMENT_XPATH = '//*[@data-iframely-url]';
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -106,58 +113,16 @@ class EmbedReplacer
         // Process each embed
         $replacementsApplied = false;
         foreach ($embeds as $embed) {
-            // Find all src attributes within the embed node:
-            // if there are none, skip this embed
-            $srcNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ELEMENT_XPATH);
-            if (count($srcNodes) === 0) {
+            // TODO extract these out to composites?
+            $replacementHtml = $this->findReplacementHtmlForSourceElements($embed);
+            // Replace the Iframely element's HTML with the new embed
+            if (isset($replacementHtml)) {
+                $replacementsApplied = true;
+                $embed->setInnerHtml($replacementHtml);
                 continue;
             }
 
-            // If there are src attributes, check if any of those URLs point to
-            // the Iframely CDN.
-            // If any do: make a separate call to the iframely API to get the
-            // HTML embed which bypasses Iframely's CDN
-            $replacementHtml = null;
-            foreach ($srcNodes as $srcNode) {
-                // Get embed without Iframely's iframe
-                $srcUrl = new Uri($srcNode->getAttribute('src'));
-                if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                    // Get the src, and figure out where it actually redirects
-                    // to in the end
-                    $response = $this->httpClient->get(
-                        $srcNode->getAttribute('src'),
-                        [
-                            RequestOptions::ALLOW_REDIRECTS => [
-                                'track_redirects' => true,
-                                'on_redirect'     => function (...$args) {
-                                    var_dump($args);
-                                }
-                            ],
-                        ],
-                    );
-
-
-                    $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
-                        ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
-                    try {
-                        $response = $this->httpClient->get($apiUrl->toString());
-                    } catch (GuzzleException $e) {
-                        // Something went wrong whilst making the new request,
-                        // e.g. this request return a 417 Expectation Failed:
-                        // this means Iframely doesn't know how to output this
-                        // content without its embed.
-                        // Anyway: just skip this conversion.
-                        continue;
-                    }
-                    $responseBody = json_decode($response->getBody()->getContents(), true);
-                    if (isset($responseBody['html'])) {
-                        $replacementHtml = $responseBody['html'];
-                        break;
-                    }
-                }
-            }
-
-            // Replace the Iframely element's HTML with the new embed
+            $replacementHtml = $this->findReplacementHtmlForIframelyUrlElements($embed);
             if (isset($replacementHtml)) {
                 $replacementsApplied = true;
                 $embed->setInnerHtml($replacementHtml);
@@ -169,5 +134,112 @@ class EmbedReplacer
             return $html;
         }
         return $doc->first('body')->html();
+    }
+
+    /**
+     * Determine what the replacement HTML should be for a source element within
+     * an Iframely embed.
+     *
+     * @param Element $embed
+     * @return string|null
+     * @noinspection PhpDocMissingThrowsInspection - xpath is hardcoded
+     */
+    private function findReplacementHtmlForSourceElements(Element $embed): ?string
+    {
+        // Find all src attributes within the embed node:
+        // if there are none, skip this embed
+        /** @noinspection PhpUnhandledExceptionInspection - xpath is hardcoded */
+        $srcNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_SOURCE_ELEMENT_XPATH);
+        if (count($srcNodes) === 0) {
+            return null;
+        }
+
+        // If there are src attributes, check if any of those URLs point to
+        // the Iframely CDN.
+        // If any do: make a separate call to the iframely API to get the
+        // HTML embed which bypasses Iframely's CDN
+        foreach ($srcNodes as $srcNode) {
+            // Get embed without Iframely's iframe
+            $srcUrl = new Uri($srcNode->getAttribute('src'));
+            if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
+                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
+                    ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
+                try {
+                    $response = $this->httpClient->get($apiUrl->toString());
+                } catch (GuzzleException $e) {
+                    // Something went wrong whilst making the new request,
+                    // e.g. this request return a 417 Expectation Failed:
+                    // this means Iframely doesn't know how to output this
+                    // content without its embed.
+                    // Anyway: just skip this conversion.
+                    continue;
+                }
+                $responseBody = json_decode($response->getBody()->getContents(), true);
+                if (isset($responseBody['html'])) {
+                    return $responseBody['html'];
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determine what the replacement HTML should be for an Iframely URL element
+     * within an Iframely embed.
+     *
+     * @param Element $embed
+     * @return string|null
+     * @noinspection PhpDocMissingThrowsInspection - xpath is hardcoded
+     */
+    private function findReplacementHtmlForIframelyUrlElements(Element $embed): ?string
+    {
+        // Find all data-iframely-url attributes within the embed node:
+        // if there are none, skip this embed
+        /** @noinspection PhpUnhandledExceptionInspection - xpath is hardcoded */
+        $iframelyUrlNodes = $embed->xpath(self::IFRAMELY_EMBED_CONTAINER_IFRAMELY_URL_ELEMENT_XPATH);
+        if (count($iframelyUrlNodes) === 0) {
+            return null;
+        }
+
+        // Now do something
+        foreach ($iframelyUrlNodes as $srcNode) {
+            // Get embed without Iframely's iframe
+            $iframelyUrl = new Uri($srcNode->getAttribute('data-iframely-url'));
+            if ($iframelyUrl->getHost() === self::IFRAMELY_CDN_HOST) {
+                // Get the src, and figure out where it actually redirects
+                // to in the end
+                $response = $this->httpClient->get(
+                    $iframelyUrl->toString(),
+                    [
+                        RequestOptions::ALLOW_REDIRECTS => [
+                            'track_redirects' => true,
+                            'on_redirect'     => function (...$args) {
+                                var_dump($args);
+                            }
+                        ],
+                    ],
+                );
+
+
+//                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
+//                    ->setQuery(self::IFRAMELY_API_PARAMS + $srcUrl->getQueryAsArray());
+//                try {
+//                    $response = $this->httpClient->get($apiUrl->toString());
+//                } catch (GuzzleException $e) {
+//                    // Something went wrong whilst making the new request,
+//                    // e.g. this request return a 417 Expectation Failed:
+//                    // this means Iframely doesn't know how to output this
+//                    // content without its embed.
+//                    // Anyway: just skip this conversion.
+//                    continue;
+//                }
+//                $responseBody = json_decode($response->getBody()->getContents(), true);
+//                if (isset($responseBody['html'])) {
+//                    return $responseBody['html'];
+//                }
+            }
+        }
+
+        return null;
     }
 }
