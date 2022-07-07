@@ -266,7 +266,7 @@
 
                         <div class="small-12 columns">
                             <label for="report-view-as">View as</label>
-                            <p class="meta">Only show assessment results that are visible as this type of user.</p>
+                            <p class="meta">Show assessment feedback that is visible to this role type.</p>
                             <select name="viewAs">
                                 {% for key, value in viewAs %}
                                     {% set selected = '' %}
@@ -285,41 +285,31 @@
                         <div class="small-12 columns">
                             <label for="report-terms" class="required">Academic Periods</label>
                             <p class="meta">
-                                The report will only include assessments that are due between the start and
-                                end of these academic periods.
+                                The report will only include assessments that are due within this academic period.
                             </p>
                             <input type="text" id="report-terms" name="terms" />
                         </div>
                     </fieldset>
 
                     <fieldset class="content">
-                        <legend>Student Selection</legend>
+                        <legend class="no-margin">Student Selection</legend>
                         <div class="small-12 columns">
                             <p class="meta">
-                                Select the students to be included in the report generation; all students
-                                in each group will be included in the final export.
+                                Select the students to be included in the report export.
+                                All users from each field will be included in the final export.
                             </p>
 
                             <div class="row">
                                 <div class="small-12 large-6 columns">
-                                    <label for="report-year-levels">Year Levels
-                                        <span class="hint has-tip tip-top" title="We'll generate reports for all the students found in the
-                                    Year Levels chosen below." data-tooltip="">?</span>
-                                    </label>
+                                    <label for="report-year-levels">Year Levels</label>
                                     <input type="text" id="report-year-levels" name="yearLevels" />
                                 </div>
                                 <div class="small-12 large-6 columns">
-                                    <label for="report-campuses">Campuses
-                                        <span class="hint has-tip tip-top" title="We'll generate reports for all the students found in the
-                                    Campuses chosen below." data-tooltip="">?</span>
-                                    </label>
+                                    <label for="report-campuses">Campuses</label>
                                     <input type="text" id="report-campuses" name="campuses" />
                                 </div>
                                 <div class="small-12 columns">
-                                    <label for="report-students">Students
-                                        <span class="hint has-tip tip-top" title="Reports for the following students will also be generated in addition
-                                    to the students found via the Year Level and Campus selections." data-tooltip="">?</span>
-                                    </label>
+                                    <label for="report-students">Students</label>
                                     <input type="text" id="report-students" name="students" />
                                 </div>
                             </div>
@@ -352,12 +342,16 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-summary-heading">Heading</label>
-                            <p class="meta">Optionally customise the name of the summary section. Leave blank to omit it altogether.</p>
+                            <p class="meta">
+                                Add a title to customise the name of the summary page.
+                                Leaving this field blank will omit a title for the summary section on the summative report.
+                            </p>
                             <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
                         </div>
 
                         <div class="small-12 columns">
                             <label for="report-summary-work-types">Work types</label>
+                            <p class="meta">Select the Work Types you require displayed on the summary page of the summative report.</p>
                             <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
                         </div>
 
@@ -378,7 +372,7 @@
                         <div class="small-12 columns">
                             <input name="summary[comments]" type="hidden" value="0" />
                             <input id="report-summary-show-comments" name="summary[comments]" type="checkbox" value="1" {% if options.summary.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-summary-show-comments" class="checkbox-label">Show comments</label>
+                            <label for="report-summary-show-comments" class="checkbox-label">Show feedback</label>
                         </div>
                         <div class="small-12 columns">
                             <input name="summary[rubrics]" type="hidden" value="0" />
@@ -413,6 +407,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="report-class-work-types">Work types</label>
+                            <p class="meta">Select the Work Types you require displayed on the class pages of the summative report.</p>
                             <select id="report-class-work-types" name="class[workType][]" multiple></select>
                         </div>
 
@@ -423,27 +418,36 @@
                         </div>
 
                         <div class="small-12 columns">
-                            <input name="class[learningLevels]" type="hidden" value="0" />
-                            <input id="report-class-show-learning-levels" name="class[learningLevels]" type="checkbox" value="1" {% if options.class.learningLevels ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-learning-levels" class="checkbox-label">Show learning levels</label>
-                        </div>
-
-                        <div class="small-12 columns">
                             <input name="class[cohort]" type="hidden" value="0" />
                             <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
                             <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class results</label>
                         </div>
 
                         <div class="small-12 columns">
+                            <input name="class[learningLevels]" type="hidden" value="0" />
+                            <input id="report-class-show-learning-levels" name="class[learningLevels]" type="checkbox" value="1" {% if options.class.learningLevels ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-learning-levels" class="checkbox-label">
+                                Show learning levels
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
+                        </div>
+
+                        <div class="small-12 columns">
                             <input name="class[capabilityGrades]" type="hidden" value="0" />
                             <input id="report-class-show-capability-grades" name="class[capabilityGrades]" type="checkbox" value="1" {% if options.class.capabilityGrades ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-capability-grades" class="checkbox-label">Show capability grades results</label>
+                            <label for="report-class-show-capability-grades" class="checkbox-label">
+                                Show capability marks
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
                         </div>
 
                         <div class="small-12 columns">
                             <input name="class[progression]" type="hidden" value="0" />
                             <input id="report-class-show-progression" name="class[progression]" type="checkbox" value="1" {% if options.class.progression ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-progression" class="checkbox-label">Show progression</label>
+                            <label for="report-class-show-progression" class="checkbox-label">
+                                Show progression
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
                         </div>
                     </fieldset>
                     <fieldset class="content">
@@ -456,7 +460,7 @@
                         <div class="small-12 columns">
                             <input name="class[comments]" type="hidden" value="0" />
                             <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments ?? false %}checked="checked"{% endif %} />
-                            <label for="report-class-show-comments" class="checkbox-label">Show comments</label>
+                            <label for="report-class-show-comments" class="checkbox-label">Show feedback</label>
                         </div>
                         <div class="small-12 columns">
                             <input name="class[rubrics]" type="hidden" value="0" />
