@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import Endpoints from './manageGroupEndpoints';
 import FilterTypes from './manageGroupFilterTypes';
 
 
@@ -46,9 +47,9 @@ export const useStore = defineStore('manageGroup', {
          * 
          * @param { String }
          */
-        async loadGroupMembers (endpoint) {
+        async loadGroupMembers () {
             try {
-                const response = await fetch(endpoint);
+                const response = await fetch(Endpoints.GET_MEMBERS);
                 const responseJson = await response.json();
                 this.groupMembers = responseJson;
                 this.groupMembers.forEach((groupMember) => { //to highlight new members just added
@@ -100,10 +101,12 @@ export const useStore = defineStore('manageGroup', {
 
         /**
          * member removal has been confirmed so pull them out
+         * 
+         * @param { String }
          */
-        async removeSelectedMembers (endpoint) {
+        async removeSelectedMembers () {
             try {
-                const response = await fetch(endpoint, {
+                const response = await fetch(Endpoints.REMOVE_MEMBERS, {
                     method: 'POST',
                     body: getRemoveMembersFormData(this.selectedMembers),
                 });
@@ -128,6 +131,34 @@ export const useStore = defineStore('manageGroup', {
          */
         cancelRemoveSelectedMembers () {
             this.isRemoveSelectedMembersPromptOpen = false;
+        },
+
+        /**
+         * 
+         */
+         async updateMemberAccessType (member, accessType) {
+            try {
+                const response = await fetch(Endpoints.UPDATE_MEMBERS, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'id': member.id,
+                        'access': accessType,
+                    }),
+                });
+                const responseJson = await response.json();
+                if (responseJson.success) {
+                    return member; //return member so the table data can be updated in manage-group-table.vue
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                // 
+            }
         },
 
     },

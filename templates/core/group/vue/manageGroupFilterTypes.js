@@ -3,7 +3,7 @@
  *
  */
 
- export default Object.freeze({
+export default Object.freeze({
     WAITING: 'waiting',
     READ: 'read',
     WRITE: 'write',

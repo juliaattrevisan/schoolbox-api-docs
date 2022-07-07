@@ -10,16 +10,6 @@ import Toast from '@schoolboxVue/components/toast.vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const props = defineProps({
-    /**
-     * the endpoint to remove members
-     */
-    removeMembersEndpoint: {
-        type: String,
-        required: true,
-    },
-});
-
 const store = useStore();
 const removeModalEl = ref(null);
 const toastEl = ref(null);
@@ -36,7 +26,7 @@ watch(() => store.isRemoveSelectedMembersPromptOpen, (newIsOpen) => {
  * remove the selected members
  */
 function onRemoveSelected () {
-    store.removeSelectedMembers(props.removeMembersEndpoint);
+    store.removeSelectedMembers();
 }
 
 /**

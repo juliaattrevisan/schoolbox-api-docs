@@ -41,6 +41,7 @@ const Template = (args, { argTypes }) => ({
 
 const getMembersEndpoint = '/getMembers'; //just using any active endpoint for a connection
 const removeMembersEndpoint = '/removeMembers';
+const updateMembersEndpoint = '/updateMembers';
 
 export const Default = Template.bind({});
 Default.parameters = {
@@ -61,12 +62,21 @@ Default.parameters = {
                     })
                 )
             }), 
+            rest.patch(updateMembersEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.delay(1000),
+                    ctx.json({
+                       success: true,
+                    })
+                )
+            }), 
         ]
     },
 }
 Default.args = {
     getMembersEndpoint: getMembersEndpoint,
     removeMembersEndpoint: removeMembersEndpoint,
+    updateMembersEndpoint: updateMembersEndpoint,
 }
 
 // export const LoadError = Template.bind({});

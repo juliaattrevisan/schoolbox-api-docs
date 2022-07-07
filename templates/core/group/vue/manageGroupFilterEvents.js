@@ -1,6 +1,5 @@
 /** 
  * The various filter events that can occur
- *
  */
 
  export default Object.freeze({
