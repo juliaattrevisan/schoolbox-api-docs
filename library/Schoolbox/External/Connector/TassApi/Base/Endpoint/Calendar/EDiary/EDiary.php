@@ -197,7 +197,7 @@ class EDiary implements IStrategy
 
             foreach ($feeds['calendar'] as $feed) {
                 foreach ($userProfiles as $userProfile) {
-                    $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
+                    $this->importStudentEvents($userProfile, $feed);
                 }
             }
         } else {
@@ -222,7 +222,7 @@ class EDiary implements IStrategy
 
             foreach ($feeds as $feed) {
                 foreach ($userProfiles as $userProfile) {
-                    $this->importStaffEvents($userProfile, $feed, 'getTeacherEDiary');
+                    $this->importStaffEvents($userProfile, $feed);
                 }
             }
         } else {
@@ -264,14 +264,14 @@ class EDiary implements IStrategy
      *
      * @param \Schoolbox\External\Profile\Student\Model $userProfile
      * @param array                                     $feed
-     * @param string                                    $endpoint
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed, string $endpoint): void
+    private function importStudentEvents(\Schoolbox\External\Profile\Student\Model $userProfile, array $feed): void
     {
+        $endpoint = 'getStudentEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
 
         /* This comes from an API request at TASS
@@ -287,18 +287,26 @@ class EDiary implements IStrategy
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
-        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
-            $endpoint,
-            [
-                'studcode' => $userExternalId,
-                'feedcode' => $feed['code'],
-                'start_date' => $this->from->getUsingFormat('d/m/Y'),
-                'end_date' => $this->to->getUsingFormat('d/m/Y')
-            ],
-            Api::VERSION_2
-        );
+        try {
+            $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+                $endpoint,
+                [
+                    'studcode' => $userExternalId,
+                    'feedcode' => $feed['code'],
+                    'start_date' => $this->from->getUsingFormat('d/m/Y'),
+                    'end_date' => $this->to->getUsingFormat('d/m/Y')
+                ],
+                Api::VERSION_2
+            );
 
-        $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+            $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+        } catch (\RuntimeException $e) {
+            $this->log->warning(sprintf(
+                'Could not process events for %s: %s',
+                $userExternalId,
+                $e->getMessage()
+            ));
+        }
     }
 
 
@@ -309,14 +317,14 @@ class EDiary implements IStrategy
      *
      * @param \Schoolbox\External\Profile\Staff\Model $userProfile
      * @param array                                   $feed
-     * @param string                                  $endpoint
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed, string $endpoint): void
+    private function importStaffEvents(\Schoolbox\External\Profile\Staff\Model $userProfile, array $feed): void
     {
+        $endpoint = 'getTeacherEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
 
         /* This comes from an API request at TASS
@@ -329,18 +337,26 @@ class EDiary implements IStrategy
             $userExternalId
         ));
 
-        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
-            $endpoint,
-            [
-                'tchcode' => $userExternalId,
-                'feedcode' => $feed['code'],
-                'start_date' => $this->from->getUsingFormat('d/m/Y'),
-                'end_date' => $this->to->getUsingFormat('d/m/Y')
-            ],
-            Api::VERSION_2
-        );
+        try {
+            $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+                $endpoint,
+                [
+                    'tchcode' => $userExternalId,
+                    'feedcode' => $feed['code'],
+                    'start_date' => $this->from->getUsingFormat('d/m/Y'),
+                    'end_date' => $this->to->getUsingFormat('d/m/Y')
+                ],
+                Api::VERSION_2
+            );
 
-        $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+            $this->importEvents($endpoint, $userExternalId, $feed, $tassEvents);
+        } catch (\RuntimeException $e) {
+            $this->log->warning(sprintf(
+                'Could not process events for %s: %s',
+                $userExternalId,
+                $e->getMessage()
+            ));
+        }
     }
 
 
