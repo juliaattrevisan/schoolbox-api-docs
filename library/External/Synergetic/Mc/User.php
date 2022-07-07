@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 class External_Synergetic_Mc_User extends External_Synergetic_User
 {
-
     /**
      * @inheritdoc
      */
