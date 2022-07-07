@@ -53,14 +53,10 @@ function onMemberAccessChange (row) {
 store.$onAction(({ name, args, after, onError }) => {
     const updatedRow = args[0];
     if (name === 'updateMemberAccess' && updatedRow.id === props.row.id) { //as each row is subscribed to onAction, we have to check for the selected row
-        const newAccessType = args[1];
         isProcessing.value = true;
         props.toastEl.activate('Updating...');
-        after((updatedMember) => {
+        after(() => {
             props.toastEl.timeout('Member successfully updated', true, 5000);
-            //we need to do this as Vue is watching tableData, not each individual file within
-            const memberInTableData = store.groupMembers.find((member) => member.id === updatedMember.id);
-            memberInTableData.accessType = newAccessType; //only once the change has occured in the database, do we reflect this change in the display table
             isProcessing.value = false;
         });
         onError((error) => {

@@ -74,9 +74,12 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         accessType: 'Access',
     },
     hiddenColumns: ['meta'], //the meta data is added to the name column, but we need a meta column so we can search for it
-    perPage: 50,
-    perPageValues: [50, 100, 200],
+    perPage: 10,
+    perPageValues: [10, 15, 200], //50, 100, 200
     resizableColumns: false,
+    rowClassCallback: (row) => { //to differentiate just updated members so it's clear they've just been updated
+        return row.justUpdated ? 'just-updated' : '';
+    },
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
     },
@@ -203,21 +206,24 @@ function updateSelectedMembers () {
                 :options="tableOptions"
                 @loaded="onLoaded"
                 @select="onRowSelected"
+                @sorted="store.refreshMembers"
+                @pagination="store.refreshMembers"
+                @filter="store.refreshMembers"
             >
                 <template #beforeTable>
                     <manage-group-table-filters />
                 </template>
-                <template #name="props">
+                <template #name="data">
                     <div class="card small-12">
                         <a href="#">
-                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${props.row.name} portrait`">
-                            {{ props.row.name }}
+                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.name} portrait`">
+                            {{ data.row.name }}
                         </a>
-                        <p class="meta">{{ props.row.meta }}</p>
+                        <p class="meta">{{ data.row.meta }}</p>
                     </div>
                 </template>
-                <template #accessType="props">
-                    <manage-group-table-access :row="props.row" :toast-el="props.toastEl" />
+                <template #accessType="data">
+                    <manage-group-table-access :row="data.row" :toast-el="props.toastEl" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
@@ -275,6 +281,17 @@ function updateSelectedMembers () {
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
     width: 15rem; //keep the edit icon on the right side
+}
+
+.VueTables__table tr.just-updated { //have to be pretty specific to overwrite foundation rules...
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-name: fadeOutBackgroundColour;
+}
+
+@keyframes fadeOutBackgroundColour {
+    0% { background-color: var(--accent-background); }
+    100% { background-color: white; }
 }
 
 </style>

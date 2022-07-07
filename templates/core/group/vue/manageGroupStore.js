@@ -2,6 +2,7 @@
  * Handles the store of the current Manage Group page
  */
 
+import { nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import Endpoints from './manageGroupEndpoints';
 import FilterTypes from './manageGroupAccessTypes';
@@ -52,10 +53,14 @@ export const useStore = defineStore('manageGroup', {
             try {
                 const response = await fetch(Endpoints.GET_MEMBERS);
                 const responseJson = await response.json();
-                this.groupMembers = responseJson;
-                this.groupMembers.forEach((groupMember) => { //to highlight new members just added
-                    groupMember = { ...groupMember, isNew: false };
+                const groupMembers = responseJson.map((groupMember) => { //add in some additional properties
+                    return { 
+                        ...groupMember,
+                        isNew: false, //to highlight new members just added 
+                        justUpdated: false, //to highlight members that have just been changed
+                    } 
                 });
+                this.groupMembers = groupMembers;
             } catch (error) {
                 console.warn(error);
                 this.hasLoadError = true; //show the load error display state 
@@ -85,7 +90,8 @@ export const useStore = defineStore('manageGroup', {
          * 
          * @param { String }
          */
-        updateFilterSelection (accessType) {
+        async updateFilterSelection (accessType) {
+            await this.refreshMembers();
             if (this.selectedFilters.includes(accessType)) { //pull the updated filter out of the list
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== accessType);
             } else { //otherwise add it back in
@@ -117,10 +123,10 @@ export const useStore = defineStore('manageGroup', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    this.groupMembers = this.groupMembers.filter((row) => { //pull out any deleted members, those rows that are in selectedMembers, which have just been deleted
+                    this.groupMembers = this.groupMembers.filter((row) => { //pull out any removed members, those rows that are in selectedMembers, which have just been deleted
                         return !this.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
                     });
-                    this.selectedMembers = [];
+                    this.selectedMembers = []; //can't keep selecting members that have just been removed
                 } else {
                     throw new Error();
                 }
@@ -147,6 +153,7 @@ export const useStore = defineStore('manageGroup', {
          */
         async updateMemberAccess (member, accessType) {
             this.isProcessing = true;
+            await this.refreshMembers();
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -157,7 +164,9 @@ export const useStore = defineStore('manageGroup', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    return member; //return members so the table data can be updated in manage-group-table.vue
+                    const updatedMember = this.groupMembers.find((groupMember) => groupMember.id === member.id);
+                    updatedMember.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
+                    updatedMember.justUpdated = true;
                 } else {
                     throw new Error();
                 }
@@ -187,7 +196,10 @@ export const useStore = defineStore('manageGroup', {
                 const responseJson = await response.json();
                 if (responseJson.success) { //update the state only after the DB change is a success
                     this.selectedMembers.forEach((member) => {
-                        member.accessType = accessType;
+                        member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data 
+                        const updatedMember = this.groupMembers.find((groupMember) => groupMember.id === member.id);
+                        updatedMember.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
+                        updatedMember.justUpdated = true;
                     });
                 } else {
                     throw new Error();
@@ -197,6 +209,19 @@ export const useStore = defineStore('manageGroup', {
             } finally {
                 this.isProcessing = false;
             }
+        },
+
+        /**
+         * Perform on any further user interaction, like updating filters, sorting or searching
+         * Otherwise the animation used to clearly show where new files have been added will be
+         * replayed on any state change
+         */
+        async refreshMembers () {
+            await nextTick();
+            this.groupMembers.forEach((member) => {
+                member.isNew = false;
+                member.justUpdated = false;
+            });
         },
 
     },

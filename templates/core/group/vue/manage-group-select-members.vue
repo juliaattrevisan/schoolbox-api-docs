@@ -108,23 +108,29 @@ function onApproveMembersSelected () {
     store.updateSelectedMembersAccess(AccessTypes.READ);
 }
 
+const changeMemberAccess = ref('');
+
+/**
+ * To update group members access
+ */
+function onMemberAccessChange () {
+    if (changeMemberAccess.value !== '') {
+        store.updateSelectedMembersAccess(this.changeMemberAccess);
+    }
+}
+
 /**
  * so we can track the progress of the member access change
  * and update the UI accordingly
  */
-store.$onAction(({ name, args, after, onError }) => {
+store.$onAction(({ name, after, onError }) => {
     if (name === 'updateSelectedMembersAccess') {
-        const newAccessType = args[0];
         isProcessing.value = true;
         props.toastEl.activate('Updating...');
         after(() => {
             props.toastEl.timeout('Members successfully updated', true, 5000);
-            store.selectedMembers.forEach((selectedMember) => {
-                //we need to do this as Vue is watching tableData, not each individual file within
-                const memberInTableData = store.groupMembers.find((member) => member.id === selectedMember.id);
-                memberInTableData.accessType = newAccessType; //only once the change has occured in the database, do we reflect this change in the display table
-            });
             isProcessing.value = false;
+            changeMemberAccess.value = ''; //default back to blank on any update
         });
         onError((error) => {
             console.warn(error);
@@ -148,15 +154,23 @@ function onRemoveMembersSelected () {
         <h3 class="selected-count"><em>{{ selectedMembersCountWithRowName }} selected</em></h3>
         <span ref="shiftSelectNoteEl" class="shift-select-note">Use Shift+Select to select multiple members</span>
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="isProcessing">Clear member selection</button>
-        <ul class="flex-list buttons">
+        <ul class="flex-list">
             <li v-if="areAllSelectedOnWaitingList">
-                <button @click.prevent="onApproveMembersSelected" class="button submit icon-add" :disable="isProcessing">Approve Membership</button>
+                <button @click.prevent="onApproveMembersSelected" class="button submit icon-add" :disabled="store.isProcessing">Approve Membership</button>
+            </li>
+            <li v-else-if="selectedMembersCount > 0">
+                <select v-model="changeMemberAccess" :disabled="store.isProcessing" @change="onMemberAccessChange()">
+                    <option value="">Change Access</option>
+                    <option :value="AccessTypes.READ">Read Access</option>
+                    <option :value="AccessTypes.WRITE">Write Access</option>
+                    <option :value="AccessTypes.ADMIN">Group Admin</option>
+                </select>
             </li>
             <li>
-                <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disable="isProcessing">Email {{ selectedMembersPlural }}</button>
+                <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ selectedMembersPlural }}</button>
             </li>
             <li>
-                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete" :disable="isProcessing">Remove {{ selectedMembersPlural }}</button>
+                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete" :disabled="store.isProcessing">Remove {{ selectedMembersPlural }}</button>
             </li>
         </ul>
     </bottom-drawer>
@@ -187,6 +201,15 @@ function onRemoveMembersSelected () {
     &:hover {
         background: none;
     }
+}
+
+.flex-list {
+    gap: 0.5rem; //add a bit more space between the buttons so each is better defined
+}
+
+select, 
+button {
+    margin-bottom: 0; //to bring the bottom-drawer down, we don't need any margin currently
 }
 
 </style>
