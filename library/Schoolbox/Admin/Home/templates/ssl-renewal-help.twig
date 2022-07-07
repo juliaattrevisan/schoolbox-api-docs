@@ -44,9 +44,9 @@
         statusCodeATag.innerText = statusCode;
 
         const headersString = buildHeadersString(headers);
-        document.getElementById("response_headers").innerText = headers ? headersString : "undefined";
+        document.getElementById("response_headers").innerText = headers ? headersString : " ";
 
-        document.getElementById("response_body").innerText = body ? body : "undefined";
+        document.getElementById("response_body").innerText = body ? body : " ";
     }
 
     $(window).on('load', function () {
