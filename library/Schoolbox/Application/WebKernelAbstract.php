@@ -491,25 +491,25 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             $currentSessionData = $_SESSION;
         }
 
+        // Restore or destroy the session when all is done
+        $authenticator = new \Authenticator();
+        $this->getShutdownHandler()->registerFunction(
+            function () use ($authenticator, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $authenticator->destroySession();
+                }
+            }
+        );
+
         // Now authenticate the given user
-        $sessionHandler = new \Session();
-        $sessionHandler->create($user->getUsername());
+        $authenticator->createSession($user->getUsername());
 
         // Also: override the DI user with this user?
         // Should not be required because the DI user is fetched from the
         // session, anyway.
         // (This would die when the container was locked, anyway)
 //        $this->di->set('user', $user);
-
-        // Restore or destroy the session when all is done
-        $this->getShutdownHandler()->registerFunction(
-            function () use ($sessionHandler, $currentSessionData) {
-                if (isset($currentSessionData)) {
-                    $_SESSION = $currentSessionData;
-                } else {
-                    $sessionHandler->destroy();
-                }
-            }
-        );
     }
 }
