@@ -1,0 +1,480 @@
+{##
+ # Create/Update a Summative Report
+ #
+ # @param string $pageCurrent            url to the current page
+ # @param array allBreadcrumbs           A set of breadcrumbs
+ # @param SummativeReport\Model $report  A of SummativeReportModel instance
+ # @param array $options                 A structure containing report options
+ # @param Zone $logoZone                 An attachzone for uploading images
+ #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+        $.fn.alaressEditor({
+            targetElements: $('#report-introduction')
+        });
+
+        $('#summative-report-form').alaressValidate({
+            rules: {
+                'title': {
+                    requiredNotBlank: true
+                },
+                'terms': {
+                    requiredNotBlank: true
+                }
+            },
+            messages: {
+                'title': "Please enter a title",
+                'terms': "Please select at least one academic period"
+            }
+        });
+
+        $('#report-terms').selectizeSelector({
+            multiple: true,
+            value: {{ options.terms|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search {{ locale.term.plural }}',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminSummativeReport.getTerms') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        $('#report-year-levels').selectizeSelector({
+            multiple: true,
+            value: {{ options.yearLevels|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search year levels',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminSummativeReport.getYearLevels') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        $('#report-campuses').selectizeSelector({
+            multiple: true,
+            value: {{ options.campuses|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search campuses',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminSummativeReport.getCampuses') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        $('#report-students').selectizeSelector({
+            multiple: true,
+            value: {{ options.students|json_encode|raw }},
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {
+                    roleTypeID: 'student',
+                },
+                dataType: 'json'
+            },
+        });
+
+        $('#report-summary-work-types').selectizeSelector({
+            multiple: true,
+            value: {{ options.summary.workType|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search work types',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        $('#report-class-work-types').selectizeSelector({
+            multiple: true,
+            value: {{ options.class.workType|json_encode|raw }},
+            selectize: {
+                create: false,
+                placeholder: 'Search work types',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('adminSummativeReport.getWorkTypes') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {query: query}
+                    }).done(function (result) {
+                        callback(result)
+                    }).fail(function () {
+                        callback()
+                    })
+                }
+            },
+        });
+
+        /* Dynamically enable sections
+         */
+        $('[data-section-enabled]').each(function(index, element) {
+            let sectionId = $(element).attr('data-section-enabled');
+            let fieldsets = $('#' + sectionId).find('fieldset');
+
+            /* Make checkboxes unchangeable
+             */
+            fieldsets.find('input:checkbox').each(function(index, input) {
+                $(input).on('click', function (event) {
+                    if ($(this).prop('readonly')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+
+            /* Initialise sections
+             */
+            initSections($(this), fieldsets);
+
+            /* Toggle settings in the section
+             */
+            $(element).on('change', function() {
+                initSections($(this), fieldsets);
+            });
+        });
+
+
+        /**
+         * Set up the initial conditions for the fieldsets
+         * based on whether the report section was enabled
+         *
+         * @param sectionSwitch
+         * @param fieldsets
+         */
+        function initSections(sectionSwitch, fieldsets) {
+            if ($(sectionSwitch).prop('checked')) {
+                fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
+                    $(checkbox).prop('readonly', false);
+                    $(checkbox).removeAttr('onclick');
+                });
+
+                /* Micromanage selectize
+                 */
+                fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
+                    $(selectizeControl).css('opacity', 1);
+                    $(selectizeControl).siblings('select').data('selectize').unlock();
+                });
+            } else {
+                fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
+                    $(checkbox).prop('readonly', true);
+                });
+
+                /* Micromanage selectize
+                 */
+                fieldsets.find('.selectize-control').each(function (index, selectizeControl) {
+                    $(selectizeControl).css('opacity', 0.5);
+                    $(selectizeControl).siblings('select').data('selectize').lock();
+                });
+            }
+        }
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    {% if report and report.id %}
+        {% set formAction = routeLookupIfAuthorized('adminSummativeReport.postUpdate', {report: report, reportId: report.id}) %}
+    {% else %}
+        {% set formAction = routeLookupIfAuthorized('adminSummativeReport.postCreate') %}
+    {% endif %}
+
+    <div class="admin-content">
+        <form id="summative-report-form" action="{{ formAction }}" method="post">
+            <div class="small-12 island">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-title" class="required">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="report-title" name="title" maxlength="100" value="{{ report.title ?? '' }}" />
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-logo">School Logo</label>
+                            {% include 'sub/attachzone.twig' with { attachzone: logoZone } %}
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-introduction">Introductory Message</label>
+                            <textarea id="report-introduction" name="introduction">{{ report.introduction ?? '' }}</textarea>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-view-as">View as</label>
+                            <p class="meta">Show assessment feedback that is visible to this role type.</p>
+                            <select name="viewAs">
+                                {% for key, value in viewAs %}
+                                    {% set selected = '' %}
+
+                                    {% if (options.viewAs ?? null) == key %}
+                                        {% set selected = 'selected="selected"' %}
+                                    {% endif %}
+
+                                    <option value="{{ key }}" {{ selected }}>{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-terms" class="required">Academic Periods</label>
+                            <p class="meta">
+                                The report will only include assessments that are due within this academic period.
+                            </p>
+                            <input type="text" id="report-terms" name="terms" />
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="content">
+                        <legend class="no-margin">Student Selection</legend>
+                        <div class="small-12 columns">
+                            <p class="meta">
+                                Select the students to be included in the report export.
+                                All users from each field will be included in the final export.
+                            </p>
+
+                            <div class="row">
+                                <div class="small-12 large-6 columns">
+                                    <label for="report-year-levels">Year Levels</label>
+                                    <input type="text" id="report-year-levels" name="yearLevels" />
+                                </div>
+                                <div class="small-12 large-6 columns">
+                                    <label for="report-campuses">Campuses</label>
+                                    <input type="text" id="report-campuses" name="campuses" />
+                                </div>
+                                <div class="small-12 columns">
+                                    <label for="report-students">Students</label>
+                                    <input type="text" id="report-students" name="students" />
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </section>
+
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Summary Page
+                                <span class="hint has-tip tip-top" title="The summary page will display a list of subjects. You may choose to display just overall grades or the grades from specific assessments in each subject." data-tooltip="">?</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <span class="switch inline">
+                            <input type="hidden" name="summary[active]" value="0" />
+
+                            <input id="report-include-summary" name="summary[active]" type="checkbox" value="1" data-section-enabled="section-summary" {% if options.summary.active ?? false %}checked="checked"{% endif %} />
+                            <label for="report-include-summary">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </nav>
+                </div>
+
+                <section id="section-summary">
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-summary-heading">Heading</label>
+                            <p class="meta">
+                                Add a title to customise the name of the summary page.
+                                Leaving this field blank will omit a title for the summary section on the summative report.
+                            </p>
+                            <input type="text" name="summary[heading]" value="{{ options.summary.heading ?? '' }}" />
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-summary-work-types">Work types</label>
+                            <p class="meta">Select the Work Types you require displayed on the summary page of the summative report.</p>
+                            <select id="report-summary-work-types" name="summary[workType][]" multiple></select>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="summary[overallGrade]" type="hidden" value="0" />
+                            <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Assessment Options</legend>
+
+                        <div class="small-12 columns">
+                            <input name="summary[grades]" type="hidden" value="0" />
+                            <input id="report-class-summary-grade" name="summary[grades]" type="checkbox" value="1" {% if options.summary.grades ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-summary-grade" class="checkbox-label">Show grades</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="summary[comments]" type="hidden" value="0" />
+                            <input id="report-summary-show-comments" name="summary[comments]" type="checkbox" value="1" {% if options.summary.comments ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-comments" class="checkbox-label">Show feedback</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="summary[rubrics]" type="hidden" value="0" />
+                            <input id="report-summary-show-rubrics" name="summary[rubrics]" type="checkbox" value="1" {% if options.summary.rubrics ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-rubrics" class="checkbox-label">Show rubrics</label>
+                        </div>
+                    </fieldset>
+                </section>
+
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Class Page
+                                <span class="hint has-tip tip-top" title="This will include a new page in the report for each class. This may include summary graphs and assessments for more detailed information about the class." data-tooltip="">?</span>
+                            </h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <span class="switch inline">
+                            <input type="hidden" name="class[active]" value="0" />
+
+                            <input id="report-include-class" name="class[active]" type="checkbox" value="1" data-section-enabled="section-class" {% if options.class.active ?? false %}checked="checked"{% endif %} />
+                            <label for="report-include-class">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </span>
+                    </nav>
+                </div>
+
+                <section id="section-class">
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="report-class-work-types">Work types</label>
+                            <p class="meta">Select the Work Types you require displayed on the class pages of the summative report.</p>
+                            <select id="report-class-work-types" name="class[workType][]" multiple></select>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[overallGrade]" type="hidden" value="0" />
+                            <input id="report-class-show-overall-grade" name="class[overallGrade]" type="checkbox" value="1" {% if options.class.overallGrade ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-overall-grade" class="checkbox-label">Show overall grade</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[cohort]" type="hidden" value="0" />
+                            <input id="report-class-show-cohort" name="class[cohort]" type="checkbox" value="1" {% if options.class.cohort ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-cohort" class="checkbox-label">Show cohort/class results</label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[learningLevels]" type="hidden" value="0" />
+                            <input id="report-class-show-learning-levels" name="class[learningLevels]" type="checkbox" value="1" {% if options.class.learningLevels ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-learning-levels" class="checkbox-label">
+                                Show learning levels
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[capabilityGrades]" type="hidden" value="0" />
+                            <input id="report-class-show-capability-grades" name="class[capabilityGrades]" type="checkbox" value="1" {% if options.class.capabilityGrades ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-capability-grades" class="checkbox-label">
+                                Show capability marks
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <input name="class[progression]" type="hidden" value="0" />
+                            <input id="report-class-show-progression" name="class[progression]" type="checkbox" value="1" {% if options.class.progression ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-progression" class="checkbox-label">
+                                Show progression
+                                <span class="hint has-tip tip-top" title="This setting will show data from rubrics associated with the selected work type/s." data-tooltip>?</span>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Assessment Options</legend>
+                        <div class="small-12 columns">
+                            <input name="class[grades]" type="hidden" value="0" />
+                            <input id="report-class-show-grade" name="class[grades]" type="checkbox" value="1" {% if options.class.grades ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-grade" class="checkbox-label">Show grades</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="class[comments]" type="hidden" value="0" />
+                            <input id="report-class-show-comments" name="class[comments]" type="checkbox" value="1" {% if options.class.comments ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-comments" class="checkbox-label">Show feedback</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input name="class[rubrics]" type="hidden" value="0" />
+                            <input id="report-class-show-rubrics" name="class[rubrics]" type="checkbox" value="1" {% if options.class.rubrics ?? false %}checked="checked"{% endif %} />
+                            <label for="report-class-show-rubrics" class="checkbox-label">Show rubrics</label>
+                        </div>
+                    </fieldset>
+                </section>
+            </div>
+            <div class="small-12 columns">
+                <section>
+                    <input type="submit" value="Save" />
+                </section>
+            </div>
+        </form>
+    </div>
+</div>

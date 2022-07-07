@@ -1,0 +1,135 @@
+{##
+ # List of Summative Reports
+ #
+ # @param GenericCollection $reports  A list of SummativeReport/Model instances
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    {% set createRoute = routeLookupIfAuthorized('adminSummativeReport.getCreate') %}
+
+    <div class="admin-content">
+        {% if reports|length %}
+            <div class="small-12 island">
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 island">
+                            <h2 class="subheader">Summative Report List</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="{{ createRoute }}" class="icon-add" title="Add a summative report"></a>
+                    </nav>
+                </div>
+                <section>
+                    <ul class="information-list">
+                        {% for report in reports %}
+                        {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
+
+                        <li class="actions-small-4">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    {% if generateRoute %}
+                                        <a href="{{ generateRoute }}">
+                                            <h3>{{ report.title }}</h3>
+                                        </a>
+                                        {% else %}
+                                        <h3>{{ report.title }}</h3>
+                                    {% endif %}
+                                    <p class="meta">
+                                        Last modified by
+                                        {% if report.updatedBy.deleted %}
+                                            {{ report.updatedBy.fullname }}
+                                        {% else %}
+                                            <a href="/search/user/{{ report.updatedBy.id }}" title="{{ report.updatedBy.fullname }}">{{ report.updatedBy.fullname }}</a>
+                                        {% endif %}
+
+                                        on {{ report.updatedAt.local }}
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
+                                {% if generateRoute %}
+                                <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
+                                {% endif %}
+
+                                {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}
+                                {% if updateRoute %}
+                                    <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
+                                {% endif %}
+
+                                {% set dupeRoute = routeLookupIfAuthorized('adminSummativeReport.getDuplicate', {report: report, reportId: report.id}) %}
+                                {% if dupeRoute %}
+                                <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate"></a>
+                                {% endif %}
+
+                                {% set deleteRoute = routeLookupIfAuthorized('adminSummativeReport.postDelete', {report: report, reportId: report.id}) %}
+                                {% if deleteRoute %}
+                                    <script>
+                                        $(function() {
+                                            let toast = $('#toast');
+
+                                            $('#container').on('click', 'a[data-delete="{{ report.id }}"]', function(event) {
+                                                event.preventDefault();
+
+                                                /* Activate indicator label
+                                                 */
+                                                toast.toastActivate({
+                                                    text: "Deleting..."
+                                                });
+
+                                                let element = $(this);
+
+                                                element.confirmDialog({
+                                                    text: 'Are you sure you want to delete this summative report?',
+                                                    confirmEvent: function() {
+                                                        $.post(element.attr('href'), function() {
+                                                            })
+                                                            .done(function() {
+                                                                toast.toastTimeout({
+                                                                    text: 'Saved',
+                                                                    css: 'success'
+                                                                });
+
+                                                                location.reload();
+                                                            })
+                                                            .fail(function(response) {
+                                                                let temp = $.parseJSON(response.responseText);
+
+                                                                toast.toastTimeout({
+                                                                    text: 'Could not save: ' + temp.error,
+                                                                    css: 'alert'
+                                                                });
+                                                            });
+                                                    }
+                                                });
+                                            });
+                                        });
+                                    </script>
+                                    <a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ report.id }}"></a>
+                                {% endif %}
+                            </nav>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                <p>No summative reports have been created.</p>
+                {% if createRoute %}
+                <p><a href="{{ createRoute }}">Click here</a> to build a summative report.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id='toast' class="toast" data-toast></div>

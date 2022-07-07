@@ -44,7 +44,7 @@ class ConfigMapper extends Mapper
     public const MODULE_OAUTH      = 'oauth';
     public const MODULE_SCHOOLDATA = 'schoolData';
     public const MODULE_LTI        = 'lti';
-    public const MODULE_REPORT_EXPORT = 'report-export';
+    public const MODULE_REPORT_EXPORT = 'summative-report';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;

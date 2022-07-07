@@ -13,10 +13,10 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\ReportExport\Test;
+namespace Schoolbox\Admin\SummativeReport\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Admin\ReportExport\CustomStyleExtractor;
+use Schoolbox\Admin\SummativeReport\CustomStyleExtractor;
 
 /**
  * Check that the custom style extractor can get the relevant css rules
