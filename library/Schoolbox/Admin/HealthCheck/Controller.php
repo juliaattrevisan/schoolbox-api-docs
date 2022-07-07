@@ -84,7 +84,7 @@ class Controller extends Base
         //loop through all reports and build the sources / routes for all of them.
         foreach ($reports as $report) {
             switch ($report) {
-                case 'assessmentAudit':
+                case 'assessment':
                     /**
                      * specific URL for assessment on folder 0
                      */
