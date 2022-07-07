@@ -22,6 +22,12 @@ use Schoolbox\GenericCollection;
 class EDiary implements IStrategy
 {
     /**
+     * Filter to specific people; set to null to disable filtering
+     */
+    private const WATCHLIST = ['ANS'];
+
+
+    /**
      * @var LoggerInterface
      */
     protected LoggerInterface $log;
@@ -274,6 +280,12 @@ class EDiary implements IStrategy
         $endpoint = 'getStudentEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
 
+        /* Only process people on the watchlist
+         */
+        if (!$this->isOnWatchlist($userExternalId, self::WATCHLIST)) {
+            return;
+        }
+
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
@@ -326,6 +338,12 @@ class EDiary implements IStrategy
     {
         $endpoint = 'getTeacherEDiary';
         $userExternalId = $userProfile->getBaseProfile()->getExternalId();
+
+        /* Only process people on the watchlist
+         */
+        if (!$this->isOnWatchlist($userExternalId, self::WATCHLIST)) {
+            return;
+        }
 
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
@@ -565,5 +583,24 @@ class EDiary implements IStrategy
         ];
 
         $this->registry->remember($endpoint, $summaryData);
+    }
+
+
+    /**
+     * Decide if $externalId is in $watchlist, which is a set of externalIds
+     *
+     * @param string|null $externalId
+     * @param array|null  $watchlist
+     * @return bool
+     */
+    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
+    {
+        /* "Everyone is on the watchlist"
+         */
+        if (null === $watchlist) {
+            return true;
+        }
+
+        return $watchlist && in_array($externalId, $watchlist, false);
     }
 }
