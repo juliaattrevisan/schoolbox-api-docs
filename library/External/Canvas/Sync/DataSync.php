@@ -246,7 +246,7 @@ class DataSync
         );
         $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
-        $assignmentDatesBridge    = new Bridge\AssignmentDates();
+        $assignmentDatesBridge    = $bridgeFactory->getAssignmentDates();
         $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
 
         $this->syncAccounts($accountBridge);

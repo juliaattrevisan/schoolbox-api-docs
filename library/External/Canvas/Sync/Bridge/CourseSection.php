@@ -295,7 +295,7 @@ class CourseSection
             $folderId   = (int)$row['f.id'];
             $folderName = $row['f.name'];
 
-            /** @var Folder\Model $folder */
+            /** @var Folder\Model|null $folder */
             $folder = $this->folderTree->getElementByHash($folderId);
             if (!$folder) {
                 $this->log->debug("Folder {$folderId} does not exist in folder tree.");
@@ -305,7 +305,7 @@ class CourseSection
             $folder->setCodes(new GenericCollection(Folder\Code\Model::class));
 
             if ($row['fc.code'] !== null) {
-                $folderCode = $row['fc.code'];
+                $folderCode = (string)$row['fc.code'];
                 // Add folderCode model to folder so we can retrieve it later
                 $folderCodeModel = (new Folder\Code\Model())->setFolder($folder)->setCode($folderCode);
                 $folder->getCodes()->setOffset($folderCode, $folderCodeModel);
@@ -390,7 +390,7 @@ class CourseSection
         foreach ($yearAndFolderCodeToFolderMap as $year => $folderCodeToFolderMap) {
             $unPrefixedToOriginalMap = [];
             foreach (array_keys($folderCodeToFolderMap) as $originalCode) {
-                $unPrefixed                             = preg_replace("#^[^/]+/#", '', $originalCode);
+                $unPrefixed                             = preg_replace("#^[^/]+/#", '', (string)$originalCode);
                 $unPrefixedToOriginalMap[$unPrefixed][] = $originalCode;
             }
             foreach ($unPrefixedToOriginalMap as $unPrefixed => $originalCodes) {
@@ -409,7 +409,7 @@ class CourseSection
         $yearAndUnPrefixedCodeToFolderMap = [];
         foreach ($yearAndFolderCodeToFolderMap as $year => $folderCodeToFolderMap) {
             foreach ($folderCodeToFolderMap as $folderCode => $folder) {
-                $yearAndUnPrefixedCodeToFolderMap[$year][preg_replace("#^[^/]+/#", '', $folderCode)] = $folder;
+                $yearAndUnPrefixedCodeToFolderMap[$year][preg_replace("#^[^/]+/#", '', (string)$folderCode)] = $folder;
             }
         }
 
