@@ -12,7 +12,6 @@
  */
 class Activity
 {
-
     /**
      * @var DeprecatedDatabase
      */
