@@ -19,6 +19,7 @@ use Crell\ApiProblem\ApiProblem;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
+use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
@@ -478,10 +479,17 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * logged in, or destroy the session completely if nobody was logged in.
      *
      * @param User $user
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws Unauthenticated if the user could not be authenticated
      */
     public function authenticateUserForThisRequestOnly(User $user): void
     {
+        // Block expired users right away
+        if (!$user->getEnabled()) {
+            throw new Unauthenticated('Schoolbox has detected that your auth token identifies an invalid user.');
+        }
+
         // Determine who was logged in, and preserve their data
         /** @var \Alaress\Session\Session $sessionDataStore */
         $sessionDataStore   = $this->di->get('session');
@@ -504,7 +512,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         );
 
         // Now authenticate the given user
-        $authenticator->createSession($user->getUsername());
+        $authenticated = true;
+        try {
+            $authenticated = $authenticator->createSession($user->getUsername());
+        } catch (SchoolboxNotAuthenticatedException $e) {
+            // noop: convert this unauthenticated error into another
+        }
+        if (!$authenticated) {
+            throw new Unauthenticated('Schoolbox could not create your user session.', 0, $e ?? null);
+        }
 
         // Also: override the DI user with this user?
         // Should not be required because the DI user is fetched from the
