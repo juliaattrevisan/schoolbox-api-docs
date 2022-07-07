@@ -373,7 +373,7 @@ switch ($_POST['module']) {
                 $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($bestSamlCert);
             } else {
                 //if IDP metadata URL cannot be reached
-                $metadataUrlSamlCertErrorMessage = "IdP metadata URL offline";
+                $metadataUrlSamlCertErrorMessage = "IDP metadata URL offline";
             }
         }
 
