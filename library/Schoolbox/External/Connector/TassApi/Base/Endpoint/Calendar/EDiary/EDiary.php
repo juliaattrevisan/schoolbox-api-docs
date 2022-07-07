@@ -457,7 +457,7 @@ class EDiary implements IStrategy
             $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
             $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
 
-            $allDay = (int)$tassEvent['all_day'];
+            $allDay = (bool)$tassEvent['all_day'];
 
             /* Third-party source identifier for our import
              *
@@ -508,7 +508,7 @@ class EDiary implements IStrategy
                 ->setLocation($location)
                 ->setStartAt($startDatetime)
                 ->setFinishAt($endDatetime)
-                ->setAllday((bool)$allDay)
+                ->setAllday($allDay)
                 ->setType($eventType)
                 ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
                 ->setGuid($guid)
