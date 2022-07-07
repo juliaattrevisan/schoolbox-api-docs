@@ -352,22 +352,42 @@ switch ($_POST['module']) {
         $samlCertMetadataUrl = $config->get('saml_idp_metadata_url');
 
         $daysBeforeExpiry = null;
+        $dbSamlCertErrorMessage = "";
+        $metadataUrlSamlCertErrorMessage = "";
 
         //if database cert field contains a value, get the days before expiry
         if ($databaseSamlCert) {
             $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
+
+            if ($daysBeforeExpiry === null) {
+                //if IDP cert in DB is invalid
+                $dbSamlCertErrorMessage = "Invalid IDP cert";
+            }
         }
 
         if (($daysBeforeExpiry === null) && $samlCertMetadataUrl) {
             $metadataSamlCerts = SamlCertHelper::getSamlCertsFromMetadataUrl($samlCertMetadataUrl);
-            $bestSamlCert = SamlCertHelper::getCertWithLongestDatedExpiryFromX509CertMulti($metadataSamlCerts);
-            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($bestSamlCert);
+
+            if ($metadataSamlCerts !== null) {
+                $bestSamlCert     = SamlCertHelper::getCertWithLongestDatedExpiryFromX509CertMulti($metadataSamlCerts);
+                $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($bestSamlCert);
+            } else {
+                //if IDP metadata URL cannot be reached
+                $metadataUrlSamlCertErrorMessage = "IdP metadata URL offline";
+            }
         }
 
         if ($daysBeforeExpiry === null) {
-            //code will only reach here if both saml configs exist but are invalid
+            //code will only reach here if neither saml config is valid
+            if ($dbSamlCertErrorMessage && $metadataUrlSamlCertErrorMessage) {
+                //if both saml_idp_certificate AND saml_idp_metadata_url are invalid
+                $separator = '; ';
+            } else {
+                $separator = '';
+            }
+
             $output[] = array('SAML_LIGHT'  => 'alert',
-                              'SAML_MESSAGE' => 'Invalid SAML config',
+                            'SAML_MESSAGE' => $dbSamlCertErrorMessage . $separator . $metadataUrlSamlCertErrorMessage,
             );
         } else {
             $absDaysBeforeExpiry = abs($daysBeforeExpiry);
