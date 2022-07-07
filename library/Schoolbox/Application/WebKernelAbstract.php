@@ -19,6 +19,7 @@ use Crell\ApiProblem\ApiProblem;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Aura\Di;
+use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
@@ -478,10 +479,19 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * logged in, or destroy the session completely if nobody was logged in.
      *
      * @param User $user
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws JwtParser\Exception\InvalidIdentity if the user could not be authenticated
      */
     public function authenticateUserForThisRequestOnly(User $user): void
     {
+        // Block expired users right away
+        if (!$user->getEnabled()) {
+            throw new JwtParser\Exception\InvalidIdentity(
+                'Schoolbox has detected that your auth token identifies an invalid user.',
+            );
+        }
+
         // Determine who was logged in, and preserve their data
         /** @var \Alaress\Session\Session $sessionDataStore */
         $sessionDataStore   = $this->di->get('session');
@@ -491,25 +501,37 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             $currentSessionData = $_SESSION;
         }
 
+        // Restore or destroy the session when all is done
+        $authenticator = new \Authenticator();
+        $this->getShutdownHandler()->registerFunction(
+            function () use ($authenticator, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $authenticator->destroySession();
+                }
+            }
+        );
+
         // Now authenticate the given user
-        $sessionHandler = new \Session();
-        $sessionHandler->create($user->getUsername());
+        $authenticated = true;
+        try {
+            $authenticated = $authenticator->createSession($user->getUsername());
+        } catch (SchoolboxNotAuthenticatedException $e) {
+            // noop: convert this unauthenticated error into another
+        }
+        if (!$authenticated) {
+            throw new JwtParser\Exception\InvalidIdentity(
+                'Schoolbox could not create your user session.',
+                0,
+                $e ?? null,
+            );
+        }
 
         // Also: override the DI user with this user?
         // Should not be required because the DI user is fetched from the
         // session, anyway.
         // (This would die when the container was locked, anyway)
 //        $this->di->set('user', $user);
-
-        // Restore or destroy the session when all is done
-        $this->getShutdownHandler()->registerFunction(
-            function () use ($sessionHandler, $currentSessionData) {
-                if (isset($currentSessionData)) {
-                    $_SESSION = $currentSessionData;
-                } else {
-                    $sessionHandler->destroy();
-                }
-            }
-        );
     }
 }
