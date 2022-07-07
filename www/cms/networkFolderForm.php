@@ -36,7 +36,7 @@ if (isset($_POST['name'])) {
     }
 
     SitePage::localRedir('/drives/' . $folder['id']);
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'] ?? false)) {
     if (!$folder = $folderHandler->getByID($_GET['delete'])) {
         error(2);
     }

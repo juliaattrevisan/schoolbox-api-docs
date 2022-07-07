@@ -21,7 +21,7 @@ $fileHandler = PortfolioWebDAV::factory();
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset($_POST['attachment'])) {
     $file = array(
         'parent' => $_POST['parent'],
-        'description' => $_POST['description'],
+        'description' => $_POST['description'] ?? '',
     );
 
     if (is_numeric($_POST['fileID'])) {
@@ -65,7 +65,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name']) || isset(
     }
 
     SitePage::localRedir('/drives/' . $_POST['parent']);
-} elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'] ?? false)) {
     if (!$file = $fileHandler->getByID($_GET['delete'])) {
         error(2);
     }

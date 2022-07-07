@@ -383,7 +383,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      */
     public function getFolderList($id)
     {
-        return $this->getDirectoryList($_SESSION['portfolioIdPathMap'][$id]);
+        return $this->getDirectoryList($_SESSION['portfolioIdPathMap'][$id] ?? '');
     }
 
     /* MYFILE INTERFACE */
@@ -394,7 +394,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      */
     public function getAllInFolder($id)
     {
-        return $this->getFileList($_SESSION['portfolioIdPathMap'][$id]);
+        return $this->getFileList($_SESSION['portfolioIdPathMap'][$id] ?? '');
     }
 
     /**
@@ -499,9 +499,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 'name' => $filename,
                 'description' => $filename,
                 'type' => $this->parseResourceType($response['{DAV:}resourcetype']),
-                'file_size' => $response['{DAV:}getcontentlength'],
-                'submitted' => $response['{DAV:}getlastmodified'],
-                'ctime' => $response['{DAV:}creationdate'],
+                'file_size' => $response['{DAV:}getcontentlength'] ?? '',
+                'submitted' => $response['{DAV:}getlastmodified'] ?? '',
+                'ctime' => $response['{DAV:}creationdate'] ?? '',
                 'owner' => $_SESSION['id'],
             ];
 
@@ -697,7 +697,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file = $this->fileMapper->createModel();
 
         $owner = new User();
-        $owner->setId($data['owner']);
+        if (isset($data['owner'])) {
+            $owner->setId($data['owner']);
+        }
 
         $cat = $this->folderMapper->createModel();
         $cat->setId($data['parent']);
