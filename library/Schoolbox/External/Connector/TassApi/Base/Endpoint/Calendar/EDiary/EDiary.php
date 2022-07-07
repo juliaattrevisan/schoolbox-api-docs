@@ -195,7 +195,7 @@ class EDiary implements IStrategy
         if ($feeds) {
             $userProfiles = $this->studentProfileMapper->findAll();
 
-            foreach ($feeds as $feed) {
+            foreach ($feeds['calendar'] as $feed) {
                 foreach ($userProfiles as $userProfile) {
                     $this->importStudentEvents($userProfile, $feed, 'getStudentEDiary');
                 }
@@ -380,7 +380,7 @@ class EDiary implements IStrategy
          */
         $summaryTass = sprintf(
             'Found %s events at endpoint %s between %s and %s',
-            \count($tassEvents['events']),
+            \count($tassEvents['calendar']),
             $endpoint,
             $this->from->getUsingFormat('d/m/Y'),
             $this->to->getUsingFormat('d/m/Y')
@@ -390,7 +390,7 @@ class EDiary implements IStrategy
 
         $n = 0;
 
-        foreach ($tassEvents['events'] as $tassEvent) {
+        foreach ($tassEvents['calendar'] as $tassEvent) {
             /* Spawn a new Event instance and ensure that we tell it where it came from
              * Set the normal Event data fields from the $tassEvent structure
              */
