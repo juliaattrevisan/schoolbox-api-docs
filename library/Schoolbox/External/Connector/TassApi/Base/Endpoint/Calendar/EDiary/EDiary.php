@@ -438,9 +438,24 @@ class EDiary implements IStrategy
             $detail = (string)$tassEvent['description'];
 
             /* Datetimes for the event and whether it's an all-day event
+             * Sometimes one of these will be empty for no reason (skip it)
              */
-            $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
-            $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
+            $tassStartDate = trim((string)$tassEvent['start']);
+            $tassEndDate = trim((string)$tassEvent['start']);
+
+            if ('' === $tassStartDate || '' === $tassEndDate) {
+                $this->log->debug(sprintf(
+                    'Missing dates for event %s - skipping',
+                    $title
+                ));
+
+                continue;
+            }
+
+            /* Process as usual
+             */
+            $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
+            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
 
             $allDay = (int)$tassEvent['all_day'];
 
