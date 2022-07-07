@@ -122,10 +122,10 @@ Admin,"Rollover folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/r
 Admin,"Rollover folders",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
-Admin,"Report Export",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/report-export,200
-Admin,"Report Export",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/report-export,401
-Admin,"Report Export",Student,https://vagrant.dev.schoolbox.cloud/adminv2/report-export,401
-Admin,"Report Export",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/report-export,401
+Admin,"Summative Report",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report,200
+Admin,"Summative Report",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report,401
+Admin,"Summative Report",Student,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report,401
+Admin,"Summative Report",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report,401
 Admin,"Setup grades",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/grades,200
 Admin,"Setup grades",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
 Admin,"Setup grades",Student,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401

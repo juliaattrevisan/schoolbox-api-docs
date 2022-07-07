@@ -29,7 +29,7 @@ Admin,Subscribe to a calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calend
 Admin,Cleanup calendar,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup
 Admin,Bulk add folders,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder
 Admin,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
-Admin,Report Export,https://vagrant.dev.schoolbox.cloud/adminv2/report-export
+Admin,Summative Report,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report
 Admin,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
 Admin,LMS LMS Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy
 Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
