@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 class External_Synergetic_Mc_User extends External_Synergetic_User
 {
-
     /**
      * @inheritdoc
      */
@@ -153,7 +152,7 @@ class External_Synergetic_Mc_User extends External_Synergetic_User
 
         /* Chesed Community Service hours in the current year
          */
-        $student['ChesedHours'] = (string)$communityService['ServiceHours'];
+        $student['ChesedHours'] = empty($communityService) ? '' : (string)$communityService['ServiceHours'];
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 
