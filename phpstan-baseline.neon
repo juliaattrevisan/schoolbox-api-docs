@@ -5311,11 +5311,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Controller.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Feedback\\\\Factory\\:\\:\\$dueWorkFeedbackDataSource \\(Schoolbox\\\\Learning\\\\Assessment\\\\Feedback\\\\SubSource\\\\DueWork\\) does not accept Schoolbox\\\\Learning\\\\Assessment\\\\Feedback\\\\IFeedbackDataSource\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php

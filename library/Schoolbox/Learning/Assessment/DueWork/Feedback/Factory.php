@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -27,7 +26,6 @@ use Schoolbox\Learning\DueWork\StateMapper;
 
 class Factory
 {
-
     /**
      * @var DueWorkFeedbackDataSource
      */
@@ -95,7 +93,7 @@ class Factory
     private $reviewRoute;
 
     /**
-     * @var DueWorkResponse
+     * @var DueWorkResponse|null
      */
     private $response;
 
@@ -127,8 +125,8 @@ class Factory
         $files,
         $fromInlineGrader,
         string $reviewRoute,
-        IFeedback $mostRecentFeedback = null,
-        DueWorkResponse $response = null
+        ?IFeedback $mostRecentFeedback = null,
+        ?DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
         $this->participant               = $participant;
@@ -228,9 +226,10 @@ class Factory
             $feedback->setPublishedAt(\Alaress_Date_Format::now());
         }
 
-        /* Attach feedback to a particular Response instance
+        /* Attach feedback to a particular Response instance, but only if the
+         * response has not been deleted
          */
-        if ($this->response) {
+        if ($this->response && !$this->response->isDeleted()) {
             $feedback->setResponse($this->response);
         }
 
