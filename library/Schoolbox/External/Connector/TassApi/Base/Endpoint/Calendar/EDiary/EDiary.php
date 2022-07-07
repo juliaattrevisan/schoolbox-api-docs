@@ -220,7 +220,7 @@ class EDiary implements IStrategy
              */
             $userProfiles = $this->staffProfileMapper->findAll();
 
-            foreach ($feeds as $feed) {
+            foreach ($feeds['calendar'] as $feed) {
                 foreach ($userProfiles as $userProfile) {
                     $this->importStaffEvents($userProfile, $feed);
                 }
