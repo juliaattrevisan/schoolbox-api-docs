@@ -587,7 +587,7 @@
                                             {{ token.createdAt.short }}
                                         </div>
                                         <div class="card small-3">
-                                            {{ token.expiry.short }}
+                                            {{ (token.expiry and not token.expiry.null) ? token.expiry.short : '–' }}
                                         </div>
                                         <div class="card small-3">
                                             {{ token.createdBy.fullName }}
@@ -1069,7 +1069,7 @@
                         let html = '<li class="actions-small-1" data-token><div class="list-item"><div class="card small-3">'
                                 + data.createdAt +
                                 '</div><div class="card small-3">'
-                                + data.expiry +
+                                + (data.expiry ?? '–') +
                                 '</div><div class="card small-3">'
                                 + data.createdBy +
                                 '</div><div class="card small-3">Not set'

@@ -91,7 +91,7 @@ class Controller extends Base
                         $userJwtId ? $userJwtId->getJwtId() : null
                     ),
                     'createdAt'    => $userJwtId ? $userJwtId->getCreatedAt()->getShort() : null,
-                    'expiry'       => $userJwtId ? $userJwtId->getExpiry()->getShort() : null,
+                    'expiry'       => $userJwtId ? $userJwtId->getExpiry()?->getShort() : null,
                     'createdBy'    => $userJwtId ? $userJwtId->getCreatedBy()->getFullName() : null,
                     'jwtId'        => $userJwtId ? $userJwtId->getJwtId() : null,
                     'showExisting' => $showExisting,
