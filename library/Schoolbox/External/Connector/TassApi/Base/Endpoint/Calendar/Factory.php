@@ -261,6 +261,9 @@ class Factory
                 $this->eventMapper,
                 self::SOURCE_NAME
             ))
+            /* TODO probably put this in an if/else
+             *  (This is only available for Scopus...)
+             */
             ->add(new EDiary(
                 $this->log,
                 $this->perform,
@@ -276,96 +279,96 @@ class Factory
                 $from,
                 $to
             ))
-//            ->add(new ParentCalendar(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
-//            ->add(new ParentNotices(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
-//            ->add(new StudentCalendar(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
-//            ->add(new StudentNotices(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
-//            ->add(new TeacherCalendar(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
-//            ->add(new TeacherNotices(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $campuses,
-//                $eventTypes,
-//                $this->eventMapper,
-//                $this->roletypeRelationMapper,
-//                $this->campusRelationMapper,
-//                $this->roleMapper,
-//                self::SOURCE_NAME,
-//                $registry,
-//                $from,
-//                $to
-//            ))
+            ->add(new ParentCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
+            ->add(new ParentNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
+            ->add(new StudentCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
+            ->add(new StudentNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
+            ->add(new TeacherCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
+            ->add(new TeacherNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $eventTypes,
+                $this->eventMapper,
+                $this->roletypeRelationMapper,
+                $this->campusRelationMapper,
+                $this->roleMapper,
+                self::SOURCE_NAME,
+                $registry,
+                $from,
+                $to
+            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
