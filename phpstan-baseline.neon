@@ -1888,11 +1888,6 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
-			path: library/External/Canvas/Sync/Bridge/CourseSection.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
 			path: library/External/Canvas/Sync/CliDatabaseCreator.php
 
 		-

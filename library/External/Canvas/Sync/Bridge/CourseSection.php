@@ -41,7 +41,6 @@ use function preg_replace;
  */
 class CourseSection
 {
-
     /** @var IConnector */
     protected $canvasDb;
 
