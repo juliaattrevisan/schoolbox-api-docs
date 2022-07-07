@@ -4,13 +4,14 @@
  * All the functionality to be able to manage a group
  */
 
-import { onBeforeMount, onMounted } from 'vue';
+import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupTable from './manage-group-table.vue';
 import ManageGroupSelectMembers from './manage-group-select-members.vue';
 import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
+import Toast from '@schoolboxVue/components/toast.vue';
 
 
 const props = defineProps({
@@ -37,6 +38,8 @@ const props = defineProps({
     },
 });
 
+const toastEl = ref(null);
+
 /**
  * set the endpoints here, and the stores can just reference the object
  * rather than having to pass them through as props as these values wont change
@@ -59,7 +62,8 @@ onMounted(() => {
 <template>
     <manage-group-heading />
     <manage-group-add-members />
-    <manage-group-table />
-    <manage-group-select-members />
-    <manage-group-remove-members />
+    <manage-group-table :toast-el="toastEl" />
+    <manage-group-select-members :toast-el="toastEl" />
+    <manage-group-remove-members :toast-el="toastEl" />
+    <toast ref="toastEl"></toast>
 </template>

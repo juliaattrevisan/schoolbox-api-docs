@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import Endpoints from './manageGroupEndpoints';
-import FilterTypes from './manageGroupFilterTypes';
+import FilterTypes from './manageGroupAccessTypes';
 
 
 export const useStore = defineStore('manageGroup', {
@@ -12,6 +12,7 @@ export const useStore = defineStore('manageGroup', {
     state: () => ({
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
+        isProcessing: false, //to notify that an action is taking place, like updating a member access
         groupMembers: [], //all the group members
         selectedMembers: [], //to track the current group member selection
         selectedFilters: [FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN], //the list of table filters available
@@ -105,9 +106,13 @@ export const useStore = defineStore('manageGroup', {
          * @param { String }
          */
         async removeSelectedMembers () {
+            this.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.REMOVE_MEMBERS, {
-                    method: 'POST',
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: getRemoveMembersFormData(this.selectedMembers),
                 });
                 const responseJson = await response.json();
@@ -123,6 +128,7 @@ export const useStore = defineStore('manageGroup', {
                 console.warn(error);
             } finally {
                 this.isRemoveSelectedMembersPromptOpen = false;
+                this.isProcessing = false;
             }
         },
 
@@ -134,30 +140,62 @@ export const useStore = defineStore('manageGroup', {
         },
 
         /**
+         * update an individual members access 
          * 
+         * @param { Object } the members data
+         * @param { String } a FilterTypes
          */
-         async updateMemberAccessType (member, accessType) {
+        async updateMemberAccess (member, accessType) {
+            this.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        'id': member.id,
-                        'access': accessType,
-                    }),
+                    body: getUpdateMemberAccessTypeFormData([member], accessType)
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    return member; //return member so the table data can be updated in manage-group-table.vue
+                    return member; //return members so the table data can be updated in manage-group-table.vue
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
             } finally {
-                // 
+                this.isProcessing = false;
+            }
+        },
+
+        /**
+         * update the selected members access type
+         * 
+         * @param { Object } the members data
+         * @param { String } a FilterTypes
+         */
+        async updateSelectedMembersAccess (accessType) {
+            this.isProcessing = true;
+            try {
+                const response = await fetch(Endpoints.UPDATE_MEMBERS, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: getUpdateMemberAccessTypeFormData(this.selectedMembers, accessType)
+                });
+                const responseJson = await response.json();
+                if (responseJson.success) { //update the state only after the DB change is a success
+                    this.selectedMembers.forEach((member) => {
+                        member.accessType = accessType;
+                    });
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
@@ -179,5 +217,23 @@ function getRemoveMembersFormData (selectedMembers) {
     membersToRemoveIdList.forEach((item) => {
         formData.append('users[]', item);
     });
+    return formData;
+}
+
+/**
+ * Set up a deleted users array to POST
+ *
+ * @param { Array }
+ * @param { String }
+ * 
+ * @returns { FormData }
+ */
+function getUpdateMemberAccessTypeFormData (selectedMembers, accessType) {
+    const membersToUpdateIdList = selectedMembers.map(row => row.id);
+    const formData = new FormData();
+    membersToUpdateIdList.forEach((item) => {
+        formData.append('users[]', item);
+    });
+    formData.append('access', accessType);
     return formData;
 }

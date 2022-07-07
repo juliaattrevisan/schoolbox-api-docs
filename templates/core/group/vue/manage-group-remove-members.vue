@@ -10,9 +10,17 @@ import Toast from '@schoolboxVue/components/toast.vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
+const props = defineProps({
+    /**
+     * To display the toast access status changes
+     */
+    toastEl: {
+        required: true,
+    },
+});
+
 const store = useStore();
 const removeModalEl = ref(null);
-const toastEl = ref(null);
 const isProcessing = ref(false);
 
 /**
@@ -36,15 +44,15 @@ function onRemoveSelected () {
 store.$onAction(({ name, after, onError }) => {
     if (name === 'removeSelectedMembers') {
         isProcessing.value = true;
-        toastEl.value.activate('Removing...');
+        props.toastEl.activate('Removing...');
         after(() => {
             isProcessing.value = false;
-            toastEl.value.timeout('Members successfully removed', true, 5000);
+            props.toastEl.timeout('Members successfully removed', true, 5000);
         });
         onError((error) => {
             console.warn(error);
             isProcessing.value = false;
-            toastEl.value.timeout('Unable to remove members', false, 5000);
+            props.toastEl.timeout('Unable to remove members', false, 5000);
         });
     }
 });
@@ -95,7 +103,6 @@ function onModalClosed () {
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
-    <toast ref="toastEl"></toast>
 </template>
 
 <style scoped>

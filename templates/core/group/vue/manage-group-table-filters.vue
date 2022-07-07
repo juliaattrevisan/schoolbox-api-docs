@@ -5,7 +5,7 @@
  */
 
 import { computed } from 'vue';
-import filterTypes from './manageGroupFilterTypes';
+import filterTypes from './manageGroupAccessTypes';
 import { useStore } from './manageGroupStore';
 
 

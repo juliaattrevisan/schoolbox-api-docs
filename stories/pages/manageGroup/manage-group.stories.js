@@ -54,7 +54,7 @@ Default.parameters = {
                     ctx.json(data)
                 ) 
             }),
-            rest.post(removeMembersEndpoint, (req, res, ctx) => {
+            rest.delete(removeMembersEndpoint, (req, res, ctx) => {
                 return res(
                     ctx.delay(3000),
                     ctx.json({

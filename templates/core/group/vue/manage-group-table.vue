@@ -9,10 +9,19 @@ import { EventBus } from 'v-tables-3-select-rows';
 import { useStore } from './manageGroupStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import ManageGroupTableFilters from './manage-group-table-filters.vue';
-import Toast from '@schoolboxVue/components/toast.vue';
+import ManageGroupTableAccess from './manage-group-table-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
-import FilterTypes from './manageGroupFilterTypes';
+import AccessTypes from './manageGroupAccessTypes';
 
+
+const props = defineProps({
+    /**
+     * To display the toast access status changes
+     */
+    toastEl: {
+        required: true,
+    },
+});
 
 
 /*****************************************************************
@@ -36,34 +45,33 @@ onMounted(() => {
  ****************************************************************/
 
 const tableEl = ref(null);
-const toastEl = ref(null);
-const tableColumns = ['name', 'meta', 'access'];
+const tableColumns = ['name', 'meta', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     columnsClasses: {
-        access: 'access-td ', //to specify a width
+        accessType: 'access-td ', //to specify a width
     },
     customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
         {
             name: FilterEvents.SHOW_WAITING_LIST,
-            callback: (row, query) => row.access !== query,
+            callback: (row, query) => row.accessType !== query,
         },
         {
             name: FilterEvents.SHOW_READ_ACCESS,
-            callback: (row, query) => row.access !== query,
+            callback: (row, query) => row.accessType !== query,
         },
         {
             name: FilterEvents.SHOW_WRITE_ACCESS,
-            callback: (row, query) => row.access !== query,
+            callback: (row, query) => row.accessType !== query,
         },
         {
             name: FilterEvents.SHOW_ADMIN_ACCESS,
-            callback: (row, query) => row.access !== query,
+            callback: (row, query) => row.accessType !== query,
         },
     ],
     debounce: 100, //shorter debounce time as data is stored locally
     headings: {
         name: 'Name',
-        access: 'Access',
+        accessType: 'Access',
     },
     hiddenColumns: ['meta'], //the meta data is added to the name column, but we need a meta column so we can search for it
     perPage: 50,
@@ -87,48 +95,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
 async function onLoaded () {
     updateFooterUI();
 }
-
-/**
- * To approve a members membership request
- * 
- * @param { Object } related row 
- */
-function onApproveMembershipSelected (row) {
-    row.access = FilterTypes.READ;
-    store.updateMemberAccessType(row, FilterTypes.READ);
-}
-
-/**
- * To update a group members access
- * 
- * @param { Object } related row 
- */
-function onMemberAccessChange (row) {
-    store.updateMemberAccessType(row, row.access);
-}
-
-/**
- * so we can track the progress of the member removal 
- * and update the UI accordingly
- */
-store.$onAction(({ name, after, onError }) => {
-    if (name === 'updateMemberAccessType') {
-        // isProcessing.value = true;
-        toastEl.value.activate('Updating...');
-        after((updatedMember) => {
-            // isProcessing.value = false;
-            toastEl.value.timeout('Member successfully updated', true, 5000);
-            //we need to do this as Vue is watching tableData, not each individual file within
-            const memberInTableData = store.groupMembers.find((member) => member.id === updatedMember.id);
-            memberInTableData.access = updatedMember.access;
-        });
-        onError((error) => {
-            console.warn(error);
-            // isProcessing.value = false;
-            toastEl.value.timeout('Unable to update members', false, 5000);
-        });
-    }
-});
 
 /**
  * Reload the page to try loading again
@@ -195,10 +161,10 @@ watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
 function dispatchFilterEvent (selectedFilter) {
     const filterParam = store.selectedFilters.includes(selectedFilter) ? '' : selectedFilter ;
     const filterEventsType = {
-        [FilterTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
-        [FilterTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
-        [FilterTypes.WRITE]: FilterEvents.SHOW_WRITE_ACCESS,
-        [FilterTypes.ADMIN]: FilterEvents.SHOW_ADMIN_ACCESS,
+        [AccessTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
+        [AccessTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
+        [AccessTypes.WRITE]: FilterEvents.SHOW_WRITE_ACCESS,
+        [AccessTypes.ADMIN]: FilterEvents.SHOW_ADMIN_ACCESS,
     }
     EventBus.emit(`vue-tables.filter::${filterEventsType[selectedFilter]}`, filterParam);
 }
@@ -211,7 +177,7 @@ function updateSelectedMembers () {
     const newSelectedMembers = []; //to store the newly selected members with the filter change considered
     const membersToRemove = []; //to store those selected members that need to be removed due to the filter change
     store.selectedMembers.forEach((member) => {
-        if (store.selectedFilters.some((accessType) => member.access == accessType)) {
+        if (store.selectedFilters.some((accessType) => member.accessType == accessType)) {
             newSelectedMembers.push(member); //add the member to the new filtered list
         } else {
             membersToRemove.push(member.id); //otherwise pull it out
@@ -250,13 +216,8 @@ function updateSelectedMembers () {
                         <p class="meta">{{ props.row.meta }}</p>
                     </div>
                 </template>
-                <template #access="props">
-                    <button v-if="props.row.access === 'waiting'" class="button expand" title="Approve Membership" @click.prevent="onApproveMembershipSelected(props.row)">Approve Membership</button>
-                    <select v-else id="access" v-model="props.row.access" @change="onMemberAccessChange(props.row)">
-                        <option :value="FilterTypes.READ">Read Access</option>
-                        <option :value="FilterTypes.WRITE">Write Access</option>
-                        <option :value="FilterTypes.ADMIN">Group Admin</option>
-                    </select>
+                <template #accessType="props">
+                    <manage-group-table-access :row="props.row" :toast-el="props.toastEl" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
@@ -292,7 +253,7 @@ function updateSelectedMembers () {
             </div>
         </div><!-- small-12 island -->
     </div><!-- row  -->
-    <toast ref="toastEl"></toast>
+    
 </template>
 
 <style lang="scss">
