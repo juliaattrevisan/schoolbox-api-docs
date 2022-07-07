@@ -7,10 +7,10 @@
 import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import ManageGroupHeading from './manage-group-heading.vue';
-import ManageGroupAddMembers from './manage-group-add-members.vue';
+import ManageGroupAdd from './manage-group-add.vue';
 import ManageGroupTable from './manage-group-table.vue';
-import ManageGroupSelectMembers from './manage-group-select-members.vue';
-import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
+import ManageGroupSelect from './manage-group-select.vue';
+import ManageGroupRemove from './manage-group-remove.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
@@ -61,9 +61,9 @@ onMounted(() => {
 
 <template>
     <manage-group-heading />
-    <manage-group-add-members />
+    <manage-group-add />
     <manage-group-table :toast-el="toastEl" />
-    <manage-group-select-members :toast-el="toastEl" />
-    <manage-group-remove-members :toast-el="toastEl" />
+    <manage-group-select :toast-el="toastEl" />
+    <manage-group-remove :toast-el="toastEl" />
     <toast ref="toastEl"></toast>
 </template>
