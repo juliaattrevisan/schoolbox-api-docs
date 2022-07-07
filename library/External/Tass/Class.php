@@ -9,7 +9,6 @@ use Schoolbox\Database\Factory;
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 class External_Tass_Class implements External_ClassInterface
 {
     /**
@@ -29,7 +28,7 @@ class External_Tass_Class implements External_ClassInterface
 
     public function __construct()
     {
-        $this->database = Factory::getInstanceExternal();
+        $this->database     = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
     }
 
@@ -49,14 +48,14 @@ class External_Tass_Class implements External_ClassInterface
             $subCodeArray = explode(',', $classCode);
             foreach ($subCodeArray as $code) {
                 [$year, $code, $class] = self::parseClassCode($code);
-                $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
+                $yearQuery = $year !== '' ? "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
             }
             $classQuery .= '1=0';
         } else {
             [$year, $code, $class] = self::parseClassCode($classCode);
-            $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
+            $yearQuery = $year !== '' ? "student.year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
         }
@@ -64,7 +63,7 @@ class External_Tass_Class implements External_ClassInterface
 
         $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
-        $query = "
+        $query        = "
             SELECT DISTINCT
                 studsub.stud_code as synergy_id,
                 student.preferred_name as firstname,
@@ -101,24 +100,24 @@ class External_Tass_Class implements External_ClassInterface
             return [];
         }
 
-        $classQueries   = [];
+        $classQueries = [];
         $subCodeArray = explode(',', $classCode);
         foreach ($subCodeArray as $code) {
             [$year, $code, $class] = self::parseClassCode($code);
             // tchsub.year_grp is smallint
-            $yearQuery  = is_numeric($year) ? "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
+            $yearQuery      = is_numeric($year) ? "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
             $classQueries[] = " ( $yearQuery sub_code = '$code' AND class = '$class' ) ";
         }
         $classQuery = implode(' OR ', $classQueries);
 
         $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
-        $query = "SELECT DISTINCT tch_code FROM tchsub
+        $query        = "SELECT DISTINCT tch_code FROM tchsub
                     WHERE semester = {$fileSemester} AND year_num = {$fileYear}
                     AND ( $classQuery )";
 
         $statement = $this->database->query($query);
-        $teachers = [];
+        $teachers  = [];
         while ($synrow = $statement->fetch()) {
             $teachers[] = $synrow['tch_code'];
         }
@@ -163,20 +162,9 @@ class External_Tass_Class implements External_ClassInterface
         } else {
             // Some other number of parts: shouldn't get here?
             // Should this be an error? I think so but pretend it's something
-            trigger_error(
-                sprintf(
-                    'TASS class code "%s" should be in the format "{year}-{code}-{class}"',
-                    $classCode,
-                ),
-                E_USER_WARNING,
-            );
-            [$year, $code, $class] = $parts;
-            // @phpstan-ignore-next-line: $year can be null
-            $year ??= '';
-            // @phpstan-ignore-next-line: $code can be null
-            $code ??= '';
-            // @phpstan-ignore-next-line: $class can be null
-            $class ??= '';
+            $class = array_pop($parts);
+            $code  = array_pop($parts) ?? '';
+            $year  = array_pop($parts) ?? '';
         }
 
         // Ensure year is an int, or an empty string if not set
