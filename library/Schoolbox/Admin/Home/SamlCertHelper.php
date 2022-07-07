@@ -13,7 +13,7 @@ class SamlCertHelper
      * Get days before SAML cert expires
      *
      * @param string $samlCert Certificate of IDP
-     * @return int  Days before the $cert expires,
+     * @return int|null  Days before the $cert expires,
      *                negative if past expiry
      */
     public static function getDaysBeforeExpiry(string $samlCert): ?int
@@ -35,7 +35,7 @@ class SamlCertHelper
      * Get SAML cert/s from metadata url
      *
      * @param string $url
-     * @return array SAML certificates found
+     * @return array|null SAML certificates found
      */
     public static function getSamlCertsFromMetadataUrl(string $url): ?array
     {
