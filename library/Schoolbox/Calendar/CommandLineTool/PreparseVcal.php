@@ -108,6 +108,16 @@ class PreparseVcal extends CliTool\App
                     $e->getMessage()
                 )
             );
+            //sb exceptions should have a previous exception, so lets log that also
+            //but if it doesn't just log the normal...
+            if (null !== $e->getPrevious()) {
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Previous Exception: %s',
+                        $e->getPrevious()->getMessage()
+                    )
+                );
+            }
             $config->addFailedCount();
             Calendar_Api_Config_Mapper::getInstance()->save($config);
         }
