@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * @var External_TimetableInterface
      */
