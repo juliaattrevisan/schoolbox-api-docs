@@ -481,13 +481,15 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * @param User $user
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws Unauthenticated if the user could not be authenticated
+     * @throws JwtParser\Exception\InvalidIdentity if the user could not be authenticated
      */
     public function authenticateUserForThisRequestOnly(User $user): void
     {
         // Block expired users right away
         if (!$user->getEnabled()) {
-            throw new Unauthenticated('Schoolbox has detected that your auth token identifies an invalid user.');
+            throw new JwtParser\Exception\InvalidIdentity(
+                'Schoolbox has detected that your auth token identifies an invalid user.',
+            );
         }
 
         // Determine who was logged in, and preserve their data
@@ -519,7 +521,11 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             // noop: convert this unauthenticated error into another
         }
         if (!$authenticated) {
-            throw new Unauthenticated('Schoolbox could not create your user session.', 0, $e ?? null);
+            throw new JwtParser\Exception\InvalidIdentity(
+                'Schoolbox could not create your user session.',
+                0,
+                $e ?? null,
+            );
         }
 
         // Also: override the DI user with this user?
