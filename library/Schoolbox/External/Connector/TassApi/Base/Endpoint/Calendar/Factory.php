@@ -77,6 +77,18 @@ class Factory
 
 
     /**
+     * @var \Schoolbox\External\Profile\Student\Mapper
+     */
+    private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
      * @var CampusMapper
      */
     private \Schoolbox\CampusMapper $campusMapper;
