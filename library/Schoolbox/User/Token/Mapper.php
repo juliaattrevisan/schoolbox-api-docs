@@ -97,7 +97,7 @@ class Mapper extends BaseMapper
         $userJwtId = $this->createModel()
                           ->setUser($user)
                           ->setCreatedBy($effector)
-                          ->setExpiry($expiry ?? (new \Alaress_Date_Format())->addDays(Model::DEFAULT_EXPIRY))
+                          ->setExpiry($expiry)
                           ->setType($type);
         $this->save($userJwtId);
         return $userJwtId;
