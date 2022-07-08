@@ -45,6 +45,7 @@ class ConfigMapper extends Mapper
     public const MODULE_SCHOOLDATA = 'schoolData';
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
+    public const MODULE_EPORTFOLIO = 'eportfolio';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -198,6 +199,8 @@ class ConfigMapper extends Mapper
     public const NAME_TASKD_REDIS_QUEUE = 'taskd_redis_queue';
 
     public const NAME_SCHOOLDATA_IMPORT_DATA_SOURCE = 'schooldata_import_data_source';
+
+    public const NAME_EPORTFOLIO_SHOW_SUBJECTS_AND_GROUPS = 'eportfolio_show_subjects_and_groups';
 
     /**
      * Config settings which may affect the behaviour of the router daemon.

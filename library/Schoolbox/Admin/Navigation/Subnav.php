@@ -230,6 +230,12 @@ class Subnav
                 'visible'    => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'searchable' => false,
                 'children'   => [
+                    '/adminv2/setting/EPortfolio' => [
+                        'name'        => 'Policy',
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
+                        'children'    => [],
+                        'description' => 'Configure policies relating to ePortfolio.',
+                    ],
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),

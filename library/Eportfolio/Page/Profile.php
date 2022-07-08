@@ -111,8 +111,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->renderRecentPhotos();
         $this->renderRecentBlogs();
 
-        $this->renderSubjects();
-        $this->renderGroups();
+        //only show groups or subjects if the ePortfolio subjects/groups policy is enabled
+        if (ConfigMapper::getInstance()->getConfigLoader()->get(ConfigMapper::NAME_EPORTFOLIO_SHOW_SUBJECTS_AND_GROUPS)) {
+            $this->renderSubjects();
+            $this->renderGroups();
+        } else {
+            $this->getPage()->setVar('has_groups_block', '');
+            $this->getPage()->setVar('has_subjects_block', '');
+        }
     }
 
     /**
