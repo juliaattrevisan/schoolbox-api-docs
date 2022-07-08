@@ -45,3 +45,7 @@ VALUES
         'settings',
         (SELECT c.sequence+2 FROM config c WHERE c.name='external_liss_calendar_owner' LIMIT 1)
     );
+
+-- Fix calendar owner appearance
+
+UPDATE `config` SET `title` = 'External LISS Calendar Owner' WHERE (`name` = 'external_liss_calendar_owner');
