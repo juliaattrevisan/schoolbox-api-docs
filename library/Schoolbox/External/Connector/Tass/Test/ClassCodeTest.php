@@ -13,7 +13,6 @@ use ReflectionClass;
 
 class ClassCodeTest extends TestCase
 {
-
     /**
      * @dataProvider providerForTestClassCode
      * @param string $classCode
