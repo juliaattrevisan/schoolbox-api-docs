@@ -8,6 +8,7 @@ import { ref, onMounted, watch } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
 import { useStore } from './store/manageGroupStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
+import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 import ManageGroupTableFilters from './manage-group-table-filters.vue';
 import ManageGroupTableAccess from './manage-group-table-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
@@ -241,21 +242,7 @@ function updateSelectedMembers () {
                 </section>
             </div>
             <div v-else-if="store.isLoading">
-                <table class="skeleton">
-                    <thead>
-                        <tr>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <loading-table />
             </div>
         </div><!-- small-12 island -->
     </div><!-- row  -->
