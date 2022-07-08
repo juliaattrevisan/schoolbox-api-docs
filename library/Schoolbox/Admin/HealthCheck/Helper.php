@@ -56,5 +56,6 @@ class Helper
             }
             fputcsv($fp, $rowOutput);
         }
+        exit;
     }
 }
