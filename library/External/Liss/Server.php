@@ -836,7 +836,7 @@ class External_Liss_Server
                     $currentEvent['type'] = $defaultEventType;
 
                     $this->log()->debug(sprintf(
-                        'Assigning default event type "%s" to %s with guid %s',
+                        'Assigning default event type "%s" to event %s with guid %s',
                         $defaultEventType,
                         $currentEvent['className'],
                         $currentEvent['guid']
