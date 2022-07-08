@@ -210,9 +210,9 @@ if (!$nextSection && !$prevSection) {
     $this->parse('endAssess_block', 'endAssess');
 } else {
     /* If there is no next section, then provide the finish link and parse out the
-    * previous button if applicable
-    */
-    if (is_numeric($nextSection['section_id'])) {
+     * previous button if applicable
+     */
+    if ($nextSection) {
         $this->setVar(
             array(
                 'NEXT_SECTION_ID' => $nextSection['section_id'],
@@ -228,7 +228,7 @@ if (!$nextSection && !$prevSection) {
 
     /* Conditions where the previous button is available
      */
-    if (is_numeric($prevSection['section_id'])) {
+    if ($prevSection) {
         $this->setVar(
             array(
                 'PREV_SECTION_ID' => $prevSection['section_id'],
