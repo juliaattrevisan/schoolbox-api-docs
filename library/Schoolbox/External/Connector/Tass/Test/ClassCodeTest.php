@@ -117,14 +117,14 @@ class ClassCodeTest extends TestCase
                 'expectedYear'  => '',
                 'expectedCode'  => '',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             'only one part' => [
                 'classCode'     => '12',
                 'expectedYear'  => '12',
                 'expectedCode'  => '',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             // This cannot be tested, as a negative year is indistinguishable
             // from a year+code if the class code is malformed
@@ -140,21 +140,21 @@ class ClassCodeTest extends TestCase
                 'expectedYear'  => '',
                 'expectedCode'  => '',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             'only two parts, no year' => [
                 'classCode'     => '-ABCDEF',
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             'only two parts, year' => [
                 'classCode'     => '12-ABCDEF',
                 'expectedYear'  => '12',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             // This cannot be tested, as a negative year is indistinguishable
             // from a year+code if the class code is malformed
@@ -170,21 +170,21 @@ class ClassCodeTest extends TestCase
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => '',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             'excess parts, no year' => [
                 'classCode'     => '-ABCDEF-Term 2-excess',
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             'excess parts, year' => [
                 'classCode'     => '6-ABCDEF-Term 2-excess',
                 'expectedYear'  => '6',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
             // This cannot be tested, as a negative year is indistinguishable
             // from a year+code if the class code is malformed
@@ -200,7 +200,7 @@ class ClassCodeTest extends TestCase
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
-                'expectWarning' => true,
+                'expectWarning' => false,
             ],
         ];
     }

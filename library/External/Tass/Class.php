@@ -162,9 +162,9 @@ class External_Tass_Class implements External_ClassInterface
         } else {
             // Some other number of parts: shouldn't get here?
             // Should this be an error? I think so but pretend it's something
-            $class = array_pop($parts);
-            $code  = array_pop($parts) ?? '';
-            $year  = array_pop($parts) ?? '';
+            $year  = array_shift($parts);
+            $code  = array_shift($parts) ?? '';
+            $class = array_shift($parts) ?? '';
         }
 
         // Ensure year is an int, or an empty string if not set
