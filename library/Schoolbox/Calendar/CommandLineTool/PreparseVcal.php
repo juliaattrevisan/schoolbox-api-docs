@@ -43,7 +43,17 @@ class PreparseVcal extends CliTool\App
 
         // Fetch it from file cache, then parse and store in Redis
         foreach ($configs as $config) {
-            $this->cacheCalendar($config);
+            if ($config->getFailedCount() >= 5) {
+                $this->getLogger()->info(
+                    sprintf(
+                        'Calendar configuration #%d has failed %d times: skipping',
+                        $config->getId(),
+                        $config->getFailedCount()
+                    )
+                );
+            } else {
+                $this->cacheCalendar($config);
+            }
         }
     }
 
