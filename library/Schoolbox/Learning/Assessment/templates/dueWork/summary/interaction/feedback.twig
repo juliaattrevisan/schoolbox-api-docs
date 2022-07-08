@@ -13,14 +13,15 @@ Data:
     responseId
     participant
  #}
-{% set url                    = null %}
-{% set tooltip                = null %}
-{% set responseId             = responseId ?? (currentFeedback.response.id ?? null ) %}
-{% set instructorReviewRoute  = null %}
-{% set studentSelfReviewRoute = null %}
+{% set url                     = null %}
+{% set tooltip                 = null %}
+{% set currentFeedbackResponse = currentFeedback.response and not currentFeedback.response.deleted ? currentFeedback.response : null %}
+{% set responseId              = responseId ?? (currentFeedback.response.id ?? null) %}
+{% set instructorReviewRoute   = null %}
+{% set studentSelfReviewRoute  = null %}
 
 {% if not currentFeedback.isPublished %}
-    {% if currentFeedback.response %}
+    {% if currentFeedbackResponse %}
         {% if currentFeedback.isSelfGrading %}
             {% set tooltip = 'Resume ' ~ locale.selfAssessment.proper %}
         {% elseif currentFeedback.isSelfReflectionOnly %}
@@ -32,11 +33,11 @@ Data:
             'learningDueWorkResponse.getParticularResponse',
             {
                 assessmentId: currentFeedback.assessable.id,
-                studentId: currentFeedback.response.submittedOnBehalfOf.id,
+                studentId: currentFeedbackResponse.submittedOnBehalfOf.id,
                 responseId: responseId,
-                response: currentFeedback.response,
+                response: currentFeedbackResponse,
                 assessment: assessment,
-                student: currentFeedback.response.submittedOnBehalfOf,
+                student: currentFeedbackResponse.submittedOnBehalfOf,
             }
         ) %}
     {% endif %}
@@ -44,16 +45,16 @@ Data:
 
 {% set selfReflectText = assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper %}
 
-{% if currentFeedback.response %}
+{% if currentFeedbackResponse %}
     {% set instructorReviewRoute = routeLookupIfAuthorized(
         'learningDueWorkResponse.getParticularResponse',
         {
             assessmentId: currentFeedback.assessable.id,
-            studentId: currentFeedback.response.submittedOnBehalfOf.id,
+            studentId: currentFeedbackResponse.submittedOnBehalfOf.id,
             responseId: responseId,
-            response: currentFeedback.response,
+            response: currentFeedbackResponse,
             assessment: assessment,
-            student: currentFeedback.response.submittedOnBehalfOf,
+            student: currentFeedbackResponse.submittedOnBehalfOf,
         }
     ) %}
     {% set studentSelfReviewRoute = routeLookupIfAuthorized(
@@ -61,8 +62,8 @@ Data:
         {
             assessmentId: currentFeedback.assessable.id,
             assessment: currentFeedback.assessable,
-            studentId: currentFeedback.response.submittedOnBehalfOf.id,
-            student: currentFeedback.response.submittedOnBehalfOf
+            studentId: currentFeedbackResponse.submittedOnBehalfOf.id,
+            student: currentFeedbackResponse.submittedOnBehalfOf
         }
     ) %}
 {% endif %}
@@ -78,7 +79,7 @@ Data:
 {# if the feedback is a draft... #}
 {% if not currentFeedback.isPublished %}
     {# and it's not a floating feedback (aka the feedback has been created for a particular submission) #}
-    {% if currentFeedback.response %}
+    {% if currentFeedbackResponse %}
         {# if the current user is the student who submitted the feedback, give them a link to resume working on it #}
         {# otherwise, if it's an instructor, take them to the inline grader for the particular draft #}
         {% set url = instructorReviewRoute ?: studentSelfReviewRoute %}
