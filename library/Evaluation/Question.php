@@ -229,7 +229,7 @@ abstract class Evaluation_Question extends DeprecatedModel
      */
     public function reorderQuestions(int $quizId, int $sectionId, array $allIds): void
     {
-        if (is_array($allIds) && count($allIds)) {
+        if (\count($allIds)) {
             $sequence = 1;
 
             foreach ($allIds as $currentId) {
