@@ -685,7 +685,7 @@ class Controller extends Base
             NAME AS 'Topic Name',
             slug AS 'Topic Tag'
         FROM
-            newstopic
+            newsTopic
         WHERE
             deleted_at IS NULL
         ORDER BY
@@ -713,7 +713,7 @@ class Controller extends Base
               ELSE 'Other'
             END AS 'News Permission'
         FROM
-          useraccess ua
+          userAccess ua
         JOIN
           user u ON ua.uid = u.id
         WHERE
