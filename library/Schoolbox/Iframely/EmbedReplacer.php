@@ -13,7 +13,6 @@ use DiDom\Document;
 use DiDom\Element;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
 use Laminas\Uri\Uri;
 
 /**
@@ -28,10 +27,10 @@ use Laminas\Uri\Uri;
 class EmbedReplacer
 {
     /**
-     * The XPath statement which identifies an Iframely embed container within
+     * The query selector which identifies an Iframely embed container within
      * the HTML.
      */
-    private const IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH = '//div[@data-oembed-url]';
+    private const IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR = 'div[data-oembed-url]';
 
     /**
      * The attributes which may contain the source to create a link to within
@@ -53,24 +52,22 @@ class EmbedReplacer
     private const IFRAMELY_API_ENDPOINT = 'https://iframe.ly/api/iframely';
 
     /**
-     * Additional parameters for the API endpoint.
+     * A set of additional parameters for the API endpoint, to be attempted in
+     * order.
      *
-     * Currently sets the `iframe` parameter to 0, to disable Iframely's display
-     * helpers and instead use the raw embedded URL.
+     * Currently:
+     * * set `omit_script=1&iframe=0`, to bypass Iframely's display helpers and
+     *   instead use the raw embedded URL
+     * * then set just `omit_script=1`, to keep the iframe display helper but
+     *   put it in an iframe instead
      *
+     * @see https://iframely.com/docs/parameters#omit_script=1
      * @see https://iframely.com/docs/parameters#iframe=0
      */
-    private const IFRAMELY_API_PARAMS_NO_IFRAME = ['iframe' => 0];
-
-    /**
-     * Additional parameters for the API endpoint.
-     *
-     * Currently sets the `iframe` parameter to 0, to disable Iframely's display
-     * helpers and instead use the raw embedded URL.
-     *
-     * @see https://iframely.com/docs/parameters#iframe=0
-     */
-    private const IFRAMELY_API_PARAMS_NO_SCRIPTS = ['omit_script' => 1];
+    private const IFRAMELY_API_PARAMS_SETS = [
+        ['omit_script' => 1, 'iframe' => 0],
+        ['omit_script' => 1],
+    ];
 
     /**
      * Constructor
@@ -103,7 +100,7 @@ class EmbedReplacer
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
-        $embeds = $doc->xpath(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_XPATH);
+        $embeds = $doc->find(self::IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR);
         if (count($embeds) === 0) {
             return $html;
         }
@@ -159,20 +156,9 @@ class EmbedReplacer
             }
             $srcUrl = new Uri($srcNode->getAttribute($attribute));
             if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                $apiUrls = [
-                    (new Uri(self::IFRAMELY_API_ENDPOINT))
-                        ->setQuery(
-                            self::IFRAMELY_API_PARAMS_NO_IFRAME
-                            + self::IFRAMELY_API_PARAMS_NO_SCRIPTS
-                            + $srcUrl->getQueryAsArray()
-                        ),
-                    (new Uri(self::IFRAMELY_API_ENDPOINT))
-                        ->setQuery(
-                            self::IFRAMELY_API_PARAMS_NO_SCRIPTS
-                            + $srcUrl->getQueryAsArray()
-                        ),
-                ];
-                foreach ($apiUrls as $apiUrl) {
+                foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
+                    $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
+                        ->setQuery($paramsSet + $srcUrl->getQueryAsArray());
                     try {
                         $response = $this->httpClient->get($apiUrl->toString());
                     } catch (GuzzleException $e) {
