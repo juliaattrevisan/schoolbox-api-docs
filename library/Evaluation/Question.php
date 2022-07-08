@@ -12,7 +12,6 @@
  */
 abstract class Evaluation_Question extends DeprecatedModel
 {
-
     /**
      * @var string
      */
