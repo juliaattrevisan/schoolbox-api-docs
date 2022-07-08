@@ -6,9 +6,10 @@
  */
 
 import { ref, computed, watch, onMounted  } from 'vue';
-import { useStore } from './manageGroupStore';
+import { useStore } from './store/manageGroupStore';
+import { useRemoveStore } from './store/manageGroupRemoveStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
-import AccessTypes from './manageGroupAccessTypes';
+import ManageGroupSelectAccess from './manage-group-select-access.vue';
 
 
 const props = defineProps({
@@ -21,10 +22,9 @@ const props = defineProps({
 });
 
 const store = useStore(); //to keep track of selectedMembers
+const removeStore = useRemoveStore(); //to remove selectedMembers
 const isShiftKeySelected = ref(false);
 const shiftSelectNoteEl = ref(null);
-const areAllSelectedOnWaitingList = ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
-const isProcessing = ref(false); //to disable buttons while a process is in place
 
 onMounted(() => {
     initShiftKeyDetection();
@@ -53,12 +53,7 @@ watch(() => store.selectedMembers, () => {
     if (store.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
         shiftSelectNoteEl.value.remove();
     } 
-    if (store.selectedMembers.length > 0 && store.selectedMembers.every((member) => member.accessType === 'waiting'))  {
-        areAllSelectedOnWaitingList.value = true;
-    } else {
-        areAllSelectedOnWaitingList.value = false;
-    }
-}, { deep: true } );
+});
 
 /**
  * To track how many are selected 
@@ -102,49 +97,10 @@ function onEmailMembersSelected () {
 }
 
 /**
- * so the selected members can be approved membership
- */
-function onApproveMembersSelected () {
-    store.updateSelectedMembersAccess(AccessTypes.READ);
-}
-
-const changeMemberAccess = ref('');
-
-/**
- * To update group members access
- */
-function onMemberAccessChange () {
-    if (changeMemberAccess.value !== '') {
-        store.updateSelectedMembersAccess(this.changeMemberAccess);
-    }
-}
-
-/**
- * so we can track the progress of the member access change
- * and update the UI accordingly
- */
-store.$onAction(({ name, after, onError }) => {
-    if (name === 'updateSelectedMembersAccess') {
-        isProcessing.value = true;
-        props.toastEl.activate('Updating...');
-        after(() => {
-            props.toastEl.timeout('Members successfully updated', true, 5000);
-            isProcessing.value = false;
-            changeMemberAccess.value = ''; //default back to blank on any update
-        });
-        onError((error) => {
-            console.warn(error);
-            props.toastEl.timeout('Unable to update members', false, 5000);
-            isProcessing.value = false;
-        });
-    }
-});
-
-/**
  * So the selected members can be removed
  */
 function onRemoveMembersSelected () {
-    store.promptRemoveSelectedMembers();
+    removeStore.promptRemoveSelectedMembers();
 }
 
 </script>
@@ -153,19 +109,9 @@ function onRemoveMembersSelected () {
     <bottom-drawer :showDrawer="selectedMembersCount > 0">
         <h3 class="selected-count"><em>{{ selectedMembersCountWithRowName }} selected</em></h3>
         <span ref="shiftSelectNoteEl" class="shift-select-note">Use Shift+Select to select multiple members</span>
-        <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="isProcessing">Clear member selection</button>
+        <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="store.isProcessing">Clear member selection</button>
         <ul class="flex-list">
-            <li v-if="areAllSelectedOnWaitingList">
-                <button @click.prevent="onApproveMembersSelected" class="button submit icon-add" :disabled="store.isProcessing">Approve Membership</button>
-            </li>
-            <li v-else-if="selectedMembersCount > 0">
-                <select v-model="changeMemberAccess" :disabled="store.isProcessing" @change="onMemberAccessChange()">
-                    <option value="">Change Access</option>
-                    <option :value="AccessTypes.READ">Read Access</option>
-                    <option :value="AccessTypes.WRITE">Write Access</option>
-                    <option :value="AccessTypes.ADMIN">Group Admin</option>
-                </select>
-            </li>
+            <manage-group-select-access :toast-el="props.toastEl" />
             <li>
                 <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ selectedMembersPlural }}</button>
             </li>

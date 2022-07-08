@@ -6,7 +6,7 @@
 
 import { computed } from 'vue';
 import filterTypes from './manageGroupAccessTypes';
-import { useStore } from './manageGroupStore';
+import { useStore } from './store/manageGroupStore';
 
 
 const store = useStore(); //to access the selectedFilters and notify of any changes

@@ -6,7 +6,7 @@
 
 import { ref, onMounted, watch } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
-import { useStore } from './manageGroupStore';
+import { useStore } from './store/manageGroupStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import ManageGroupTableFilters from './manage-group-table-filters.vue';
 import ManageGroupTableAccess from './manage-group-table-access.vue';

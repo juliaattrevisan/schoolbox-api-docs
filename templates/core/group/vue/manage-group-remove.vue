@@ -5,8 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useStore } from './manageGroupStore';
-import Toast from '@schoolboxVue/components/toast.vue';
+import { useRemoveStore } from './store/manageGroupRemoveStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
@@ -19,7 +18,7 @@ const props = defineProps({
     },
 });
 
-const store = useStore();
+const store = useRemoveStore();
 const removeModalEl = ref(null);
 const isProcessing = ref(false);
 
